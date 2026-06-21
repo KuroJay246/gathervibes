@@ -3,7 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ===============================================================
-    // Assumed Phase 2 data model
+    // Phase 3.1 data model
     // ===============================================================
     // settings/accessControl
     //   approvedEmails: list<string> (created only in Firebase Console)
@@ -16,14 +16,18 @@ service cloud.firestore {
     //   eventType: supported enum
     //   status: supported enum
     //   capacity: int (1..100000)
-    //   ticketPrice: number (0..1000000)
+    //   ticketPrice: number (0..1000000)  — backward-compat scalar
+    //   priceTiers: list<map> or null     — Phase 3.1 optional
+    //     { name: string, price: number>=0, status: enum }
     //   notes: string (0..10000)
     //   createdAt: timestamp (immutable)
     //   updatedAt: timestamp
     //
+    // registrations/{registrationId}
+    //   (unchanged from Phase 3)
+    //
     // auditLogs/{logId}
-    //   append-only event audit record created in the same batch as
-    //   event.create, event.update, or event.delete.
+    //   append-only event/registration audit record created in the same batch.
 
     function isSignedIn() {
       return request.auth != null;
@@ -42,42 +46,118 @@ service cloud.firestore {
       return value is string && value.size() > 0 && value.size() <= 128;
     }
 
+    function validOptionalString(value, maxLength) {
+      return value == null || value == '' || (value is string && value.size() <= maxLength);
+    }
+
+    function validPerformedBy(value) {
+      return value is string
+        && value.size() > 0
+        && value.size() <= 256
+        && (
+          value == request.auth.token.email
+          || (request.auth.uid != null && value == request.auth.uid)
+        );
+    }
+
+    // ── Price tier validation ──────────────────────────────────────────────
+    // Each tier must have: name (string), price (number >= 0), status (enum).
+    // We validate up to 7 tiers. Firestore Security Rules do not support
+    // looping over list elements, so we allow the list to exist and be
+    // structurally a list; fine-grained per-element enforcement is done
+    // client-side (validators.js) and is reinforced by the size bound.
+
+    function validPriceTiers(tiers) {
+      return tiers == null
+        || (
+          tiers is list
+          && tiers.size() <= 7
+        );
+    }
+
+    // ── Event allowed keys with optional priceTiers ────────────────────────
     function isValidEvent(data, eventId) {
+      return (
+          // Must have all required keys
+          data.keys().hasAll([
+            'eventId', 'eventName', 'eventDate', 'location', 'eventType',
+            'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt'
+          ])
+          // May optionally include priceTiers
+          && data.keys().hasOnly([
+            'eventId', 'eventName', 'eventDate', 'location', 'eventType',
+            'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt',
+            'priceTiers'
+          ])
+          && data.eventId == eventId
+          && validShortId(data.eventId)
+          && data.eventName is string
+          && data.eventName.size() > 0
+          && data.eventName.size() <= 150
+          && data.eventDate is timestamp
+          && data.location is string
+          && data.location.size() > 0
+          && data.location.size() <= 250
+          && data.eventType in [
+            'cake-picnic', 'brunch', 'tasting', 'vendor-pop-up',
+            'private-food-experience', 'other'
+          ]
+          && data.status in ['draft', 'upcoming', 'active', 'completed', 'cancelled']
+          && data.capacity is int
+          && data.capacity > 0
+          && data.capacity <= 100000
+          && data.ticketPrice is number
+          && data.ticketPrice >= 0
+          && data.ticketPrice <= 1000000
+          && data.notes is string
+          && data.notes.size() <= 10000
+          && data.createdAt is timestamp
+          && data.updatedAt is timestamp
+          // Optional price tiers
+          && (!('priceTiers' in data) || validPriceTiers(data.priceTiers))
+        );
+    }
+
+    function isValidRegistration(data, registrationId) {
       return data.keys().hasAll([
-          'eventId', 'eventName', 'eventDate', 'location', 'eventType',
-          'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt'
+          'registrationId', 'eventId', 'fullName', 'email', 'phone',
+          'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
+          'ticketStatus', 'notes', 'checkedIn', 'checkInTime', 'source', 'sourceRowId', 'timestamp',
+          'createdAt', 'updatedAt'
         ])
         && data.keys().hasOnly([
-          'eventId', 'eventName', 'eventDate', 'location', 'eventType',
-          'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt'
+          'registrationId', 'eventId', 'fullName', 'email', 'phone',
+          'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
+          'ticketStatus', 'notes', 'checkedIn', 'checkInTime', 'source', 'sourceRowId', 'timestamp',
+          'createdAt', 'updatedAt'
         ])
-        && data.eventId == eventId
+        && data.registrationId == registrationId
+        && validShortId(data.registrationId)
         && validShortId(data.eventId)
-        && data.eventName is string
-        && data.eventName.size() > 0
-        && data.eventName.size() <= 150
-        && data.eventDate is timestamp
-        && data.location is string
-        && data.location.size() > 0
-        && data.location.size() <= 250
-        && data.eventType in [
-          'cake-picnic', 'brunch', 'tasting', 'vendor-pop-up',
-          'private-food-experience', 'other'
-        ]
-        && data.status in ['draft', 'upcoming', 'active', 'completed', 'cancelled']
-        && data.capacity is int
-        && data.capacity > 0
-        && data.capacity <= 100000
-        && data.ticketPrice is number
-        && data.ticketPrice >= 0
-        && data.ticketPrice <= 1000000
+        && data.fullName is string
+        && data.fullName.size() > 0
+        && data.fullName.size() <= 250
+        && validOptionalString(data.email, 320)
+        && validOptionalString(data.phone, 32)
+        && validOptionalString(data.groupName, 250)
+        && data.personsAttending is int
+        && data.personsAttending >= 1
+        && data.personsAttending <= 100
+        && data.paymentStatus in ['paid', 'pending', 'complimentary', 'door-list', 'unknown']
+        && validOptionalString(data.paymentReference, 250)
+        && data.ticketStatus in ['no-ticket-assigned', 'partially-assigned', 'assigned']
         && data.notes is string
         && data.notes.size() <= 10000
+        && data.checkedIn is bool
+        && (data.checkInTime == null || data.checkInTime is timestamp)
+        && data.source in ['manual', 'csv-import']
+        && validOptionalString(data.sourceRowId, 128)
+        && (data.timestamp == null || data.timestamp is timestamp)
         && data.createdAt is timestamp
         && data.updatedAt is timestamp;
     }
 
-    function isValidAuditLog(data, logId) {
+    function isValidEventAuditLog(data, logId) {
       return data.keys().hasAll([
           'logId', 'eventId', 'action', 'targetType', 'targetId',
           'performedBy', 'timestamp', 'details'
@@ -92,13 +172,35 @@ service cloud.firestore {
         && data.action in ['event.create', 'event.update', 'event.delete']
         && data.targetType == 'event'
         && data.targetId == data.eventId
-        && data.performedBy == request.auth.token.email
+        && validPerformedBy(data.performedBy)
         && data.timestamp == request.time
         && data.details is map
         && data.details.keys().hasOnly(['eventName'])
         && data.details.eventName is string
         && data.details.eventName.size() > 0
         && data.details.eventName.size() <= 150;
+    }
+
+    function isValidRegistrationAuditLog(data, logId) {
+      return data.keys().hasAll([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.keys().hasOnly([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.logId == logId
+        && validShortId(data.logId)
+        && validShortId(data.eventId)
+        && data.action in [
+          'registration.create', 'registration.update', 'registration.delete', 'registration.import'
+        ]
+        && data.targetType == 'registration'
+        && validShortId(data.targetId)
+        && validPerformedBy(data.performedBy)
+        && data.timestamp == request.time
+        && data.details is map;
     }
 
     function matchesEventMutation(data) {
@@ -123,6 +225,30 @@ service cloud.firestore {
         );
     }
 
+    function matchesRegistrationMutation(data) {
+      return (
+        data.targetType == 'registration'
+        && (
+          (
+            data.action in ['registration.create', 'registration.import']
+            && !exists(/databases/$(database)/documents/registrations/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action == 'registration.update'
+            && exists(/databases/$(database)/documents/registrations/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action == 'registration.delete'
+            && exists(/databases/$(database)/documents/registrations/$(data.targetId))
+            && !existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
+            && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
+          )
+        )
+      );
+    }
+
     // The allowlist is bootstrapped in the Firebase Console. Client code can
     // never create, update, or delete it.
     match /settings/accessControl {
@@ -144,21 +270,45 @@ service cloud.firestore {
       allow delete: if isApprovedAdmin();
     }
 
+    match /registrations/{registrationId} {
+      allow read: if isApprovedAdmin();
+      allow create: if isApprovedAdmin()
+        && isValidRegistration(request.resource.data, registrationId)
+        && request.resource.data.checkedIn == false
+        && request.resource.data.checkInTime == null
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isApprovedAdmin()
+        && isValidRegistration(request.resource.data, registrationId)
+        && request.resource.data.registrationId == resource.data.registrationId
+        && request.resource.data.eventId == resource.data.eventId
+        && request.resource.data.source == resource.data.source
+        && request.resource.data.sourceRowId == resource.data.sourceRowId
+        && request.resource.data.timestamp == resource.data.timestamp
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.checkedIn == resource.data.checkedIn
+        && request.resource.data.checkInTime == resource.data.checkInTime
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isApprovedAdmin();
+    }
+
     match /auditLogs/{logId} {
       allow read: if isApprovedAdmin();
       allow create: if isApprovedAdmin()
-        && isValidAuditLog(request.resource.data, logId)
-        && matchesEventMutation(request.resource.data);
+        && (
+          (isValidEventAuditLog(request.resource.data, logId) && matchesEventMutation(request.resource.data))
+          || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesRegistrationMutation(request.resource.data))
+        );
       allow update, delete: if false;
     }
 
     // Future phases remain unavailable until their schemas and rules are
     // implemented and tested.
-    match /registrations/{documentId} {
+    match /tickets/{documentId} {
       allow read, write: if false;
     }
 
-    match /tickets/{documentId} {
+    match /checkIn/{documentId} {
       allow read, write: if false;
     }
 

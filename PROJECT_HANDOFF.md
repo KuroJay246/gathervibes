@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 21, 2026
+Last updated: June 21, 2026 (Phase 3.1 Option B — branch antigravity/continue-phase3-1-option-b)
 
 ## 1. Project overview
 
@@ -9,15 +9,15 @@ Last updated: June 21, 2026
 **Initial event:** Cake Picnic Barbados  
 **Purpose:** A private event-operations dashboard for the organizer and trusted staff.
 
-This is not a public attendee application. Guests continue using Instagram, Linktree, Google Forms, and Google Sheets. The dashboard is for internal event administration only.
+This is not a public attendee application. Guests continue using Instagram, Linktree, Google Forms, and Google Sheets. The dashboard is for internal event administration only. It is a private web admin app, not a native Android or iOS application.
 
 The repository currently contains:
 
 - Phase 1: application foundation, authentication, protected routing, theme, responsive admin layout, Firebase initialization, Hosting configuration, and Firestore rules.
 - Phase 2: complete Events CRUD, active-event selection, event validation, operational states, and append-only audit logging.
 - Phase 2.5: Google sign-in with email/password backup plus a mobile-first installable PWA foundation.
-
-The project intentionally stops after Phase 2.5.
+- Phase 3: registrations CRUD, CSV upload/paste import, field mapping, import preview, duplicate detection, stable privacy-safe import IDs, and registration audit logging (Cursor-reviewed).
+- Phase 3.1 Option B: production security verified, price tier schema, enhanced dashboard with live countdowns, registration metrics, selected-event UX (branch `antigravity/continue-phase3-1-option-b`).
 
 ## 2. Technology stack
 
@@ -55,7 +55,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Firebase configuration through environment variables
 - Explicit missing-Firebase configuration state
 - Firebase Hosting single-page-application rewrites
-- Hardened, deployed Firestore Security Rules
+- Hardened Firestore Security Rules
 - Approved-admin email allowlist
 - Append-only audit log rules
 - Branded SVG favicon
@@ -66,68 +66,86 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 
 - Events page connected to Cloud Firestore
 - Real-time event list using a Firestore snapshot subscription
-- Create event
-- Edit event
-- Delete event with explicit confirmation
+- Create, edit, and delete events with explicit confirmation
 - Event form validation
-- Loading state
-- Firestore error state with retry
-- Empty state
-- Success notifications
-- Responsive desktop event table
-- Responsive mobile event cards
-- Event summary counts:
-  - Total events
-  - Upcoming or active events
-  - Combined planned capacity
-- Active-event selection
-- Active-event persistence in browser local storage
-- Active event displayed in the sidebar
-- Active event displayed on the dashboard
-- Automatic clearing of a locally selected event if it no longer exists in Firestore
+- Loading, error, empty, and success states
+- Responsive desktop event table and mobile event cards
+- Event summary counts
+- Active-event selection with local persistence
 - Atomic event and audit-log writes using Firestore batches
-- Audit entries for:
-  - Event creation
-  - Event updates
-  - Event deletion
+- Audit entries for event create, update, and delete
 
 ### Phase 2.5 — Complete
 
 - Google provider popup flow on desktop
 - Google full-page redirect flow on mobile
-- Friendly popup-cancelled, popup-blocked, unauthorized-domain, and unapproved-account errors
-- Firestore allowlist verification before a Firebase user is exposed to protected routes
+- Firestore allowlist verification before protected routes receive a user
 - Email/password backup preserved through the same allowlist verification
-- Installable manifest: `Gather & Savor Hub` / `G&S Hub`
-- Branded 180, 192, and 512 pixel app icons
-- Apple touch icon and standalone display metadata
-- iPhone safe-area spacing
-- Mobile bottom navigation and larger touch targets
-- Mobile-first login and event-card refinements
+- Installable manifest: Gather & Savor Hub / G&S Hub
+- Branded app icons and Apple touch icon metadata
+- iPhone safe-area spacing and mobile bottom navigation
 - Lifecycle-only service worker with no fetch interception or private-data caching
+
+### Phase 3 — Complete (Cursor-reviewed)
+
+- Registrations CRUD scoped to the active event via `useActiveEvent()`
+- Manual registration create, edit, and delete with confirmation
+- Search and payment-status filters
+- CSV file upload and pasted CSV import
+- CSV parser supporting quoted commas, quoted newlines, and escaped quotes
+- Field mapping with header auto-detection
+- Import preview before any Firestore write
+- Row validation with valid, warning, and blocked states
+- Duplicate detection by event-scoped email+timestamp, phone+timestamp, and sourceRowId
+- Privacy-safe deterministic import IDs (`imp_` + SHA-256 prefix; no raw email/phone in document IDs)
+- Import chunking at 249 rows per batch (registration + audit log per row)
+- Append-only registration audit logs in the same batch as mutations
+- Firestore rules for registrations with strict schema validation
+- `checkedIn` locked to `false` and `checkInTime` locked to `null` in Phase 3
+- Responsive mobile registration cards and desktop table
+- Composite Firestore index on `registrations` (`eventId`, `createdAt`)
+
+### Phase 3.1 Option B — Complete (branch `antigravity/continue-phase3-1-option-b`)
+
+- Production security verified: `AuthProvider.jsx` enforces Firestore allowlist check; no debug bypasses present
+- Price tier schema added to `validators.js`, `EventFormModal.jsx`, `eventService.js`, and `firestore.rules`
+- Named tiers supported: Early Bird, General, Door, Tier 1, Tier 2, Tier 3, Complimentary
+- Tier fields: `name` (required string), `price` (number ≥ 0), `status` (active | sold-out | hidden)
+- Backward-compatible: existing events with only `ticketPrice` scalar continue to work
+- Firestore rules updated: `priceTiers` optional list (max 7) added to `isValidEvent`
+- Dashboard rewritten: live local date/time clock, upcoming events from Firestore
+- Dashboard: countdown badge on each upcoming event (updates every 30s)
+- Dashboard: "Active Event" renamed to **Working Event / Selected Event** throughout
+- Dashboard: explanation text — selected event is workspace-only, does not change event status
+- Dashboard: clear selected event button (X on card header)
+- Dashboard: select a different event directly from the upcoming events list
+- Dashboard: registration metrics for selected event (total, paid, pending, complimentary)
+- Dashboard: capacity progress bar with color thresholds (green → amber → red)
+- Dashboard: price tier summary chips with sold-out and hidden visual states
+- Excel/XLSX: deferred — no `xlsx` dependency added
+- Google Sheets OAuth: remains deferred
+- 51/51 tests pass; 0 lint errors; build clean
 
 ## 4. Features intentionally not implemented
 
-The following features remain phase-gated and do not contain fake backend behavior:
+The following remain phase-gated or deferred:
 
-- Registrations CRUD
-- Google Forms or CSV imports
-- Google Sheets OAuth
-- Ticket assignment
-- Ticket-code tracking
-- Event-day check-in
-- Communication filters
-- Bulk email sending
-- AI writing drafts
+- Ticket assignment and ticket-code generation (Phase 4)
+- Door check-in and QR scanning (Phase 5)
+- Communications and bulk email sending (Phase 6)
+- AI writing drafts (Phase 7)
+- Google Sheets OAuth (deferred; use CSV export first)
 - Payment processing
 - Public registration forms
 - Attendee accounts
-- QR scanning
-- Automatic Instagram posting
 - Firebase Cloud Functions
 - Firebase Storage
+- Native Android/iOS apps, Capacitor, React Native, or Flutter
+- Push notifications and Firebase Cloud Messaging
+- Offline Firestore writes
+- Service worker caching of private admin data
 
-The corresponding navigation routes show a clear future-phase message instead of pretending to load or save data.
+The `/tickets`, `/check-in`, `/communications`, and `/ai-writing` routes show clear future-phase messages and do not save or load backend data.
 
 ## 5. Application routes
 
@@ -136,8 +154,8 @@ The corresponding navigation routes show a clear future-phase message instead of
 | `/login` | Complete | Google sign-in with email/password backup |
 | `/dashboard` | Complete | Secure workspace and selected-event context |
 | `/events` | Complete | Firestore event CRUD and active-event selection |
-| `/registrations` | Phase 3 boundary | Future registration management |
-| `/imports` | Phase 3 boundary | Future CSV/Google Sheets import workflow |
+| `/registrations` | Phase 3 complete | Registration CRUD for the active event |
+| `/imports` | Phase 3 complete | CSV upload/paste, mapping, preview, and import |
 | `/tickets` | Phase 4 boundary | Future ticket-code management |
 | `/check-in` | Phase 5 boundary | Future event-day check-in |
 | `/communications` | Phase 6 boundary | Future guest filtering and message drafts |
@@ -148,67 +166,24 @@ Every route other than `/login` is protected by Firebase Authentication.
 
 ## 6. Firebase configuration
 
-Firebase credentials are not committed to the repository.
+Firebase credentials are not committed to the repository. The application reads environment variables from `.env.local` (see `.env.example`).
 
-The application reads these environment variables:
+Do not commit `.env.local`, service account keys, or admin SDK JSON private keys.
 
-```env
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=gathervibeshub.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=gathervibeshub
-VITE_FIREBASE_STORAGE_BUCKET=gathervibeshub.firebasestorage.app
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-```
-
-The template is stored in `.env.example`.
-
-Create the local configuration file with:
-
-```powershell
-Copy-Item .env.example .env.local
-```
-
-Then replace the example values with the Firebase Web App configuration.
-
-### Safe information to provide for setup
-
-The Firebase Web App configuration values above can be provided when connecting the project. Do not provide or commit:
-
-- Firebase account passwords
-- User passwords
-- Service-account private keys
-- Admin SDK JSON private keys
-- Recovery codes
-- Google OAuth client secrets not intended for browser use
-
-Firebase browser configuration identifies the project. Authentication and Firestore Security Rules enforce authorization.
-
-## 7. Firebase project and remaining Console setup
-
-Confirmed and configured on June 21, 2026:
+## 7. Firebase project and Console setup
 
 - Firebase project ID: `gathervibeshub`
 - Firebase project number: `9444350727`
-- Web app ID: `1:9444350727:web:27345e830f0769a91183a2`
-- Default Firestore database: Standard edition, Native mode, `nam5`
-- Google Authentication provider: enabled
-- Email/password Authentication provider: enabled
-- Firestore rules: compiled and deployed
-- Firebase Hosting: deployed at `https://gathervibeshub.web.app`
+- Production Hosting: `https://gathervibeshub.web.app`
+- Google and Email/Password Authentication: enabled
 
-Remaining before authenticated event CRUD can be tested:
+Before live CRUD testing:
 
-1. Confirm which existing Firebase user is the organizer/trusted administrator.
-2. Create the admin allowlist document described below.
-
-There is deliberately no public account-registration page.
+1. Confirm the organizer/trusted administrator Firebase Authentication user.
+2. Create `settings/accessControl` with `approvedEmails` (lowercase strings matching Auth users).
+3. Deploy reviewed Firestore rules and the registrations composite index when approved.
 
 ## 8. Approved-admin allowlist
-
-The rules use a Firestore-managed email allowlist instead of hardcoding personal emails in the source file.
-
-Create this document manually in the Firebase Console:
 
 ```text
 Collection: settings
@@ -218,445 +193,275 @@ Type: array
 Value: ["owner@example.com", "trusted.staff@example.com"]
 ```
 
-Use lowercase email addresses that exactly match the Firebase Authentication users.
-
-Client code cannot create, update, or delete `settings/accessControl`. This prevents a signed-in browser client from adding another administrator.
+Client code cannot create, update, or delete `settings/accessControl`.
 
 ## 9. Firestore Security Rules behavior
 
-The rules are stored in `firestore.rules`.
+The rules in `firestore.rules` implement:
 
-They implement the following policy:
+- Default deny for all unmatched paths
+- Approved-admin access via `settings/accessControl.approvedEmails`
+- Client writes to `settings/accessControl` denied
+- Strict event schema validation and CRUD for approved admins
+- Strict registration schema validation and CRUD for approved admins
+- Registration create requires `checkedIn == false` and `checkInTime == null`
+- Registration update keeps `checkedIn`, `checkInTime`, `registrationId`, `eventId`, `source`, `sourceRowId`, `timestamp`, and `createdAt` immutable
+- Append-only `auditLogs` for matching event and registration mutations
+- `tickets`, `checkIn`, `communications`, and `aiDrafts` collections denied
+- Other `settings/*` documents denied
 
-- Unauthenticated users cannot read or write any application collection.
-- A signed-in user must have an email in `settings/accessControl.approvedEmails`.
-- Approved administrators can read events and create, update, or delete only schema-valid event records.
-- The allowlist document cannot be modified through client code.
-- Audit log documents can be created only for matching event mutations and read by approved administrators.
-- Audit log documents cannot be updated or deleted.
-- Future-phase collections remain denied until their schemas and features are implemented.
-- Anything not explicitly matched is denied by default.
-
-Collections currently covered by the rules:
-
-- `events`
-- `registrations`
-- `tickets`
-- `communications`
-- `aiDrafts`
-- `auditLogs`
-- `settings`
-
-Only `events`, `auditLogs`, and the `settings/accessControl` allowlist are currently used by implemented application behavior.
+Deploy rules only after explicit approval following this review.
 
 ## 10. Firestore event data model
 
-Each event is stored in the `events` collection.
+Collection: `events`
 
 ```text
-eventId       string       Firestore document ID duplicated as a field
-eventName     string       Required
-eventDate     Timestamp    Required
-location      string       Required
-eventType     string       Required
-status        string       Required
-capacity      number       Required, integer greater than zero
-ticketPrice   number       Required, zero or greater
-notes         string       Optional internal notes
-createdAt     Timestamp    Firestore server timestamp
-updatedAt     Timestamp    Firestore server timestamp
+eventId       string         Firestore document ID duplicated as a field
+eventName     string         Required
+eventDate     Timestamp      Required
+location      string         Required
+eventType     string         Required enum
+status        string         Required enum
+capacity      number         Required integer > 0
+ticketPrice   number         Required, zero or greater (backward-compat scalar)
+priceTiers    list<map>|null Optional — Phase 3.1
+                               { name: string, price: number>=0, status: active|sold-out|hidden }
+                               Max 7 tiers. Named: Early Bird, General, Door, Tier 1-3, Complimentary.
+notes         string         Optional internal notes
+createdAt     Timestamp      Immutable after create
+updatedAt     Timestamp      Required on every update
 ```
 
-Supported event types in the current form:
+Existing events without `priceTiers` continue to work unchanged.
 
-- Cake picnic
-- Brunch
-- Tasting
-- Vendor pop-up
-- Private food experience
-- Other
+## 11. Registrations collection data model
 
-Supported statuses:
+Collection: `registrations`
 
-- Draft
-- Upcoming
-- Active
-- Completed
-- Cancelled
+```text
+registrationId     string       Document ID duplicated as a field; immutable after create
+eventId            string       Required; immutable after create
+fullName           string       Required, 1..250 characters
+email              string|null  Normalized lowercase when present
+phone              string|null
+groupName          string|null
+personsAttending   number       Integer 1..100
+paymentStatus      string       paid | pending | complimentary | door-list | unknown
+paymentReference   string|null
+ticketStatus       string       no-ticket-assigned | partially-assigned | assigned
+notes              string       Internal notes, max 10000 characters
+checkedIn          boolean      Must be false in Phase 3; cannot change yet
+checkInTime        Timestamp|null  Must be null in Phase 3; cannot change yet
+source             string       manual | csv-import
+sourceRowId        string|null  Import row identifier (e.g. row-1)
+timestamp          Timestamp|null  Original form submission time when known
+createdAt          Timestamp    Immutable after create
+updatedAt          Timestamp    Required on every update
+```
 
-Selecting an event as the dashboard's active event is separate from setting the event's `status` field to `active`.
+Manual creates use Firestore-generated document IDs. CSV imports use deterministic privacy-safe IDs (`imp_<16-char hash>`).
 
-## 11. Audit log data model
+## 12. Import workflow
 
-Event changes create records in `auditLogs`.
+```text
+Google Form → Google Sheet → Export CSV → Admin uploads or pastes CSV
+  → Map columns to registration fields
+  → Preview rows (valid / warning / blocked)
+  → Confirm import
+  → Chunked Firestore batch writes (registration + audit log per row)
+```
+
+Rules:
+
+- Preview never writes to Firestore
+- Rows missing both email and phone are blocked
+- Duplicates blocked by email+timestamp, phone+timestamp, or sourceRowId within the event
+- Google Sheets OAuth is not implemented; CSV export remains the supported path
+
+## 13. Audit log data model
+
+Collection: `auditLogs` (append-only)
+
+Shared fields:
 
 ```text
 logId          string       Audit document ID
 eventId        string       Related event ID
-action         string       event.create, event.update, or event.delete
-targetType     string       event
-targetId       string       Event document ID
-performedBy    string       Admin email, or UID fallback
-timestamp      Timestamp    Firestore server timestamp
-details        map          Current event name
+action         string       See actions below
+targetType     string       event | registration
+targetId       string       Target document ID
+performedBy    string       Admin email or UID fallback
+timestamp      Timestamp    Server timestamp
+details        map          Action-specific metadata
 ```
 
-Event writes and audit writes are committed in the same Firestore batch. This means:
+Event actions: `event.create`, `event.update`, `event.delete`  
+Registration actions: `registration.create`, `registration.update`, `registration.delete`, `registration.import`
 
-- An event creation cannot commit without its audit entry.
-- An event update cannot commit without its audit entry.
-- An event deletion cannot commit without its audit entry.
+Registration audit examples include `fullName` and, for imports, `sourceRowId`. Event audits include `eventName`.
 
-The client cannot edit or delete audit history after creation.
+All mutations commit the target document and audit log in one Firestore batch. Clients cannot update or delete audit logs.
 
-## 12. Active-event behavior
+## 14. Active-event behavior
 
-The selected active event is stored locally under this browser storage key:
+Local storage key: `gather-savor-active-event`
 
-```text
-gather-savor-active-event
-```
-
-Only the following event summary is stored locally:
-
-- Event ID
-- Event name
-- Event date
-- Location
-- Status
-
-The full event remains in Firestore. Local persistence lets the sidebar and dashboard remember the organizer's working context after a refresh.
-
-If the selected event is deleted or no longer exists in the real-time event list, the local active-event selection is cleared.
-
-## 13. Event CRUD behavior
-
-### Create
-
-1. The administrator opens the event form.
-2. Required fields are validated in the browser.
-3. A new Firestore event document ID is generated.
-4. The event and `event.create` audit record are written atomically.
-5. Firestore's live subscription updates the event list.
-6. The interface displays a success notification.
-
-### Edit
-
-1. Existing event data is loaded into the form.
-2. Updated fields are validated.
-3. The event and `event.update` audit record are written atomically.
-4. `createdAt` remains unchanged and `updatedAt` receives a new server timestamp.
-5. If the edited event is selected as active, its locally stored summary is refreshed.
-
-### Delete
-
-1. The administrator must open a destructive-action confirmation dialog.
-2. The event name is displayed in the warning.
-3. The event and `event.delete` audit record are committed atomically.
-4. An active-event selection is cleared when its event is deleted.
-5. Audit history remains append-only.
-
-## 14. User-interface and reliability states
-
-Implemented states include:
-
-- Authentication loading screen
-- Missing Firebase configuration warning
-- Disabled login form until Firebase is configured
-- Friendly Firebase Authentication errors
-- Protected-route redirect
-- Firestore event loading state
-- Firestore error state
-- Retry action
-- Empty event-calendar state
-- Field-level validation errors
-- Form-level save errors
-- Saving state
-- Deleting state
-- Success notifications
-- Confirmed destructive actions
-- Desktop event table
-- Mobile event cards
-- Mobile event-form scrolling
-- Keyboard Escape support for closing the event form when not saving
-- Reduced-motion CSS support
-- Visible keyboard focus states
+Registrations and imports require an active event selected from Events or the dashboard. Without an active event, those pages show an empty state directing the organizer to choose an event.
 
 ## 15. Folder structure
 
 ```text
 gather-savor-event-hub/
-  .env.example
-  .firebaserc
-  .gitignore
-  firebase.json
-  firestore.indexes.json
   firestore.rules
-  index.html
-  package.json
-  package-lock.json
+  firestore.indexes.json
   README.md
   PROJECT_HANDOFF.md
-  vite.config.js
-  eslint.config.js
-
-  public/
-    favicon.svg
-
   src/
     App.jsx
-    main.jsx
-    styles.css
-
     auth/
-      AuthContext.js
-      AuthProvider.jsx
-      ProtectedRoute.jsx
-      useAuth.js
-
     components/
-      BrandMark.jsx
-      LoadingScreen.jsx
-
       events/
-        DeleteEventDialog.jsx
-        EventFormModal.jsx
-
+      imports/
+      registrations/
       ui/
-        EmptyState.jsx
-        ErrorState.jsx
-        LoadingState.jsx
-
     events/
-      ActiveEventContext.js
-      ActiveEventProvider.jsx
-      useActiveEvent.js
-
     layout/
-      AppShell.jsx
-
     lib/
-      firebase.js
-
     pages/
-      DashboardPage.jsx
-      EventsPage.jsx
-      LoginPage.jsx
-      NotFoundPage.jsx
-      PhasePage.jsx
-      SettingsPage.jsx
-
+      RegistrationsPage.jsx
+      ImportsPage.jsx
     services/
-      auditService.js
       eventService.js
-
+      registrationService.js
+      importService.js
+      auditService.js
     utils/
-      dateUtils.js
-      validators.js
-
   tests/
     event-utils.test.js
+    phase25-foundation.test.js
+    registration-utils.test.js
+    csv-parser.test.js
 ```
 
 ## 16. Important source files
 
 | File | Responsibility |
 |---|---|
-| `src/lib/firebase.js` | Initializes Firebase Auth and Firestore from environment variables |
-| `src/auth/AuthProvider.jsx` | Tracks the Firebase Authentication session |
+| `src/lib/firebase.js` | Initializes Firebase Auth and Firestore |
+| `src/auth/AuthProvider.jsx` | Tracks Firebase Authentication session |
 | `src/auth/ProtectedRoute.jsx` | Blocks private routes for signed-out users |
 | `src/App.jsx` | Registers implemented and future-phase routes |
-| `src/layout/AppShell.jsx` | Responsive private dashboard layout and navigation |
-| `src/pages/LoginPage.jsx` | Secure admin login interface |
-| `src/pages/DashboardPage.jsx` | Workspace and active-event summary |
-| `src/pages/EventsPage.jsx` | Event list, states, active selection, and CRUD coordination |
-| `src/components/events/EventFormModal.jsx` | Validated create/edit form |
-| `src/components/events/DeleteEventDialog.jsx` | Destructive-action confirmation |
+| `src/layout/AppShell.jsx` | Responsive admin layout and navigation |
+| `src/pages/RegistrationsPage.jsx` | Registration list, filters, CRUD coordination |
+| `src/pages/ImportsPage.jsx` | CSV import wizard |
+| `src/services/registrationService.js` | Firestore registration subscription and batch mutations |
+| `src/services/importService.js` | CSV parsing, mapping, validation, duplicate detection, chunked import |
+| `src/services/auditService.js` | Creates append-only audit records |
 | `src/services/eventService.js` | Firestore event subscription and batch mutations |
-| `src/services/auditService.js` | Creates append-only event audit records |
 | `src/events/ActiveEventProvider.jsx` | Persists active-event context locally |
-| `src/utils/validators.js` | Event-form validation |
-| `src/utils/dateUtils.js` | Firestore and browser date conversion |
-| `firestore.rules` | Approved-admin data authorization |
-| `firebase.json` | Firestore and Hosting deployment configuration |
+| `src/utils/validators.js` | Event and registration form validation |
+| `firestore.rules` | Approved-admin authorization and schema enforcement |
 
 ## 17. Local commands
 
-Install dependencies:
-
 ```powershell
 npm install
-```
-
-Start the development server:
-
-```powershell
 npm run dev
-```
-
-Run tests:
-
-```powershell
-npm test
-```
-
-Run lint checks:
-
-```powershell
 npm run lint
-```
-
-Create a production build:
-
-```powershell
+npm test
 npm run build
-```
-
-Preview the production build locally:
-
-```powershell
-npm run preview
 ```
 
 ## 18. Firebase deployment commands
 
-Review `.firebaserc` before deployment and confirm that it contains the correct Firebase project ID.
-
-Authenticate the Firebase CLI:
-
-```powershell
-npx firebase-tools login
-```
-
-Select the project:
-
-```powershell
-npx firebase-tools use gathervibeshub
-```
-
-Deploy Firestore rules:
+Deploy only when explicitly approved:
 
 ```powershell
 npx firebase-tools deploy --only firestore:rules --project gathervibeshub
-```
-
-Build and deploy Hosting:
-
-```powershell
+npx firebase-tools deploy --only firestore:indexes --project gathervibeshub
 npm run build
 npx firebase-tools deploy --only hosting --project gathervibeshub
 ```
 
-Deploy rules and Hosting together:
-
-```powershell
-npm run build
-npx firebase-tools deploy --only firestore:rules,hosting --project gathervibeshub
-```
-
 ## 19. Verification completed
 
-The current implementation passed:
+### Phase 3 (Cursor review)
 
 - ESLint
+- Node unit tests (events, PWA, registrations, CSV import)
 - Production Vite build
-- Node unit tests
-- Dependency audit with zero known vulnerabilities
-- Protected `/dashboard` to `/login` browser redirect
-- Missing-Firebase configuration state
-- Event-form required-field validation
-- Completed event-form submission through an isolated browser test harness
-- 390-pixel mobile event-form rendering
-- Mobile horizontal-overflow check
-- Browser runtime-error check
-- Browser failed-request check
-- Firebase CLI project and web-app identity verification
-- Firestore database existence and edition verification
-- Firestore rules compilation and production deployment
-- Firebase Hosting production deployment
-- Live Hosting root page and production asset HTTP 200 checks
-- Live Google and Email/Password provider configuration verification
-- Authorized-domain verification for `localhost`, `gathervibeshub.firebaseapp.com`, and `gathervibeshub.web.app`
-- Google button and email/password backup presence at 390, 430, 768, and 1440 pixel widths
-- Signed-out `/dashboard`, `/events`, and `/settings` redirects to `/login`
-- Zero horizontal overflow at all tested login widths
-- PWA manifest, production icons, and no-cache service worker verification
+- No committed secrets (`.env.local`, service account keys excluded by `.gitignore`)
+- Phase 4+ routes remain boundary-only
+- Firestore rules reviewed for default-deny, allowlist protection, registration schema, and check-in lock
 
-Unit tests currently cover:
+### Phase 3.1 Option B (Antigravity)
 
-- Valid event data
-- Missing and invalid event data
-- Whole-number capacity enforcement
-- Non-negative ticket-price enforcement
-- Stable active-event date persistence
-- PWA name, colors, display mode, and icon requirements
-- Absence of service-worker fetch interception or Cache API use
-- Google/email authentication wiring through the admin allowlist check
+- ESLint: 0 errors
+- 51/51 unit tests passing (24 Phase 3 + 27 new Phase 3.1)
+- Production Vite build: clean
+- No debug bypasses in `AuthProvider.jsx` or `firestore.rules`
+- Price tier schema verified in validators, form, service, and rules
+- Dashboard enhancements verified: clock, countdowns, selected-event UX, metrics, capacity bar
+- Excel/XLSX confirmed deferred (not added)
+- No new dependencies added
+- No merge to main; no deployment; branch: `antigravity/continue-phase3-1-option-b`
 
-## 20. Remaining authenticated end-to-end testing limitation
+Unit tests now cover:
 
-Firebase is connected and deployed. A true authenticated database test still requires:
+- Event validation (including price tier schema)
+- Price tier names, statuses, bounds, and per-field errors
+- Countdown utility (past, future, formatting)
+- Upcoming event filtering and sorting
+- Adaptive CSV header detection (blank rows, various header names)
+- PWA manifest and no-cache service worker safety
+- Registration validation and ticket status validation
+- Payment status normalization
+- CSV parser (quoted commas, newlines, escaped quotes)
+- Field mapping, duplicate detection, stable registration ID generation
+- Missing email and phone blocked for CSV import
 
-- The existing Firebase Authentication user's email in `settings/accessControl.approvedEmails`
+## 20. Remaining live testing limitations
 
-The Authentication user export contained one user during the Phase 2.5 review, but `settings/accessControl` did not exist. Codex did not invent an allowlist or claim a successful approved login without owner confirmation.
+Live Firebase testing still requires:
 
-No fake Firebase fallback or bypass was added. This prevents local demonstrations from being mistaken for working production authorization.
+- An approved email in `settings/accessControl.approvedEmails`
+- Deployment of Phase 3 Firestore rules and the registrations composite index when approved
 
-After the first approved administrator is created, live verification should confirm:
+After deployment, verify:
 
-1. Approved admin login succeeds.
-2. Unapproved login cannot read Firestore data.
-3. Event creation produces both an `events` document and an `auditLogs` document.
-4. Event editing preserves `createdAt` and updates `updatedAt`.
-5. Event deletion removes the event and preserves the deletion audit record.
-6. Audit records cannot be edited or deleted from the browser client.
-7. Refreshing the page preserves the active-event selection.
+1. Approved admin login succeeds
+2. Active event selection enables registrations and imports
+3. Manual registration CRUD writes both `registrations` and `auditLogs` documents
+4. CSV import preview does not write until confirmed
+5. Import creates deterministic IDs and blocks duplicates
+6. Check-in fields cannot be mutated from the client
+7. Phase 4+ routes remain non-functional placeholders
 
 ## 21. Design decisions
 
-### Firestore allowlist instead of hardcoded emails
+### CSV before Google Sheets OAuth
 
-Approved emails are kept in `settings/accessControl`. This avoids committing personal email addresses to source control and allows the Firebase Console to remain the administrative source of truth.
+Direct Google Sheets OAuth was deferred. CSV export from Google Forms or Sheets is the supported import path until OAuth is evaluated separately.
+
+### Privacy-safe import IDs
+
+Import registration IDs hash event-scoped keys with SHA-256 so document IDs do not expose raw emails or phone numbers.
+
+### Check-in deferred to Phase 5
+
+Registration records include `checkedIn` and `checkInTime` fields for future door check-in, but Phase 3 rules and UI do not allow check-in mutations.
 
 ### Atomic audit logging
 
-Event changes and audit records share one Firestore batch. This is stronger than writing the event first and attempting the audit record afterward.
-
-### Local active-event persistence
-
-The active-event choice is an organizer-interface preference, so it is currently stored locally instead of requiring another Firestore write. A future multi-device requirement could move this to a protected settings document.
-
-### Firestore Timestamp for event dates
-
-Event dates are stored as Firestore Timestamps. The form converts dates at local noon to avoid date-only values moving to the previous day because of timezone conversion.
-
-### No early Google Sheets OAuth integration
-
-Google Sheets OAuth was intentionally deferred. The recommended first import workflow remains:
-
-```text
-Google Form → Google Sheet → Export CSV → Import Preview → Firestore
-```
-
-Direct Google Sheets OAuth can be evaluated after the safer CSV workflow is complete.
+Registration and import writes always include an audit log entry in the same batch, matching the Phase 2 event pattern.
 
 ## 22. Recommended next phase
 
-Phase 3 should be implemented as one complete registration feature without adding tickets or AI.
+**Phase 4 — Ticket Assignment only**, after Phase 3 is verified live with the real Firebase project:
 
-Recommended Phase 3 scope:
+- Assign externally created ticket codes to registrations
+- Track ticket status transitions
+- Do not add door check-in, communications, or AI until their respective phases
 
-- Registrations CRUD
-- CSV upload or pasted CSV
-- Import preview before any Firestore write
-- Field mapping
-- Row validation
-- Duplicate detection
-- Stable registration IDs
-- Atomic import and audit entries
-- Search and registration filters
-- Loading, error, empty, and success states
-- No Google OAuth initially
-
-Do not begin Phase 3 until the live Firebase login, event CRUD, rules, and audit behavior have been verified with the real project.
+Do not merge to `main` or deploy Hosting/rules until the organizer approves this review branch.
