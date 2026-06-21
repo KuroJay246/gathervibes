@@ -7,5 +7,11 @@ dist
 firebase-debug.log
 firestore-debug.log
 serviceAccountKey.json
+serviceAccount*.json
+*service-account*.json
+firebase-service-account*.json
+.keys/
+secrets/
 *.pem
+*.key
 *.local

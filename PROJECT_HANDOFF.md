@@ -183,6 +183,39 @@ Before live CRUD testing:
 2. Create `settings/accessControl` with `approvedEmails` (lowercase strings matching Auth users).
 3. Deploy reviewed Firestore rules and the registrations composite index when approved.
 
+### Automatic Firebase admin setup
+
+Preferred method:
+
+1. Login to Firebase CLI:
+   `npx firebase-tools login`
+
+2. Set project:
+   `npx firebase-tools use gathervibeshub`
+
+3. Set admin emails locally:
+   - **PowerShell:** `$env:ADMIN_EMAILS="your-lowercase-google-email@gmail.com"`
+   - **Command Prompt:** `set ADMIN_EMAILS=your-lowercase-google-email@gmail.com`
+   - **macOS/Linux:** `export ADMIN_EMAILS="your-lowercase-google-email@gmail.com"`
+
+4. Run:
+   `npm run admin:ensure-access`
+
+5. Verify:
+   `npm run admin:verify-firebase`
+
+6. Deploy rules/indexes:
+   `npm run firebase:deploy-rules`
+
+7. Deploy hosting:
+   `npm run firebase:deploy-hosting`
+
+If Application Default Credentials are missing, you can run `gcloud auth application-default login` if available, or use a service account JSON stored OUTSIDE the repository and referenced only with `GOOGLE_APPLICATION_CREDENTIALS`. For example:
+- **PowerShell:** `$env:GOOGLE_APPLICATION_CREDENTIALS="C:\secure-keys\gathervibeshub-admin.json"`
+- **macOS/Linux:** `export GOOGLE_APPLICATION_CREDENTIALS="/secure-keys/gathervibeshub-admin.json"`
+
+Never paste private keys into code and never commit a service account JSON.
+
 ### Troubleshooting Google sign-in
 
 If you experience issues with Google sign-in (e.g., "This account is not approved"), verify the following in the Firebase Console:
