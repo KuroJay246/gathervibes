@@ -24,13 +24,13 @@ Requirements: Node.js 20.19+ or 22.12+ and a Firebase project you control.
    npm install
    ```
 
-2. In the [Firebase console](https://console.firebase.google.com/), create or select the `gather-savor-event-hub` project.
+2. Open the existing [`gathervibeshub` Firebase project](https://console.firebase.google.com/project/gathervibeshub/overview) (project number `9444350727`).
 
-3. Add a Firebase Web App, then enable **Authentication → Sign-in method → Email/Password**.
+3. The Firebase Web App is already registered and **Authentication → Sign-in method → Email/Password** is enabled.
 
 4. Create trusted staff accounts under **Authentication → Users**. There is deliberately no public sign-up flow.
 
-5. Create a Cloud Firestore database. Use production mode; the included rules replace the initial rules in the deployment step below.
+5. The default Cloud Firestore database already exists; deploy the included rules after any reviewed changes.
 
 6. Copy `.env.example` to `.env.local` and add the Web App configuration values:
 
@@ -62,8 +62,8 @@ Deploy rules after reviewing the project ID and allowlist document:
 
 ```bash
 npx firebase-tools login
-npx firebase-tools use gather-savor-event-hub
-npx firebase-tools deploy --only firestore:rules
+npx firebase-tools use gathervibeshub
+npx firebase-tools deploy --only firestore:rules --project gathervibeshub
 ```
 
 Do not deploy the database with temporary public rules. Firebase web configuration values are identifiers, not secrets; authorization is enforced by Authentication and Firestore Security Rules.
@@ -78,6 +78,8 @@ npx firebase-tools deploy --only hosting
 ```
 
 `firebase.json` sends all Hosting routes to `index.html`, allowing React Router URLs to work on refresh.
+
+The current production build is deployed at [gathervibeshub.web.app](https://gathervibeshub.web.app). Firestore rules and Hosting were last deployed on June 21, 2026. Authentication is enabled, but the project still needs its first trusted user and `settings/accessControl` allowlist document before dashboard login and live CRUD can be tested.
 
 ## Project structure
 

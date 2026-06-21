@@ -2,50 +2,180 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Phase 2 data model
+    // ===============================================================
+    // settings/accessControl
+    //   approvedEmails: list<string> (created only in Firebase Console)
+    //
+    // events/{eventId}
+    //   eventId: string (immutable, must equal document ID)
+    //   eventName: string (1..150)
+    //   eventDate: timestamp
+    //   location: string (1..250)
+    //   eventType: supported enum
+    //   status: supported enum
+    //   capacity: int (1..100000)
+    //   ticketPrice: number (0..1000000)
+    //   notes: string (0..10000)
+    //   createdAt: timestamp (immutable)
+    //   updatedAt: timestamp
+    //
+    // auditLogs/{logId}
+    //   append-only event audit record created in the same batch as
+    //   event.create, event.update, or event.delete.
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
     function isApprovedAdmin() {
-      return request.auth != null
-        && request.auth.token.email != null
+      return isSignedIn()
+        && request.auth.token.email is string
         && exists(/databases/$(database)/documents/settings/accessControl)
+        && get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails is list
         && request.auth.token.email in
           get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails;
     }
 
-    // Bootstrap this document in the Firebase console. Client code can never
-    // create or change the admin allowlist.
+    function validShortId(value) {
+      return value is string && value.size() > 0 && value.size() <= 128;
+    }
+
+    function isValidEvent(data, eventId) {
+      return data.keys().hasAll([
+          'eventId', 'eventName', 'eventDate', 'location', 'eventType',
+          'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'eventId', 'eventName', 'eventDate', 'location', 'eventType',
+          'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt'
+        ])
+        && data.eventId == eventId
+        && validShortId(data.eventId)
+        && data.eventName is string
+        && data.eventName.size() > 0
+        && data.eventName.size() <= 150
+        && data.eventDate is timestamp
+        && data.location is string
+        && data.location.size() > 0
+        && data.location.size() <= 250
+        && data.eventType in [
+          'cake-picnic', 'brunch', 'tasting', 'vendor-pop-up',
+          'private-food-experience', 'other'
+        ]
+        && data.status in ['draft', 'upcoming', 'active', 'completed', 'cancelled']
+        && data.capacity is int
+        && data.capacity > 0
+        && data.capacity <= 100000
+        && data.ticketPrice is number
+        && data.ticketPrice >= 0
+        && data.ticketPrice <= 1000000
+        && data.notes is string
+        && data.notes.size() <= 10000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidAuditLog(data, logId) {
+      return data.keys().hasAll([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.keys().hasOnly([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.logId == logId
+        && validShortId(data.logId)
+        && validShortId(data.eventId)
+        && data.action in ['event.create', 'event.update', 'event.delete']
+        && data.targetType == 'event'
+        && data.targetId == data.eventId
+        && data.performedBy == request.auth.token.email
+        && data.timestamp == request.time
+        && data.details is map
+        && data.details.keys().hasOnly(['eventName'])
+        && data.details.eventName is string
+        && data.details.eventName.size() > 0
+        && data.details.eventName.size() <= 150;
+    }
+
+    function matchesEventMutation(data) {
+      return (
+          data.action == 'event.create'
+          && !exists(/databases/$(database)/documents/events/$(data.eventId))
+          && existsAfter(/databases/$(database)/documents/events/$(data.eventId))
+          && getAfter(/databases/$(database)/documents/events/$(data.eventId)).data.eventName
+            == data.details.eventName
+        ) || (
+          data.action == 'event.update'
+          && exists(/databases/$(database)/documents/events/$(data.eventId))
+          && existsAfter(/databases/$(database)/documents/events/$(data.eventId))
+          && getAfter(/databases/$(database)/documents/events/$(data.eventId)).data.eventName
+            == data.details.eventName
+        ) || (
+          data.action == 'event.delete'
+          && exists(/databases/$(database)/documents/events/$(data.eventId))
+          && !existsAfter(/databases/$(database)/documents/events/$(data.eventId))
+          && get(/databases/$(database)/documents/events/$(data.eventId)).data.eventName
+            == data.details.eventName
+        );
+    }
+
+    // The allowlist is bootstrapped in the Firebase Console. Client code can
+    // never create, update, or delete it.
     match /settings/accessControl {
+      allow get: if isApprovedAdmin();
+      allow list, create, update, delete: if false;
+    }
+
+    match /events/{eventId} {
       allow read: if isApprovedAdmin();
-      allow write: if false;
+      allow create: if isApprovedAdmin()
+        && isValidEvent(request.resource.data, eventId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isApprovedAdmin()
+        && isValidEvent(request.resource.data, eventId)
+        && request.resource.data.eventId == resource.data.eventId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isApprovedAdmin();
     }
 
-    match /settings/{settingId} {
-      allow read, write: if isApprovedAdmin() && settingId != 'accessControl';
+    match /auditLogs/{logId} {
+      allow read: if isApprovedAdmin();
+      allow create: if isApprovedAdmin()
+        && isValidAuditLog(request.resource.data, logId)
+        && matchesEventMutation(request.resource.data);
+      allow update, delete: if false;
     }
 
-    match /events/{documentId} {
-      allow read, write: if isApprovedAdmin();
-    }
-
+    // Future phases remain unavailable until their schemas and rules are
+    // implemented and tested.
     match /registrations/{documentId} {
-      allow read, write: if isApprovedAdmin();
+      allow read, write: if false;
     }
 
     match /tickets/{documentId} {
-      allow read, write: if isApprovedAdmin();
+      allow read, write: if false;
     }
 
     match /communications/{documentId} {
-      allow read, write: if isApprovedAdmin();
+      allow read, write: if false;
     }
 
     match /aiDrafts/{documentId} {
-      allow read, write: if isApprovedAdmin();
+      allow read, write: if false;
     }
 
-    // Audit history is append-only from the client.
-    match /auditLogs/{documentId} {
-      allow read: if isApprovedAdmin();
-      allow create: if isApprovedAdmin();
-      allow update, delete: if false;
+    match /settings/{documentId} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

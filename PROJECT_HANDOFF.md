@@ -52,7 +52,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Firebase configuration through environment variables
 - Explicit missing-Firebase configuration state
 - Firebase Hosting single-page-application rewrites
-- Firestore Security Rules draft
+- Hardened, deployed Firestore Security Rules
 - Approved-admin email allowlist
 - Append-only audit log rules
 - Branded SVG favicon
@@ -136,9 +136,9 @@ The application reads these environment variables:
 
 ```env
 VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=gather-savor-event-hub.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=gather-savor-event-hub
-VITE_FIREBASE_STORAGE_BUCKET=gather-savor-event-hub.firebasestorage.app
+VITE_FIREBASE_AUTH_DOMAIN=gathervibeshub.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=gathervibeshub
+VITE_FIREBASE_STORAGE_BUCKET=gathervibeshub.firebasestorage.app
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
 ```
@@ -166,18 +166,22 @@ The Firebase Web App configuration values above can be provided when connecting 
 
 Firebase browser configuration identifies the project. Authentication and Firestore Security Rules enforce authorization.
 
-## 7. Required Firebase Console setup
+## 7. Firebase project and remaining Console setup
 
-Before live authentication and event CRUD can work:
+Confirmed and configured on June 21, 2026:
 
-1. Create or select the Firebase project.
-2. Register a Firebase Web App.
-3. Enable **Authentication → Sign-in method → Email/Password**.
-4. Create the organizer and trusted-staff accounts under **Authentication → Users**.
-5. Create a Cloud Firestore database.
-6. Create the admin allowlist document described below.
-7. Deploy `firestore.rules`.
-8. Build and deploy Firebase Hosting.
+- Firebase project ID: `gathervibeshub`
+- Firebase project number: `9444350727`
+- Web app ID: `1:9444350727:web:27345e830f0769a91183a2`
+- Default Firestore database: Standard edition, Native mode, `nam5`
+- Email/password Authentication provider: enabled
+- Firestore rules: compiled and deployed
+- Firebase Hosting: deployed at `https://gathervibeshub.web.app`
+
+Remaining before authenticated event CRUD can be tested:
+
+1. Create the organizer and trusted-staff accounts under **Authentication → Users**.
+2. Create the admin allowlist document described below.
 
 There is deliberately no public account-registration page.
 
@@ -207,10 +211,11 @@ They implement the following policy:
 
 - Unauthenticated users cannot read or write any application collection.
 - A signed-in user must have an email in `settings/accessControl.approvedEmails`.
-- Approved administrators can read and write application data.
+- Approved administrators can read events and create, update, or delete only schema-valid event records.
 - The allowlist document cannot be modified through client code.
-- Audit log documents can be created and read by approved administrators.
+- Audit log documents can be created only for matching event mutations and read by approved administrators.
 - Audit log documents cannot be updated or deleted.
+- Future-phase collections remain denied until their schemas and features are implemented.
 - Anything not explicitly matched is denied by default.
 
 Collections currently covered by the rules:
@@ -507,27 +512,27 @@ npx firebase-tools login
 Select the project:
 
 ```powershell
-npx firebase-tools use gather-savor-event-hub
+npx firebase-tools use gathervibeshub
 ```
 
 Deploy Firestore rules:
 
 ```powershell
-npx firebase-tools deploy --only firestore:rules
+npx firebase-tools deploy --only firestore:rules --project gathervibeshub
 ```
 
 Build and deploy Hosting:
 
 ```powershell
 npm run build
-npx firebase-tools deploy --only hosting
+npx firebase-tools deploy --only hosting --project gathervibeshub
 ```
 
 Deploy rules and Hosting together:
 
 ```powershell
 npm run build
-npx firebase-tools deploy --only firestore:rules,hosting
+npx firebase-tools deploy --only firestore:rules,hosting --project gathervibeshub
 ```
 
 ## 19. Verification completed
@@ -546,6 +551,11 @@ The current implementation passed:
 - Mobile horizontal-overflow check
 - Browser runtime-error check
 - Browser failed-request check
+- Firebase CLI project and web-app identity verification
+- Firestore database existence and edition verification
+- Firestore rules compilation and production deployment
+- Firebase Hosting production deployment
+- Live Hosting root page and production asset HTTP 200 checks
 
 Unit tests currently cover:
 
@@ -555,19 +565,18 @@ Unit tests currently cover:
 - Non-negative ticket-price enforcement
 - Stable active-event date persistence
 
-## 20. Testing limitation before Firebase connection
+## 20. Remaining authenticated end-to-end testing limitation
 
-The Firestore CRUD code is implemented and compiles, but a true end-to-end database test requires:
+Firebase is connected and deployed. A true authenticated database test still requires:
 
-- The Firebase Web App configuration
-- An enabled Email/Password provider
 - A real Firebase Authentication user
 - That user's email in `settings/accessControl.approvedEmails`
-- Deployed Firestore rules
+
+The Authentication user export contained zero users at the time of deployment, so Codex did not invent a password or create an account without the owner's credentials.
 
 No fake Firebase fallback or bypass was added. This prevents local demonstrations from being mistaken for working production authorization.
 
-After Firebase is connected, the first live verification should confirm:
+After the first approved administrator is created, live verification should confirm:
 
 1. Approved admin login succeeds.
 2. Unapproved login cannot read Firestore data.
@@ -624,4 +633,3 @@ Recommended Phase 3 scope:
 - No Google OAuth initially
 
 Do not begin Phase 3 until the live Firebase login, event CRUD, rules, and audit behavior have been verified with the real project.
-
