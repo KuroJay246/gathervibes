@@ -96,6 +96,27 @@ Requirements: Node.js 20.19+ or 22.12+ and a Firebase project you control.
 
 The app shows an explicit configuration notice and disables sign-in if Firebase environment variables are missing. It does not use fallback credentials or a fake authentication mode.
 
+## Troubleshooting Google sign-in
+
+If you experience issues with Google sign-in (e.g., "This account is not approved"), verify the following in the Firebase Console:
+
+**Firebase Authentication:**
+- Google provider is enabled.
+- Email/password provider remains enabled.
+- The Google email used for login exists as an Authentication user after the first sign-in attempt.
+
+**Firebase Authentication authorized domains:**
+- `localhost`
+- `gathervibeshub.firebaseapp.com`
+- `gathervibeshub.web.app`
+
+**Firestore:**
+- Collection: `settings`
+- Document: `accessControl`
+- Field: `approvedEmails`
+- Type: `array`
+- Value: The **exact lowercase** Google email used to sign in.
+
 ## Routes
 
 | Route | Status | Purpose |

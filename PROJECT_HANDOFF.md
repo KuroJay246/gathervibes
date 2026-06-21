@@ -183,6 +183,27 @@ Before live CRUD testing:
 2. Create `settings/accessControl` with `approvedEmails` (lowercase strings matching Auth users).
 3. Deploy reviewed Firestore rules and the registrations composite index when approved.
 
+### Troubleshooting Google sign-in
+
+If you experience issues with Google sign-in (e.g., "This account is not approved"), verify the following in the Firebase Console:
+
+**Firebase Authentication:**
+- Google provider is enabled.
+- Email/password provider remains enabled.
+- The Google email used for login exists as an Authentication user after the first sign-in attempt.
+
+**Firebase Authentication authorized domains:**
+- `localhost`
+- `gathervibeshub.firebaseapp.com`
+- `gathervibeshub.web.app`
+
+**Firestore:**
+- Collection: `settings`
+- Document: `accessControl`
+- Field: `approvedEmails`
+- Type: `array`
+- Value: The **exact lowercase** Google email used to sign in.
+
 ## 8. Approved-admin allowlist
 
 ```text

@@ -27,8 +27,31 @@ async function verifyAdminAccess(nextUser) {
   try {
     const accessDocument = await getDoc(doc(db, 'settings', 'accessControl'))
     if (!accessDocument.exists()) throw adminAccessError()
+    
+    const data = accessDocument.data()
+    const approvedEmails = Array.isArray(data?.approvedEmails) ? data.approvedEmails : []
+    const userEmail = typeof nextUser.email === 'string' ? nextUser.email.toLowerCase() : ''
+    
+    if (!approvedEmails.includes(userEmail)) {
+      throw adminAccessError({ code: 'permission-denied' })
+    }
   } catch (error) {
+    if (import.meta.env.DEV) {
+      console.error('[Diagnostic] verifyAdminAccess failed:', {
+        errorCode: error?.code,
+        errorMessage: error?.message,
+        authProvider: nextUser.providerData?.[0]?.providerId,
+        currentDomain: window.location.hostname,
+        firebaseConfigured: isFirebaseConfigured,
+        email: nextUser.email,
+        emailLower: typeof nextUser.email === 'string' ? nextUser.email.toLowerCase() : null,
+      })
+    }
+    
     if (error?.code?.startsWith('auth/')) throw error
+    if (error?.code === 'permission-denied' || error?.code === 'firestore/permission-denied') {
+      throw adminAccessError({ code: 'permission-denied' })
+    }
     throw adminAccessError(error)
   }
 }
