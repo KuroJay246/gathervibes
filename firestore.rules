@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isApprovedAdmin() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && exists(/databases/$(database)/documents/settings/accessControl)
+        && request.auth.token.email in
+          get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails;
+    }
+
+    // Bootstrap this document in the Firebase console. Client code can never
+    // create or change the admin allowlist.
+    match /settings/accessControl {
+      allow read: if isApprovedAdmin();
+      allow write: if false;
+    }
+
+    match /settings/{settingId} {
+      allow read, write: if isApprovedAdmin() && settingId != 'accessControl';
+    }
+
+    match /events/{documentId} {
+      allow read, write: if isApprovedAdmin();
+    }
+
+    match /registrations/{documentId} {
+      allow read, write: if isApprovedAdmin();
+    }
+
+    match /tickets/{documentId} {
+      allow read, write: if isApprovedAdmin();
+    }
+
+    match /communications/{documentId} {
+      allow read, write: if isApprovedAdmin();
+    }
+
+    match /aiDrafts/{documentId} {
+      allow read, write: if isApprovedAdmin();
+    }
+
+    // Audit history is append-only from the client.
+    match /auditLogs/{documentId} {
+      allow read: if isApprovedAdmin();
+      allow create: if isApprovedAdmin();
+      allow update, delete: if false;
+    }
+  }
+}
