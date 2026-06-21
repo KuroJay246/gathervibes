@@ -8,11 +8,12 @@ import { NotFoundPage } from './pages/NotFoundPage'
 import { PhasePage } from './pages/PhasePage'
 import { SettingsPage } from './pages/SettingsPage'
 
+import { RegistrationsPage } from './pages/RegistrationsPage'
+import { ImportsPage } from './pages/ImportsPage'
+
 const futureRoutes = [
-  { path: 'registrations', title: 'Registrations', phase: 'Phase 3', description: 'Import and manage guest registrations.' },
   { path: 'tickets', title: 'Tickets', phase: 'Phase 4', description: 'Assign and track externally created ticket codes.' },
   { path: 'check-in', title: 'Check-In', phase: 'Phase 5', description: 'Run fast, reliable event-day admissions.' },
-  { path: 'imports', title: 'Sheets Import', phase: 'Phase 3', description: 'Preview and safely import Google Forms CSV data.' },
   { path: 'communications', title: 'Communication Center', phase: 'Phase 6', description: 'Filter guest lists and prepare copy-ready messages.' },
   { path: 'ai-writing', title: 'AI Writing Assistant', phase: 'Phase 7', description: 'Create editable writing drafts for admin review.' },
 ]
@@ -26,6 +27,8 @@ export default function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/events" element={<EventsPage />} />
+          <Route path="/registrations" element={<RegistrationsPage />} />
+          <Route path="/imports" element={<ImportsPage />} />
           {futureRoutes.map((route) => (
             <Route
               key={route.path}

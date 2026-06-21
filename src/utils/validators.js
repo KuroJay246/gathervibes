@@ -19,3 +19,30 @@ export function validateEvent(values) {
 
   return errors
 }
+
+export const validPaymentStatuses = ['paid', 'pending', 'complimentary', 'door-list', 'unknown']
+export const validTicketStatuses = ['no-ticket-assigned', 'partially-assigned', 'assigned']
+const MAX_PERSONS_ATTENDING = 100
+
+export function validateRegistration(values) {
+  const errors = {}
+
+  if (!values.fullName?.trim()) errors.fullName = 'Full name is required.'
+
+  const persons = Number(values.personsAttending)
+  if (!values.personsAttending || !Number.isInteger(persons) || persons < 1) {
+    errors.personsAttending = 'Persons attending must be a whole number of at least 1.'
+  } else if (persons > MAX_PERSONS_ATTENDING) {
+    errors.personsAttending = `Persons attending cannot exceed ${MAX_PERSONS_ATTENDING}.`
+  }
+
+  if (values.paymentStatus && !validPaymentStatuses.includes(values.paymentStatus)) {
+    errors.paymentStatus = 'Invalid payment status.'
+  }
+
+  if (values.ticketStatus && !validTicketStatuses.includes(values.ticketStatus)) {
+    errors.ticketStatus = 'Invalid ticket status.'
+  }
+
+  return errors
+}

@@ -2,9 +2,35 @@
 
 For the complete implementation, Firebase, security, testing, and deployment handoff, see [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md).
 
-Private event-operations dashboard for **Gather & Savor Vibes**. Phases 1, 2, and 2.5 are implemented: the secure React/Firebase foundation, complete event management, Google sign-in, and a mobile-first PWA foundation.
+Private event-operations dashboard for **Gather & Savor Vibes**. This is an admin-only workspace—not a public attendee app. Guests continue using Instagram, Linktree, Google Forms, and Google Sheets.
 
-Registrations, tickets, check-in, imports, communications, and AI writing are not implemented yet. Those routes identify their planned phase and do not pretend to save or load data.
+## Implementation status
+
+- [x] **Phase 1**: Auth and base app shell
+- [x] **Phase 2**: Event management
+- [x] **Phase 2.5**: Google sign-in, email/password backup, mobile-first PWA foundation
+- [x] **Phase 3**: Registrations and CSV imports (Cursor-reviewed on branch `cursor/review-phase3-local`)
+- [ ] **Phase 4**: Ticket assignment
+- [ ] **Phase 5**: Door check-in
+- [ ] **Phase 6**: Communications
+- [ ] **Phase 7**: AI writing assistant
+
+Phase 3 adds real registration CRUD and CSV import workflows. Tickets, door check-in, communications, AI writing, Google Sheets OAuth, Cloud Functions, Storage, and public attendee flows remain unimplemented.
+
+## Phase 3 feature summary
+
+- Registrations CRUD scoped to the active event
+- CSV file upload and pasted CSV import
+- Field mapping with auto-detection of common headers
+- Import preview before any Firestore write
+- Row validation with valid, warning, and blocked states
+- Duplicate detection by email+timestamp, phone+timestamp, and source row ID
+- Privacy-safe deterministic registration IDs for imports (`imp_` + SHA-256 prefix)
+- Append-only registration audit logs in the same batch as mutations
+- Search and payment-status filters
+- Responsive mobile cards and desktop table
+
+Google Sheets OAuth remains deferred. Export CSV from Google Forms or Sheets first.
 
 ## Stack
 
@@ -54,9 +80,24 @@ Requirements: Node.js 20.19+ or 22.12+ and a Firebase project you control.
 
 The app shows an explicit configuration notice and disables sign-in if Firebase environment variables are missing. It does not use fallback credentials or a fake authentication mode.
 
+## Routes
+
+| Route | Status | Purpose |
+|---|---|---|
+| `/login` | Complete | Google sign-in with email/password backup |
+| `/dashboard` | Complete | Workspace and active-event summary |
+| `/events` | Complete | Firestore event CRUD and active-event selection |
+| `/registrations` | Phase 3 | Registration CRUD for the active event |
+| `/imports` | Phase 3 | CSV upload/paste, mapping, preview, and import |
+| `/tickets` | Phase 4 boundary | Future ticket-code management |
+| `/check-in` | Phase 5 boundary | Future event-day check-in |
+| `/communications` | Phase 6 boundary | Future guest filtering and message drafts |
+| `/ai-writing` | Phase 7 boundary | Future editable AI writing drafts |
+| `/settings` | Complete | Firebase and data-model status |
+
 ## Security rules
 
-`firestore.rules` denies public access and permits only authenticated users whose email appears in `settings/accessControl.approvedEmails`. The allowlist document cannot be written by client code. Audit log documents are append-only from the client.
+`firestore.rules` denies public access and permits only authenticated users whose email appears in `settings/accessControl.approvedEmails`. The allowlist document cannot be written by client code. Audit log documents are append-only from the client. Registrations are strictly schema-validated; `checkedIn` and `checkInTime` are locked for Phase 3.
 
 Deploy rules after reviewing the project ID and allowlist document:
 
@@ -79,26 +120,35 @@ npx firebase-tools deploy --only hosting
 
 `firebase.json` sends all Hosting routes to `index.html`, allowing React Router URLs to work on refresh.
 
-The current production build is deployed at [gathervibeshub.web.app](https://gathervibeshub.web.app). Authentication providers are enabled, but `settings/accessControl` must be created before approved dashboard login and live CRUD can be tested.
+The current production build is deployed at [gathervibeshub.web.app](https://gathervibeshub.web.app). Phase 3 code is reviewed locally but not merged or deployed until explicitly approved.
 
 ## Mobile/PWA foundation
 
 Phase 2.5 adds an installable mobile-web foundation named **Gather & Savor Hub** (`G&S Hub`). It includes a manifest, branded app icons, Apple touch icon metadata, standalone display mode, iPhone safe-area spacing, mobile navigation, and larger touch targets. The service worker performs lifecycle setup only: it has no fetch handler and does not cache Firestore or other private admin data.
 
-This remains a private web application. It is not a public attendee app and is not yet a native App Store or Play Store application.
+This remains a private web application. It is not a public attendee app and is not a native App Store or Play Store application.
 
 ## Project structure
 
 ```text
 src/
-  auth/         Firebase session context and route guard
-  components/   Shared UI plus event form and confirmation dialogs
-  events/       Active-event context with local persistence
-  layout/       Responsive protected admin shell
-  lib/          Firebase initialization
-  pages/        Login, dashboard, Events CRUD, settings, and phase boundaries
-  services/     Firestore event and audit operations
-  utils/        Event validation and date formatting
+  auth/              Firebase session context and route guard
+  components/
+    events/          Event form and confirmation dialogs
+    imports/         CSV field mapping, preview, and summary
+    registrations/   Registration form, cards, and delete dialog
+    ui/              Shared loading, error, and empty states
+  events/            Active-event context with local persistence
+  layout/            Responsive protected admin shell
+  lib/               Firebase initialization
+  pages/             Login, dashboard, events, registrations, imports, settings
+  services/          Firestore event, registration, import, and audit operations
+  utils/             Event and registration validation, date formatting
+tests/
+  event-utils.test.js
+  phase25-foundation.test.js
+  registration-utils.test.js
+  csv-parser.test.js
 ```
 
 ## Phase 1 acceptance checklist
@@ -137,4 +187,31 @@ Event mutations and their audit records use a single Firestore batch. A failed a
 - [x] Apple touch icon and standalone mobile metadata
 - [x] Safe-area support and mobile bottom navigation
 - [x] No offline Firestore writes, push notifications, or private-data caching
-- [x] Phase 3 and all later features remain unimplemented
+
+## Phase 3 acceptance checklist
+
+- [x] Registrations CRUD scoped to the active event
+- [x] CSV upload and pasted CSV import
+- [x] Field mapping with preview before Firestore writes
+- [x] Duplicate detection (email+timestamp, phone+timestamp, sourceRowId)
+- [x] Privacy-safe deterministic import registration IDs
+- [x] Append-only registration audit logs in the same batch as mutations
+- [x] Search and payment-status filters
+- [x] Loading, error, empty, saving, and success states
+- [x] Responsive mobile cards and desktop table
+- [x] Firestore rules for registrations with check-in fields locked
+- [x] Tickets, check-in, communications, and AI remain phase-boundary only
+- [x] Google Sheets OAuth remains deferred
+- [x] No Cloud Functions, Storage, public registration, or attendee accounts
+
+Registration and import mutations share one Firestore batch with their audit records. Import chunking respects the 500-write limit (249 rows per chunk: registration + audit log per row).
+
+## Verification
+
+```bash
+npm run lint
+npm test
+npm run build
+```
+
+Tests cover event validation, PWA/service worker safety, registration validation, payment status normalization, ticket status validation, CSV parsing (quoted commas, newlines, escaped quotes), field mapping, duplicate detection helpers, stable registration ID generation, and missing email/phone blocking for CSV import.
