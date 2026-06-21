@@ -2,7 +2,7 @@
 
 For the complete implementation, Firebase, security, testing, and deployment handoff, see [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md).
 
-Private event-operations dashboard for **Gather & Savor Vibes**. Phases 1 and 2 are implemented: the secure React/Firebase foundation plus complete event management.
+Private event-operations dashboard for **Gather & Savor Vibes**. Phases 1, 2, and 2.5 are implemented: the secure React/Firebase foundation, complete event management, Google sign-in, and a mobile-first PWA foundation.
 
 Registrations, tickets, check-in, imports, communications, and AI writing are not implemented yet. Those routes identify their planned phase and do not pretend to save or load data.
 
@@ -11,7 +11,7 @@ Registrations, tickets, check-in, imports, communications, and AI writing are no
 - React 19 + Vite
 - JavaScript
 - Tailwind CSS 4
-- Firebase Authentication and Cloud Firestore
+- Firebase Authentication (Google primary, email/password backup) and Cloud Firestore
 - Firebase Hosting
 
 ## Local setup
@@ -26,7 +26,7 @@ Requirements: Node.js 20.19+ or 22.12+ and a Firebase project you control.
 
 2. Open the existing [`gathervibeshub` Firebase project](https://console.firebase.google.com/project/gathervibeshub/overview) (project number `9444350727`).
 
-3. The Firebase Web App is already registered and **Authentication → Sign-in method → Email/Password** is enabled.
+3. The Firebase Web App is already registered. **Authentication → Sign-in method → Google** and **Email/Password** are enabled.
 
 4. Create trusted staff accounts under **Authentication → Users**. There is deliberately no public sign-up flow.
 
@@ -79,7 +79,13 @@ npx firebase-tools deploy --only hosting
 
 `firebase.json` sends all Hosting routes to `index.html`, allowing React Router URLs to work on refresh.
 
-The current production build is deployed at [gathervibeshub.web.app](https://gathervibeshub.web.app). Firestore rules and Hosting were last deployed on June 21, 2026. Authentication is enabled, but the project still needs its first trusted user and `settings/accessControl` allowlist document before dashboard login and live CRUD can be tested.
+The current production build is deployed at [gathervibeshub.web.app](https://gathervibeshub.web.app). Authentication providers are enabled, but `settings/accessControl` must be created before approved dashboard login and live CRUD can be tested.
+
+## Mobile/PWA foundation
+
+Phase 2.5 adds an installable mobile-web foundation named **Gather & Savor Hub** (`G&S Hub`). It includes a manifest, branded app icons, Apple touch icon metadata, standalone display mode, iPhone safe-area spacing, mobile navigation, and larger touch targets. The service worker performs lifecycle setup only: it has no fetch handler and does not cache Firestore or other private admin data.
+
+This remains a private web application. It is not a public attendee app and is not yet a native App Store or Play Store application.
 
 ## Project structure
 
@@ -101,7 +107,8 @@ src/
 - [x] Tailwind theme and responsive luxury admin layout
 - [x] All planned top-level routes registered
 - [x] Firebase initialization via environment variables
-- [x] Email/password login with clear loading and error states
+- [x] Google login with mobile redirect support and clear loading/error states
+- [x] Email/password login retained as backup
 - [x] Protected routes with return-to-requested-page behavior
 - [x] No public Firestore access in the rules draft
 - [x] Approved-admin email allowlist
@@ -120,3 +127,14 @@ src/
 - [x] No registrations, tickets, imports, or AI behavior added
 
 Event mutations and their audit records use a single Firestore batch. A failed audit write therefore prevents the associated event mutation from committing.
+
+## Phase 2.5 acceptance checklist
+
+- [x] Google provider integration with popup cancellation/blocked handling
+- [x] Firestore allowlist verification before protected routes receive a user
+- [x] Email/password backup preserved
+- [x] PWA manifest and branded 192/512 PNG icons
+- [x] Apple touch icon and standalone mobile metadata
+- [x] Safe-area support and mobile bottom navigation
+- [x] No offline Firestore writes, push notifications, or private-data caching
+- [x] Phase 3 and all later features remain unimplemented

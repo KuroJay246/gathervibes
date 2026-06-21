@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Gather and Savor Hub">
+  <defs>
+    <linearGradient id="g" x1="54" y1="32" x2="458" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#412638"/>
+      <stop offset="1" stop-color="#2B1723"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="#FFF8F2"/>
+  <rect x="38" y="38" width="436" height="436" rx="104" fill="url(#g)"/>
+  <circle cx="256" cy="256" r="144" fill="#FFF8F2" fill-opacity=".08" stroke="#F5E6C8" stroke-opacity=".35" stroke-width="3"/>
+  <text x="256" y="310" text-anchor="middle" font-family="Georgia,serif" font-size="188" fill="#F5E6C8">&amp;</text>
+  <circle cx="384" cy="128" r="19" fill="#C98291"/>
+</svg>

@@ -15,8 +15,9 @@ The repository currently contains:
 
 - Phase 1: application foundation, authentication, protected routing, theme, responsive admin layout, Firebase initialization, Hosting configuration, and Firestore rules.
 - Phase 2: complete Events CRUD, active-event selection, event validation, operational states, and append-only audit logging.
+- Phase 2.5: Google sign-in with email/password backup plus a mobile-first installable PWA foundation.
 
-The project intentionally stops after Phase 2.
+The project intentionally stops after Phase 2.5.
 
 ## 2. Technology stack
 
@@ -27,6 +28,7 @@ The project intentionally stops after Phase 2.
 - Firebase Authentication
 - Cloud Firestore
 - Firebase Hosting
+- Web app manifest and deliberately no-cache service worker lifecycle
 - React Router
 - Lucide React icons
 - ESLint
@@ -44,7 +46,8 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Responsive private admin shell
 - Desktop sidebar and mobile navigation drawer
 - Login page with email and password fields
-- Firebase Authentication integration
+- Google Authentication as the primary sign-in option
+- Email/password Authentication retained as backup
 - Authentication loading state
 - Friendly authentication error messages
 - Protected routes
@@ -88,6 +91,21 @@ Important dependency versions are recorded in `package.json` and locked in `pack
   - Event updates
   - Event deletion
 
+### Phase 2.5 — Complete
+
+- Google provider popup flow on desktop
+- Google full-page redirect flow on mobile
+- Friendly popup-cancelled, popup-blocked, unauthorized-domain, and unapproved-account errors
+- Firestore allowlist verification before a Firebase user is exposed to protected routes
+- Email/password backup preserved through the same allowlist verification
+- Installable manifest: `Gather & Savor Hub` / `G&S Hub`
+- Branded 180, 192, and 512 pixel app icons
+- Apple touch icon and standalone display metadata
+- iPhone safe-area spacing
+- Mobile bottom navigation and larger touch targets
+- Mobile-first login and event-card refinements
+- Lifecycle-only service worker with no fetch interception or private-data caching
+
 ## 4. Features intentionally not implemented
 
 The following features remain phase-gated and do not contain fake backend behavior:
@@ -115,7 +133,7 @@ The corresponding navigation routes show a clear future-phase message instead of
 
 | Route | Status | Purpose |
 |---|---|---|
-| `/login` | Complete | Firebase email/password login |
+| `/login` | Complete | Google sign-in with email/password backup |
 | `/dashboard` | Complete | Secure workspace and selected-event context |
 | `/events` | Complete | Firestore event CRUD and active-event selection |
 | `/registrations` | Phase 3 boundary | Future registration management |
@@ -174,13 +192,14 @@ Confirmed and configured on June 21, 2026:
 - Firebase project number: `9444350727`
 - Web app ID: `1:9444350727:web:27345e830f0769a91183a2`
 - Default Firestore database: Standard edition, Native mode, `nam5`
+- Google Authentication provider: enabled
 - Email/password Authentication provider: enabled
 - Firestore rules: compiled and deployed
 - Firebase Hosting: deployed at `https://gathervibeshub.web.app`
 
 Remaining before authenticated event CRUD can be tested:
 
-1. Create the organizer and trusted-staff accounts under **Authentication → Users**.
+1. Confirm which existing Firebase user is the organizer/trusted administrator.
 2. Create the admin allowlist document described below.
 
 There is deliberately no public account-registration page.
@@ -556,6 +575,12 @@ The current implementation passed:
 - Firestore rules compilation and production deployment
 - Firebase Hosting production deployment
 - Live Hosting root page and production asset HTTP 200 checks
+- Live Google and Email/Password provider configuration verification
+- Authorized-domain verification for `localhost`, `gathervibeshub.firebaseapp.com`, and `gathervibeshub.web.app`
+- Google button and email/password backup presence at 390, 430, 768, and 1440 pixel widths
+- Signed-out `/dashboard`, `/events`, and `/settings` redirects to `/login`
+- Zero horizontal overflow at all tested login widths
+- PWA manifest, production icons, and no-cache service worker verification
 
 Unit tests currently cover:
 
@@ -564,15 +589,17 @@ Unit tests currently cover:
 - Whole-number capacity enforcement
 - Non-negative ticket-price enforcement
 - Stable active-event date persistence
+- PWA name, colors, display mode, and icon requirements
+- Absence of service-worker fetch interception or Cache API use
+- Google/email authentication wiring through the admin allowlist check
 
 ## 20. Remaining authenticated end-to-end testing limitation
 
 Firebase is connected and deployed. A true authenticated database test still requires:
 
-- A real Firebase Authentication user
-- That user's email in `settings/accessControl.approvedEmails`
+- The existing Firebase Authentication user's email in `settings/accessControl.approvedEmails`
 
-The Authentication user export contained zero users at the time of deployment, so Codex did not invent a password or create an account without the owner's credentials.
+The Authentication user export contained one user during the Phase 2.5 review, but `settings/accessControl` did not exist. Codex did not invent an allowlist or claim a successful approved login without owner confirmation.
 
 No fake Firebase fallback or bypass was added. This prevents local demonstrations from being mistaken for working production authorization.
 
@@ -604,7 +631,7 @@ The active-event choice is an organizer-interface preference, so it is currently
 
 Event dates are stored as Firestore Timestamps. The form converts dates at local noon to avoid date-only values moving to the previous day because of timezone conversion.
 
-### No early Google OAuth integration
+### No early Google Sheets OAuth integration
 
 Google Sheets OAuth was intentionally deferred. The recommended first import workflow remains:
 

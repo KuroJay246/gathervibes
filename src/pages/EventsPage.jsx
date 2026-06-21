@@ -184,7 +184,7 @@ export function EventsPage() {
           <h2 className="font-serif text-3xl text-[#2B1723]">Your gatherings</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-[#806C61]">Create each event once, keep its details current, and select the event your team is working on.</p>
         </div>
-        <button type="button" onClick={openCreate} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B]">
+        <button type="button" onClick={openCreate} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B]">
           <Plus className="size-4" strokeWidth={2.5} /> Create event
         </button>
       </section>
@@ -242,13 +242,13 @@ export function EventsPage() {
             {events.map((event) => {
               const isActive = activeEvent?.eventId === event.eventId
               return (
-                <article key={event.eventId} className={`p-5 ${isActive ? 'bg-[#FFF8F2]' : ''}`}>
+                <article key={event.eventId} className={`p-4 sm:p-5 ${isActive ? 'bg-[#FFF8F2]' : ''}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h4 className="font-serif text-lg text-[#35212B]">{event.eventName}</h4>{isActive && <span className="inline-flex items-center gap-1 rounded-full bg-[#E7F6ED] px-2 py-1 text-[8px] font-bold uppercase text-[#2F855A]"><CheckCircle2 className="size-3" /> Active</span>}</div><p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#806C61]"><MapPin className="size-3.5" /> {event.location}</p></div>
                     <StatusBadge status={event.status} />
                   </div>
                   <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-white p-3 text-center"><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Date</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{formatEventDate(event.eventDate, { year: undefined })}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Capacity</p><p className="mt-1 flex items-center justify-center gap-1 text-[10px] font-semibold text-[#59454E]"><UsersRound className="size-3" /> {event.capacity}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Price</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{currency.format(Number(event.ticketPrice) || 0)}</p></div></div>
-                  <div className="mt-4 flex gap-2"><button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`flex-1 rounded-lg py-2.5 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#2F855A]' : 'border border-[#E1D1C8] text-[#806C61]'}`}>{isActive ? 'Active event' : 'Set active'}</button><button type="button" onClick={() => openEdit(event)} className="rounded-lg border border-[#E1D1C8] p-2.5 text-[#806C61]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button><button type="button" onClick={() => requestDelete(event)} className="rounded-lg border border-[#F0D3D3] p-2.5 text-[#C53030]" aria-label={`Delete ${event.eventName}`}><Trash2 className="size-4" /></button></div>
+                  <div className="mt-4 flex gap-2"><button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`min-h-11 flex-1 rounded-lg py-2.5 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#2F855A]' : 'border border-[#E1D1C8] text-[#806C61]'}`}>{isActive ? 'Active event' : 'Set active'}</button><button type="button" onClick={() => openEdit(event)} className="grid size-11 place-items-center rounded-lg border border-[#E1D1C8] text-[#806C61]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button><button type="button" onClick={() => requestDelete(event)} className="grid size-11 place-items-center rounded-lg border border-[#F0D3D3] text-[#C53030]" aria-label={`Delete ${event.eventName}`}><Trash2 className="size-4" /></button></div>
                 </article>
               )
             })}

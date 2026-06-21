@@ -4,10 +4,10 @@ import { useActiveEvent } from '../events/useActiveEvent'
 import { formatEventDate } from '../utils/dateUtils'
 
 const foundationItems = [
-  { label: 'Private sign-in', detail: 'Firebase email and password authentication', icon: LockKeyhole },
-  { label: 'Protected workspace', detail: 'Every admin route requires an active session', icon: ShieldCheck },
+  { label: 'Private sign-in', detail: 'Google sign-in with email/password backup', icon: LockKeyhole },
+  { label: 'Protected workspace', detail: 'Every admin route requires approved allowlist access', icon: ShieldCheck },
   { label: 'Firestore access rules', detail: 'Approved-email allowlist with no public access', icon: Database },
-  { label: 'Hosting ready', detail: 'Firebase Hosting SPA configuration included', icon: Flame },
+  { label: 'Mobile-ready PWA', detail: 'Installable foundation on Firebase Hosting', icon: Flame },
 ]
 
 export function DashboardPage() {

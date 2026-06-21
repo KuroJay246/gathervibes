@@ -92,12 +92,12 @@ export function EventFormModal({ event, onClose, onSave }) {
   const inputClass = (field) => `event-input ${errors[field] ? 'event-input-error' : ''}`
 
   return (
-    <div className="fixed inset-0 z-[70] grid place-items-center overflow-y-auto bg-[#160B12]/65 p-3 backdrop-blur-sm sm:p-6">
+    <div className="fixed inset-0 z-[70] flex items-end justify-center overflow-y-auto bg-[#160B12]/65 p-0 backdrop-blur-sm sm:items-center sm:p-6">
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="event-form-title"
-        className="my-auto flex max-h-[calc(100vh-1.5rem)] w-full max-w-3xl flex-col overflow-hidden rounded-[26px] bg-[#FFFDFB] shadow-[0_28px_90px_rgba(26,12,19,0.3)] sm:max-h-[calc(100vh-3rem)]"
+        className="event-modal-safe flex max-h-[calc(100dvh-0.75rem)] w-full max-w-3xl flex-col overflow-hidden rounded-t-[26px] bg-[#FFFDFB] shadow-[0_28px_90px_rgba(26,12,19,0.3)] sm:my-auto sm:max-h-[calc(100dvh-3rem)] sm:rounded-[26px]"
       >
         <div className="flex items-center justify-between border-b border-[#EEDFD6] px-5 py-4 sm:px-7 sm:py-5">
           <div className="flex items-center gap-3">

@@ -5,6 +5,17 @@ import { BrandMark } from '../components/BrandMark'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { useAuth } from '../auth/useAuth'
 
+function GoogleMark() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[18px]" aria-hidden="true">
+      <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.23-.2-1.77h-9.2v3.34h5.4a4.7 4.7 0 0 1-2 3.03l-.02.11 2.9 2.24.2.02c1.84-1.7 2.92-4.2 2.92-6.97Z" />
+      <path fill="#34A853" d="M12.2 21.8c2.63 0 4.84-.87 6.45-2.6l-3.07-2.37c-.82.55-1.92.94-3.38.94a5.87 5.87 0 0 1-5.55-4.06l-.1.01-3.02 2.34-.04.1A9.73 9.73 0 0 0 12.2 21.8Z" />
+      <path fill="#FBBC05" d="M6.65 13.71a6 6 0 0 1-.33-1.95c0-.68.12-1.34.32-1.95v-.1L3.6 7.34l-.1.05a9.8 9.8 0 0 0 0 8.77l3.15-2.45Z" />
+      <path fill="#EA4335" d="M12.2 5.74c1.83 0 3.07.79 3.78 1.44l2.73-2.67A9.28 9.28 0 0 0 12.2 2a9.73 9.73 0 0 0-8.71 5.39l3.15 2.42a5.9 5.9 0 0 1 5.56-4.07Z" />
+    </svg>
+  )
+}
+
 function getAuthErrorMessage(code) {
   const messages = {
     'auth/invalid-credential': 'The email or password is incorrect.',
@@ -12,6 +23,14 @@ function getAuthErrorMessage(code) {
     'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
     'auth/network-request-failed': 'Could not reach Firebase. Check your connection and try again.',
     'auth/user-disabled': 'This account has been disabled. Contact the workspace owner.',
+    'auth/popup-closed-by-user': 'Google sign-in was cancelled. Nothing changed.',
+    'auth/cancelled-popup-request': 'The earlier Google sign-in window was closed. Please try again.',
+    'auth/popup-blocked': 'Your browser blocked the Google sign-in window. Continue in this window instead.',
+    'auth/unauthorized-domain': 'This website is not authorized for Google sign-in. Contact the workspace owner.',
+    'auth/operation-not-allowed': 'Google sign-in is not enabled for this Firebase project.',
+    'auth/unapproved-account': 'This account is not approved for the private Gather & Savor workspace.',
+    'auth/access-check-failed': 'Your admin access could not be verified. Check your connection and try again.',
+    'auth/redirect-failed': 'Google sign-in could not be completed. Please try again.',
   }
 
   return messages[code] || 'Sign-in failed. Please try again.'
@@ -21,11 +40,22 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
+  const [submitting, setSubmitting] = useState('')
   const [error, setError] = useState('')
-  const { user, loading, signIn, isConfigured } = useAuth()
+  const [offerRedirect, setOfferRedirect] = useState(false)
+  const {
+    user,
+    loading,
+    authError,
+    signIn,
+    signInWithGoogle,
+    signInWithGoogleRedirect,
+    isConfigured,
+  } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const displayedError = error || (authError ? getAuthErrorMessage(authError) : '')
+  const canUseRedirectFallback = offerRedirect || authError === 'auth/popup-blocked'
 
   if (loading) return <LoadingScreen />
   if (user) return <Navigate to="/dashboard" replace />
@@ -37,7 +67,7 @@ export function LoginPage() {
     if (!isConfigured) return
 
     setError('')
-    setSubmitting(true)
+    setSubmitting('email')
 
     try {
       await signIn(email.trim(), password)
@@ -45,13 +75,49 @@ export function LoginPage() {
     } catch (authError) {
       setError(getAuthErrorMessage(authError.code))
     } finally {
-      setSubmitting(false)
+      setSubmitting('')
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    if (!isConfigured) return
+
+    setError('')
+    setOfferRedirect(false)
+    setSubmitting('google')
+
+    try {
+      const prefersRedirect = window.matchMedia('(max-width: 767px)').matches
+      if (prefersRedirect) {
+        await signInWithGoogleRedirect()
+        return
+      }
+
+      await signInWithGoogle()
+      navigate(from, { replace: true })
+    } catch (authFailure) {
+      setError(getAuthErrorMessage(authFailure.code))
+      setOfferRedirect(authFailure.code === 'auth/popup-blocked')
+      setSubmitting('')
+    }
+  }
+
+  async function handleRedirectSignIn() {
+    setError('')
+    setOfferRedirect(false)
+    setSubmitting('google')
+
+    try {
+      await signInWithGoogleRedirect()
+    } catch (authFailure) {
+      setError(getAuthErrorMessage(authFailure.code))
+      setSubmitting('')
     }
   }
 
   return (
-    <main className="min-h-screen bg-[#FFF8F2] p-3 sm:p-5 lg:p-6">
-      <div className="mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1500px] overflow-hidden rounded-[28px] bg-white shadow-[0_24px_80px_rgba(69,35,50,0.13)] sm:min-h-[calc(100vh-2.5rem)] lg:grid-cols-[1.05fr_0.95fr]">
+    <main className="login-safe-area min-h-[100dvh] bg-[#FFF8F2] p-3 sm:p-5 lg:p-6">
+      <div className="mx-auto grid min-h-[calc(100dvh-1.5rem)] max-w-[1500px] overflow-hidden rounded-[24px] bg-white shadow-[0_24px_80px_rgba(69,35,50,0.13)] sm:min-h-[calc(100dvh-2.5rem)] sm:rounded-[28px] lg:grid-cols-[1.05fr_0.95fr]">
         <section className="relative hidden overflow-hidden bg-[#2B1723] p-12 text-white lg:flex lg:flex-col xl:p-16">
           <div className="login-glow login-glow-one" />
           <div className="login-glow login-glow-two" />
@@ -80,9 +146,9 @@ export function LoginPage() {
           </div>
         </section>
 
-        <section className="flex items-center justify-center px-5 py-12 sm:px-10 lg:px-14 xl:px-24">
+        <section className="flex items-center justify-center px-5 py-8 sm:px-10 sm:py-12 lg:px-14 xl:px-24">
           <div className="w-full max-w-[430px]">
-            <div className="mb-10 lg:hidden">
+            <div className="mb-8 lg:hidden">
               <BrandMark />
             </div>
 
@@ -101,6 +167,38 @@ export function LoginPage() {
               </div>
             )}
 
+            <button
+              type="button"
+              className="google-sign-in-button"
+              onClick={handleGoogleSignIn}
+              disabled={!isConfigured || Boolean(submitting)}
+              aria-label="Continue with Google"
+            >
+              {submitting === 'google' ? (
+                <>
+                  <span className="size-4 animate-spin rounded-full border-2 border-[#B76E79]/25 border-t-[#B76E79]" />
+                  Opening Google…
+                </>
+              ) : (
+                <>
+                  <GoogleMark />
+                  Continue with Google
+                </>
+              )}
+            </button>
+
+            {canUseRedirectFallback && (
+              <button type="button" onClick={handleRedirectSignIn} className="mt-3 w-full rounded-xl px-4 py-2.5 text-xs font-bold text-[#A85F6B] hover:bg-[#FFF8F2]">
+                Continue in this window
+              </button>
+            )}
+
+            <div className="my-6 flex items-center gap-3" aria-hidden="true">
+              <span className="h-px flex-1 bg-[#E9DDD6]" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Sign in with email</span>
+              <span className="h-px flex-1 bg-[#E9DDD6]" />
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="email" className="mb-2 block text-xs font-semibold text-[#4F3B43]">
@@ -117,7 +215,7 @@ export function LoginPage() {
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="admin@gatherandsavor.com"
                     className="field-input"
-                    disabled={!isConfigured || submitting}
+                    disabled={!isConfigured || Boolean(submitting)}
                   />
                 </div>
               </div>
@@ -140,7 +238,7 @@ export function LoginPage() {
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="Enter your password"
                     className="field-input pr-12"
-                    disabled={!isConfigured || submitting}
+                    disabled={!isConfigured || Boolean(submitting)}
                   />
                   <button
                     type="button"
@@ -154,14 +252,14 @@ export function LoginPage() {
                 </div>
               </div>
 
-              {error && (
+              {displayedError && (
                 <p className="rounded-xl border border-[#F2C6C6] bg-[#FFF1F1] px-4 py-3 text-xs text-[#A32626]" role="alert">
-                  {error}
+                  {displayedError}
                 </p>
               )}
 
-              <button type="submit" className="primary-button" disabled={!isConfigured || submitting}>
-                {submitting ? (
+              <button type="submit" className="primary-button" disabled={!isConfigured || Boolean(submitting)}>
+                {submitting === 'email' ? (
                   <>
                     <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                     Signing in…

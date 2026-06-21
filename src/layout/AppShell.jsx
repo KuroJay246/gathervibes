@@ -182,7 +182,7 @@ export function AppShell() {
       )}
 
       <div className="lg:pl-[258px]">
-        <header className="sticky top-0 z-20 border-b border-[#EEDDD3] bg-[#FFF8F2]/90 px-4 py-4 backdrop-blur-xl sm:px-7 lg:px-10">
+        <header className="app-safe-top sticky top-0 z-20 border-b border-[#EEDDD3] bg-[#FFF8F2]/90 px-4 py-3.5 backdrop-blur-xl sm:px-7 sm:py-4 lg:px-10">
           <div className="mx-auto flex max-w-[1480px] items-center gap-4">
             <button
               type="button"
@@ -214,11 +214,26 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="px-4 py-7 sm:px-7 lg:px-10 lg:py-9">
+        <main className="px-4 pb-28 pt-6 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
           <div className="mx-auto max-w-[1480px]">
             <Outlet />
           </div>
         </main>
+
+        <nav className="mobile-tab-bar lg:hidden" aria-label="Mobile navigation">
+          <NavLink to="/dashboard" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
+            <LayoutDashboard className="size-5" strokeWidth={1.8} aria-hidden="true" />
+            <span>Home</span>
+          </NavLink>
+          <NavLink to="/events" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
+            <CalendarDays className="size-5" strokeWidth={1.8} aria-hidden="true" />
+            <span>Events</span>
+          </NavLink>
+          <button type="button" onClick={() => setMenuOpen(true)} className="mobile-tab-item" aria-label="Open all navigation">
+            <Menu className="size-5" strokeWidth={1.8} aria-hidden="true" />
+            <span>More</span>
+          </button>
+        </nav>
       </div>
     </div>
   )

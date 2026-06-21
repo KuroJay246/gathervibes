@@ -24,8 +24,8 @@ export function SettingsPage() {
               <KeyRound className="size-[18px]" />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold">Email/password authentication</p>
-              <p className="mt-0.5 text-xs text-[#8A7468]">Active session verified by Firebase Auth</p>
+              <p className="text-sm font-bold">Google + email authentication</p>
+              <p className="mt-0.5 text-xs text-[#8A7468]">Google is primary; email/password remains available as backup</p>
             </div>
             <CheckCircle2 className="size-5 shrink-0 text-[#2F855A]" />
           </div>
@@ -35,7 +35,7 @@ export function SettingsPage() {
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold">Cloud Firestore</p>
-              <p className="mt-0.5 text-xs text-[#8A7468]">Approved-admin security rules drafted</p>
+              <p className="mt-0.5 text-xs text-[#8A7468]">Deployed approved-admin rules with no public access</p>
             </div>
             <CheckCircle2 className="size-5 shrink-0 text-[#2F855A]" />
           </div>
@@ -45,7 +45,7 @@ export function SettingsPage() {
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold">Firebase Hosting</p>
-              <p className="mt-0.5 text-xs text-[#8A7468]">SPA rewrites and production build configured</p>
+              <p className="mt-0.5 text-xs text-[#8A7468]">SPA rewrites and mobile PWA foundation configured</p>
             </div>
             <CheckCircle2 className="size-5 shrink-0 text-[#2F855A]" />
           </div>
