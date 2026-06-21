@@ -31,10 +31,10 @@ const navGroups = [
     label: 'Event operations',
     items: [
       { to: '/events', label: 'Events', icon: CalendarDays, available: true },
-      { to: '/registrations', label: 'Registrations', icon: UsersRound, phase: 3 },
+      { to: '/registrations', label: 'Registrations', icon: UsersRound, available: true },
       { to: '/tickets', label: 'Tickets', icon: TicketCheck, phase: 4 },
       { to: '/check-in', label: 'Check-In', icon: ClipboardCheck, phase: 5 },
-      { to: '/imports', label: 'Sheets Import', icon: FileInput, phase: 3 },
+      { to: '/imports', label: 'Sheets Import', icon: FileInput, available: true },
     ],
   },
   {
@@ -196,15 +196,10 @@ export function AppShell() {
               <h1 className="truncate font-serif text-xl sm:text-2xl">{title}</h1>
               <p className="mt-0.5 hidden text-xs text-[#8C766A] sm:block">{subtitle}</p>
             </div>
-            <button
-              type="button"
-              className="hidden min-w-[220px] items-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-3.5 py-2.5 text-left text-xs text-[#9B867A] shadow-sm md:flex"
-              disabled
-            >
+            <div className="hidden min-w-[220px] items-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-3.5 py-2.5 text-left text-xs text-[#9B867A] shadow-sm md:flex">
               <Search className="size-4" aria-hidden="true" />
-              Search arrives with registrations
-              <span className="ml-auto rounded-md bg-[#F8EFEA] px-1.5 py-0.5 text-[9px]">P3</span>
-            </button>
+              <span className="italic">Local search available in Registrations</span>
+            </div>
             <div className="hidden items-center gap-2 rounded-full border border-[#E7D6CC] bg-white py-1.5 pl-2 pr-3 sm:flex">
               <span className="grid size-7 place-items-center rounded-full bg-[#F7DDE6]">
                 <Sparkles className="size-3.5 text-[#B76E79]" aria-hidden="true" />

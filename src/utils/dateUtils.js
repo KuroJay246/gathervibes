@@ -33,3 +33,9 @@ export function formatEventDate(value, options = {}) {
     ...options,
   }).format(date)
 }
+
+export function parseTimestampSafely(value) {
+  if (!value) return null
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? null : date
+}
