@@ -79,7 +79,7 @@ test('ticket and check-in services create registration audit actions', async () 
 
   assert.match(service, /action = 'ticket\.assign'/)
   assert.match(service, /action: 'ticket\.unassign'/)
-  assert.ok(service.includes("action,\n    targetType: 'registration'"))
+  assert.match(service, /action,\s+targetType: 'registration'/)
   assert.match(service, /action: 'checkin\.complete'/)
   assert.match(service, /action: 'checkin\.duplicate-attempt'/)
 })
