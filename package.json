@@ -11,6 +11,7 @@
     "test": "node --test",
     "admin:ensure-access": "node scripts/admin/ensureAccessControl.mjs",
     "admin:verify-firebase": "node scripts/admin/verifyFirebaseSetup.mjs",
+    "admin:ensure-codex-test-event": "node scripts/admin/ensureCodexTestEvent.mjs",
     "firebase:deploy-rules": "npx firebase-tools deploy --only firestore:rules,firestore:indexes --project gathervibeshub",
     "firebase:deploy-hosting": "npx firebase-tools deploy --only hosting --project gathervibeshub",
     "firebase:deploy-all": "npx firebase-tools deploy --only firestore:rules,firestore:indexes,hosting --project gathervibeshub"
