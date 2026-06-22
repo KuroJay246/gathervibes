@@ -64,6 +64,20 @@ test('Check-In page waits for Firestore success and avoids false success on perm
   assert.doesNotMatch(checkIn.slice(completeIndex, successIndex), /set[A-Z][A-Za-z]*\([^)]*checkedIn/)
 })
 
+test('Check-In page labels undo and clear actions truthfully', async () => {
+  const checkIn = await readFile('src/pages/CheckInPage.jsx', 'utf8')
+  const undoIndex = checkIn.indexOf('await undoCheckIn')
+  const undoSuccessIndex = checkIn.indexOf('setMessage(`Check-in undone for ${selectedRegistration.fullName}.`)')
+
+  assert.match(checkIn, /Undo Check-In/)
+  assert.match(checkIn, /Clear Selected Guest/)
+  assert.doesNotMatch(checkIn, />\\s*Reset\\s*</)
+  assert.match(checkIn, /Undo check-in for this guest\? This should only be used if the check-in was accidental\./)
+  assert.match(checkIn, /Undo check-in was not saved because Firestore denied the write/)
+  assert.ok(undoIndex > -1)
+  assert.ok(undoSuccessIndex > undoIndex)
+})
+
 test('production count diagnostic is read-only and uses shared metrics', async () => {
   const script = await readFile('scripts/admin/verifyProductionCounts.mjs', 'utf8')
   const pkg = JSON.parse(await readFile('package.json', 'utf8'))
