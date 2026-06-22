@@ -26,10 +26,28 @@ body {
   overflow-x: hidden;
 }
 
+#root {
+  min-width: 0;
+}
+
+main,
+section,
+article,
+div {
+  min-width: 0;
+}
+
 button,
 a,
 input {
   -webkit-tap-highlight-color: transparent;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
 }
 
 button:not(:disabled),
@@ -70,6 +88,7 @@ input:focus-visible {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   min-height: 4.25rem;
+  padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
   overflow: hidden;
   border: 1px solid rgba(238, 223, 214, 0.92);
   border-radius: 1.25rem;
@@ -92,6 +111,7 @@ input:focus-visible {
   color: #8c766a;
   font-size: 0.63rem;
   font-weight: 700;
+  line-height: 1;
 }
 
 .mobile-tab-item-active {
@@ -214,6 +234,17 @@ input:focus-visible {
   color: #2b1723;
   font-size: 0.8rem;
   transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.safe-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1023px) {
+  html {
+    scroll-padding-bottom: calc(7.5rem + env(safe-area-inset-bottom));
+  }
 }
 
 .event-input::placeholder {

@@ -11,6 +11,8 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
+export const firebaseProjectId = firebaseConfig.projectId || ''
+
 const requiredConfigKeys = ['apiKey', 'authDomain', 'projectId', 'messagingSenderId', 'appId']
 
 export const isFirebaseConfigured = requiredConfigKeys.every(

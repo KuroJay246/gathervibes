@@ -51,3 +51,14 @@ test('registration audit logs preserve registration target type', async () => {
   assert.match(registrationService, /targetType: 'registration'/)
   assert.match(importService, /targetType: 'registration'/)
 })
+
+test('mobile navigation keeps More, Settings, and logout reachable', async () => {
+  const shell = await readFile('src/layout/AppShell.jsx', 'utf8')
+  const settingsPage = await readFile('src/pages/SettingsPage.jsx', 'utf8')
+
+  assert.match(shell, /aria-label="Open all navigation"/)
+  assert.match(shell, />More</)
+  assert.match(shell, /to="\/settings"/)
+  assert.match(shell, /aria-label="Sign out"/)
+  assert.match(settingsPage, /Log out/)
+})

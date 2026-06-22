@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 22, 2026 (Phase 3.2 Import Center and Phase 4.5 ticket/check-in foundation implemented locally; deployment pending approval)
+Last updated: June 22, 2026 (Phase 3.2 Import Center, XLSX import, runtime health, and Phase 4.5 ticket/check-in foundation implemented on feature branch)
 
 ## 1. Project overview
 
@@ -18,7 +18,7 @@ The repository currently contains:
 - Phase 2.5: Google sign-in with email/password backup plus a mobile-first installable PWA foundation.
 - Phase 3: registrations CRUD, CSV upload/paste import, field mapping, import preview, duplicate detection, stable privacy-safe import IDs, and registration audit logging (Cursor-reviewed).
 - Phase 3.1 recovery: Google auth restored, production security verified, price tier schema, enhanced dashboard with live countdowns, registration metrics, selected-event UX. PR #3 (`cursor/review-phase3-1-google-auth` -> `main`) has been merged and redeployed to Firebase project `gathervibeshub`.
-- Phase 3.2: Import Center cleanup with source selector and explicit XLSX deferral.
+- Phase 3.2: Import Center cleanup with source selector, CSV/pasted table import, and Excel/XLSX workbook import.
 - Phase 4.5 foundation: ticket assignment plus search-based door check-in for approved admins.
 
 ## Production QA fixture
@@ -153,7 +153,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Dashboard: registration metrics for selected event (total, paid, pending, complimentary)
 - Dashboard: capacity progress bar with color thresholds (green → amber → red)
 - Dashboard: price tier summary chips with sold-out and hidden visual states
-- Excel/XLSX: deferred — no `xlsx` dependency added
+- Excel/XLSX: implemented with `read-excel-file`, sheet selection, and preview-before-write safety
 - Google Sheets OAuth: remains deferred
 - 52/52 tests pass; 0 lint errors; build clean
 
@@ -165,7 +165,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Google Forms and Google Sheets remain export-to-CSV workflows
 - Pasted table text and CSV upload still reuse the existing parse, map, preview, and confirm-import flow
 - Header detection improved for payment references and notes
-- XLSX is marked **Coming next**; no parser dependency was added in this pass
+- XLSX upload is active. Workbooks are parsed with `read-excel-file`, multiple sheets show a selector, formulas are not executed, and rows still go through map -> preview -> confirm before Firestore writes
 - Google Sheets OAuth remains deferred
 
 ### Phase 4.5 Ticketing + Door Check-In foundation — Complete locally
@@ -217,7 +217,7 @@ The `/communications` and `/ai-writing` routes remain future-phase messages. `/t
 | `/dashboard` | Complete | Secure workspace and selected-event context |
 | `/events` | Complete | Firestore event CRUD and active-event selection |
 | `/registrations` | Phase 3 complete | Registration CRUD for the active event |
-| `/imports` | Phase 3.2 complete locally | Import Center source selector, CSV upload/paste, mapping, preview, and import |
+| `/imports` | Phase 3.2 complete locally | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
 | `/tickets` | Phase 4.5 complete locally | Ticket-code assignment, generation, regeneration, and unassignment |
 | `/check-in` | Phase 4.5 complete locally | Search-based door check-in and duplicate prevention |
 | `/communications` | Phase 6 boundary | Future guest filtering and message drafts |
@@ -389,7 +389,7 @@ Ticket and check-in fields are backward-compatible. New manual registrations and
 ## 12. Import workflow
 
 ```text
-Google Form / Google Sheet / payment export → CSV or pasted table → Admin loads into Import Center
+Google Form / Google Sheet / payment export → CSV, XLSX workbook, or pasted table → Admin loads into Import Center
   → Map columns to registration fields
   → Preview rows (valid / warning / blocked)
   → Confirm import
@@ -402,7 +402,7 @@ Rules:
 - Rows missing both email and phone are blocked
 - Duplicates blocked by email+timestamp, phone+timestamp, or sourceRowId within the event
 - Google Sheets OAuth is not implemented; CSV export remains the supported path
-- XLSX upload is marked Coming next until a maintained parser dependency, sheet selector, and tests are added
+- XLSX upload is implemented with a maintained parser dependency, sheet selector, and tests. Formulas are not executed.
 
 ## 13. Ticket and check-in workflow
 
@@ -565,8 +565,8 @@ npx firebase-tools deploy --only hosting --project gathervibeshub
 - No debug bypasses in `AuthProvider.jsx` or `firestore.rules`
 - Price tier schema verified in validators, form, service, and rules
 - Dashboard enhancements verified: clock, countdowns, selected-event UX, metrics, capacity bar
-- Excel/XLSX confirmed deferred (not added)
-- No new dependencies added
+- Excel/XLSX implemented with `read-excel-file`
+- New dependency added: `read-excel-file`
 - PR #3 merged to `main`; `main` redeployed to Firebase project `gathervibeshub`
 
 Unit tests now cover:
@@ -582,7 +582,9 @@ Unit tests now cover:
 - CSV parser (quoted commas, newlines, escaped quotes)
 - Field mapping, duplicate detection, stable registration ID generation
 - Missing email and phone blocked for CSV import
-- Import Center source definitions and XLSX deferral
+- Import Center source definitions and XLSX row normalization
+- Admin search helpers
+- Runtime health helpers
 - Ticket code generation, validation, uniqueness checks, and privacy safety
 - Ticket status transitions
 - Check-in false -> true helper and duplicate blocking
@@ -629,9 +631,9 @@ Direct Google Sheets OAuth was deferred. CSV export from Google Forms or Sheets 
 
 Import registration IDs hash event-scoped keys with SHA-256 so document IDs do not expose raw emails or phone numbers.
 
-### XLSX deferred
+### XLSX import
 
-XLSX upload is visible as a coming-next source type but not active. Enabling it later should add a maintained parser dependency, multiple-sheet selection, parser tests, and documentation.
+XLSX upload is active in Import Center. The app uses `read-excel-file` to read workbook values in the browser, presents a sheet selector when multiple worksheets are present, and then reuses the same column mapping, preview, validation, and confirm-import flow as CSV. Formulas are not executed.
 
 ### Search before QR scanning
 

@@ -15,7 +15,7 @@ export const IMPORT_SOURCES = [
     value: 'xlsx',
     label: 'Excel/XLSX',
     helperText: 'Upload an Excel workbook. Choose the sheet and map columns before saving.',
-    mode: 'deferred',
+    mode: 'xlsx',
   },
   {
     value: 'pasted-table',

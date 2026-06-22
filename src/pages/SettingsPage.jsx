@@ -1,12 +1,16 @@
-import { CheckCircle2, Database, ExternalLink, KeyRound, ServerCog } from 'lucide-react'
+import { CheckCircle2, Database, ExternalLink, KeyRound, LogOut, ServerCog } from 'lucide-react'
+import { useAuth } from '../auth/useAuth'
 import { isFirebaseConfigured } from '../lib/firebase'
+import { SystemHealthPanel } from '../components/SystemHealthPanel'
 
 const collections = ['events', 'registrations', 'tickets', 'communications', 'aiDrafts', 'auditLogs', 'settings']
 
 export function SettingsPage() {
+  const { user, signOut } = useAuth()
+
   return (
-    <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-      <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
+    <div className="grid min-w-0 gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Workspace connection</p>
@@ -62,7 +66,7 @@ export function SettingsPage() {
         </a>
       </section>
 
-      <section className="rounded-[24px] border border-[#E6D4B4] bg-[#F8E9CB] p-6 sm:p-8">
+      <section className="min-w-0 rounded-[24px] border border-[#E6D4B4] bg-[#F8E9CB] p-6 sm:p-8">
         <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Data model reserved</p>
         <h2 className="mt-2 font-serif text-2xl text-[#4E3928]">Firestore collections</h2>
         <p className="mt-3 text-xs leading-5 text-[#715D46]">
@@ -75,6 +79,24 @@ export function SettingsPage() {
             </code>
           ))}
         </div>
+      </section>
+
+      <SystemHealthPanel />
+
+      <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
+        <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Session</p>
+        <h2 className="mt-2 font-serif text-2xl">Admin access</h2>
+        <p className="mt-3 break-words text-sm text-[#816D62]">
+          Signed in as <strong>{user?.email || 'admin'}</strong>.
+        </p>
+        <button
+          type="button"
+          onClick={signOut}
+          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#2B1723] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#3A2630] sm:w-auto"
+        >
+          <LogOut className="size-4" />
+          Log out
+        </button>
       </section>
     </div>
   )

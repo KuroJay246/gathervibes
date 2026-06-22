@@ -9,6 +9,7 @@ export {
   normalizePhone,
   timestampMillis,
   generateStableId,
+  buildInitialFieldMap,
   mapRows,
   validateRow,
   findDuplicate,

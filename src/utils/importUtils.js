@@ -2,6 +2,61 @@ import { dateFromValue, parseTimestampSafely } from './dateUtils.js'
 
 export const MAX_PERSONS_ATTENDING = 100
 
+function cellToImportText(value) {
+  if (value === null || value === undefined) return ''
+  if (value instanceof Date) return value.toISOString()
+  if (typeof value === 'string') return value.trim()
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  return String(value).trim()
+}
+
+export function rowsToParsedTable(sheetRows = []) {
+  const normalizedRows = sheetRows
+    .map((row) => (Array.isArray(row) ? row.map(cellToImportText) : []))
+    .filter((row) => row.some((cell) => cell.trim() !== ''))
+
+  if (normalizedRows.length === 0) return { headers: [], rows: [] }
+
+  const headerIndex = normalizedRows.findIndex((row) => row.some((cell) => cell.trim() !== ''))
+  const rawHeaders = normalizedRows[headerIndex] || []
+  const columnCount = Math.max(
+    rawHeaders.length,
+    ...normalizedRows.slice(headerIndex + 1).map((row) => row.length),
+  )
+
+  const headers = Array.from({ length: columnCount }, (_, index) => {
+    const header = rawHeaders[index]?.trim()
+    return header || `Column ${index + 1}`
+  })
+
+  const dataRows = normalizedRows.slice(headerIndex + 1).map((row, index) => {
+    const cells = Array.from({ length: headers.length }, (_, cellIndex) => row[cellIndex]?.trim() || '')
+    return {
+      _sourceRowId: `row-${index + 1}`,
+      data: cells,
+    }
+  })
+
+  return { headers, rows: dataRows }
+}
+
+export function buildInitialFieldMap(headers = []) {
+  const initialMap = {}
+  headers.forEach((h, i) => {
+    const lower = h.toLowerCase()
+    if (lower.includes('name') && !lower.includes('group')) initialMap.fullName = i
+    else if (lower.includes('email')) initialMap.email = i
+    else if (lower.includes('phone')) initialMap.phone = i
+    else if (lower.includes('group')) initialMap.groupName = i
+    else if (lower.includes('person') || lower.includes('ticket')) initialMap.personsAttending = i
+    else if (lower.includes('reference') || lower.includes('receipt') || lower.includes('transaction')) initialMap.paymentReference = i
+    else if (lower.includes('pay')) initialMap.paymentStatus = i
+    else if (lower.includes('timestamp') || lower.includes('submitted')) initialMap.timestamp = i
+    else if (lower.includes('note') || lower.includes('comment')) initialMap.notes = i
+  })
+  return initialMap
+}
+
 async function sha256(message) {
   const msgBuffer = new TextEncoder().encode(message)
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
@@ -57,16 +112,7 @@ export function parseCSV(text) {
 
   if (cleanedRows.length === 0) return { headers: [], rows: [] }
 
-  const headers = cleanedRows[0].map((h) => h.trim())
-  const dataRows = cleanedRows.slice(1).map((row, index) => {
-    while (row.length < headers.length) row.push('')
-    return {
-      _sourceRowId: `row-${index + 1}`,
-      data: row.slice(0, headers.length).map((c) => c.trim()),
-    }
-  })
-
-  return { headers, rows: dataRows }
+  return rowsToParsedTable(cleanedRows)
 }
 
 export function normalizePaymentStatus(val) {
