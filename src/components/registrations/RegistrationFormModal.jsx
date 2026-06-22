@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
-import { validPaymentStatuses, validTicketStatuses, validateRegistration } from '../../utils/validators.js'
+import { validPaymentStatuses, validateRegistration } from '../../utils/validators.js'
 
 export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, saving }) {
   const [formData, setFormData] = useState({
@@ -11,7 +11,6 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
     personsAttending: 1,
     paymentStatus: 'unknown',
     paymentReference: '',
-    ticketStatus: 'no-ticket-assigned',
     notes: '',
   })
   const [errors, setErrors] = useState({})
@@ -28,7 +27,6 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
           personsAttending: initialData.personsAttending || 1,
           paymentStatus: initialData.paymentStatus || 'unknown',
           paymentReference: initialData.paymentReference || '',
-          ticketStatus: initialData.ticketStatus || 'no-ticket-assigned',
           notes: initialData.notes || '',
         })
       } else {
@@ -40,7 +38,6 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
           personsAttending: 1,
           paymentStatus: 'unknown',
           paymentReference: '',
-          ticketStatus: 'no-ticket-assigned',
           notes: '',
         })
       }
@@ -148,7 +145,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
               </div>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2">
               <div>
                 <label className="event-label">Persons Attending <span>*</span></label>
                 <input
@@ -173,20 +170,6 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
                 >
                   {validPaymentStatuses.map(status => (
                     <option key={status} value={status}>{status.replace('-', ' ').toUpperCase()}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="event-label">Ticket Status <span>*</span></label>
-                <select
-                  value={formData.ticketStatus}
-                  onChange={(e) => handleChange('ticketStatus', e.target.value)}
-                  className="event-input bg-white"
-                  disabled={saving}
-                >
-                  {validTicketStatuses.map(status => (
-                    <option key={status} value={status}>{status.replace(/-/g, ' ').toUpperCase()}</option>
                   ))}
                 </select>
               </div>

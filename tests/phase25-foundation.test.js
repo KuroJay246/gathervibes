@@ -36,8 +36,8 @@ test('Google and email sign-in both retain admin allowlist verification', async 
   assert.match(authProvider, /doc\(db, 'settings', 'accessControl'\)/)
   assert.match(firebaseConfig, /authDomain: import\.meta\.env\.VITE_FIREBASE_AUTH_DOMAIN/)
   assert.match(loginPage, /googleMode/)
-  assert.match(loginPage, /Sign up with Google/)
-  assert.match(loginPage, /Log in with Google/)
+  assert.match(loginPage, /Continue with Google/)
+  assert.doesNotMatch(loginPage, /Sign up with Google/)
   assert.match(loginPage, /Sign in with email/)
 })
 
@@ -50,4 +50,18 @@ test('registration audit logs preserve registration target type', async () => {
   assert.match(auditService, /targetType,/)
   assert.match(registrationService, /targetType: 'registration'/)
   assert.match(importService, /targetType: 'registration'/)
+})
+
+test('mobile navigation keeps More, Settings, and logout reachable', async () => {
+  const shell = await readFile('src/layout/AppShell.jsx', 'utf8')
+  const settingsPage = await readFile('src/pages/SettingsPage.jsx', 'utf8')
+  const styles = await readFile('src/styles.css', 'utf8')
+
+  assert.match(shell, /aria-label="Open all navigation"/)
+  assert.match(shell, /mobile-tab-bar lg:hidden/)
+  assert.match(shell, />More</)
+  assert.match(shell, /to="\/settings"/)
+  assert.match(shell, /aria-label="Sign out"/)
+  assert.match(settingsPage, /Log out/)
+  assert.match(styles, /@media \(min-width: 1024px\)[\s\S]*\.mobile-tab-bar[\s\S]*display: none/)
 })

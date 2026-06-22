@@ -26,9 +26,9 @@ function getAuthErrorMessage(code) {
     'auth/popup-closed-by-user': 'Google sign-in was cancelled. Nothing changed.',
     'auth/cancelled-popup-request': 'The earlier Google sign-in window was closed. Please try again.',
     'auth/popup-blocked': 'Your browser blocked the Google sign-in window. Continue in this window instead.',
-    'auth/unauthorized-domain': 'This website is not authorized for Google sign-in. Contact the workspace owner.',
+    'auth/unauthorized-domain': 'Google sign-in is blocked because this website domain is not authorized in Firebase Authentication. Add this domain under Firebase Console → Authentication → Settings → Authorized domains.',
     'auth/operation-not-allowed': 'Google sign-in is not enabled for this Firebase project.',
-    'auth/unapproved-account': 'This account is not approved for the private Gather & Savor workspace.',
+    'auth/unapproved-account': 'This account signed in successfully but is not approved in settings/accessControl.',
     'auth/access-check-failed': 'Your admin access could not be verified. Check your connection and try again.',
     'auth/redirect-failed': 'Google sign-in could not be completed. Please try again.',
   }
@@ -48,7 +48,6 @@ export function LoginPage() {
     authError,
     signIn,
     signInWithGoogle,
-    signUpWithGoogle,
     isConfigured,
   } = useAuth()
   const navigate = useNavigate()
@@ -65,28 +64,19 @@ export function LoginPage() {
     setSubmitting(mode)
 
     try {
-      if (mode === 'google-signup') {
-        await signUpWithGoogle()
-        return
-      }
-
       await signInWithGoogle()
     } catch (authFailure) {
       setError(getAuthErrorMessage(authFailure.code))
       setSubmitting('')
     }
-  }, [isConfigured, signInWithGoogle, signUpWithGoogle])
+  }, [isConfigured, signInWithGoogle])
 
   useEffect(() => {
     if (loading || user || !isConfigured || autoGoogleStarted.current) return
 
     let authMode = ''
-    if (googleMode === 'login') {
+    if (googleMode === 'login' || googleMode === 'signup') {
       authMode = 'google-login'
-    }
-
-    if (googleMode === 'signup') {
-      authMode = 'google-signup'
     }
 
     if (!authMode) return
@@ -174,29 +164,9 @@ export function LoginPage() {
             <button
               type="button"
               className="google-sign-in-button"
-              onClick={() => handleGoogleAuth('google-signup')}
-              disabled={!isConfigured || Boolean(submitting)}
-              aria-label="Sign up with Google"
-            >
-              {submitting === 'google-signup' ? (
-                <>
-                  <span className="size-4 animate-spin rounded-full border-2 border-[#B76E79]/25 border-t-[#B76E79]" />
-                  Opening Google…
-                </>
-              ) : (
-                <>
-                  <GoogleMark />
-                  Sign up with Google
-                </>
-              )}
-            </button>
-
-            <button
-              type="button"
-              className="mt-3 google-sign-in-button"
               onClick={() => handleGoogleAuth('google-login')}
               disabled={!isConfigured || Boolean(submitting)}
-              aria-label="Log in with Google"
+              aria-label="Continue with Google"
             >
               {submitting === 'google-login' ? (
                 <>
@@ -206,7 +176,7 @@ export function LoginPage() {
               ) : (
                 <>
                   <GoogleMark />
-                  Log in with Google
+                  Continue with Google
                 </>
               )}
             </button>

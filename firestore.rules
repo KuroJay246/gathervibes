@@ -3,7 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ===============================================================
-    // Phase 3.1 data model
+    // Phase 4.5 data model
     // ===============================================================
     // settings/accessControl
     //   approvedEmails: list<string> (created only in Firebase Console)
@@ -24,7 +24,10 @@ service cloud.firestore {
     //   updatedAt: timestamp
     //
     // registrations/{registrationId}
-    //   (unchanged from Phase 3)
+    //   ticketCode: string|null
+    //   ticketAssignedAt: timestamp|null
+    //   ticketAssignedBy: string|null
+    //   checkedInBy: string|null
     //
     // auditLogs/{logId}
     //   append-only event/registration audit record created in the same batch.
@@ -143,13 +146,15 @@ service cloud.firestore {
       return data.keys().hasAll([
           'registrationId', 'eventId', 'fullName', 'email', 'phone',
           'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
-          'ticketStatus', 'notes', 'checkedIn', 'checkInTime', 'source', 'sourceRowId', 'timestamp',
+          'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy',
+          'notes', 'checkedIn', 'checkInTime', 'checkedInBy', 'source', 'sourceRowId', 'timestamp',
           'createdAt', 'updatedAt'
         ])
         && data.keys().hasOnly([
           'registrationId', 'eventId', 'fullName', 'email', 'phone',
           'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
-          'ticketStatus', 'notes', 'checkedIn', 'checkInTime', 'source', 'sourceRowId', 'timestamp',
+          'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy',
+          'notes', 'checkedIn', 'checkInTime', 'checkedInBy', 'source', 'sourceRowId', 'timestamp',
           'createdAt', 'updatedAt'
         ])
         && data.registrationId == registrationId
@@ -167,10 +172,14 @@ service cloud.firestore {
         && data.paymentStatus in ['paid', 'pending', 'complimentary', 'door-list', 'unknown']
         && validOptionalString(data.paymentReference, 250)
         && data.ticketStatus in ['no-ticket-assigned', 'partially-assigned', 'assigned']
+        && validOptionalString(data.ticketCode, 32)
+        && (data.ticketAssignedAt == null || data.ticketAssignedAt is timestamp)
+        && validOptionalString(data.ticketAssignedBy, 256)
         && data.notes is string
         && data.notes.size() <= 10000
         && data.checkedIn is bool
         && (data.checkInTime == null || data.checkInTime is timestamp)
+        && validOptionalString(data.checkedInBy, 256)
         && data.source in ['manual', 'csv-import']
         && validOptionalString(data.sourceRowId, 128)
         && (data.timestamp == null || data.timestamp is timestamp)
@@ -215,7 +224,9 @@ service cloud.firestore {
         && validShortId(data.logId)
         && validShortId(data.eventId)
         && data.action in [
-          'registration.create', 'registration.update', 'registration.delete', 'registration.import'
+          'registration.create', 'registration.update', 'registration.delete', 'registration.import',
+          'ticket.assign', 'ticket.unassign', 'ticket.regenerate',
+          'checkin.complete', 'checkin.duplicate-attempt'
         ]
         && data.targetType == 'registration'
         && validShortId(data.targetId)
@@ -256,7 +267,10 @@ service cloud.firestore {
             && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
           ) || (
-            data.action == 'registration.update'
+            data.action in [
+              'registration.update', 'ticket.assign', 'ticket.unassign',
+              'ticket.regenerate', 'checkin.complete'
+            ]
             && exists(/databases/$(database)/documents/registrations/$(data.targetId))
             && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
@@ -268,6 +282,84 @@ service cloud.firestore {
           )
         )
       );
+    }
+
+    function matchesDuplicateCheckInAttempt(data) {
+      return data.action == 'checkin.duplicate-attempt'
+        && exists(/databases/$(database)/documents/registrations/$(data.targetId))
+        && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
+        && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedIn == true;
+    }
+
+    function registrationIdentityUnchanged() {
+      return request.resource.data.registrationId == resource.data.registrationId
+        && request.resource.data.eventId == resource.data.eventId
+        && request.resource.data.source == resource.data.source
+        && request.resource.data.sourceRowId == resource.data.sourceRowId
+        && request.resource.data.timestamp == resource.data.timestamp
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    function registrationDetailsUnchanged() {
+      return registrationIdentityUnchanged()
+        && request.resource.data.fullName == resource.data.fullName
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.phone == resource.data.phone
+        && request.resource.data.groupName == resource.data.groupName
+        && request.resource.data.personsAttending == resource.data.personsAttending
+        && request.resource.data.paymentStatus == resource.data.paymentStatus
+        && request.resource.data.paymentReference == resource.data.paymentReference
+        && request.resource.data.notes == resource.data.notes;
+    }
+
+    function ticketFieldsUnchanged() {
+      return request.resource.data.ticketStatus == resource.data.ticketStatus
+        && request.resource.data.ticketCode == resource.data.ticketCode
+        && request.resource.data.ticketAssignedAt == resource.data.ticketAssignedAt
+        && request.resource.data.ticketAssignedBy == resource.data.ticketAssignedBy;
+    }
+
+    function checkInFieldsUnchanged() {
+      return request.resource.data.checkedIn == resource.data.checkedIn
+        && request.resource.data.checkInTime == resource.data.checkInTime
+        && request.resource.data.checkedInBy == resource.data.checkedInBy;
+    }
+
+    function isRegistrationDetailsUpdate() {
+      return registrationIdentityUnchanged()
+        && ticketFieldsUnchanged()
+        && checkInFieldsUnchanged();
+    }
+
+    function isTicketAssignmentUpdate() {
+      return registrationDetailsUnchanged()
+        && checkInFieldsUnchanged()
+        && request.resource.data.ticketStatus == 'assigned'
+        && request.resource.data.ticketCode is string
+        && request.resource.data.ticketCode.size() > 0
+        && request.resource.data.ticketCode.size() <= 32
+        && request.resource.data.ticketAssignedAt == request.time
+        && validPerformedBy(request.resource.data.ticketAssignedBy);
+    }
+
+    function isTicketUnassignmentUpdate() {
+      return registrationDetailsUnchanged()
+        && checkInFieldsUnchanged()
+        && resource.data.ticketStatus == 'assigned'
+        && request.resource.data.ticketStatus == 'no-ticket-assigned'
+        && request.resource.data.ticketCode == null
+        && request.resource.data.ticketAssignedAt == null
+        && request.resource.data.ticketAssignedBy == null;
+    }
+
+    function isCheckInCompletionUpdate() {
+      return registrationDetailsUnchanged()
+        && ticketFieldsUnchanged()
+        && resource.data.checkedIn == false
+        && resource.data.checkInTime == null
+        && request.resource.data.checkedIn == true
+        && request.resource.data.checkInTime == request.time
+        && validPerformedBy(request.resource.data.checkedInBy);
     }
 
     // The allowlist is bootstrapped in the Firebase Console. Client code can
@@ -297,19 +389,22 @@ service cloud.firestore {
         && isValidRegistration(request.resource.data, registrationId)
         && request.resource.data.checkedIn == false
         && request.resource.data.checkInTime == null
+        && request.resource.data.checkedInBy == null
+        && request.resource.data.ticketStatus == 'no-ticket-assigned'
+        && request.resource.data.ticketCode == null
+        && request.resource.data.ticketAssignedAt == null
+        && request.resource.data.ticketAssignedBy == null
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if isApprovedAdmin()
         && isValidRegistration(request.resource.data, registrationId)
-        && request.resource.data.registrationId == resource.data.registrationId
-        && request.resource.data.eventId == resource.data.eventId
-        && request.resource.data.source == resource.data.source
-        && request.resource.data.sourceRowId == resource.data.sourceRowId
-        && request.resource.data.timestamp == resource.data.timestamp
-        && request.resource.data.createdAt == resource.data.createdAt
-        && request.resource.data.checkedIn == resource.data.checkedIn
-        && request.resource.data.checkInTime == resource.data.checkInTime
-        && request.resource.data.updatedAt == request.time;
+        && request.resource.data.updatedAt == request.time
+        && (
+          isRegistrationDetailsUpdate()
+          || isTicketAssignmentUpdate()
+          || isTicketUnassignmentUpdate()
+          || isCheckInCompletionUpdate()
+        );
       allow delete: if isApprovedAdmin();
     }
 
@@ -319,6 +414,7 @@ service cloud.firestore {
         && (
           (isValidEventAuditLog(request.resource.data, logId) && matchesEventMutation(request.resource.data))
           || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesRegistrationMutation(request.resource.data))
+          || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesDuplicateCheckInAttempt(request.resource.data))
         );
       allow update, delete: if false;
     }

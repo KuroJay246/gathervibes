@@ -123,7 +123,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden rounded-[28px] bg-[#2B1723] px-6 py-8 text-white shadow-[0_18px_50px_rgba(43,23,35,0.15)] sm:px-9 sm:py-10 lg:px-12">
+      <section className="safe-card relative overflow-hidden rounded-[28px] bg-[#2B1723] px-6 py-8 text-white shadow-[0_18px_50px_rgba(43,23,35,0.15)] sm:px-9 sm:py-10 lg:px-12">
         <div className="absolute -right-16 -top-24 size-72 rounded-full bg-[#C98291]/20 blur-3xl" />
         <div className="absolute -bottom-24 right-40 size-56 rounded-full bg-[#F5E6C8]/10 blur-3xl" />
 
@@ -167,7 +167,7 @@ export function DashboardPage() {
         <div className="space-y-6">
 
           {/* Selected / Working Event card */}
-          <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
+          <article className="safe-card rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
             <div className="mb-1 flex items-start justify-between gap-4">
               <div>
                 <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Working Event</p>
@@ -193,7 +193,7 @@ export function DashboardPage() {
             <div className="mb-5 flex items-start gap-2 rounded-xl bg-[#FFF8F2] px-3 py-2.5">
               <Info className="mt-0.5 size-3.5 shrink-0 text-[#B76E79]" />
               <p className="text-[11px] leading-5 text-[#8A7468]">
-                The <strong>selected event</strong> is only your current workspace focus. It does not change the event status or affect other admins.
+                The <strong>Working Event</strong> is the one event currently used for registrations, imports, tickets, and check-in. Dashboard can show several upcoming or active events, but operational pages use only this selected Working Event. Selecting one does not change its event status.
                 {activeEvent && (
                   <> To change it, <Link to="/events" className="font-bold text-[#B76E79] underline underline-offset-2">select another event</Link> from the Events page.</>
                 )}
@@ -204,7 +204,7 @@ export function DashboardPage() {
               <>
                 {/* Registration metrics */}
                 {metrics.total > 0 && (
-                  <div className="mb-5 grid grid-cols-4 gap-2">
+                  <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
                     <MetricPill label="Total" value={metrics.total} color="bg-[#FFF8F2] text-[#4E3A2C]" />
                     <MetricPill label="Paid" value={metrics.paid} color="bg-[#EAF6EF] text-[#2F5C3E]" />
                     <MetricPill label="Pending" value={metrics.pending} color="bg-[#FFFBEA] text-[#7A5700]" />
@@ -260,7 +260,7 @@ export function DashboardPage() {
           </article>
 
           {/* Upcoming events */}
-          <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
+          <article className="safe-card rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
                 <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">On the calendar</p>
@@ -303,7 +303,7 @@ export function DashboardPage() {
                             type="button"
                             id={`select-event-${ev.eventId}`}
                             onClick={() => setActiveEvent(ev)}
-                            className="text-[10px] font-bold text-[#B76E79] opacity-0 transition group-hover:opacity-100 hover:underline"
+                            className="text-[10px] font-bold text-[#B76E79] transition hover:underline lg:opacity-0 lg:group-hover:opacity-100"
                           >
                             Select
                           </button>
@@ -345,14 +345,16 @@ export function DashboardPage() {
           </section>
 
           {/* Quick links */}
-          <article className="rounded-[24px] border border-[#E6D4B4] bg-[#F8E9CB] p-6">
+          <article className="safe-card rounded-[24px] border border-[#E6D4B4] bg-[#F8E9CB] p-6">
             <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Quick navigation</p>
             <h3 className="mt-1.5 font-serif text-xl text-[#4E3928]">Workspace</h3>
             <ul className="mt-5 space-y-2">
               {[
                 { to: '/events', label: 'Events', sub: 'Create and manage events' },
                 { to: '/registrations', label: 'Registrations', sub: 'Guest list for selected event' },
-                { to: '/imports', label: 'Import CSV', sub: 'Upload or paste a spreadsheet' },
+                { to: '/tickets', label: 'Tickets', sub: 'Assign and track ticket codes' },
+                { to: '/check-in', label: 'Check-In', sub: 'Search and check in guests at the door' },
+                { to: '/imports', label: 'Import Center', sub: 'Upload CSV exports or paste table rows' },
               ].map(({ to, label, sub }) => (
                 <li key={to}>
                   <Link
@@ -373,8 +375,6 @@ export function DashboardPage() {
               <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Future phases</p>
               <ul className="mt-2 space-y-1">
                 {[
-                  { label: 'Ticket assignment', phase: 'Phase 4' },
-                  { label: 'Door check-in', phase: 'Phase 5' },
                   { label: 'Communications', phase: 'Phase 6' },
                   { label: 'AI writing', phase: 'Phase 7' },
                 ].map(({ label, phase }) => (

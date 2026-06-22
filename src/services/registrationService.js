@@ -27,8 +27,41 @@ function registrationPayload(values, eventId) {
     personsAttending: Number(values.personsAttending) || 1,
     paymentStatus: values.paymentStatus || 'unknown',
     paymentReference: values.paymentReference?.trim() || null,
-    ticketStatus: values.ticketStatus || 'no-ticket-assigned',
     notes: values.notes?.trim() || '',
+  }
+}
+
+function registrationTicketDefaults() {
+  return {
+    ticketStatus: 'no-ticket-assigned',
+    ticketCode: null,
+    ticketAssignedAt: null,
+    ticketAssignedBy: null,
+  }
+}
+
+function registrationCheckInDefaults() {
+  return {
+    checkedIn: false,
+    checkInTime: null,
+    checkedInBy: null,
+  }
+}
+
+function existingTicketFields(registration = {}) {
+  return {
+    ticketStatus: registration.ticketStatus || 'no-ticket-assigned',
+    ticketCode: registration.ticketCode || null,
+    ticketAssignedAt: registration.ticketAssignedAt || null,
+    ticketAssignedBy: registration.ticketAssignedBy || null,
+  }
+}
+
+function existingCheckInFields(registration = {}) {
+  return {
+    checkedIn: Boolean(registration.checkedIn),
+    checkInTime: registration.checkInTime || null,
+    checkedInBy: registration.checkedInBy || null,
   }
 }
 
@@ -67,8 +100,8 @@ export async function createRegistration(values, eventId, user) {
   batch.set(regRef, {
     registrationId: regRef.id,
     ...registrationPayload(values, eventId),
-    checkedIn: false,
-    checkInTime: null,
+    ...registrationTicketDefaults(),
+    ...registrationCheckInDefaults(),
     source: 'manual',
     sourceRowId: null,
     timestamp: null,
@@ -81,7 +114,7 @@ export async function createRegistration(values, eventId, user) {
   return regRef.id
 }
 
-export async function updateRegistration(registrationId, eventId, values, user) {
+export async function updateRegistration(registrationId, eventId, values, user, existingRegistration = {}) {
   const firestore = requireDatabase()
   const regRef = doc(firestore, 'registrations', registrationId)
   const audit = createAuditLogWrite({
@@ -96,6 +129,8 @@ export async function updateRegistration(registrationId, eventId, values, user) 
 
   batch.update(regRef, {
     ...registrationPayload(values, eventId),
+    ...existingTicketFields(existingRegistration),
+    ...existingCheckInFields(existingRegistration),
     updatedAt: serverTimestamp(),
   })
   batch.set(audit.ref, audit.data)

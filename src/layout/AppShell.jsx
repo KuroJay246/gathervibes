@@ -10,7 +10,6 @@ import {
   LogOut,
   Menu,
   MessageSquareText,
-  Search,
   Settings,
   Sparkles,
   TicketCheck,
@@ -18,6 +17,7 @@ import {
   X,
 } from 'lucide-react'
 import { BrandMark } from '../components/BrandMark'
+import { AdminSearch } from '../components/AdminSearch'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { formatEventDate } from '../utils/dateUtils'
@@ -32,9 +32,9 @@ const navGroups = [
     items: [
       { to: '/events', label: 'Events', icon: CalendarDays, available: true },
       { to: '/registrations', label: 'Registrations', icon: UsersRound, available: true },
-      { to: '/tickets', label: 'Tickets', icon: TicketCheck, phase: 4 },
-      { to: '/check-in', label: 'Check-In', icon: ClipboardCheck, phase: 5 },
-      { to: '/imports', label: 'Sheets Import', icon: FileInput, available: true },
+      { to: '/tickets', label: 'Tickets', icon: TicketCheck, available: true },
+      { to: '/check-in', label: 'Check-In', icon: ClipboardCheck, available: true },
+      { to: '/imports', label: 'Import Center', icon: FileInput, available: true },
     ],
   },
   {
@@ -52,18 +52,18 @@ const pageTitles = {
   '/registrations': ['Registrations', 'Keep your guest list beautifully organized'],
   '/tickets': ['Tickets', 'Assign and track ticket codes'],
   '/check-in': ['Check-In', 'Fast, confident event-day admissions'],
-  '/imports': ['Sheets Import', 'Bring in Google Forms responses safely'],
+  '/imports': ['Import Center', 'Bring in CSV exports and pasted table rows safely'],
   '/communications': ['Communication Center', 'Prepare messages for the right guests'],
   '/ai-writing': ['AI Writing Assistant', 'Create polished drafts for review'],
   '/settings': ['Settings', 'Manage workspace configuration'],
 }
 
-function SidebarContent({ onNavigate }) {
+function SidebarContent({ onNavigate, mobile = false }) {
   const { user, signOut } = useAuth()
   const { activeEvent } = useActiveEvent()
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       <div className="px-6 pb-7 pt-6">
         <BrandMark light />
       </div>
@@ -81,7 +81,7 @@ function SidebarContent({ onNavigate }) {
         </Link>
       </div>
 
-      <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-4" aria-label="Main navigation">
+      <nav className="mt-5 min-h-0 flex-1 overflow-y-auto px-3 pb-4" aria-label="Main navigation">
         {navGroups.map((group) => (
           <div className="mb-5" key={group.label}>
             <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/30">{group.label}</p>
@@ -113,7 +113,7 @@ function SidebarContent({ onNavigate }) {
         ))}
       </nav>
 
-      <div className="border-t border-white/10 p-3">
+      <div className={`shrink-0 border-t border-white/10 p-3 ${mobile ? 'pb-[max(1rem,env(safe-area-inset-bottom))]' : ''}`}>
         <NavLink
           to="/settings"
           onClick={onNavigate}
@@ -167,7 +167,7 @@ export function AppShell() {
             aria-label="Close navigation"
             type="button"
           />
-          <aside className="relative h-full w-[286px] bg-[#2B1723] shadow-2xl">
+          <aside className="relative h-[100dvh] w-[min(20rem,calc(100vw-2rem))] overflow-hidden bg-[#2B1723] shadow-2xl">
             <button
               className="absolute right-3 top-3 rounded-lg p-2 text-white/50 hover:bg-white/10 hover:text-white"
               onClick={() => setMenuOpen(false)}
@@ -176,12 +176,12 @@ export function AppShell() {
             >
               <X className="size-5" />
             </button>
-            <SidebarContent onNavigate={() => setMenuOpen(false)} />
+            <SidebarContent onNavigate={() => setMenuOpen(false)} mobile />
           </aside>
         </div>
       )}
 
-      <div className="lg:pl-[258px]">
+      <div className="min-w-0 lg:pl-[258px]">
         <header className="app-safe-top sticky top-0 z-20 border-b border-[#EEDDD3] bg-[#FFF8F2]/90 px-4 py-3.5 backdrop-blur-xl sm:px-7 sm:py-4 lg:px-10">
           <div className="mx-auto flex max-w-[1480px] items-center gap-4">
             <button
@@ -189,6 +189,7 @@ export function AppShell() {
               onClick={() => setMenuOpen(true)}
               className="rounded-xl border border-[#E7D6CC] bg-white p-2.5 text-[#2B1723] lg:hidden"
               aria-label="Open navigation"
+              aria-expanded={menuOpen}
             >
               <Menu className="size-5" />
             </button>
@@ -196,10 +197,7 @@ export function AppShell() {
               <h1 className="truncate font-serif text-xl sm:text-2xl">{title}</h1>
               <p className="mt-0.5 hidden text-xs text-[#8C766A] sm:block">{subtitle}</p>
             </div>
-            <div className="hidden min-w-[220px] items-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-3.5 py-2.5 text-left text-xs text-[#9B867A] shadow-sm md:flex">
-              <Search className="size-4" aria-hidden="true" />
-              <span className="italic">Local search available in Registrations</span>
-            </div>
+            <AdminSearch />
             <div className="hidden items-center gap-2 rounded-full border border-[#E7D6CC] bg-white py-1.5 pl-2 pr-3 sm:flex">
               <span className="grid size-7 place-items-center rounded-full bg-[#F7DDE6]">
                 <Sparkles className="size-3.5 text-[#B76E79]" aria-hidden="true" />
@@ -209,8 +207,8 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="px-4 pb-28 pt-6 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
-          <div className="mx-auto max-w-[1480px]">
+        <main className="px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-6 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
+          <div className="mx-auto max-w-[1480px] min-w-0 overflow-x-clip">
             <Outlet />
           </div>
         </main>

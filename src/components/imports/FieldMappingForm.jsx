@@ -17,9 +17,9 @@ export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onP
   
   return (
     <div className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-[0_4px_24px_rgba(43,23,35,0.04)]">
-      <h3 className="font-serif text-xl text-[#2B1723]">Map CSV Columns</h3>
+      <h3 className="font-serif text-xl text-[#2B1723]">Map Columns</h3>
       <p className="mt-2 text-sm text-[#816D62]">
-        Match your CSV columns to Gather & Savor registration fields.
+        Match imported columns to Gather & Savor registration fields.
       </p>
 
       <div className="mt-6 space-y-4">
