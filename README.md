@@ -9,14 +9,29 @@ Private event-operations dashboard for **Gather & Savor Vibes**. This is an admi
 - [x] **Phase 1**: Auth and base app shell
 - [x] **Phase 2**: Event management
 - [x] **Phase 2.5**: Google sign-in, email/password backup, mobile-first PWA foundation
-- [x] **Phase 3**: Registrations and CSV imports (Cursor-reviewed on branch `cursor/review-phase3-local`)
-- [x] **Phase 3.1 Option B**: Production security confirmed, adaptive imports, price tier schema, dashboard countdown and selected-event UX (branch `antigravity/continue-phase3-1-option-b`)
+- [x] **Phase 3**: Registrations and CSV imports
+- [x] **Phase 3.1 recovery**: Google auth restored, production security confirmed, adaptive imports, price tier schema, dashboard countdown and selected-event UX (PR #3 merged to `main`)
 - [ ] **Phase 4**: Ticket assignment
 - [ ] **Phase 5**: Door check-in
 - [ ] **Phase 6**: Communications
 - [ ] **Phase 7**: AI writing assistant
 
 Phase 3.1 adds price tiers, an enhanced dashboard with live countdowns and registration metrics, and renames "Active Event" to "Working Event / Selected Event". Tickets, door check-in, communications, AI writing, Google Sheets OAuth, Cloud Functions, Storage, and public attendee flows remain unimplemented.
+
+## Production and QA status
+
+- PR #3 (`cursor/review-phase3-1-google-auth` -> `main`) is merged.
+- `main` has been redeployed to Firebase Hosting, Firestore rules, and Firestore indexes for project `gathervibeshub`.
+- `CODEX_TEST Live Verification Event` is intentionally kept as the permanent QA / smoke-test event.
+- The CODEX_TEST event may be used for safe app testing, but not for real guests.
+- Do not delete the CODEX_TEST event unless the organizer explicitly says so.
+- Do not create a new daily test event; reuse CODEX_TEST for smoke testing.
+- Do not delete `auditLogs` globally. Test data should be clearly prefixed with `CODEX_TEST` or `CODEX_DAILY`.
+- Daily QA runs in GitHub Actions via `.github/workflows/daily-qa.yml`.
+- Daily QA is read-only by default: `npm ci`, lint, tests, build, built auth UI smoke, and live HTTP smoke checks.
+- Any future write smoke test must be opt-in only with `QA_WRITE_SMOKE=true`.
+- Write smoke tests, if enabled later, must use only CODEX_TEST, create/delete only their own `CODEX_DAILY` registration, and must leave audit logs append-only.
+- Phase 4 can begin only after `main` deployment and daily QA setup are complete. Phase 4 is Ticket Assignment only.
 
 ## Phase 3 feature summary
 
@@ -190,7 +205,7 @@ npx firebase-tools deploy --only hosting
 
 `firebase.json` sends all Hosting routes to `index.html`, allowing React Router URLs to work on refresh.
 
-The current production build is deployed at [gathervibeshub.web.app](https://gathervibeshub.web.app). Phase 3 code is reviewed locally but not merged or deployed until explicitly approved.
+The current production build is deployed at [gathervibeshub.web.app](https://gathervibeshub.web.app) from `main`.
 
 ## Mobile/PWA foundation
 
@@ -291,7 +306,7 @@ Event mutations and their audit records use a single Firestore batch. A failed a
 - [x] Dashboard: capacity progress bar
 - [x] Dashboard: price tier summary chips
 - [x] Excel/XLSX: deferred (no dependency added)
-- [x] 51/51 tests passing
+- [x] 52/52 tests passing
 - [x] Lint: 0 errors
 - [x] Build: clean
 

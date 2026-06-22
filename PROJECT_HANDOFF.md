@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 21, 2026 (Phase 3.1 Option B — branch antigravity/continue-phase3-1-option-b)
+Last updated: June 22, 2026 (PR #3 merged to main, Firebase redeployed, daily QA added)
 
 ## 1. Project overview
 
@@ -17,7 +17,37 @@ The repository currently contains:
 - Phase 2: complete Events CRUD, active-event selection, event validation, operational states, and append-only audit logging.
 - Phase 2.5: Google sign-in with email/password backup plus a mobile-first installable PWA foundation.
 - Phase 3: registrations CRUD, CSV upload/paste import, field mapping, import preview, duplicate detection, stable privacy-safe import IDs, and registration audit logging (Cursor-reviewed).
-- Phase 3.1 Option B: production security verified, price tier schema, enhanced dashboard with live countdowns, registration metrics, selected-event UX (branch `antigravity/continue-phase3-1-option-b`).
+- Phase 3.1 recovery: Google auth restored, production security verified, price tier schema, enhanced dashboard with live countdowns, registration metrics, selected-event UX. PR #3 (`cursor/review-phase3-1-google-auth` -> `main`) has been merged and redeployed to Firebase project `gathervibeshub`.
+
+## Production QA fixture
+
+`CODEX_TEST Live Verification Event` is intentionally kept as the permanent QA / smoke-test event.
+
+Rules:
+
+- This event may be used for safe app testing.
+- Do not use it for real guests.
+- Do not delete it unless the organizer explicitly says so.
+- Do not create a new daily test event; reuse the existing CODEX_TEST event.
+- Do not delete `auditLogs` globally.
+- Prefix test data clearly with `CODEX_TEST` or `CODEX_DAILY`.
+- Any future write smoke test must be opt-in only with `QA_WRITE_SMOKE=true`.
+- Because audit logs are append-only, write smoke tests will create audit log records. That is expected and should be documented before enabling them.
+
+## Daily QA
+
+GitHub Actions workflow: `.github/workflows/daily-qa.yml`
+
+The scheduled daily workflow is read-only by default:
+
+- `npm ci`
+- `npm run lint`
+- `npm test`
+- `npm run build`
+- Built auth UI smoke check for Google and email/password entry points
+- Live HTTP smoke check for `https://gathervibeshub.web.app/` and `/login`
+
+The workflow does not require service account secrets and does not automate Google OAuth login. Optional Firestore health checks may be added later only if repository secrets are configured safely. Do not commit service account JSON files, private keys, `.pem`, `.key`, or `.env.local`.
 
 ## 2. Technology stack
 
@@ -104,7 +134,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Responsive mobile registration cards and desktop table
 - Composite Firestore index on `registrations` (`eventId`, `createdAt`)
 
-### Phase 3.1 Option B — Complete (branch `antigravity/continue-phase3-1-option-b`)
+### Phase 3.1 recovery — Complete (PR #3 merged to `main`)
 
 - Production security verified: `AuthProvider.jsx` enforces Firestore allowlist check; no debug bypasses present
 - Price tier schema added to `validators.js`, `EventFormModal.jsx`, `eventService.js`, and `firestore.rules`
@@ -123,7 +153,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Dashboard: price tier summary chips with sold-out and hidden visual states
 - Excel/XLSX: deferred — no `xlsx` dependency added
 - Google Sheets OAuth: remains deferred
-- 51/51 tests pass; 0 lint errors; build clean
+- 52/52 tests pass; 0 lint errors; build clean
 
 ## 4. Features intentionally not implemented
 
@@ -451,14 +481,14 @@ npx firebase-tools deploy --only hosting --project gathervibeshub
 ### Phase 3.1 Option B (Antigravity)
 
 - ESLint: 0 errors
-- 51/51 unit tests passing (24 Phase 3 + 27 new Phase 3.1)
+- 52/52 unit tests passing
 - Production Vite build: clean
 - No debug bypasses in `AuthProvider.jsx` or `firestore.rules`
 - Price tier schema verified in validators, form, service, and rules
 - Dashboard enhancements verified: clock, countdowns, selected-event UX, metrics, capacity bar
 - Excel/XLSX confirmed deferred (not added)
 - No new dependencies added
-- No merge to main; no deployment; branch: `antigravity/continue-phase3-1-option-b`
+- PR #3 merged to `main`; `main` redeployed to Firebase project `gathervibeshub`
 
 Unit tests now cover:
 
@@ -511,10 +541,17 @@ Registration and import writes always include an audit log entry in the same bat
 
 ## 22. Recommended next phase
 
-**Phase 4 — Ticket Assignment only**, after Phase 3 is verified live with the real Firebase project:
+**Phase 4 — Ticket Assignment only**, after PR #3 is merged to `main`, `main` is redeployed, and daily QA is in place:
 
 - Assign externally created ticket codes to registrations
 - Track ticket status transitions
 - Do not add door check-in, communications, or AI until their respective phases
 
-Do not merge to `main` or deploy Hosting/rules until the organizer approves this review branch.
+Phase boundaries remain:
+
+- Phase 4: Ticket Assignment only
+- Phase 5: Door Check-In
+- Phase 6: Communications
+- Phase 7: AI Writing
+
+Google Sheets OAuth remains deferred. There is no public attendee app, no native Android app, no Cloud Functions, and no Storage integration yet.
