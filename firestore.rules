@@ -368,14 +368,23 @@ service cloud.firestore {
         && request.resource.data.ticketAssignedBy == null;
     }
 
-    function isCheckInCompletionUpdate() {
-      return registrationDetailsUnchanged()
-        && ticketFieldsUnchanged()
+    function checkInCompletionChangedKeysOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+        'checkedIn', 'checkInTime', 'checkedInBy', 'updatedAt'
+      ]);
+    }
+
+    function isCheckInCompletionUpdate(registrationId) {
+      return checkInCompletionChangedKeysOnly()
+        && request.resource.data.registrationId == registrationId
+        && request.resource.data.eventId == resource.data.eventId
+        && validShortId(request.resource.data.eventId)
         && resource.data.checkedIn == false
         && resource.data.checkInTime == null
         && request.resource.data.checkedIn == true
         && request.resource.data.checkInTime == request.time
-        && validPerformedBy(request.resource.data.checkedInBy);
+        && validPerformedBy(request.resource.data.checkedInBy)
+        && request.resource.data.updatedAt == request.time;
     }
 
     // The allowlist is bootstrapped in the Firebase Console. Client code can
@@ -410,13 +419,17 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if isApprovedAdmin()
-        && isValidRegistration(request.resource.data, registrationId)
-        && request.resource.data.updatedAt == request.time
         && (
-          isRegistrationDetailsUpdate()
-          || isTicketAssignmentUpdate()
-          || isTicketUnassignmentUpdate()
-          || isCheckInCompletionUpdate()
+          (
+            isValidRegistration(request.resource.data, registrationId)
+            && request.resource.data.updatedAt == request.time
+            && (
+              isRegistrationDetailsUpdate()
+              || isTicketAssignmentUpdate()
+              || isTicketUnassignmentUpdate()
+            )
+          )
+          || isCheckInCompletionUpdate(registrationId)
         );
       allow delete: if isApprovedAdmin();
     }

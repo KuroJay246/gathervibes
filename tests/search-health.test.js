@@ -57,3 +57,40 @@ test('runtime health helpers hide allowlist contents while reporting approval', 
   assert.doesNotMatch(JSON.stringify(items), /approvedEmails/)
 })
 
+test('runtime health treats missing build commit as informational', () => {
+  const missingCommit = buildRuntimeHealthItems({
+    firebaseConfigured: true,
+    projectId: 'gathervibeshub',
+    user: { email: 'jaylanspencer99@gmail.com' },
+    allowlistApproved: true,
+    eventsStatus: 'ok',
+    registrationsStatus: 'ok',
+    auditStatus: 'ok',
+    serviceWorkerSafe: true,
+    activeEvent: { eventId: 'event-1', eventName: 'CODEX_TEST Live Verification Event' },
+    buildCommit: '',
+  })
+  const withCommit = buildRuntimeHealthItems({
+    firebaseConfigured: true,
+    projectId: 'gathervibeshub',
+    user: { email: 'jaylanspencer99@gmail.com' },
+    allowlistApproved: true,
+    eventsStatus: 'ok',
+    registrationsStatus: 'ok',
+    auditStatus: 'ok',
+    serviceWorkerSafe: true,
+    activeEvent: { eventId: 'event-1', eventName: 'CODEX_TEST Live Verification Event' },
+    buildCommit: 'abc1234',
+  })
+
+  assert.deepEqual(
+    missingCommit.find((item) => item.label === 'Build metadata'),
+    {
+      label: 'Build metadata',
+      status: 'ok',
+      detail: 'Build commit not configured for this build.',
+    },
+  )
+  assert.equal(withCommit.find((item) => item.label === 'Build metadata').detail, 'Commit abc1234')
+})
+

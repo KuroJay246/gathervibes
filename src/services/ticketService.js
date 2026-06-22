@@ -17,29 +17,6 @@ function performedBy(user) {
   return user?.email || user?.uid || 'unknown-admin'
 }
 
-function preserveRegistrationForCheckIn(registration) {
-  return {
-    registrationId: registration.registrationId,
-    eventId: registration.eventId,
-    fullName: registration.fullName || '',
-    email: registration.email || null,
-    phone: registration.phone || null,
-    groupName: registration.groupName || null,
-    personsAttending: Number(registration.personsAttending) || 1,
-    paymentStatus: registration.paymentStatus || 'unknown',
-    paymentReference: registration.paymentReference || null,
-    ticketStatus: registration.ticketStatus || 'no-ticket-assigned',
-    ticketCode: registration.ticketCode || null,
-    ticketAssignedAt: registration.ticketAssignedAt || null,
-    ticketAssignedBy: registration.ticketAssignedBy || null,
-    notes: registration.notes || '',
-    source: registration.source || 'manual',
-    sourceRowId: registration.sourceRowId || null,
-    timestamp: registration.timestamp || null,
-    createdAt: registration.createdAt,
-  }
-}
-
 export function buildTicketAuditDetails(registration, ticketCode) {
   return {
     fullName: registration.fullName,
@@ -126,7 +103,6 @@ export async function completeCheckIn(registration, user) {
   const batch = writeBatch(firestore)
 
   batch.update(regRef, {
-    ...preserveRegistrationForCheckIn(registration),
     checkedIn: true,
     checkInTime: serverTimestamp(),
     checkedInBy: performedBy(user),

@@ -58,9 +58,9 @@ export function buildRuntimeHealthItems({
       detail: serviceWorkerSafe ? 'No private data fetch caching is registered.' : 'Service worker safety needs review.',
     },
     {
-      label: 'Build commit',
-      status: buildCommit ? 'ok' : 'warn',
-      detail: buildCommit || 'Not provided in this build.',
+      label: 'Build metadata',
+      status: 'ok',
+      detail: buildCommit ? `Commit ${buildCommit}` : 'Build commit not configured for this build.',
     },
     {
       label: 'Working Event',
