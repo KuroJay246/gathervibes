@@ -66,19 +66,10 @@ export function AuthProvider({ children }) {
     }
 
     let active = true
+    let redirectSettled = false
 
-    getRedirectResult(auth).catch((error) => {
-      if (active) setAuthError(error.code || 'auth/redirect-failed')
-    })
-
-    const unsubscribe = onAuthStateChanged(auth, async (nextUser) => {
+    async function approveUser(nextUser) {
       if (!active) return
-
-      if (!nextUser) {
-        setUser(null)
-        setLoading(false)
-        return
-      }
 
       setLoading(true)
       try {
@@ -96,6 +87,44 @@ export function AuthProvider({ children }) {
       } finally {
         if (active) setLoading(false)
       }
+    }
+
+    getRedirectResult(auth)
+      .then(async (result) => {
+        redirectSettled = true
+        if (!active) return
+
+        if (result?.user) {
+          await approveUser(result.user)
+          return
+        }
+
+        if (!auth.currentUser) {
+          setUser(null)
+          setLoading(false)
+        }
+      })
+      .catch((error) => {
+        redirectSettled = true
+        if (active) {
+          setUser(null)
+          setAuthError(error.code || 'auth/redirect-failed')
+          setLoading(false)
+        }
+      })
+
+    const unsubscribe = onAuthStateChanged(auth, async (nextUser) => {
+      if (!active) return
+
+      if (!nextUser) {
+        if (redirectSettled) {
+          setUser(null)
+          setLoading(false)
+        }
+        return
+      }
+
+      await approveUser(nextUser)
     })
 
     return () => {
