@@ -32,9 +32,9 @@ const navGroups = [
     items: [
       { to: '/events', label: 'Events', icon: CalendarDays, available: true },
       { to: '/registrations', label: 'Registrations', icon: UsersRound, available: true },
-      { to: '/tickets', label: 'Tickets', icon: TicketCheck, phase: 4 },
-      { to: '/check-in', label: 'Check-In', icon: ClipboardCheck, phase: 5 },
-      { to: '/imports', label: 'Sheets Import', icon: FileInput, available: true },
+      { to: '/tickets', label: 'Tickets', icon: TicketCheck, available: true },
+      { to: '/check-in', label: 'Check-In', icon: ClipboardCheck, available: true },
+      { to: '/imports', label: 'Import Center', icon: FileInput, available: true },
     ],
   },
   {
@@ -52,7 +52,7 @@ const pageTitles = {
   '/registrations': ['Registrations', 'Keep your guest list beautifully organized'],
   '/tickets': ['Tickets', 'Assign and track ticket codes'],
   '/check-in': ['Check-In', 'Fast, confident event-day admissions'],
-  '/imports': ['Sheets Import', 'Bring in Google Forms responses safely'],
+  '/imports': ['Import Center', 'Bring in CSV exports and pasted table rows safely'],
   '/communications': ['Communication Center', 'Prepare messages for the right guests'],
   '/ai-writing': ['AI Writing Assistant', 'Create polished drafts for review'],
   '/settings': ['Settings', 'Manage workspace configuration'],

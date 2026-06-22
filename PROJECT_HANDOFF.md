@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 22, 2026 (PR #3 merged to main, Firebase redeployed, daily QA added)
+Last updated: June 22, 2026 (Phase 3.2 Import Center and Phase 4.5 ticket/check-in foundation implemented locally; deployment pending approval)
 
 ## 1. Project overview
 
@@ -18,6 +18,8 @@ The repository currently contains:
 - Phase 2.5: Google sign-in with email/password backup plus a mobile-first installable PWA foundation.
 - Phase 3: registrations CRUD, CSV upload/paste import, field mapping, import preview, duplicate detection, stable privacy-safe import IDs, and registration audit logging (Cursor-reviewed).
 - Phase 3.1 recovery: Google auth restored, production security verified, price tier schema, enhanced dashboard with live countdowns, registration metrics, selected-event UX. PR #3 (`cursor/review-phase3-1-google-auth` -> `main`) has been merged and redeployed to Firebase project `gathervibeshub`.
+- Phase 3.2: Import Center cleanup with source selector and explicit XLSX deferral.
+- Phase 4.5 foundation: ticket assignment plus search-based door check-in for approved admins.
 
 ## Production QA fixture
 
@@ -155,12 +157,43 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Google Sheets OAuth: remains deferred
 - 52/52 tests pass; 0 lint errors; build clean
 
+### Phase 3.2 Import Center — Complete locally
+
+- `/imports` renamed **Import Center** in navigation, dashboard entry points, and page heading
+- Source selector added for Google Forms CSV, Google Sheets CSV, Excel/XLSX, pasted table text, bank/payment CSV, and custom files
+- Source-specific helper text added for each requested source type
+- Google Forms and Google Sheets remain export-to-CSV workflows
+- Pasted table text and CSV upload still reuse the existing parse, map, preview, and confirm-import flow
+- Header detection improved for payment references and notes
+- XLSX is marked **Coming next**; no parser dependency was added in this pass
+- Google Sheets OAuth remains deferred
+
+### Phase 4.5 Ticketing + Door Check-In foundation — Complete locally
+
+- `/tickets` route is live for approved admins
+- Tickets page requires a selected Working Event
+- Registrations list shows name, email, phone, payment status, ticket status, and ticket code
+- Admins can assign manual `GSV-XXXXXX` codes
+- Admins can generate readable privacy-safe codes
+- Regeneration and clear/unassign require confirmation
+- Filters: all, no ticket, assigned, paid, pending, complimentary
+- Search covers name, email, phone, and ticket code
+- Mobile cards and desktop table implemented
+- Ticket actions write audit logs: `ticket.assign`, `ticket.unassign`, `ticket.regenerate`
+- `/check-in` route is live for approved admins
+- Check-In page requires a selected Working Event
+- Large mobile-first search supports name, email, phone, and ticket code
+- Guest card shows payment, ticket, and check-in status
+- Check-in moves `checkedIn` false -> true and sets `checkInTime` / `checkedInBy`
+- Duplicate check-in is blocked and can record `checkin.duplicate-attempt`
+- QR scanning is deferred with a visible note: search by ticket code is active now
+- No public attendee access, no QR scanner, no communications, no AI, no OAuth, no Cloud Functions
+
 ## 4. Features intentionally not implemented
 
 The following remain phase-gated or deferred:
 
-- Ticket assignment and ticket-code generation (Phase 4)
-- Door check-in and QR scanning (Phase 5)
+- QR scanning
 - Communications and bulk email sending (Phase 6)
 - AI writing drafts (Phase 7)
 - Google Sheets OAuth (deferred; use CSV export first)
@@ -174,7 +207,7 @@ The following remain phase-gated or deferred:
 - Offline Firestore writes
 - Service worker caching of private admin data
 
-The `/tickets`, `/check-in`, `/communications`, and `/ai-writing` routes show clear future-phase messages and do not save or load backend data.
+The `/communications` and `/ai-writing` routes remain future-phase messages. `/tickets` and `/check-in` are live private-admin routes on this feature branch and are not deployed until explicit approval.
 
 ## 5. Application routes
 
@@ -184,9 +217,9 @@ The `/tickets`, `/check-in`, `/communications`, and `/ai-writing` routes show cl
 | `/dashboard` | Complete | Secure workspace and selected-event context |
 | `/events` | Complete | Firestore event CRUD and active-event selection |
 | `/registrations` | Phase 3 complete | Registration CRUD for the active event |
-| `/imports` | Phase 3 complete | CSV upload/paste, mapping, preview, and import |
-| `/tickets` | Phase 4 boundary | Future ticket-code management |
-| `/check-in` | Phase 5 boundary | Future event-day check-in |
+| `/imports` | Phase 3.2 complete locally | Import Center source selector, CSV upload/paste, mapping, preview, and import |
+| `/tickets` | Phase 4.5 complete locally | Ticket-code assignment, generation, regeneration, and unassignment |
+| `/check-in` | Phase 4.5 complete locally | Search-based door check-in and duplicate prevention |
 | `/communications` | Phase 6 boundary | Future guest filtering and message drafts |
 | `/ai-writing` | Phase 7 boundary | Future editable AI writing drafts |
 | `/settings` | Complete | Firebase and data-model status |
@@ -288,9 +321,11 @@ The rules in `firestore.rules` implement:
 - Strict event schema validation and CRUD for approved admins
 - Strict registration schema validation and CRUD for approved admins
 - Registration create requires `checkedIn == false` and `checkInTime == null`
-- Registration update keeps `checkedIn`, `checkInTime`, `registrationId`, `eventId`, `source`, `sourceRowId`, `timestamp`, and `createdAt` immutable
-- Append-only `auditLogs` for matching event and registration mutations
-- `tickets`, `checkIn`, `communications`, and `aiDrafts` collections denied
+- Registration update keeps identity/source/create fields immutable
+- Ticket assignment updates are constrained to ticket metadata fields
+- Check-in updates are constrained to `checkedIn` false -> true, `checkInTime == request.time`, and approved admin `checkedInBy`
+- Append-only `auditLogs` for matching event, registration, ticket, and check-in mutations
+- `tickets`, `checkIn`, `communications`, and `aiDrafts` collections denied; ticket/check-in state lives on registration documents
 - Other `settings/*` documents denied
 
 Deploy rules only after explicit approval following this review.
@@ -333,9 +368,13 @@ personsAttending   number       Integer 1..100
 paymentStatus      string       paid | pending | complimentary | door-list | unknown
 paymentReference   string|null
 ticketStatus       string       no-ticket-assigned | partially-assigned | assigned
+ticketCode         string|null  Readable private admin ticket code, e.g. GSV-ABC234
+ticketAssignedAt   Timestamp|null
+ticketAssignedBy   string|null  Admin email or UID fallback
 notes              string       Internal notes, max 10000 characters
-checkedIn          boolean      Must be false in Phase 3; cannot change yet
-checkInTime        Timestamp|null  Must be null in Phase 3; cannot change yet
+checkedIn          boolean      Door check-in state
+checkInTime        Timestamp|null  Set on check-in
+checkedInBy        string|null  Admin email or UID fallback
 source             string       manual | csv-import
 sourceRowId        string|null  Import row identifier (e.g. row-1)
 timestamp          Timestamp|null  Original form submission time when known
@@ -345,10 +384,12 @@ updatedAt          Timestamp    Required on every update
 
 Manual creates use Firestore-generated document IDs. CSV imports use deterministic privacy-safe IDs (`imp_<16-char hash>`).
 
+Ticket and check-in fields are backward-compatible. New manual registrations and imports write the fields immediately; editing older registrations normalizes missing ticket/check-in metadata to null/default values without changing assigned tickets or check-in state.
+
 ## 12. Import workflow
 
 ```text
-Google Form → Google Sheet → Export CSV → Admin uploads or pastes CSV
+Google Form / Google Sheet / payment export → CSV or pasted table → Admin loads into Import Center
   → Map columns to registration fields
   → Preview rows (valid / warning / blocked)
   → Confirm import
@@ -361,8 +402,34 @@ Rules:
 - Rows missing both email and phone are blocked
 - Duplicates blocked by email+timestamp, phone+timestamp, or sourceRowId within the event
 - Google Sheets OAuth is not implemented; CSV export remains the supported path
+- XLSX upload is marked Coming next until a maintained parser dependency, sheet selector, and tests are added
 
-## 13. Audit log data model
+## 13. Ticket and check-in workflow
+
+```text
+Tickets:
+Selected Event → Tickets → assign/generate/regenerate/clear code
+  → Firestore batch updates registration ticket fields
+  → Append-only registration audit log
+
+Check-In:
+Selected Event → Check-In → search name/email/phone/ticket code
+  → Review payment/ticket/check-in state
+  → Check in guest once
+  → Append-only registration audit log
+```
+
+Rules:
+
+- Ticket code format is privacy-safe and readable in the app: `GSV-XXXXXX`
+- Raw email and phone are never embedded in generated ticket codes
+- Ticket code must not change unless explicitly regenerated
+- Clear/unassign requires confirmation in the UI
+- Check-in is one-way in this phase; no undo is implemented
+- Duplicate check-in is blocked
+- QR scanning is deferred; search by ticket code is active now
+
+## 14. Audit log data model
 
 Collection: `auditLogs` (append-only)
 
@@ -380,19 +447,19 @@ details        map          Action-specific metadata
 ```
 
 Event actions: `event.create`, `event.update`, `event.delete`  
-Registration actions: `registration.create`, `registration.update`, `registration.delete`, `registration.import`
+Registration actions: `registration.create`, `registration.update`, `registration.delete`, `registration.import`, `ticket.assign`, `ticket.unassign`, `ticket.regenerate`, `checkin.complete`, `checkin.duplicate-attempt`
 
 Registration audit examples include `fullName` and, for imports, `sourceRowId`. Event audits include `eventName`.
 
 All mutations commit the target document and audit log in one Firestore batch. Clients cannot update or delete audit logs.
 
-## 14. Active-event behavior
+## 15. Active-event behavior
 
 Local storage key: `gather-savor-active-event`
 
-Registrations and imports require an active event selected from Events or the dashboard. Without an active event, those pages show an empty state directing the organizer to choose an event.
+Registrations, Import Center, Tickets, and Check-In require a selected Working Event from Events or the dashboard. Without a selected event, those pages show an empty state directing the organizer to choose an event.
 
-## 15. Folder structure
+## 16. Folder structure
 
 ```text
 gather-savor-event-hub/
@@ -414,20 +481,27 @@ gather-savor-event-hub/
     pages/
       RegistrationsPage.jsx
       ImportsPage.jsx
+      TicketsPage.jsx
+      CheckInPage.jsx
     services/
       eventService.js
       registrationService.js
       importService.js
+      ticketService.js
       auditService.js
     utils/
+      importSources.js
+      ticketUtils.js
   tests/
     event-utils.test.js
+    import-center.test.js
+    phase45-ticketing.test.js
     phase25-foundation.test.js
     registration-utils.test.js
     csv-parser.test.js
 ```
 
-## 16. Important source files
+## 17. Important source files
 
 | File | Responsibility |
 |---|---|
@@ -437,16 +511,21 @@ gather-savor-event-hub/
 | `src/App.jsx` | Registers implemented and future-phase routes |
 | `src/layout/AppShell.jsx` | Responsive admin layout and navigation |
 | `src/pages/RegistrationsPage.jsx` | Registration list, filters, CRUD coordination |
-| `src/pages/ImportsPage.jsx` | CSV import wizard |
+| `src/pages/ImportsPage.jsx` | Import Center wizard |
+| `src/pages/TicketsPage.jsx` | Ticket assignment, generation, regeneration, and unassignment |
+| `src/pages/CheckInPage.jsx` | Search-based door check-in and duplicate prevention |
 | `src/services/registrationService.js` | Firestore registration subscription and batch mutations |
 | `src/services/importService.js` | CSV parsing, mapping, validation, duplicate detection, chunked import |
+| `src/services/ticketService.js` | Ticket/check-in mutations and audit batches |
 | `src/services/auditService.js` | Creates append-only audit records |
 | `src/services/eventService.js` | Firestore event subscription and batch mutations |
 | `src/events/ActiveEventProvider.jsx` | Persists active-event context locally |
 | `src/utils/validators.js` | Event and registration form validation |
+| `src/utils/importSources.js` | Import Center source definitions |
+| `src/utils/ticketUtils.js` | Ticket code, transition, check-in, and search helpers |
 | `firestore.rules` | Approved-admin authorization and schema enforcement |
 
-## 17. Local commands
+## 18. Local commands
 
 ```powershell
 npm install
@@ -456,7 +535,7 @@ npm test
 npm run build
 ```
 
-## 18. Firebase deployment commands
+## 19. Firebase deployment commands
 
 Deploy only when explicitly approved:
 
@@ -467,7 +546,7 @@ npm run build
 npx firebase-tools deploy --only hosting --project gathervibeshub
 ```
 
-## 19. Verification completed
+## 20. Verification completed
 
 ### Phase 3 (Cursor review)
 
@@ -475,8 +554,8 @@ npx firebase-tools deploy --only hosting --project gathervibeshub
 - Node unit tests (events, PWA, registrations, CSV import)
 - Production Vite build
 - No committed secrets (`.env.local`, service account keys excluded by `.gitignore`)
-- Phase 4+ routes remain boundary-only
-- Firestore rules reviewed for default-deny, allowlist protection, registration schema, and check-in lock
+- Phase 4+ routes remained boundary-only at that time
+- Firestore rules reviewed for default-deny, allowlist protection, registration schema, and the then-locked check-in fields
 
 ### Phase 3.1 Option B (Antigravity)
 
@@ -503,25 +582,44 @@ Unit tests now cover:
 - CSV parser (quoted commas, newlines, escaped quotes)
 - Field mapping, duplicate detection, stable registration ID generation
 - Missing email and phone blocked for CSV import
+- Import Center source definitions and XLSX deferral
+- Ticket code generation, validation, uniqueness checks, and privacy safety
+- Ticket status transitions
+- Check-in false -> true helper and duplicate blocking
+- Check-in warning states for pending payment and missing ticket code
+- Ticket/check-in audit action coverage
+- Firestore rules text coverage for ticket/check-in fields and closed future collections
 
-## 20. Remaining live testing limitations
+### Phase 3.2 / Phase 4.5 local verification
 
-Live Firebase testing still requires:
+- ESLint: 0 errors
+- Unit tests: 65/65 passing
+- Production Vite build: clean
+- Firestore rules dry-run compile: passed for project `gathervibeshub`
+- Deployment: not run; explicit approval required
+- No service account JSON, private key, `.pem`, `.key`, or `.env.local` staged
+- Service worker still has no fetch handler and does not cache private admin data
+
+## 21. Remaining live testing limitations
+
+Live Firebase testing for this branch still requires:
 
 - An approved email in `settings/accessControl.approvedEmails`
-- Deployment of Phase 3 Firestore rules and the registrations composite index when approved
+- Explicit approval to deploy rules/indexes/hosting from this feature branch
 
 After deployment, verify:
 
 1. Approved admin login succeeds
-2. Active event selection enables registrations and imports
+2. Working Event selection enables registrations, Import Center, Tickets, and Check-In
 3. Manual registration CRUD writes both `registrations` and `auditLogs` documents
-4. CSV import preview does not write until confirmed
+4. Import Center preview does not write until confirmed
 5. Import creates deterministic IDs and blocks duplicates
-6. Check-in fields cannot be mutated from the client
-7. Phase 4+ routes remain non-functional placeholders
+6. Ticket assignment/generation/unassignment writes audit logs
+7. Check-in writes audit logs and blocks duplicate check-in
+8. QR scanning remains absent/deferred
+9. Communications and AI routes remain future placeholders
 
-## 21. Design decisions
+## 22. Design decisions
 
 ### CSV before Google Sheets OAuth
 
@@ -531,27 +629,30 @@ Direct Google Sheets OAuth was deferred. CSV export from Google Forms or Sheets 
 
 Import registration IDs hash event-scoped keys with SHA-256 so document IDs do not expose raw emails or phone numbers.
 
-### Check-in deferred to Phase 5
+### XLSX deferred
 
-Registration records include `checkedIn` and `checkInTime` fields for future door check-in, but Phase 3 rules and UI do not allow check-in mutations.
+XLSX upload is visible as a coming-next source type but not active. Enabling it later should add a maintained parser dependency, multiple-sheet selection, parser tests, and documentation.
+
+### Search before QR scanning
+
+Door check-in is implemented with fast search by name, email, phone, and ticket code. QR scanning remains deferred until it can be added without expanding public access or adding unsafe device/browser assumptions.
 
 ### Atomic audit logging
 
-Registration and import writes always include an audit log entry in the same batch, matching the Phase 2 event pattern.
+Registration, import, ticket, and check-in writes include an audit log entry in the same batch, matching the Phase 2 event pattern. Duplicate check-in attempts can be recorded as append-only audit logs without reversing check-in state.
 
-## 22. Recommended next phase
+## 23. Recommended next phase
 
-**Phase 4 — Ticket Assignment only**, after PR #3 is merged to `main`, `main` is redeployed, and daily QA is in place:
+After this feature branch is reviewed, approved, merged, and deployed, the next implementation phase should stay narrow:
 
-- Assign externally created ticket codes to registrations
-- Track ticket status transitions
-- Do not add door check-in, communications, or AI until their respective phases
+- Harden live ticket/check-in QA around CODEX_TEST
+- Consider QR scanning only if it can remain private-admin-only and does not require Cloud Functions, Storage, or public attendee flows
+- Keep communications and AI deferred
 
 Phase boundaries remain:
 
-- Phase 4: Ticket Assignment only
-- Phase 5: Door Check-In
+- Phase 4.5: Ticket Assignment + search-based Door Check-In foundation
 - Phase 6: Communications
 - Phase 7: AI Writing
 
-Google Sheets OAuth remains deferred. There is no public attendee app, no native Android app, no Cloud Functions, and no Storage integration yet.
+Google Sheets OAuth remains deferred. There is no public attendee app, no native Android app, no Cloud Functions, and no Storage integration.

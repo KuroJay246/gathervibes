@@ -96,7 +96,7 @@ export function RegistrationsPage() {
     setSuccess('')
     try {
       if (editingRegistration) {
-        await updateRegistration(editingRegistration.registrationId, activeEvent.eventId, data, user)
+        await updateRegistration(editingRegistration.registrationId, activeEvent.eventId, data, user, editingRegistration)
         setSuccess('Registration updated.')
       } else {
         await createRegistration(data, activeEvent.eventId, user)
@@ -143,7 +143,7 @@ export function RegistrationsPage() {
             to="/imports"
             className="flex items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#8C766A] shadow-sm transition hover:bg-[#FBF8F5]"
           >
-            Import CSV
+            Import Center
           </Link>
           <button
             type="button"

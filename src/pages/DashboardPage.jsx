@@ -352,7 +352,9 @@ export function DashboardPage() {
               {[
                 { to: '/events', label: 'Events', sub: 'Create and manage events' },
                 { to: '/registrations', label: 'Registrations', sub: 'Guest list for selected event' },
-                { to: '/imports', label: 'Import CSV', sub: 'Upload or paste a spreadsheet' },
+                { to: '/tickets', label: 'Tickets', sub: 'Assign and track ticket codes' },
+                { to: '/check-in', label: 'Check-In', sub: 'Search and check in guests at the door' },
+                { to: '/imports', label: 'Import Center', sub: 'Upload CSV exports or paste table rows' },
               ].map(({ to, label, sub }) => (
                 <li key={to}>
                   <Link
@@ -373,8 +375,6 @@ export function DashboardPage() {
               <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Future phases</p>
               <ul className="mt-2 space-y-1">
                 {[
-                  { label: 'Ticket assignment', phase: 'Phase 4' },
-                  { label: 'Door check-in', phase: 'Phase 5' },
                   { label: 'Communications', phase: 'Phase 6' },
                   { label: 'AI writing', phase: 'Phase 7' },
                 ].map(({ label, phase }) => (
