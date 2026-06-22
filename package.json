@@ -12,6 +12,8 @@
     "admin:ensure-access": "node scripts/admin/ensureAccessControl.mjs",
     "admin:verify-firebase": "node scripts/admin/verifyFirebaseSetup.mjs",
     "admin:ensure-codex-test-event": "node scripts/admin/ensureCodexTestEvent.mjs",
+    "admin:verify-production-fixtures": "node scripts/admin/verifyProductionFixtures.mjs",
+    "admin:verify-production-counts": "node scripts/admin/verifyProductionCounts.mjs",
     "firebase:deploy-rules": "npx firebase-tools deploy --only firestore:rules,firestore:indexes --project gathervibeshub",
     "firebase:deploy-hosting": "npx firebase-tools deploy --only hosting --project gathervibeshub",
     "firebase:deploy-all": "npx firebase-tools deploy --only firestore:rules,firestore:indexes,hosting --project gathervibeshub"
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@firebase/rules-unit-testing": "^5.0.1",
     "@tailwindcss/vite": "^4.1.17",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

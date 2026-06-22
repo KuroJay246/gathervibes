@@ -1,4 +1,6 @@
 import { dateFromValue, parseTimestampSafely } from './dateUtils.js'
+import { normalizePersonsAttending } from './registrationMetrics.js'
+import { findTicketCodeDuplicate, normalizeTicketCode, validateTicketCode } from './ticketUtils.js'
 
 export const MAX_PERSONS_ATTENDING = 100
 
@@ -44,11 +46,23 @@ export function buildInitialFieldMap(headers = []) {
   const initialMap = {}
   headers.forEach((h, i) => {
     const lower = h.toLowerCase()
-    if (lower.includes('name') && !lower.includes('group')) initialMap.fullName = i
+    const normalized = lower.replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim()
+    const isTicketCode = [
+      'ticket code',
+      'ticket number',
+      'ticket id',
+      'ticket',
+      'code',
+      'admission code',
+      'reference code',
+    ].includes(normalized)
+
+    if (isTicketCode) initialMap.ticketCode = i
+    else if (lower.includes('name') && !lower.includes('group')) initialMap.fullName = i
     else if (lower.includes('email')) initialMap.email = i
     else if (lower.includes('phone')) initialMap.phone = i
     else if (lower.includes('group')) initialMap.groupName = i
-    else if (lower.includes('person') || lower.includes('ticket')) initialMap.personsAttending = i
+    else if (lower.includes('person') || lower.includes('attending') || lower.includes('quantity')) initialMap.personsAttending = i
     else if (lower.includes('reference') || lower.includes('receipt') || lower.includes('transaction')) initialMap.paymentReference = i
     else if (lower.includes('pay')) initialMap.paymentStatus = i
     else if (lower.includes('timestamp') || lower.includes('submitted')) initialMap.timestamp = i
@@ -172,10 +186,12 @@ export function mapRows(parsedRows, headers, fieldMap) {
     rowObj.groupName = fieldMap.groupName !== undefined ? parsedRow.data[fieldMap.groupName]?.trim() || null : null
 
     const rawPersons = fieldMap.personsAttending !== undefined ? parsedRow.data[fieldMap.personsAttending] : ''
-    rowObj.personsAttending = Number(rawPersons) || 1
+    rowObj.personsAttending = normalizePersonsAttending(rawPersons)
 
     rowObj.paymentStatus = normalizePaymentStatus(fieldMap.paymentStatus !== undefined ? parsedRow.data[fieldMap.paymentStatus] : '')
     rowObj.paymentReference = fieldMap.paymentReference !== undefined ? parsedRow.data[fieldMap.paymentReference]?.trim() || null : null
+    rowObj.ticketCode = normalizeTicketCode(fieldMap.ticketCode !== undefined ? parsedRow.data[fieldMap.ticketCode] : '')
+    rowObj.ticketStatus = rowObj.ticketCode ? 'assigned' : 'no-ticket-assigned'
     rowObj.notes = fieldMap.notes !== undefined ? parsedRow.data[fieldMap.notes]?.trim() || '' : ''
 
     const rawTimestamp = fieldMap.timestamp !== undefined ? parsedRow.data[fieldMap.timestamp] : ''
@@ -203,6 +219,13 @@ export function validateRow(row) {
   } else if (row.personsAttending > MAX_PERSONS_ATTENDING) {
     issues.push(`Persons attending exceeds ${MAX_PERSONS_ATTENDING}`)
     status = 'blocked'
+  }
+  if (row.ticketCode) {
+    const ticketError = validateTicketCode(row.ticketCode, [], row.registrationId)
+    if (ticketError) {
+      issues.push(ticketError)
+      status = 'blocked'
+    }
   }
 
   return { status, issues }
@@ -263,8 +286,10 @@ export async function processAndValidate(rows, eventId, existingRegistrations) {
     const { status, issues } = validateRow(row)
 
     const dupReason = findDuplicate(existingRegistrations, processed, row)
-    const finalStatus = dupReason ? 'blocked' : status
+    const ticketDupReason = findTicketCodeDuplicate(existingRegistrations, processed, row)
+    const finalStatus = dupReason || ticketDupReason ? 'blocked' : status
     if (dupReason) issues.push(dupReason)
+    if (ticketDupReason) issues.push(ticketDupReason)
 
     row.registrationId = await generateStableId(eventId, row)
 

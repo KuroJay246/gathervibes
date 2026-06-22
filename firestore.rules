@@ -325,6 +325,22 @@ service cloud.firestore {
         && request.resource.data.checkedInBy == resource.data.checkedInBy;
     }
 
+    function hasNoTicketAssigned(data) {
+      return data.ticketStatus == 'no-ticket-assigned'
+        && data.ticketCode == null
+        && data.ticketAssignedAt == null
+        && data.ticketAssignedBy == null;
+    }
+
+    function hasImportedTicketCode(data) {
+      return data.ticketStatus == 'assigned'
+        && data.ticketCode is string
+        && data.ticketCode.size() > 0
+        && data.ticketCode.size() <= 32
+        && data.ticketAssignedAt == null
+        && data.ticketAssignedBy == null;
+    }
+
     function isRegistrationDetailsUpdate() {
       return registrationIdentityUnchanged()
         && ticketFieldsUnchanged()
@@ -352,14 +368,23 @@ service cloud.firestore {
         && request.resource.data.ticketAssignedBy == null;
     }
 
-    function isCheckInCompletionUpdate() {
-      return registrationDetailsUnchanged()
-        && ticketFieldsUnchanged()
+    function checkInCompletionChangedKeysOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+        'checkedIn', 'checkInTime', 'checkedInBy', 'updatedAt'
+      ]);
+    }
+
+    function isCheckInCompletionUpdate(registrationId) {
+      return checkInCompletionChangedKeysOnly()
+        && request.resource.data.registrationId == registrationId
+        && request.resource.data.eventId == resource.data.eventId
+        && validShortId(request.resource.data.eventId)
         && resource.data.checkedIn == false
         && resource.data.checkInTime == null
         && request.resource.data.checkedIn == true
         && request.resource.data.checkInTime == request.time
-        && validPerformedBy(request.resource.data.checkedInBy);
+        && validPerformedBy(request.resource.data.checkedInBy)
+        && request.resource.data.updatedAt == request.time;
     }
 
     // The allowlist is bootstrapped in the Firebase Console. Client code can
@@ -390,20 +415,21 @@ service cloud.firestore {
         && request.resource.data.checkedIn == false
         && request.resource.data.checkInTime == null
         && request.resource.data.checkedInBy == null
-        && request.resource.data.ticketStatus == 'no-ticket-assigned'
-        && request.resource.data.ticketCode == null
-        && request.resource.data.ticketAssignedAt == null
-        && request.resource.data.ticketAssignedBy == null
+        && (hasNoTicketAssigned(request.resource.data) || hasImportedTicketCode(request.resource.data))
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if isApprovedAdmin()
-        && isValidRegistration(request.resource.data, registrationId)
-        && request.resource.data.updatedAt == request.time
         && (
-          isRegistrationDetailsUpdate()
-          || isTicketAssignmentUpdate()
-          || isTicketUnassignmentUpdate()
-          || isCheckInCompletionUpdate()
+          (
+            isValidRegistration(request.resource.data, registrationId)
+            && request.resource.data.updatedAt == request.time
+            && (
+              isRegistrationDetailsUpdate()
+              || isTicketAssignmentUpdate()
+              || isTicketUnassignmentUpdate()
+            )
+          )
+          || isCheckInCompletionUpdate(registrationId)
         );
       allow delete: if isApprovedAdmin();
     }

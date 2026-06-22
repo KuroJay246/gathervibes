@@ -11,6 +11,7 @@ import {
   Menu,
   MessageSquareText,
   Settings,
+  ShieldCheck,
   Sparkles,
   TicketCheck,
   UsersRound,
@@ -35,6 +36,7 @@ const navGroups = [
       { to: '/tickets', label: 'Tickets', icon: TicketCheck, available: true },
       { to: '/check-in', label: 'Check-In', icon: ClipboardCheck, available: true },
       { to: '/imports', label: 'Import Center', icon: FileInput, available: true },
+      { to: '/qa', label: 'QA Center', icon: ShieldCheck, available: true },
     ],
   },
   {
@@ -53,6 +55,7 @@ const pageTitles = {
   '/tickets': ['Tickets', 'Assign and track ticket codes'],
   '/check-in': ['Check-In', 'Fast, confident event-day admissions'],
   '/imports': ['Import Center', 'Bring in CSV exports and pasted table rows safely'],
+  '/qa': ['QA Center', 'Production smoke testing without touching CPB'],
   '/communications': ['Communication Center', 'Prepare messages for the right guests'],
   '/ai-writing': ['AI Writing Assistant', 'Create polished drafts for review'],
   '/settings': ['Settings', 'Manage workspace configuration'],

@@ -1,9 +1,30 @@
 export const TICKET_CODE_PREFIX = 'GSV'
 export const TICKET_CODE_PATTERN = /^GSV-[A-HJ-NP-Z2-9]{6}$/
+export const FLEXIBLE_TICKET_CODE_PATTERN = /^[A-Z0-9]{2,12}-[A-Z0-9]{3,12}$/
+export const SEQUENTIAL_TICKET_CODE_PATTERN = /^([A-Z0-9]{2,12})-(\d{3,6})$/
 export const TICKET_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 
 export function normalizeTicketCode(value) {
-  return (value || '').trim().toUpperCase()
+  return (value || '').trim().toUpperCase().replace(/\s+/g, '-')
+}
+
+export function buildTicketPrefix(event = {}) {
+  const candidate = event.ticketPrefix || event.eventCode || event.eventName || ''
+  const words = candidate
+    .toUpperCase()
+    .replace(/[^A-Z0-9\s-]/g, ' ')
+    .split(/[\s-]+/)
+    .filter(Boolean)
+
+  if (words.length === 0) return TICKET_CODE_PREFIX
+  if (words.length === 1) return words[0].slice(0, 6) || TICKET_CODE_PREFIX
+
+  const initials = words.map((word) => word[0]).join('')
+  return initials.slice(0, 6) || TICKET_CODE_PREFIX
+}
+
+export function ticketCodeForSort(value) {
+  return normalizeTicketCode(value)
 }
 
 export function generateTicketCode(existingCodes = new Set(), random = Math.random) {
@@ -21,10 +42,32 @@ export function generateTicketCode(existingCodes = new Set(), random = Math.rand
   throw new Error('Could not generate a unique ticket code. Try again.')
 }
 
+export function generateSequentialTicketCode(existingCodes = [], event = {}, minimumDigits = 3) {
+  const prefix = buildTicketPrefix(event)
+  const codes = existingCodes instanceof Set ? [...existingCodes] : existingCodes
+  const normalized = new Set(codes.map(normalizeTicketCode).filter(Boolean))
+  let maxNumber = 0
+
+  for (const code of normalized) {
+    const match = code.match(SEQUENTIAL_TICKET_CODE_PATTERN)
+    if (match?.[1] === prefix) {
+      maxNumber = Math.max(maxNumber, Number(match[2]))
+    }
+  }
+
+  for (let nextNumber = maxNumber + 1; nextNumber < 1000000; nextNumber += 1) {
+    const suffix = String(nextNumber).padStart(minimumDigits, '0')
+    const candidate = `${prefix}-${suffix}`
+    if (!normalized.has(candidate)) return candidate
+  }
+
+  throw new Error(`Could not generate a unique ${prefix} ticket code.`)
+}
+
 export function validateTicketCode(value, existingRegistrations = [], currentRegistrationId = null) {
   const code = normalizeTicketCode(value)
   if (!code) return 'Ticket code is required.'
-  if (!TICKET_CODE_PATTERN.test(code)) return 'Use format GSV-XXXXXX with readable letters or numbers.'
+  if (!FLEXIBLE_TICKET_CODE_PATTERN.test(code)) return 'Use format PREFIX-001 or PREFIX-CODE with letters and numbers only.'
 
   const duplicate = existingRegistrations.find((registration) => (
     registration.registrationId !== currentRegistrationId
@@ -33,6 +76,19 @@ export function validateTicketCode(value, existingRegistrations = [], currentReg
 
   if (duplicate) return 'This ticket code is already assigned for the selected event.'
   return ''
+}
+
+export function findTicketCodeDuplicate(existingRegistrations = [], processedRows = [], row = {}) {
+  const code = normalizeTicketCode(row.ticketCode)
+  if (!code) return null
+
+  const existingDuplicate = existingRegistrations.find((registration) => normalizeTicketCode(registration.ticketCode) === code)
+  if (existingDuplicate) return 'Duplicate ticket code for selected event'
+
+  const batchDuplicate = processedRows.find((processed) => normalizeTicketCode(processed.row?.ticketCode) === code)
+  if (batchDuplicate) return 'Duplicate ticket code in import batch'
+
+  return null
 }
 
 export function ticketStatusForCode(ticketCode) {

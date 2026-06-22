@@ -9,6 +9,7 @@ import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { canCompleteCheckIn, checkInWarnings, searchableRegistrationText } from '../utils/ticketUtils'
+import { CHECK_IN_VIEWS, buildCheckInSummary, filterCheckInRegistrations, formatCheckInTime } from '../utils/checkInUtils'
 
 function StatusBadge({ children, tone = 'neutral' }) {
   const tones = {
@@ -68,6 +69,12 @@ export function CheckInPage() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const [actionError, setActionError] = useState('')
+  const [activeView, setActiveView] = useState('search')
+  const summary = useMemo(() => buildCheckInSummary(registrations), [registrations])
+  const visibleRegistrations = useMemo(
+    () => filterCheckInRegistrations(registrations, activeView),
+    [activeView, registrations],
+  )
 
   const matches = useMemo(() => {
     const query = searchQuery.trim().toLowerCase()
@@ -106,7 +113,10 @@ export function CheckInPage() {
       setSelectedId('')
     } catch (err) {
       if (import.meta.env.DEV) console.error(err)
-      setActionError(err.message || 'Check-in failed.')
+      const permissionDenied = err?.code === 'permission-denied' || /permission|insufficient/i.test(err?.message || '')
+      setActionError(permissionDenied
+        ? 'Check-in was not saved because Firestore denied the write. No local success state was applied.'
+        : err.message || 'Check-in failed. No local success state was applied.')
     } finally {
       setSaving(false)
     }
@@ -147,7 +157,47 @@ export function CheckInPage() {
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
       {actionError && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{actionError}</div>}
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          ['Total registrations', summary.totalRegistrations],
+          ['Total persons attending', summary.totalPersons],
+          ['Checked-in registrations', summary.checkedInRegistrations],
+          ['Checked-in persons', summary.checkedInPersons],
+          ['Remaining registrations', summary.remainingRegistrations],
+          ['Remaining persons', summary.remainingPersons],
+          ['Paid checked in', summary.paidCheckedIn],
+          ['Pending/comp checked in', `${summary.pendingCheckedIn}/${summary.complimentaryCheckedIn}`],
+        ].map(([label, value]) => (
+          <article key={label} className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
+            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">{label}</p>
+            <p className="mt-2 text-2xl font-bold text-[#2B1723]">{value}</p>
+          </article>
+        ))}
+      </section>
+
+      <p className="rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
+        Persons attending may be higher than registrations when one registration includes multiple guests.
+      </p>
+
+      <section className="flex gap-2 overflow-x-auto pb-2">
+        {CHECK_IN_VIEWS.map((view) => (
+          <button
+            key={view.value}
+            type="button"
+            onClick={() => {
+              setActiveView(view.value)
+              setMessage('')
+              setActionError('')
+            }}
+            className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition ${activeView === view.value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1]'}`}
+          >
+            {view.label}
+          </button>
+        ))}
+      </section>
+
+      {activeView === 'search' ? (
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div className="space-y-4">
           <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
             <label htmlFor="door-search" className="event-label">Find guest</label>
@@ -298,7 +348,65 @@ export function CheckInPage() {
             </div>
           )}
         </div>
-      </section>
+        </section>
+      ) : (
+        <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)] sm:p-5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">{CHECK_IN_VIEWS.find((view) => view.value === activeView)?.label}</p>
+              <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Checked-in guest visibility</h3>
+            </div>
+            <p className="text-xs font-semibold text-[#8C7567]">{visibleRegistrations.length} registrations shown</p>
+          </div>
+
+          {visibleRegistrations.length === 0 ? (
+            <div className="mt-5 rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-6 text-sm text-[#816D62]">
+              No guests in this view for the selected Working Event.
+            </div>
+          ) : (
+            <div className="mt-5 overflow-hidden rounded-xl border border-[#F2E8E1]">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
+                      <th className="px-4 py-3">Guest</th>
+                      <th className="px-4 py-3">Contact</th>
+                      <th className="px-4 py-3">Group</th>
+                      <th className="px-4 py-3">Persons</th>
+                      <th className="px-4 py-3">Payment</th>
+                      <th className="px-4 py-3">Ticket Code</th>
+                      <th className="px-4 py-3">Check-in</th>
+                      <th className="px-4 py-3">Checked in by</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#F2E8E1]">
+                    {visibleRegistrations.map((registration) => (
+                      <tr key={registration.registrationId}>
+                        <td className="px-4 py-3 font-medium text-[#2B1723]">{registration.fullName}</td>
+                        <td className="px-4 py-3 text-[#5D4A52]">
+                          {registration.email && <div>{registration.email}</div>}
+                          {registration.phone && <div>{registration.phone}</div>}
+                        </td>
+                        <td className="px-4 py-3 text-[#5D4A52]">{registration.groupName || '—'}</td>
+                        <td className="px-4 py-3 text-[#5D4A52]">{registration.personsAttending || 1}</td>
+                        <td className="px-4 py-3"><StatusBadge tone={paymentTone(registration.paymentStatus)}>{registration.paymentStatus?.replace('-', ' ') || 'unknown'}</StatusBadge></td>
+                        <td className="px-4 py-3 font-mono text-xs font-bold text-[#2B1723]">{registration.ticketCode || 'None'}</td>
+                        <td className="px-4 py-3">
+                          <div className="space-y-1">
+                            <StatusBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Not checked in'}</StatusBadge>
+                            <p className="text-[11px] text-[#8C7567]">{formatCheckInTime(registration.checkInTime)}</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-[#5D4A52]">{registration.checkedInBy || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
     </div>
   )
 }

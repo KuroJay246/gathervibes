@@ -8,6 +8,7 @@ const REGISTRATION_FIELDS = [
   { value: 'personsAttending', label: 'Persons Attending (Default 1)' },
   { value: 'paymentStatus', label: 'Payment Status' },
   { value: 'paymentReference', label: 'Payment Reference' },
+  { value: 'ticketCode', label: 'Ticket Code' },
   { value: 'timestamp', label: 'Timestamp (for duplicate detection)' },
   { value: 'notes', label: 'Notes' },
 ]
