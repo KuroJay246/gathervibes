@@ -40,6 +40,7 @@ export function ImportPreviewTable({ processedRows, onCancel, onImport, importin
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Contact</th>
+                <th className="px-4 py-3">Ticket Code</th>
                 <th className="px-4 py-3">Issues</th>
               </tr>
             </thead>
@@ -59,6 +60,9 @@ export function ImportPreviewTable({ processedRows, onCancel, onImport, importin
                       {!pr.row.email && !pr.row.phone && <span className="italic text-[#A48A7B]">No contact</span>}
                     </div>
                   </td>
+                  <td className="px-4 py-3 font-mono text-xs font-bold text-[#2B1723]">
+                    {pr.row.ticketCode || <span className="font-sans font-normal italic text-[#A48A7B]">None</span>}
+                  </td>
                   <td className="px-4 py-3 text-xs text-[#A32626]">
                     {pr.issues.length > 0 ? pr.issues.join(', ') : <span className="text-[#816D62]">None</span>}
                   </td>
@@ -66,7 +70,7 @@ export function ImportPreviewTable({ processedRows, onCancel, onImport, importin
               ))}
               {processedRows.length > 100 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-3 text-center text-xs italic text-[#8C7567]">
+                  <td colSpan={5} className="px-4 py-3 text-center text-xs italic text-[#8C7567]">
                     ...and {processedRows.length - 100} more rows not shown.
                   </td>
                 </tr>

@@ -6,11 +6,15 @@ import {
   canCompleteCheckIn,
   canTransitionTicketStatus,
   checkInWarnings,
+  buildTicketPrefix,
+  findTicketCodeDuplicate,
+  generateSequentialTicketCode,
   generateTicketCode,
   normalizeTicketCode,
   searchableRegistrationText,
   validateTicketCode,
 } from '../src/utils/ticketUtils.js'
+import { buildCheckInSummary, filterCheckInRegistrations } from '../src/utils/checkInUtils.js'
 
 test('ticket code generation is readable, unique, and privacy-safe', () => {
   const code = generateTicketCode(new Set(), () => 0)
@@ -39,7 +43,15 @@ test('ticket assignment validation rejects invalid and duplicate codes', () => {
   assert.equal(normalizeTicketCode(' gsv-abc234 '), 'GSV-ABC234')
   assert.match(validateTicketCode('bad', existing, 'reg-b'), /format/)
   assert.match(validateTicketCode('GSV-ABC234', existing, 'reg-b'), /already assigned/)
+  assert.equal(validateTicketCode('CPB-001', existing, 'reg-b'), '')
   assert.equal(validateTicketCode('GSV-ABC234', existing, 'reg-a'), '')
+})
+
+test('event-style ticket prefix and sequential generation use selected event context', () => {
+  assert.equal(buildTicketPrefix({ eventName: 'CPB' }), 'CPB')
+  assert.equal(buildTicketPrefix({ eventName: 'Cake Picnic Barbados' }), 'CPB')
+  assert.equal(generateSequentialTicketCode(['CPB-001', 'CPB-003'], { eventName: 'CPB' }), 'CPB-004')
+  assert.equal(generateSequentialTicketCode(['CPB-001', 'CPB-002'], { eventName: 'Cake Picnic Barbados' }), 'CPB-003')
 })
 
 test('ticket status transitions stay controlled', () => {
@@ -51,6 +63,36 @@ test('ticket status transitions stay controlled', () => {
 test('check-in transition allows false to true and blocks duplicates', () => {
   assert.deepEqual(canCompleteCheckIn({ checkedIn: false }), { allowed: true, reason: '' })
   assert.equal(canCompleteCheckIn({ checkedIn: true }).allowed, false)
+})
+
+test('checked-in summary counts registrations and persons attending', () => {
+  const summary = buildCheckInSummary([
+    { checkedIn: true, personsAttending: 2, paymentStatus: 'paid' },
+    { checkedIn: true, personsAttending: 1, paymentStatus: 'complimentary' },
+    { checkedIn: false, personsAttending: 3, paymentStatus: 'pending' },
+  ])
+
+  assert.equal(summary.totalRegistrations, 3)
+  assert.equal(summary.totalPersons, 6)
+  assert.equal(summary.checkedInRegistrations, 2)
+  assert.equal(summary.checkedInPersons, 3)
+  assert.equal(summary.notCheckedInRegistrations, 1)
+  assert.equal(summary.notCheckedInPersons, 3)
+  assert.equal(summary.paidCheckedIn, 1)
+  assert.equal(summary.complimentaryCheckedIn, 1)
+  assert.equal(filterCheckInRegistrations([{ checkedIn: true }, { checkedIn: false }], 'checked-in').length, 1)
+})
+
+test('ticket code duplicate helper blocks existing and imported batch duplicates', () => {
+  assert.match(
+    findTicketCodeDuplicate([{ ticketCode: 'CPB-001' }], [], { ticketCode: 'cpb-001' }),
+    /Duplicate ticket code/,
+  )
+  assert.match(
+    findTicketCodeDuplicate([], [{ row: { ticketCode: 'CPB-002' } }], { ticketCode: 'CPB-002' }),
+    /Duplicate ticket code in import batch/,
+  )
+  assert.equal(findTicketCodeDuplicate([], [], { ticketCode: 'CPB-003' }), null)
 })
 
 test('check-in warnings flag pending payments and missing ticket codes', () => {
@@ -82,6 +124,7 @@ test('ticket and check-in services create registration audit actions', async () 
   assert.match(service, /action,\s+targetType: 'registration'/)
   assert.match(service, /action: 'checkin\.complete'/)
   assert.match(service, /action: 'checkin\.duplicate-attempt'/)
+  assert.match(service, /preserveRegistrationForCheckIn/)
 })
 
 test('Firestore rules include ticket and check-in fields and actions', async () => {
@@ -96,6 +139,8 @@ test('Firestore rules include ticket and check-in fields and actions', async () 
   }
 
   assert.match(rules, /allow update, delete: if false/)
+  assert.match(rules, /hasImportedTicketCode/)
+  assert.match(rules, /isCheckInCompletionUpdate/)
   assert.ok(rules.includes('match /communications/{documentId}'))
   assert.ok(rules.includes('match /aiDrafts/{documentId}'))
 })

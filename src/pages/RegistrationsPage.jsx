@@ -11,7 +11,7 @@ import { RegistrationFormModal } from '../components/registrations/RegistrationF
 import { DeleteRegistrationDialog } from '../components/registrations/DeleteRegistrationDialog'
 import { Link } from 'react-router-dom'
 
-const TABS = ['All', 'Paid', 'Pending', 'Complimentary', 'Door List']
+const TABS = ['All', 'Paid', 'Pending', 'Complimentary', 'Door List', 'Checked In']
 
 function titleCase(value = '') {
   return value
@@ -80,7 +80,8 @@ export function RegistrationsPage() {
   if (loading) return <LoadingState message="Loading registrations…" />
 
   const filteredRegistrations = registrations.filter((reg) => {
-    if (activeTab !== 'All' && reg.paymentStatus !== activeTab.toLowerCase().replace(' ', '-')) return false
+    if (activeTab === 'Checked In' && !reg.checkedIn) return false
+    if (!['All', 'Checked In'].includes(activeTab) && reg.paymentStatus !== activeTab.toLowerCase().replace(' ', '-')) return false
     if (!searchQuery) return true
 
     const query = searchQuery.toLowerCase()
@@ -218,6 +219,7 @@ export function RegistrationsPage() {
                     <th className="px-4 py-3">Party</th>
                     <th className="px-4 py-3">Payment</th>
                     <th className="px-4 py-3">Ticket status</th>
+                    <th className="px-4 py-3">Check-in</th>
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -235,6 +237,7 @@ export function RegistrationsPage() {
                       <td className="px-4 py-3">{reg.personsAttending}</td>
                       <td className="px-4 py-3">{titleCase(reg.paymentStatus)}</td>
                       <td className="px-4 py-3 text-xs text-[#816D62]">{titleCase(reg.ticketStatus)}</td>
+                      <td className="px-4 py-3 text-xs font-bold text-[#816D62]">{reg.checkedIn ? 'Checked in' : 'Not checked in'}</td>
                       <td className="px-4 py-3 text-right">
                         <button
                           type="button"

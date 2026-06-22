@@ -47,6 +47,11 @@ export function RegistrationCard({ registration, onEdit, onDelete }) {
         }`}>
           {registration.ticketStatus.replace(/-/g, ' ')}
         </span>
+        <span className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
+          registration.checkedIn ? 'bg-[#E5F3EC] text-[#1E7345]' : 'bg-[#F7F1ED] text-[#8C766A]'
+        }`}>
+          {registration.checkedIn ? 'Checked in' : 'Not checked in'}
+        </span>
         
         <div className="ml-auto flex items-center gap-2">
           <button

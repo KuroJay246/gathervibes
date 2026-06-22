@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
 import { IMPORT_SOURCES, getImportSource } from '../src/utils/importSources.js'
-import { buildInitialFieldMap, mapRows, parseCSV, rowsToParsedTable } from '../src/utils/importUtils.js'
+import { buildInitialFieldMap, mapRows, parseCSV, processAndValidate, rowsToParsedTable } from '../src/utils/importUtils.js'
 
 test('Import Center source selector covers supported source types', () => {
   assert.deepEqual(
@@ -39,18 +39,34 @@ test('Import Center page labels source selector and XLSX upload as preview-first
 })
 
 test('existing CSV parsing and mapping still works for registration imports', () => {
-  const parsed = parseCSV('Full name,Email,Payment reference,Notes\nJane,jane@example.com,TEST123,Window seat')
+  const parsed = parseCSV('Full name,Email,Payment reference,Ticket Code,Notes\nJane,jane@example.com,TEST123,CPB-001,Window seat')
   const rows = mapRows(parsed.rows, parsed.headers, {
     fullName: 0,
     email: 1,
     paymentReference: 2,
-    notes: 3,
+    ticketCode: 3,
+    notes: 4,
   })
 
   assert.equal(rows[0].fullName, 'Jane')
   assert.equal(rows[0].email, 'jane@example.com')
   assert.equal(rows[0].paymentReference, 'TEST123')
+  assert.equal(rows[0].ticketCode, 'CPB-001')
+  assert.equal(rows[0].ticketStatus, 'assigned')
   assert.equal(rows[0].notes, 'Window seat')
+})
+
+test('Import Center detects ticket code headers and blocks duplicate imported ticket codes', async () => {
+  const parsed = parseCSV('Full name,Email,Ticket Number\nJane,jane@example.com,CPB-001\nJohn,john@example.com,CPB-001')
+  const fieldMap = buildInitialFieldMap(parsed.headers)
+  const rows = mapRows(parsed.rows, parsed.headers, fieldMap)
+  const processed = await processAndValidate(rows, 'event-1', [])
+
+  assert.equal(fieldMap.ticketCode, 2)
+  assert.equal(processed[0].row.ticketCode, 'CPB-001')
+  assert.equal(processed[0].status, 'valid')
+  assert.equal(processed[1].status, 'blocked')
+  assert.ok(processed[1].issues.some((issue) => /Duplicate ticket code/.test(issue)))
 })
 
 test('XLSX row normalization detects headers and preserves existing mapping flow', () => {

@@ -8,7 +8,7 @@ import { clearTicketAssignment, saveTicketAssignment } from '../services/ticketS
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
-import { generateTicketCode, normalizeTicketCode, searchableRegistrationText } from '../utils/ticketUtils'
+import { buildTicketPrefix, generateSequentialTicketCode, generateTicketCode, normalizeTicketCode, searchableRegistrationText } from '../utils/ticketUtils'
 
 const FILTERS = [
   { value: 'all', label: 'All' },
@@ -79,6 +79,7 @@ export function TicketsPage() {
     () => new Set(registrations.map((registration) => normalizeTicketCode(registration.ticketCode)).filter(Boolean)),
     [registrations],
   )
+  const ticketPrefix = buildTicketPrefix(activeEvent)
 
   const filteredRegistrations = registrations.filter((registration) => {
     if (filter === 'no-ticket' && registration.ticketStatus === 'assigned') return false
@@ -139,19 +140,36 @@ export function TicketsPage() {
 
     if (assigned) {
       return (
-        <div className="flex flex-wrap justify-end gap-2">
+        <div className="flex flex-col gap-2 sm:items-end">
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              value={draftCode}
+              onChange={(event) => setDraftCodes((prev) => ({ ...prev, [registration.registrationId]: event.target.value.toUpperCase() }))}
+              placeholder={registration.ticketCode || `${ticketPrefix}-001`}
+              className="min-h-10 rounded-lg border border-[#E5D7CF] bg-white px-3 text-xs font-bold text-[#2B1723] focus:border-[#B76E79] focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => assignCode(registration, draftCode, 'ticket.regenerate')}
+              disabled={savingId === registration.registrationId || !draftCode.trim()}
+              className="rounded-lg bg-[#2B1723] px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
+            >
+              Save manual code
+            </button>
+          </div>
+          <div className="flex flex-wrap justify-end gap-2">
           <button
             type="button"
             onClick={() => {
               if (window.confirm(`Regenerate ticket code for ${registration.fullName}?`)) {
-                assignCode(registration, generateTicketCode(existingCodes), 'ticket.regenerate')
+                assignCode(registration, generateSequentialTicketCode(existingCodes, activeEvent), 'ticket.regenerate')
               }
             }}
             disabled={savingId === registration.registrationId}
             className="inline-flex items-center gap-2 rounded-lg border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5] disabled:opacity-50"
           >
             <RefreshCw className="size-3.5" />
-            Regenerate
+            Generate next {ticketPrefix} code
           </button>
           <button
             type="button"
@@ -162,6 +180,7 @@ export function TicketsPage() {
             <Trash2 className="size-3.5" />
             Clear
           </button>
+          </div>
         </div>
       )
     }
@@ -171,7 +190,7 @@ export function TicketsPage() {
         <input
           value={draftCode}
           onChange={(event) => setDraftCodes((prev) => ({ ...prev, [registration.registrationId]: event.target.value.toUpperCase() }))}
-          placeholder="GSV-XXXXXX"
+          placeholder={`${ticketPrefix}-001`}
           className="min-h-10 rounded-lg border border-[#E5D7CF] bg-white px-3 text-xs font-bold text-[#2B1723] focus:border-[#B76E79] focus:outline-none"
         />
         <button
@@ -184,12 +203,20 @@ export function TicketsPage() {
         </button>
         <button
           type="button"
-          onClick={() => assignCode(registration, generateTicketCode(existingCodes))}
+          onClick={() => assignCode(registration, generateSequentialTicketCode(existingCodes, activeEvent))}
           disabled={savingId === registration.registrationId}
           className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#B76E79] px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
         >
           <Wand2 className="size-3.5" />
-          Generate
+          Generate next {ticketPrefix} code
+        </button>
+        <button
+          type="button"
+          onClick={() => assignCode(registration, generateTicketCode(existingCodes))}
+          disabled={savingId === registration.registrationId}
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#6B564C] disabled:opacity-50"
+        >
+          Random GSV fallback
         </button>
       </div>
     )
@@ -206,7 +233,7 @@ export function TicketsPage() {
           </p>
         </div>
         <div className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-3 text-xs text-[#6B564C]">
-          Codes are private admin references. No guest accounts or public ticket purchase flow is active.
+          Manual code entry is allowed. Use Generate next {ticketPrefix} code for event-style sequencing.
         </div>
       </header>
 
@@ -252,6 +279,7 @@ export function TicketsPage() {
                   <th className="px-4 py-3">Contact</th>
                   <th className="px-4 py-3">Payment</th>
                   <th className="px-4 py-3">Ticket</th>
+                  <th className="px-4 py-3">Check-in</th>
                   <th className="px-4 py-3 text-right">Assignment</th>
                 </tr>
               </thead>
@@ -271,6 +299,7 @@ export function TicketsPage() {
                       <div className="font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'No ticket'}</div>
                       <div className="mt-1"><TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{titleCase(registration.ticketStatus || 'no-ticket-assigned')}</TicketBadge></div>
                     </td>
+                    <td className="px-4 py-3"><TicketBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Not checked in'}</TicketBadge></td>
                     <td className="px-4 py-3 text-right">{renderActions(registration)}</td>
                   </tr>
                 ))}
@@ -292,6 +321,7 @@ export function TicketsPage() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Ticket code</p>
                   <p className="mt-1 font-mono text-lg font-bold text-[#2B1723]">{registration.ticketCode || 'Not assigned'}</p>
                 </div>
+                <div className="mt-3"><TicketBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Not checked in'}</TicketBadge></div>
                 <div className="mt-4">{renderActions(registration)}</div>
               </article>
             ))}
