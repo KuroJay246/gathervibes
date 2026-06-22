@@ -13,16 +13,19 @@ Private event-operations dashboard for **Gather & Savor Vibes**. This is an admi
 - [x] **Phase 3.1 recovery**: Google auth restored, production security confirmed, adaptive imports, price tier schema, dashboard countdown and selected-event UX (PR #3 merged to `main`)
 - [x] **Phase 3.2**: Import Center cleanup with source selector
 - [x] **Phase 4.5 foundation**: Ticket assignment and search-based door check-in
+- [x] **Phase 5**: Production QA Hardening with private QA Center and read-only fixture verification
 - [ ] **Phase 6**: Communications
 - [ ] **Phase 7**: AI writing assistant
 
-Phase 3.2 renames imports to **Import Center** and adds source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files. Phase 4.5 adds controlled ticket assignment and search-based door check-in. QR scanning, communications, AI writing, Google Sheets OAuth, Cloud Functions, Storage, and public attendee flows remain deferred.
+Phase 3.2 renames imports to **Import Center** and adds source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files. Phase 4.5 adds controlled ticket assignment and search-based door check-in. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. QR scanning, communications, AI writing, Google Sheets OAuth, Cloud Functions, Storage, and public attendee flows remain deferred.
 
 ## Production and QA status
 
 - PR #3 (`cursor/review-phase3-1-google-auth` -> `main`) is merged.
 - `main` has been redeployed to Firebase Hosting, Firestore rules, and Firestore indexes for project `gathervibeshub`.
 - `CODEX_TEST Live Verification Event` is intentionally kept as the permanent QA / smoke-test event.
+- CODEX_TEST event ID: `xPfa0b3KZyLSDnAD2uGI`.
+- CPB is real production data and must not be used for QA. CPB event ID: `zhaPxi31cpqLAW0cuS20`.
 - The CODEX_TEST event may be used for safe app testing, but not for real guests.
 - Do not delete the CODEX_TEST event unless the organizer explicitly says so.
 - Do not create a new daily test event; reuse CODEX_TEST for smoke testing.
@@ -31,7 +34,9 @@ Phase 3.2 renames imports to **Import Center** and adds source-specific guidance
 - Daily QA is read-only by default: `npm ci`, lint, tests, build, built auth UI smoke, and live HTTP smoke checks.
 - Any future write smoke test must be opt-in only with `QA_WRITE_SMOKE=true`.
 - Write smoke tests, if enabled later, must use only CODEX_TEST, create/delete only their own `CODEX_DAILY` registration, and must leave audit logs append-only.
-- Phase 3.2 / Phase 4.5 changes on this branch are not deployed until explicitly approved.
+- `/qa` is the private QA Center. It shows CODEX_TEST status, CPB warnings, current Working Event status, audit log status, System Health, a manual QA checklist, and a copyable CODEX_TEST sample CSV.
+- The QA Center helper does not write to Firestore. Production QA writes remain manual through the app and must use CODEX_TEST only.
+- Read-only fixture verification: `npm run admin:verify-production-fixtures`.
 
 ## Phase 3 feature summary
 
@@ -155,10 +160,13 @@ Preferred method:
 5. Verify:
    `npm run admin:verify-firebase`
 
-6. Deploy rules/indexes:
+6. Verify production QA fixtures without writes:
+   `npm run admin:verify-production-fixtures`
+
+7. Deploy rules/indexes:
    `npm run firebase:deploy-rules`
 
-7. Deploy hosting:
+8. Deploy hosting:
    `npm run firebase:deploy-hosting`
 
 If Firebase Admin SDK credentials are missing, use a service account JSON stored OUTSIDE the repository and referenced only with `GOOGLE_APPLICATION_CREDENTIALS`. For example:
@@ -199,6 +207,7 @@ If you experience issues with Google sign-in (e.g., "This account is not approve
 | `/imports` | Phase 3.2 | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
 | `/tickets` | Phase 4.5 | Ticket-code assignment, generation, regeneration, and unassignment |
 | `/check-in` | Phase 4.5 | Search-based door check-in and duplicate prevention |
+| `/qa` | Phase 5 | Private QA Center for CODEX_TEST fixture status, sample CSV, checklist, and read-only health guidance |
 | `/communications` | Phase 6 boundary | Future guest filtering and message drafts |
 | `/ai-writing` | Phase 7 boundary | Future editable AI writing drafts |
 | `/settings` | Complete | Firebase and data-model status |

@@ -7,6 +7,7 @@ import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PhasePage } from './pages/PhasePage'
 import { SettingsPage } from './pages/SettingsPage'
+import { QaPage } from './pages/QaPage'
 
 import { RegistrationsPage } from './pages/RegistrationsPage'
 import { ImportsPage } from './pages/ImportsPage'
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/imports" element={<ImportsPage />} />
           <Route path="/tickets" element={<TicketsPage />} />
           <Route path="/check-in" element={<CheckInPage />} />
+          <Route path="/qa" element={<QaPage />} />
           {futureRoutes.map((route) => (
             <Route
               key={route.path}

@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 22, 2026 (Phase 3.2 Import Center, XLSX import, runtime health, and Phase 4.5 ticket/check-in foundation implemented on feature branch)
+Last updated: June 22, 2026 (Phase 5 Production QA Hardening started on feature branch)
 
 ## 1. Project overview
 
@@ -20,6 +20,7 @@ The repository currently contains:
 - Phase 3.1 recovery: Google auth restored, production security verified, price tier schema, enhanced dashboard with live countdowns, registration metrics, selected-event UX. PR #3 (`cursor/review-phase3-1-google-auth` -> `main`) has been merged and redeployed to Firebase project `gathervibeshub`.
 - Phase 3.2: Import Center cleanup with source selector, CSV/pasted table import, and Excel/XLSX workbook import.
 - Phase 4.5 foundation: ticket assignment plus search-based door check-in for approved admins.
+- Phase 5: Production QA Hardening with a private QA Center, CODEX_TEST helper data, and read-only fixture verification.
 
 ## Production QA fixture
 
@@ -28,13 +29,25 @@ The repository currently contains:
 Rules:
 
 - This event may be used for safe app testing.
+- Event ID: `xPfa0b3KZyLSDnAD2uGI`.
 - Do not use it for real guests.
 - Do not delete it unless the organizer explicitly says so.
 - Do not create a new daily test event; reuse the existing CODEX_TEST event.
+- CPB is real production data and must not be used for QA. CPB event ID: `zhaPxi31cpqLAW0cuS20`.
 - Do not delete `auditLogs` globally.
 - Prefix test data clearly with `CODEX_TEST` or `CODEX_DAILY`.
 - Any future write smoke test must be opt-in only with `QA_WRITE_SMOKE=true`.
 - Because audit logs are append-only, write smoke tests will create audit log records. That is expected and should be documented before enabling them.
+
+## Phase 5 Production QA Hardening
+
+- `/qa` is a private approved-admin route for safe production smoke-test guidance.
+- QA Center shows CODEX_TEST status, CODEX_TEST event ID, CPB production-data warning, current Working Event status, audit log read status, System Health, and a safe QA checklist.
+- QA Center generates a `CODEX_TEST_YYYYMMDD_HHMM` prefix and copyable sample CSV for Import Center testing.
+- The helper never writes Firestore data automatically. Registration, import, ticket, and check-in smoke tests remain manual through the app and must use CODEX_TEST only.
+- Read-only fixture verification command: `npm run admin:verify-production-fixtures`.
+- The verification script requires Firebase project `gathervibeshub`, verifies exactly one CODEX_TEST event, verifies CPB is unchanged, verifies auditLogs exist, and performs no writes or deletes.
+- Audit logs are append-only. Do not delete auditLogs globally.
 
 ## Daily QA
 
@@ -189,6 +202,16 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - QR scanning is deferred with a visible note: search by ticket code is active now
 - No public attendee access, no QR scanner, no communications, no AI, no OAuth, no Cloud Functions
 
+### Phase 5 Production QA Hardening — In progress on feature branch
+
+- `/qa` private QA Center route added for approved admins
+- CODEX_TEST fixture status and CPB warning displayed
+- Current Working Event indicates whether CODEX_TEST is selected
+- Copyable CODEX_TEST sample CSV and safe test prefix helper added
+- Manual QA checklist added for registration CRUD, CSV/XLSX import, ticket actions, check-in, duplicate block, and audit log verification
+- Read-only production fixture verification script added
+- No automatic write smoke tests added
+
 ## 4. Features intentionally not implemented
 
 The following remain phase-gated or deferred:
@@ -220,6 +243,7 @@ The `/communications` and `/ai-writing` routes remain future-phase messages. `/t
 | `/imports` | Phase 3.2 complete locally | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
 | `/tickets` | Phase 4.5 complete locally | Ticket-code assignment, generation, regeneration, and unassignment |
 | `/check-in` | Phase 4.5 complete locally | Search-based door check-in and duplicate prevention |
+| `/qa` | Phase 5 in progress | Private QA Center for CODEX_TEST status, CPB warning, sample CSV, checklist, and fixture verification guidance |
 | `/communications` | Phase 6 boundary | Future guest filtering and message drafts |
 | `/ai-writing` | Phase 7 boundary | Future editable AI writing drafts |
 | `/settings` | Complete | Firebase and data-model status |
