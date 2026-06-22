@@ -42,20 +42,18 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [submitting, setSubmitting] = useState('')
   const [error, setError] = useState('')
-  const [offerRedirect, setOfferRedirect] = useState(false)
   const {
     user,
     loading,
     authError,
     signIn,
     signInWithGoogle,
-    signInWithGoogleRedirect,
+    signUpWithGoogle,
     isConfigured,
   } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const displayedError = error || (authError ? getAuthErrorMessage(authError) : '')
-  const canUseRedirectFallback = offerRedirect || authError === 'auth/popup-blocked'
 
   if (loading) return <LoadingScreen />
   if (user) return <Navigate to="/dashboard" replace />
@@ -79,36 +77,19 @@ export function LoginPage() {
     }
   }
 
-  async function handleGoogleSignIn() {
+  async function handleGoogleAuth(mode) {
     if (!isConfigured) return
 
     setError('')
-    setOfferRedirect(false)
-    setSubmitting('google')
+    setSubmitting(mode)
 
     try {
-      const prefersRedirect = window.matchMedia('(max-width: 767px)').matches
-      if (prefersRedirect) {
-        await signInWithGoogleRedirect()
+      if (mode === 'google-signup') {
+        await signUpWithGoogle()
         return
       }
 
       await signInWithGoogle()
-      navigate(from, { replace: true })
-    } catch (authFailure) {
-      setError(getAuthErrorMessage(authFailure.code))
-      setOfferRedirect(authFailure.code === 'auth/popup-blocked')
-      setSubmitting('')
-    }
-  }
-
-  async function handleRedirectSignIn() {
-    setError('')
-    setOfferRedirect(false)
-    setSubmitting('google')
-
-    try {
-      await signInWithGoogleRedirect()
     } catch (authFailure) {
       setError(getAuthErrorMessage(authFailure.code))
       setSubmitting('')
@@ -170,11 +151,11 @@ export function LoginPage() {
             <button
               type="button"
               className="google-sign-in-button"
-              onClick={handleGoogleSignIn}
+              onClick={() => handleGoogleAuth('google-signup')}
               disabled={!isConfigured || Boolean(submitting)}
-              aria-label="Continue with Google"
+              aria-label="Sign up with Google"
             >
-              {submitting === 'google' ? (
+              {submitting === 'google-signup' ? (
                 <>
                   <span className="size-4 animate-spin rounded-full border-2 border-[#B76E79]/25 border-t-[#B76E79]" />
                   Opening Google…
@@ -182,16 +163,30 @@ export function LoginPage() {
               ) : (
                 <>
                   <GoogleMark />
-                  Continue with Google
+                  Sign up with Google
                 </>
               )}
             </button>
 
-            {canUseRedirectFallback && (
-              <button type="button" onClick={handleRedirectSignIn} className="mt-3 w-full rounded-xl px-4 py-2.5 text-xs font-bold text-[#A85F6B] hover:bg-[#FFF8F2]">
-                Continue in this window
-              </button>
-            )}
+            <button
+              type="button"
+              className="mt-3 google-sign-in-button"
+              onClick={() => handleGoogleAuth('google-login')}
+              disabled={!isConfigured || Boolean(submitting)}
+              aria-label="Log in with Google"
+            >
+              {submitting === 'google-login' ? (
+                <>
+                  <span className="size-4 animate-spin rounded-full border-2 border-[#B76E79]/25 border-t-[#B76E79]" />
+                  Opening Google…
+                </>
+              ) : (
+                <>
+                  <GoogleMark />
+                  Log in with Google
+                </>
+              )}
+            </button>
 
             <div className="my-6 flex items-center gap-3" aria-hidden="true">
               <span className="h-px flex-1 bg-[#E9DDD6]" />

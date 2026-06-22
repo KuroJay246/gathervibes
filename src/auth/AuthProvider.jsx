@@ -4,7 +4,6 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signInWithRedirect,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
@@ -128,8 +127,12 @@ export function AuthProvider({ children }) {
       authError,
       isConfigured: isFirebaseConfigured,
       signIn: (email, password) => completeSignIn(() => signInWithEmailAndPassword(auth, email, password)),
-      signInWithGoogle: () => completeSignIn(() => signInWithPopup(auth, googleProvider)),
-      signInWithGoogleRedirect: () => {
+      signInWithGoogle: () => {
+        if (!auth) throw new Error('Firebase is not configured')
+        setAuthError('')
+        return signInWithRedirect(auth, googleProvider)
+      },
+      signUpWithGoogle: () => {
         if (!auth) throw new Error('Firebase is not configured')
         setAuthError('')
         return signInWithRedirect(auth, googleProvider)

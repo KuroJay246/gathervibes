@@ -30,6 +30,7 @@ test('Google and email sign-in both retain admin allowlist verification', async 
   assert.match(authProvider, /signInWithEmailAndPassword/)
   assert.match(authProvider, /verifyAdminAccess/)
   assert.match(authProvider, /doc\(db, 'settings', 'accessControl'\)/)
-  assert.match(loginPage, /Continue with Google/)
+  assert.match(loginPage, /Sign up with Google/)
+  assert.match(loginPage, /Log in with Google/)
   assert.match(loginPage, /Sign in with email/)
 })
