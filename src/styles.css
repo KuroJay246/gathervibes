@@ -247,6 +247,12 @@ input:focus-visible {
   }
 }
 
+@media (min-width: 1024px) {
+  .mobile-tab-bar {
+    display: none;
+  }
+}
+
 .event-input::placeholder {
   color: #b8a49a;
 }
