@@ -20,6 +20,7 @@ import { useActiveEvent } from '../events/useActiveEvent'
 import { subscribeToEvents } from '../services/eventService'
 import { subscribeToRegistrations } from '../services/registrationService'
 import { formatEventDate, formatCountdown, upcomingEvents } from '../utils/dateUtils'
+import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 
 // ── Local clock ──────────────────────────────────────────────────────────────
 
@@ -62,14 +63,7 @@ function useRegistrationMetrics(eventId) {
     return subscribeToRegistrations(eventId, setRegs, () => {})
   }, [eventId])
 
-  return useMemo(() => {
-    const total = regs.length
-    const paid = regs.filter((r) => r.paymentStatus === 'paid').length
-    const pending = regs.filter((r) => r.paymentStatus === 'pending').length
-    const complimentary = regs.filter((r) => r.paymentStatus === 'complimentary').length
-    const persons = regs.reduce((sum, r) => sum + (r.personsAttending || 1), 0)
-    return { total, paid, pending, complimentary, persons }
-  }, [regs])
+  return regs
 }
 
 // ── Metric pill ──────────────────────────────────────────────────────────────
@@ -88,7 +82,7 @@ function MetricPill({ label, value, color }) {
 export function DashboardPage() {
   const { activeEvent, clearActiveEvent, setActiveEvent } = useActiveEvent()
   const now = useLocalClock()
-  const metrics = useRegistrationMetrics(activeEvent?.eventId)
+  const registrations = useRegistrationMetrics(activeEvent?.eventId)
 
   const [allEvents, setAllEvents] = useState([])
   const [eventsLoaded, setEventsLoaded] = useState(false)
@@ -107,7 +101,8 @@ export function DashboardPage() {
     ? allEvents.find((e) => e.eventId === activeEvent.eventId)
     : null
   const capacity = selectedFull?.capacity || 0
-  const capacityPct = capacity > 0 ? Math.min(100, Math.round((metrics.persons / capacity) * 100)) : 0
+  const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedFull), [registrations, selectedFull])
+  const capacityPct = metrics.capacityPercent
 
   // Price tiers for selected event
   const priceTiers = selectedFull?.priceTiers
@@ -203,12 +198,12 @@ export function DashboardPage() {
             {activeEvent ? (
               <>
                 {/* Registration metrics */}
-                {metrics.total > 0 && (
+                {metrics.totalRegistrations > 0 && (
                   <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    <MetricPill label="Total" value={metrics.total} color="bg-[#FFF8F2] text-[#4E3A2C]" />
-                    <MetricPill label="Paid" value={metrics.paid} color="bg-[#EAF6EF] text-[#2F5C3E]" />
-                    <MetricPill label="Pending" value={metrics.pending} color="bg-[#FFFBEA] text-[#7A5700]" />
-                    <MetricPill label="Comp" value={metrics.complimentary} color="bg-[#F3EEFF] text-[#5E3D8C]" />
+                    <MetricPill label="Registrations" value={metrics.totalRegistrations} color="bg-[#FFF8F2] text-[#4E3A2C]" />
+                    <MetricPill label="Persons" value={metrics.totalPersons} color="bg-[#EAF6EF] text-[#2F5C3E]" />
+                    <MetricPill label="Paid regs" value={metrics.paidRegistrations} color="bg-[#EAF6EF] text-[#2F5C3E]" />
+                    <MetricPill label="Pending regs" value={metrics.pendingRegistrations} color="bg-[#FFFBEA] text-[#7A5700]" />
                   </div>
                 )}
 
@@ -217,7 +212,7 @@ export function DashboardPage() {
                   <div className="mb-5">
                     <div className="mb-1.5 flex items-center justify-between text-xs text-[#8A7468]">
                       <span className="font-bold text-[#3A2630]">Capacity</span>
-                      <span>{metrics.persons} / {capacity} persons ({capacityPct}%)</span>
+                      <span>{metrics.capacityUsed} / {capacity} persons ({capacityPct}%)</span>
                     </div>
                     <div className="h-2.5 overflow-hidden rounded-full bg-[#F2E8E1]">
                       <div
@@ -248,7 +243,11 @@ export function DashboardPage() {
                   </div>
                 )}
 
-                {metrics.total === 0 && (
+                <p className="mb-5 text-[11px] leading-5 text-[#8A7468]">
+                  Registrations are form entries. Persons attending is the guest count inside those entries, and capacity uses persons attending.
+                </p>
+
+                {metrics.totalRegistrations === 0 && (
                   <p className="text-xs leading-5 text-[#8A7468]">No registrations yet for this event. <Link to="/registrations" className="font-bold text-[#B76E79]">Add registrations</Link> or <Link to="/imports" className="font-bold text-[#B76E79]">import a CSV</Link>.</p>
                 )}
               </>

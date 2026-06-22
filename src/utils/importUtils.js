@@ -1,4 +1,5 @@
 import { dateFromValue, parseTimestampSafely } from './dateUtils.js'
+import { normalizePersonsAttending } from './registrationMetrics.js'
 import { findTicketCodeDuplicate, normalizeTicketCode, validateTicketCode } from './ticketUtils.js'
 
 export const MAX_PERSONS_ATTENDING = 100
@@ -185,7 +186,7 @@ export function mapRows(parsedRows, headers, fieldMap) {
     rowObj.groupName = fieldMap.groupName !== undefined ? parsedRow.data[fieldMap.groupName]?.trim() || null : null
 
     const rawPersons = fieldMap.personsAttending !== undefined ? parsedRow.data[fieldMap.personsAttending] : ''
-    rowObj.personsAttending = Number(rawPersons) || 1
+    rowObj.personsAttending = normalizePersonsAttending(rawPersons)
 
     rowObj.paymentStatus = normalizePaymentStatus(fieldMap.paymentStatus !== undefined ? parsedRow.data[fieldMap.paymentStatus] : '')
     rowObj.paymentReference = fieldMap.paymentReference !== undefined ? parsedRow.data[fieldMap.paymentReference]?.trim() || null : null

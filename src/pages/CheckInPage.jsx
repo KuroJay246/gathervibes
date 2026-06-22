@@ -161,10 +161,10 @@ export function CheckInPage() {
         {[
           ['Total registrations', summary.totalRegistrations],
           ['Total persons attending', summary.totalPersons],
-          ['Checked-in guests', summary.checkedInRegistrations],
-          ['People checked in', summary.checkedInPersons],
-          ['Not checked-in guests', summary.notCheckedInRegistrations],
-          ['People remaining', summary.notCheckedInPersons],
+          ['Checked-in registrations', summary.checkedInRegistrations],
+          ['Checked-in persons', summary.checkedInPersons],
+          ['Remaining registrations', summary.remainingRegistrations],
+          ['Remaining persons', summary.remainingPersons],
           ['Paid checked in', summary.paidCheckedIn],
           ['Pending/comp checked in', `${summary.pendingCheckedIn}/${summary.complimentaryCheckedIn}`],
         ].map(([label, value]) => (
@@ -174,6 +174,10 @@ export function CheckInPage() {
           </article>
         ))}
       </section>
+
+      <p className="rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
+        Persons attending may be higher than registrations when one registration includes multiple guests.
+      </p>
 
       <section className="flex gap-2 overflow-x-auto pb-2">
         {CHECK_IN_VIEWS.map((view) => (

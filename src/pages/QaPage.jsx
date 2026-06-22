@@ -136,6 +136,14 @@ export function QaPage() {
           </div>
         </div>
 
+        <div className="mt-5 rounded-2xl border border-[#EEDFD6] bg-[#FFF8F2] p-4">
+          <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#A85F6B]">Counting guide</p>
+          <p className="mt-2 text-sm leading-6 text-[#7B665C]">
+            Registrations are form entries. Persons attending is the guest count inside those entries. Capacity,
+            checked-in persons, and remaining persons should use persons attending, not just the number of registration rows.
+          </p>
+        </div>
+
         {cpbEvent && (
           <p className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#F7F1ED] px-3 py-2 text-xs font-semibold text-[#6B564C]">
             <Database className="size-4" aria-hidden="true" />

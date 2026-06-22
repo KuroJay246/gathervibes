@@ -1,3 +1,5 @@
+import { buildRegistrationMetrics } from './registrationMetrics.js'
+
 export const CHECK_IN_VIEWS = [
   { value: 'search', label: 'Search Guest' },
   { value: 'checked-in', label: 'Checked In' },
@@ -5,42 +7,16 @@ export const CHECK_IN_VIEWS = [
   { value: 'all', label: 'All Guests' },
 ]
 
-export function personsCount(registration) {
-  const count = Number(registration?.personsAttending)
-  return Number.isInteger(count) && count > 0 ? count : 1
-}
-
 export function buildCheckInSummary(registrations = []) {
-  const initial = {
-    totalRegistrations: 0,
-    totalPersons: 0,
-    checkedInRegistrations: 0,
-    checkedInPersons: 0,
-    notCheckedInRegistrations: 0,
-    notCheckedInPersons: 0,
-    paidCheckedIn: 0,
-    pendingCheckedIn: 0,
-    complimentaryCheckedIn: 0,
+  const metrics = buildRegistrationMetrics(registrations)
+  return {
+    ...metrics,
+    notCheckedInRegistrations: metrics.remainingRegistrations,
+    notCheckedInPersons: metrics.remainingPersons,
+    paidCheckedIn: registrations.filter((registration) => registration.checkedIn && registration.paymentStatus === 'paid').length,
+    pendingCheckedIn: registrations.filter((registration) => registration.checkedIn && registration.paymentStatus === 'pending').length,
+    complimentaryCheckedIn: registrations.filter((registration) => registration.checkedIn && registration.paymentStatus === 'complimentary').length,
   }
-
-  return registrations.reduce((summary, registration) => {
-    const persons = personsCount(registration)
-    summary.totalRegistrations += 1
-    summary.totalPersons += persons
-
-    if (registration.checkedIn) {
-      summary.checkedInRegistrations += 1
-      summary.checkedInPersons += persons
-      if (registration.paymentStatus === 'paid') summary.paidCheckedIn += 1
-      if (registration.paymentStatus === 'pending') summary.pendingCheckedIn += 1
-      if (registration.paymentStatus === 'complimentary') summary.complimentaryCheckedIn += 1
-    } else {
-      summary.notCheckedInRegistrations += 1
-      summary.notCheckedInPersons += persons
-    }
-
-    return summary
-  }, initial)
 }
 
 export function filterCheckInRegistrations(registrations = [], view = 'search') {
