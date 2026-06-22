@@ -31,7 +31,9 @@ export function ImportsPage() {
     const unsubscribe = subscribeToRegistrations(
       activeEvent.eventId,
       (data) => setExistingRegistrations(data),
-      (err) => console.error(err),
+      (err) => {
+        if (import.meta.env.DEV) console.error(err)
+      },
     )
     return () => unsubscribe()
   }, [activeEvent?.eventId])
@@ -39,7 +41,7 @@ export function ImportsPage() {
   if (!activeEvent?.eventId) {
     return (
       <EmptyState
-        title="No active event selected"
+        title="No selected event"
         description="Select an event before importing registrations."
         action={(
           <Link to="/events" className="rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white">
@@ -103,7 +105,7 @@ export function ImportsPage() {
       })
       setStep(4)
     } catch (err) {
-      console.error(err)
+      if (import.meta.env.DEV) console.error(err)
       setError('Failed to import. Check your connection and permissions.')
     } finally {
       setImporting(false)

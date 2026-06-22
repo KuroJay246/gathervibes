@@ -67,7 +67,7 @@ async function main() {
   try {
     await accessControlRef.set({
       approvedEmails: mergedEmails
-    });
+    }, { merge: true });
   } catch (error) {
     console.error('Error: Failed to write to settings/accessControl.');
     console.error(error.message);

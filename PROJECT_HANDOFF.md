@@ -77,8 +77,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 
 ### Phase 2.5 — Complete
 
-- Google provider popup flow on desktop
-- Google full-page redirect flow on mobile
+- Google full-page redirect flow for sign-up and login
 - Firestore allowlist verification before protected routes receive a user
 - Email/password backup preserved through the same allowlist verification
 - Installable manifest: Gather & Savor Hub / G&S Hub
@@ -112,7 +111,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Named tiers supported: Early Bird, General, Door, Tier 1, Tier 2, Tier 3, Complimentary
 - Tier fields: `name` (required string), `price` (number ≥ 0), `status` (active | sold-out | hidden)
 - Backward-compatible: existing events with only `ticketPrice` scalar continue to work
-- Firestore rules updated: `priceTiers` optional list (max 7) added to `isValidEvent`
+- Firestore rules updated: `priceTiers` optional list with strict per-tier validation (max 7) added to `isValidEvent`
 - Dashboard rewritten: live local date/time clock, upcoming events from Firestore
 - Dashboard: countdown badge on each upcoming event (updates every 30s)
 - Dashboard: "Active Event" renamed to **Working Event / Selected Event** throughout
@@ -210,7 +209,7 @@ Preferred method:
 7. Deploy hosting:
    `npm run firebase:deploy-hosting`
 
-If Application Default Credentials are missing, you can run `gcloud auth application-default login` if available, or use a service account JSON stored OUTSIDE the repository and referenced only with `GOOGLE_APPLICATION_CREDENTIALS`. For example:
+If Firebase Admin SDK credentials are missing, use a service account JSON stored OUTSIDE the repository and referenced only with `GOOGLE_APPLICATION_CREDENTIALS`. For example:
 - **PowerShell:** `$env:GOOGLE_APPLICATION_CREDENTIALS="C:\secure-keys\gathervibeshub-admin.json"`
 - **macOS/Linux:** `export GOOGLE_APPLICATION_CREDENTIALS="/secure-keys/gathervibeshub-admin.json"`
 
@@ -281,7 +280,7 @@ capacity      number         Required integer > 0
 ticketPrice   number         Required, zero or greater (backward-compat scalar)
 priceTiers    list<map>|null Optional — Phase 3.1
                                { name: string, price: number>=0, status: active|sold-out|hidden }
-                               Max 7 tiers. Named: Early Bird, General, Door, Tier 1-3, Complimentary.
+                               Max 7 tiers. Named tiers, numeric price, and active/sold-out/hidden status are enforced by rules.
 notes         string         Optional internal notes
 createdAt     Timestamp      Immutable after create
 updatedAt     Timestamp      Required on every update

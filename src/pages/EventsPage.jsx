@@ -157,7 +157,7 @@ export function EventsPage() {
 
   function chooseActiveEvent(event) {
     setActiveEvent(event)
-    setSuccess(`${event.eventName} is now the active event.`)
+    setSuccess(`${event.eventName} is now the selected event.`)
   }
 
   function retryEvents() {
@@ -227,7 +227,7 @@ export function EventsPage() {
                       <td className="px-4 py-4 text-xs font-semibold text-[#6D594F]">{Number(event.capacity).toLocaleString('en-BB')}</td>
                       <td className="px-4 py-4 text-xs font-semibold text-[#6D594F]">{currency.format(Number(event.ticketPrice) || 0)}</td>
                       <td className="px-6 py-4"><div className="flex items-center justify-end gap-1.5">
-                        <button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`rounded-lg px-3 py-2 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#2F855A]' : 'border border-[#E1D1C8] text-[#806C61] hover:bg-[#FFF8F2]'}`}>{isActive ? 'Active event' : 'Set active'}</button>
+                        <button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`rounded-lg px-3 py-2 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#2F855A]' : 'border border-[#E1D1C8] text-[#806C61] hover:bg-[#FFF8F2]'}`}>{isActive ? 'Selected event' : 'Select'}</button>
                         <button type="button" onClick={() => openEdit(event)} className="rounded-lg p-2 text-[#8C766A] hover:bg-[#FCEEF1] hover:text-[#A85F6B]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button>
                         <button type="button" onClick={() => requestDelete(event)} className="rounded-lg p-2 text-[#9A7777] hover:bg-[#FFF0F0] hover:text-[#C53030]" aria-label={`Delete ${event.eventName}`}><Trash2 className="size-4" /></button>
                       </div></td>
@@ -244,11 +244,11 @@ export function EventsPage() {
               return (
                 <article key={event.eventId} className={`p-4 sm:p-5 ${isActive ? 'bg-[#FFF8F2]' : ''}`}>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h4 className="font-serif text-lg text-[#35212B]">{event.eventName}</h4>{isActive && <span className="inline-flex items-center gap-1 rounded-full bg-[#E7F6ED] px-2 py-1 text-[8px] font-bold uppercase text-[#2F855A]"><CheckCircle2 className="size-3" /> Active</span>}</div><p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#806C61]"><MapPin className="size-3.5" /> {event.location}</p></div>
+                    <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h4 className="font-serif text-lg text-[#35212B]">{event.eventName}</h4>{isActive && <span className="inline-flex items-center gap-1 rounded-full bg-[#E7F6ED] px-2 py-1 text-[8px] font-bold uppercase text-[#2F855A]"><CheckCircle2 className="size-3" /> Selected</span>}</div><p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#806C61]"><MapPin className="size-3.5" /> {event.location}</p></div>
                     <StatusBadge status={event.status} />
                   </div>
                   <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-white p-3 text-center"><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Date</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{formatEventDate(event.eventDate, { year: undefined })}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Capacity</p><p className="mt-1 flex items-center justify-center gap-1 text-[10px] font-semibold text-[#59454E]"><UsersRound className="size-3" /> {event.capacity}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Price</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{currency.format(Number(event.ticketPrice) || 0)}</p></div></div>
-                  <div className="mt-4 flex gap-2"><button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`min-h-11 flex-1 rounded-lg py-2.5 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#2F855A]' : 'border border-[#E1D1C8] text-[#806C61]'}`}>{isActive ? 'Active event' : 'Set active'}</button><button type="button" onClick={() => openEdit(event)} className="grid size-11 place-items-center rounded-lg border border-[#E1D1C8] text-[#806C61]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button><button type="button" onClick={() => requestDelete(event)} className="grid size-11 place-items-center rounded-lg border border-[#F0D3D3] text-[#C53030]" aria-label={`Delete ${event.eventName}`}><Trash2 className="size-4" /></button></div>
+                  <div className="mt-4 flex gap-2"><button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`min-h-11 flex-1 rounded-lg py-2.5 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#2F855A]' : 'border border-[#E1D1C8] text-[#806C61]'}`}>{isActive ? 'Selected event' : 'Select'}</button><button type="button" onClick={() => openEdit(event)} className="grid size-11 place-items-center rounded-lg border border-[#E1D1C8] text-[#806C61]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button><button type="button" onClick={() => requestDelete(event)} className="grid size-11 place-items-center rounded-lg border border-[#F0D3D3] text-[#C53030]" aria-label={`Delete ${event.eventName}`}><Trash2 className="size-4" /></button></div>
                 </article>
               )
             })}

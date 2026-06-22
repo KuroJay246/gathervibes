@@ -61,17 +61,38 @@ service cloud.firestore {
     }
 
     // ── Price tier validation ──────────────────────────────────────────────
-    // Each tier must have: name (string), price (number >= 0), status (enum).
-    // We validate up to 7 tiers. Firestore Security Rules do not support
-    // looping over list elements, so we allow the list to exist and be
-    // structurally a list; fine-grained per-element enforcement is done
-    // client-side (validators.js) and is reinforced by the size bound.
+    // Each tier must have: name (supported enum), price (number >= 0), and
+    // status (supported enum). Rules do not support loops, so each allowed
+    // list size is checked explicitly up to MAX_PRICE_TIERS (7).
+
+    function validPriceTier(tier) {
+      return tier is map
+        && tier.keys().hasAll(['name', 'price', 'status'])
+        && tier.keys().hasOnly(['name', 'price', 'status'])
+        && tier.name in [
+          'Early Bird', 'General', 'Door', 'Tier 1', 'Tier 2', 'Tier 3', 'Complimentary'
+        ]
+        && tier.price is number
+        && tier.price >= 0
+        && tier.price <= 1000000
+        && tier.status in ['active', 'sold-out', 'hidden'];
+    }
 
     function validPriceTiers(tiers) {
       return tiers == null
         || (
           tiers is list
           && tiers.size() <= 7
+          && (
+            tiers.size() == 0
+            || (tiers.size() == 1 && validPriceTier(tiers[0]))
+            || (tiers.size() == 2 && validPriceTier(tiers[0]) && validPriceTier(tiers[1]))
+            || (tiers.size() == 3 && validPriceTier(tiers[0]) && validPriceTier(tiers[1]) && validPriceTier(tiers[2]))
+            || (tiers.size() == 4 && validPriceTier(tiers[0]) && validPriceTier(tiers[1]) && validPriceTier(tiers[2]) && validPriceTier(tiers[3]))
+            || (tiers.size() == 5 && validPriceTier(tiers[0]) && validPriceTier(tiers[1]) && validPriceTier(tiers[2]) && validPriceTier(tiers[3]) && validPriceTier(tiers[4]))
+            || (tiers.size() == 6 && validPriceTier(tiers[0]) && validPriceTier(tiers[1]) && validPriceTier(tiers[2]) && validPriceTier(tiers[3]) && validPriceTier(tiers[4]) && validPriceTier(tiers[5]))
+            || (tiers.size() == 7 && validPriceTier(tiers[0]) && validPriceTier(tiers[1]) && validPriceTier(tiers[2]) && validPriceTier(tiers[3]) && validPriceTier(tiers[4]) && validPriceTier(tiers[5]) && validPriceTier(tiers[6]))
+          )
         );
     }
 

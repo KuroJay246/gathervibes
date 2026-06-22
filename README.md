@@ -36,7 +36,7 @@ Phase 3.1 adds price tiers, an enhanced dashboard with live countdowns and regis
 - Production security verified: allowlist enforced, no debug bypasses
 - Price tier schema: optional `priceTiers` array (Early Bird, General, Door, Tier 1–3, Complimentary)
 - Backward-compatible with `ticketPrice` scalar (existing events unaffected)
-- Firestore rules updated to allow optional `priceTiers` list (max 7 tiers)
+- Firestore rules updated to strictly validate optional `priceTiers` list entries (max 7 tiers)
 - Dashboard enhanced: live local date/time, upcoming events list, countdowns per event
 - Dashboard: "Active Event" renamed to **Working Event / Selected Event** throughout
 - Dashboard: explanation text clarifying selected event is workspace-only
@@ -123,7 +123,7 @@ Preferred method:
 7. Deploy hosting:
    `npm run firebase:deploy-hosting`
 
-If Application Default Credentials are missing, you can run `gcloud auth application-default login` if available, or use a service account JSON stored OUTSIDE the repository and referenced only with `GOOGLE_APPLICATION_CREDENTIALS`. For example:
+If Firebase Admin SDK credentials are missing, use a service account JSON stored OUTSIDE the repository and referenced only with `GOOGLE_APPLICATION_CREDENTIALS`. For example:
 - **PowerShell:** `$env:GOOGLE_APPLICATION_CREDENTIALS="C:\secure-keys\gathervibeshub-admin.json"`
 - **macOS/Linux:** `export GOOGLE_APPLICATION_CREDENTIALS="/secure-keys/gathervibeshub-admin.json"`
 
@@ -250,7 +250,7 @@ Event mutations and their audit records use a single Firestore batch. A failed a
 
 ## Phase 2.5 acceptance checklist
 
-- [x] Google provider integration with popup cancellation/blocked handling
+- [x] Google provider integration with full-page redirect handling
 - [x] Firestore allowlist verification before protected routes receive a user
 - [x] Email/password backup preserved
 - [x] PWA manifest and branded 192/512 PNG icons
@@ -281,7 +281,7 @@ Event mutations and their audit records use a single Firestore batch. A failed a
 - [x] Named tiers: Early Bird, General, Door, Tier 1, Tier 2, Tier 3, Complimentary
 - [x] Backward-compatible with ticketPrice scalar
 - [x] Tier price ≥ 0, tier name required, tier status validated
-- [x] Max 7 tiers enforced client-side and in Firestore rules
+- [x] Max 7 tiers and tier fields enforced client-side and in Firestore rules
 - [x] Dashboard: live local date/time clock
 - [x] Dashboard: upcoming events list from Firestore with countdown badges
 - [x] Dashboard: Working Event / Selected Event rename and explanation

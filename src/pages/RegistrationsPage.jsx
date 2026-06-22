@@ -52,7 +52,7 @@ export function RegistrationsPage() {
         setLoading(false)
       },
       (err) => {
-        console.error('Registration fetch error:', err)
+        if (import.meta.env.DEV) console.error('Registration fetch error:', err)
         setLoadError('Could not load registrations. Please try again later.')
         setLoading(false)
       },
@@ -66,7 +66,7 @@ export function RegistrationsPage() {
     return (
       <EmptyState
         icon={Users}
-        title="No active event selected"
+        title="No selected event"
         description="Select an event from Events or the dashboard before managing registrations."
         action={(
           <Link to="/events" className="mt-6 inline-block rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B]">
@@ -105,7 +105,7 @@ export function RegistrationsPage() {
       setIsModalOpen(false)
       setEditingRegistration(null)
     } catch (err) {
-      console.error('Save error:', err)
+      if (import.meta.env.DEV) console.error('Save error:', err)
       alert('Failed to save registration. Check your permissions.')
     } finally {
       setSaving(false)
@@ -120,7 +120,7 @@ export function RegistrationsPage() {
       setDeletingRegistration(null)
       setSuccess('Registration deleted.')
     } catch (err) {
-      console.error('Delete error:', err)
+      if (import.meta.env.DEV) console.error('Delete error:', err)
       alert('Failed to delete registration. Check your permissions.')
     } finally {
       setSaving(false)
