@@ -48,7 +48,6 @@ export function LoginPage() {
     authError,
     signIn,
     signInWithGoogle,
-    signUpWithGoogle,
     isConfigured,
   } = useAuth()
   const navigate = useNavigate()
@@ -65,28 +64,19 @@ export function LoginPage() {
     setSubmitting(mode)
 
     try {
-      if (mode === 'google-signup') {
-        await signUpWithGoogle()
-        return
-      }
-
       await signInWithGoogle()
     } catch (authFailure) {
       setError(getAuthErrorMessage(authFailure.code))
       setSubmitting('')
     }
-  }, [isConfigured, signInWithGoogle, signUpWithGoogle])
+  }, [isConfigured, signInWithGoogle])
 
   useEffect(() => {
     if (loading || user || !isConfigured || autoGoogleStarted.current) return
 
     let authMode = ''
-    if (googleMode === 'login') {
+    if (googleMode === 'login' || googleMode === 'signup') {
       authMode = 'google-login'
-    }
-
-    if (googleMode === 'signup') {
-      authMode = 'google-signup'
     }
 
     if (!authMode) return
@@ -174,29 +164,9 @@ export function LoginPage() {
             <button
               type="button"
               className="google-sign-in-button"
-              onClick={() => handleGoogleAuth('google-signup')}
-              disabled={!isConfigured || Boolean(submitting)}
-              aria-label="Sign up with Google"
-            >
-              {submitting === 'google-signup' ? (
-                <>
-                  <span className="size-4 animate-spin rounded-full border-2 border-[#B76E79]/25 border-t-[#B76E79]" />
-                  Opening Google…
-                </>
-              ) : (
-                <>
-                  <GoogleMark />
-                  Sign up with Google
-                </>
-              )}
-            </button>
-
-            <button
-              type="button"
-              className="mt-3 google-sign-in-button"
               onClick={() => handleGoogleAuth('google-login')}
               disabled={!isConfigured || Boolean(submitting)}
-              aria-label="Log in with Google"
+              aria-label="Continue with Google"
             >
               {submitting === 'google-login' ? (
                 <>
@@ -206,7 +176,7 @@ export function LoginPage() {
               ) : (
                 <>
                   <GoogleMark />
-                  Log in with Google
+                  Continue with Google
                 </>
               )}
             </button>

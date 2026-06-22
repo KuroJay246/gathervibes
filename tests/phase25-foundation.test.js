@@ -36,8 +36,8 @@ test('Google and email sign-in both retain admin allowlist verification', async 
   assert.match(authProvider, /doc\(db, 'settings', 'accessControl'\)/)
   assert.match(firebaseConfig, /authDomain: import\.meta\.env\.VITE_FIREBASE_AUTH_DOMAIN/)
   assert.match(loginPage, /googleMode/)
-  assert.match(loginPage, /Sign up with Google/)
-  assert.match(loginPage, /Log in with Google/)
+  assert.match(loginPage, /Continue with Google/)
+  assert.doesNotMatch(loginPage, /Sign up with Google/)
   assert.match(loginPage, /Sign in with email/)
 })
 
