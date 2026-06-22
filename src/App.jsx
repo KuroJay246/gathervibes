@@ -13,9 +13,9 @@ import { RegistrationsPage } from './pages/RegistrationsPage'
 import { ImportsPage } from './pages/ImportsPage'
 import { TicketsPage } from './pages/TicketsPage'
 import { CheckInPage } from './pages/CheckInPage'
+import { CommunicationsPage } from './pages/CommunicationsPage'
 
 const futureRoutes = [
-  { path: 'communications', title: 'Communication Center', phase: 'Phase 6', description: 'Filter guest lists and prepare copy-ready messages.' },
   { path: 'ai-writing', title: 'AI Writing Assistant', phase: 'Phase 7', description: 'Create editable writing drafts for admin review.' },
 ]
 
@@ -33,6 +33,7 @@ export default function App() {
           <Route path="/tickets" element={<TicketsPage />} />
           <Route path="/check-in" element={<CheckInPage />} />
           <Route path="/qa" element={<QaPage />} />
+          <Route path="/communications" element={<CommunicationsPage />} />
           {futureRoutes.map((route) => (
             <Route
               key={route.path}
