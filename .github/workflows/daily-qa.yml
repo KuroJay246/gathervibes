@@ -1,0 +1,86 @@
+name: Daily QA
+
+on:
+  schedule:
+    - cron: "15 10 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  app-qa:
+    name: Lint, test, build, and live smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Smoke check built auth UI
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFile, readdir } from 'node:fs/promises'
+
+          const assets = await readdir('dist/assets')
+          const appAsset = assets.find((name) => name.startsWith('index-') && name.endsWith('.js'))
+          if (!appAsset) throw new Error('Built app bundle was not found.')
+
+          const appCode = await readFile(`dist/assets/${appAsset}`, 'utf8')
+          for (const expected of ['Sign up with Google', 'Log in with Google', 'Sign in with email']) {
+            if (!appCode.includes(expected)) {
+              throw new Error(`Built app is missing expected auth UI text: ${expected}`)
+            }
+          }
+          NODE
+
+      - name: Live HTTP smoke check
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          const urls = [
+            'https://gathervibeshub.web.app/',
+            'https://gathervibeshub.web.app/login',
+          ]
+
+          for (const url of urls) {
+            const response = await fetch(url, { redirect: 'follow' })
+            if (!response.ok) {
+              throw new Error(`${url} returned HTTP ${response.status}`)
+            }
+
+            const html = await response.text()
+            if (!html.includes('<div id="root">')) {
+              throw new Error(`${url} did not return the app shell.`)
+            }
+
+            if (html.includes('Firebase setup required')) {
+              throw new Error(`${url} returned the Firebase setup warning in the initial document.`)
+            }
+          }
+          NODE
+
+      - name: Document write-smoke policy
+        shell: bash
+        run: |
+          echo "Daily QA is read-only. Future write smoke tests must be explicitly gated with QA_WRITE_SMOKE=true."
