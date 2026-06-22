@@ -14,6 +14,20 @@ import { AuthContext } from './AuthContext'
 const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({ prompt: 'select_account' })
 
+const CANONICAL_AUTH_ORIGIN = 'https://gathervibeshub.firebaseapp.com'
+const WEB_APP_HOST = 'gathervibeshub.web.app'
+
+function redirectToCanonicalAuthHost(mode) {
+  if (typeof window === 'undefined' || window.location.hostname !== WEB_APP_HOST) {
+    return false
+  }
+
+  const targetUrl = new URL('/login', CANONICAL_AUTH_ORIGIN)
+  targetUrl.searchParams.set('googleMode', mode)
+  window.location.assign(targetUrl.toString())
+  return true
+}
+
 function adminAccessError(cause) {
   const error = new Error('This account is not approved for the private Gather & Savor workspace.', { cause })
   error.code = cause?.code === 'permission-denied' ? 'auth/unapproved-account' : 'auth/access-check-failed'
@@ -159,11 +173,13 @@ export function AuthProvider({ children }) {
       signInWithGoogle: () => {
         if (!auth) throw new Error('Firebase is not configured')
         setAuthError('')
+        if (redirectToCanonicalAuthHost('login')) return Promise.resolve()
         return signInWithRedirect(auth, googleProvider)
       },
       signUpWithGoogle: () => {
         if (!auth) throw new Error('Firebase is not configured')
         setAuthError('')
+        if (redirectToCanonicalAuthHost('signup')) return Promise.resolve()
         return signInWithRedirect(auth, googleProvider)
       },
       signOut: () => {

@@ -24,12 +24,18 @@ test('service worker does not cache or intercept private admin data', async () =
 
 test('Google and email sign-in both retain admin allowlist verification', async () => {
   const authProvider = await readFile('src/auth/AuthProvider.jsx', 'utf8')
+  const firebaseConfig = await readFile('src/lib/firebase.js', 'utf8')
   const loginPage = await readFile('src/pages/LoginPage.jsx', 'utf8')
 
   assert.match(authProvider, /GoogleAuthProvider/)
+  assert.match(authProvider, /signInWithRedirect/)
   assert.match(authProvider, /signInWithEmailAndPassword/)
   assert.match(authProvider, /verifyAdminAccess/)
+  assert.match(authProvider, /gathervibeshub\.web\.app/)
+  assert.match(authProvider, /gathervibeshub\.firebaseapp\.com/)
   assert.match(authProvider, /doc\(db, 'settings', 'accessControl'\)/)
+  assert.match(firebaseConfig, /authDomain: import\.meta\.env\.VITE_FIREBASE_AUTH_DOMAIN/)
+  assert.match(loginPage, /googleMode/)
   assert.match(loginPage, /Sign up with Google/)
   assert.match(loginPage, /Log in with Google/)
   assert.match(loginPage, /Sign in with email/)

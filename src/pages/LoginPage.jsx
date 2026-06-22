@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, Sparkles } from 'lucide-react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { BrandMark } from '../components/BrandMark'
@@ -54,30 +54,11 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const displayedError = error || (authError ? getAuthErrorMessage(authError) : '')
-
-  if (loading) return <LoadingScreen />
-  if (user) return <Navigate to="/dashboard" replace />
-
+  const autoGoogleStarted = useRef(false)
   const from = location.state?.from?.pathname || '/dashboard'
+  const googleMode = new URLSearchParams(location.search).get('googleMode')
 
-  async function handleSubmit(event) {
-    event.preventDefault()
-    if (!isConfigured) return
-
-    setError('')
-    setSubmitting('email')
-
-    try {
-      await signIn(email.trim(), password)
-      navigate(from, { replace: true })
-    } catch (authError) {
-      setError(getAuthErrorMessage(authError.code))
-    } finally {
-      setSubmitting('')
-    }
-  }
-
-  async function handleGoogleAuth(mode) {
+  const handleGoogleAuth = useCallback(async (mode) => {
     if (!isConfigured) return
 
     setError('')
@@ -92,6 +73,48 @@ export function LoginPage() {
       await signInWithGoogle()
     } catch (authFailure) {
       setError(getAuthErrorMessage(authFailure.code))
+      setSubmitting('')
+    }
+  }, [isConfigured, signInWithGoogle, signUpWithGoogle])
+
+  useEffect(() => {
+    if (loading || user || !isConfigured || autoGoogleStarted.current) return
+
+    let authMode = ''
+    if (googleMode === 'login') {
+      authMode = 'google-login'
+    }
+
+    if (googleMode === 'signup') {
+      authMode = 'google-signup'
+    }
+
+    if (!authMode) return
+
+    autoGoogleStarted.current = true
+    const authTimer = window.setTimeout(() => {
+      void handleGoogleAuth(authMode)
+    }, 0)
+
+    return () => window.clearTimeout(authTimer)
+  }, [googleMode, handleGoogleAuth, isConfigured, loading, user])
+
+  if (loading) return <LoadingScreen />
+  if (user) return <Navigate to="/dashboard" replace />
+
+  async function handleSubmit(event) {
+    event.preventDefault()
+    if (!isConfigured) return
+
+    setError('')
+    setSubmitting('email')
+
+    try {
+      await signIn(email.trim(), password)
+      navigate(from, { replace: true })
+    } catch (authError) {
+      setError(getAuthErrorMessage(authError.code))
+    } finally {
       setSubmitting('')
     }
   }
