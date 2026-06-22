@@ -116,6 +116,44 @@ function checkInAuditData(action = 'checkin.complete') {
   }
 }
 
+function checkedInRegistration(overrides = {}) {
+  return importedRegistration({
+    checkedIn: true,
+    checkInTime: Timestamp.fromMillis(1710000200000),
+    checkedInBy: adminEmail,
+    updatedAt: Timestamp.fromMillis(1710000200000),
+    ...overrides,
+  })
+}
+
+function undoCheckInAfterState(registration = checkedInRegistration()) {
+  return {
+    ...registration,
+    checkedIn: false,
+    checkInTime: null,
+    checkedInBy: null,
+    updatedAt: serverTimestamp(),
+  }
+}
+
+function undoCheckInAuditData() {
+  return {
+    logId: 'audit-checkin-undo-1',
+    eventId,
+    action: 'checkin.undo',
+    targetType: 'registration',
+    targetId: registrationId,
+    performedBy: adminEmail,
+    timestamp: serverTimestamp(),
+    details: {
+      fullName: 'CODEX_TEST Guest One',
+      ticketCode: 'GSV-009',
+      paymentStatus: 'complimentary',
+      previousCheckedIn: true,
+    },
+  }
+}
+
 test('Firestore rules allow approved admin check-in batch for imported ticketed registration', { skip: !emulatorHost }, async () => {
   const env = await createTestEnv()
   try {
@@ -163,18 +201,54 @@ test('Firestore rules reject standalone check-in audit without registration tran
 test('Firestore rules reject duplicate check-in registration update', { skip: !emulatorHost }, async () => {
   const env = await createTestEnv()
   try {
-    await seed(env, importedRegistration({
-      checkedIn: true,
-      checkInTime: Timestamp.fromMillis(1710000200000),
-      checkedInBy: adminEmail,
-    }))
+    await seed(env, checkedInRegistration())
     const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
 
-    await assertFails(updateDoc(doc(db, 'registrations', registrationId), checkInAfterState(importedRegistration({
-      checkedIn: true,
-      checkInTime: Timestamp.fromMillis(1710000200000),
-      checkedInBy: adminEmail,
-    }))))
+    await assertFails(updateDoc(doc(db, 'registrations', registrationId), checkInAfterState(checkedInRegistration())))
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules allow approved admin undo check-in batch', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, checkedInRegistration())
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+    const batch = writeBatch(db)
+
+    batch.update(doc(db, 'registrations', registrationId), undoCheckInAfterState())
+    batch.set(doc(db, 'auditLogs', 'audit-checkin-undo-1'), undoCheckInAuditData())
+
+    await assertSucceeds(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject unapproved undo check-in batch', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, checkedInRegistration())
+    const db = env.authenticatedContext('not-approved', { email: 'other@example.com' }).firestore()
+    const batch = writeBatch(db)
+
+    batch.update(doc(db, 'registrations', registrationId), undoCheckInAfterState())
+    batch.set(doc(db, 'auditLogs', 'audit-checkin-undo-1'), undoCheckInAuditData())
+
+    await assertFails(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject standalone undo audit without registration transition', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, checkedInRegistration())
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+
+    await assertFails(setDoc(doc(db, 'auditLogs', 'audit-checkin-undo-1'), undoCheckInAuditData()))
   } finally {
     await env.cleanup()
   }
@@ -194,14 +268,20 @@ test('check-in rules allow only check-in field changes without broad schema loos
   assert.match(rules, /request\.resource\.data\.checkedIn == true/)
   assert.match(rules, /request\.resource\.data\.checkInTime == request\.time/)
   assert.match(rules, /validPerformedBy\(request\.resource\.data\.checkedInBy\)/)
+  assert.match(rules, /function isCheckInUndoUpdate\(registrationId\)/)
+  assert.match(rules, /data\.action == 'checkin\.undo'/)
+  assert.match(rules, /request\.resource\.data\.checkInTime == null/)
+  assert.match(rules, /request\.resource\.data\.checkedInBy == null/)
   assert.doesNotMatch(rules, /allow update: if isApprovedAdmin\(\)\s+&& request\.resource\.data\.updatedAt == request\.time/)
 })
 
-test('check-in service sends a minimal persistence payload plus audit log', async () => {
+test('check-in and undo services send minimal persistence payloads plus audit logs', async () => {
   const service = await readFile('src/services/ticketService.js', 'utf8')
   const checkInStart = service.indexOf('export async function completeCheckIn')
+  const undoStart = service.indexOf('export async function undoCheckIn')
   const duplicateStart = service.indexOf('export async function recordDuplicateCheckInAttempt')
-  const checkInService = service.slice(checkInStart, duplicateStart)
+  const checkInService = service.slice(checkInStart, undoStart)
+  const undoService = service.slice(undoStart, duplicateStart)
 
   assert.match(checkInService, /batch\.update\(regRef,\s+\{/)
   assert.match(checkInService, /checkedIn:\s+true/)
@@ -212,4 +292,11 @@ test('check-in service sends a minimal persistence payload plus audit log', asyn
   assert.doesNotMatch(checkInService, /\.\.\.registration/)
   assert.doesNotMatch(checkInService, /personsAttending/)
   assert.doesNotMatch(checkInService, /createdAt/)
+  assert.match(undoService, /action: 'checkin\.undo'/)
+  assert.match(service, /previousCheckedIn:\s+Boolean\(registration\.checkedIn\)/)
+  assert.match(undoService, /checkedIn:\s+false/)
+  assert.match(undoService, /checkInTime:\s+null/)
+  assert.match(undoService, /checkedInBy:\s+null/)
+  assert.match(undoService, /updatedAt:\s+serverTimestamp\(\)/)
+  assert.doesNotMatch(undoService, /\.\.\.registration/)
 })

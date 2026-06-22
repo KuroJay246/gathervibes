@@ -4,7 +4,7 @@ import { AlertTriangle, CheckCircle2, ClipboardCheck, Search, XCircle } from 'lu
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { subscribeToRegistrations } from '../services/registrationService'
-import { completeCheckIn, recordDuplicateCheckInAttempt } from '../services/ticketService'
+import { completeCheckIn, recordDuplicateCheckInAttempt, undoCheckIn } from '../services/ticketService'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
@@ -70,6 +70,7 @@ export function CheckInPage() {
   const [message, setMessage] = useState('')
   const [actionError, setActionError] = useState('')
   const [activeView, setActiveView] = useState('search')
+  const [confirmUndo, setConfirmUndo] = useState(false)
   const summary = useMemo(() => buildCheckInSummary(registrations), [registrations])
   const visibleRegistrations = useMemo(
     () => filterCheckInRegistrations(registrations, activeView),
@@ -111,12 +112,36 @@ export function CheckInPage() {
       setMessage(`${selectedRegistration.fullName} checked in.`)
       setSearchQuery('')
       setSelectedId('')
+      setConfirmUndo(false)
     } catch (err) {
       if (import.meta.env.DEV) console.error(err)
       const permissionDenied = err?.code === 'permission-denied' || /permission|insufficient/i.test(err?.message || '')
       setActionError(permissionDenied
         ? 'Check-in was not saved because Firestore denied the write. No local success state was applied.'
         : err.message || 'Check-in failed. No local success state was applied.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleUndoCheckIn() {
+    if (!selectedRegistration?.checkedIn) return
+    setSaving(true)
+    setMessage('')
+    setActionError('')
+    try {
+      await undoCheckIn(selectedRegistration, user)
+      setMessage(`Check-in undone for ${selectedRegistration.fullName}.`)
+      setConfirmUndo(false)
+      setSearchQuery('')
+      setSelectedId('')
+      setActiveView('not-checked-in')
+    } catch (err) {
+      if (import.meta.env.DEV) console.error(err)
+      const permissionDenied = err?.code === 'permission-denied' || /permission|insufficient/i.test(err?.message || '')
+      setActionError(permissionDenied
+        ? 'Undo check-in was not saved because Firestore denied the write. The guest remains checked in.'
+        : err.message || 'Undo check-in failed. The guest remains checked in.')
     } finally {
       setSaving(false)
     }
@@ -328,22 +353,37 @@ export function CheckInPage() {
                     setSelectedId('')
                     setMessage('')
                     setActionError('')
+                    setConfirmUndo(false)
                   }}
                   className="min-h-16 rounded-2xl border border-[#E7D6CC] bg-white px-6 text-sm font-bold text-[#6B564C] hover:bg-[#FBF8F5]"
                 >
-                  Reset
+                  Clear Selected Guest
                 </button>
               </div>
 
               {selectedRegistration.checkedIn && (
-                <button
-                  type="button"
-                  onClick={handleDuplicateAttempt}
-                  disabled={saving}
-                  className="w-full rounded-xl border border-[#E7D6CC] bg-white px-4 py-3 text-sm font-bold text-[#6B564C] hover:bg-[#FBF8F5] disabled:opacity-50"
-                >
-                  Record duplicate attempt
-                </button>
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setConfirmUndo(true)
+                      setMessage('')
+                      setActionError('')
+                    }}
+                    disabled={saving}
+                    className="w-full rounded-xl border border-[#F2C3C3] bg-[#FFF8F8] px-4 py-3 text-sm font-bold text-[#A32626] hover:bg-[#FFF1F1] disabled:opacity-50"
+                  >
+                    Undo Check-In
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDuplicateAttempt}
+                    disabled={saving}
+                    className="w-full rounded-xl border border-[#E7D6CC] bg-white px-4 py-3 text-sm font-bold text-[#6B564C] hover:bg-[#FBF8F5] disabled:opacity-50"
+                  >
+                    Record duplicate attempt
+                  </button>
+                </div>
               )}
             </div>
           )}
@@ -406,6 +446,36 @@ export function CheckInPage() {
             </div>
           )}
         </section>
+      )}
+
+      {confirmUndo && selectedRegistration?.checkedIn && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-[#2B1723]/40 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-[#EEDFD6] bg-white p-6 shadow-2xl">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#A32626]">Undo Check-In</p>
+            <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">{selectedRegistration.fullName}</h3>
+            <p className="mt-3 text-sm leading-6 text-[#6B564C]">
+              Undo check-in for this guest? This should only be used if the check-in was accidental.
+            </p>
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setConfirmUndo(false)}
+                disabled={saving}
+                className="rounded-xl border border-[#E7D6CC] bg-white px-5 py-3 text-sm font-bold text-[#6B564C] hover:bg-[#FBF8F5] disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleUndoCheckIn}
+                disabled={saving}
+                className="rounded-xl bg-[#A32626] px-5 py-3 text-sm font-bold text-white hover:bg-[#8F1F1F] disabled:opacity-50"
+              >
+                {saving ? 'Saving…' : 'Undo Check-In'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

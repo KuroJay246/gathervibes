@@ -83,6 +83,30 @@ test('checked-in summary counts registrations and persons attending', () => {
   assert.equal(filterCheckInRegistrations([{ checkedIn: true }, { checkedIn: false }], 'checked-in').length, 1)
 })
 
+test('undo check-in moves guest back to not checked in counts and tabs', () => {
+  const before = buildCheckInSummary([
+    { checkedIn: true, personsAttending: 2, paymentStatus: 'complimentary' },
+    { checkedIn: false, personsAttending: 1, paymentStatus: 'pending' },
+  ])
+  const after = buildCheckInSummary([
+    { checkedIn: false, personsAttending: 2, paymentStatus: 'complimentary' },
+    { checkedIn: false, personsAttending: 1, paymentStatus: 'pending' },
+  ])
+  const rows = [
+    { registrationId: 'reg-1', checkedIn: false },
+    { registrationId: 'reg-2', checkedIn: true },
+  ]
+
+  assert.equal(before.checkedInRegistrations, 1)
+  assert.equal(before.checkedInPersons, 2)
+  assert.equal(after.checkedInRegistrations, 0)
+  assert.equal(after.checkedInPersons, 0)
+  assert.equal(after.remainingRegistrations, 2)
+  assert.equal(after.remainingPersons, 3)
+  assert.deepEqual(filterCheckInRegistrations(rows, 'checked-in').map((row) => row.registrationId), ['reg-2'])
+  assert.deepEqual(filterCheckInRegistrations([{ registrationId: 'reg-1', checkedIn: false }], 'not-checked-in').map((row) => row.registrationId), ['reg-1'])
+})
+
 test('ticket code duplicate helper blocks existing and imported batch duplicates', () => {
   assert.match(
     findTicketCodeDuplicate([{ ticketCode: 'CPB-001' }], [], { ticketCode: 'cpb-001' }),
@@ -123,6 +147,7 @@ test('ticket and check-in services create registration audit actions', async () 
   assert.match(service, /action: 'ticket\.unassign'/)
   assert.match(service, /action,\s+targetType: 'registration'/)
   assert.match(service, /action: 'checkin\.complete'/)
+  assert.match(service, /action: 'checkin\.undo'/)
   assert.match(service, /action: 'checkin\.duplicate-attempt'/)
   assert.match(service, /checkedIn:\s+true/)
   assert.match(service, /checkInTime:\s+serverTimestamp\(\)/)
@@ -138,13 +163,14 @@ test('Firestore rules include ticket and check-in fields and actions', async () 
     assert.match(rules, new RegExp(field))
   }
 
-  for (const action of ['ticket.assign', 'ticket.unassign', 'ticket.regenerate', 'checkin.complete', 'checkin.duplicate-attempt']) {
+  for (const action of ['ticket.assign', 'ticket.unassign', 'ticket.regenerate', 'checkin.complete', 'checkin.undo', 'checkin.duplicate-attempt']) {
     assert.match(rules, new RegExp(action.replace('.', '\\.')))
   }
 
   assert.match(rules, /allow update, delete: if false/)
   assert.match(rules, /hasImportedTicketCode/)
   assert.match(rules, /isCheckInCompletionUpdate\(registrationId\)/)
+  assert.match(rules, /isCheckInUndoUpdate\(registrationId\)/)
   assert.match(rules, /checkInCompletionChangedKeysOnly/)
   assert.match(rules, /affectedKeys\(\)\.hasOnly\(\[/)
   assert.match(rules, /'checkedIn', 'checkInTime', 'checkedInBy', 'updatedAt'/)

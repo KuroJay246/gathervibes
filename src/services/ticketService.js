@@ -86,6 +86,15 @@ export function buildCheckInAuditDetails(registration) {
   }
 }
 
+export function buildUndoCheckInAuditDetails(registration) {
+  return {
+    fullName: registration.fullName,
+    ticketCode: registration.ticketCode || null,
+    paymentStatus: registration.paymentStatus,
+    previousCheckedIn: Boolean(registration.checkedIn),
+  }
+}
+
 export async function completeCheckIn(registration, user) {
   const allowed = canCompleteCheckIn(registration)
   if (!allowed.allowed) throw new Error(allowed.reason)
@@ -106,6 +115,31 @@ export async function completeCheckIn(registration, user) {
     checkedIn: true,
     checkInTime: serverTimestamp(),
     checkedInBy: performedBy(user),
+    updatedAt: serverTimestamp(),
+  })
+  batch.set(audit.ref, audit.data)
+  await batch.commit()
+}
+
+export async function undoCheckIn(registration, user) {
+  if (!registration?.checkedIn) throw new Error('This guest is not currently checked in.')
+
+  const firestore = requireDatabase()
+  const regRef = doc(firestore, 'registrations', registration.registrationId)
+  const audit = createAuditLogWrite({
+    eventId: registration.eventId,
+    action: 'checkin.undo',
+    targetType: 'registration',
+    targetId: registration.registrationId,
+    performedBy: user,
+    details: buildUndoCheckInAuditDetails(registration),
+  })
+  const batch = writeBatch(firestore)
+
+  batch.update(regRef, {
+    checkedIn: false,
+    checkInTime: null,
+    checkedInBy: null,
     updatedAt: serverTimestamp(),
   })
   batch.set(audit.ref, audit.data)

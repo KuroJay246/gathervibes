@@ -226,7 +226,7 @@ service cloud.firestore {
         && data.action in [
           'registration.create', 'registration.update', 'registration.delete', 'registration.import',
           'ticket.assign', 'ticket.unassign', 'ticket.regenerate',
-          'checkin.complete', 'checkin.duplicate-attempt'
+          'checkin.complete', 'checkin.undo', 'checkin.duplicate-attempt'
         ]
         && data.targetType == 'registration'
         && validShortId(data.targetId)
@@ -277,6 +277,18 @@ service cloud.firestore {
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedIn == true
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkInTime == data.timestamp
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedInBy == data.performedBy
+          ) || (
+            data.action == 'checkin.undo'
+            && exists(/databases/$(database)/documents/registrations/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
+            && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
+            && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedIn == true
+            && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkInTime is timestamp
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedIn == false
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkInTime == null
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedInBy == null
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.updatedAt == data.timestamp
           ) || (
             data.action in [
               'registration.update', 'ticket.assign', 'ticket.unassign',
@@ -398,6 +410,20 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time;
     }
 
+    function isCheckInUndoUpdate(registrationId) {
+      return checkInCompletionChangedKeysOnly()
+        && request.resource.data.registrationId == registrationId
+        && request.resource.data.eventId == resource.data.eventId
+        && validShortId(request.resource.data.eventId)
+        && resource.data.checkedIn == true
+        && resource.data.checkInTime is timestamp
+        && resource.data.checkedInBy != null
+        && request.resource.data.checkedIn == false
+        && request.resource.data.checkInTime == null
+        && request.resource.data.checkedInBy == null
+        && request.resource.data.updatedAt == request.time;
+    }
+
     // The allowlist is bootstrapped in the Firebase Console. Client code can
     // never create, update, or delete it.
     match /settings/accessControl {
@@ -432,6 +458,7 @@ service cloud.firestore {
       allow update: if isApprovedAdmin()
         && (
           isCheckInCompletionUpdate(registrationId)
+          || isCheckInUndoUpdate(registrationId)
           || (
             isValidRegistration(request.resource.data, registrationId)
             && request.resource.data.updatedAt == request.time
@@ -450,7 +477,7 @@ service cloud.firestore {
       allow create: if isApprovedAdmin()
         && (
           (
-            request.resource.data.action == 'checkin.complete'
+            request.resource.data.action in ['checkin.complete', 'checkin.undo']
             && isValidRegistrationAuditLog(request.resource.data, logId)
             && matchesRegistrationMutation(request.resource.data)
           )
