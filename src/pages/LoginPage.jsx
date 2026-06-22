@@ -26,9 +26,9 @@ function getAuthErrorMessage(code) {
     'auth/popup-closed-by-user': 'Google sign-in was cancelled. Nothing changed.',
     'auth/cancelled-popup-request': 'The earlier Google sign-in window was closed. Please try again.',
     'auth/popup-blocked': 'Your browser blocked the Google sign-in window. Continue in this window instead.',
-    'auth/unauthorized-domain': 'This website is not authorized for Google sign-in. Contact the workspace owner.',
+    'auth/unauthorized-domain': 'Google sign-in is blocked because this website domain is not authorized in Firebase Authentication. Add this domain under Firebase Console → Authentication → Settings → Authorized domains.',
     'auth/operation-not-allowed': 'Google sign-in is not enabled for this Firebase project.',
-    'auth/unapproved-account': 'This account is not approved for the private Gather & Savor workspace.',
+    'auth/unapproved-account': 'This account signed in successfully but is not approved in settings/accessControl.',
     'auth/access-check-failed': 'Your admin access could not be verified. Check your connection and try again.',
     'auth/redirect-failed': 'Google sign-in could not be completed. Please try again.',
   }
