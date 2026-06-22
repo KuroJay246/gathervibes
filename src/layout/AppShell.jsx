@@ -42,7 +42,7 @@ const navGroups = [
   {
     label: 'Guest experience',
     items: [
-      { to: '/communications', label: 'Communication', icon: MessageSquareText, phase: 6 },
+      { to: '/communications', label: 'Communication', icon: MessageSquareText, available: true },
       { to: '/ai-writing', label: 'AI Writing', icon: Bot, phase: 7 },
     ],
   },
