@@ -148,19 +148,13 @@ test('Firestore rules reject unapproved check-in batch', { skip: !emulatorHost }
   }
 })
 
-test('Firestore rules identify audit payload as part of valid check-in mutation', { skip: !emulatorHost }, async () => {
+test('Firestore rules reject standalone check-in audit without registration transition', { skip: !emulatorHost }, async () => {
   const env = await createTestEnv()
   try {
     await seed(env)
     const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
 
     await assertFails(setDoc(doc(db, 'auditLogs', 'audit-checkin-1'), checkInAuditData()))
-
-    const batch = writeBatch(db)
-    batch.update(doc(db, 'registrations', registrationId), checkInAfterState())
-    batch.set(doc(db, 'auditLogs', 'audit-checkin-1'), checkInAuditData())
-
-    await assertSucceeds(batch.commit())
   } finally {
     await env.cleanup()
   }

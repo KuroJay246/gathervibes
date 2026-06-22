@@ -267,9 +267,20 @@ service cloud.firestore {
             && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
           ) || (
+            data.action == 'checkin.complete'
+            && exists(/databases/$(database)/documents/registrations/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
+            && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
+            && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedIn == false
+            && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkInTime == null
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedIn == true
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkInTime == data.timestamp
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedInBy == data.performedBy
+          ) || (
             data.action in [
               'registration.update', 'ticket.assign', 'ticket.unassign',
-              'ticket.regenerate', 'checkin.complete'
+              'ticket.regenerate'
             ]
             && exists(/databases/$(database)/documents/registrations/$(data.targetId))
             && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
@@ -420,7 +431,8 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time;
       allow update: if isApprovedAdmin()
         && (
-          (
+          isCheckInCompletionUpdate(registrationId)
+          || (
             isValidRegistration(request.resource.data, registrationId)
             && request.resource.data.updatedAt == request.time
             && (
@@ -429,7 +441,6 @@ service cloud.firestore {
               || isTicketUnassignmentUpdate()
             )
           )
-          || isCheckInCompletionUpdate(registrationId)
         );
       allow delete: if isApprovedAdmin();
     }
@@ -438,7 +449,12 @@ service cloud.firestore {
       allow read: if isApprovedAdmin();
       allow create: if isApprovedAdmin()
         && (
-          (isValidEventAuditLog(request.resource.data, logId) && matchesEventMutation(request.resource.data))
+          (
+            request.resource.data.action == 'checkin.complete'
+            && isValidRegistrationAuditLog(request.resource.data, logId)
+            && matchesRegistrationMutation(request.resource.data)
+          )
+          || (isValidEventAuditLog(request.resource.data, logId) && matchesEventMutation(request.resource.data))
           || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesRegistrationMutation(request.resource.data))
           || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesDuplicateCheckInAttempt(request.resource.data))
         );
