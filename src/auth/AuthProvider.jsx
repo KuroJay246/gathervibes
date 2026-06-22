@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   getRedirectResult,
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signInWithRedirect,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
@@ -147,7 +148,7 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  async function completeSignIn(signInRequest) {
+  const completeSignIn = useCallback(async (signInRequest) => {
     if (!auth) throw new Error('Firebase is not configured')
     setAuthError('')
 
@@ -161,7 +162,24 @@ export function AuthProvider({ children }) {
       setAuthError(error.code || 'auth/access-check-failed')
       throw error
     }
-  }
+  }, [])
+
+  const startGoogleSignIn = useCallback(async (mode) => {
+    if (!auth) throw new Error('Firebase is not configured')
+    setAuthError('')
+    if (redirectToCanonicalAuthHost(mode)) return undefined
+
+    try {
+      return await completeSignIn(() => signInWithPopup(auth, googleProvider))
+    } catch (error) {
+      if (error?.code === 'auth/popup-blocked' || error?.code === 'auth/cancelled-popup-request') {
+        setAuthError('')
+        return signInWithRedirect(auth, googleProvider)
+      }
+
+      throw error
+    }
+  }, [completeSignIn])
 
   const value = useMemo(
     () => ({
@@ -170,25 +188,15 @@ export function AuthProvider({ children }) {
       authError,
       isConfigured: isFirebaseConfigured,
       signIn: (email, password) => completeSignIn(() => signInWithEmailAndPassword(auth, email, password)),
-      signInWithGoogle: () => {
-        if (!auth) throw new Error('Firebase is not configured')
-        setAuthError('')
-        if (redirectToCanonicalAuthHost('login')) return Promise.resolve()
-        return signInWithRedirect(auth, googleProvider)
-      },
-      signUpWithGoogle: () => {
-        if (!auth) throw new Error('Firebase is not configured')
-        setAuthError('')
-        if (redirectToCanonicalAuthHost('signup')) return Promise.resolve()
-        return signInWithRedirect(auth, googleProvider)
-      },
+      signInWithGoogle: () => startGoogleSignIn('login'),
+      signUpWithGoogle: () => startGoogleSignIn('signup'),
       signOut: () => {
         if (!auth) return Promise.resolve()
         setUser(null)
         return firebaseSignOut(auth)
       },
     }),
-    [authError, loading, user],
+    [authError, completeSignIn, loading, startGoogleSignIn, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
