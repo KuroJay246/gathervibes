@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
-import { CalendarDays, X } from 'lucide-react'
+import { CalendarDays, Plus, Trash2, X } from 'lucide-react'
 import { toDateInput } from '../../utils/dateUtils'
-import { validateEvent } from '../../utils/validators'
+import { VALID_TIER_NAMES, VALID_TIER_STATUSES, MAX_PRICE_TIERS, validateEvent } from '../../utils/validators'
+
+const EMPTY_TIER = { name: 'General', price: '', status: 'active' }
 
 const EMPTY_EVENT = {
   eventName: '',
@@ -12,6 +14,7 @@ const EMPTY_EVENT = {
   capacity: '',
   ticketPrice: '',
   notes: '',
+  priceTiers: [],
 }
 
 const eventTypes = [
@@ -31,6 +34,12 @@ const statuses = [
   ['cancelled', 'Cancelled'],
 ]
 
+const tierStatusLabels = {
+  active: 'Active',
+  'sold-out': 'Sold out',
+  hidden: 'Hidden',
+}
+
 function valuesFromEvent(event) {
   if (!event) return EMPTY_EVENT
 
@@ -43,6 +52,9 @@ function valuesFromEvent(event) {
     capacity: String(event.capacity ?? ''),
     ticketPrice: String(event.ticketPrice ?? ''),
     notes: event.notes || '',
+    priceTiers: Array.isArray(event.priceTiers)
+      ? event.priceTiers.map((t) => ({ name: t.name, price: String(t.price), status: t.status || 'active' }))
+      : [],
   }
 }
 
@@ -71,6 +83,43 @@ export function EventFormModal({ event, onClose, onSave }) {
     setValues((current) => ({ ...current, [field]: value }))
     if (errors[field]) setErrors((current) => ({ ...current, [field]: '' }))
   }
+
+  // ── price tier helpers ────────────────────────────────────────────────────
+
+  function addTier() {
+    if (values.priceTiers.length >= MAX_PRICE_TIERS) return
+    setValues((c) => ({ ...c, priceTiers: [...c.priceTiers, { ...EMPTY_TIER }] }))
+  }
+
+  function removeTier(index) {
+    setValues((c) => ({ ...c, priceTiers: c.priceTiers.filter((_, i) => i !== index) }))
+    setErrors((c) => {
+      const next = { ...c }
+      if (next.priceTiers) {
+        const t = { ...next.priceTiers }
+        delete t[index]
+        next.priceTiers = Object.keys(t).length ? t : undefined
+      }
+      return next
+    })
+  }
+
+  function updateTier(index, field, value) {
+    setValues((c) => {
+      const tiers = [...c.priceTiers]
+      tiers[index] = { ...tiers[index], [field]: value }
+      return { ...c, priceTiers: tiers }
+    })
+    setErrors((c) => {
+      if (!c.priceTiers?.[index]?.[field]) return c
+      const t = { ...c.priceTiers }
+      t[index] = { ...t[index] }
+      delete t[index][field]
+      return { ...c, priceTiers: t }
+    })
+  }
+
+  // ── submit ────────────────────────────────────────────────────────────────
 
   async function handleSubmit(submitEvent) {
     submitEvent.preventDefault()
@@ -169,15 +218,118 @@ export function EventFormModal({ event, onClose, onSave }) {
               </div>
 
               <div>
-                <label htmlFor="ticketPrice" className="event-label">Ticket price (BBD) <span>*</span></label>
+                <label htmlFor="ticketPrice" className="event-label">Base ticket price (BBD) <span>*</span></label>
                 <input id="ticketPrice" type="number" min="0" step="0.01" value={values.ticketPrice} onChange={(changeEvent) => updateField('ticketPrice', changeEvent.target.value)} className={inputClass('ticketPrice')} placeholder="75.00" disabled={saving} />
                 <FieldError id="ticketPrice-error">{errors.ticketPrice}</FieldError>
               </div>
 
               <div className="sm:col-span-2">
                 <label htmlFor="notes" className="event-label">Internal notes</label>
-                <textarea id="notes" rows="4" value={values.notes} onChange={(changeEvent) => updateField('notes', changeEvent.target.value)} className={`${inputClass('notes')} resize-y`} placeholder="Add planning notes for trusted staff…" disabled={saving} />
+                <textarea id="notes" rows="3" value={values.notes} onChange={(changeEvent) => updateField('notes', changeEvent.target.value)} className={`${inputClass('notes')} resize-y`} placeholder="Add planning notes for trusted staff…" disabled={saving} />
               </div>
+            </div>
+
+            {/* ── Price tiers ──────────────────────────────────────────── */}
+            <div className="mt-7">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Optional</p>
+                  <h3 className="font-serif text-base text-[#2B1723]">Price tiers</h3>
+                </div>
+                {values.priceTiers.length < MAX_PRICE_TIERS && (
+                  <button
+                    type="button"
+                    onClick={addTier}
+                    disabled={saving}
+                    id="add-price-tier"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-[#E1D1C8] px-3 py-2 text-[11px] font-bold text-[#6B564C] hover:bg-[#FFF8F2] disabled:opacity-50"
+                  >
+                    <Plus className="size-3.5" />
+                    Add tier
+                  </button>
+                )}
+              </div>
+
+              {errors.priceTiers?._array && (
+                <p className="mb-3 text-[11px] font-medium text-[#C53030]">{errors.priceTiers._array}</p>
+              )}
+
+              {values.priceTiers.length === 0 ? (
+                <p className="rounded-xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] px-4 py-4 text-xs text-[#A08578]">
+                  No price tiers set. The base ticket price above applies. Add tiers for Early Bird, Door pricing, complimentary spots, etc.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {values.priceTiers.map((tier, index) => (
+                    <div key={index} className="rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] p-4">
+                      <div className="grid gap-3 sm:grid-cols-[1fr_120px_120px_auto]">
+                        <div>
+                          <label htmlFor={`tier-name-${index}`} className="event-label">Tier name</label>
+                          <select
+                            id={`tier-name-${index}`}
+                            value={VALID_TIER_NAMES.includes(tier.name) ? tier.name : 'General'}
+                            onChange={(e) => updateTier(index, 'name', e.target.value)}
+                            className="event-input"
+                            disabled={saving}
+                          >
+                            {VALID_TIER_NAMES.map((n) => (
+                              <option key={n} value={n}>{n}</option>
+                            ))}
+                          </select>
+                          {errors.priceTiers?.[index]?.name && (
+                            <p className="mt-1 text-[11px] font-medium text-[#C53030]">{errors.priceTiers[index].name}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label htmlFor={`tier-price-${index}`} className="event-label">Price (BBD)</label>
+                          <input
+                            id={`tier-price-${index}`}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={tier.price}
+                            onChange={(e) => updateTier(index, 'price', e.target.value)}
+                            className="event-input"
+                            placeholder="0.00"
+                            disabled={saving}
+                          />
+                          {errors.priceTiers?.[index]?.price && (
+                            <p className="mt-1 text-[11px] font-medium text-[#C53030]">{errors.priceTiers[index].price}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label htmlFor={`tier-status-${index}`} className="event-label">Status</label>
+                          <select
+                            id={`tier-status-${index}`}
+                            value={tier.status}
+                            onChange={(e) => updateTier(index, 'status', e.target.value)}
+                            className="event-input"
+                            disabled={saving}
+                          >
+                            {VALID_TIER_STATUSES.map((s) => (
+                              <option key={s} value={s}>{tierStatusLabels[s]}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="flex items-end pb-0.5">
+                          <button
+                            type="button"
+                            onClick={() => removeTier(index)}
+                            disabled={saving}
+                            aria-label={`Remove tier ${index + 1}`}
+                            className="rounded-lg p-2 text-[#9B867A] hover:bg-[#FCEEF1] hover:text-[#B76E79] disabled:opacity-40"
+                          >
+                            <Trash2 className="size-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 

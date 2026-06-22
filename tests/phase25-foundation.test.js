@@ -24,12 +24,30 @@ test('service worker does not cache or intercept private admin data', async () =
 
 test('Google and email sign-in both retain admin allowlist verification', async () => {
   const authProvider = await readFile('src/auth/AuthProvider.jsx', 'utf8')
+  const firebaseConfig = await readFile('src/lib/firebase.js', 'utf8')
   const loginPage = await readFile('src/pages/LoginPage.jsx', 'utf8')
 
   assert.match(authProvider, /GoogleAuthProvider/)
+  assert.match(authProvider, /signInWithRedirect/)
   assert.match(authProvider, /signInWithEmailAndPassword/)
   assert.match(authProvider, /verifyAdminAccess/)
+  assert.match(authProvider, /gathervibeshub\.web\.app/)
+  assert.match(authProvider, /gathervibeshub\.firebaseapp\.com/)
   assert.match(authProvider, /doc\(db, 'settings', 'accessControl'\)/)
-  assert.match(loginPage, /Continue with Google/)
+  assert.match(firebaseConfig, /authDomain: import\.meta\.env\.VITE_FIREBASE_AUTH_DOMAIN/)
+  assert.match(loginPage, /googleMode/)
+  assert.match(loginPage, /Sign up with Google/)
+  assert.match(loginPage, /Log in with Google/)
   assert.match(loginPage, /Sign in with email/)
+})
+
+test('registration audit logs preserve registration target type', async () => {
+  const auditService = await readFile('src/services/auditService.js', 'utf8')
+  const registrationService = await readFile('src/services/registrationService.js', 'utf8')
+  const importService = await readFile('src/services/importService.js', 'utf8')
+
+  assert.match(auditService, /targetType = 'event'/)
+  assert.match(auditService, /targetType,/)
+  assert.match(registrationService, /targetType: 'registration'/)
+  assert.match(importService, /targetType: 'registration'/)
 })

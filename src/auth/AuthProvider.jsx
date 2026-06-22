@@ -4,7 +4,6 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signInWithRedirect,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
@@ -14,6 +13,20 @@ import { AuthContext } from './AuthContext'
 
 const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({ prompt: 'select_account' })
+
+const CANONICAL_AUTH_ORIGIN = 'https://gathervibeshub.firebaseapp.com'
+const WEB_APP_HOST = 'gathervibeshub.web.app'
+
+function redirectToCanonicalAuthHost(mode) {
+  if (typeof window === 'undefined' || window.location.hostname !== WEB_APP_HOST) {
+    return false
+  }
+
+  const targetUrl = new URL('/login', CANONICAL_AUTH_ORIGIN)
+  targetUrl.searchParams.set('googleMode', mode)
+  window.location.assign(targetUrl.toString())
+  return true
+}
 
 function adminAccessError(cause) {
   const error = new Error('This account is not approved for the private Gather & Savor workspace.', { cause })
@@ -27,8 +40,31 @@ async function verifyAdminAccess(nextUser) {
   try {
     const accessDocument = await getDoc(doc(db, 'settings', 'accessControl'))
     if (!accessDocument.exists()) throw adminAccessError()
+    
+    const data = accessDocument.data()
+    const approvedEmails = Array.isArray(data?.approvedEmails) ? data.approvedEmails : []
+    const userEmail = typeof nextUser.email === 'string' ? nextUser.email.toLowerCase() : ''
+    
+    if (!approvedEmails.includes(userEmail)) {
+      throw adminAccessError({ code: 'permission-denied' })
+    }
   } catch (error) {
+    if (import.meta.env.DEV) {
+      console.error('[Diagnostic] verifyAdminAccess failed:', {
+        errorCode: error?.code,
+        errorMessage: error?.message,
+        authProvider: nextUser.providerData?.[0]?.providerId,
+        currentDomain: window.location.hostname,
+        firebaseConfigured: isFirebaseConfigured,
+        email: nextUser.email,
+        emailLower: typeof nextUser.email === 'string' ? nextUser.email.toLowerCase() : null,
+      })
+    }
+    
     if (error?.code?.startsWith('auth/')) throw error
+    if (error?.code === 'permission-denied' || error?.code === 'firestore/permission-denied') {
+      throw adminAccessError({ code: 'permission-denied' })
+    }
     throw adminAccessError(error)
   }
 }
@@ -44,19 +80,10 @@ export function AuthProvider({ children }) {
     }
 
     let active = true
+    let redirectSettled = false
 
-    getRedirectResult(auth).catch((error) => {
-      if (active) setAuthError(error.code || 'auth/redirect-failed')
-    })
-
-    const unsubscribe = onAuthStateChanged(auth, async (nextUser) => {
+    async function approveUser(nextUser) {
       if (!active) return
-
-      if (!nextUser) {
-        setUser(null)
-        setLoading(false)
-        return
-      }
 
       setLoading(true)
       try {
@@ -74,6 +101,44 @@ export function AuthProvider({ children }) {
       } finally {
         if (active) setLoading(false)
       }
+    }
+
+    getRedirectResult(auth)
+      .then(async (result) => {
+        redirectSettled = true
+        if (!active) return
+
+        if (result?.user) {
+          await approveUser(result.user)
+          return
+        }
+
+        if (!auth.currentUser) {
+          setUser(null)
+          setLoading(false)
+        }
+      })
+      .catch((error) => {
+        redirectSettled = true
+        if (active) {
+          setUser(null)
+          setAuthError(error.code || 'auth/redirect-failed')
+          setLoading(false)
+        }
+      })
+
+    const unsubscribe = onAuthStateChanged(auth, async (nextUser) => {
+      if (!active) return
+
+      if (!nextUser) {
+        if (redirectSettled) {
+          setUser(null)
+          setLoading(false)
+        }
+        return
+      }
+
+      await approveUser(nextUser)
     })
 
     return () => {
@@ -105,10 +170,16 @@ export function AuthProvider({ children }) {
       authError,
       isConfigured: isFirebaseConfigured,
       signIn: (email, password) => completeSignIn(() => signInWithEmailAndPassword(auth, email, password)),
-      signInWithGoogle: () => completeSignIn(() => signInWithPopup(auth, googleProvider)),
-      signInWithGoogleRedirect: () => {
+      signInWithGoogle: () => {
         if (!auth) throw new Error('Firebase is not configured')
         setAuthError('')
+        if (redirectToCanonicalAuthHost('login')) return Promise.resolve()
+        return signInWithRedirect(auth, googleProvider)
+      },
+      signUpWithGoogle: () => {
+        if (!auth) throw new Error('Firebase is not configured')
+        setAuthError('')
+        if (redirectToCanonicalAuthHost('signup')) return Promise.resolve()
         return signInWithRedirect(auth, googleProvider)
       },
       signOut: () => {

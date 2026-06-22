@@ -16,8 +16,21 @@ function requireDatabase() {
   return db
 }
 
+/**
+ * Normalise priceTiers from form state into a clean array for Firestore.
+ * Returns undefined when no tiers are present so the field is omitted.
+ */
+function normalisePriceTiers(tiers) {
+  if (!Array.isArray(tiers) || tiers.length === 0) return undefined
+  return tiers.map((tier) => ({
+    name: tier.name.trim(),
+    price: Number(tier.price),
+    status: tier.status || 'active',
+  }))
+}
+
 function eventPayload(values) {
-  return {
+  const payload = {
     eventName: values.eventName.trim(),
     eventDate: Timestamp.fromDate(new Date(`${values.eventDate}T12:00:00`)),
     location: values.location.trim(),
@@ -27,6 +40,11 @@ function eventPayload(values) {
     ticketPrice: Number(values.ticketPrice),
     notes: values.notes.trim(),
   }
+
+  const tiers = normalisePriceTiers(values.priceTiers)
+  if (tiers !== undefined) payload.priceTiers = tiers
+
+  return payload
 }
 
 export function subscribeToEvents(onEvents, onError) {
@@ -79,8 +97,16 @@ export async function updateEvent(eventId, values, user) {
   })
   const batch = writeBatch(firestore)
 
+  const payload = eventPayload(values)
+
+  // When priceTiers is not present in the new values (user removed all tiers),
+  // explicitly delete the field so stale tiers don't linger.
+  if (normalisePriceTiers(values.priceTiers) === undefined) {
+    payload.priceTiers = null
+  }
+
   batch.update(eventRef, {
-    ...eventPayload(values),
+    ...payload,
     updatedAt: serverTimestamp(),
   })
   batch.set(audit.ref, audit.data)
