@@ -325,6 +325,34 @@ export function DashboardPage() {
 
         {/* RIGHT COLUMN */}
         <div className="space-y-6">
+          <article className="safe-card rounded-[24px] border border-[#D9EBD8] bg-[#EAF6EF] p-6">
+            <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Event-day command center</p>
+            <h3 className="mt-1.5 font-serif text-xl text-[#244B32]">Fast links for live operations</h3>
+            <p className="mt-2 text-[11px] leading-5 text-[#456B50]">
+              Use these when the Working Event is selected and staff are checking guests in.
+            </p>
+            <div className="mt-5 grid gap-2">
+              {[
+                { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Scan, search, check in, and undo.' },
+                { to: '/tickets', label: 'Tickets / QR Print List', sub: 'Assign codes and print QR lists.' },
+                { to: '/communications', label: 'Communications', sub: 'Prepare copy-ready guest messages.' },
+                { to: '/imports', label: 'Import Center', sub: 'Preview guest list uploads before saving.' },
+                { to: '/qa', label: 'QA Center', sub: 'Run CODEX_TEST and System Health checks.' },
+              ].map(({ to, label, sub }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className="flex min-w-0 items-center justify-between gap-3 rounded-xl bg-white/70 px-4 py-3 text-[#244B32] transition hover:bg-white"
+                >
+                  <span className="min-w-0">
+                    <span className="block break-words text-sm font-bold">{label}</span>
+                    <span className="mt-0.5 block break-words text-[11px] leading-4 text-[#58745F]">{sub}</span>
+                  </span>
+                  <ChevronRight className="size-4 shrink-0 text-[#1E7345]" />
+                </Link>
+              ))}
+            </div>
+          </article>
 
           {/* Foundation status */}
           <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1" aria-label="Workspace status">

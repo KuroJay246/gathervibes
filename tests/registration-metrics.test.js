@@ -56,7 +56,7 @@ test('Dashboard and Check-In use shared count wording and helpers', async () => 
 test('Check-In page waits for Firestore success and avoids false success on permission denied', async () => {
   const checkIn = await readFile('src/pages/CheckInPage.jsx', 'utf8')
   const completeIndex = checkIn.indexOf('await completeCheckIn')
-  const successIndex = checkIn.indexOf('setMessage(`${selectedRegistration.fullName} checked in.`)')
+  const successIndex = checkIn.indexOf('setMessage(`${selectedRegistration.fullName} checked in successfully.`)')
 
   assert.ok(completeIndex > -1)
   assert.ok(successIndex > completeIndex)
