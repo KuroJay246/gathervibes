@@ -13,6 +13,22 @@ import { EmptyState } from '../components/ui/EmptyState'
 import { IMPORT_SOURCES, getImportSource } from '../utils/importSources'
 import { readXlsxWorkbook } from '../utils/xlsxImport'
 
+function isPermissionDeniedImportError(err) {
+  const text = `${err?.code || ''} ${err?.message || ''}`.toLowerCase()
+  return text.includes('permission-denied') || text.includes('permission denied') || text.includes('insufficient permissions')
+}
+
+function buildSafeImportErrorDetails(err, rowCount) {
+  return {
+    step: 'confirmed-import-batch',
+    attemptedRows: rowCount,
+    writes: 'registration create plus audit log create',
+    code: err?.code || err?.name || 'unknown',
+    message: String(err?.message || err || 'Unknown import failure').replace(/\s+/g, ' ').slice(0, 500),
+    privacy: 'Guest row values are not included in this diagnostic.',
+  }
+}
+
 export function ImportsPage() {
   const { user } = useAuth()
   const { activeEvent } = useActiveEvent()
@@ -36,6 +52,7 @@ export function ImportsPage() {
 
   const [importing, setImporting] = useState(false)
   const [error, setError] = useState('')
+  const [importErrorDetails, setImportErrorDetails] = useState(null)
   const [importResult, setImportResult] = useState(null)
   const selectedSource = getImportSource(sourceType)
   const selectedSheet = workbookSheets.find((sheet) => sheet.id === selectedSheetId)
@@ -80,6 +97,7 @@ export function ImportsPage() {
     if (!file) return
 
     setError('')
+    setImportErrorDetails(null)
     setImportResult(null)
     setUploadedFileName(file.name)
 
@@ -131,6 +149,7 @@ export function ImportsPage() {
   function loadParsedData(headers, rows, context = {}) {
     setParsedData({ headers, rows })
     setError('')
+    setImportErrorDetails(null)
     setImportContext(context)
     setFieldMap(buildInitialFieldMap(headers))
     setProcessedRows([])
@@ -169,6 +188,7 @@ export function ImportsPage() {
   }
 
   async function handleProceedToPreview() {
+    setImportErrorDetails(null)
     const mapped = mapRows(parsedData.rows, parsedData.headers, fieldMap, importContext)
     const processed = await processAndValidate(mapped, activeEvent.eventId, existingRegistrations)
     setProcessedRows(processed)
@@ -230,12 +250,14 @@ export function ImportsPage() {
     const nextFinalRows = buildFinalRowsFromReview()
     setFinalRows(nextFinalRows)
     setError('')
+    setImportErrorDetails(null)
     setStep(5)
   }
 
   async function handleImport(validRows) {
     setImporting(true)
     setError('')
+    setImportErrorDetails(null)
     try {
       await commitImport(validRows, activeEvent.eventId, user)
       setImportResult({
@@ -245,9 +267,23 @@ export function ImportsPage() {
       setStep(6)
     } catch (err) {
       if (import.meta.env.DEV) console.error(err)
-      setError('Failed to import. Check your connection and permissions.')
+      setImportErrorDetails(buildSafeImportErrorDetails(err, validRows.length))
+      setError(
+        isPermissionDeniedImportError(err)
+          ? 'Import failed because Firestore denied the write. No rows were imported. This usually means the confirmed import payload does not match the current Firestore rules/schema.'
+          : 'Import failed before any rows were imported. Check the diagnostic details below and try again.',
+      )
     } finally {
       setImporting(false)
+    }
+  }
+
+  async function copyImportErrorDetails() {
+    if (!importErrorDetails) return
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(importErrorDetails, null, 2))
+    } catch (err) {
+      if (import.meta.env.DEV) console.error(err)
     }
   }
 
@@ -267,6 +303,7 @@ export function ImportsPage() {
     setFinalRows([])
     setImportResult(null)
     setError('')
+    setImportErrorDetails(null)
   }
 
   function reset() {
@@ -290,7 +327,26 @@ export function ImportsPage() {
 
       {error && (
         <div className="rounded-xl bg-[#FFF1F1] p-4 text-sm text-[#A32626]">
-          {error}
+          <p>{error}</p>
+          {importErrorDetails && (
+            <div className="mt-3 rounded-lg border border-[#F3C2C2] bg-white/70 p-3 text-xs leading-5 text-[#7E1E1E]">
+              <p className="font-bold">Safe diagnostic details</p>
+              <p>No guest row values are shown here. The import batch is atomic, so a denied write means no rows were imported.</p>
+              <dl className="mt-2 grid gap-1 sm:grid-cols-2">
+                <div><dt className="font-bold">Step</dt><dd>{importErrorDetails.step}</dd></div>
+                <div><dt className="font-bold">Rows attempted</dt><dd>{importErrorDetails.attemptedRows}</dd></div>
+                <div><dt className="font-bold">Write type</dt><dd>{importErrorDetails.writes}</dd></div>
+                <div><dt className="font-bold">Code</dt><dd>{importErrorDetails.code}</dd></div>
+              </dl>
+              <button
+                type="button"
+                onClick={copyImportErrorDetails}
+                className="mt-3 rounded-lg border border-[#F3C2C2] px-3 py-1.5 text-xs font-bold text-[#A32626] hover:bg-[#FFF1F1]"
+              >
+                Copy Error Details
+              </button>
+            </div>
+          )}
         </div>
       )}
 

@@ -1,6 +1,6 @@
 export const TICKET_CODE_PREFIX = 'GSV'
 export const TICKET_CODE_PATTERN = /^GSV-[A-HJ-NP-Z2-9]{6}$/
-export const FLEXIBLE_TICKET_CODE_PATTERN = /^[A-Z0-9]{2,12}-[A-Z0-9]{3,12}$/
+export const FLEXIBLE_TICKET_CODE_PATTERN = /^[A-Z0-9]{2,12}(?:-[A-Z0-9]{2,12}){1,3}$/
 export const SEQUENTIAL_TICKET_CODE_PATTERN = /^([A-Z0-9]{2,12})-(\d{3,6})$/
 export const TICKET_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 
@@ -67,7 +67,9 @@ export function generateSequentialTicketCode(existingCodes = [], event = {}, min
 export function validateTicketCode(value, existingRegistrations = [], currentRegistrationId = null) {
   const code = normalizeTicketCode(value)
   if (!code) return 'Ticket code is required.'
-  if (!FLEXIBLE_TICKET_CODE_PATTERN.test(code)) return 'Use format PREFIX-001 or PREFIX-CODE with letters and numbers only.'
+  if (code.length > 32 || !FLEXIBLE_TICKET_CODE_PATTERN.test(code)) {
+    return 'Use format PREFIX-001, PREFIX-CODE, or PREFIX-EVENT-001 with letters and numbers only.'
+  }
 
   const duplicate = existingRegistrations.find((registration) => (
     registration.registrationId !== currentRegistrationId

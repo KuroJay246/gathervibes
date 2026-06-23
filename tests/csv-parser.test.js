@@ -42,6 +42,8 @@ test('normalizePaymentStatus', () => {
 
 test('normalizeEmail', () => {
   assert.strictEqual(normalizeEmail(' TEST@example.com '), 'test@example.com')
+  assert.strictEqual(normalizeEmail('[Jane@example.com](mailto:Jane@example.com)'), 'jane@example.com')
+  assert.strictEqual(normalizeEmail('mailto:buyer@example.com'), 'buyer@example.com')
   assert.strictEqual(normalizeEmail(''), null)
 })
 

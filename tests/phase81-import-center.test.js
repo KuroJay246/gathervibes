@@ -14,7 +14,7 @@ import {
   rowsToParsedTable,
 } from '../src/utils/importUtils.js'
 import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
-import { searchableRegistrationText } from '../src/utils/ticketUtils.js'
+import { searchableRegistrationText, validateTicketCode } from '../src/utils/ticketUtils.js'
 
 test('XLSX sheet selection requires explicit confirmation before mapping or preview', async () => {
   const page = await readFile('src/pages/ImportsPage.jsx', 'utf8')
@@ -217,6 +217,18 @@ test('ticket code duplicates remain hard errors for batch and existing event sco
   assert.ok(existingProcessed[0].issues.some((issue) => /already used/.test(issue)))
 })
 
+test('event-style multi-part ticket codes are valid for imports and QR lookup', async () => {
+  const parsed = parseCSV('Full Name,Email,Ticket Code\nJane,jane@example.com,CPB-TEST-001')
+  const rows = mapRows(parsed.rows, parsed.headers, buildInitialFieldMap(parsed.headers), { importBatchId: 'batch-ticket-format' })
+  const processed = await processAndValidate(rows, 'codex-test', [])
+
+  assert.equal(validateTicketCode('CPB-TEST-001'), '')
+  assert.equal(rows[0].ticketCode, 'CPB-TEST-001')
+  assert.equal(processed[0].status, 'valid')
+  assert.equal(qrPayloadForTicketCode('CPB-TEST-001'), 'GSV:TICKET:CPB-TEST-001')
+  assert.match(validateTicketCode('CPB-TOO-LONG-TICKET-CODE-123456789'), /Use format/)
+})
+
 test('sourceRowId and registration IDs do not collide just because contact is shared', async () => {
   const rowA = { fullName: 'Jane', email: 'family@example.com', phone: '2465550000', sourceRowId: 'row-1', importBatchId: 'batch-a' }
   const rowB = { fullName: 'John', email: 'family@example.com', phone: '2465550000', sourceRowId: 'row-2', importBatchId: 'batch-a' }
@@ -241,6 +253,23 @@ test('manual merge sums persons and preserves original names in notes', () => {
   assert.equal(merged.row.personsAttending, 3)
   assert.match(merged.row.notes, /Jane Guest/)
   assert.match(merged.row.notes, /John Guest/)
+})
+
+test('manual merge keeps sourceRowId within Firestore rule limit', () => {
+  const longId = 'long-file-name-for-import:long-sheet-name-for-import:row-with-extra-metadata-'
+  const merged = mergeRowsIntoGroupRegistration(Array.from({ length: 5 }, (_, index) => ({
+    status: 'warning',
+    row: {
+      fullName: `Guest ${index + 1}`,
+      groupName: 'Large Family',
+      personsAttending: 1,
+      sourceRowId: `${longId}${index + 1}`.repeat(2),
+    },
+  })))
+
+  assert.equal(merged.status, 'valid')
+  assert.ok(merged.row.sourceRowId.length <= 128)
+  assert.match(merged.row.sourceRowId, /^merged:5:/)
 })
 
 test('manual merge preserves buyerName and attendeeNames', () => {
@@ -297,6 +326,30 @@ test('Import Center keeps preview before writes and skip rows excluded from fina
   assert.match(preview, /Skip Row/)
   assert.match(preview, /row\.status !== 'blocked' && row\.status !== 'skipped'/)
   assert.match(page, /commitImport\(validRows/)
+})
+
+test('confirmed import write strips UI-only review fields', async () => {
+  const service = await readFile('src/services/importService.js', 'utf8')
+
+  assert.match(service, /batch\.set\(regRef, \{/)
+  assert.match(service, /buyerName/)
+  assert.match(service, /attendeeNames/)
+  assert.doesNotMatch(service, /personsAttendingWasBlank/)
+  assert.doesNotMatch(service, /displayNameFromFirstAttendee/)
+  assert.doesNotMatch(service, /reviewActions/)
+  assert.doesNotMatch(service, /sourceFileName/)
+  assert.doesNotMatch(service, /sourceSheetName/)
+  assert.doesNotMatch(service, /importBatchId/)
+})
+
+test('Import Center shows clear Firestore permission-denied diagnostics without guest rows', async () => {
+  const page = await readFile('src/pages/ImportsPage.jsx', 'utf8')
+
+  assert.match(page, /Import failed because Firestore denied the write/)
+  assert.match(page, /No rows were imported/)
+  assert.match(page, /confirmed-import-batch/)
+  assert.match(page, /Copy Error Details/)
+  assert.match(page, /Guest row values are not included/)
 })
 
 test('duplicate checks stay scoped to the selected Working Event data passed to processing', async () => {

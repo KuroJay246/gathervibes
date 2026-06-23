@@ -245,8 +245,12 @@ export function normalizePaymentStatus(val) {
 
 export function normalizeEmail(val) {
   if (!val) return null
-  const trimmed = val.trim().toLowerCase()
-  return trimmed || null
+  const trimmed = String(val).trim()
+  const mailto = trimmed.match(/mailto:([^\s)]+)/i)
+  const bracketed = trimmed.match(/\[([^\]]+@[^\]]+)\]/)
+  const plain = trimmed.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)
+  const candidate = mailto?.[1] || bracketed?.[1] || plain?.[0] || trimmed
+  return candidate.trim().toLowerCase() || null
 }
 
 export function normalizePhone(val) {
@@ -292,7 +296,19 @@ function buildSourceRowId(parsedRow, context = {}) {
     context.sourceSheetName,
   ].map(sourceIdentityPart).filter(Boolean).join(':')
 
-  return scope ? `${scope}:${rowPart}` : rowPart
+  return (scope ? `${scope}:${rowPart}` : rowPart).slice(0, 128)
+}
+
+function mergeSourceRowIds(sourceRowIds = []) {
+  const cleanIds = sourceRowIds.filter(Boolean)
+  if (cleanIds.length === 0) return null
+
+  const combined = cleanIds.join('+')
+  if (combined.length <= 128) return combined
+
+  const firstId = cleanIds[0].slice(0, 80)
+  const lastId = cleanIds[cleanIds.length - 1].slice(-24)
+  return `merged:${cleanIds.length}:${firstId}:${lastId}`.slice(0, 128)
 }
 
 export async function generateStableId(eventId, row) {
@@ -573,7 +589,7 @@ export function mergeRowsIntoGroupRegistration(rows = []) {
       ticketCode: ticketCodes[0] || '',
       ticketStatus: ticketCodes[0] ? 'assigned' : 'no-ticket-assigned',
       notes: mergedNotes,
-      sourceRowId: candidates.map((row) => row.sourceRowId).filter(Boolean).join('+'),
+      sourceRowId: mergeSourceRowIds(candidates.map((row) => row.sourceRowId)),
     },
   }
 }
