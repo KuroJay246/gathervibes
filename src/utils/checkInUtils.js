@@ -1,4 +1,5 @@
 import { buildRegistrationMetrics } from './registrationMetrics.js'
+import { normalizePaymentStatus } from './paymentStatus.js'
 
 export const CHECK_IN_VIEWS = [
   { value: 'search', label: 'Search Guest' },
@@ -13,9 +14,10 @@ export function buildCheckInSummary(registrations = []) {
     ...metrics,
     notCheckedInRegistrations: metrics.remainingRegistrations,
     notCheckedInPersons: metrics.remainingPersons,
-    paidCheckedIn: registrations.filter((registration) => registration.checkedIn && registration.paymentStatus === 'paid').length,
-    pendingCheckedIn: registrations.filter((registration) => registration.checkedIn && registration.paymentStatus === 'pending').length,
-    complimentaryCheckedIn: registrations.filter((registration) => registration.checkedIn && registration.paymentStatus === 'complimentary').length,
+    paidCheckedIn: registrations.filter((registration) => registration.checkedIn && normalizePaymentStatus(registration.paymentStatus) === 'paid').length,
+    pendingCheckedIn: registrations.filter((registration) => registration.checkedIn && normalizePaymentStatus(registration.paymentStatus) === 'pending').length,
+    complimentaryCheckedIn: registrations.filter((registration) => registration.checkedIn && normalizePaymentStatus(registration.paymentStatus) === 'complimentary').length,
+    doorCheckedIn: registrations.filter((registration) => registration.checkedIn && normalizePaymentStatus(registration.paymentStatus) === 'door').length,
   }
 }
 

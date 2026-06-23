@@ -226,7 +226,7 @@ test('event-style multi-part ticket codes are valid for imports and QR lookup', 
   assert.equal(rows[0].ticketCode, 'CPB-TEST-001')
   assert.equal(processed[0].status, 'valid')
   assert.equal(qrPayloadForTicketCode('CPB-TEST-001'), 'GSV:TICKET:CPB-TEST-001')
-  assert.match(validateTicketCode('CPB-TOO-LONG-TICKET-CODE-123456789'), /Use format/)
+  assert.match(validateTicketCode('CPB-TOO-LONG-TICKET-CODE-123456789'), /letters/)
 })
 
 test('sourceRowId and registration IDs do not collide just because contact is shared', async () => {

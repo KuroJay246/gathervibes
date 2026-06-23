@@ -36,7 +36,8 @@ test('parseCSV - handles escaped quotes', () => {
 test('normalizePaymentStatus', () => {
   assert.strictEqual(normalizePaymentStatus('Paid '), 'paid')
   assert.strictEqual(normalizePaymentStatus('COMP'), 'complimentary')
-  assert.strictEqual(normalizePaymentStatus('door list'), 'door-list')
+  assert.strictEqual(normalizePaymentStatus('door list'), 'door')
+  assert.strictEqual(normalizePaymentStatus('Pay at Door'), 'door')
   assert.strictEqual(normalizePaymentStatus('random'), 'unknown')
 })
 

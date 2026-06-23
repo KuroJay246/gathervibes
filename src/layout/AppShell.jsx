@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
-  Bot,
   CalendarDays,
   ChevronDown,
   ClipboardCheck,
@@ -43,7 +42,6 @@ const navGroups = [
     label: 'Guest experience',
     items: [
       { to: '/communications', label: 'Communications', icon: MessageSquareText, available: true },
-      { to: '/ai-writing', label: 'AI Writing', icon: Bot, phase: 7 },
     ],
   },
 ]
@@ -57,7 +55,6 @@ const pageTitles = {
   '/imports': ['Import Center', 'Bring in CSV exports and pasted table rows safely'],
   '/qa': ['QA Center', 'Production smoke testing without touching CPB'],
   '/communications': ['Communication Center', 'Prepare messages for the right guests'],
-  '/ai-writing': ['AI Writing Assistant', 'Create polished drafts for review'],
   '/settings': ['Settings', 'Manage workspace configuration'],
 }
 
@@ -89,7 +86,7 @@ function SidebarContent({ onNavigate, mobile = false }) {
           <div className="mb-5" key={group.label}>
             <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/30">{group.label}</p>
             <div className="space-y-1">
-              {group.items.map(({ to, label, icon: Icon, phase, available }) => (
+              {group.items.map(({ to, label, icon: Icon }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -104,11 +101,6 @@ function SidebarContent({ onNavigate, mobile = false }) {
                 >
                   <Icon className="size-[17px] shrink-0" strokeWidth={1.8} aria-hidden="true" />
                   <span className="flex-1">{label}</span>
-                  {phase > 1 && !available && (
-                    <span className="rounded-full border border-white/10 px-1.5 py-0.5 text-[8px] font-bold text-white/30 group-[.active]:text-white/70">
-                      P{phase}
-                    </span>
-                  )}
                 </NavLink>
               ))}
             </div>

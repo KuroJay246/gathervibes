@@ -1,4 +1,5 @@
 import { buildCheckInSummary } from './checkInUtils.js'
+import { formatPaymentLabel as sharedFormatPaymentLabel, normalizePaymentStatus } from './paymentStatus.js'
 import { normalizeTicketCode } from './ticketUtils.js'
 
 export function buildEventDaySummary(registrations = []) {
@@ -20,7 +21,10 @@ export function getMissingTicketRegistrations(registrations = []) {
 }
 
 export function getPendingPaymentRegistrations(registrations = []) {
-  return registrations.filter((registration) => registration.paymentStatus === 'pending' || registration.paymentStatus === 'unknown')
+  return registrations.filter((registration) => {
+    const status = normalizePaymentStatus(registration.paymentStatus)
+    return status === 'pending' || status === 'unknown' || status === 'door'
+  })
 }
 
 export function getDoorListRegistrations(registrations = []) {
@@ -36,10 +40,10 @@ export function formatDoorStatus(registration = {}) {
 }
 
 export function formatPaymentLabel(status = '') {
-  if (status === 'paid') return 'Paid'
-  if (status === 'pending') return 'Pending payment'
-  if (status === 'complimentary') return 'Complimentary'
-  return 'Payment unknown'
+  const normalized = normalizePaymentStatus(status)
+  if (normalized === 'pending') return 'Pending payment'
+  if (normalized === 'door') return 'Door payment'
+  return sharedFormatPaymentLabel(normalized)
 }
 
 function csvValue(value) {

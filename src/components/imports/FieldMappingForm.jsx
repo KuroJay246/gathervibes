@@ -8,6 +8,7 @@ const REGISTRATION_FIELDS = [
   { value: 'email', label: 'Email Address' },
   { value: 'phone', label: 'Phone Number' },
   { value: 'groupName', label: 'Group Name' },
+  { value: 'preferredSchool', label: 'Preferred School / Organization Notes' },
   { value: 'personsAttending', label: 'Persons Attending (Default 1)' },
   { value: 'paymentStatus', label: 'Payment Status' },
   { value: 'paymentReference', label: 'Payment Reference' },

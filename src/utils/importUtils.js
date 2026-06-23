@@ -1,6 +1,12 @@
 import { dateFromValue, parseTimestampSafely } from './dateUtils.js'
+import {
+  isUnknownOrganizerPaymentStatus,
+  normalizePaymentStatus,
+} from './paymentStatus.js'
 import { normalizePersonsAttending } from './registrationMetrics.js'
 import { findTicketCodeDuplicate, normalizeTicketCode, validateTicketCode } from './ticketUtils.js'
+
+export { normalizePaymentStatus } from './paymentStatus.js'
 
 export const MAX_PERSONS_ATTENDING = 100
 
@@ -103,6 +109,10 @@ export function detectHeaderField(normalizedHeader = '', lowerHeader = normalize
     school: 'groupName',
     organization: 'groupName',
     organisation: 'groupName',
+    'preferred school': 'preferredSchool',
+    'school preference': 'preferredSchool',
+    class: 'preferredSchool',
+    department: 'preferredSchool',
     'persons attending': 'personsAttending',
     'number attending': 'personsAttending',
     guests: 'personsAttending',
@@ -147,6 +157,7 @@ export function detectHeaderField(normalizedHeader = '', lowerHeader = normalize
   if (normalized.includes('ticket') && (normalized.includes('code') || normalized.includes('number') || normalized.includes('id'))) return { field: 'ticketCode', confidence: 'high' }
   if (normalized.includes('email')) return { field: 'email', confidence: 'high' }
   if (normalized.includes('phone') || normalized.includes('contact') || normalized.includes('whatsapp')) return { field: 'phone', confidence: 'medium' }
+  if (normalized.includes('preferred school') || normalized.includes('school preference') || normalized.includes('class') || normalized.includes('department')) return { field: 'preferredSchool', confidence: 'high' }
   if (normalized.includes('group') || normalized.includes('school') || normalized.includes('organi')) return { field: 'groupName', confidence: 'medium' }
   if ((normalized.includes('name') || lower.includes('student')) && !normalized.includes('group')) return { field: 'fullName', confidence: 'medium' }
   if (normalized.includes('person') || normalized.includes('attending') || normalized.includes('guest') || normalized.includes('quantity')) return { field: 'personsAttending', confidence: 'medium' }
@@ -231,16 +242,6 @@ export function parseCSV(text) {
   if (cleanedRows.length === 0) return { headers: [], rows: [] }
 
   return rowsToParsedTable(cleanedRows)
-}
-
-export function normalizePaymentStatus(val) {
-  if (!val) return 'unknown'
-  const s = val.toLowerCase().trim()
-  if (s === 'paid') return 'paid'
-  if (s === 'pending') return 'pending'
-  if (s === 'complimentary' || s === 'comp') return 'complimentary'
-  if (s === 'door-list' || s === 'door' || s === 'door list') return 'door-list'
-  return 'unknown'
 }
 
 export function normalizeEmail(val) {
@@ -347,6 +348,7 @@ export function mapRows(parsedRows, headers, fieldMap, context = {}) {
     const attendeeNames = normalizeAttendeeNames(mappedValue('attendeeNames'))
     const buyerName = normalizeOptionalText(mappedText('buyerName'))
     const groupName = normalizeOptionalText(mappedText('groupName'))
+    const preferredSchool = normalizeOptionalText(mappedText('preferredSchool'))
     const explicitFullName = normalizeOptionalText(mappedText('fullName'))
     const fullName = explicitFullName || attendeeNames[0] || ''
     const rawPersons = mappedText('personsAttending')
@@ -365,6 +367,7 @@ export function mapRows(parsedRows, headers, fieldMap, context = {}) {
       ticketStatus: 'no-ticket-assigned',
       buyerName,
       attendeeNames,
+      preferredSchool,
       personsAttendingWasBlank: rawPersonsTrimmed === '',
       displayNameFromFirstAttendee: !explicitFullName && attendeeNames.length > 0,
     }
@@ -375,7 +378,9 @@ export function mapRows(parsedRows, headers, fieldMap, context = {}) {
     rowObj.groupName = groupName
     rowObj.personsAttending = rawPersonsTrimmed === '' && attendeeNames.length > 0 ? suggestedPersons : normalizePersonsAttending(rawPersons)
 
-    rowObj.paymentStatus = normalizePaymentStatus(mappedText('paymentStatus'))
+    const rawPaymentStatus = mappedText('paymentStatus')
+    rowObj.originalPaymentStatus = normalizeOptionalText(rawPaymentStatus)
+    rowObj.paymentStatus = normalizePaymentStatus(rawPaymentStatus)
     rowObj.paymentReference = normalizeOptionalText(mappedText('paymentReference'))
     rowObj.ticketCode = normalizeTicketCode(mappedText('ticketCode'))
     rowObj.ticketStatus = rowObj.ticketCode ? 'assigned' : 'no-ticket-assigned'
@@ -409,6 +414,10 @@ export function validateRow(row) {
       issues.push(ticketError)
       status = 'blocked'
     }
+  }
+  if (isUnknownOrganizerPaymentStatus(row.originalPaymentStatus, row.paymentStatus)) {
+    issues.push(`Payment status "${row.originalPaymentStatus}" needs review. Choose Paid, Pending, Complimentary, or Door.`)
+    status = status === 'blocked' ? status : 'needs-review'
   }
 
   return { status, issues }
@@ -615,7 +624,7 @@ export async function processAndValidate(rows, eventId, existingRegistrations) {
     ]
     const finalStatus = dupReason || ticketDupReason
       ? 'blocked'
-      : reviewReasons.length > 0
+      : status === 'needs-review' || reviewReasons.length > 0
         ? 'needs-review'
         : warnings.length > 0
           ? 'warning'

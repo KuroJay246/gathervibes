@@ -208,6 +208,8 @@ export function DashboardPage() {
                     <MetricPill label="Persons" value={metrics.totalPersons} color="bg-[#EAF6EF] text-[#2F5C3E]" />
                     <MetricPill label="Paid regs" value={metrics.paidRegistrations} color="bg-[#EAF6EF] text-[#2F5C3E]" />
                     <MetricPill label="Pending regs" value={metrics.pendingRegistrations} color="bg-[#FFFBEA] text-[#7A5700]" />
+                    <MetricPill label="Door regs" value={metrics.doorRegistrations} color="bg-[#E6F0FA] text-[#285E9E]" />
+                    <MetricPill label="Missing tickets" value={metrics.missingTicketRegistrations} color="bg-[#FCEEF1] text-[#A32626]" />
                   </div>
                 )}
 
@@ -410,7 +412,7 @@ export function DashboardPage() {
             <div className="mt-5 border-t border-[#E6D4B4] pt-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Deferred</p>
               <p className="mt-2 text-[11px] leading-5 text-[#7A6548]">
-                AI writing and external email integrations are not active in this workspace.
+                External sending integrations are not active in this workspace.
               </p>
             </div>
 

@@ -49,6 +49,7 @@ export function ImportsPage() {
   const [reviewActions, setReviewActions] = useState({})
   const [finalRows, setFinalRows] = useState([])
   const [existingRegistrations, setExistingRegistrations] = useState([])
+  const [ticketMode, setTicketMode] = useState('use-imported')
 
   const [importing, setImporting] = useState(false)
   const [error, setError] = useState('')
@@ -184,6 +185,7 @@ export function ImportsPage() {
     setProcessedRows([])
     setFinalRows([])
     setReviewActions({})
+    setTicketMode('use-imported')
     setStep(2)
   }
 
@@ -215,6 +217,64 @@ export function ImportsPage() {
 
   function handleReviewAction(index, action) {
     setReviewActions((prev) => ({ ...prev, [index]: action }))
+  }
+
+  async function reprocessRows(rows, editedIndex = null) {
+    const processed = await processAndValidate(rows, activeEvent.eventId, existingRegistrations)
+    if (editedIndex !== null && processed[editedIndex]?.row) {
+      processed[editedIndex].row.edited = true
+    }
+    setProcessedRows(processed)
+    setReviewActions((prev) => Object.fromEntries(processed.map((row, index) => [
+      index,
+      prev[index] && prev[index] !== 'blocked' ? prev[index] : row.defaultAction,
+    ])))
+    setFinalRows([])
+    return processed
+  }
+
+  async function handleRowEdit(index, updates) {
+    const nextRows = processedRows.map((processed, rowIndex) => {
+      if (rowIndex !== index) return processed.row
+      return {
+        ...processed.row,
+        ...updates,
+        originalPaymentStatus: updates.paymentStatus ? null : updates.originalPaymentStatus || processed.row.originalPaymentStatus,
+        edited: true,
+      }
+    })
+    await reprocessRows(nextRows, index)
+  }
+
+  async function handleRevalidateAll() {
+    await reprocessRows(processedRows.map((processed) => processed.row))
+  }
+
+  function rowsWithTicketMode(rows, mode = ticketMode) {
+    if (mode !== 'generate-missing') return rows
+    const existingCodes = new Set([
+      ...existingRegistrations.map((registration) => registration.ticketCode).filter(Boolean),
+      ...rows.map((processed) => processed.row.ticketCode).filter(Boolean),
+    ])
+    return rows.map((processed, index) => {
+      if (processed.row.ticketCode) return processed
+      let candidate = `IMP-${String(index + 1).padStart(3, '0')}`
+      let attempt = index + 1
+      while (existingCodes.has(candidate)) {
+        attempt += 1
+        candidate = `IMP-${String(attempt).padStart(3, '0')}`
+      }
+      existingCodes.add(candidate)
+      return {
+        ...processed,
+        row: {
+          ...processed.row,
+          ticketCode: candidate,
+          ticketStatus: 'assigned',
+          edited: true,
+        },
+      }
+    })
   }
 
   function buildFinalRowsFromReview() {
@@ -263,7 +323,7 @@ export function ImportsPage() {
       return
     }
 
-    const nextFinalRows = buildFinalRowsFromReview()
+    const nextFinalRows = rowsWithTicketMode(buildFinalRowsFromReview())
     setFinalRows(nextFinalRows)
     setError('')
     setImportErrorDetails(null)
@@ -325,6 +385,7 @@ export function ImportsPage() {
     setProcessedRows([])
     setReviewActions({})
     setFinalRows([])
+    setTicketMode('use-imported')
     setImportResult(null)
     setError('')
     setImportErrorDetails(null)
@@ -599,6 +660,8 @@ export function ImportsPage() {
           reviewActions={reviewActions}
           onActionChange={handleReviewAction}
           onContinue={handleContinueToFinalPreview}
+          onRowEdit={handleRowEdit}
+          onRevalidateAll={handleRevalidateAll}
           canContinue={processedRows.every((processed, index) => (
             processed.status !== 'needs-review' || !['needs-review', undefined].includes(reviewActions[index])
           ))}
@@ -606,14 +669,38 @@ export function ImportsPage() {
       )}
 
       {step === 5 && (
-        <ImportPreviewTable
-          processedRows={finalRows}
-          onCancel={reset}
-          onImport={handleImport}
-          importing={importing}
-          onStartOver={reset}
-          onBack={handleBackToDuplicateReview}
-        />
+        <div className="space-y-4">
+          <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Ticket code handling</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {[
+                ['use-imported', 'Use imported ticket codes'],
+                ['generate-missing', 'Auto-generate missing ticket codes'],
+                ['leave-missing', 'Leave missing ticket codes blank for now'],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => {
+                    setTicketMode(value)
+                    setFinalRows(rowsWithTicketMode(buildFinalRowsFromReview(), value))
+                  }}
+                  className={`rounded-xl px-4 py-2 text-xs font-bold ${ticketMode === value ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED] text-[#6B564C]'}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </section>
+          <ImportPreviewTable
+            processedRows={finalRows}
+            onCancel={reset}
+            onImport={handleImport}
+            importing={importing}
+            onStartOver={reset}
+            onBack={handleBackToDuplicateReview}
+          />
+        </div>
       )}
 
       {step === 6 && (

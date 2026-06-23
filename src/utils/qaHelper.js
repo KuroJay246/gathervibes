@@ -39,9 +39,11 @@ export function buildQaTestPrefix(date = new Date()) {
 
 export function buildQaSampleCsv(prefix = buildQaTestPrefix()) {
   return [
-    'Full name,Email,Phone,Group name,Persons attending,Payment status,Payment reference,Ticket Code,Notes',
-    `${prefix} Guest One,${prefix.toLowerCase()}_guest1@example.com,2465550101,${prefix} Group,1,complimentary,${prefix}-001,QATEST-001,Manual QA import row for CODEX_TEST only`,
-    `${prefix} Guest Two,${prefix.toLowerCase()}_guest2@example.com,2465550102,${prefix} Group,2,pending,${prefix}-002,QATEST-002,XLSX or CSV QA row for CODEX_TEST only`,
+    'Buyer Name,Attendee Names,Email,Phone,Group Name,Persons Attending,Payment Status,Payment Reference,Dietary Notes,Ticket Code,Preferred School',
+    `${prefix} Buyer One,"${prefix} Guest One",${prefix.toLowerCase()}_guest1@example.com,2465550101,${prefix} Group,1,paid,${prefix}-001,No nuts,QATEST-001,North School`,
+    `${prefix} Buyer Two,"${prefix} Guest Two; ${prefix} Guest Three",${prefix.toLowerCase()}_guest2@example.com,2465550102,${prefix} Group,2,pending,${prefix}-002,Vegetarian,,West School`,
+    `${prefix} Shared Buyer,"${prefix} Door Guest",${prefix.toLowerCase()}_shared@example.com,2465550103,${prefix} Group,1,Door Payment,${prefix}-003,Pay at door,DOOR 001,Central School`,
+    `${prefix} Shared Buyer,"${prefix} Comp Guest",${prefix.toLowerCase()}_shared@example.com,2465550103,${prefix} Group,1,complimentary,${prefix}-004,Duplicate-like shared contact for review,QATEST-004,Central School`,
   ].join('\n')
 }
 

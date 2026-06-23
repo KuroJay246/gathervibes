@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { CheckCircle2, AlertCircle, XCircle } from 'lucide-react'
+import { formatPaymentLabel, normalizePaymentStatus } from '../../utils/paymentStatus'
 
 function statusTone(status) {
   if (status === 'valid') return 'text-[#1E7345]'
@@ -39,7 +41,12 @@ export function ImportPreviewTable({
   canContinue = true,
   onBack,
   onStartOver,
+  onRowEdit,
+  onRevalidateAll,
 }) {
+  const [editingIndex, setEditingIndex] = useState(null)
+  const [editDraft, setEditDraft] = useState({})
+  const [selectedRows, setSelectedRows] = useState(new Set())
   const validRows = processedRows.filter(r => r.status === 'valid')
   const warningRows = processedRows.filter(r => r.status === 'warning')
   const reviewRows = processedRows.filter(r => r.status === 'needs-review')
@@ -54,6 +61,83 @@ export function ImportPreviewTable({
     : !isReviewMode && !canImport
       ? 'No rows were imported because every row is blocked or skipped.'
       : ''
+  const selectedProcessedRows = processedRows.filter((_, index) => selectedRows.has(index))
+  const selectedCount = selectedRows.size
+
+  function toggleSelected(index) {
+    setSelectedRows((current) => {
+      const next = new Set(current)
+      if (next.has(index)) next.delete(index)
+      else next.add(index)
+      return next
+    })
+  }
+
+  function selectByStatus(status) {
+    setSelectedRows(new Set(processedRows
+      .map((row, index) => (row.status === status ? index : null))
+      .filter((index) => index !== null)))
+  }
+
+  function updateDraft(field, value) {
+    setEditDraft((current) => ({ ...current, [field]: value }))
+  }
+
+  function beginEdit(index, row) {
+    setEditingIndex(index)
+    setEditDraft({
+      fullName: row.fullName || '',
+      buyerName: row.buyerName || '',
+      attendeeNames: Array.isArray(row.attendeeNames) ? row.attendeeNames.join('\n') : '',
+      groupName: row.groupName || '',
+      email: row.email || '',
+      phone: row.phone || '',
+      personsAttending: row.personsAttending || 1,
+      paymentStatus: normalizePaymentStatus(row.paymentStatus),
+      paymentReference: row.paymentReference || '',
+      ticketCode: row.ticketCode || '',
+      notes: row.notes || '',
+      preferredSchool: row.preferredSchool || '',
+    })
+  }
+
+  async function saveEdit(index) {
+    await onRowEdit?.(index, {
+      ...editDraft,
+      attendeeNames: String(editDraft.attendeeNames || '').split(/\n|,|;/).map((name) => name.trim()).filter(Boolean),
+      personsAttending: Number(editDraft.personsAttending) || 1,
+      paymentStatus: normalizePaymentStatus(editDraft.paymentStatus),
+      ticketCode: String(editDraft.ticketCode || '').trim(),
+      edited: true,
+    })
+    setEditingIndex(null)
+    setEditDraft({})
+  }
+
+  function skipSelected() {
+    selectedRows.forEach((index) => onActionChange?.(index, 'skip'))
+  }
+
+  function clearSelectedActions() {
+    selectedRows.forEach((index) => onActionChange?.(index, processedRows[index]?.defaultAction || 'keep'))
+  }
+
+  async function applyPaymentToSelected(paymentStatus) {
+    if (!paymentStatus) return
+    for (const index of selectedRows) {
+      const row = processedRows[index]?.row
+      if (row) await onRowEdit?.(index, { ...row, paymentStatus: normalizePaymentStatus(paymentStatus), edited: true })
+    }
+  }
+
+  async function generateTicketsForSelected() {
+    for (const index of selectedRows) {
+      const row = processedRows[index]?.row
+      if (row && !row.ticketCode) {
+        await onRowEdit?.(index, { ...row, ticketCode: `IMP-${String(index + 1).padStart(3, '0')}`, edited: true })
+      }
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6 rounded-2xl bg-white p-4 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
@@ -91,21 +175,54 @@ export function ImportPreviewTable({
           )}
         </div>
       </div>
+      {isReviewMode && (
+        <div className="sticky top-20 z-10 flex flex-col gap-3 rounded-2xl border border-[#EEDFD6] bg-white/95 p-3 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap gap-2 text-xs font-bold">
+            <span>Total {processedRows.length}</span>
+            <span className="text-[#1E7345]">Ready {validRows.length}</span>
+            <span className="text-[#986F26]">Warnings {warningRows.length}</span>
+            <span className="text-[#986F26]">Review {reviewRows.length}</span>
+            <span className="text-[#A32626]">Blocked {blockedRows.length}</span>
+            <span className="text-[#8C7567]">Selected {selectedCount}</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => selectByStatus('warning')} className="rounded-lg border border-[#E7D6CC] px-3 py-1.5 text-xs font-bold text-[#6B564C]">Select warnings</button>
+            <button type="button" onClick={() => selectByStatus('blocked')} className="rounded-lg border border-[#E7D6CC] px-3 py-1.5 text-xs font-bold text-[#6B564C]">Select blocked</button>
+            <button type="button" onClick={() => setSelectedRows(new Set())} className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#8C7567]">Clear selected</button>
+            <button type="button" onClick={skipSelected} disabled={selectedCount === 0} className="rounded-lg bg-[#F7F1ED] px-3 py-1.5 text-xs font-bold text-[#6B564C] disabled:opacity-50">Skip selected</button>
+            <button type="button" onClick={clearSelectedActions} disabled={selectedCount === 0} className="rounded-lg bg-[#F7F1ED] px-3 py-1.5 text-xs font-bold text-[#6B564C] disabled:opacity-50">Clear actions</button>
+            <select
+              aria-label="Apply payment status to selected import rows"
+              disabled={selectedCount === 0}
+              onChange={(event) => {
+                applyPaymentToSelected(event.target.value)
+                event.target.value = ''
+              }}
+              className="rounded-lg border border-[#E7D6CC] bg-white px-2 py-1.5 text-xs font-bold text-[#6B564C]"
+            >
+              <option value="">Apply payment...</option>
+              {['paid', 'pending', 'complimentary', 'door'].map((status) => <option key={status} value={status}>{formatPaymentLabel(status)}</option>)}
+            </select>
+            <button type="button" onClick={generateTicketsForSelected} disabled={selectedCount === 0 || selectedProcessedRows.every((row) => row.row.ticketCode)} className="rounded-lg bg-[#F7F1ED] px-3 py-1.5 text-xs font-bold text-[#6B564C] disabled:opacity-50">Generate missing tickets</button>
+            <button type="button" onClick={onRevalidateAll} className="rounded-lg bg-[#2B1723] px-3 py-1.5 text-xs font-bold text-white">Revalidate all</button>
+          </div>
+        </div>
+      )}
 
       <div className="overflow-hidden rounded-xl border border-[#F2E8E1]">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
+                {isReviewMode && <th className="px-4 py-3">Select</th>}
                 <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Buyer / Contact</th>
-                <th className="px-4 py-3">Guests Attending</th>
-                <th className="px-4 py-3">Group Name</th>
-                <th className="px-4 py-3">Persons Count</th>
-                <th className="px-4 py-3">Email / Phone</th>
-                <th className="px-4 py-3">Payment</th>
-                <th className="px-4 py-3">Ticket Code</th>
-                <th className="px-4 py-3">Notes / Dietary Notes</th>
+                <th className="px-4 py-3">Row</th>
+                <th className="px-4 py-3">Guests</th>
+                <th className="px-4 py-3">Buyer</th>
+                <th className="px-4 py-3">Count</th>
+                <th className="px-4 py-3">Pay</th>
+                <th className="px-4 py-3">Ticket</th>
+                <th className="px-4 py-3">Details</th>
                 <th className="px-4 py-3">Issues</th>
                 {isReviewMode && <th className="px-4 py-3">Decision</th>}
               </tr>
@@ -113,36 +230,41 @@ export function ImportPreviewTable({
             <tbody className="divide-y divide-[#F2E8E1]">
               {processedRows.slice(0, 100).map((pr, idx) => (
                 <tr key={idx} className={pr.status === 'blocked' ? 'bg-[#FFF1F1]/50' : pr.status === 'warning' || pr.status === 'needs-review' ? 'bg-[#FFF4DF]/30' : pr.status === 'skipped' ? 'bg-[#F7F1ED]/60' : ''}>
+                  {isReviewMode && (
+                    <td className="px-4 py-3">
+                      <input type="checkbox" checked={selectedRows.has(idx)} onChange={() => toggleSelected(idx)} aria-label={`Select import row ${idx + 1}`} />
+                    </td>
+                  )}
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <StatusIcon status={pr.status} />
                       <span className={`text-xs font-bold ${statusTone(pr.status)}`}>{statusLabel(pr.status)}</span>
+                      {pr.row.edited && <span className="rounded-full bg-[#E6F0FA] px-2 py-0.5 text-[10px] font-bold text-[#285E9E]">Edited</span>}
                     </div>
+                  </td>
+                  <td className="px-4 py-3 text-xs font-bold text-[#8C7567]">{pr.row.sourceRowIndex || idx + 1}</td>
+                  <td className="px-4 py-3 text-[#5D4A52]">
+                    <div className="max-w-[16rem] whitespace-normal font-medium text-[#2B1723]">{formatAttendees(pr.row)}</div>
                   </td>
                   <td className="px-4 py-3 text-[#5D4A52]">
                     <div className="font-medium text-[#2B1723]">{pr.row.buyerName || pr.row.fullName || 'No buyer/contact'}</div>
                   </td>
-                  <td className="px-4 py-3 text-[#5D4A52]">
-                    <div className="max-w-[16rem] whitespace-normal font-medium text-[#2B1723]">{formatAttendees(pr.row)}</div>
-                  </td>
-                  <td className="px-4 py-3 text-[#5D4A52]">{pr.row.groupName || <span className="italic text-[#A48A7B]">No group</span>}</td>
                   <td className="px-4 py-3 text-[#5D4A52]">{pr.row.personsAttending || 1}</td>
                   <td className="px-4 py-3 text-[#5D4A52]">
-                    <div className="flex flex-col gap-0.5">
-                      {pr.row.email && <span>{pr.row.email}</span>}
-                      {pr.row.phone && <span>{pr.row.phone}</span>}
-                      {!pr.row.email && !pr.row.phone && <span className="italic text-[#A48A7B]">No contact</span>}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-[#5D4A52]">
-                    <div>{pr.row.paymentStatus || 'unknown'}</div>
+                    <div>{formatPaymentLabel(pr.row.paymentStatus)}</div>
                     {pr.row.paymentReference && <div className="mt-0.5 text-xs text-[#8C7567]">{pr.row.paymentReference}</div>}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs font-bold text-[#2B1723]">
-                    {pr.row.ticketCode || <span className="font-sans font-normal italic text-[#A48A7B]">None</span>}
+                    {pr.row.ticketCode || <span className="font-sans font-normal italic text-[#A48A7B]">No ticket code assigned</span>}
                   </td>
                   <td className="px-4 py-3 text-xs text-[#5D4A52]">
-                    {pr.row.notes || <span className="italic text-[#A48A7B]">None</span>}
+                    <div className="space-y-0.5">
+                      {pr.row.email && <div>{pr.row.email}</div>}
+                      {pr.row.phone && <div>{pr.row.phone}</div>}
+                      {pr.row.groupName && <div>Group: {pr.row.groupName}</div>}
+                      {pr.row.preferredSchool && <div>School: {pr.row.preferredSchool}</div>}
+                      {pr.row.notes && <div>{pr.row.notes}</div>}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-xs text-[#5D4A52]">
                     {pr.issues.length > 0 ? (
@@ -158,6 +280,40 @@ export function ImportPreviewTable({
                         <span className="rounded-full bg-[#FCEEF1] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#A32626]">Blocked</span>
                       ) : (
                         <div className="flex flex-col gap-2">
+                          {editingIndex === idx ? (
+                            <div className="min-w-[18rem] space-y-2 rounded-xl border border-[#E7D6CC] bg-white p-3">
+                              {[
+                                ['fullName', 'Full name'],
+                                ['buyerName', 'Buyer'],
+                                ['groupName', 'Group'],
+                                ['email', 'Email'],
+                                ['phone', 'Phone'],
+                                ['paymentReference', 'Payment ref'],
+                                ['ticketCode', 'Ticket'],
+                                ['preferredSchool', 'School'],
+                              ].map(([field, label]) => (
+                                <input key={field} value={editDraft[field] || ''} onChange={(event) => updateDraft(field, event.target.value)} placeholder={label} className="w-full rounded-lg border border-[#E5D7CF] px-2 py-1.5 text-xs" />
+                              ))}
+                              <textarea value={editDraft.attendeeNames || ''} onChange={(event) => updateDraft('attendeeNames', event.target.value)} placeholder="Attendee names" className="w-full rounded-lg border border-[#E5D7CF] px-2 py-1.5 text-xs" />
+                              <input type="number" min="1" value={editDraft.personsAttending || 1} onChange={(event) => updateDraft('personsAttending', event.target.value)} className="w-full rounded-lg border border-[#E5D7CF] px-2 py-1.5 text-xs" />
+                              <select value={editDraft.paymentStatus || 'unknown'} onChange={(event) => updateDraft('paymentStatus', event.target.value)} className="w-full rounded-lg border border-[#E5D7CF] px-2 py-1.5 text-xs">
+                                {['paid', 'pending', 'complimentary', 'door', 'unknown'].map((status) => <option key={status} value={status}>{formatPaymentLabel(status)}</option>)}
+                              </select>
+                              <textarea value={editDraft.notes || ''} onChange={(event) => updateDraft('notes', event.target.value)} placeholder="Notes" className="w-full rounded-lg border border-[#E5D7CF] px-2 py-1.5 text-xs" />
+                              <div className="flex gap-2">
+                                <button type="button" onClick={() => saveEdit(idx)} className="rounded-lg bg-[#2B1723] px-3 py-1.5 text-xs font-bold text-white">Save changes</button>
+                                <button type="button" onClick={() => { setEditingIndex(null); setEditDraft({}) }} className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#6B564C] hover:bg-[#F7F1ED]">Cancel edit</button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => beginEdit(idx, pr.row)}
+                              className="rounded-lg px-3 py-2 text-left text-xs font-bold transition bg-[#F7F1ED] text-[#6B564C] hover:bg-[#EFE2DA]"
+                            >
+                              Edit row
+                            </button>
+                          )}
                           {[
                             ['keep', 'Keep Separate'],
                             ['merge', 'Merge Into One Group Registration'],
@@ -180,7 +336,7 @@ export function ImportPreviewTable({
               ))}
               {processedRows.length > 100 && (
                 <tr>
-                  <td colSpan={isReviewMode ? 11 : 10} className="px-4 py-3 text-center text-xs italic text-[#8C7567]">
+                  <td colSpan={isReviewMode ? 11 : 9} className="px-4 py-3 text-center text-xs italic text-[#8C7567]">
                     ...and {processedRows.length - 100} more rows not shown.
                   </td>
                 </tr>

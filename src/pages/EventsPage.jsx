@@ -179,7 +179,7 @@ export function EventsPage() {
       <section className="flex flex-col gap-5 rounded-[26px] border border-[#EEDFD6] bg-white p-6 shadow-[0_10px_32px_rgba(84,53,67,0.05)] sm:flex-row sm:items-center sm:justify-between sm:p-7">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#FCEEF1] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#A85F6B]">
-            <Sparkles className="size-3.5" /> Phase 2 live
+            <Sparkles className="size-3.5" /> Live events
           </div>
           <h2 className="font-serif text-3xl text-[#2B1723]">Your gatherings</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-[#806C61]">Create each event once, keep its details current, and select the event your team is working on.</p>

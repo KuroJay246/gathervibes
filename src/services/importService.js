@@ -17,6 +17,16 @@ export {
   processAndValidate,
 } from '../utils/importUtils.js'
 
+function importNotes(row = {}) {
+  return [
+    row.notes || '',
+    row.preferredSchool ? `Preferred school: ${row.preferredSchool}` : '',
+    row.originalPaymentStatus && row.originalPaymentStatus !== row.paymentStatus
+      ? `Original payment status: ${row.originalPaymentStatus}`
+      : '',
+  ].filter(Boolean).join('\n')
+}
+
 export async function commitImport(validRows, eventId, user) {
   if (!db) throw new Error('Firebase is not configured')
 
@@ -47,7 +57,7 @@ export async function commitImport(validRows, eventId, user) {
         ticketCode: row.ticketCode || null,
         ticketAssignedAt: null,
         ticketAssignedBy: null,
-        notes: row.notes || '',
+        notes: importNotes(row),
         checkedIn: false,
         checkInTime: null,
         checkedInBy: null,

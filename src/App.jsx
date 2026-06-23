@@ -5,7 +5,6 @@ import { DashboardPage } from './pages/DashboardPage'
 import { EventsPage } from './pages/EventsPage'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
-import { PhasePage } from './pages/PhasePage'
 import { SettingsPage } from './pages/SettingsPage'
 import { QaPage } from './pages/QaPage'
 
@@ -14,10 +13,6 @@ import { ImportsPage } from './pages/ImportsPage'
 import { TicketsPage } from './pages/TicketsPage'
 import { CheckInPage } from './pages/CheckInPage'
 import { CommunicationsPage } from './pages/CommunicationsPage'
-
-const futureRoutes = [
-  { path: 'ai-writing', title: 'AI Writing Assistant', phase: 'Phase 7', description: 'Create editable writing drafts for admin review.' },
-]
 
 export default function App() {
   return (
@@ -34,13 +29,6 @@ export default function App() {
           <Route path="/check-in" element={<CheckInPage />} />
           <Route path="/qa" element={<QaPage />} />
           <Route path="/communications" element={<CommunicationsPage />} />
-          {futureRoutes.map((route) => (
-            <Route
-              key={route.path}
-              path={`/${route.path}`}
-              element={<PhasePage title={route.title} phase={route.phase} description={route.description} />}
-            />
-          ))}
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>

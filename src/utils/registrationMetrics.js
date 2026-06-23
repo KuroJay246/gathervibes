@@ -1,3 +1,5 @@
+import { normalizePaymentStatus } from './paymentStatus.js'
+
 export function normalizePersonsAttending(value, fallback = 1) {
   if (value === '' || value === null || value === undefined) return fallback
   const number = Number(value)
@@ -20,17 +22,27 @@ export function buildRegistrationMetrics(registrations = [], event = {}) {
       summary.checkedInPersons += persons
     }
 
-    if (registration.paymentStatus === 'paid') {
+    const paymentStatus = normalizePaymentStatus(registration.paymentStatus)
+
+    if (paymentStatus === 'paid') {
       summary.paidRegistrations += 1
       summary.paidPersons += persons
     }
-    if (registration.paymentStatus === 'pending') {
+    if (paymentStatus === 'pending') {
       summary.pendingRegistrations += 1
       summary.pendingPersons += persons
     }
-    if (registration.paymentStatus === 'complimentary') {
+    if (paymentStatus === 'complimentary') {
       summary.complimentaryRegistrations += 1
       summary.complimentaryPersons += persons
+    }
+    if (paymentStatus === 'door') {
+      summary.doorRegistrations += 1
+      summary.doorPersons += persons
+    }
+    if (!registration.ticketCode) {
+      summary.missingTicketRegistrations += 1
+      summary.missingTicketPersons += persons
     }
 
     return summary
@@ -42,9 +54,13 @@ export function buildRegistrationMetrics(registrations = [], event = {}) {
     paidRegistrations: 0,
     pendingRegistrations: 0,
     complimentaryRegistrations: 0,
+    doorRegistrations: 0,
+    missingTicketRegistrations: 0,
     paidPersons: 0,
     pendingPersons: 0,
     complimentaryPersons: 0,
+    doorPersons: 0,
+    missingTicketPersons: 0,
   })
 
   metrics.remainingRegistrations = metrics.totalRegistrations - metrics.checkedInRegistrations

@@ -3,7 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ===============================================================
-    // Phase 4.5 data model
+    // Gather & Savor data model
     // ===============================================================
     // settings/accessControl
     //   approvedEmails: list<string> (created only in Firebase Console)
@@ -17,7 +17,7 @@ service cloud.firestore {
     //   status: supported enum
     //   capacity: int (1..100000)
     //   ticketPrice: number (0..1000000)  — backward-compat scalar
-    //   priceTiers: list<map> or null     — Phase 3.1 optional
+    //   priceTiers: list<map> or null
     //     { name: string, price: number>=0, status: enum }
     //   notes: string (0..10000)
     //   createdAt: timestamp (immutable)
@@ -178,7 +178,7 @@ service cloud.firestore {
         && data.personsAttending is int
         && data.personsAttending >= 1
         && data.personsAttending <= 100
-        && data.paymentStatus in ['paid', 'pending', 'complimentary', 'door-list', 'unknown']
+        && data.paymentStatus in ['paid', 'pending', 'complimentary', 'door', 'door-list', 'unknown']
         && validOptionalString(data.paymentReference, 250)
         && data.ticketStatus in ['no-ticket-assigned', 'partially-assigned', 'assigned']
         && validOptionalString(data.ticketCode, 32)
@@ -510,8 +510,8 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // Future phases remain unavailable until their schemas and rules are
-    // implemented and tested.
+    // Reserved collections remain unavailable until their schemas and rules
+    // are implemented and tested.
     match /tickets/{documentId} {
       allow read, write: if false;
     }

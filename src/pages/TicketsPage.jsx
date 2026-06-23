@@ -10,6 +10,7 @@ import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { TicketQrCode } from '../components/tickets/TicketQrCode'
 import { buildTicketPrefix, generateSequentialTicketCode, generateTicketCode, normalizeTicketCode, searchableRegistrationText } from '../utils/ticketUtils'
+import { formatPaymentLabel, normalizePaymentStatus, paymentStatusMatches } from '../utils/paymentStatus'
 
 const FILTERS = [
   { value: 'all', label: 'All' },
@@ -18,6 +19,7 @@ const FILTERS = [
   { value: 'paid', label: 'Paid' },
   { value: 'pending', label: 'Pending' },
   { value: 'complimentary', label: 'Complimentary' },
+  { value: 'door', label: 'Door' },
 ]
 
 function titleCase(value = '') {
@@ -92,7 +94,7 @@ export function TicketsPage() {
   const filteredRegistrations = registrations.filter((registration) => {
     if (filter === 'no-ticket' && registration.ticketStatus === 'assigned') return false
     if (filter === 'assigned' && registration.ticketStatus !== 'assigned') return false
-    if (['paid', 'pending', 'complimentary'].includes(filter) && registration.paymentStatus !== filter) return false
+    if (['paid', 'pending', 'complimentary', 'door'].includes(filter) && !paymentStatusMatches(registration.paymentStatus, filter)) return false
 
     if (!searchQuery.trim()) return true
     return searchableRegistrationText(registration).includes(searchQuery.trim().toLowerCase())
@@ -238,7 +240,6 @@ export function TicketsPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#1E7345]">Phase 4.5</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Tickets</h2>
           <p className="mt-2 text-sm text-[#816D62]">
             Assigning ticket codes for <strong>{activeEvent.eventName}</strong>.
@@ -355,7 +356,7 @@ export function TicketsPage() {
                       {registration.email && <div>{registration.email}</div>}
                       {registration.phone && <div>{registration.phone}</div>}
                     </td>
-                    <td className="px-4 py-3"><TicketBadge tone={registration.paymentStatus === 'paid' ? 'green' : registration.paymentStatus === 'pending' ? 'gold' : 'neutral'}>{titleCase(registration.paymentStatus)}</TicketBadge></td>
+                    <td className="px-4 py-3"><TicketBadge tone={normalizePaymentStatus(registration.paymentStatus) === 'paid' ? 'green' : normalizePaymentStatus(registration.paymentStatus) === 'pending' || normalizePaymentStatus(registration.paymentStatus) === 'door' ? 'gold' : 'neutral'}>{formatPaymentLabel(registration.paymentStatus)}</TicketBadge></td>
                     <td className="px-4 py-3">
                       <div className="font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'No ticket'}</div>
                       <div className="mt-1"><TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{titleCase(registration.ticketStatus || 'no-ticket-assigned')}</TicketBadge></div>

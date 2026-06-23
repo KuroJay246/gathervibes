@@ -21,6 +21,7 @@ import {
   getMissingTicketRegistrations,
   getPendingPaymentRegistrations,
 } from '../utils/eventDayUtils'
+import { normalizePaymentStatus } from '../utils/paymentStatus'
 
 function StatusBadge({ children, tone = 'neutral' }) {
   const tones = {
@@ -34,9 +35,10 @@ function StatusBadge({ children, tone = 'neutral' }) {
 }
 
 function paymentTone(status) {
-  if (status === 'paid') return 'green'
-  if (status === 'pending' || status === 'unknown') return 'gold'
-  if (status === 'complimentary') return 'plum'
+  const normalized = normalizePaymentStatus(status)
+  if (normalized === 'paid') return 'green'
+  if (normalized === 'pending' || normalized === 'unknown' || normalized === 'door') return 'gold'
+  if (normalized === 'complimentary') return 'plum'
   return 'neutral'
 }
 

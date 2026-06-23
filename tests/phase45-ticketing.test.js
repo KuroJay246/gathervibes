@@ -41,7 +41,10 @@ test('ticket assignment validation rejects invalid and duplicate codes', () => {
   ]
 
   assert.equal(normalizeTicketCode(' gsv-abc234 '), 'GSV-ABC234')
-  assert.match(validateTicketCode('bad', existing, 'reg-b'), /format/)
+  assert.equal(validateTicketCode('bad', existing, 'reg-b'), '')
+  assert.equal(validateTicketCode('001', existing, 'reg-b'), '')
+  assert.equal(validateTicketCode('CPB DOOR 001', existing, 'reg-b'), '')
+  assert.match(validateTicketCode('bad<script>', existing, 'reg-b'), /letters/)
   assert.match(validateTicketCode('GSV-ABC234', existing, 'reg-b'), /already assigned/)
   assert.equal(validateTicketCode('CPB-001', existing, 'reg-b'), '')
   assert.equal(validateTicketCode('GSV-ABC234', existing, 'reg-a'), '')

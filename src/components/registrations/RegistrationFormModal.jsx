@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { validPaymentStatuses, validateRegistration } from '../../utils/validators.js'
+import { formatPaymentLabel, normalizePaymentStatus } from '../../utils/paymentStatus.js'
 
 export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, saving }) {
   const [formData, setFormData] = useState({
@@ -29,7 +30,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
           phone: initialData.phone || '',
           groupName: initialData.groupName || '',
           personsAttending: initialData.personsAttending || 1,
-          paymentStatus: initialData.paymentStatus || 'unknown',
+          paymentStatus: normalizePaymentStatus(initialData.paymentStatus || 'unknown'),
           paymentReference: initialData.paymentReference || '',
           notes: initialData.notes || '',
         })
@@ -201,7 +202,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
                   disabled={saving}
                 >
                   {validPaymentStatuses.map(status => (
-                    <option key={status} value={status}>{status.replace('-', ' ').toUpperCase()}</option>
+                    <option key={status} value={status}>{formatPaymentLabel(status)}</option>
                   ))}
                 </select>
               </div>
