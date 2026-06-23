@@ -1,5 +1,11 @@
 import { dateFromValue, parseTimestampSafely } from './dateUtils.js'
 import {
+  calculateRegistrationFinance,
+  financeWarnings,
+  normalizePaymentMethod,
+  parseMoney,
+} from './financeUtils.js'
+import {
   isUnknownOrganizerPaymentStatus,
   normalizePaymentStatus,
 } from './paymentStatus.js'
@@ -120,10 +126,27 @@ export function detectHeaderField(normalizedHeader = '', lowerHeader = normalize
     attendees: 'personsAttending',
     'payment status': 'paymentStatus',
     status: 'paymentStatus',
+    'payment method': 'paymentMethod',
+    method: 'paymentMethod',
+    firstpay: 'paymentMethod',
+    'ticket price': 'ticketPrice',
+    price: 'ticketPrice',
+    'price tier': 'priceTier',
+    'ticket type': 'priceTier',
+    'amount due': 'amountDue',
+    total: 'amountDue',
+    'amount paid': 'amountPaid',
+    'paid amount': 'amountPaid',
+    balance: 'balanceDue',
+    'balance due': 'balanceDue',
     'payment reference': 'paymentReference',
     reference: 'paymentReference',
     receipt: 'paymentReference',
+    'receipt number': 'paymentReference',
     transaction: 'paymentReference',
+    'transaction id': 'paymentReference',
+    'firstpay reference': 'paymentReference',
+    'bank transfer reference': 'paymentReference',
     'ticket code': 'ticketCode',
     'ticket number': 'ticketCode',
     'ticket id': 'ticketCode',
@@ -161,6 +184,12 @@ export function detectHeaderField(normalizedHeader = '', lowerHeader = normalize
   if (normalized.includes('group') || normalized.includes('school') || normalized.includes('organi')) return { field: 'groupName', confidence: 'medium' }
   if ((normalized.includes('name') || lower.includes('student')) && !normalized.includes('group')) return { field: 'fullName', confidence: 'medium' }
   if (normalized.includes('person') || normalized.includes('attending') || normalized.includes('guest') || normalized.includes('quantity')) return { field: 'personsAttending', confidence: 'medium' }
+  if (normalized.includes('price tier') || normalized.includes('ticket type')) return { field: 'priceTier', confidence: 'high' }
+  if (normalized.includes('ticket price') || normalized === 'price') return { field: 'ticketPrice', confidence: 'high' }
+  if (normalized.includes('amount due') || normalized === 'total') return { field: 'amountDue', confidence: 'high' }
+  if (normalized.includes('amount paid') || normalized.includes('paid amount')) return { field: 'amountPaid', confidence: 'high' }
+  if (normalized.includes('balance')) return { field: 'balanceDue', confidence: 'high' }
+  if (normalized.includes('payment method') || normalized.includes('firstpay') || normalized.includes('bank transfer')) return { field: 'paymentMethod', confidence: 'high' }
   if (normalized.includes('reference') || normalized.includes('receipt') || normalized.includes('transaction')) return { field: 'paymentReference', confidence: 'medium' }
   if (normalized.includes('pay')) return { field: 'paymentStatus', confidence: 'medium' }
   if (normalized.includes('timestamp') || normalized.includes('submitted') || normalized.includes('date')) return { field: 'timestamp', confidence: 'medium' }
@@ -354,6 +383,8 @@ export function mapRows(parsedRows, headers, fieldMap, context = {}) {
     const rawPersons = mappedText('personsAttending')
     const rawPersonsTrimmed = String(rawPersons || '').trim()
     const suggestedPersons = attendeeNames.length > 0 ? attendeeNames.length : normalizePersonsAttending(rawPersons)
+    const hasFinanceInput = ['priceTier', 'ticketPrice', 'amountDue', 'amountPaid', 'balanceDue', 'paymentMethod']
+      .some((field) => String(mappedText(field) || '').trim())
 
     const rowObj = {
       sourceRowId: buildSourceRowId(parsedRow, context),
@@ -368,6 +399,7 @@ export function mapRows(parsedRows, headers, fieldMap, context = {}) {
       buyerName,
       attendeeNames,
       preferredSchool,
+      financeReviewRequired: Boolean(context.event || hasFinanceInput),
       personsAttendingWasBlank: rawPersonsTrimmed === '',
       displayNameFromFirstAttendee: !explicitFullName && attendeeNames.length > 0,
     }
@@ -381,6 +413,19 @@ export function mapRows(parsedRows, headers, fieldMap, context = {}) {
     const rawPaymentStatus = mappedText('paymentStatus')
     rowObj.originalPaymentStatus = normalizeOptionalText(rawPaymentStatus)
     rowObj.paymentStatus = normalizePaymentStatus(rawPaymentStatus)
+    rowObj.paymentMethod = normalizePaymentMethod(mappedText('paymentMethod'))
+    rowObj.priceTier = normalizeOptionalText(mappedText('priceTier'))
+    rowObj.ticketPrice = parseMoney(mappedText('ticketPrice'))
+    rowObj.amountDue = parseMoney(mappedText('amountDue'))
+    rowObj.amountPaid = parseMoney(mappedText('amountPaid'))
+    rowObj.balanceDue = parseMoney(mappedText('balanceDue'))
+    const finance = calculateRegistrationFinance(rowObj, context.event || {})
+    rowObj.priceTier = finance.priceTier
+    rowObj.ticketPrice = finance.ticketPrice
+    rowObj.amountDue = finance.amountDue
+    rowObj.amountPaid = finance.amountPaid
+    rowObj.balanceDue = finance.balanceDue
+    rowObj.paymentMethod = finance.paymentMethod
     rowObj.paymentReference = normalizeOptionalText(mappedText('paymentReference'))
     rowObj.ticketCode = normalizeTicketCode(mappedText('ticketCode'))
     rowObj.ticketStatus = rowObj.ticketCode ? 'assigned' : 'no-ticket-assigned'
@@ -417,6 +462,11 @@ export function validateRow(row) {
   }
   if (isUnknownOrganizerPaymentStatus(row.originalPaymentStatus, row.paymentStatus)) {
     issues.push(`Payment status "${row.originalPaymentStatus}" needs review. Choose Paid, Pending, Complimentary, or Door.`)
+    status = status === 'blocked' ? status : 'needs-review'
+  }
+  const financeIssues = financeWarnings(row)
+  if (financeIssues.length > 0) {
+    issues.push(...financeIssues)
     status = status === 'blocked' ? status : 'needs-review'
   }
 
@@ -595,6 +645,12 @@ export function mergeRowsIntoGroupRegistration(rows = []) {
       attendeeNames: guestNames,
       personsAttending: candidates.reduce((total, row) => total + (Number.isInteger(row.personsAttending) ? row.personsAttending : 1), 0),
       groupName: primary?.groupName || candidates.find((row) => row.groupName)?.groupName || null,
+      priceTier: primary?.priceTier || null,
+      ticketPrice: primary?.ticketPrice ?? null,
+      amountDue: candidates.reduce((total, row) => total + (Number(row.amountDue) || 0), 0),
+      amountPaid: candidates.reduce((total, row) => total + (Number(row.amountPaid) || 0), 0),
+      balanceDue: candidates.reduce((total, row) => total + (Number(row.balanceDue) || 0), 0),
+      paymentMethod: primary?.paymentMethod || 'unknown',
       ticketCode: ticketCodes[0] || '',
       ticketStatus: ticketCodes[0] ? 'assigned' : 'no-ticket-assigned',
       notes: mergedNotes,

@@ -3,6 +3,17 @@ import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
 import { SystemHealthPanel } from '../components/SystemHealthPanel'
+import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeUtils'
+
+const ROADMAP_ITEMS = [
+  ['AI writing', 'Deferred'],
+  ['Gmail/Outlook OAuth', 'Deferred'],
+  ['Google Sheets OAuth', 'Deferred'],
+  ['Cloud Functions', 'Deferred'],
+  ['Storage', 'Deferred'],
+  ['Staff roles', 'Future phase'],
+  ['Finance tracker', 'Phase 9 active'],
+]
 
 function SettingsSection({ eyebrow, title, children }) {
   return (
@@ -98,6 +109,33 @@ export function SettingsPage() {
           <InfoRow label="Import behavior" value="Preview first; missing tickets may stay blank" />
           <InfoRow label="Check-in behavior" value="Warn on pending/door, do not auto-block" />
           <InfoRow label="Communication footer" value="Copy-ready messages only" />
+        </div>
+      </SettingsSection>
+
+      <SettingsSection eyebrow="Finance Defaults" title="Money tracker defaults">
+        <div className="rounded-2xl border border-[#EFE2DA] p-4">
+          <InfoRow label="Default currency" value={DEFAULT_FINANCE_SETTINGS.currency} />
+          <InfoRow label="Default ticket price" value="Uses event ticket price when available" />
+          <InfoRow label="Default price tier" value={DEFAULT_FINANCE_SETTINGS.defaultPriceTier} />
+          <InfoRow label="Default payment method" value={formatPaymentMethod(DEFAULT_FINANCE_SETTINGS.defaultPaymentMethod)} />
+          <InfoRow label="Allow blank ticket codes" value={DEFAULT_FINANCE_SETTINGS.allowBlankTicketCodes ? 'Yes' : 'No'} />
+          <InfoRow label="Allow door payment" value={DEFAULT_FINANCE_SETTINGS.allowDoorPayment ? 'Yes' : 'No'} />
+          <InfoRow label="Require payment reference for paid status" value={DEFAULT_FINANCE_SETTINGS.requirePaymentReferenceForPaidStatus ? 'Yes' : 'No'} />
+          <InfoRow label="Show finance warnings" value={DEFAULT_FINANCE_SETTINGS.showFinanceWarnings ? 'Yes' : 'No'} />
+        </div>
+        <p className="mt-3 text-xs leading-5 text-[#8A7468]">
+          These are safe app defaults for this foundation. Persisted workspace-level finance settings are deferred until a dedicated settings schema is approved.
+        </p>
+      </SettingsSection>
+
+      <SettingsSection eyebrow="Deferred Features / Roadmap" title="Backlog visibility">
+        <div className="grid gap-3">
+          {ROADMAP_ITEMS.map(([label, status]) => (
+            <div key={label} className="flex items-center justify-between gap-3 rounded-2xl border border-[#EFE2DA] p-4">
+              <p className="text-sm font-bold text-[#2B1723]">{label}</p>
+              <span className="rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{status}</span>
+            </div>
+          ))}
         </div>
       </SettingsSection>
 

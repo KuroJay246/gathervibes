@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CheckCircle2, AlertCircle, XCircle } from 'lucide-react'
 import { formatPaymentLabel, normalizePaymentStatus } from '../../utils/paymentStatus'
+import { PAYMENT_METHODS, formatCurrency, formatPaymentMethod, normalizePaymentMethod, parseMoney } from '../../utils/financeUtils'
 
 function statusTone(status) {
   if (status === 'valid') return 'text-[#1E7345]'
@@ -94,6 +95,12 @@ export function ImportPreviewTable({
       phone: row.phone || '',
       personsAttending: row.personsAttending || 1,
       paymentStatus: normalizePaymentStatus(row.paymentStatus),
+      priceTier: row.priceTier || '',
+      ticketPrice: row.ticketPrice ?? '',
+      amountDue: row.amountDue ?? '',
+      amountPaid: row.amountPaid ?? '',
+      balanceDue: row.balanceDue ?? '',
+      paymentMethod: normalizePaymentMethod(row.paymentMethod),
       paymentReference: row.paymentReference || '',
       ticketCode: row.ticketCode || '',
       notes: row.notes || '',
@@ -107,6 +114,12 @@ export function ImportPreviewTable({
       attendeeNames: String(editDraft.attendeeNames || '').split(/\n|,|;/).map((name) => name.trim()).filter(Boolean),
       personsAttending: Number(editDraft.personsAttending) || 1,
       paymentStatus: normalizePaymentStatus(editDraft.paymentStatus),
+      priceTier: String(editDraft.priceTier || '').trim(),
+      ticketPrice: parseMoney(editDraft.ticketPrice),
+      amountDue: parseMoney(editDraft.amountDue),
+      amountPaid: parseMoney(editDraft.amountPaid) ?? 0,
+      balanceDue: parseMoney(editDraft.balanceDue),
+      paymentMethod: normalizePaymentMethod(editDraft.paymentMethod),
       ticketCode: String(editDraft.ticketCode || '').trim(),
       edited: true,
     })
@@ -221,6 +234,7 @@ export function ImportPreviewTable({
                 <th className="px-4 py-3">Buyer</th>
                 <th className="px-4 py-3">Count</th>
                 <th className="px-4 py-3">Pay</th>
+                <th className="px-4 py-3">Money</th>
                 <th className="px-4 py-3">Ticket</th>
                 <th className="px-4 py-3">Details</th>
                 <th className="px-4 py-3">Issues</th>
@@ -252,7 +266,15 @@ export function ImportPreviewTable({
                   <td className="px-4 py-3 text-[#5D4A52]">{pr.row.personsAttending || 1}</td>
                   <td className="px-4 py-3 text-[#5D4A52]">
                     <div>{formatPaymentLabel(pr.row.paymentStatus)}</div>
+                    <div className="mt-0.5 text-xs text-[#8C7567]">{formatPaymentMethod(pr.row.paymentMethod)}</div>
                     {pr.row.paymentReference && <div className="mt-0.5 text-xs text-[#8C7567]">{pr.row.paymentReference}</div>}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-[#5D4A52]">
+                    <div>Tier: {pr.row.priceTier || 'Needs review'}</div>
+                    <div>Price: {pr.row.ticketPrice === null || pr.row.ticketPrice === undefined ? 'Needs review' : formatCurrency(pr.row.ticketPrice)}</div>
+                    <div>Due: {pr.row.amountDue === null || pr.row.amountDue === undefined ? 'Needs review' : formatCurrency(pr.row.amountDue)}</div>
+                    <div>Paid: {formatCurrency(pr.row.amountPaid || 0)}</div>
+                    <div>Balance: {pr.row.balanceDue === null || pr.row.balanceDue === undefined ? 'Needs review' : formatCurrency(pr.row.balanceDue)}</div>
                   </td>
                   <td className="px-4 py-3 font-mono text-xs font-bold text-[#2B1723]">
                     {pr.row.ticketCode || <span className="font-sans font-normal italic text-[#A48A7B]">No ticket code assigned</span>}
@@ -288,6 +310,11 @@ export function ImportPreviewTable({
                                 ['groupName', 'Group'],
                                 ['email', 'Email'],
                                 ['phone', 'Phone'],
+                                ['priceTier', 'Price tier'],
+                                ['ticketPrice', 'Ticket price'],
+                                ['amountDue', 'Amount due'],
+                                ['amountPaid', 'Amount paid'],
+                                ['balanceDue', 'Balance due'],
                                 ['paymentReference', 'Payment ref'],
                                 ['ticketCode', 'Ticket'],
                                 ['preferredSchool', 'School'],
@@ -298,6 +325,9 @@ export function ImportPreviewTable({
                               <input type="number" min="1" value={editDraft.personsAttending || 1} onChange={(event) => updateDraft('personsAttending', event.target.value)} className="w-full rounded-lg border border-[#E5D7CF] px-2 py-1.5 text-xs" />
                               <select value={editDraft.paymentStatus || 'unknown'} onChange={(event) => updateDraft('paymentStatus', event.target.value)} className="w-full rounded-lg border border-[#E5D7CF] px-2 py-1.5 text-xs">
                                 {['paid', 'pending', 'complimentary', 'door', 'unknown'].map((status) => <option key={status} value={status}>{formatPaymentLabel(status)}</option>)}
+                              </select>
+                              <select value={editDraft.paymentMethod || 'unknown'} onChange={(event) => updateDraft('paymentMethod', event.target.value)} className="w-full rounded-lg border border-[#E5D7CF] px-2 py-1.5 text-xs">
+                                {PAYMENT_METHODS.map((method) => <option key={method} value={method}>{formatPaymentMethod(method)}</option>)}
                               </select>
                               <textarea value={editDraft.notes || ''} onChange={(event) => updateDraft('notes', event.target.value)} placeholder="Notes" className="w-full rounded-lg border border-[#E5D7CF] px-2 py-1.5 text-xs" />
                               <div className="flex gap-2">
@@ -336,7 +366,7 @@ export function ImportPreviewTable({
               ))}
               {processedRows.length > 100 && (
                 <tr>
-                  <td colSpan={isReviewMode ? 11 : 9} className="px-4 py-3 text-center text-xs italic text-[#8C7567]">
+                  <td colSpan={isReviewMode ? 12 : 10} className="px-4 py-3 text-center text-xs italic text-[#8C7567]">
                     ...and {processedRows.length - 100} more rows not shown.
                   </td>
                 </tr>

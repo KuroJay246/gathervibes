@@ -11,6 +11,7 @@ import { LoadingState } from '../components/ui/LoadingState'
 import { TicketQrCode } from '../components/tickets/TicketQrCode'
 import { buildTicketPrefix, generateSequentialTicketCode, generateTicketCode, normalizeTicketCode, searchableRegistrationText } from '../utils/ticketUtils'
 import { formatPaymentLabel, normalizePaymentStatus, paymentStatusMatches } from '../utils/paymentStatus'
+import { calculateRegistrationFinance, formatCurrency } from '../utils/financeUtils'
 
 const FILTERS = [
   { value: 'all', label: 'All' },
@@ -356,7 +357,18 @@ export function TicketsPage() {
                       {registration.email && <div>{registration.email}</div>}
                       {registration.phone && <div>{registration.phone}</div>}
                     </td>
-                    <td className="px-4 py-3"><TicketBadge tone={normalizePaymentStatus(registration.paymentStatus) === 'paid' ? 'green' : normalizePaymentStatus(registration.paymentStatus) === 'pending' || normalizePaymentStatus(registration.paymentStatus) === 'door' ? 'gold' : 'neutral'}>{formatPaymentLabel(registration.paymentStatus)}</TicketBadge></td>
+                    <td className="px-4 py-3">
+                      {(() => {
+                        const finance = calculateRegistrationFinance(registration, activeEvent)
+                        return (
+                          <div className="space-y-1">
+                            <TicketBadge tone={normalizePaymentStatus(registration.paymentStatus) === 'paid' ? 'green' : normalizePaymentStatus(registration.paymentStatus) === 'pending' || normalizePaymentStatus(registration.paymentStatus) === 'door' ? 'gold' : 'neutral'}>{formatPaymentLabel(registration.paymentStatus)}</TicketBadge>
+                            {finance.paymentStatus === 'door' && <TicketBadge tone="gold">Door payment</TicketBadge>}
+                            {finance.balanceDue > 0 && <div className="text-xs font-bold text-[#A32626]">Balance {formatCurrency(finance.balanceDue)}</div>}
+                          </div>
+                        )
+                      })()}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'No ticket'}</div>
                       <div className="mt-1"><TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{titleCase(registration.ticketStatus || 'no-ticket-assigned')}</TicketBadge></div>
@@ -395,7 +407,13 @@ export function TicketsPage() {
                     <TicketQrCode ticketCode={registration.ticketCode} />
                   </div>
                 )}
-                <div className="mt-3"><TicketBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Not checked in'}</TicketBadge></div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <TicketBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Not checked in'}</TicketBadge>
+                  {(() => {
+                    const finance = calculateRegistrationFinance(registration, activeEvent)
+                    return finance.balanceDue > 0 ? <TicketBadge tone="gold">Balance {formatCurrency(finance.balanceDue)}</TicketBadge> : null
+                  })()}
+                </div>
                 <div className="mt-4">{renderActions(registration)}</div>
               </article>
             ))}

@@ -59,6 +59,16 @@ service cloud.firestore {
       return value == null || (value is list && value.size() <= 100);
     }
 
+    function validOptionalMoney(value) {
+      return value == null || (value is number && value >= 0 && value <= 1000000);
+    }
+
+    function validOptionalPaymentMethod(value) {
+      return value == null || value in [
+        'firstpay', 'bank-transfer', 'cash', 'door', 'card', 'complimentary', 'unknown'
+      ];
+    }
+
     function validPerformedBy(value) {
       return value is string
         && value.size() > 0
@@ -160,6 +170,7 @@ service cloud.firestore {
           'registrationId', 'eventId', 'fullName', 'email', 'phone',
           'buyerName', 'attendeeNames',
           'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
+          'priceTier', 'ticketPrice', 'amountDue', 'amountPaid', 'balanceDue', 'paymentMethod',
           'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy',
           'notes', 'checkedIn', 'checkInTime', 'checkedInBy', 'source', 'sourceRowId', 'timestamp',
           'createdAt', 'updatedAt'
@@ -179,6 +190,12 @@ service cloud.firestore {
         && data.personsAttending >= 1
         && data.personsAttending <= 100
         && data.paymentStatus in ['paid', 'pending', 'complimentary', 'door', 'door-list', 'unknown']
+        && (!('priceTier' in data) || validOptionalString(data.priceTier, 100))
+        && (!('ticketPrice' in data) || validOptionalMoney(data.ticketPrice))
+        && (!('amountDue' in data) || validOptionalMoney(data.amountDue))
+        && (!('amountPaid' in data) || validOptionalMoney(data.amountPaid))
+        && (!('balanceDue' in data) || validOptionalMoney(data.balanceDue))
+        && (!('paymentMethod' in data) || validOptionalPaymentMethod(data.paymentMethod))
         && validOptionalString(data.paymentReference, 250)
         && data.ticketStatus in ['no-ticket-assigned', 'partially-assigned', 'assigned']
         && validOptionalString(data.ticketCode, 32)
@@ -234,6 +251,7 @@ service cloud.firestore {
         && validShortId(data.eventId)
         && data.action in [
           'registration.create', 'registration.update', 'registration.delete', 'registration.import',
+          'registration.finance-update',
           'ticket.assign', 'ticket.unassign', 'ticket.regenerate',
           'checkin.complete', 'checkin.undo', 'checkin.duplicate-attempt'
         ]
@@ -301,7 +319,7 @@ service cloud.firestore {
           ) || (
             data.action in [
               'registration.update', 'ticket.assign', 'ticket.unassign',
-              'ticket.regenerate'
+              'ticket.regenerate', 'registration.finance-update'
             ]
             && exists(/databases/$(database)/documents/registrations/$(data.targetId))
             && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
@@ -342,6 +360,12 @@ service cloud.firestore {
         && request.resource.data.groupName == resource.data.groupName
         && request.resource.data.personsAttending == resource.data.personsAttending
         && request.resource.data.paymentStatus == resource.data.paymentStatus
+        && request.resource.data.get('priceTier', null) == resource.data.get('priceTier', null)
+        && request.resource.data.get('ticketPrice', null) == resource.data.get('ticketPrice', null)
+        && request.resource.data.get('amountDue', null) == resource.data.get('amountDue', null)
+        && request.resource.data.get('amountPaid', null) == resource.data.get('amountPaid', null)
+        && request.resource.data.get('balanceDue', null) == resource.data.get('balanceDue', null)
+        && request.resource.data.get('paymentMethod', null) == resource.data.get('paymentMethod', null)
         && request.resource.data.paymentReference == resource.data.paymentReference
         && request.resource.data.notes == resource.data.notes;
     }
@@ -382,6 +406,7 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'fullName', 'buyerName', 'attendeeNames', 'email', 'phone',
           'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
+          'priceTier', 'ticketPrice', 'amountDue', 'amountPaid', 'balanceDue', 'paymentMethod',
           'notes', 'updatedAt'
         ]);
     }

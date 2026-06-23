@@ -67,6 +67,21 @@ export function buildRuntimeHealthItems({
       status: activeEvent?.eventId ? 'ok' : 'warn',
       detail: activeEvent?.eventName || 'No Working Event selected.',
     },
+    {
+      label: 'Safe route checklist',
+      status: 'ok',
+      detail: '/login, /dashboard, /settings, /qa, and /security redirect are expected app routes.',
+    },
+    {
+      label: 'QA guidance',
+      status: 'ok',
+      detail: 'Start daily and manual QA at https://gathervibeshub.web.app/login.',
+    },
+    {
+      label: 'Deferred integrations',
+      status: 'ok',
+      detail: 'AI writing, Gmail/Outlook OAuth, Google Sheets OAuth, Cloud Functions, Storage, and public attendee flows are not enabled.',
+    },
   ]
 }
 

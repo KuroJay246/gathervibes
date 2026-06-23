@@ -52,6 +52,12 @@ export async function commitImport(validRows, eventId, user) {
         groupName: row.groupName,
         personsAttending: row.personsAttending,
         paymentStatus: row.paymentStatus,
+        priceTier: row.priceTier || null,
+        ticketPrice: row.ticketPrice ?? null,
+        amountDue: row.amountDue ?? null,
+        amountPaid: row.amountPaid ?? 0,
+        balanceDue: row.balanceDue ?? null,
+        paymentMethod: row.paymentMethod || 'unknown',
         paymentReference: row.paymentReference,
         ticketStatus: row.ticketCode ? 'assigned' : 'no-ticket-assigned',
         ticketCode: row.ticketCode || null,
@@ -74,7 +80,7 @@ export async function commitImport(validRows, eventId, user) {
         targetType: 'registration',
         targetId: regRef.id,
         performedBy: user,
-        details: { fullName: row.fullName, sourceRowId: row.sourceRowId },
+        details: { fullName: row.fullName, sourceRowId: row.sourceRowId, financeFieldsImported: true },
       })
 
       batch.set(audit.ref, audit.data)

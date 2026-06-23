@@ -23,6 +23,7 @@ export function CommunicationsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [filters, setFilters] = useState({
     paymentStatus: 'all',
+    financeSegment: 'all',
     checkInStatus: 'all',
     ticketStatus: 'all',
     groupName: '',
@@ -159,6 +160,27 @@ export function CommunicationsPage() {
 
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">
+                  Finance Segment
+                </label>
+                <select
+                  value={filters.financeSegment}
+                  onChange={(e) => setFilters(f => ({ ...f, financeSegment: e.target.value }))}
+                  className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
+                >
+                  <option value="all">All Finance Segments</option>
+                  <option value="outstanding">Payment outstanding</option>
+                  <option value="pending-payment">Pending payment</option>
+                  <option value="door-payment">Door payment</option>
+                  <option value="paid-guests">Paid guests</option>
+                  <option value="complimentary-guests">Complimentary guests</option>
+                  <option value="missing-payment-reference">Missing payment reference</option>
+                  <option value="missing-ticket-code">Missing ticket code</option>
+                  <option value="balance-due">Balance due greater than 0</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">
                   Check-in Status
                 </label>
                 <select
@@ -270,7 +292,7 @@ export function CommunicationsPage() {
                 placeholder="Write your message here..."
               />
               <p className="mt-2 text-xs text-[#8A7468]">
-                Placeholders: {'{{guestName}}'}, {'{{buyerName}}'}, {'{{attendeeNames}}'}, {'{{eventName}}'}, {'{{ticketCode}}'}, {'{{paymentStatus}}'}, {'{{personsAttending}}'}, {'{{groupName}}'}, {'{{eventDate}}'}, {'{{eventTime}}'}, {'{{venue}}'}
+                Placeholders: {'{{guestName}}'}, {'{{buyerName}}'}, {'{{attendeeNames}}'}, {'{{eventName}}'}, {'{{ticketCode}}'}, {'{{paymentStatus}}'}, {'{{personsAttending}}'}, {'{{groupName}}'}, {'{{eventDate}}'}, {'{{eventTime}}'}, {'{{venue}}'}, {'{{amountDue}}'}, {'{{amountPaid}}'}, {'{{balanceDue}}'}, {'{{paymentReference}}'}
               </p>
             </div>
           </section>

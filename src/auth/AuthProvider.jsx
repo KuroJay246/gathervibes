@@ -15,17 +15,18 @@ import { AuthContext } from './AuthContext'
 const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({ prompt: 'select_account' })
 
-const CANONICAL_AUTH_ORIGIN = 'https://gathervibeshub.firebaseapp.com'
+const FIREBASE_APP_HOST = 'gathervibeshub.firebaseapp.com'
 const WEB_APP_HOST = 'gathervibeshub.web.app'
 
-function redirectToCanonicalAuthHost(mode) {
-  if (typeof window === 'undefined' || window.location.hostname !== WEB_APP_HOST) {
+function redirectToWebAppHostIfNeeded() {
+  if (typeof window === 'undefined' || window.location.hostname !== FIREBASE_APP_HOST) {
     return false
   }
+  if (window.location.pathname.startsWith('/__/auth/')) return false
 
-  const targetUrl = new URL('/login', CANONICAL_AUTH_ORIGIN)
-  targetUrl.searchParams.set('googleMode', mode)
-  window.location.assign(targetUrl.toString())
+  const targetUrl = new URL(window.location.href)
+  targetUrl.hostname = WEB_APP_HOST
+  window.location.replace(targetUrl.toString())
   return true
 }
 
@@ -92,6 +93,7 @@ export function AuthProvider({ children }) {
         if (active) {
           setUser(nextUser)
           setAuthError('')
+          redirectToWebAppHostIfNeeded()
         }
       } catch (error) {
         if (active) {
@@ -167,7 +169,7 @@ export function AuthProvider({ children }) {
   const startGoogleSignIn = useCallback(async (mode) => {
     if (!auth) throw new Error('Firebase is not configured')
     setAuthError('')
-    if (redirectToCanonicalAuthHost(mode)) return undefined
+    void mode
 
     try {
       return await completeSignIn(() => signInWithPopup(auth, googleProvider))

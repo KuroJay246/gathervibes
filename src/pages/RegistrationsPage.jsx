@@ -8,6 +8,7 @@ import {
   updateRegistration,
   deleteRegistration,
   bulkDeleteRegistrations,
+  bulkUpdateFinanceFields,
   bulkUpdatePaymentStatus,
 } from '../services/registrationService'
 import { LoadingState } from '../components/ui/LoadingState'
@@ -19,8 +20,15 @@ import { DeleteRegistrationDialog } from '../components/registrations/DeleteRegi
 import { Link } from 'react-router-dom'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { formatPaymentLabel, paymentStatusMatches } from '../utils/paymentStatus'
+import {
+  buildFinanceSummary,
+  calculateRegistrationFinance,
+  financeFilterMatches,
+  formatCurrency,
+  formatPaymentMethod,
+} from '../utils/financeUtils'
 
-const TABS = ['All', 'Paid', 'Pending', 'Complimentary', 'Door', 'Missing Ticket', 'Checked In']
+const TABS = ['All', 'Paid', 'Pending', 'Complimentary', 'Door', 'Outstanding Balance', 'Missing Amount', 'Missing Payment Reference', 'Missing Ticket Price', 'Missing Ticket', 'Checked In']
 
 function titleCase(value = '') {
   return value
@@ -96,7 +104,7 @@ export function RegistrationsPage() {
   const filteredRegistrations = registrations.filter((reg) => {
     if (activeTab === 'Checked In' && !reg.checkedIn) return false
     if (activeTab === 'Missing Ticket' && reg.ticketCode) return false
-    if (!['All', 'Checked In', 'Missing Ticket'].includes(activeTab) && !paymentStatusMatches(reg.paymentStatus, activeTab)) return false
+    if (!['All', 'Checked In', 'Missing Ticket'].includes(activeTab) && !paymentStatusMatches(reg.paymentStatus, activeTab) && !financeFilterMatches(reg, activeTab, activeEvent)) return false
     if (!searchQuery) return true
 
     const query = searchQuery.toLowerCase()
@@ -111,6 +119,7 @@ export function RegistrationsPage() {
   })
   const allMetrics = buildRegistrationMetrics(registrations, activeEvent)
   const filteredMetrics = buildRegistrationMetrics(filteredRegistrations, activeEvent)
+  const financeSummary = buildFinanceSummary(registrations, activeEvent)
   const selectedRegistrations = filteredRegistrations.filter((registration) => selectedIds.has(registration.registrationId))
   const allVisibleSelected = filteredRegistrations.length > 0 && filteredRegistrations.every((registration) => selectedIds.has(registration.registrationId))
 
@@ -172,15 +181,33 @@ export function RegistrationsPage() {
     }
   }
 
+  async function handleBulkFinance(updates, confirmation = '') {
+    const selected = selectedRegistrations.filter((registration) => registration.eventId === activeEvent.eventId)
+    if (selected.length === 0) return
+    if (confirmation && !window.confirm(`${confirmation} This affects ${selected.length} selected registration${selected.length === 1 ? '' : 's'} in ${activeEvent.eventName} only.`)) return
+
+    setSaving(true)
+    setSuccess('')
+    try {
+      await bulkUpdateFinanceFields(selected, activeEvent.eventId, updates, user, activeEvent)
+      setSuccess(`Updated finance fields for ${selected.length} selected registration${selected.length === 1 ? '' : 's'}.`)
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Bulk finance error:', err)
+      alert('Failed to update selected finance fields. Check your permissions.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   async function handleSave(data) {
     setSaving(true)
     setSuccess('')
     try {
       if (editingRegistration) {
-        await updateRegistration(editingRegistration.registrationId, activeEvent.eventId, data, user, editingRegistration)
+        await updateRegistration(editingRegistration.registrationId, activeEvent.eventId, data, user, editingRegistration, activeEvent)
         setSuccess('Registration updated.')
       } else {
-        await createRegistration(data, activeEvent.eventId, user)
+        await createRegistration(data, activeEvent.eventId, user, activeEvent)
         setSuccess('Registration created.')
       }
       setIsModalOpen(false)
@@ -252,6 +279,12 @@ export function RegistrationsPage() {
           ['Pending', `${allMetrics.pendingRegistrations} / ${allMetrics.pendingPersons}`],
           ['Complimentary', `${allMetrics.complimentaryRegistrations} / ${allMetrics.complimentaryPersons}`],
           ['Door', `${allMetrics.doorRegistrations} / ${allMetrics.doorPersons}`],
+          ['Total expected', formatCurrency(financeSummary.totalExpected)],
+          ['Collected', formatCurrency(financeSummary.totalCollected)],
+          ['Outstanding', formatCurrency(financeSummary.totalOutstanding)],
+          ['Door expected', formatCurrency(financeSummary.doorTotal)],
+          ['Complimentary value', formatCurrency(financeSummary.complimentaryValue)],
+          ['Finance warnings', financeSummary.financeWarningCount],
           ['Checked in', `${allMetrics.checkedInRegistrations} / ${allMetrics.checkedInPersons}`],
           ['Missing ticket', allMetrics.missingTicketRegistrations],
           ['Filtered regs', filteredMetrics.totalRegistrations],
@@ -340,6 +373,51 @@ export function RegistrationsPage() {
                 <option key={status} value={status}>{formatPaymentLabel(status)}</option>
               ))}
             </select>
+            <select
+              aria-label="Bulk payment method"
+              onChange={(event) => {
+                const value = event.target.value
+                event.target.value = ''
+                void handleBulkFinance({ paymentMethod: value }, 'Update payment method?')
+              }}
+              disabled={saving}
+              className="rounded-xl border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#6B564C]"
+            >
+              <option value="">Update method...</option>
+              {['firstpay', 'bank-transfer', 'cash', 'door', 'card', 'complimentary', 'unknown'].map((method) => (
+                <option key={method} value={method}>{formatPaymentMethod(method)}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => {
+                const value = window.prompt('Set ticket price for selected rows. Use numbers only, for example 100.')
+                if (value !== null && value.trim() !== '') void handleBulkFinance({ ticketPrice: value }, 'Set ticket price?')
+              }}
+              disabled={saving}
+              className="rounded-xl border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#6B564C]"
+            >
+              Set ticket price
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const value = window.prompt('Set price tier for selected rows, for example General or Complimentary.')
+                if (value !== null && value.trim() !== '') void handleBulkFinance({ priceTier: value }, 'Set price tier?')
+              }}
+              disabled={saving}
+              className="rounded-xl border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#6B564C]"
+            >
+              Set price tier
+            </button>
+            <button
+              type="button"
+              onClick={() => void handleBulkFinance({ paymentStatus: 'paid' }, 'Mark selected rows as paid? Confirm payment was actually received.')}
+              disabled={saving}
+              className="rounded-xl bg-[#1E7345] px-3 py-2 text-xs font-bold text-white"
+            >
+              Mark paid
+            </button>
             <button
               type="button"
               onClick={handleBulkDelete}
@@ -382,6 +460,7 @@ export function RegistrationsPage() {
                     <th className="px-4 py-3">Contact</th>
                     <th className="px-4 py-3">Party</th>
                     <th className="px-4 py-3">Payment</th>
+                    <th className="px-4 py-3">Finance</th>
                     <th className="px-4 py-3">Ticket status</th>
                     <th className="px-4 py-3">Check-in</th>
                     <th className="px-4 py-3 text-right">Actions</th>
@@ -410,6 +489,21 @@ export function RegistrationsPage() {
                       </td>
                       <td className="px-4 py-3">{reg.personsAttending}</td>
                       <td className="px-4 py-3">{formatPaymentLabel(reg.paymentStatus)}</td>
+                      <td className="px-4 py-3 text-xs text-[#5D4A52]">
+                        {(() => {
+                          const finance = calculateRegistrationFinance(reg, activeEvent)
+                          return (
+                            <div className="space-y-0.5">
+                              <div>{reg.priceTier || finance.priceTier || 'Needs review'}</div>
+                              <div>Due {finance.amountDue === null ? 'Needs review' : formatCurrency(finance.amountDue)}</div>
+                              <div>Paid {formatCurrency(finance.amountPaid)}</div>
+                              <div className={finance.balanceDue > 0 ? 'font-bold text-[#A32626]' : 'text-[#1E7345]'}>Balance {finance.balanceDue === null ? 'Needs review' : formatCurrency(finance.balanceDue)}</div>
+                              <div>{formatPaymentMethod(finance.paymentMethod)}</div>
+                              {reg.paymentReference && <div>Ref: {reg.paymentReference}</div>}
+                            </div>
+                          )
+                        })()}
+                      </td>
                       <td className="px-4 py-3 text-xs text-[#816D62]">{titleCase(reg.ticketStatus)}</td>
                       <td className="px-4 py-3 text-xs font-bold text-[#816D62]">{reg.checkedIn ? 'Checked in' : 'Not checked in'}</td>
                       <td className="px-4 py-3 text-right">

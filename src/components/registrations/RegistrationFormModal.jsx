@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { validPaymentStatuses, validateRegistration } from '../../utils/validators.js'
 import { formatPaymentLabel, normalizePaymentStatus } from '../../utils/paymentStatus.js'
+import { PAYMENT_METHODS, formatPaymentMethod, normalizePaymentMethod } from '../../utils/financeUtils.js'
 
 export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, saving }) {
   const [formData, setFormData] = useState({
@@ -13,6 +14,12 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
     groupName: '',
     personsAttending: 1,
     paymentStatus: 'unknown',
+    priceTier: '',
+    ticketPrice: '',
+    amountDue: '',
+    amountPaid: '',
+    balanceDue: '',
+    paymentMethod: 'unknown',
     paymentReference: '',
     notes: '',
   })
@@ -31,6 +38,12 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
           groupName: initialData.groupName || '',
           personsAttending: initialData.personsAttending || 1,
           paymentStatus: normalizePaymentStatus(initialData.paymentStatus || 'unknown'),
+          priceTier: initialData.priceTier || '',
+          ticketPrice: initialData.ticketPrice ?? '',
+          amountDue: initialData.amountDue ?? '',
+          amountPaid: initialData.amountPaid ?? '',
+          balanceDue: initialData.balanceDue ?? '',
+          paymentMethod: normalizePaymentMethod(initialData.paymentMethod),
           paymentReference: initialData.paymentReference || '',
           notes: initialData.notes || '',
         })
@@ -44,6 +57,12 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
           groupName: '',
           personsAttending: 1,
           paymentStatus: 'unknown',
+          priceTier: '',
+          ticketPrice: '',
+          amountDue: '',
+          amountPaid: '',
+          balanceDue: '',
+          paymentMethod: 'unknown',
           paymentReference: '',
           notes: '',
         })
@@ -218,6 +237,56 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
                 disabled={saving}
                 placeholder="e.g. Stripe ch_123 or Check #456"
               />
+            </div>
+
+            <div className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+              <p className="mb-4 text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Finance / Money Tracker</p>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label className="event-label">Price Tier</label>
+                  <input
+                    type="text"
+                    value={formData.priceTier}
+                    onChange={(e) => handleChange('priceTier', e.target.value)}
+                    className="event-input"
+                    disabled={saving}
+                    placeholder="General"
+                  />
+                </div>
+                <div>
+                  <label className="event-label">Payment Method</label>
+                  <select
+                    value={formData.paymentMethod}
+                    onChange={(e) => handleChange('paymentMethod', e.target.value)}
+                    className="event-input bg-white"
+                    disabled={saving}
+                  >
+                    {PAYMENT_METHODS.map((method) => (
+                      <option key={method} value={method}>{formatPaymentMethod(method)}</option>
+                    ))}
+                  </select>
+                </div>
+                {[
+                  ['ticketPrice', 'Ticket Price'],
+                  ['amountDue', 'Amount Due'],
+                  ['amountPaid', 'Amount Paid'],
+                  ['balanceDue', 'Balance Due'],
+                ].map(([field, label]) => (
+                  <div key={field}>
+                    <label className="event-label">{label}</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={formData[field]}
+                      onChange={(e) => handleChange(field, e.target.value)}
+                      className={`event-input ${errors[field] ? 'event-input-error' : ''}`}
+                      disabled={saving}
+                    />
+                    {errors[field] && <p className="mt-1 text-[11px] text-[#C53030]">{errors[field]}</p>}
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div>
