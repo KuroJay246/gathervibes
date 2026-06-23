@@ -66,7 +66,7 @@ test('Import Center detects ticket code headers and blocks duplicate imported ti
   assert.equal(processed[0].row.ticketCode, 'CPB-001')
   assert.equal(processed[0].status, 'valid')
   assert.equal(processed[1].status, 'blocked')
-  assert.ok(processed[1].issues.some((issue) => /Duplicate ticket code/.test(issue)))
+  assert.ok(processed[1].issues.some((issue) => /ticket code appears more than once/.test(issue)))
 })
 
 test('XLSX row normalization detects headers and preserves existing mapping flow', () => {

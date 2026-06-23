@@ -4,6 +4,7 @@ import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { Link } from 'react-router-dom'
 import { parseCSV, buildInitialFieldMap, mapRows, processAndValidate, commitImport } from '../services/importService'
+import { mergeRowsIntoGroupRegistration } from '../utils/importUtils'
 import { subscribeToRegistrations } from '../services/registrationService'
 import { FieldMappingForm } from '../components/imports/FieldMappingForm'
 import { ImportPreviewTable } from '../components/imports/ImportPreviewTable'
@@ -22,17 +23,23 @@ export function ImportsPage() {
   const [uploadedFileName, setUploadedFileName] = useState('')
   const [workbookSheets, setWorkbookSheets] = useState([])
   const [selectedSheetId, setSelectedSheetId] = useState('')
+  const [confirmedSheetId, setConfirmedSheetId] = useState('')
   const [parsingFile, setParsingFile] = useState(false)
 
   const [parsedData, setParsedData] = useState({ headers: [], rows: [] })
+  const [importContext, setImportContext] = useState({})
   const [fieldMap, setFieldMap] = useState({})
   const [processedRows, setProcessedRows] = useState([])
+  const [reviewActions, setReviewActions] = useState({})
+  const [finalRows, setFinalRows] = useState([])
   const [existingRegistrations, setExistingRegistrations] = useState([])
 
   const [importing, setImporting] = useState(false)
   const [error, setError] = useState('')
   const [importResult, setImportResult] = useState(null)
   const selectedSource = getImportSource(sourceType)
+  const selectedSheet = workbookSheets.find((sheet) => sheet.id === selectedSheetId)
+  const canConfirmSheet = Boolean(selectedSheet?.importable)
 
   useEffect(() => {
     if (!activeEvent?.eventId) return
@@ -80,18 +87,19 @@ export function ImportsPage() {
       setParsingFile(true)
       try {
         const sheets = await readXlsxWorkbook(file)
-        const usableSheets = sheets.filter((sheet) => sheet.headers.length > 0 && sheet.rows.length > 0)
-        setWorkbookSheets(usableSheets)
-        if (usableSheets.length === 0) {
-          setError('The workbook does not contain a sheet with headers and data rows.')
+        setWorkbookSheets(sheets)
+        setSelectedSheetId(sheets[0]?.id || '')
+        setConfirmedSheetId('')
+        setParsedData({ headers: [], rows: [] })
+        setFieldMap({})
+        setProcessedRows([])
+        setFinalRows([])
+        setReviewActions({})
+        if (sheets.length === 0) {
+          setError('The workbook does not contain any sheets.')
           return
         }
-        if (usableSheets.length === 1) {
-          setSelectedSheetId(usableSheets[0].id)
-          loadParsedData(usableSheets[0].headers, usableSheets[0].rows)
-        } else {
-          setSelectedSheetId(usableSheets[0].id)
-        }
+        setStep(2)
       } catch (err) {
         if (import.meta.env.DEV) console.error(err)
         setError('The XLSX workbook could not be read. Check that it is a valid .xlsx file.')
@@ -105,39 +113,124 @@ export function ImportsPage() {
     const reader = new FileReader()
     reader.onload = (event) => {
       setCsvText(event.target.result)
-      parseAndMoveToMap(event.target.result)
+      parseAndMoveToMap(event.target.result, { sourceFileName: file.name, importBatchId: file.name })
     }
     reader.readAsText(file)
     e.target.value = ''
   }
 
-  function parseAndMoveToMap(text) {
+  function parseAndMoveToMap(text, context = {}) {
     const { headers, rows } = parseCSV(text)
     if (headers.length === 0 || rows.length === 0) {
       setError('The CSV appears to be empty or invalid.')
       return
     }
-    loadParsedData(headers, rows)
+    loadParsedData(headers, rows, context)
   }
 
-  function loadParsedData(headers, rows) {
+  function loadParsedData(headers, rows, context = {}) {
     setParsedData({ headers, rows })
     setError('')
+    setImportContext(context)
     setFieldMap(buildInitialFieldMap(headers))
-    setStep(2)
+    setProcessedRows([])
+    setFinalRows([])
+    setReviewActions({})
+    setStep(3)
   }
 
   function handleSheetSelection(sheetId) {
     setSelectedSheetId(sheetId)
-    const sheet = workbookSheets.find((candidate) => candidate.id === sheetId)
-    if (sheet) loadParsedData(sheet.headers, sheet.rows)
+  }
+
+  function confirmSheetSelection() {
+    const sheet = workbookSheets.find((candidate) => candidate.id === selectedSheetId)
+    if (!sheet?.importable) {
+      setError('This sheet does not appear to contain importable rows.')
+      return
+    }
+    setConfirmedSheetId(sheet.id)
+    loadParsedData(sheet.headers, sheet.rows, {
+      sourceFileName: uploadedFileName,
+      sourceSheetName: sheet.name,
+      importBatchId: `${uploadedFileName}:${sheet.name}`,
+    })
+  }
+
+  function handleChangeSheet() {
+    if (!window.confirm('Changing sheets will reset mapping, duplicate review, and preview for the current sheet. Continue?')) return
+    setConfirmedSheetId('')
+    setParsedData({ headers: [], rows: [] })
+    setFieldMap({})
+    setProcessedRows([])
+    setFinalRows([])
+    setReviewActions({})
+    setStep(2)
   }
 
   async function handleProceedToPreview() {
-    const mapped = mapRows(parsedData.rows, parsedData.headers, fieldMap)
+    const mapped = mapRows(parsedData.rows, parsedData.headers, fieldMap, importContext)
     const processed = await processAndValidate(mapped, activeEvent.eventId, existingRegistrations)
     setProcessedRows(processed)
-    setStep(3)
+    setReviewActions(Object.fromEntries(processed.map((row, index) => [index, row.defaultAction])))
+    setFinalRows([])
+    setStep(4)
+  }
+
+  function handleReviewAction(index, action) {
+    setReviewActions((prev) => ({ ...prev, [index]: action }))
+  }
+
+  function buildFinalRowsFromReview() {
+    const final = []
+    const mergedGroups = new Set()
+    const mergeKeyForRow = (processed, index) => {
+      const group = processed.row.groupName?.trim().toLowerCase()
+      if (group) return `group:${group}`
+      return processed.duplicateGroupKey || `row-${index}`
+    }
+
+    processedRows.forEach((processed, index) => {
+      const action = reviewActions[index] || processed.defaultAction
+      if (processed.status === 'blocked' || action === 'blocked' || action === 'skip' || action === 'needs-review') return
+
+      if (action === 'merge') {
+        const key = mergeKeyForRow(processed, index)
+        if (mergedGroups.has(key)) return
+        mergedGroups.add(key)
+        const groupRows = processedRows.filter((candidate, candidateIndex) => (
+          mergeKeyForRow(candidate, candidateIndex) === key
+          && (reviewActions[candidateIndex] || candidate.defaultAction) === 'merge'
+        ))
+        const merged = mergeRowsIntoGroupRegistration(groupRows)
+        final.push({
+          ...merged,
+          row: merged.row || processed.row,
+          status: merged.status,
+          issues: merged.issues,
+        })
+        return
+      }
+
+      final.push({ ...processed, status: processed.status === 'needs-review' ? 'valid' : processed.status })
+    })
+
+    return final
+  }
+
+  function handleContinueToFinalPreview() {
+    const unresolved = processedRows.some((processed, index) => (
+      processed.status === 'needs-review' && (reviewActions[index] || processed.defaultAction) === 'needs-review'
+    ))
+    if (unresolved) {
+      setError('Choose Keep Separate, Merge Into One Group Registration, or Skip Row for every Needs Review row.')
+      return
+    }
+
+    const nextFinalRows = buildFinalRowsFromReview()
+    setFinalRows(nextFinalRows)
+    setError('')
+    setStep(5)
   }
 
   async function handleImport(validRows) {
@@ -149,7 +242,7 @@ export function ImportsPage() {
         importedCount: validRows.length,
         blockedCount: processedRows.length - validRows.length,
       })
-      setStep(4)
+      setStep(6)
     } catch (err) {
       if (import.meta.env.DEV) console.error(err)
       setError('Failed to import. Check your connection and permissions.')
@@ -164,10 +257,14 @@ export function ImportsPage() {
     setUploadedFileName('')
     setWorkbookSheets([])
     setSelectedSheetId('')
+    setConfirmedSheetId('')
     setParsingFile(false)
     setParsedData({ headers: [], rows: [] })
+    setImportContext({})
     setFieldMap({})
     setProcessedRows([])
+    setReviewActions({})
+    setFinalRows([])
     setImportResult(null)
     setError('')
   }
@@ -185,6 +282,9 @@ export function ImportsPage() {
         <h2 className="font-serif text-3xl text-[#2B1723]">Import Center</h2>
         <p className="mt-2 text-sm text-[#816D62]">
           For event: <strong>{activeEvent.eventName}</strong>. CSV, pasted table rows, and Excel/XLSX workbooks all use preview before saving.
+        </p>
+        <p className="mt-2 text-xs font-semibold text-[#8C7567]">
+          Flow: Upload/Paste -&gt; Select Sheet -&gt; Header Mapping Preview -&gt; Duplicate Review -&gt; Final Import Preview -&gt; Confirm Import -&gt; Results.
         </p>
       </header>
 
@@ -246,27 +346,6 @@ export function ImportsPage() {
                   {uploadedFileName && <p className="mt-2 text-[11px] font-bold text-[#B76E79]">{uploadedFileName}</p>}
                 </div>
 
-                {workbookSheets.length > 1 && (
-                  <div className="rounded-2xl border border-[#EEDFD6] bg-[#FFFDFB] p-4">
-                    <label htmlFor="xlsx-sheet" className="event-label">Choose worksheet</label>
-                    <select
-                      id="xlsx-sheet"
-                      value={selectedSheetId}
-                      onChange={(event) => handleSheetSelection(event.target.value)}
-                      className="event-input"
-                    >
-                      {workbookSheets.map((sheet) => (
-                        <option key={sheet.id} value={sheet.id}>
-                          {sheet.name} ({sheet.rows.length} rows)
-                        </option>
-                      ))}
-                    </select>
-                    <p className="mt-2 text-xs leading-5 text-[#816D62]">
-                      Selecting a sheet starts the same map, preview, and confirm flow used by CSV imports.
-                    </p>
-                  </div>
-                )}
-
                 <div className="rounded-2xl border border-[#F2D6A3] bg-[#FFF7E8] p-5 text-sm leading-6 text-[#7A5818]">
                   <div className="flex gap-3">
                     <Info className="mt-0.5 size-5 shrink-0" />
@@ -302,7 +381,7 @@ export function ImportsPage() {
                 />
                 <button
                   type="button"
-                  onClick={() => parseAndMoveToMap(csvText)}
+                  onClick={() => parseAndMoveToMap(csvText, { sourceFileName: 'pasted-table', importBatchId: `pasted-${Date.now()}` })}
                   disabled={!csvText.trim()}
                   className="mt-4 self-end rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B] disabled:opacity-50"
                 >
@@ -315,25 +394,138 @@ export function ImportsPage() {
       )}
 
       {step === 2 && (
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+          <section className="rounded-2xl bg-white p-5 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Select worksheet</p>
+            <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Select the worksheet to import</h3>
+            <p className="mt-2 text-sm leading-6 text-[#816D62]">
+              Choose the sheet you want to import, review the sample rows, then confirm before continuing.
+            </p>
+
+            <div className="mt-5 space-y-3">
+              {workbookSheets.map((sheet) => (
+                <button
+                  key={sheet.id}
+                  type="button"
+                  onClick={() => handleSheetSelection(sheet.id)}
+                  className={`w-full rounded-xl border p-4 text-left transition ${selectedSheetId === sheet.id ? 'border-[#B76E79] bg-[#FFF8F2]' : 'border-[#F2E8E1] bg-white hover:bg-[#FBF8F5]'}`}
+                >
+                  <span className="block text-sm font-bold text-[#2B1723]">{sheet.name}</span>
+                  <span className="mt-1 block text-xs text-[#816D62]">
+                    {sheet.rows.length} data rows · {sheet.columnCount || 0} columns
+                  </span>
+                  {!sheet.importable && (
+                    <span className="mt-2 block text-xs font-bold text-[#A32626]">
+                      This sheet does not appear to contain importable rows.
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-2xl bg-white p-5 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Selected sheet</p>
+                <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">{selectedSheet?.name || 'No sheet selected'}</h3>
+                {selectedSheet && (
+                  <p className="mt-2 text-sm text-[#816D62]">
+                    {selectedSheet.rows.length} data rows · {selectedSheet.columnCount || 0} columns
+                  </p>
+                )}
+              </div>
+              {confirmedSheetId && selectedSheet && (
+                <span className="rounded-full bg-[#E5F3EC] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">
+                  Using sheet: {selectedSheet.name}
+                </span>
+              )}
+            </div>
+
+            {!selectedSheet?.importable && (
+              <div className="mt-4 rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">
+                This sheet does not appear to contain importable rows.
+              </div>
+            )}
+
+            <div className="mt-5 overflow-hidden rounded-xl border border-[#F2E8E1]">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <tbody className="divide-y divide-[#F2E8E1]">
+                    {(selectedSheet?.sampleRows || []).slice(0, 6).map((row, rowIndex) => (
+                      <tr key={`${selectedSheet.id}-${rowIndex}`} className={rowIndex === 0 ? 'bg-[#FBF8F5] font-bold text-[#2B1723]' : 'text-[#5D4A52]'}>
+                        {(row || []).slice(0, 8).map((cell, cellIndex) => (
+                          <td key={cellIndex} className="max-w-[12rem] truncate px-3 py-2">{String(cell ?? '')}</td>
+                        ))}
+                      </tr>
+                    ))}
+                    {(!selectedSheet || selectedSheet.sampleRows.length === 0) && (
+                      <tr>
+                        <td className="px-3 py-4 text-[#816D62]">No sample rows available.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={reset}
+                className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmSheetSelection}
+                disabled={!canConfirmSheet}
+                className="rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#B76E79]/30 disabled:opacity-50"
+              >
+                Confirm Sheet Selection
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {step === 3 && (
         <FieldMappingForm
           headers={parsedData.headers}
           fieldMap={fieldMap}
           onMapChange={setFieldMap}
           onCancel={reset}
           onProceed={handleProceedToPreview}
+          sheetName={importContext.sourceSheetName}
+          onChangeSheet={workbookSheets.length > 0 ? handleChangeSheet : undefined}
         />
       )}
 
-      {step === 3 && (
+      {step === 4 && (
         <ImportPreviewTable
           processedRows={processedRows}
+          onCancel={reset}
+          mode="review"
+          reviewActions={reviewActions}
+          onActionChange={handleReviewAction}
+          onContinue={handleContinueToFinalPreview}
+          canContinue={processedRows.every((processed, index) => (
+            processed.status !== 'needs-review' || !['needs-review', undefined].includes(reviewActions[index])
+          ))}
+        />
+      )}
+
+      {step === 5 && (
+        <ImportPreviewTable
+          processedRows={finalRows}
           onCancel={reset}
           onImport={handleImport}
           importing={importing}
         />
       )}
 
-      {step === 4 && (
+      {step === 6 && (
         <ImportSummary result={importResult} onReset={reset} />
       )}
     </div>

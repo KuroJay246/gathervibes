@@ -12,7 +12,8 @@ function cellToImportText(value) {
   return String(value).trim()
 }
 
-export function rowsToParsedTable(sheetRows = []) {
+export function rowsToParsedTable(sheetRows = [], options = {}) {
+  const sourceKey = options.sourceKey ? `${options.sourceKey}:` : ''
   const normalizedRows = sheetRows
     .map((row) => (Array.isArray(row) ? row.map(cellToImportText) : []))
     .filter((row) => row.some((cell) => cell.trim() !== ''))
@@ -35,6 +36,8 @@ export function rowsToParsedTable(sheetRows = []) {
     const cells = Array.from({ length: headers.length }, (_, cellIndex) => row[cellIndex]?.trim() || '')
     return {
       _sourceRowId: `row-${index + 1}`,
+      _sourceRowIndex: index + 1,
+      _sourceKey: sourceKey,
       data: cells,
     }
   })
@@ -47,28 +50,86 @@ export function buildInitialFieldMap(headers = []) {
   headers.forEach((h, i) => {
     const lower = h.toLowerCase()
     const normalized = lower.replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim()
-    const isTicketCode = [
-      'ticket code',
-      'ticket number',
-      'ticket id',
-      'ticket',
-      'code',
-      'admission code',
-      'reference code',
-    ].includes(normalized)
-
-    if (isTicketCode) initialMap.ticketCode = i
-    else if (lower.includes('name') && !lower.includes('group')) initialMap.fullName = i
-    else if (lower.includes('email')) initialMap.email = i
-    else if (lower.includes('phone')) initialMap.phone = i
-    else if (lower.includes('group')) initialMap.groupName = i
-    else if (lower.includes('person') || lower.includes('attending') || lower.includes('quantity')) initialMap.personsAttending = i
-    else if (lower.includes('reference') || lower.includes('receipt') || lower.includes('transaction')) initialMap.paymentReference = i
-    else if (lower.includes('pay')) initialMap.paymentStatus = i
-    else if (lower.includes('timestamp') || lower.includes('submitted')) initialMap.timestamp = i
-    else if (lower.includes('note') || lower.includes('comment')) initialMap.notes = i
+    const detected = detectHeaderField(normalized, lower)
+    if (detected?.field && initialMap[detected.field] === undefined) initialMap[detected.field] = i
   })
   return initialMap
+}
+
+export function detectHeaderField(normalizedHeader = '', lowerHeader = normalizedHeader) {
+  const normalized = normalizedHeader.replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim()
+  const lower = lowerHeader.toLowerCase()
+  const exact = {
+    timestamp: 'timestamp',
+    submitted: 'timestamp',
+    'submission time': 'timestamp',
+    'full name': 'fullName',
+    name: 'fullName',
+    'first name last name': 'fullName',
+    'email address': 'email',
+    email: 'email',
+    'phone number': 'phone',
+    'contact number': 'phone',
+    'whatsapp number': 'phone',
+    'whats app number': 'phone',
+    phone: 'phone',
+    mobile: 'phone',
+    'group name': 'groupName',
+    group: 'groupName',
+    school: 'groupName',
+    organization: 'groupName',
+    organisation: 'groupName',
+    'persons attending': 'personsAttending',
+    'number attending': 'personsAttending',
+    guests: 'personsAttending',
+    quantity: 'personsAttending',
+    attendees: 'personsAttending',
+    'payment status': 'paymentStatus',
+    status: 'paymentStatus',
+    'payment reference': 'paymentReference',
+    reference: 'paymentReference',
+    receipt: 'paymentReference',
+    transaction: 'paymentReference',
+    'ticket code': 'ticketCode',
+    'ticket number': 'ticketCode',
+    'ticket id': 'ticketCode',
+    ticket: 'ticketCode',
+    code: 'ticketCode',
+    'admission code': 'ticketCode',
+    notes: 'notes',
+    note: 'notes',
+    comments: 'notes',
+    comment: 'notes',
+  }
+
+  if (exact[normalized]) return { field: exact[normalized], confidence: 'high' }
+  if (normalized.includes('ticket') && (normalized.includes('code') || normalized.includes('number') || normalized.includes('id'))) return { field: 'ticketCode', confidence: 'high' }
+  if (normalized.includes('email')) return { field: 'email', confidence: 'high' }
+  if (normalized.includes('phone') || normalized.includes('contact') || normalized.includes('whatsapp')) return { field: 'phone', confidence: 'medium' }
+  if (normalized.includes('group') || normalized.includes('school') || normalized.includes('organi')) return { field: 'groupName', confidence: 'medium' }
+  if ((normalized.includes('name') || lower.includes('student')) && !normalized.includes('group')) return { field: 'fullName', confidence: 'medium' }
+  if (normalized.includes('person') || normalized.includes('attending') || normalized.includes('guest') || normalized.includes('quantity')) return { field: 'personsAttending', confidence: 'medium' }
+  if (normalized.includes('reference') || normalized.includes('receipt') || normalized.includes('transaction')) return { field: 'paymentReference', confidence: 'medium' }
+  if (normalized.includes('pay')) return { field: 'paymentStatus', confidence: 'medium' }
+  if (normalized.includes('timestamp') || normalized.includes('submitted') || normalized.includes('date')) return { field: 'timestamp', confidence: 'medium' }
+  if (normalized.includes('note') || normalized.includes('comment')) return { field: 'notes', confidence: 'medium' }
+  return { field: '', confidence: 'none' }
+}
+
+export function buildHeaderMappingPreview(headers = [], fieldMap = buildInitialFieldMap(headers)) {
+  return headers.map((header, index) => {
+    const mappedField = Object.keys(fieldMap).find((field) => fieldMap[field] === index) || ''
+    const normalized = header.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim()
+    const detected = detectHeaderField(normalized, header.toLowerCase())
+    return {
+      index,
+      header,
+      detectedField: mappedField || detected.field,
+      confidence: mappedField ? detected.confidence : detected.confidence,
+      mapped: Boolean(mappedField),
+      ignored: !mappedField,
+    }
+  })
 }
 
 async function sha256(message) {
@@ -156,24 +217,50 @@ export function timestampMillis(value) {
   return date ? date.getTime() : null
 }
 
+function sourceIdentityPart(value) {
+  return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 120)
+}
+
+function buildSourceRowId(parsedRow, context = {}) {
+  const rowPart = `${parsedRow._sourceKey || ''}${parsedRow._sourceRowId || `row-${parsedRow._sourceRowIndex || 'unknown'}`}`
+  const scope = [
+    context.importBatchId,
+    context.sourceFileName,
+    context.sourceSheetName,
+  ].map(sourceIdentityPart).filter(Boolean).join(':')
+
+  return scope ? `${scope}:${rowPart}` : rowPart
+}
+
 export async function generateStableId(eventId, row) {
   const ts = row.timestamp ? timestampMillis(row.timestamp) : ''
-  let key = ''
-  if (row.email) {
-    key = `${eventId}:email:${row.email}:${ts}`
-  } else if (row.phone) {
-    key = `${eventId}:phone:${row.phone}:${ts}`
-  } else {
-    key = `${eventId}:row:${row.sourceRowId}`
-  }
+  const rowIdentity = [
+    row.importBatchId || 'manual-import',
+    row.sourceFileName || '',
+    row.sourceSheetName || '',
+    row.sourceRowId || '',
+    row.sourceRowIndex || '',
+  ].join(':')
+  const secondary = [
+    row.fullName || '',
+    row.email || '',
+    row.phone || '',
+    row.groupName || '',
+    ts,
+  ].join(':')
+  const key = `${eventId}:row:${rowIdentity}:secondary:${secondary}`
   const hash = await sha256(key)
   return `imp_${hash.substring(0, 16)}`
 }
 
-export function mapRows(parsedRows, headers, fieldMap) {
+export function mapRows(parsedRows, headers, fieldMap, context = {}) {
   return parsedRows.map((parsedRow) => {
     const rowObj = {
-      sourceRowId: parsedRow._sourceRowId,
+      sourceRowId: buildSourceRowId(parsedRow, context),
+      sourceRowIndex: parsedRow._sourceRowIndex,
+      sourceFileName: context.sourceFileName || null,
+      sourceSheetName: context.sourceSheetName || null,
+      importBatchId: context.importBatchId || null,
       source: 'csv-import',
       checkedIn: false,
       checkInTime: null,
@@ -206,15 +293,15 @@ export function validateRow(row) {
   let status = 'valid'
 
   if (!row.fullName?.trim()) {
-    issues.push('Missing full name')
+    issues.push('This row is blocked because Full Name is missing.')
     status = 'blocked'
   }
   if (!row.email && !row.phone) {
-    issues.push('Missing both email and phone')
+    issues.push('This row is blocked because email and phone are both missing.')
     status = 'blocked'
   }
   if (!Number.isInteger(row.personsAttending) || row.personsAttending < 1) {
-    issues.push('Invalid persons attending')
+    issues.push('This row is blocked because Persons Attending is invalid.')
     status = 'blocked'
   } else if (row.personsAttending > MAX_PERSONS_ATTENDING) {
     issues.push(`Persons attending exceeds ${MAX_PERSONS_ATTENDING}`)
@@ -231,20 +318,6 @@ export function validateRow(row) {
   return { status, issues }
 }
 
-function matchesEmailTimestamp(existing, row) {
-  return existing.email
-    && row.email
-    && existing.email === row.email
-    && timestampMillis(existing.timestamp) === timestampMillis(row.timestamp)
-}
-
-function matchesPhoneTimestamp(existing, row) {
-  return existing.phone
-    && row.phone
-    && existing.phone === row.phone
-    && timestampMillis(existing.timestamp) === timestampMillis(row.timestamp)
-}
-
 function matchesSourceRowId(existing, row) {
   return existing.sourceRowId
     && row.sourceRowId
@@ -254,29 +327,96 @@ function matchesSourceRowId(existing, row) {
 export function findDuplicate(existingRegistrations, processedRows, row) {
   for (const existing of existingRegistrations) {
     if (matchesSourceRowId(existing, row)) {
-      return 'Duplicate source row ID'
-    }
-    if (matchesEmailTimestamp(existing, row)) {
-      return 'Duplicate email and timestamp'
-    }
-    if (matchesPhoneTimestamp(existing, row)) {
-      return 'Duplicate phone and timestamp'
+      return 'This source row was already imported for the selected Working Event.'
     }
   }
 
   for (const processed of processedRows) {
     if (matchesSourceRowId(processed.row, row)) {
-      return 'Duplicate source row ID in import batch'
-    }
-    if (matchesEmailTimestamp(processed.row, row)) {
-      return 'Duplicate email and timestamp in import batch'
-    }
-    if (matchesPhoneTimestamp(processed.row, row)) {
-      return 'Duplicate phone and timestamp in import batch'
+      return 'This source row appears twice in the import batch.'
     }
   }
 
   return null
+}
+
+function sameText(a, b) {
+  return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase()
+}
+
+function sameName(a, b) {
+  return Boolean(a.fullName && b.fullName && sameText(a.fullName, b.fullName))
+}
+
+function sameContact(a, b) {
+  return Boolean((a.email && b.email && a.email === b.email) || (a.phone && b.phone && a.phone === b.phone))
+}
+
+function duplicateGroupKey(row) {
+  return [
+    String(row.fullName || '').trim().toLowerCase(),
+    row.email || row.phone || String(row.groupName || '').trim().toLowerCase(),
+  ].join('|')
+}
+
+function sharedContactWarnings(existingRegistrations, processedRows, row) {
+  const warnings = []
+  const allRows = [...existingRegistrations, ...processedRows.map((processed) => processed.row)]
+  const sharedPhone = row.phone && allRows.some((candidate) => candidate.phone === row.phone && !sameName(candidate, row))
+  const sharedEmail = row.email && allRows.some((candidate) => candidate.email === row.email && !sameName(candidate, row))
+  const sharedGroup = row.groupName && allRows.some((candidate) => sameText(candidate.groupName, row.groupName) && !sameName(candidate, row))
+
+  if (sharedPhone) warnings.push('Same phone number appears on multiple rows. This may be a group/shared contact.')
+  if (sharedEmail) warnings.push('Same email appears on multiple rows. You can keep these as separate guests.')
+  if (sharedGroup) warnings.push('Same group name appears on multiple rows. This can be normal for family, school, or organization rows.')
+  return warnings
+}
+
+function trueDuplicateReasons(existingRegistrations, processedRows, row) {
+  const reasons = []
+  const allRows = [...existingRegistrations, ...processedRows.map((processed) => processed.row)]
+
+  for (const candidate of allRows) {
+    if (!sameName(candidate, row)) continue
+    if (sameContact(candidate, row)) reasons.push('This row appears to be the same guest already in this event.')
+    else if (candidate.groupName && row.groupName && sameText(candidate.groupName, row.groupName)) reasons.push('Same full name and group name needs organizer review.')
+  }
+
+  return [...new Set(reasons)]
+}
+
+export function mergeRowsIntoGroupRegistration(rows = []) {
+  const candidates = rows.filter((item) => item?.row ? item.status !== 'blocked' : true).map((item) => item.row || item)
+  const ticketCodes = [...new Set(candidates.map((row) => normalizeTicketCode(row.ticketCode)).filter(Boolean))]
+  if (ticketCodes.length > 1) {
+    return {
+      status: 'blocked',
+      issues: ['Multiple ticket codes exist in rows selected for merge. Choose one ticket code before importing.'],
+      row: null,
+    }
+  }
+
+  const primary = candidates.find((row) => row.email || row.phone) || candidates[0]
+  const guestNames = candidates.map((row) => row.fullName?.trim()).filter(Boolean)
+  const mergedNotes = [
+    primary?.notes,
+    `Merged guest names: ${guestNames.join('; ')}`,
+  ].filter(Boolean).join('\n')
+
+  return {
+    status: 'valid',
+    issues: ['Merged into one group registration. Review before import.'],
+    row: {
+      ...primary,
+      fullName: primary?.groupName || primary?.fullName || guestNames[0] || 'Merged group',
+      personsAttending: candidates.reduce((total, row) => total + (Number.isInteger(row.personsAttending) ? row.personsAttending : 1), 0),
+      groupName: primary?.groupName || candidates.find((row) => row.groupName)?.groupName || null,
+      ticketCode: ticketCodes[0] || '',
+      ticketStatus: ticketCodes[0] ? 'assigned' : 'no-ticket-assigned',
+      notes: mergedNotes,
+      sourceRowId: candidates.map((row) => row.sourceRowId).filter(Boolean).join('+'),
+    },
+  }
 }
 
 export async function processAndValidate(rows, eventId, existingRegistrations) {
@@ -287,9 +427,20 @@ export async function processAndValidate(rows, eventId, existingRegistrations) {
 
     const dupReason = findDuplicate(existingRegistrations, processed, row)
     const ticketDupReason = findTicketCodeDuplicate(existingRegistrations, processed, row)
-    const finalStatus = dupReason || ticketDupReason ? 'blocked' : status
+    const reviewReasons = status === 'blocked' ? [] : trueDuplicateReasons(existingRegistrations, processed, row)
+    const warnings = status === 'blocked' ? [] : sharedContactWarnings(existingRegistrations, processed, row)
+    const finalStatus = dupReason || ticketDupReason
+      ? 'blocked'
+      : reviewReasons.length > 0
+        ? 'needs-review'
+        : warnings.length > 0
+          ? 'warning'
+          : status
     if (dupReason) issues.push(dupReason)
-    if (ticketDupReason) issues.push(ticketDupReason)
+    if (ticketDupReason) issues.push(ticketDupReason.includes('selected event')
+      ? 'This ticket code is already used and must be changed.'
+      : 'This ticket code appears more than once in this import and must be changed.')
+    issues.push(...reviewReasons, ...warnings)
 
     row.registrationId = await generateStableId(eventId, row)
 
@@ -297,6 +448,15 @@ export async function processAndValidate(rows, eventId, existingRegistrations) {
       row,
       status: finalStatus,
       issues,
+      defaultAction: finalStatus === 'blocked' ? 'blocked' : finalStatus === 'needs-review' ? 'needs-review' : 'keep',
+      recommendedAction: finalStatus === 'blocked'
+        ? 'Blocked until the row is fixed.'
+        : finalStatus === 'needs-review'
+          ? 'Review and choose Keep Separate, Merge, or Skip Row.'
+          : warnings.length > 0
+            ? 'Usually safe to Keep Separate for shared family, school, or organization contacts.'
+            : 'Ready to import.',
+      duplicateGroupKey: duplicateGroupKey(row),
     })
   }
 

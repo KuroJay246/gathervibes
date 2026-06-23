@@ -1,4 +1,5 @@
 import { ChevronRight } from 'lucide-react'
+import { buildHeaderMappingPreview } from '../../utils/importUtils'
 
 const REGISTRATION_FIELDS = [
   { value: 'fullName', label: 'Full Name (Required)' },
@@ -13,14 +14,29 @@ const REGISTRATION_FIELDS = [
   { value: 'notes', label: 'Notes' },
 ]
 
-export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onProceed }) {
+export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onProceed, sheetName, onChangeSheet }) {
   const isReady = fieldMap.fullName !== undefined
+  const mappingPreview = buildHeaderMappingPreview(headers, fieldMap)
   
   return (
     <div className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-[0_4px_24px_rgba(43,23,35,0.04)]">
-      <h3 className="font-serif text-xl text-[#2B1723]">Map Columns</h3>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h3 className="font-serif text-xl text-[#2B1723]">Header Mapping Preview</h3>
+          {sheetName && <p className="mt-1 text-xs font-bold text-[#1E7345]">Using sheet: {sheetName}</p>}
+        </div>
+        {onChangeSheet && (
+          <button
+            type="button"
+            onClick={onChangeSheet}
+            className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]"
+          >
+            Change Sheet
+          </button>
+        )}
+      </div>
       <p className="mt-2 text-sm text-[#816D62]">
-        Match imported columns to Gather & Savor registration fields.
+        Match imported columns to Gather & Savor registration fields. Extra columns can remain ignored safely.
       </p>
 
       <div className="mt-6 space-y-4">
@@ -32,6 +48,14 @@ export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onP
             <div key={index} className="flex flex-col gap-3 rounded-xl border border-[#F2E8E1] p-4 sm:flex-row sm:items-center sm:gap-6">
               <div className="flex-1 font-mono text-sm font-semibold text-[#5D4A52]">
                 {header || `Column ${index + 1}`}
+                <div className="mt-1 flex flex-wrap gap-2 font-sans text-[10px] font-bold uppercase tracking-wider">
+                  <span className="rounded-full bg-[#F7F1ED] px-2 py-0.5 text-[#8C7567]">
+                    Detected: {mappingPreview[index]?.detectedField || 'Unmapped'}
+                  </span>
+                  <span className="rounded-full bg-[#F7F1ED] px-2 py-0.5 text-[#8C7567]">
+                    Confidence: {mappingPreview[index]?.confidence || 'none'}
+                  </span>
+                </div>
               </div>
               <ChevronRight className="hidden size-4 text-[#C4B4AA] sm:block" />
               <div className="flex-1">
@@ -66,7 +90,7 @@ export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onP
 
       {!isReady && (
         <div className="mt-6 rounded-xl bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">
-          <strong>Action needed:</strong> You must map a column to "Full Name" to proceed.
+          <strong>Action needed:</strong> Full Name is missing. Detected columns: {headers.join(', ') || 'none'}. Map a name column or fix the uploaded headers before preview.
         </div>
       )}
 

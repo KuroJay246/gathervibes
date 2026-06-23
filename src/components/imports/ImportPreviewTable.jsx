@@ -1,19 +1,55 @@
 import { CheckCircle2, AlertCircle, XCircle } from 'lucide-react'
 
-export function ImportPreviewTable({ processedRows, onCancel, onImport, importing }) {
+function statusTone(status) {
+  if (status === 'valid') return 'text-[#1E7345]'
+  if (status === 'warning' || status === 'needs-review') return 'text-[#986F26]'
+  if (status === 'skipped') return 'text-[#8C7567]'
+  return 'text-[#A32626]'
+}
+
+function statusLabel(status) {
+  if (status === 'valid') return 'Ready'
+  if (status === 'warning') return 'Warning'
+  if (status === 'needs-review') return 'Needs Review'
+  if (status === 'skipped') return 'Skipped'
+  return 'Blocked'
+}
+
+function StatusIcon({ status }) {
+  if (status === 'valid') return <CheckCircle2 className="size-5 text-[#1E7345]" />
+  if (status === 'warning' || status === 'needs-review') return <AlertCircle className="size-5 text-[#986F26]" />
+  return <XCircle className="size-5 text-[#A32626]" />
+}
+
+export function ImportPreviewTable({
+  processedRows,
+  onCancel,
+  onImport,
+  importing,
+  mode = 'final',
+  reviewActions = {},
+  onActionChange,
+  onContinue,
+  canContinue = true,
+}) {
   const validRows = processedRows.filter(r => r.status === 'valid')
   const warningRows = processedRows.filter(r => r.status === 'warning')
+  const reviewRows = processedRows.filter(r => r.status === 'needs-review')
   const blockedRows = processedRows.filter(r => r.status === 'blocked')
+  const skippedRows = processedRows.filter(r => r.status === 'skipped')
   
-  const canImport = validRows.length > 0 || warningRows.length > 0
+  const canImport = mode === 'final' && processedRows.some((row) => row.status !== 'blocked' && row.status !== 'skipped')
+  const isReviewMode = mode === 'review'
 
   return (
     <div className="flex flex-col gap-6 rounded-2xl bg-white p-4 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="font-serif text-xl text-[#2B1723]">Preview Import</h3>
+          <h3 className="font-serif text-xl text-[#2B1723]">{isReviewMode ? 'Duplicate Review' : 'Final Import Preview'}</h3>
           <p className="mt-1 text-sm text-[#816D62]">
-            Review the rows before importing to Firestore.
+            {isReviewMode
+              ? 'Review hard errors, shared-contact warnings, and possible true duplicates before the final preview.'
+              : 'Preview the exact rows that will be written after confirmation. No Firestore write happens before this step.'}
           </p>
         </div>
         <div className="flex items-center gap-4 text-sm font-semibold">
@@ -25,10 +61,20 @@ export function ImportPreviewTable({ processedRows, onCancel, onImport, importin
             <AlertCircle className="size-4" />
             {warningRows.length} Warning
           </div>
+          <div className="flex items-center gap-1.5 text-[#986F26]">
+            <AlertCircle className="size-4" />
+            {reviewRows.length} Review
+          </div>
           <div className="flex items-center gap-1.5 text-[#A32626]">
             <XCircle className="size-4" />
             {blockedRows.length} Blocked
           </div>
+          {skippedRows.length > 0 && (
+            <div className="flex items-center gap-1.5 text-[#8C7567]">
+              <XCircle className="size-4" />
+              {skippedRows.length} Skipped
+            </div>
+          )}
         </div>
       </div>
 
@@ -40,17 +86,20 @@ export function ImportPreviewTable({ processedRows, onCancel, onImport, importin
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Contact</th>
+                <th className="px-4 py-3">Group / Persons</th>
                 <th className="px-4 py-3">Ticket Code</th>
                 <th className="px-4 py-3">Issues</th>
+                {isReviewMode && <th className="px-4 py-3">Decision</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F2E8E1]">
               {processedRows.slice(0, 100).map((pr, idx) => (
-                <tr key={idx} className={pr.status === 'blocked' ? 'bg-[#FFF1F1]/50' : pr.status === 'warning' ? 'bg-[#FFF4DF]/30' : ''}>
+                <tr key={idx} className={pr.status === 'blocked' ? 'bg-[#FFF1F1]/50' : pr.status === 'warning' || pr.status === 'needs-review' ? 'bg-[#FFF4DF]/30' : pr.status === 'skipped' ? 'bg-[#F7F1ED]/60' : ''}>
                   <td className="px-4 py-3">
-                    {pr.status === 'valid' && <CheckCircle2 className="size-5 text-[#1E7345]" />}
-                    {pr.status === 'warning' && <AlertCircle className="size-5 text-[#986F26]" />}
-                    {pr.status === 'blocked' && <XCircle className="size-5 text-[#A32626]" />}
+                    <div className="flex items-center gap-2">
+                      <StatusIcon status={pr.status} />
+                      <span className={`text-xs font-bold ${statusTone(pr.status)}`}>{statusLabel(pr.status)}</span>
+                    </div>
                   </td>
                   <td className="px-4 py-3 font-medium text-[#2B1723]">{pr.row.fullName}</td>
                   <td className="px-4 py-3 text-[#5D4A52]">
@@ -60,17 +109,50 @@ export function ImportPreviewTable({ processedRows, onCancel, onImport, importin
                       {!pr.row.email && !pr.row.phone && <span className="italic text-[#A48A7B]">No contact</span>}
                     </div>
                   </td>
+                  <td className="px-4 py-3 text-[#5D4A52]">
+                    <div>{pr.row.groupName || <span className="italic text-[#A48A7B]">No group</span>}</div>
+                    <div className="mt-0.5 text-xs text-[#8C7567]">{pr.row.personsAttending || 1} persons</div>
+                  </td>
                   <td className="px-4 py-3 font-mono text-xs font-bold text-[#2B1723]">
                     {pr.row.ticketCode || <span className="font-sans font-normal italic text-[#A48A7B]">None</span>}
                   </td>
-                  <td className="px-4 py-3 text-xs text-[#A32626]">
-                    {pr.issues.length > 0 ? pr.issues.join(', ') : <span className="text-[#816D62]">None</span>}
+                  <td className="px-4 py-3 text-xs text-[#5D4A52]">
+                    {pr.issues.length > 0 ? (
+                      <ul className="list-disc space-y-1 pl-4">
+                        {pr.issues.map((issue) => <li key={issue}>{issue}</li>)}
+                        {pr.recommendedAction && <li className="font-bold text-[#2B1723]">{pr.recommendedAction}</li>}
+                      </ul>
+                    ) : <span className="text-[#816D62]">None</span>}
                   </td>
+                  {isReviewMode && (
+                    <td className="px-4 py-3">
+                      {pr.status === 'blocked' ? (
+                        <span className="rounded-full bg-[#FCEEF1] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#A32626]">Blocked</span>
+                      ) : (
+                        <div className="flex flex-col gap-2">
+                          {[
+                            ['keep', 'Keep Separate'],
+                            ['merge', 'Merge Into One Group Registration'],
+                            ['skip', 'Skip Row'],
+                          ].map(([value, label]) => (
+                            <button
+                              key={value}
+                              type="button"
+                              onClick={() => onActionChange?.(idx, value)}
+                              className={`rounded-lg px-3 py-2 text-left text-xs font-bold transition ${reviewActions[idx] === value ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED] text-[#6B564C] hover:bg-[#EFE2DA]'}`}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
               {processedRows.length > 100 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-3 text-center text-xs italic text-[#8C7567]">
+                  <td colSpan={isReviewMode ? 7 : 6} className="px-4 py-3 text-center text-xs italic text-[#8C7567]">
                     ...and {processedRows.length - 100} more rows not shown.
                   </td>
                 </tr>
@@ -89,21 +171,32 @@ export function ImportPreviewTable({ processedRows, onCancel, onImport, importin
         >
           Cancel
         </button>
-        <button
-          type="button"
-          onClick={() => onImport(validRows.concat(warningRows))}
-          disabled={!canImport || importing}
-          className="flex items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#B76E79]/30 disabled:opacity-50"
-        >
-          {importing ? (
-            <>
-              <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-              Importing…
-            </>
-          ) : (
-            `Import ${validRows.length + warningRows.length} rows`
-          )}
-        </button>
+        {isReviewMode ? (
+          <button
+            type="button"
+            onClick={onContinue}
+            disabled={!canContinue}
+            className="flex items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#B76E79]/30 disabled:opacity-50"
+          >
+            Continue to Final Import Preview
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onImport(processedRows.filter((row) => row.status !== 'blocked' && row.status !== 'skipped'))}
+            disabled={!canImport || importing}
+            className="flex items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#B76E79]/30 disabled:opacity-50"
+          >
+            {importing ? (
+              <>
+                <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                Importing…
+              </>
+            ) : (
+              `Confirm Import (${processedRows.filter((row) => row.status !== 'blocked' && row.status !== 'skipped').length} rows)`
+            )}
+          </button>
+        )}
       </div>
     </div>
   )
