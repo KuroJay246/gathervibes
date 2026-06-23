@@ -40,15 +40,17 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
 
     const match = findRegistrationByQrTicketCode(registrations, parsed.ticketCode)
     if (!match) {
-      const message = `No registration with ticket code ${parsed.ticketCode} was found for the selected Working Event.`
+      const message = `No matching ticket code: ${parsed.ticketCode} was found for the selected Working Event.`
       setScannerError(message)
       onMissing?.(parsed.ticketCode)
       return
     }
 
-    setScannerNote(source === 'scan'
-      ? 'QR matched a guest. Review the guest card before check-in.'
-      : 'Ticket code matched a guest. Review the guest card before check-in.')
+    setScannerNote(match.checkedIn
+      ? `${match.fullName} is already checked in. Duplicate check-in is blocked.`
+      : source === 'scan'
+        ? `${match.fullName} matched from QR. Review the guest card before check-in.`
+        : `${match.fullName} matched from manual ticket lookup. Review the guest card before check-in.`)
     onMatch(match, parsed.ticketCode)
   }
 
@@ -77,10 +79,13 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
 
   async function startScanner() {
     setScannerError('')
-    setScannerNote('')
+    setScannerNote('Scanning... Point the camera at one ticket QR code.')
+    setScanning(true)
 
     if (scannerRef.current) {
       await stopScanner()
+      setScanning(true)
+      setScannerNote('Scanning... Point the camera at one ticket QR code.')
     }
 
     try {
@@ -100,7 +105,8 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
       scannerRef.current = null
       setScanning(false)
       if (import.meta.env.DEV) console.error('QR scanner failed:', err)
-      setScannerError('Camera scanner could not start. Check browser camera permission or paste the ticket code below.')
+      setScannerNote('')
+      setScannerError('Camera unavailable or permission denied. Use the manual ticket lookup fallback below.')
     }
   }
 
@@ -114,7 +120,10 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
             QR lookup only selects the guest. Check-in still requires confirmation.
           </p>
         </div>
-        <ScanLine className="size-8 text-[#B76E79]" />
+        <div className="flex items-center gap-2">
+          {scanning && <span className="rounded-full bg-[#E5F3EC] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">Scanning...</span>}
+          <ScanLine className="size-8 text-[#B76E79]" />
+        </div>
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
