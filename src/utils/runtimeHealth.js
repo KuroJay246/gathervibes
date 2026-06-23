@@ -8,6 +8,7 @@ export function buildRuntimeHealthItems({
   firebaseConfigured,
   projectId,
   user,
+  currentRoleLabel,
   allowlistApproved,
   eventsStatus,
   registrationsStatus,
@@ -36,6 +37,11 @@ export function buildRuntimeHealthItems({
       label: 'Current email approved',
       status: allowlistApproved === true ? 'ok' : allowlistApproved === false ? 'fail' : 'warn',
       detail: allowlistApproved === true ? 'Approved by settings/accessControl.' : allowlistApproved === false ? 'Not approved by allowlist.' : 'Checking allowlist.',
+    },
+    {
+      label: 'Current role detected',
+      status: currentRoleLabel ? 'ok' : 'warn',
+      detail: currentRoleLabel ? `${currentRoleLabel} from settings/accessControl with approvedEmails fallback.` : 'Role display is pending accessControl load.',
     },
     {
       label: 'Events read',
@@ -81,6 +87,11 @@ export function buildRuntimeHealthItems({
       label: 'Deferred integrations',
       status: 'ok',
       detail: 'AI writing, Gmail/Outlook OAuth, Google Sheets OAuth, Cloud Functions, Storage, and public attendee flows are not enabled.',
+    },
+    {
+      label: 'Communications Pro safety',
+      status: 'ok',
+      detail: 'Communications remain copy-only. No email, WhatsApp, OAuth, AI, or automatic sending is enabled.',
     },
   ]
 }

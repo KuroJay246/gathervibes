@@ -4,6 +4,7 @@ import { useActiveEvent } from '../events/useActiveEvent'
 import { firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
 import { SystemHealthPanel } from '../components/SystemHealthPanel'
 import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeUtils'
+import { ACCESS_ROLES, ROLE_ORDER, listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
 
 const ROADMAP_ITEMS = [
   ['AI writing', 'Deferred'],
@@ -11,8 +12,9 @@ const ROADMAP_ITEMS = [
   ['Google Sheets OAuth', 'Deferred'],
   ['Cloud Functions', 'Deferred'],
   ['Storage', 'Deferred'],
-  ['Staff roles', 'Future phase'],
+  ['Staff roles', 'Phase 10 foundation'],
   ['Finance tracker', 'Phase 9 active'],
+  ['Communications Pro', 'Phase 11 copy-only'],
 ]
 
 function SettingsSection({ eyebrow, title, children }) {
@@ -46,8 +48,10 @@ function ProfileAvatar({ user }) {
 }
 
 export function SettingsPage() {
-  const { user, signOut } = useAuth()
+  const { user, signOut, accessControl, currentRole, currentRoleLabel } = useAuth()
   const { activeEvent } = useActiveEvent()
+  const approvedEntries = listApprovedAccessEntries(accessControl || {})
+  const rolesConfigured = Boolean(accessControl?.rolesByEmail && Object.keys(accessControl.rolesByEmail).length > 0)
 
   return (
     <div className="grid min-w-0 gap-6 xl:grid-cols-2">
@@ -57,13 +61,14 @@ export function SettingsPage() {
           <div className="min-w-0">
             <p className="break-words text-lg font-bold text-[#2B1723]">{user?.displayName || 'Gather & Savor Admin'}</p>
             <p className="mt-1 break-words text-sm text-[#816D62]">{user?.email || 'No email available'}</p>
-            <p className="mt-2 inline-flex rounded-full bg-[#EAF6EF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#2F855A]">Admin</p>
+            <p className="mt-2 inline-flex rounded-full bg-[#EAF6EF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#2F855A]">{currentRoleLabel}</p>
           </div>
         </div>
         <div className="mt-6 rounded-2xl border border-[#EFE2DA] p-4">
           <InfoRow label="Auth provider" value={user?.providerData?.[0]?.providerId || 'Firebase Auth'} />
           <InfoRow label="Organizer display name" value={user?.displayName || 'Use Google profile name'} />
-          <InfoRow label="Role label" value="Admin" />
+          <InfoRow label="Role label" value={currentRoleLabel} />
+          <InfoRow label="Role source" value={rolesConfigured ? 'settings/accessControl.rolesByEmail' : 'approvedEmails fallback'} />
         </div>
         <button type="button" onClick={signOut} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#2B1723] px-5 py-3 text-sm font-bold text-white">
           <LogOut className="size-4" />
@@ -82,23 +87,59 @@ export function SettingsPage() {
       </SettingsSection>
 
       <SettingsSection eyebrow="Admin Access" title="Private access controls">
-        <div className="grid gap-3">
-          {[
-            ['Approved admin allowlist', 'Active in settings/accessControl'],
-            ['Current user status', user?.email ? 'Signed in and approved' : 'Not signed in'],
-            ['Owner', 'Reserved role label'],
-            ['Admin', 'Current operational role'],
-            ['Check-In Staff', 'Prepared for future scoped access'],
-            ['Viewer', 'Prepared for future read-only access'],
-          ].map(([label, value]) => (
-            <div key={label} className="flex items-center gap-3 rounded-2xl border border-[#EFE2DA] p-4">
-              <ShieldCheck className="size-5 text-[#B76E79]" />
-              <div>
-                <p className="text-sm font-bold text-[#2B1723]">{label}</p>
-                <p className="text-xs text-[#816D62]">{value}</p>
+        <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
+          Staff roles are allowlist-only. This release displays role foundations from <strong>settings/accessControl</strong>, but Firestore write permissions still use the existing approved-admin rules until scoped role rules are separately designed and tested.
+        </div>
+
+        <div className="mt-4 grid gap-3">
+          <div className="flex items-center gap-3 rounded-2xl border border-[#EFE2DA] p-4">
+            <ShieldCheck className="size-5 text-[#B76E79]" />
+            <div>
+              <p className="text-sm font-bold text-[#2B1723]">Approved admin allowlist</p>
+              <p className="text-xs text-[#816D62]">Active in settings/accessControl. Random signed-in users remain blocked.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-2xl border border-[#EFE2DA] p-4">
+            <ShieldCheck className="size-5 text-[#B76E79]" />
+            <div>
+              <p className="text-sm font-bold text-[#2B1723]">Current user status</p>
+              <p className="text-xs text-[#816D62]">{user?.email ? `Signed in and approved as ${currentRoleLabel}` : 'Not signed in'}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Approved emails and roles</p>
+          <div className="mt-3 overflow-hidden rounded-2xl border border-[#EFE2DA]">
+            {approvedEntries.length === 0 ? (
+              <p className="p-4 text-sm text-[#816D62]">No approved emails were loaded.</p>
+            ) : approvedEntries.map((entry) => (
+              <div key={entry.email} className="flex flex-col gap-1 border-b border-[#F2E8E1] p-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
+                <p className="break-all text-sm font-bold text-[#2B1723]">{entry.email}</p>
+                <span className="w-fit rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{ACCESS_ROLES[entry.role]?.label || 'Admin'}</span>
               </div>
+            ))}
+          </div>
+          <p className="mt-2 text-xs leading-5 text-[#8A7468]">
+            If rolesByEmail is missing or a role is not recognized, approved emails continue as Admin for backward compatibility.
+          </p>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {ROLE_ORDER.map((roleId) => (
+            <div key={roleId} className="rounded-2xl border border-[#EFE2DA] p-4">
+              <p className="text-sm font-bold text-[#2B1723]">{ACCESS_ROLES[roleId].label}</p>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">{ACCESS_ROLES[roleId].summary}</p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+          <p className="text-sm font-bold text-[#2B1723]">Current role behavior</p>
+          <p className="mt-1 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
+          <p className="mt-2 text-xs leading-5 text-[#8A7468]">
+            Role editing, owner-only controls, viewer read-only rules, and check-in staff scoped rules are deferred. They should be added only with matching Firestore rules and audit tests.
+          </p>
         </div>
       </SettingsSection>
 

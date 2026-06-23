@@ -1,43 +1,67 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { MessageSquareText, Search, Copy, CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Copy, MessageSquareText, Search } from 'lucide-react'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { subscribeToRegistrations } from '../services/registrationService'
 import { LoadingState } from '../components/ui/LoadingState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { EmptyState } from '../components/ui/EmptyState'
-import { 
-  COMMUNICATION_TEMPLATES, 
-  extractAvailableGroups, 
-  filterCommunicationsRegistrations, 
-  buildCommunicationsExport 
+import {
+  COMMUNICATION_SEGMENTS,
+  COMMUNICATION_TEMPLATES,
+  buildCommunicationMessages,
+  buildCommunicationsCsvPacket,
+  buildCommunicationsExport,
+  buildCommunicationsSegmentSummary,
+  buildRecipientList,
+  extractAvailableGroups,
+  filterCommunicationsRegistrations,
 } from '../utils/communicationsUtils'
-import { buildRegistrationMetrics } from '../utils/registrationMetrics'
+import { formatCurrency } from '../utils/financeUtils'
+
+function SummaryCard({ label, value, detail }) {
+  return (
+    <div className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-3">
+      <div className="text-2xl font-serif text-[#2B1723]">{value}</div>
+      <div className="text-[10px] font-bold uppercase tracking-wider text-[#8A7468]">{label}</div>
+      {detail && <div className="mt-1 text-[11px] text-[#8A7468]">{detail}</div>}
+    </div>
+  )
+}
+
+function Section({ eyebrow, title, children }) {
+  return (
+    <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm">
+      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">{eyebrow}</p>
+      <h3 className="mt-1 font-bold text-[#2B1723]">{title}</h3>
+      <div className="mt-4">{children}</div>
+    </section>
+  )
+}
 
 export function CommunicationsPage() {
   const { activeEvent } = useActiveEvent()
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
-  
   const [searchQuery, setSearchQuery] = useState('')
   const [filters, setFilters] = useState({
     paymentStatus: 'all',
     financeSegment: 'all',
     checkInStatus: 'all',
     ticketStatus: 'all',
+    contactSegment: 'all',
     groupName: '',
   })
-
   const [selectedTemplate, setSelectedTemplate] = useState(COMMUNICATION_TEMPLATES[0].id)
   const [draftContent, setDraftContent] = useState(COMMUNICATION_TEMPLATES[0].content)
-  const [copied, setCopied] = useState(false)
+  const [copiedAction, setCopiedAction] = useState('')
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     if (!activeEvent?.eventId) {
       setLoading(false)
-      return
+      return undefined
     }
 
     setLoading(true)
@@ -60,6 +84,18 @@ export function CommunicationsPage() {
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [activeEvent?.eventId])
 
+  const availableGroups = useMemo(() => extractAvailableGroups(registrations), [registrations])
+  const filteredRegistrations = useMemo(
+    () => filterCommunicationsRegistrations(registrations, filters, searchQuery),
+    [filters, registrations, searchQuery],
+  )
+  const summary = useMemo(() => buildCommunicationsSegmentSummary(filteredRegistrations, activeEvent), [activeEvent, filteredRegistrations])
+  const messages = useMemo(() => buildCommunicationMessages(filteredRegistrations, draftContent, activeEvent), [activeEvent, draftContent, filteredRegistrations])
+  const finalExportText = useMemo(() => buildCommunicationsExport(filteredRegistrations, draftContent, activeEvent), [activeEvent, draftContent, filteredRegistrations])
+  const recipientList = useMemo(() => buildRecipientList(filteredRegistrations), [filteredRegistrations])
+  const csvPacket = useMemo(() => buildCommunicationsCsvPacket(filteredRegistrations, draftContent, activeEvent), [activeEvent, draftContent, filteredRegistrations])
+  const firstMessage = messages[0]
+
   if (!activeEvent?.eventId) {
     return (
       <EmptyState
@@ -78,24 +114,17 @@ export function CommunicationsPage() {
   if (loading) return <LoadingState message="Loading registrations…" />
   if (loadError) return <ErrorState message={loadError} onRetry={() => window.location.reload()} />
 
-  const availableGroups = extractAvailableGroups(registrations)
-  const filteredRegistrations = filterCommunicationsRegistrations(registrations, filters, searchQuery)
-  const metrics = buildRegistrationMetrics(filteredRegistrations, activeEvent)
-  const finalExportText = buildCommunicationsExport(filteredRegistrations, draftContent, activeEvent)
-
   function handleTemplateChange(templateId) {
     setSelectedTemplate(templateId)
-    const template = COMMUNICATION_TEMPLATES.find((t) => t.id === templateId)
-    if (template) {
-      setDraftContent(template.content)
-    }
+    const template = COMMUNICATION_TEMPLATES.find((item) => item.id === templateId)
+    if (template) setDraftContent(template.content)
   }
 
-  async function handleCopy() {
+  async function copyText(label, text) {
     try {
-      await navigator.clipboard.writeText(finalExportText)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(text)
+      setCopiedAction(label)
+      window.setTimeout(() => setCopiedAction(''), 2000)
     } catch (err) {
       if (import.meta.env.DEV) console.error('Failed to copy', err)
       alert('Failed to copy to clipboard')
@@ -106,221 +135,171 @@ export function CommunicationsPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="font-serif text-3xl text-[#2B1723]">Communications</h2>
+          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#B76E79]">Copy-only command center</p>
+          <h2 className="mt-1 font-serif text-3xl text-[#2B1723]">Communications Pro</h2>
           <p className="mt-2 text-sm text-[#816D62]">
-            Prepare copy-ready messages for <strong>{activeEvent.eventName}</strong>
+            Build copy-ready packets for <strong>{activeEvent.eventName}</strong>. No email, WhatsApp, OAuth, or AI sending is enabled.
           </p>
         </div>
       </header>
 
       <div className="rounded-xl border border-[#EFE2DA] bg-[#FFF8F2] px-4 py-3 text-sm text-[#8A7468]">
-        <strong>Safety Notice:</strong> This page prepares copy-ready drafts only. It does not send messages automatically.
+        <strong>Safety Notice:</strong> This page only prepares text for clipboard copy. It does not send messages, write communication logs, or create fake sent records.
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
         <div className="space-y-6 lg:col-span-4">
-          <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm">
-            <h3 className="mb-4 font-bold text-[#2B1723]">Guest Segment</h3>
-            
+          <Section eyebrow="Segment Builder" title="Choose recipients">
             <div className="space-y-4">
               <div>
-                <label htmlFor="search" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">
-                  Search Guest
-                </label>
+                <label htmlFor="search" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Search Guest</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
                   <input
                     id="search"
                     type="text"
-                placeholder="Guest, buyer, attendee, email, ticket..."
+                    placeholder="Guest, buyer, attendee, email, ticket..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(event) => setSearchQuery(event.target.value)}
                     className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">
-                  Payment Status
-                </label>
-                <select
-                  value={filters.paymentStatus}
-                  onChange={(e) => setFilters(f => ({ ...f, paymentStatus: e.target.value }))}
-                  className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
-                >
-                  <option value="all">All Payments</option>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Payment</label>
+                <select value={filters.paymentStatus} onChange={(event) => setFilters((current) => ({ ...current, paymentStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
+                  <option value="all">All payments</option>
                   <option value="paid">Paid</option>
                   <option value="pending">Pending</option>
-                  <option value="complimentary">Complimentary</option>
                   <option value="door">Door</option>
+                  <option value="complimentary">Complimentary</option>
                   <option value="unknown">Unknown</option>
                 </select>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">
-                  Finance Segment
-                </label>
-                <select
-                  value={filters.financeSegment}
-                  onChange={(e) => setFilters(f => ({ ...f, financeSegment: e.target.value }))}
-                  className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
-                >
-                  <option value="all">All Finance Segments</option>
-                  <option value="outstanding">Payment outstanding</option>
-                  <option value="pending-payment">Pending payment</option>
-                  <option value="door-payment">Door payment</option>
-                  <option value="paid-guests">Paid guests</option>
-                  <option value="complimentary-guests">Complimentary guests</option>
-                  <option value="missing-payment-reference">Missing payment reference</option>
-                  <option value="missing-ticket-code">Missing ticket code</option>
-                  <option value="balance-due">Balance due greater than 0</option>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Finance Segment</label>
+                <select value={filters.financeSegment} onChange={(event) => setFilters((current) => ({ ...current, financeSegment: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
+                  {COMMUNICATION_SEGMENTS.finance.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">
-                  Check-in Status
-                </label>
-                <select
-                  value={filters.checkInStatus}
-                  onChange={(e) => setFilters(f => ({ ...f, checkInStatus: e.target.value }))}
-                  className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
-                >
-                  <option value="all">All Guests</option>
-                  <option value="checked-in">Checked In</option>
-                  <option value="not-checked-in">Not Checked In</option>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Ticket Segment</label>
+                <select value={filters.ticketStatus} onChange={(event) => setFilters((current) => ({ ...current, ticketStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
+                  {COMMUNICATION_SEGMENTS.ticket.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">
-                  Ticket Status
-                </label>
-                <select
-                  value={filters.ticketStatus}
-                  onChange={(e) => setFilters(f => ({ ...f, ticketStatus: e.target.value }))}
-                  className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
-                >
-                  <option value="all">All Statuses</option>
-                  <option value="assigned">Ticket Assigned</option>
-                  <option value="not-assigned">No Ticket Assigned</option>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Attendance</label>
+                <select value={filters.checkInStatus} onChange={(event) => setFilters((current) => ({ ...current, checkInStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
+                  <option value="all">All guests</option>
+                  <option value="checked-in">Checked in</option>
+                  <option value="not-checked-in">Not checked in</option>
                 </select>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">
-                  Group Name
-                </label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Guest / Contact</label>
+                <select value={filters.contactSegment} onChange={(event) => setFilters((current) => ({ ...current, contactSegment: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
+                  {COMMUNICATION_SEGMENTS.contact.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Group Name</label>
                 <input
                   type="text"
                   placeholder="Search group..."
                   value={filters.groupName}
-                  onChange={(e) => setFilters(f => ({ ...f, groupName: e.target.value }))}
+                  onChange={(event) => setFilters((current) => ({ ...current, groupName: event.target.value }))}
                   list="groups-list"
-                  className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 px-3 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
+                  className="w-full rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-sm"
                 />
-                <datalist id="groups-list">
-                  {availableGroups.map((g) => <option key={g} value={g} />)}
-                </datalist>
+                <datalist id="groups-list">{availableGroups.map((group) => <option key={group} value={group} />)}</datalist>
               </div>
             </div>
-          </section>
+          </Section>
 
-          <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm">
-            <h3 className="mb-4 font-bold text-[#2B1723]">Segment Summary</h3>
+          <Section eyebrow="Counts" title="Segment summary">
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-3">
-                <div className="text-2xl font-serif text-[#2B1723]">{metrics.totalRegistrations}</div>
-                <div className="text-[10px] font-bold uppercase tracking-wider text-[#8A7468]">Registrations</div>
-              </div>
-              <div className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-3">
-                <div className="text-2xl font-serif text-[#2B1723]">{metrics.totalPersons}</div>
-                <div className="text-[10px] font-bold uppercase tracking-wider text-[#8A7468]">Persons</div>
-              </div>
+              <SummaryCard label="Registrations" value={summary.totalRegistrations} />
+              <SummaryCard label="Persons" value={summary.totalPersons} />
+              <SummaryCard label="Missing email/phone" value={summary.missingEmailOrPhone} />
+              <SummaryCard label="Missing tickets" value={summary.missingTicket} />
+              <SummaryCard label="Outstanding" value={summary.outstandingBalance} detail={formatCurrency(summary.finance.totalOutstanding)} />
+              <SummaryCard label="Collected" value={formatCurrency(summary.finance.totalCollected)} />
             </div>
-            <div className="mt-4 flex flex-col gap-2 text-sm text-[#5D4A52]">
-              <div className="flex justify-between">
-                <span>Paid / Pending</span>
-                <span className="font-medium text-[#2B1723]">{metrics.paidRegistrations} / {metrics.pendingRegistrations}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Complimentary / Door</span>
-                <span className="font-medium text-[#2B1723]">{metrics.complimentaryRegistrations} / {metrics.doorRegistrations}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Missing ticket codes</span>
-                <span className="font-medium text-[#2B1723]">{metrics.missingTicketRegistrations}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Checked In</span>
-                <span className="font-medium text-[#2B1723]">{metrics.checkedInRegistrations}</span>
-              </div>
-            </div>
-          </section>
+          </Section>
         </div>
 
         <div className="space-y-6 lg:col-span-8">
-          <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm">
-            <h3 className="mb-4 font-bold text-[#2B1723]">Message Template</h3>
-            
-            <div className="mb-4">
-              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">
-                Starter Template
-              </label>
-              <select
-                value={selectedTemplate}
-                onChange={(e) => handleTemplateChange(e.target.value)}
-                className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm font-medium focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
-              >
-                {COMMUNICATION_TEMPLATES.map((t) => (
-                  <option key={t.id} value={t.id}>{t.label}</option>
-                ))}
-              </select>
+          <Section eyebrow="Template Library" title="Choose and edit copy">
+            <div className="grid gap-4 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+              <div>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Starter Template</label>
+                <select value={selectedTemplate} onChange={(event) => handleTemplateChange(event.target.value)} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm font-medium">
+                  {COMMUNICATION_TEMPLATES.map((template) => <option key={template.id} value={template.id}>{template.label}</option>)}
+                </select>
+                <p className="mt-3 text-xs leading-5 text-[#8A7468]">Available templates include payment reminder, balance due, door payment, payment received, ticket/QR reminder, check-in instructions, missing ticket follow-up, event reminder, group reminder, thank-you, post-event, and internal note.</p>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Editable Draft</label>
+                <textarea value={draftContent} onChange={(event) => setDraftContent(event.target.value)} rows={6} className="w-full resize-y rounded-xl border border-[#E5D7CF] bg-white p-3 text-sm" />
+                <p className="mt-2 text-xs leading-5 text-[#8A7468]">
+                  Placeholders: {'{{eventName}}'}, {'{{eventDate}}'}, {'{{eventTime}}'}, {'{{venue}}'}, {'{{buyerName}}'}, {'{{guestName}}'}, {'{{attendeeNames}}'}, {'{{groupName}}'}, {'{{ticketCode}}'}, {'{{paymentStatus}}'}, {'{{amountDue}}'}, {'{{amountPaid}}'}, {'{{balanceDue}}'}, {'{{paymentMethod}}'}, {'{{paymentReference}}'}
+                </p>
+              </div>
             </div>
+          </Section>
 
-            <div>
-              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">
-                Editable Draft
-              </label>
-              <textarea
-                value={draftContent}
-                onChange={(e) => setDraftContent(e.target.value)}
-                rows={5}
-                className="w-full resize-y rounded-xl border border-[#E5D7CF] bg-white p-3 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
-                placeholder="Write your message here..."
-              />
-              <p className="mt-2 text-xs text-[#8A7468]">
-                Placeholders: {'{{guestName}}'}, {'{{buyerName}}'}, {'{{attendeeNames}}'}, {'{{eventName}}'}, {'{{ticketCode}}'}, {'{{paymentStatus}}'}, {'{{personsAttending}}'}, {'{{groupName}}'}, {'{{eventDate}}'}, {'{{eventTime}}'}, {'{{venue}}'}, {'{{amountDue}}'}, {'{{amountPaid}}'}, {'{{balanceDue}}'}, {'{{paymentReference}}'}
-              </p>
-            </div>
-          </section>
+          <Section eyebrow="Preview" title="Message preview and warnings">
+            {firstMessage ? (
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_16rem]">
+                <pre className="max-h-72 overflow-auto rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 text-[13px] leading-relaxed whitespace-pre-wrap text-[#2B1723]">{firstMessage.message}</pre>
+                <div className="rounded-xl border border-[#EFE2DA] p-4">
+                  <p className="text-sm font-bold text-[#2B1723]">{firstMessage.name}</p>
+                  <p className="mt-1 break-all text-xs text-[#8A7468]">{firstMessage.email || 'No email'} / {firstMessage.phone || 'No phone'}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {firstMessage.warnings.length === 0 ? (
+                      <span className="rounded-full bg-[#EAF6EF] px-3 py-1 text-[10px] font-bold uppercase text-[#2F855A]">No missing data</span>
+                    ) : firstMessage.warnings.map((warning) => (
+                      <span key={warning} className="rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase text-[#986F26]">{warning}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-[#E5D7CF] p-8 text-center text-sm text-[#8A7468]">No guests match your segment filters.</div>
+            )}
+          </Section>
 
-          <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-bold text-[#2B1723]">Copy-Ready Output</h3>
-              <button
-                type="button"
-                onClick={handleCopy}
-                disabled={filteredRegistrations.length === 0}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#2B1723] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#160B12] disabled:opacity-50"
-              >
-                {copied ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
-                {copied ? 'Copied to Clipboard' : 'Copy Full Packet'}
+          <Section eyebrow="Copy Packet" title="Copy one message, all messages, recipients, or CSV">
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={() => copyText('one', firstMessage?.message || '')} disabled={!firstMessage} className="inline-flex items-center gap-2 rounded-xl bg-[#2B1723] px-4 py-2 text-xs font-bold text-white disabled:opacity-50">
+                {copiedAction === 'one' ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
+                Copy One Message
+              </button>
+              <button type="button" onClick={() => copyText('all', finalExportText)} disabled={filteredRegistrations.length === 0} className="inline-flex items-center gap-2 rounded-xl bg-[#2B1723] px-4 py-2 text-xs font-bold text-white disabled:opacity-50">
+                {copiedAction === 'all' ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
+                Copy All Messages
+              </button>
+              <button type="button" onClick={() => copyText('recipients', recipientList)} disabled={filteredRegistrations.length === 0} className="inline-flex items-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C] disabled:opacity-50">
+                {copiedAction === 'recipients' ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
+                Copy Recipient List
+              </button>
+              <button type="button" onClick={() => copyText('csv', csvPacket)} disabled={filteredRegistrations.length === 0} className="inline-flex items-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C] disabled:opacity-50">
+                {copiedAction === 'csv' ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
+                Copy CSV Packet
               </button>
             </div>
 
-            {filteredRegistrations.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-[#E5D7CF] p-8 text-center text-sm text-[#8A7468]">
-                No guests match your segment filters.
-              </div>
-            ) : (
-              <pre className="max-h-[400px] overflow-auto rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 text-[13px] leading-relaxed text-[#2B1723] whitespace-pre-wrap font-mono">
-                {finalExportText}
-              </pre>
-            )}
-          </section>
+            <pre className="mt-4 max-h-[420px] overflow-auto rounded-xl border border-[#EFE2DA] bg-[#23131C] p-4 font-mono text-[12px] leading-relaxed whitespace-pre-wrap text-[#FFF8F2]">
+              {filteredRegistrations.length === 0 ? 'No guests match your segment filters.' : finalExportText}
+            </pre>
+          </Section>
         </div>
       </div>
     </div>

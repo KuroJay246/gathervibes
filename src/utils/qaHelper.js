@@ -23,6 +23,12 @@ export const qaChecklist = [
   'Confirm finance totals: expected, collected, outstanding, door, and complimentary',
   'Confirm missing ticket price, missing paid amount, and balance mismatch warnings',
   'Confirm QR payload still contains ticket code only and no money or private data',
+  'Confirm current user role appears in Settings and System Health',
+  'Confirm approved-admin allowlist remains active and no public access is enabled',
+  'Confirm Communications Pro segments and templates are copy-only',
+  'Confirm copy packet, recipient list, and CSV packet work without sending messages',
+  'Confirm AI writing, Gmail/Outlook OAuth, Google Sheets OAuth, Cloud Functions, and Storage remain deferred',
+  'Confirm CPB is protected and not used for role or communications QA',
   'Assign, regenerate, and unassign a ticket code',
   'Verify auditLogs show registration, ticket, and check-in activity',
 ]

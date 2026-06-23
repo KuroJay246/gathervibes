@@ -59,7 +59,7 @@ const pageTitles = {
 }
 
 function SidebarContent({ onNavigate, mobile = false }) {
-  const { user, signOut } = useAuth()
+  const { user, signOut, currentRoleLabel } = useAuth()
   const { activeEvent } = useActiveEvent()
 
   return (
@@ -126,7 +126,7 @@ function SidebarContent({ onNavigate, mobile = false }) {
             {user?.email?.slice(0, 1) || 'A'}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-medium text-white">Admin</p>
+            <p className="truncate text-xs font-medium text-white">{currentRoleLabel || 'Admin'}</p>
             <p className="truncate text-[10px] text-white/40">{user?.email}</p>
           </div>
           <button
@@ -146,6 +146,7 @@ function SidebarContent({ onNavigate, mobile = false }) {
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
+  const { currentRoleLabel } = useAuth()
   const [title, subtitle] = pageTitles[location.pathname] || ['Event Hub', 'Gather & Savor Vibes']
 
   return (
@@ -197,7 +198,7 @@ export function AppShell() {
               <span className="grid size-7 place-items-center rounded-full bg-[#F7DDE6]">
                 <Sparkles className="size-3.5 text-[#B76E79]" aria-hidden="true" />
               </span>
-              <span className="text-[11px] font-semibold text-[#6B564C]">Private admin</span>
+              <span className="text-[11px] font-semibold text-[#6B564C]">{currentRoleLabel || 'Private admin'}</span>
             </div>
           </div>
         </header>
