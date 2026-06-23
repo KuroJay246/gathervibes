@@ -187,6 +187,22 @@ export function ImportsPage() {
     setStep(2)
   }
 
+  function handleBackToHeaderMapping() {
+    setProcessedRows([])
+    setReviewActions({})
+    setFinalRows([])
+    setError('')
+    setImportErrorDetails(null)
+    setStep(3)
+  }
+
+  function handleBackToDuplicateReview() {
+    setFinalRows([])
+    setError('')
+    setImportErrorDetails(null)
+    setStep(4)
+  }
+
   async function handleProceedToPreview() {
     setImportErrorDetails(null)
     const mapped = mapRows(parsedData.rows, parsedData.headers, fieldMap, importContext)
@@ -255,6 +271,13 @@ export function ImportsPage() {
   }
 
   async function handleImport(validRows) {
+    if (validRows.length === 0) {
+      setImportResult({ importedCount: 0, blockedCount: processedRows.length })
+      setImportErrorDetails(null)
+      setError('No rows were imported because every row is blocked or skipped. Go back to Duplicate Review or start over with a corrected file.')
+      return
+    }
+
     setImporting(true)
     setError('')
     setImportErrorDetails(null)
@@ -289,6 +312,7 @@ export function ImportsPage() {
 
   function resetImportState() {
     setStep(1)
+    setImporting(false)
     setCsvText('')
     setUploadedFileName('')
     setWorkbookSheets([])
@@ -327,6 +351,7 @@ export function ImportsPage() {
 
       {error && (
         <div className="rounded-xl bg-[#FFF1F1] p-4 text-sm text-[#A32626]">
+          <p className="mb-1 font-bold">{importErrorDetails ? 'Import failed' : 'Action needed'}</p>
           <p>{error}</p>
           {importErrorDetails && (
             <div className="mt-3 rounded-lg border border-[#F3C2C2] bg-white/70 p-3 text-xs leading-5 text-[#7E1E1E]">
@@ -531,8 +556,13 @@ export function ImportsPage() {
                 onClick={reset}
                 className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1]"
               >
-                Cancel
+                Clear File / Start Over
               </button>
+              {!canConfirmSheet && (
+                <p className="self-center text-xs font-semibold text-[#A32626]">
+                  Select an importable sheet to continue.
+                </p>
+              )}
               <button
                 type="button"
                 onClick={confirmSheetSelection}
@@ -555,6 +585,7 @@ export function ImportsPage() {
           onProceed={handleProceedToPreview}
           sheetName={importContext.sourceSheetName}
           onChangeSheet={workbookSheets.length > 0 ? handleChangeSheet : undefined}
+          onStartOver={reset}
         />
       )}
 
@@ -562,6 +593,8 @@ export function ImportsPage() {
         <ImportPreviewTable
           processedRows={processedRows}
           onCancel={reset}
+          onStartOver={reset}
+          onBack={handleBackToHeaderMapping}
           mode="review"
           reviewActions={reviewActions}
           onActionChange={handleReviewAction}
@@ -578,6 +611,8 @@ export function ImportsPage() {
           onCancel={reset}
           onImport={handleImport}
           importing={importing}
+          onStartOver={reset}
+          onBack={handleBackToDuplicateReview}
         />
       )}
 

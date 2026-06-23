@@ -154,6 +154,59 @@ function undoCheckInAuditData() {
   }
 }
 
+function importRegistrationData(id, index = 1) {
+  return {
+    registrationId: id,
+    eventId,
+    fullName: `CODEX_TEST Import Guest ${index}`,
+    buyerName: 'CODEX_TEST Buyer',
+    attendeeNames: [`CODEX_TEST Import Guest ${index}`],
+    email: `codex-import-${index}@example.com`,
+    phone: `24655510${String(index).padStart(2, '0')}`,
+    groupName: 'CODEX_TEST Import Group',
+    personsAttending: 1,
+    paymentStatus: 'complimentary',
+    paymentReference: `CODEX-IMPORT-${index}`,
+    ticketStatus: 'assigned',
+    ticketCode: `CT-IMP-${index}`,
+    ticketAssignedAt: null,
+    ticketAssignedBy: null,
+    notes: 'Rules import test',
+    checkedIn: false,
+    checkInTime: null,
+    checkedInBy: null,
+    source: 'csv-import',
+    sourceRowId: `codex-import:row-${index}`,
+    timestamp: null,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  }
+}
+
+function importAuditData(id, registrationId, index = 1) {
+  return {
+    logId: id,
+    eventId,
+    action: 'registration.import',
+    targetType: 'registration',
+    targetId: registrationId,
+    performedBy: adminEmail,
+    timestamp: serverTimestamp(),
+    details: {
+      fullName: `CODEX_TEST Import Guest ${index}`,
+      sourceRowId: `codex-import:row-${index}`,
+    },
+  }
+}
+
+function addImportRowsToBatch(db, batch, count) {
+  for (let index = 1; index <= count; index += 1) {
+    const importRegistrationId = `imp_rules_import_${index}`
+    batch.set(doc(db, 'registrations', importRegistrationId), importRegistrationData(importRegistrationId, index))
+    batch.set(doc(db, 'auditLogs', `audit-rules-import-${index}`), importAuditData(`audit-rules-import-${index}`, importRegistrationId, index))
+  }
+}
+
 test('Firestore rules allow approved admin check-in batch for imported ticketed registration', { skip: !emulatorHost }, async () => {
   const env = await createTestEnv()
   try {
@@ -165,6 +218,36 @@ test('Firestore rules allow approved admin check-in batch for imported ticketed 
     batch.set(doc(db, 'auditLogs', 'audit-checkin-1'), checkInAuditData())
 
     await assertSucceeds(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules allow small approved admin registration import batch', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+    const batch = writeBatch(db)
+
+    addImportRowsToBatch(db, batch, 3)
+
+    await assertSucceeds(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject oversized single registration import batch due audit verification access limits', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+    const batch = writeBatch(db)
+
+    addImportRowsToBatch(db, batch, 7)
+
+    await assertFails(batch.commit())
   } finally {
     await env.cleanup()
   }

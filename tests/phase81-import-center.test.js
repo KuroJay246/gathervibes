@@ -332,6 +332,7 @@ test('confirmed import write strips UI-only review fields', async () => {
   const service = await readFile('src/services/importService.js', 'utf8')
 
   assert.match(service, /batch\.set\(regRef, \{/)
+  assert.match(service, /const chunkSize = 5/)
   assert.match(service, /buyerName/)
   assert.match(service, /attendeeNames/)
   assert.doesNotMatch(service, /personsAttendingWasBlank/)

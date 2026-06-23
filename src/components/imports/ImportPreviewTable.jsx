@@ -37,6 +37,8 @@ export function ImportPreviewTable({
   onActionChange,
   onContinue,
   canContinue = true,
+  onBack,
+  onStartOver,
 }) {
   const validRows = processedRows.filter(r => r.status === 'valid')
   const warningRows = processedRows.filter(r => r.status === 'warning')
@@ -46,6 +48,12 @@ export function ImportPreviewTable({
   
   const canImport = mode === 'final' && processedRows.some((row) => row.status !== 'blocked' && row.status !== 'skipped')
   const isReviewMode = mode === 'review'
+  const importableCount = processedRows.filter((row) => row.status !== 'blocked' && row.status !== 'skipped').length
+  const disabledReason = isReviewMode && !canContinue
+    ? 'Resolve every Needs Review row before continuing.'
+    : !isReviewMode && !canImport
+      ? 'No rows were imported because every row is blocked or skipped.'
+      : ''
 
   return (
     <div className="flex flex-col gap-6 rounded-2xl bg-white p-4 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
@@ -183,13 +191,26 @@ export function ImportPreviewTable({
       </div>
 
       <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+        {disabledReason && (
+          <p className="self-center text-xs font-semibold text-[#A32626]">{disabledReason}</p>
+        )}
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            disabled={importing}
+            className="rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#6B564C] transition hover:bg-[#FBF8F5] disabled:opacity-50"
+          >
+            {isReviewMode ? 'Back to Header Mapping' : 'Back to Duplicate Review'}
+          </button>
+        )}
         <button
           type="button"
-          onClick={onCancel}
+          onClick={onStartOver || onCancel}
           disabled={importing}
           className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1] disabled:opacity-50"
         >
-          Cancel
+          Change File / Start Over
         </button>
         {isReviewMode ? (
           <button
@@ -213,7 +234,7 @@ export function ImportPreviewTable({
                 Importing…
               </>
             ) : (
-              `Confirm Import (${processedRows.filter((row) => row.status !== 'blocked' && row.status !== 'skipped').length} rows)`
+              `Confirm Import (${importableCount} rows)`
             )}
           </button>
         )}

@@ -20,7 +20,10 @@ export {
 export async function commitImport(validRows, eventId, user) {
   if (!db) throw new Error('Firebase is not configured')
 
-  const chunkSize = 249
+  // Each imported registration also writes an audit log whose rule verifies
+  // the paired registration create. Keep chunks below Firestore's batch rules
+  // document-access ceiling.
+  const chunkSize = 5
   for (let i = 0; i < validRows.length; i += chunkSize) {
     const chunk = validRows.slice(i, i + chunkSize)
     const batch = writeBatch(db)

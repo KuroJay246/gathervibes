@@ -16,7 +16,16 @@ const REGISTRATION_FIELDS = [
   { value: 'notes', label: 'Notes' },
 ]
 
-export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onProceed, sheetName, onChangeSheet }) {
+export function FieldMappingForm({
+  headers,
+  fieldMap,
+  onMapChange,
+  onCancel,
+  onProceed,
+  sheetName,
+  onChangeSheet,
+  onStartOver,
+}) {
   const hasAttendeeNames = Array.isArray(fieldMap.attendeeNames) && fieldMap.attendeeNames.length > 0
   const isReady = fieldMap.fullName !== undefined || fieldMap.buyerName !== undefined || hasAttendeeNames
   const mappingPreview = buildHeaderMappingPreview(headers, fieldMap)
@@ -37,7 +46,7 @@ export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onP
             onClick={onChangeSheet}
             className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]"
           >
-            Change Sheet
+            Back to Sheet Selection
           </button>
         )}
       </div>
@@ -110,11 +119,23 @@ export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onP
       <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <button
           type="button"
+          onClick={onStartOver || onCancel}
+          className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1]"
+        >
+          Change File / Start Over
+        </button>
+        <button
+          type="button"
           onClick={onCancel}
           className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1]"
         >
-          Cancel
+          Clear File
         </button>
+        {!isReady && (
+          <p className="self-center text-xs font-semibold text-[#A32626]">
+            Map a full name, buyer/contact, or attendee column to continue.
+          </p>
+        )}
         <button
           type="button"
           onClick={onProceed}
