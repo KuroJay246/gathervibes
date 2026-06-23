@@ -22,6 +22,7 @@ import {
   getPendingPaymentRegistrations,
 } from '../utils/eventDayUtils'
 import { normalizePaymentStatus } from '../utils/paymentStatus'
+import { calculateRegistrationFinance, formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
 
 function StatusBadge({ children, tone = 'neutral' }) {
   const tones = {
@@ -117,6 +118,7 @@ export function CheckInPage() {
 
   const selectedRegistration = registrations.find((registration) => registration.registrationId === selectedId) || matches[0]
   const selectedWarnings = selectedRegistration ? checkInWarnings(selectedRegistration) : []
+  const selectedFinance = selectedRegistration ? calculateRegistrationFinance(selectedRegistration, activeEvent) : null
   const checkInState = selectedRegistration ? canCompleteCheckIn(selectedRegistration) : { allowed: false, reason: '' }
 
   if (!activeEvent?.eventId) {
@@ -465,8 +467,15 @@ export function CheckInPage() {
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="rounded-xl bg-[#FBF8F5] p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Payment</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Door payment</p>
                   <div className="mt-2"><StatusBadge tone={paymentTone(selectedRegistration.paymentStatus)}>{formatPaymentLabel(selectedRegistration.paymentStatus)}</StatusBadge></div>
+                  {selectedFinance && (
+                    <div className="mt-2 text-xs leading-5 text-[#6B564C]">
+                      <div>Method: {formatPaymentMethod(selectedFinance.paymentMethod)}</div>
+                      <div>Due: {selectedFinance.amountDue === null ? 'Needs review' : formatCurrency(selectedFinance.amountDue)}</div>
+                      <div className={selectedFinance.balanceDue > 0 ? 'font-bold text-[#A32626]' : 'text-[#1E7345]'}>Balance: {selectedFinance.balanceDue === null ? 'Needs review' : formatCurrency(selectedFinance.balanceDue)}</div>
+                    </div>
+                  )}
                 </div>
                 <div className="rounded-xl bg-[#FBF8F5] p-3">
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Ticket</p>

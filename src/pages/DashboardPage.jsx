@@ -25,6 +25,7 @@ import { subscribeToEvents } from '../services/eventService'
 import { subscribeToRegistrations } from '../services/registrationService'
 import { formatEventDate, formatCountdown, upcomingEvents } from '../utils/dateUtils'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
+import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
 
 // ── Local clock ──────────────────────────────────────────────────────────────
 
@@ -106,6 +107,7 @@ export function DashboardPage() {
     : null
   const capacity = selectedFull?.capacity || 0
   const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedFull), [registrations, selectedFull])
+  const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedFull), [registrations, selectedFull])
   const capacityPct = metrics.capacityPercent
 
   // Price tiers for selected event
@@ -228,6 +230,27 @@ export function DashboardPage() {
                     </div>
                   </div>
                 )}
+
+                <div className="mb-5 rounded-2xl border border-[#EEDFD6] bg-[#FBF8F5] p-4">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Finance Snapshot</p>
+                  <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
+                    {[
+                      ['Expected revenue', formatCurrency(financeSummary.totalExpected)],
+                      ['Collected revenue', formatCurrency(financeSummary.totalCollected)],
+                      ['Outstanding balance', formatCurrency(financeSummary.totalOutstanding)],
+                      ['Door payment expected', formatCurrency(financeSummary.doorTotal)],
+                      ['Paid / Pending', `${financeSummary.paidRegistrations} / ${financeSummary.pendingRegistrations}`],
+                      ['Door / Comp', `${financeSummary.doorRegistrations} / ${financeSummary.complimentaryRegistrations}`],
+                      ['Missing finance info', financeSummary.missingFinanceInfo],
+                      ['Finance warnings', financeSummary.financeWarningCount],
+                    ].map(([label, value]) => (
+                      <div key={label} className="rounded-xl bg-white px-3 py-2">
+                        <p className="text-sm font-bold text-[#2B1723]">{value}</p>
+                        <p className="mt-1 text-[9px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
                 {/* Price tier summary */}
                 {Array.isArray(priceTiers) && priceTiers.length > 0 && (

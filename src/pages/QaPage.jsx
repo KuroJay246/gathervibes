@@ -5,6 +5,7 @@ import { SystemHealthPanel } from '../components/SystemHealthPanel'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { db } from '../lib/firebase'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
+import { buildFinanceSummary, calculateRegistrationFinance, financeWarnings, formatCurrency } from '../utils/financeUtils'
 import { qrPayloadForTicketCode } from '../utils/qrTicketUtils'
 import {
   CODEX_TEST_EVENT_ID,
@@ -97,6 +98,7 @@ export function QaPage() {
       const registrationsSnapshot = await getDocs(query(collection(db, 'registrations'), where('eventId', '==', activeEvent.eventId)))
       const rows = registrationsSnapshot.docs.map((doc) => ({ registrationId: doc.id, ...doc.data() }))
       const metrics = buildRegistrationMetrics(rows, activeEvent)
+      const financeSummary = buildFinanceSummary(rows, activeEvent)
       const ticketCodes = rows.map((row) => String(row.ticketCode || '').trim()).filter(Boolean)
       const duplicateTicketCodes = ticketCodes.filter((code, index) => ticketCodes.indexOf(code) !== index)
       const missingBuyer = rows.filter((row) => !row.buyerName && !row.email && !row.phone)
@@ -104,6 +106,18 @@ export function QaPage() {
       const invalidPersons = rows.filter((row) => !Number.isInteger(row.personsAttending) || row.personsAttending < 1)
       const qrPrivateData = qrPayloadForTicketCode(ticketCodes[0] || 'QA-001')
       const hasPrivateQrData = /@|buyer|guest|phone|note/i.test(qrPrivateData)
+      const missingTicketPrice = rows.filter((row) => calculateRegistrationFinance(row, activeEvent).ticketPrice === null)
+      const missingPaidAmount = rows.filter((row) => calculateRegistrationFinance(row, activeEvent).paymentStatus === 'paid' && calculateRegistrationFinance(row, activeEvent).amountPaid === 0)
+      const balanceMismatch = rows.filter((row) => financeWarnings(row, activeEvent).some((warning) => /Amount due does not match/.test(warning)))
+      const paidOutstanding = rows.filter((row) => {
+        const finance = calculateRegistrationFinance(row, activeEvent)
+        return finance.paymentStatus === 'paid' && finance.balanceDue > 0
+      })
+      const complimentaryDue = rows.filter((row) => {
+        const finance = calculateRegistrationFinance(row, activeEvent)
+        return finance.paymentStatus === 'complimentary' && finance.amountDue > 0
+      })
+      const missingPaidReference = rows.filter((row) => calculateRegistrationFinance(row, activeEvent).paymentStatus === 'paid' && !row.paymentReference)
 
       setQaChecks([
         { label: 'Working Event selected', status: activeEvent.eventId ? 'pass' : 'fail', detail: activeEvent.eventName },
@@ -117,6 +131,15 @@ export function QaPage() {
         { label: 'Invalid personsAttending', status: invalidPersons.length ? 'fail' : 'pass', detail: `${invalidPersons.length} rows` },
         { label: 'Pending payment count', status: metrics.pendingRegistrations ? 'warning' : 'pass', detail: `${metrics.pendingRegistrations} registrations` },
         { label: 'Door payment count', status: metrics.doorRegistrations ? 'warning' : 'pass', detail: `${metrics.doorRegistrations} registrations` },
+        { label: 'Total expected', status: 'pass', detail: formatCurrency(financeSummary.totalExpected) },
+        { label: 'Total collected', status: 'pass', detail: formatCurrency(financeSummary.totalCollected) },
+        { label: 'Total outstanding', status: financeSummary.totalOutstanding > 0 ? 'warning' : 'pass', detail: formatCurrency(financeSummary.totalOutstanding) },
+        { label: 'Missing ticket price', status: missingTicketPrice.length ? 'warning' : 'pass', detail: `${missingTicketPrice.length} rows` },
+        { label: 'Missing amount paid on paid rows', status: missingPaidAmount.length ? 'warning' : 'pass', detail: `${missingPaidAmount.length} rows` },
+        { label: 'Balance due mismatch', status: balanceMismatch.length ? 'warning' : 'pass', detail: `${balanceMismatch.length} rows` },
+        { label: 'Paid status with outstanding balance', status: paidOutstanding.length ? 'fail' : 'pass', detail: `${paidOutstanding.length} rows` },
+        { label: 'Complimentary with amount due', status: complimentaryDue.length ? 'warning' : 'pass', detail: `${complimentaryDue.length} rows` },
+        { label: 'Missing payment reference for paid rows', status: missingPaidReference.length ? 'warning' : 'pass', detail: `${missingPaidReference.length} rows` },
         { label: 'Checked-in count', status: 'pass', detail: `${metrics.checkedInRegistrations} registrations / ${metrics.checkedInPersons} persons` },
         { label: 'auditLogs reachable', status: auditStatus === 'ok' ? 'pass' : 'warning', detail: auditStatus },
         { label: 'QR payload privacy', status: hasPrivateQrData ? 'fail' : 'pass', detail: qrPrivateData },

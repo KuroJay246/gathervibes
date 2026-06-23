@@ -12,6 +12,7 @@ import {
 import { db } from '../lib/firebase.js'
 import { createAuditLogWrite } from './auditService.js'
 import { normalizeAttendeeNames } from '../utils/importUtils.js'
+import { financePayload, normalizePaymentMethod } from '../utils/financeUtils.js'
 import { normalizePaymentStatus } from '../utils/paymentStatus.js'
 
 function requireDatabase() {
@@ -19,7 +20,7 @@ function requireDatabase() {
   return db
 }
 
-function registrationPayload(values, eventId) {
+function registrationPayload(values, eventId, event = {}) {
   return {
     eventId,
     fullName: values.fullName?.trim() || '',
@@ -30,6 +31,7 @@ function registrationPayload(values, eventId) {
     groupName: values.groupName?.trim() || null,
     personsAttending: Number(values.personsAttending) || 1,
     paymentStatus: normalizePaymentStatus(values.paymentStatus || 'unknown'),
+    ...financePayload(values, event),
     paymentReference: values.paymentReference?.trim() || null,
     notes: values.notes?.trim() || '',
   }
@@ -88,7 +90,7 @@ export function subscribeToRegistrations(eventId, onRegistrations, onError) {
   )
 }
 
-export async function createRegistration(values, eventId, user) {
+export async function createRegistration(values, eventId, user, event = {}) {
   const firestore = requireDatabase()
   const regRef = doc(collection(firestore, 'registrations'))
   const audit = createAuditLogWrite({
@@ -103,7 +105,7 @@ export async function createRegistration(values, eventId, user) {
 
   batch.set(regRef, {
     registrationId: regRef.id,
-    ...registrationPayload(values, eventId),
+    ...registrationPayload(values, eventId, event),
     ...registrationTicketDefaults(),
     ...registrationCheckInDefaults(),
     source: 'manual',
@@ -118,21 +120,21 @@ export async function createRegistration(values, eventId, user) {
   return regRef.id
 }
 
-export async function updateRegistration(registrationId, eventId, values, user, existingRegistration = {}) {
+export async function updateRegistration(registrationId, eventId, values, user, existingRegistration = {}, event = {}) {
   const firestore = requireDatabase()
   const regRef = doc(firestore, 'registrations', registrationId)
   const audit = createAuditLogWrite({
     eventId,
-    action: 'registration.update',
+    action: 'registration.finance-update',
     targetType: 'registration',
     targetId: registrationId,
     performedBy: user,
-    details: { fullName: values.fullName?.trim() },
+    details: { fullName: values.fullName?.trim(), financeFieldsUpdated: true },
   })
   const batch = writeBatch(firestore)
 
   batch.update(regRef, {
-    ...registrationPayload(values, eventId),
+    ...registrationPayload(values, eventId, event),
     ...existingTicketFields(existingRegistration),
     ...existingCheckInFields(existingRegistration),
     updatedAt: serverTimestamp(),
@@ -210,6 +212,49 @@ export async function bulkUpdatePaymentStatus(registrations = [], eventId, payme
 
       batch.update(regRef, {
         paymentStatus: nextStatus,
+        updatedAt: serverTimestamp(),
+      })
+      batch.set(audit.ref, audit.data)
+    })
+
+    await batch.commit()
+  }
+}
+
+export async function bulkUpdateFinanceFields(registrations = [], eventId, updates = {}, user, event = {}) {
+  const scoped = registrations.filter((registration) => registration.eventId === eventId)
+  const firestore = requireDatabase()
+  const chunkSize = 5
+
+  for (let i = 0; i < scoped.length; i += chunkSize) {
+    const batch = writeBatch(firestore)
+    const chunk = scoped.slice(i, i + chunkSize)
+
+    chunk.forEach((registration) => {
+      const regRef = doc(firestore, 'registrations', registration.registrationId)
+      const values = {
+        ...registration,
+        ...updates,
+        paymentStatus: updates.paymentStatus ? normalizePaymentStatus(updates.paymentStatus) : registration.paymentStatus,
+        paymentMethod: updates.paymentMethod ? normalizePaymentMethod(updates.paymentMethod) : registration.paymentMethod,
+      }
+      const audit = createAuditLogWrite({
+        eventId,
+        action: 'registration.finance-update',
+        targetType: 'registration',
+        targetId: registration.registrationId,
+        performedBy: user,
+        details: {
+          fullName: registration.fullName,
+          bulkAction: true,
+          updatedFields: Object.keys(updates).filter((key) => updates[key] !== '' && updates[key] !== null && updates[key] !== undefined).join(','),
+        },
+      })
+
+      batch.update(regRef, {
+        paymentStatus: normalizePaymentStatus(values.paymentStatus || 'unknown'),
+        paymentReference: values.paymentReference?.trim?.() || values.paymentReference || null,
+        ...financePayload(values, event),
         updatedAt: serverTimestamp(),
       })
       batch.set(audit.ref, audit.data)

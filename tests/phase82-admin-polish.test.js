@@ -105,7 +105,7 @@ test('Settings, QA, and Communications pages expose practical admin polish', asy
   assert.match(templates, /\{\{venue\}\}/)
 })
 
-test('old internal phase labels are removed from active UI source files', async () => {
+test('old internal labels are removed while roadmap backlog remains visible', async () => {
   const files = [
     'src/App.jsx',
     'src/layout/AppShell.jsx',
@@ -119,6 +119,11 @@ test('old internal phase labels are removed from active UI source files', async 
 
   for (const file of files) {
     const content = await readFile(file, 'utf8')
-    assert.doesNotMatch(content, /Phase [0-9]|AI Writing|Door List/)
+    assert.doesNotMatch(content, /Door List/)
   }
+
+  const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
+  assert.match(settings, /AI writing/)
+  assert.match(settings, /Finance tracker/)
+  assert.match(settings, /Phase 9 active/)
 })

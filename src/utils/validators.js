@@ -1,4 +1,5 @@
 import { PAYMENT_STATUSES, normalizePaymentStatus } from './paymentStatus.js'
+import { PAYMENT_METHODS, normalizePaymentMethod, parseMoney } from './financeUtils.js'
 
 // ─── Event validation ──────────────────────────────────────────────────────
 
@@ -100,6 +101,17 @@ export function validateRegistration(values) {
   const rawPaymentStatus = String(values.paymentStatus || '').trim().toLowerCase()
   if (values.paymentStatus && (!validPaymentStatuses.includes(normalizedPaymentStatus) || (normalizedPaymentStatus === 'unknown' && rawPaymentStatus !== 'unknown'))) {
     errors.paymentStatus = 'Invalid payment status.'
+  }
+
+  if (values.paymentMethod && !PAYMENT_METHODS.includes(normalizePaymentMethod(values.paymentMethod))) {
+    errors.paymentMethod = 'Invalid payment method.'
+  }
+
+  for (const field of ['ticketPrice', 'amountDue', 'amountPaid', 'balanceDue']) {
+    const value = values[field]
+    if (value !== '' && value !== null && value !== undefined && parseMoney(value) === null) {
+      errors[field] = 'Money fields must be zero or greater.'
+    }
   }
 
   if (values.ticketStatus && !validTicketStatuses.includes(values.ticketStatus)) {

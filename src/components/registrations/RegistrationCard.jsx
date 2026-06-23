@@ -1,5 +1,6 @@
 import { User } from 'lucide-react'
 import { formatPaymentLabel, normalizePaymentStatus } from '../../utils/paymentStatus'
+import { calculateRegistrationFinance, formatCurrency, formatPaymentMethod } from '../../utils/financeUtils'
 
 function attendeesText(registration = {}) {
   return Array.isArray(registration.attendeeNames) && registration.attendeeNames.length > 0
@@ -10,6 +11,7 @@ function attendeesText(registration = {}) {
 export function RegistrationCard({ registration, onEdit, onDelete }) {
   const attendees = attendeesText(registration)
   const paymentStatus = normalizePaymentStatus(registration.paymentStatus)
+  const finance = calculateRegistrationFinance(registration)
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
       <div className="flex items-start justify-between">
@@ -44,6 +46,18 @@ export function RegistrationCard({ registration, onEdit, onDelete }) {
           )}
         </div>
       )}
+
+      <div className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-3 text-xs text-[#5D4A52]">
+        <div className="font-bold text-[#2B1723]">Finance</div>
+        <div className="mt-1 grid grid-cols-2 gap-2">
+          <span>Tier: {registration.priceTier || finance.priceTier || 'Needs review'}</span>
+          <span>Method: {formatPaymentMethod(finance.paymentMethod)}</span>
+          <span>Due: {finance.amountDue === null ? 'Needs review' : formatCurrency(finance.amountDue)}</span>
+          <span>Paid: {formatCurrency(finance.amountPaid)}</span>
+          <span className={finance.balanceDue > 0 ? 'font-bold text-[#A32626]' : 'text-[#1E7345]'}>Balance: {finance.balanceDue === null ? 'Needs review' : formatCurrency(finance.balanceDue)}</span>
+          <span>Ref: {registration.paymentReference || 'Missing'}</span>
+        </div>
+      </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-[#F2E8E1] pt-3">
         <span className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${

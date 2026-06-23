@@ -5,6 +5,7 @@ export const CPB_EVENT_NAME = 'CPB'
 export const CODEX_TEST_NOTES = 'Permanent QA fixture. Do not use for real guests. Do not delete unless the organizer explicitly approves.'
 
 export const qaChecklist = [
+  'Start QA at https://gathervibeshub.web.app/login',
   'Test check-in permission with one CODEX_TEST guest',
   'Confirm the checked-in guest appears in the Checked In list',
   'Confirm checked-in persons count increases using personsAttending',
@@ -19,6 +20,9 @@ export const qaChecklist = [
   'Create, edit, and delete one manual CODEX_TEST registration',
   'Import a small CSV only after preview confirms the rows',
   'Import an XLSX workbook only after preview confirms the rows',
+  'Confirm finance totals: expected, collected, outstanding, door, and complimentary',
+  'Confirm missing ticket price, missing paid amount, and balance mismatch warnings',
+  'Confirm QR payload still contains ticket code only and no money or private data',
   'Assign, regenerate, and unassign a ticket code',
   'Verify auditLogs show registration, ticket, and check-in activity',
 ]

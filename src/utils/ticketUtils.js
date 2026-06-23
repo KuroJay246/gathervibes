@@ -124,6 +124,7 @@ export function checkInWarnings(registration) {
     warnings.push('Payment is not marked paid.')
   }
   if (paymentStatus === 'door') warnings.push('Door payment: collect or verify payment at check-in.')
+  if (Number(registration?.balanceDue || 0) > 0) warnings.push(`Outstanding balance due: ${registration.balanceDue}.`)
   return warnings
 }
 

@@ -12,6 +12,7 @@ import { ImportSummary } from '../components/imports/ImportSummary'
 import { EmptyState } from '../components/ui/EmptyState'
 import { IMPORT_SOURCES, getImportSource } from '../utils/importSources'
 import { readXlsxWorkbook } from '../utils/xlsxImport'
+import { calculateRegistrationFinance } from '../utils/financeUtils'
 
 function isPermissionDeniedImportError(err) {
   const text = `${err?.code || ''} ${err?.message || ''}`.toLowerCase()
@@ -207,7 +208,7 @@ export function ImportsPage() {
 
   async function handleProceedToPreview() {
     setImportErrorDetails(null)
-    const mapped = mapRows(parsedData.rows, parsedData.headers, fieldMap, importContext)
+    const mapped = mapRows(parsedData.rows, parsedData.headers, fieldMap, { ...importContext, event: activeEvent })
     const processed = await processAndValidate(mapped, activeEvent.eventId, existingRegistrations)
     setProcessedRows(processed)
     setReviewActions(Object.fromEntries(processed.map((row, index) => [index, row.defaultAction])))
@@ -239,6 +240,7 @@ export function ImportsPage() {
       return {
         ...processed.row,
         ...updates,
+        ...calculateRegistrationFinance({ ...processed.row, ...updates }, activeEvent),
         originalPaymentStatus: updates.paymentStatus ? null : updates.originalPaymentStatus || processed.row.originalPaymentStatus,
         edited: true,
       }

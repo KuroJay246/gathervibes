@@ -1,6 +1,7 @@
 import { searchableRegistrationText } from './ticketUtils.js'
 import { formatEventDate } from './dateUtils.js'
 import { formatPaymentLabel, paymentStatusMatches } from './paymentStatus.js'
+import { calculateRegistrationFinance, formatCurrency } from './financeUtils.js'
 
 export const COMMUNICATION_TEMPLATES = [
   {
@@ -14,6 +15,11 @@ export const COMMUNICATION_TEMPLATES = [
     content: 'Hello {{guestName}}, this is a reminder that your payment status for {{eventName}} is currently {{paymentStatus}}. Please contact us if this needs to be updated.',
   },
   {
+    id: 'balance-due-reminder',
+    label: 'Balance Due Reminder',
+    content: 'Hello {{buyerName}}, your balance due for {{eventName}} is {{balanceDue}}. Please use your payment reference {{paymentReference}} when following up.',
+  },
+  {
     id: 'event-day-notice',
     label: 'Event Day Notice',
     content: 'Hello {{guestName}}, we are looking forward to seeing you at {{eventName}} at {{venue}}. Please have your ticket/reference code ready for check-in.',
@@ -21,7 +27,22 @@ export const COMMUNICATION_TEMPLATES = [
   {
     id: 'door-payment-instructions',
     label: 'Door Payment Instructions',
-    content: 'Hello {{buyerName}}, your {{eventName}} registration is marked for door payment. Please check in with {{attendeeNames}} at the door and have {{ticketCode}} ready if assigned.',
+    content: 'Hello {{buyerName}}, your {{eventName}} registration is marked for door payment. Please bring {{balanceDue}} and check in with {{attendeeNames}} at the door.',
+  },
+  {
+    id: 'payment-received',
+    label: 'Payment Received Confirmation',
+    content: 'Hello {{buyerName}}, payment received for {{eventName}}. Amount paid: {{amountPaid}}. Your ticket/reference code is {{ticketCode}}.',
+  },
+  {
+    id: 'ticket-qr-reminder',
+    label: 'Ticket / QR Reminder',
+    content: 'Hello {{guestName}}, please keep your ticket code {{ticketCode}} ready for {{eventName}} check-in.',
+  },
+  {
+    id: 'thank-you-payment',
+    label: 'Thank-you After Payment',
+    content: 'Hello {{buyerName}}, thank you for your payment for {{eventName}}. We look forward to seeing {{attendeeNames}}.',
   },
   {
     id: 'check-in-instructions',
@@ -57,6 +78,11 @@ export function buildMessagePreview(templateContent, registration, event) {
   const paymentStatus = formatPaymentLabel(registration?.paymentStatus || 'unknown')
   const personsAttending = registration?.personsAttending || 1
   const groupName = registration?.groupName || 'your group'
+  const finance = calculateRegistrationFinance(registration, event)
+  const amountDue = finance.amountDue === null ? 'an amount that needs review' : formatCurrency(finance.amountDue, finance.currency)
+  const amountPaid = formatCurrency(finance.amountPaid, finance.currency)
+  const balanceDue = finance.balanceDue === null ? 'an amount that needs review' : formatCurrency(finance.balanceDue, finance.currency)
+  const paymentReference = registration?.paymentReference || 'your payment reference'
 
   return templateContent
     .replace(/\{\{eventName\}\}/g, eventName)
@@ -71,6 +97,10 @@ export function buildMessagePreview(templateContent, registration, event) {
     .replace(/\{\{paymentStatus\}\}/g, paymentStatus)
     .replace(/\{\{personsAttending\}\}/g, personsAttending)
     .replace(/\{\{groupName\}\}/g, groupName)
+    .replace(/\{\{amountDue\}\}/g, amountDue)
+    .replace(/\{\{amountPaid\}\}/g, amountPaid)
+    .replace(/\{\{balanceDue\}\}/g, balanceDue)
+    .replace(/\{\{paymentReference\}\}/g, paymentReference)
 }
 
 export function filterCommunicationsRegistrations(registrations, filters, searchQuery = '') {
@@ -79,6 +109,16 @@ export function filterCommunicationsRegistrations(registrations, filters, search
     if (!paymentStatusMatches(reg.paymentStatus, filters.paymentStatus)) {
       return false
     }
+
+    const finance = calculateRegistrationFinance(reg)
+    if (filters.financeSegment === 'outstanding' && !(finance.balanceDue > 0)) return false
+    if (filters.financeSegment === 'pending-payment' && finance.paymentStatus !== 'pending') return false
+    if (filters.financeSegment === 'door-payment' && finance.paymentStatus !== 'door') return false
+    if (filters.financeSegment === 'paid-guests' && finance.paymentStatus !== 'paid') return false
+    if (filters.financeSegment === 'complimentary-guests' && finance.paymentStatus !== 'complimentary') return false
+    if (filters.financeSegment === 'missing-payment-reference' && !(finance.paymentStatus === 'paid' && !reg.paymentReference)) return false
+    if (filters.financeSegment === 'missing-ticket-code' && reg.ticketCode) return false
+    if (filters.financeSegment === 'balance-due' && !(finance.balanceDue > 0)) return false
 
     // Check-in Status Filter
     if (filters.checkInStatus === 'checked-in' && !reg.checkedIn) return false
