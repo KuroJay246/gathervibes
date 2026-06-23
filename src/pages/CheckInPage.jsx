@@ -8,6 +8,7 @@ import { completeCheckIn, recordDuplicateCheckInAttempt, undoCheckIn } from '../
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
+import { QrScannerPanel } from '../components/checkin/QrScannerPanel'
 import { canCompleteCheckIn, checkInWarnings, searchableRegistrationText } from '../utils/ticketUtils'
 import { CHECK_IN_VIEWS, buildCheckInSummary, filterCheckInRegistrations, formatCheckInTime } from '../utils/checkInUtils'
 
@@ -163,6 +164,29 @@ export function CheckInPage() {
     }
   }
 
+  function handleQrMatch(registration, ticketCode) {
+    setActiveView('search')
+    setSelectedId(registration.registrationId)
+    setSearchQuery(ticketCode)
+    setActionError('')
+    setConfirmUndo(false)
+    setMessage(registration.checkedIn
+      ? `${registration.fullName} is already checked in. Duplicate check-in is blocked.`
+      : `${registration.fullName} found from ticket ${ticketCode}. Review before checking in.`)
+  }
+
+  function handleQrMissing(ticketCode) {
+    setActiveView('search')
+    setSelectedId('')
+    setMessage('')
+    setActionError(`No registration with ticket code ${ticketCode} was found for ${activeEvent.eventName}.`)
+  }
+
+  function handleQrInvalid(errorMessage) {
+    setMessage('')
+    setActionError(errorMessage)
+  }
+
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -174,7 +198,7 @@ export function CheckInPage() {
           </p>
         </div>
         <div className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-3 text-xs text-[#6B564C]">
-          QR scan coming later; search by ticket code is active now.
+          QR lookup is active. Search by name or ticket code still works.
         </div>
       </header>
 
@@ -224,6 +248,13 @@ export function CheckInPage() {
       {activeView === 'search' ? (
         <section className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div className="space-y-4">
+          <QrScannerPanel
+            registrations={registrations}
+            onMatch={handleQrMatch}
+            onMissing={handleQrMissing}
+            onInvalid={handleQrInvalid}
+          />
+
           <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
             <label htmlFor="door-search" className="event-label">Find guest</label>
             <div className="relative">

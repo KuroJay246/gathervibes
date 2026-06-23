@@ -65,3 +65,34 @@ test('mobile navigation keeps More, Settings, and logout reachable', async () =>
   assert.match(settingsPage, /Log out/)
   assert.match(styles, /@media \(min-width: 1024px\)[\s\S]*\.mobile-tab-bar[\s\S]*display: none/)
 })
+
+test('sidebar Working Event box contains long event text safely', async () => {
+  const shell = await readFile('src/layout/AppShell.jsx', 'utf8')
+
+  assert.match(shell, />Working Event</)
+  assert.match(shell, /max-w-full overflow-hidden rounded-2xl/)
+  assert.match(shell, /flex w-full min-w-0 items-center/)
+  assert.match(shell, /min-w-0 flex-1 overflow-hidden/)
+  assert.match(shell, /max-w-full truncate text-sm/)
+  assert.doesNotMatch(shell, />Current event</)
+  assert.doesNotMatch(shell, />Active Event</)
+})
+
+test('Dashboard quick navigation reflects current production tools', async () => {
+  const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
+
+  for (const route of ['/events', '/registrations', '/imports', '/tickets', '/check-in', '/communications', '/qa']) {
+    assert.match(dashboard, new RegExp(`to: '${route}'`))
+  }
+
+  for (const label of ['Events', 'Registrations', 'Import Center', 'Tickets', 'Check-In / QR Scan', 'Communications', 'QA Center / System Health']) {
+    assert.match(dashboard, new RegExp(label.replace('/', '\\/')))
+  }
+
+  assert.match(dashboard, /Assign ticket codes and generate QR codes/)
+  assert.match(dashboard, /Search, scan, check in, and undo check-ins/)
+  assert.match(dashboard, /Prepare copy-ready guest messages/)
+  assert.match(dashboard, /Run safe checks using CODEX_TEST/)
+  assert.doesNotMatch(dashboard, /Future phases/)
+  assert.doesNotMatch(dashboard, /Communications', phase/)
+})
