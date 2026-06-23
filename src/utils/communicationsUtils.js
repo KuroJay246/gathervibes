@@ -42,6 +42,10 @@ export function buildMessagePreview(templateContent, registration, event) {
   const location = event?.location || 'the event location'
 
   const guestName = registration?.fullName || 'Guest'
+  const buyerName = registration?.buyerName || guestName
+  const attendeeNames = Array.isArray(registration?.attendeeNames) && registration.attendeeNames.length > 0
+    ? registration.attendeeNames.join(', ')
+    : guestName
   const ticketCode = registration?.ticketCode || 'your ticket code'
   const paymentStatus = registration?.paymentStatus || 'unknown'
   const personsAttending = registration?.personsAttending || 1
@@ -52,6 +56,8 @@ export function buildMessagePreview(templateContent, registration, event) {
     .replace(/\{\{eventDate\}\}/g, eventDate)
     .replace(/\{\{location\}\}/g, location)
     .replace(/\{\{guestName\}\}/g, guestName)
+    .replace(/\{\{buyerName\}\}/g, buyerName)
+    .replace(/\{\{attendeeNames\}\}/g, attendeeNames)
     .replace(/\{\{ticketCode\}\}/g, ticketCode)
     .replace(/\{\{paymentStatus\}\}/g, paymentStatus)
     .replace(/\{\{personsAttending\}\}/g, personsAttending)
@@ -108,11 +114,15 @@ export function buildCommunicationsExport(registrations, templateContent, event)
   return registrations.map((reg) => {
     const message = buildMessagePreview(templateContent, reg, event)
     const name = reg.fullName || 'Unknown Name'
+    const buyerName = reg.buyerName || name
+    const attendeeNames = Array.isArray(reg.attendeeNames) && reg.attendeeNames.length > 0 ? reg.attendeeNames.join(', ') : 'No attendee names'
     const email = reg.email || 'No Email'
     const phone = reg.phone || 'No Phone'
     
     return `---
 To: ${name}
+Buyer / Contact: ${buyerName}
+Guests Attending: ${attendeeNames}
 Email: ${email}
 Phone: ${phone}
 

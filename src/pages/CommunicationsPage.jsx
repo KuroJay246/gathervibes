@@ -132,7 +132,7 @@ export function CommunicationsPage() {
                   <input
                     id="search"
                     type="text"
-                    placeholder="Name, email, ticket..."
+                placeholder="Guest, buyer, attendee, email, ticket..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
@@ -263,7 +263,7 @@ export function CommunicationsPage() {
                 placeholder="Write your message here..."
               />
               <p className="mt-2 text-xs text-[#8A7468]">
-                Placeholders: {'{{guestName}}'}, {'{{eventName}}'}, {'{{ticketCode}}'}, {'{{paymentStatus}}'}, {'{{personsAttending}}'}, {'{{groupName}}'}, {'{{eventDate}}'}, {'{{location}}'}
+                Placeholders: {'{{guestName}}'}, {'{{buyerName}}'}, {'{{attendeeNames}}'}, {'{{eventName}}'}, {'{{ticketCode}}'}, {'{{paymentStatus}}'}, {'{{personsAttending}}'}, {'{{groupName}}'}, {'{{eventDate}}'}, {'{{location}}'}
               </p>
             </div>
           </section>

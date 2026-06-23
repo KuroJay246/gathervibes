@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '../lib/firebase.js'
 import { createAuditLogWrite } from './auditService.js'
+import { normalizeAttendeeNames } from '../utils/importUtils.js'
 
 function requireDatabase() {
   if (!db) throw new Error('Firebase is not configured')
@@ -21,6 +22,8 @@ function registrationPayload(values, eventId) {
   return {
     eventId,
     fullName: values.fullName?.trim() || '',
+    buyerName: values.buyerName?.trim() || null,
+    attendeeNames: normalizeAttendeeNames(values.attendeeNames),
     email: values.email?.trim().toLowerCase() || null,
     phone: values.phone?.trim() || null,
     groupName: values.groupName?.trim() || null,

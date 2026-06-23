@@ -45,13 +45,22 @@ export function rowsToParsedTable(sheetRows = [], options = {}) {
   return { headers, rows: dataRows }
 }
 
+function addDetectedField(initialMap, field, index) {
+  if (!field) return
+  if (field === 'attendeeNames') {
+    initialMap.attendeeNames = [...(Array.isArray(initialMap.attendeeNames) ? initialMap.attendeeNames : []), index]
+    return
+  }
+  if (initialMap[field] === undefined) initialMap[field] = index
+}
+
 export function buildInitialFieldMap(headers = []) {
   const initialMap = {}
   headers.forEach((h, i) => {
     const lower = h.toLowerCase()
     const normalized = lower.replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim()
     const detected = detectHeaderField(normalized, lower)
-    if (detected?.field && initialMap[detected.field] === undefined) initialMap[detected.field] = i
+    addDetectedField(initialMap, detected?.field, i)
   })
   return initialMap
 }
@@ -64,8 +73,23 @@ export function detectHeaderField(normalizedHeader = '', lowerHeader = normalize
     submitted: 'timestamp',
     'submission time': 'timestamp',
     'full name': 'fullName',
+    'main guest name': 'fullName',
+    'guest name': 'fullName',
+    'attendee name': 'fullName',
     name: 'fullName',
     'first name last name': 'fullName',
+    'buyer name': 'buyerName',
+    'purchaser name': 'buyerName',
+    'paid by': 'buyerName',
+    'bought by': 'buyerName',
+    'registered by': 'buyerName',
+    'contact name': 'buyerName',
+    'main contact': 'buyerName',
+    'parent guardian name': 'buyerName',
+    'person buying': 'buyerName',
+    'name of buyer': 'buyerName',
+    'customer name': 'buyerName',
+    'order name': 'buyerName',
     'email address': 'email',
     email: 'email',
     'phone number': 'phone',
@@ -96,6 +120,18 @@ export function detectHeaderField(normalizedHeader = '', lowerHeader = normalize
     ticket: 'ticketCode',
     code: 'ticketCode',
     'admission code': 'ticketCode',
+    'guest names': 'attendeeNames',
+    'attendee names': 'attendeeNames',
+    'names of persons attending': 'attendeeNames',
+    'persons attending names': 'attendeeNames',
+    'guest list': 'attendeeNames',
+    'names in group': 'attendeeNames',
+    'group members': 'attendeeNames',
+    'dietary notes': 'notes',
+    'dietary requirements': 'notes',
+    allergies: 'notes',
+    'special notes': 'notes',
+    'special requests': 'notes',
     notes: 'notes',
     note: 'notes',
     comments: 'notes',
@@ -103,6 +139,11 @@ export function detectHeaderField(normalizedHeader = '', lowerHeader = normalize
   }
 
   if (exact[normalized]) return { field: exact[normalized], confidence: 'high' }
+  if (/^(guest|attendee|person|child)\s+\d+$/i.test(normalized)) return { field: 'attendeeNames', confidence: 'high' }
+  if (normalized.includes('buyer') || normalized.includes('purchaser') || normalized.includes('bought by') || normalized.includes('paid by')) return { field: 'buyerName', confidence: 'high' }
+  if (normalized.includes('registered by') || normalized.includes('contact name') || normalized.includes('main contact') || normalized.includes('guardian') || normalized.includes('customer name') || normalized.includes('order name')) return { field: 'buyerName', confidence: 'medium' }
+  if ((normalized.includes('attendee') || normalized.includes('guest') || normalized.includes('person') || normalized.includes('child')) && normalized.includes('name')) return { field: 'attendeeNames', confidence: 'high' }
+  if (normalized.includes('guest list') || normalized.includes('group members') || normalized.includes('names in group')) return { field: 'attendeeNames', confidence: 'high' }
   if (normalized.includes('ticket') && (normalized.includes('code') || normalized.includes('number') || normalized.includes('id'))) return { field: 'ticketCode', confidence: 'high' }
   if (normalized.includes('email')) return { field: 'email', confidence: 'high' }
   if (normalized.includes('phone') || normalized.includes('contact') || normalized.includes('whatsapp')) return { field: 'phone', confidence: 'medium' }
@@ -112,13 +153,15 @@ export function detectHeaderField(normalizedHeader = '', lowerHeader = normalize
   if (normalized.includes('reference') || normalized.includes('receipt') || normalized.includes('transaction')) return { field: 'paymentReference', confidence: 'medium' }
   if (normalized.includes('pay')) return { field: 'paymentStatus', confidence: 'medium' }
   if (normalized.includes('timestamp') || normalized.includes('submitted') || normalized.includes('date')) return { field: 'timestamp', confidence: 'medium' }
-  if (normalized.includes('note') || normalized.includes('comment')) return { field: 'notes', confidence: 'medium' }
+  if (normalized.includes('note') || normalized.includes('comment') || normalized.includes('allerg') || normalized.includes('dietary') || normalized.includes('special request')) return { field: 'notes', confidence: 'medium' }
   return { field: '', confidence: 'none' }
 }
 
 export function buildHeaderMappingPreview(headers = [], fieldMap = buildInitialFieldMap(headers)) {
   return headers.map((header, index) => {
-    const mappedField = Object.keys(fieldMap).find((field) => fieldMap[field] === index) || ''
+    const mappedField = Object.keys(fieldMap).find((field) => (
+      Array.isArray(fieldMap[field]) ? fieldMap[field].includes(index) : fieldMap[field] === index
+    )) || ''
     const normalized = header.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim()
     const detected = detectHeaderField(normalized, header.toLowerCase())
     return {
@@ -212,13 +255,33 @@ export function normalizePhone(val) {
   return trimmed || null
 }
 
+function normalizeOptionalText(val) {
+  if (!val) return null
+  const trimmed = String(val).trim()
+  return trimmed || null
+}
+
+export function normalizeAttendeeNames(value) {
+  if (Array.isArray(value)) {
+    return [...new Set(value.flatMap((item) => normalizeAttendeeNames(item)))]
+  }
+  if (!value) return []
+
+  return String(value)
+    .replace(/\r\n/g, '\n')
+    .split(/\n|;|,|\s\/\s|\s+\band\b\s+/i)
+    .map((name) => name.trim().replace(/\s+/g, ' '))
+    .filter(Boolean)
+    .filter((name, index, all) => all.findIndex((candidate) => candidate.toLowerCase() === name.toLowerCase()) === index)
+}
+
 export function timestampMillis(value) {
   const date = dateFromValue(value)
   return date ? date.getTime() : null
 }
 
 function sourceIdentityPart(value) {
-  return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 120)
+  return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 32)
 }
 
 function buildSourceRowId(parsedRow, context = {}) {
@@ -255,6 +318,24 @@ export async function generateStableId(eventId, row) {
 
 export function mapRows(parsedRows, headers, fieldMap, context = {}) {
   return parsedRows.map((parsedRow) => {
+    const mappedValue = (field) => {
+      const mapping = fieldMap[field]
+      if (Array.isArray(mapping)) return mapping.map((index) => parsedRow.data[index]).filter((value) => value !== undefined)
+      return mapping !== undefined ? parsedRow.data[mapping] : undefined
+    }
+    const mappedText = (field) => {
+      const value = mappedValue(field)
+      if (Array.isArray(value)) return value.find((item) => String(item || '').trim()) || ''
+      return value || ''
+    }
+    const attendeeNames = normalizeAttendeeNames(mappedValue('attendeeNames'))
+    const buyerName = normalizeOptionalText(mappedText('buyerName'))
+    const groupName = normalizeOptionalText(mappedText('groupName'))
+    const fullName = normalizeOptionalText(mappedText('fullName')) || attendeeNames[0] || buyerName || groupName || ''
+    const rawPersons = mappedText('personsAttending')
+    const rawPersonsTrimmed = String(rawPersons || '').trim()
+    const suggestedPersons = attendeeNames.length > 0 ? attendeeNames.length : normalizePersonsAttending(rawPersons)
+
     const rowObj = {
       sourceRowId: buildSourceRowId(parsedRow, context),
       sourceRowIndex: parsedRow._sourceRowIndex,
@@ -265,23 +346,24 @@ export function mapRows(parsedRows, headers, fieldMap, context = {}) {
       checkedIn: false,
       checkInTime: null,
       ticketStatus: 'no-ticket-assigned',
+      buyerName,
+      attendeeNames,
+      personsAttendingWasBlank: rawPersonsTrimmed === '',
     }
 
-    rowObj.fullName = fieldMap.fullName !== undefined ? parsedRow.data[fieldMap.fullName] : ''
-    rowObj.email = normalizeEmail(fieldMap.email !== undefined ? parsedRow.data[fieldMap.email] : '')
-    rowObj.phone = normalizePhone(fieldMap.phone !== undefined ? parsedRow.data[fieldMap.phone] : null)
-    rowObj.groupName = fieldMap.groupName !== undefined ? parsedRow.data[fieldMap.groupName]?.trim() || null : null
+    rowObj.fullName = fullName
+    rowObj.email = normalizeEmail(mappedText('email'))
+    rowObj.phone = normalizePhone(mappedText('phone'))
+    rowObj.groupName = groupName
+    rowObj.personsAttending = rawPersonsTrimmed === '' && attendeeNames.length > 0 ? suggestedPersons : normalizePersonsAttending(rawPersons)
 
-    const rawPersons = fieldMap.personsAttending !== undefined ? parsedRow.data[fieldMap.personsAttending] : ''
-    rowObj.personsAttending = normalizePersonsAttending(rawPersons)
-
-    rowObj.paymentStatus = normalizePaymentStatus(fieldMap.paymentStatus !== undefined ? parsedRow.data[fieldMap.paymentStatus] : '')
-    rowObj.paymentReference = fieldMap.paymentReference !== undefined ? parsedRow.data[fieldMap.paymentReference]?.trim() || null : null
-    rowObj.ticketCode = normalizeTicketCode(fieldMap.ticketCode !== undefined ? parsedRow.data[fieldMap.ticketCode] : '')
+    rowObj.paymentStatus = normalizePaymentStatus(mappedText('paymentStatus'))
+    rowObj.paymentReference = normalizeOptionalText(mappedText('paymentReference'))
+    rowObj.ticketCode = normalizeTicketCode(mappedText('ticketCode'))
     rowObj.ticketStatus = rowObj.ticketCode ? 'assigned' : 'no-ticket-assigned'
-    rowObj.notes = fieldMap.notes !== undefined ? parsedRow.data[fieldMap.notes]?.trim() || '' : ''
+    rowObj.notes = normalizeOptionalText(mappedText('notes')) || ''
 
-    const rawTimestamp = fieldMap.timestamp !== undefined ? parsedRow.data[fieldMap.timestamp] : ''
+    const rawTimestamp = mappedText('timestamp')
     rowObj.timestamp = parseTimestampSafely(rawTimestamp)
 
     return rowObj
@@ -292,12 +374,8 @@ export function validateRow(row) {
   const issues = []
   let status = 'valid'
 
-  if (!row.fullName?.trim()) {
-    issues.push('This row is blocked because Full Name is missing.')
-    status = 'blocked'
-  }
-  if (!row.email && !row.phone) {
-    issues.push('This row is blocked because email and phone are both missing.')
+  if (!row.fullName?.trim() && !row.buyerName?.trim() && (!Array.isArray(row.attendeeNames) || row.attendeeNames.length === 0)) {
+    issues.push('This row is blocked because required name information is missing.')
     status = 'blocked'
   }
   if (!Number.isInteger(row.personsAttending) || row.personsAttending < 1) {
@@ -348,8 +426,36 @@ function sameName(a, b) {
   return Boolean(a.fullName && b.fullName && sameText(a.fullName, b.fullName))
 }
 
+function sameBuyerName(a, b) {
+  return Boolean(a.buyerName && b.buyerName && sameText(a.buyerName, b.buyerName))
+}
+
 function sameContact(a, b) {
   return Boolean((a.email && b.email && a.email === b.email) || (a.phone && b.phone && a.phone === b.phone))
+}
+
+function normalizedAttendeeNames(row = {}) {
+  const names = Array.isArray(row.attendeeNames) ? row.attendeeNames : normalizeAttendeeNames(row.attendeeNames)
+  return names.map((name) => name.toLowerCase()).filter(Boolean)
+}
+
+function sameBuyerOrContact(a, b) {
+  return sameBuyerName(a, b) || sameContact(a, b)
+}
+
+function attendeeOverlap(a, b) {
+  const aNames = normalizedAttendeeNames(a)
+  const bNames = normalizedAttendeeNames(b)
+  if (aNames.length === 0 || bNames.length === 0) return false
+  return aNames.some((name) => bNames.includes(name))
+}
+
+function sameAttendeeList(a, b) {
+  const aNames = normalizedAttendeeNames(a).sort()
+  const bNames = normalizedAttendeeNames(b).sort()
+  return aNames.length > 0
+    && aNames.length === bNames.length
+    && aNames.every((name, index) => name === bNames[index])
 }
 
 function duplicateGroupKey(row) {
@@ -364,10 +470,12 @@ function sharedContactWarnings(existingRegistrations, processedRows, row) {
   const allRows = [...existingRegistrations, ...processedRows.map((processed) => processed.row)]
   const sharedPhone = row.phone && allRows.some((candidate) => candidate.phone === row.phone && !sameName(candidate, row))
   const sharedEmail = row.email && allRows.some((candidate) => candidate.email === row.email && !sameName(candidate, row))
+  const sharedBuyer = row.buyerName && allRows.some((candidate) => sameBuyerName(candidate, row) && !attendeeOverlap(candidate, row))
   const sharedGroup = row.groupName && allRows.some((candidate) => sameText(candidate.groupName, row.groupName) && !sameName(candidate, row))
 
   if (sharedPhone) warnings.push('Same phone number appears on multiple rows. This may be a group/shared contact.')
   if (sharedEmail) warnings.push('Same email appears on multiple rows. You can keep these as separate guests.')
+  if (sharedBuyer) warnings.push('Same buyer/contact name appears on multiple rows. This can be normal for family, school, or group purchases.')
   if (sharedGroup) warnings.push('Same group name appears on multiple rows. This can be normal for family, school, or organization rows.')
   return warnings
 }
@@ -377,12 +485,44 @@ function trueDuplicateReasons(existingRegistrations, processedRows, row) {
   const allRows = [...existingRegistrations, ...processedRows.map((processed) => processed.row)]
 
   for (const candidate of allRows) {
-    if (!sameName(candidate, row)) continue
-    if (sameContact(candidate, row)) reasons.push('This row appears to be the same guest already in this event.')
-    else if (candidate.groupName && row.groupName && sameText(candidate.groupName, row.groupName)) reasons.push('Same full name and group name needs organizer review.')
+    if (sameAttendeeList(candidate, row) && sameBuyerOrContact(candidate, row)) {
+      reasons.push('This row has the same attendee list and buyer/contact as another registration.')
+    } else if (attendeeOverlap(candidate, row) && sameBuyerOrContact(candidate, row)) {
+      reasons.push('One or more attendee names match another row with the same buyer/contact.')
+    } else if (attendeeOverlap(candidate, row) && row.ticketCode && normalizeTicketCode(candidate.ticketCode) === row.ticketCode) {
+      reasons.push('An attendee name matches another row with the same ticket code.')
+    } else if (sameName(candidate, row) && sameContact(candidate, row)) {
+      reasons.push('This row appears to be the same guest already in this event.')
+    } else if (sameName(candidate, row) && candidate.groupName && row.groupName && sameText(candidate.groupName, row.groupName)) {
+      reasons.push('Same full name and group name needs organizer review.')
+    }
   }
 
   return [...new Set(reasons)]
+}
+
+function attendeeCountIssues(row) {
+  const attendeeCount = normalizedAttendeeNames(row).length
+  if (attendeeCount === 0) return { review: [], warnings: [] }
+  if (row.personsAttendingWasBlank) {
+    return {
+      review: [`Persons attending was blank; suggested count is ${attendeeCount} from attendee names.`],
+      warnings: [],
+    }
+  }
+  if (attendeeCount > row.personsAttending) {
+    return {
+      review: [`${attendeeCount} attendee names were found, but Persons attending is ${row.personsAttending}. Review the count before import.`],
+      warnings: [],
+    }
+  }
+  if (attendeeCount < row.personsAttending) {
+    return {
+      review: [],
+      warnings: [`Persons attending is ${row.personsAttending}, but only ${attendeeCount} attendee names were found.`],
+    }
+  }
+  return { review: [], warnings: [] }
 }
 
 export function mergeRowsIntoGroupRegistration(rows = []) {
@@ -395,9 +535,19 @@ export function mergeRowsIntoGroupRegistration(rows = []) {
       row: null,
     }
   }
+  const buyerNames = [...new Set(candidates.map((row) => normalizeOptionalText(row.buyerName)?.toLowerCase()).filter(Boolean))]
+  if (buyerNames.length > 1) {
+    return {
+      status: 'blocked',
+      issues: ['Conflicting buyer names exist in rows selected for merge. Choose the correct buyer before importing.'],
+      row: null,
+    }
+  }
 
   const primary = candidates.find((row) => row.email || row.phone) || candidates[0]
-  const guestNames = candidates.map((row) => row.fullName?.trim()).filter(Boolean)
+  const guestNames = normalizeAttendeeNames(candidates.flatMap((row) => (
+    normalizedAttendeeNames(row).length > 0 ? row.attendeeNames : [row.fullName]
+  )))
   const mergedNotes = [
     primary?.notes,
     `Merged guest names: ${guestNames.join('; ')}`,
@@ -409,6 +559,8 @@ export function mergeRowsIntoGroupRegistration(rows = []) {
     row: {
       ...primary,
       fullName: primary?.groupName || primary?.fullName || guestNames[0] || 'Merged group',
+      buyerName: primary?.buyerName || null,
+      attendeeNames: guestNames,
       personsAttending: candidates.reduce((total, row) => total + (Number.isInteger(row.personsAttending) ? row.personsAttending : 1), 0),
       groupName: primary?.groupName || candidates.find((row) => row.groupName)?.groupName || null,
       ticketCode: ticketCodes[0] || '',
@@ -427,8 +579,16 @@ export async function processAndValidate(rows, eventId, existingRegistrations) {
 
     const dupReason = findDuplicate(existingRegistrations, processed, row)
     const ticketDupReason = findTicketCodeDuplicate(existingRegistrations, processed, row)
-    const reviewReasons = status === 'blocked' ? [] : trueDuplicateReasons(existingRegistrations, processed, row)
-    const warnings = status === 'blocked' ? [] : sharedContactWarnings(existingRegistrations, processed, row)
+    const countIssues = status === 'blocked' ? { review: [], warnings: [] } : attendeeCountIssues(row)
+    const reviewReasons = status === 'blocked' ? [] : [
+      ...trueDuplicateReasons(existingRegistrations, processed, row),
+      ...countIssues.review,
+    ]
+    const warnings = status === 'blocked' ? [] : [
+      ...sharedContactWarnings(existingRegistrations, processed, row),
+      ...countIssues.warnings,
+      ...(!row.email && !row.phone ? ['No email or phone was found for this row. Confirm the buyer/contact details before import.'] : []),
+    ]
     const finalStatus = dupReason || ticketDupReason
       ? 'blocked'
       : reviewReasons.length > 0

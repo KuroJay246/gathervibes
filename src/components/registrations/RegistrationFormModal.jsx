@@ -5,6 +5,8 @@ import { validPaymentStatuses, validateRegistration } from '../../utils/validato
 export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, saving }) {
   const [formData, setFormData] = useState({
     fullName: '',
+    buyerName: '',
+    attendeeNames: '',
     email: '',
     phone: '',
     groupName: '',
@@ -21,6 +23,8 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
       if (initialData) {
         setFormData({
           fullName: initialData.fullName || '',
+          buyerName: initialData.buyerName || '',
+          attendeeNames: Array.isArray(initialData.attendeeNames) ? initialData.attendeeNames.join('\n') : '',
           email: initialData.email || '',
           phone: initialData.phone || '',
           groupName: initialData.groupName || '',
@@ -32,6 +36,8 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
       } else {
         setFormData({
           fullName: '',
+          buyerName: '',
+          attendeeNames: '',
           email: '',
           phone: '',
           groupName: '',
@@ -115,6 +121,32 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
                   className="event-input"
                   disabled={saving}
                   placeholder="e.g. The Doe Family"
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label className="event-label">Buyer / Contact Name</label>
+                <input
+                  type="text"
+                  value={formData.buyerName}
+                  onChange={(e) => handleChange('buyerName', e.target.value)}
+                  className="event-input"
+                  disabled={saving}
+                  placeholder="e.g. Jane Buyer"
+                />
+              </div>
+
+              <div>
+                <label className="event-label">Guest / Attendee Names</label>
+                <textarea
+                  rows={3}
+                  value={formData.attendeeNames}
+                  onChange={(e) => handleChange('attendeeNames', e.target.value)}
+                  className="event-input resize-y"
+                  disabled={saving}
+                  placeholder={'Jayla Maynard\nCorey Bob\nCarl Griffith'}
                 />
               </div>
             </div>

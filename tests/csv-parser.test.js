@@ -45,11 +45,11 @@ test('normalizeEmail', () => {
   assert.strictEqual(normalizeEmail(''), null)
 })
 
-test('validateRow - blocks missing both email and phone', () => {
+test('validateRow - missing email and phone is not a hard blocker', () => {
   const row = { fullName: 'John', email: null, phone: null, personsAttending: 1 }
   const result = validateRow(row)
-  assert.strictEqual(result.status, 'blocked')
-  assert.ok(result.issues.some((issue) => /email and phone are both missing/.test(issue)))
+  assert.strictEqual(result.status, 'valid')
+  assert.strictEqual(result.issues.length, 0)
 })
 
 test('validateRow - valid if at least phone is present', () => {

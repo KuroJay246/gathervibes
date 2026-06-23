@@ -34,6 +34,12 @@ function TicketBadge({ children, tone = 'neutral' }) {
   return <span className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${tones[tone]}`}>{children}</span>
 }
 
+function attendeeNamesText(registration = {}) {
+  return Array.isArray(registration.attendeeNames) && registration.attendeeNames.length > 0
+    ? registration.attendeeNames.join(', ')
+    : ''
+}
+
 function useRegistrationList(activeEvent) {
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
@@ -308,6 +314,7 @@ export function TicketsPage() {
               {assignedRegistrations.map((registration) => (
                 <article key={registration.registrationId} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
                   <p className="truncate text-sm font-bold text-[#2B1723]">{registration.fullName}</p>
+                  {attendeeNamesText(registration) && <p className="mt-1 truncate text-xs text-[#6B564C]">{attendeeNamesText(registration)}</p>}
                   <p className="mt-1 font-mono text-xs font-bold text-[#6B564C]">{registration.ticketCode}</p>
                   <div className="mt-3">
                     <TicketQrCode ticketCode={registration.ticketCode} compact />
@@ -340,6 +347,8 @@ export function TicketsPage() {
                   <tr key={registration.registrationId}>
                     <td className="px-4 py-3">
                       <div className="font-medium text-[#2B1723]">{registration.fullName}</div>
+                      {registration.buyerName && <div className="text-xs font-semibold text-[#8C7567]">Buyer / Contact: {registration.buyerName}</div>}
+                      {attendeeNamesText(registration) && <div className="max-w-xs text-xs text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}
                       {registration.groupName && <div className="text-xs text-[#816D62]">{registration.groupName}</div>}
                     </td>
                     <td className="px-4 py-3 text-[#5D4A52]">
@@ -370,6 +379,8 @@ export function TicketsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="font-bold text-[#2B1723]">{registration.fullName}</h3>
+                    {registration.buyerName && <p className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer / Contact: {registration.buyerName}</p>}
+                    {attendeeNamesText(registration) && <p className="mt-1 text-xs text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</p>}
                     <p className="mt-1 text-xs text-[#816D62]">{registration.email || registration.phone || 'No contact'}</p>
                   </div>
                   <TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{registration.ticketStatus === 'assigned' ? 'Assigned' : 'No ticket'}</TicketBadge>

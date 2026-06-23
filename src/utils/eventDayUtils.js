@@ -48,10 +48,16 @@ function csvValue(value) {
   return text
 }
 
+function attendeeNamesText(registration = {}) {
+  return Array.isArray(registration.attendeeNames) ? registration.attendeeNames.join('; ') : ''
+}
+
 export function formatEventDayCsv(registrations = [], event = {}) {
   const headers = [
     'Event',
     'Full name',
+    'Buyer name',
+    'Attendee names',
     'Group name',
     'Persons attending',
     'Payment status',
@@ -63,6 +69,8 @@ export function formatEventDayCsv(registrations = [], event = {}) {
   const rows = registrations.map((registration) => [
     event.eventName || '',
     registration.fullName || '',
+    registration.buyerName || '',
+    attendeeNamesText(registration),
     registration.groupName || '',
     registration.personsAttending || 1,
     formatPaymentLabel(registration.paymentStatus),

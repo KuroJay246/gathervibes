@@ -1,6 +1,13 @@
 import { User } from 'lucide-react'
 
+function attendeesText(registration = {}) {
+  return Array.isArray(registration.attendeeNames) && registration.attendeeNames.length > 0
+    ? registration.attendeeNames.join(', ')
+    : ''
+}
+
 export function RegistrationCard({ registration, onEdit, onDelete }) {
+  const attendees = attendeesText(registration)
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
       <div className="flex items-start justify-between">
@@ -8,6 +15,12 @@ export function RegistrationCard({ registration, onEdit, onDelete }) {
           <div className="flex items-center gap-2">
             <h3 className="font-bold text-[#2B1723]">{registration.fullName}</h3>
           </div>
+          {registration.buyerName && (
+            <div className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer / Contact: {registration.buyerName}</div>
+          )}
+          {attendees && (
+            <div className="mt-1 text-xs text-[#5D4A52]">Guests: {attendees}</div>
+          )}
           <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#816D62]">
             {registration.email && <span>{registration.email}</span>}
             {registration.phone && <span>{registration.phone}</span>}

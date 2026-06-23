@@ -3,6 +3,8 @@ import { buildHeaderMappingPreview } from '../../utils/importUtils'
 
 const REGISTRATION_FIELDS = [
   { value: 'fullName', label: 'Full Name (Required)' },
+  { value: 'buyerName', label: 'Buyer / Purchaser Name' },
+  { value: 'attendeeNames', label: 'Guest / Attendee Name(s)' },
   { value: 'email', label: 'Email Address' },
   { value: 'phone', label: 'Phone Number' },
   { value: 'groupName', label: 'Group Name' },
@@ -15,8 +17,12 @@ const REGISTRATION_FIELDS = [
 ]
 
 export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onProceed, sheetName, onChangeSheet }) {
-  const isReady = fieldMap.fullName !== undefined
+  const hasAttendeeNames = Array.isArray(fieldMap.attendeeNames) && fieldMap.attendeeNames.length > 0
+  const isReady = fieldMap.fullName !== undefined || fieldMap.buyerName !== undefined || hasAttendeeNames
   const mappingPreview = buildHeaderMappingPreview(headers, fieldMap)
+  const fieldMapsIndex = (field, index) => (
+    Array.isArray(fieldMap[field]) ? fieldMap[field].includes(index) : fieldMap[field] === index
+  )
   
   return (
     <div className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-[0_4px_24px_rgba(43,23,35,0.04)]">
@@ -41,8 +47,8 @@ export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onP
 
       <div className="mt-6 space-y-4">
         {headers.map((header, index) => {
-          // Find if this field is currently mapped
-          const mappedKey = Object.keys(fieldMap).find(key => fieldMap[key] === index)
+          // Find if this field is currently mapped. attendeeNames can map to several columns.
+          const mappedKey = Object.keys(fieldMap).find(key => fieldMapsIndex(key, index))
           
           return (
             <div key={index} className="flex flex-col gap-3 rounded-xl border border-[#F2E8E1] p-4 sm:flex-row sm:items-center sm:gap-6">
@@ -63,10 +69,17 @@ export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onP
                   value={mappedKey || ''}
                   onChange={(e) => {
                     const newMap = { ...fieldMap }
-                    // Remove old mapping if it exists
-                    if (mappedKey) delete newMap[mappedKey]
-                    // Set new mapping
-                    if (e.target.value) newMap[e.target.value] = index
+                    if (mappedKey === 'attendeeNames') {
+                      newMap.attendeeNames = (newMap.attendeeNames || []).filter((item) => item !== index)
+                      if (newMap.attendeeNames.length === 0) delete newMap.attendeeNames
+                    } else if (mappedKey) {
+                      delete newMap[mappedKey]
+                    }
+                    if (e.target.value === 'attendeeNames') {
+                      newMap.attendeeNames = [...new Set([...(newMap.attendeeNames || []), index])]
+                    } else if (e.target.value) {
+                      newMap[e.target.value] = index
+                    }
                     onMapChange(newMap)
                   }}
                   className="w-full rounded-lg border border-[#E5D7CF] bg-[#FBF8F5] px-3 py-2 text-sm text-[#2B1723] focus:border-[#B76E79] focus:outline-none"
@@ -76,7 +89,7 @@ export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onP
                     <option 
                       key={field.value} 
                       value={field.value}
-                      disabled={field.value !== mappedKey && Object.keys(fieldMap).includes(field.value)}
+                      disabled={field.value !== 'attendeeNames' && field.value !== mappedKey && Object.keys(fieldMap).includes(field.value)}
                     >
                       {field.label}
                     </option>
@@ -90,7 +103,7 @@ export function FieldMappingForm({ headers, fieldMap, onMapChange, onCancel, onP
 
       {!isReady && (
         <div className="mt-6 rounded-xl bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">
-          <strong>Action needed:</strong> Full Name is missing. Detected columns: {headers.join(', ') || 'none'}. Map a name column or fix the uploaded headers before preview.
+          <strong>Action needed:</strong> Name information is missing. Detected columns: {headers.join(', ') || 'none'}. Map a full name, buyer/contact name, or guest/attendee names before preview.
         </div>
       )}
 

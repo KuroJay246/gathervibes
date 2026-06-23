@@ -20,6 +20,10 @@ function titleCase(value = '') {
     .join(' ')
 }
 
+function attendeeNamesText(registration = {}) {
+  return Array.isArray(registration.attendeeNames) ? registration.attendeeNames.join(', ') : ''
+}
+
 export function RegistrationsPage() {
   const { user } = useAuth()
   const { activeEvent } = useActiveEvent()
@@ -87,6 +91,8 @@ export function RegistrationsPage() {
     const query = searchQuery.toLowerCase()
     return (
       reg.fullName?.toLowerCase().includes(query)
+      || reg.buyerName?.toLowerCase().includes(query)
+      || attendeeNamesText(reg).toLowerCase().includes(query)
       || reg.email?.toLowerCase().includes(query)
       || reg.phone?.toLowerCase().includes(query)
     )
@@ -170,7 +176,7 @@ export function RegistrationsPage() {
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
           <input
             type="text"
-            placeholder="Search name, email, phone…"
+          placeholder="Search guest, buyer, attendee, email, phone…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
@@ -228,6 +234,8 @@ export function RegistrationsPage() {
                     <tr key={reg.registrationId}>
                       <td className="px-4 py-3">
                         <div className="font-medium text-[#2B1723]">{reg.fullName}</div>
+                        {reg.buyerName && <div className="text-xs font-semibold text-[#8C7567]">Buyer: {reg.buyerName}</div>}
+                        {attendeeNamesText(reg) && <div className="max-w-xs text-xs text-[#5D4A52]">Guests: {attendeeNamesText(reg)}</div>}
                         {reg.groupName && <div className="text-xs text-[#816D62]">{reg.groupName}</div>}
                       </td>
                       <td className="px-4 py-3 text-[#5D4A52]">

@@ -21,6 +21,12 @@ function StatusIcon({ status }) {
   return <XCircle className="size-5 text-[#A32626]" />
 }
 
+function formatAttendees(row = {}) {
+  return Array.isArray(row.attendeeNames) && row.attendeeNames.length > 0
+    ? row.attendeeNames.join(', ')
+    : row.fullName || 'No guest names'
+}
+
 export function ImportPreviewTable({
   processedRows,
   onCancel,
@@ -84,10 +90,14 @@ export function ImportPreviewTable({
             <thead>
               <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
                 <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Contact</th>
-                <th className="px-4 py-3">Group / Persons</th>
+                <th className="px-4 py-3">Buyer / Contact</th>
+                <th className="px-4 py-3">Guests Attending</th>
+                <th className="px-4 py-3">Group Name</th>
+                <th className="px-4 py-3">Persons Count</th>
+                <th className="px-4 py-3">Email / Phone</th>
+                <th className="px-4 py-3">Payment</th>
                 <th className="px-4 py-3">Ticket Code</th>
+                <th className="px-4 py-3">Notes / Dietary Notes</th>
                 <th className="px-4 py-3">Issues</th>
                 {isReviewMode && <th className="px-4 py-3">Decision</th>}
               </tr>
@@ -101,7 +111,14 @@ export function ImportPreviewTable({
                       <span className={`text-xs font-bold ${statusTone(pr.status)}`}>{statusLabel(pr.status)}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 font-medium text-[#2B1723]">{pr.row.fullName}</td>
+                  <td className="px-4 py-3 text-[#5D4A52]">
+                    <div className="font-medium text-[#2B1723]">{pr.row.buyerName || pr.row.fullName || 'No buyer/contact'}</div>
+                  </td>
+                  <td className="px-4 py-3 text-[#5D4A52]">
+                    <div className="max-w-[16rem] whitespace-normal font-medium text-[#2B1723]">{formatAttendees(pr.row)}</div>
+                  </td>
+                  <td className="px-4 py-3 text-[#5D4A52]">{pr.row.groupName || <span className="italic text-[#A48A7B]">No group</span>}</td>
+                  <td className="px-4 py-3 text-[#5D4A52]">{pr.row.personsAttending || 1}</td>
                   <td className="px-4 py-3 text-[#5D4A52]">
                     <div className="flex flex-col gap-0.5">
                       {pr.row.email && <span>{pr.row.email}</span>}
@@ -110,11 +127,14 @@ export function ImportPreviewTable({
                     </div>
                   </td>
                   <td className="px-4 py-3 text-[#5D4A52]">
-                    <div>{pr.row.groupName || <span className="italic text-[#A48A7B]">No group</span>}</div>
-                    <div className="mt-0.5 text-xs text-[#8C7567]">{pr.row.personsAttending || 1} persons</div>
+                    <div>{pr.row.paymentStatus || 'unknown'}</div>
+                    {pr.row.paymentReference && <div className="mt-0.5 text-xs text-[#8C7567]">{pr.row.paymentReference}</div>}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs font-bold text-[#2B1723]">
                     {pr.row.ticketCode || <span className="font-sans font-normal italic text-[#A48A7B]">None</span>}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-[#5D4A52]">
+                    {pr.row.notes || <span className="italic text-[#A48A7B]">None</span>}
                   </td>
                   <td className="px-4 py-3 text-xs text-[#5D4A52]">
                     {pr.issues.length > 0 ? (
@@ -152,7 +172,7 @@ export function ImportPreviewTable({
               ))}
               {processedRows.length > 100 && (
                 <tr>
-                  <td colSpan={isReviewMode ? 7 : 6} className="px-4 py-3 text-center text-xs italic text-[#8C7567]">
+                  <td colSpan={isReviewMode ? 11 : 10} className="px-4 py-3 text-center text-xs italic text-[#8C7567]">
                     ...and {processedRows.length - 100} more rows not shown.
                   </td>
                 </tr>

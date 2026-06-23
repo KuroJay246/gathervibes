@@ -40,6 +40,16 @@ function paymentTone(status) {
   return 'neutral'
 }
 
+function attendeeNamesText(registration = {}) {
+  return Array.isArray(registration.attendeeNames) && registration.attendeeNames.length > 0
+    ? registration.attendeeNames.join(', ')
+    : ''
+}
+
+function registrationDisplayName(registration = {}) {
+  return attendeeNamesText(registration) || registration.fullName || registration.buyerName || 'Guest'
+}
+
 function useRegistrations(activeEvent) {
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
@@ -127,7 +137,7 @@ export function CheckInPage() {
     setActionError('')
     try {
       await completeCheckIn(selectedRegistration, user)
-      setMessage(`${selectedRegistration.fullName} checked in successfully.`)
+      setMessage(`${registrationDisplayName(selectedRegistration)} checked in successfully.`)
       setSearchQuery('')
       setSelectedId('')
       setConfirmUndo(false)
@@ -159,7 +169,7 @@ export function CheckInPage() {
     setActionError('')
     try {
       await undoCheckIn(selectedRegistration, user)
-      setMessage(`Check-in undone for ${selectedRegistration.fullName}.`)
+      setMessage(`Check-in undone for ${registrationDisplayName(selectedRegistration)}.`)
       setConfirmUndo(false)
       setSearchQuery('')
       setSelectedId('')
@@ -198,8 +208,8 @@ export function CheckInPage() {
     setActionError('')
     setConfirmUndo(false)
     setMessage(registration.checkedIn
-      ? `${registration.fullName} is already checked in. Duplicate check-in is blocked.`
-      : `${registration.fullName} matched from ticket ${ticketCode}. Review before checking in.`)
+      ? `${registrationDisplayName(registration)} is already checked in. Duplicate check-in is blocked.`
+      : `${registrationDisplayName(registration)} matched from ticket ${ticketCode}. Review before checking in.`)
   }
 
   function handleQrMissing(ticketCode) {
@@ -329,6 +339,8 @@ export function CheckInPage() {
                   <tr key={registration.registrationId}>
                     <td className="px-3 py-2 font-medium text-[#2B1723]">
                       <div>{registration.fullName}</div>
+                      {attendeeNamesText(registration) && <div className="mt-0.5 text-[11px] text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}
+                      {registration.buyerName && <div className="mt-0.5 text-[11px] text-[#8C7567]">Buyer: {registration.buyerName}</div>}
                       {registration.groupName && <div className="mt-0.5 text-[11px] text-[#8C7567]">{registration.groupName}</div>}
                     </td>
                     <td className="px-3 py-2 text-[#5D4A52]">{registration.personsAttending || 1}</td>
@@ -383,7 +395,7 @@ export function CheckInPage() {
                   setMessage('')
                   setActionError('')
                 }}
-                placeholder="Name, email, phone, or GSV ticket code"
+                placeholder="Guest, buyer, attendee, email, phone, or GSV ticket code"
                 className="min-h-16 w-full rounded-2xl border border-[#E5D7CF] bg-white py-4 pl-12 pr-4 text-lg font-semibold text-[#2B1723] focus:border-[#B76E79] focus:outline-none focus:ring-4 focus:ring-[#B76E79]/15"
                 autoComplete="off"
               />
@@ -406,6 +418,8 @@ export function CheckInPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-bold text-[#2B1723]">{registration.fullName}</p>
+                    {attendeeNamesText(registration) && <p className="mt-1 text-xs text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</p>}
+                    {registration.buyerName && <p className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer: {registration.buyerName}</p>}
                     <p className="mt-1 text-xs text-[#816D62]">{registration.email || registration.phone || registration.ticketCode || 'No contact'}</p>
                   </div>
                   <StatusBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Waiting'}</StatusBadge>
@@ -430,6 +444,12 @@ export function CheckInPage() {
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8C7567]">Guest</p>
                   <h3 className="mt-1 font-serif text-3xl text-[#2B1723]">{selectedRegistration.fullName}</h3>
+                  {attendeeNamesText(selectedRegistration) && (
+                    <p className="mt-2 text-sm font-semibold text-[#5D4A52]">Guests attending: {attendeeNamesText(selectedRegistration)}</p>
+                  )}
+                  {selectedRegistration.buyerName && (
+                    <p className="mt-1 text-sm font-semibold text-[#8C7567]">Buyer / Contact: {selectedRegistration.buyerName}</p>
+                  )}
                   <p className="mt-2 text-sm text-[#816D62]">
                     {selectedRegistration.email || 'No email'} {selectedRegistration.phone ? `· ${selectedRegistration.phone}` : ''}
                   </p>
@@ -568,7 +588,11 @@ export function CheckInPage() {
                   <tbody className="divide-y divide-[#F2E8E1]">
                     {visibleRegistrations.map((registration) => (
                       <tr key={registration.registrationId}>
-                        <td className="px-4 py-3 font-medium text-[#2B1723]">{registration.fullName}</td>
+                        <td className="px-4 py-3 font-medium text-[#2B1723]">
+                          <div>{registration.fullName}</div>
+                          {attendeeNamesText(registration) && <div className="mt-1 text-xs font-normal text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}
+                          {registration.buyerName && <div className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer: {registration.buyerName}</div>}
+                        </td>
                         <td className="px-4 py-3 text-[#5D4A52]">
                           {registration.email && <div>{registration.email}</div>}
                           {registration.phone && <div>{registration.phone}</div>}
@@ -598,7 +622,7 @@ export function CheckInPage() {
         <div className="fixed inset-0 z-50 grid place-items-center bg-[#2B1723]/40 p-4">
           <div className="w-full max-w-md rounded-2xl border border-[#EEDFD6] bg-white p-6 shadow-2xl">
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#A32626]">Undo Check-In</p>
-            <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">{selectedRegistration.fullName}</h3>
+            <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">{registrationDisplayName(selectedRegistration)}</h3>
             <p className="mt-3 text-sm leading-6 text-[#6B564C]">
               Undo check-in for this guest? This should only be used if the check-in was accidental.
             </p>

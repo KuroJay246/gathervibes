@@ -56,7 +56,7 @@ test('Dashboard and Check-In use shared count wording and helpers', async () => 
 test('Check-In page waits for Firestore success and avoids false success on permission denied', async () => {
   const checkIn = await readFile('src/pages/CheckInPage.jsx', 'utf8')
   const completeIndex = checkIn.indexOf('await completeCheckIn')
-  const successIndex = checkIn.indexOf('setMessage(`${selectedRegistration.fullName} checked in successfully.`)')
+  const successIndex = checkIn.indexOf('setMessage(`${registrationDisplayName(selectedRegistration)} checked in successfully.`)')
 
   assert.ok(completeIndex > -1)
   assert.ok(successIndex > completeIndex)
@@ -67,7 +67,7 @@ test('Check-In page waits for Firestore success and avoids false success on perm
 test('Check-In page labels undo and clear actions truthfully', async () => {
   const checkIn = await readFile('src/pages/CheckInPage.jsx', 'utf8')
   const undoIndex = checkIn.indexOf('await undoCheckIn')
-  const undoSuccessIndex = checkIn.indexOf('setMessage(`Check-in undone for ${selectedRegistration.fullName}.`)')
+  const undoSuccessIndex = checkIn.indexOf('setMessage(`Check-in undone for ${registrationDisplayName(selectedRegistration)}.`)')
 
   assert.match(checkIn, /Undo Check-In/)
   assert.match(checkIn, /Clear Selected Guest/)

@@ -124,6 +124,8 @@ export function checkInWarnings(registration) {
 export function searchableRegistrationText(registration) {
   return [
     registration.fullName,
+    registration.buyerName,
+    ...(Array.isArray(registration.attendeeNames) ? registration.attendeeNames : []),
     registration.email,
     registration.phone,
     registration.ticketCode,
