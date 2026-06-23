@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { RefreshCw, Search, TicketCheck, Trash2, Wand2 } from 'lucide-react'
+import { Printer, RefreshCw, Search, TicketCheck, Trash2, Wand2 } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { subscribeToRegistrations } from '../services/registrationService'
@@ -8,6 +8,7 @@ import { clearTicketAssignment, saveTicketAssignment } from '../services/ticketS
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
+import { TicketQrCode } from '../components/tickets/TicketQrCode'
 import { buildTicketPrefix, generateSequentialTicketCode, generateTicketCode, normalizeTicketCode, searchableRegistrationText } from '../utils/ticketUtils'
 
 const FILTERS = [
@@ -74,6 +75,7 @@ export function TicketsPage() {
   const [savingId, setSavingId] = useState('')
   const [message, setMessage] = useState('')
   const [actionError, setActionError] = useState('')
+  const [showPrintableQrs, setShowPrintableQrs] = useState(false)
 
   const existingCodes = useMemo(
     () => new Set(registrations.map((registration) => normalizeTicketCode(registration.ticketCode)).filter(Boolean)),
@@ -89,6 +91,10 @@ export function TicketsPage() {
     if (!searchQuery.trim()) return true
     return searchableRegistrationText(registration).includes(searchQuery.trim().toLowerCase())
   })
+  const assignedRegistrations = useMemo(
+    () => filteredRegistrations.filter((registration) => registration.ticketStatus === 'assigned' && registration.ticketCode),
+    [filteredRegistrations],
+  )
 
   if (!activeEvent?.eventId) {
     return (
@@ -233,7 +239,7 @@ export function TicketsPage() {
           </p>
         </div>
         <div className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-3 text-xs text-[#6B564C]">
-          Manual code entry is allowed. Use Generate next {ticketPrefix} code for event-style sequencing.
+          QR codes store ticket codes only. Use Generate next {ticketPrefix} code for event-style sequencing.
         </div>
       </header>
 
@@ -267,6 +273,52 @@ export function TicketsPage() {
         </div>
       </section>
 
+      {assignedRegistrations.length > 0 && (
+        <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">QR Tickets</p>
+              <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Printable QR list</h3>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">
+                QR codes encode only the assigned ticket code, not guest contact details.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => setShowPrintableQrs((value) => !value)}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]"
+              >
+                <Printer className="size-4" />
+                {showPrintableQrs ? 'Hide QR list' : 'Show QR list'}
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#2B1723] px-4 text-xs font-bold text-white hover:bg-[#3B2430]"
+              >
+                <Printer className="size-4" />
+                Print
+              </button>
+            </div>
+          </div>
+
+          {showPrintableQrs && (
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {assignedRegistrations.map((registration) => (
+                <article key={registration.registrationId} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
+                  <p className="truncate text-sm font-bold text-[#2B1723]">{registration.fullName}</p>
+                  <p className="mt-1 font-mono text-xs font-bold text-[#6B564C]">{registration.ticketCode}</p>
+                  <div className="mt-3">
+                    <TicketQrCode ticketCode={registration.ticketCode} compact />
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
       {filteredRegistrations.length === 0 ? (
         <EmptyState icon={TicketCheck} title="No ticket records found" description="Try another filter or search term." />
       ) : (
@@ -298,6 +350,11 @@ export function TicketsPage() {
                     <td className="px-4 py-3">
                       <div className="font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'No ticket'}</div>
                       <div className="mt-1"><TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{titleCase(registration.ticketStatus || 'no-ticket-assigned')}</TicketBadge></div>
+                      {registration.ticketStatus === 'assigned' && registration.ticketCode && (
+                        <div className="mt-3">
+                          <TicketQrCode ticketCode={registration.ticketCode} compact />
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3"><TicketBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Not checked in'}</TicketBadge></td>
                     <td className="px-4 py-3 text-right">{renderActions(registration)}</td>
@@ -321,6 +378,11 @@ export function TicketsPage() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Ticket code</p>
                   <p className="mt-1 font-mono text-lg font-bold text-[#2B1723]">{registration.ticketCode || 'Not assigned'}</p>
                 </div>
+                {registration.ticketStatus === 'assigned' && registration.ticketCode && (
+                  <div className="mt-3">
+                    <TicketQrCode ticketCode={registration.ticketCode} />
+                  </div>
+                )}
                 <div className="mt-3"><TicketBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Not checked in'}</TicketBadge></div>
                 <div className="mt-4">{renderActions(registration)}</div>
               </article>
