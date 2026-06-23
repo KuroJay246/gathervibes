@@ -10,6 +10,7 @@ import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { TicketQrCode } from '../components/tickets/TicketQrCode'
 import { buildTicketPrefix, generateSequentialTicketCode, generateTicketCode, normalizeTicketCode, searchableRegistrationText } from '../utils/ticketUtils'
+import { formatPaymentLabel, normalizePaymentStatus, paymentStatusMatches } from '../utils/paymentStatus'
 
 const FILTERS = [
   { value: 'all', label: 'All' },
@@ -18,6 +19,7 @@ const FILTERS = [
   { value: 'paid', label: 'Paid' },
   { value: 'pending', label: 'Pending' },
   { value: 'complimentary', label: 'Complimentary' },
+  { value: 'door', label: 'Door' },
 ]
 
 function titleCase(value = '') {
@@ -32,6 +34,12 @@ function TicketBadge({ children, tone = 'neutral' }) {
     neutral: 'bg-[#F7F1ED] text-[#8C766A]',
   }
   return <span className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${tones[tone]}`}>{children}</span>
+}
+
+function attendeeNamesText(registration = {}) {
+  return Array.isArray(registration.attendeeNames) && registration.attendeeNames.length > 0
+    ? registration.attendeeNames.join(', ')
+    : ''
 }
 
 function useRegistrationList(activeEvent) {
@@ -86,7 +94,7 @@ export function TicketsPage() {
   const filteredRegistrations = registrations.filter((registration) => {
     if (filter === 'no-ticket' && registration.ticketStatus === 'assigned') return false
     if (filter === 'assigned' && registration.ticketStatus !== 'assigned') return false
-    if (['paid', 'pending', 'complimentary'].includes(filter) && registration.paymentStatus !== filter) return false
+    if (['paid', 'pending', 'complimentary', 'door'].includes(filter) && !paymentStatusMatches(registration.paymentStatus, filter)) return false
 
     if (!searchQuery.trim()) return true
     return searchableRegistrationText(registration).includes(searchQuery.trim().toLowerCase())
@@ -232,7 +240,6 @@ export function TicketsPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#1E7345]">Phase 4.5</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Tickets</h2>
           <p className="mt-2 text-sm text-[#816D62]">
             Assigning ticket codes for <strong>{activeEvent.eventName}</strong>.
@@ -308,6 +315,7 @@ export function TicketsPage() {
               {assignedRegistrations.map((registration) => (
                 <article key={registration.registrationId} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
                   <p className="truncate text-sm font-bold text-[#2B1723]">{registration.fullName}</p>
+                  {attendeeNamesText(registration) && <p className="mt-1 truncate text-xs text-[#6B564C]">{attendeeNamesText(registration)}</p>}
                   <p className="mt-1 font-mono text-xs font-bold text-[#6B564C]">{registration.ticketCode}</p>
                   <div className="mt-3">
                     <TicketQrCode ticketCode={registration.ticketCode} compact />
@@ -340,13 +348,15 @@ export function TicketsPage() {
                   <tr key={registration.registrationId}>
                     <td className="px-4 py-3">
                       <div className="font-medium text-[#2B1723]">{registration.fullName}</div>
+                      {registration.buyerName && <div className="text-xs font-semibold text-[#8C7567]">Buyer / Contact: {registration.buyerName}</div>}
+                      {attendeeNamesText(registration) && <div className="max-w-xs text-xs text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}
                       {registration.groupName && <div className="text-xs text-[#816D62]">{registration.groupName}</div>}
                     </td>
                     <td className="px-4 py-3 text-[#5D4A52]">
                       {registration.email && <div>{registration.email}</div>}
                       {registration.phone && <div>{registration.phone}</div>}
                     </td>
-                    <td className="px-4 py-3"><TicketBadge tone={registration.paymentStatus === 'paid' ? 'green' : registration.paymentStatus === 'pending' ? 'gold' : 'neutral'}>{titleCase(registration.paymentStatus)}</TicketBadge></td>
+                    <td className="px-4 py-3"><TicketBadge tone={normalizePaymentStatus(registration.paymentStatus) === 'paid' ? 'green' : normalizePaymentStatus(registration.paymentStatus) === 'pending' || normalizePaymentStatus(registration.paymentStatus) === 'door' ? 'gold' : 'neutral'}>{formatPaymentLabel(registration.paymentStatus)}</TicketBadge></td>
                     <td className="px-4 py-3">
                       <div className="font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'No ticket'}</div>
                       <div className="mt-1"><TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{titleCase(registration.ticketStatus || 'no-ticket-assigned')}</TicketBadge></div>
@@ -370,6 +380,8 @@ export function TicketsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="font-bold text-[#2B1723]">{registration.fullName}</h3>
+                    {registration.buyerName && <p className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer / Contact: {registration.buyerName}</p>}
+                    {attendeeNamesText(registration) && <p className="mt-1 text-xs text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</p>}
                     <p className="mt-1 text-xs text-[#816D62]">{registration.email || registration.phone || 'No contact'}</p>
                   </div>
                   <TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{registration.ticketStatus === 'assigned' ? 'Assigned' : 'No ticket'}</TicketBadge>

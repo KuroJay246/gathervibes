@@ -11,15 +11,29 @@ export {
   generateStableId,
   buildInitialFieldMap,
   mapRows,
+  normalizeAttendeeNames,
   validateRow,
   findDuplicate,
   processAndValidate,
 } from '../utils/importUtils.js'
 
+function importNotes(row = {}) {
+  return [
+    row.notes || '',
+    row.preferredSchool ? `Preferred school: ${row.preferredSchool}` : '',
+    row.originalPaymentStatus && row.originalPaymentStatus !== row.paymentStatus
+      ? `Original payment status: ${row.originalPaymentStatus}`
+      : '',
+  ].filter(Boolean).join('\n')
+}
+
 export async function commitImport(validRows, eventId, user) {
   if (!db) throw new Error('Firebase is not configured')
 
-  const chunkSize = 249
+  // Each imported registration also writes an audit log whose rule verifies
+  // the paired registration create. Keep chunks below Firestore's batch rules
+  // document-access ceiling.
+  const chunkSize = 5
   for (let i = 0; i < validRows.length; i += chunkSize) {
     const chunk = validRows.slice(i, i + chunkSize)
     const batch = writeBatch(db)
@@ -33,6 +47,8 @@ export async function commitImport(validRows, eventId, user) {
         fullName: row.fullName?.trim() || '',
         email: row.email,
         phone: row.phone,
+        buyerName: row.buyerName || null,
+        attendeeNames: Array.isArray(row.attendeeNames) ? row.attendeeNames : [],
         groupName: row.groupName,
         personsAttending: row.personsAttending,
         paymentStatus: row.paymentStatus,
@@ -41,7 +57,7 @@ export async function commitImport(validRows, eventId, user) {
         ticketCode: row.ticketCode || null,
         ticketAssignedAt: null,
         ticketAssignedBy: null,
-        notes: row.notes || '',
+        notes: importNotes(row),
         checkedIn: false,
         checkInTime: null,
         checkedInBy: null,

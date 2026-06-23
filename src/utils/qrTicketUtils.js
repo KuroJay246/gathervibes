@@ -4,7 +4,7 @@ export const QR_TICKET_PREFIX = 'GSV:TICKET:'
 
 export function qrPayloadForTicketCode(ticketCode) {
   const normalized = normalizeTicketCode(ticketCode)
-  if (!normalized || !FLEXIBLE_TICKET_CODE_PATTERN.test(normalized)) return ''
+  if (!normalized || normalized.length > 32 || !FLEXIBLE_TICKET_CODE_PATTERN.test(normalized)) return ''
   return `${QR_TICKET_PREFIX}${normalized}`
 }
 
@@ -18,7 +18,7 @@ export function parseQrTicketCode(value) {
     : upper
   const ticketCode = normalizeTicketCode(withoutPrefix)
 
-  if (!FLEXIBLE_TICKET_CODE_PATTERN.test(ticketCode)) {
+  if (ticketCode.length > 32 || !FLEXIBLE_TICKET_CODE_PATTERN.test(ticketCode)) {
     return {
       ticketCode: '',
       error: 'This QR code does not contain a valid ticket code.',

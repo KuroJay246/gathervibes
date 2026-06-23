@@ -11,6 +11,8 @@ import {
 } from 'firebase/firestore'
 import { db } from '../lib/firebase.js'
 import { createAuditLogWrite } from './auditService.js'
+import { normalizeAttendeeNames } from '../utils/importUtils.js'
+import { normalizePaymentStatus } from '../utils/paymentStatus.js'
 
 function requireDatabase() {
   if (!db) throw new Error('Firebase is not configured')
@@ -21,11 +23,13 @@ function registrationPayload(values, eventId) {
   return {
     eventId,
     fullName: values.fullName?.trim() || '',
+    buyerName: values.buyerName?.trim() || null,
+    attendeeNames: normalizeAttendeeNames(values.attendeeNames),
     email: values.email?.trim().toLowerCase() || null,
     phone: values.phone?.trim() || null,
     groupName: values.groupName?.trim() || null,
     personsAttending: Number(values.personsAttending) || 1,
-    paymentStatus: values.paymentStatus || 'unknown',
+    paymentStatus: normalizePaymentStatus(values.paymentStatus || 'unknown'),
     paymentReference: values.paymentReference?.trim() || null,
     notes: values.notes?.trim() || '',
   }
@@ -153,4 +157,64 @@ export async function deleteRegistration(registration, user) {
   batch.delete(regRef)
   batch.set(audit.ref, audit.data)
   await batch.commit()
+}
+
+export async function bulkDeleteRegistrations(registrations = [], eventId, user) {
+  const scoped = registrations.filter((registration) => registration.eventId === eventId)
+  const firestore = requireDatabase()
+  const chunkSize = 5
+
+  for (let i = 0; i < scoped.length; i += chunkSize) {
+    const batch = writeBatch(firestore)
+    const chunk = scoped.slice(i, i + chunkSize)
+
+    chunk.forEach((registration) => {
+      const regRef = doc(firestore, 'registrations', registration.registrationId)
+      const audit = createAuditLogWrite({
+        eventId,
+        action: 'registration.delete',
+        targetType: 'registration',
+        targetId: registration.registrationId,
+        performedBy: user,
+        details: { fullName: registration.fullName, bulkAction: true },
+      })
+
+      batch.delete(regRef)
+      batch.set(audit.ref, audit.data)
+    })
+
+    await batch.commit()
+  }
+}
+
+export async function bulkUpdatePaymentStatus(registrations = [], eventId, paymentStatus, user) {
+  const scoped = registrations.filter((registration) => registration.eventId === eventId)
+  const firestore = requireDatabase()
+  const nextStatus = normalizePaymentStatus(paymentStatus)
+  const chunkSize = 5
+
+  for (let i = 0; i < scoped.length; i += chunkSize) {
+    const batch = writeBatch(firestore)
+    const chunk = scoped.slice(i, i + chunkSize)
+
+    chunk.forEach((registration) => {
+      const regRef = doc(firestore, 'registrations', registration.registrationId)
+      const audit = createAuditLogWrite({
+        eventId,
+        action: 'registration.update',
+        targetType: 'registration',
+        targetId: registration.registrationId,
+        performedBy: user,
+        details: { fullName: registration.fullName, paymentStatus: nextStatus, bulkAction: true },
+      })
+
+      batch.update(regRef, {
+        paymentStatus: nextStatus,
+        updatedAt: serverTimestamp(),
+      })
+      batch.set(audit.ref, audit.data)
+    })
+
+    await batch.commit()
+  }
 }

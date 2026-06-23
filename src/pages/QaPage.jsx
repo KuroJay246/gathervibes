@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, CheckCircle2, Clipboard, Database, ShieldCheck } from 'lucide-react'
-import { collection, getDocs, limit, query } from 'firebase/firestore'
+import { collection, getDocs, limit, query, where } from 'firebase/firestore'
 import { SystemHealthPanel } from '../components/SystemHealthPanel'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { db } from '../lib/firebase'
+import { buildRegistrationMetrics } from '../utils/registrationMetrics'
+import { qrPayloadForTicketCode } from '../utils/qrTicketUtils'
 import {
   CODEX_TEST_EVENT_ID,
   CODEX_TEST_EVENT_NAME,
@@ -31,6 +33,9 @@ export function QaPage() {
   const [auditStatus, setAuditStatus] = useState('checking')
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [qaChecks, setQaChecks] = useState([])
+  const [qaReportCopied, setQaReportCopied] = useState(false)
+  const [lastRunAt, setLastRunAt] = useState('')
   const prefix = useMemo(() => buildQaTestPrefix(), [])
   const sampleCsv = useMemo(() => buildQaSampleCsv(prefix), [prefix])
   const codexEvents = events.filter((event) => event.eventId === CODEX_TEST_EVENT_ID || event.eventName === CODEX_TEST_EVENT_NAME)
@@ -82,6 +87,65 @@ export function QaPage() {
     }
   }
 
+  async function runQaChecks() {
+    if (!db || !activeEvent?.eventId) {
+      setQaChecks([{ label: 'Working Event selected', status: 'fail', detail: 'Select a Working Event before running checks.' }])
+      return
+    }
+
+    try {
+      const registrationsSnapshot = await getDocs(query(collection(db, 'registrations'), where('eventId', '==', activeEvent.eventId)))
+      const rows = registrationsSnapshot.docs.map((doc) => ({ registrationId: doc.id, ...doc.data() }))
+      const metrics = buildRegistrationMetrics(rows, activeEvent)
+      const ticketCodes = rows.map((row) => String(row.ticketCode || '').trim()).filter(Boolean)
+      const duplicateTicketCodes = ticketCodes.filter((code, index) => ticketCodes.indexOf(code) !== index)
+      const missingBuyer = rows.filter((row) => !row.buyerName && !row.email && !row.phone)
+      const missingAttendees = rows.filter((row) => !row.fullName && (!Array.isArray(row.attendeeNames) || row.attendeeNames.length === 0))
+      const invalidPersons = rows.filter((row) => !Number.isInteger(row.personsAttending) || row.personsAttending < 1)
+      const qrPrivateData = qrPayloadForTicketCode(ticketCodes[0] || 'QA-001')
+      const hasPrivateQrData = /@|buyer|guest|phone|note/i.test(qrPrivateData)
+
+      setQaChecks([
+        { label: 'Working Event selected', status: activeEvent.eventId ? 'pass' : 'fail', detail: activeEvent.eventName },
+        { label: 'Event exists', status: events.some((event) => event.eventId === activeEvent.eventId) ? 'pass' : 'warning', detail: activeEvent.eventId },
+        { label: 'Registrations count', status: 'pass', detail: `${metrics.totalRegistrations} registrations / ${metrics.totalPersons} persons` },
+        { label: 'Payment breakdown', status: 'pass', detail: `Paid ${metrics.paidRegistrations}, pending ${metrics.pendingRegistrations}, complimentary ${metrics.complimentaryRegistrations}, door ${metrics.doorRegistrations}` },
+        { label: 'Missing ticket codes', status: metrics.missingTicketRegistrations ? 'warning' : 'pass', detail: `${metrics.missingTicketRegistrations} registrations` },
+        { label: 'Duplicate ticket codes', status: duplicateTicketCodes.length ? 'fail' : 'pass', detail: duplicateTicketCodes.length ? [...new Set(duplicateTicketCodes)].join(', ') : 'None found' },
+        { label: 'Missing buyer/contact', status: missingBuyer.length ? 'warning' : 'pass', detail: `${missingBuyer.length} rows` },
+        { label: 'Missing attendee names', status: missingAttendees.length ? 'warning' : 'pass', detail: `${missingAttendees.length} rows` },
+        { label: 'Invalid personsAttending', status: invalidPersons.length ? 'fail' : 'pass', detail: `${invalidPersons.length} rows` },
+        { label: 'Pending payment count', status: metrics.pendingRegistrations ? 'warning' : 'pass', detail: `${metrics.pendingRegistrations} registrations` },
+        { label: 'Door payment count', status: metrics.doorRegistrations ? 'warning' : 'pass', detail: `${metrics.doorRegistrations} registrations` },
+        { label: 'Checked-in count', status: 'pass', detail: `${metrics.checkedInRegistrations} registrations / ${metrics.checkedInPersons} persons` },
+        { label: 'auditLogs reachable', status: auditStatus === 'ok' ? 'pass' : 'warning', detail: auditStatus },
+        { label: 'QR payload privacy', status: hasPrivateQrData ? 'fail' : 'pass', detail: qrPrivateData },
+        { label: 'Approved admin detected', status: db ? 'pass' : 'fail', detail: 'Protected page loaded with Firestore access' },
+        { label: 'Import readiness', status: workingEventIsCodex ? 'pass' : 'warning', detail: workingEventIsCodex ? 'CODEX_TEST selected' : 'Use CODEX_TEST for QA imports' },
+      ])
+      setLastRunAt(new Date().toLocaleString())
+    } catch (err) {
+      setQaChecks([{ label: 'Run QA checks', status: 'fail', detail: err.message || 'Read-only checks failed.' }])
+    }
+  }
+
+  async function copyQaReport() {
+    const report = [
+      `QA report for ${activeEvent?.eventName || 'No event'}`,
+      `Last run: ${lastRunAt || 'Not run'}`,
+      ...qaChecks.map((check) => `${check.status.toUpperCase()}: ${check.label} - ${check.detail}`),
+    ].join('\n')
+    await navigator.clipboard.writeText(report)
+    setQaReportCopied(true)
+    window.setTimeout(() => setQaReportCopied(false), 1800)
+  }
+
+  function qaTone(status) {
+    if (status === 'pass') return 'bg-[#EAF6EF] text-[#2F855A]'
+    if (status === 'fail') return 'bg-[#FFF1F1] text-[#A32626]'
+    return 'bg-[#FFF4DF] text-[#986F26]'
+  }
+
   return (
     <div className="grid min-w-0 gap-6 xl:grid-cols-[1.15fr_0.85fr]">
       <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
@@ -95,6 +159,31 @@ export function QaPage() {
             </p>
           </div>
           <StatusBadge ok={codexEvents.length === 1}>{loading ? 'Checking fixture' : codexEvents.length === 1 ? 'Fixture ready' : 'Fixture needs review'}</StatusBadge>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-[#EEDFD6] bg-[#FBF8F5] p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-[#2B1723]">Read-only QA checks</h3>
+              <p className="mt-1 text-xs text-[#816D62]">Checks registrations, payment breakdowns, tickets, QR privacy, and audit log reachability without writing data.</p>
+              {lastRunAt && <p className="mt-1 text-xs font-semibold text-[#8C7567]">Last run: {lastRunAt}</p>}
+            </div>
+            <div className="flex gap-2">
+              <button type="button" onClick={runQaChecks} className="rounded-xl bg-[#2B1723] px-4 py-2 text-xs font-bold text-white">Run QA checks</button>
+              <button type="button" onClick={copyQaReport} disabled={qaChecks.length === 0} className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C] disabled:opacity-50">{qaReportCopied ? 'Copied' : 'Copy QA report'}</button>
+            </div>
+          </div>
+          {qaChecks.length > 0 && (
+            <div className="mt-4 grid gap-2 md:grid-cols-2">
+              {qaChecks.map((check) => (
+                <div key={check.label} className="rounded-xl border border-[#EEDFD6] bg-white p-3">
+                  <span className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase ${qaTone(check.status)}`}>{check.status}</span>
+                  <p className="mt-2 text-sm font-bold text-[#2B1723]">{check.label}</p>
+                  <p className="mt-1 text-xs text-[#816D62]">{check.detail}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="mt-6 grid gap-3 md:grid-cols-2">

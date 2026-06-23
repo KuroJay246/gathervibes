@@ -36,20 +36,23 @@ test('parseCSV - handles escaped quotes', () => {
 test('normalizePaymentStatus', () => {
   assert.strictEqual(normalizePaymentStatus('Paid '), 'paid')
   assert.strictEqual(normalizePaymentStatus('COMP'), 'complimentary')
-  assert.strictEqual(normalizePaymentStatus('door list'), 'door-list')
+  assert.strictEqual(normalizePaymentStatus('door list'), 'door')
+  assert.strictEqual(normalizePaymentStatus('Pay at Door'), 'door')
   assert.strictEqual(normalizePaymentStatus('random'), 'unknown')
 })
 
 test('normalizeEmail', () => {
   assert.strictEqual(normalizeEmail(' TEST@example.com '), 'test@example.com')
+  assert.strictEqual(normalizeEmail('[Jane@example.com](mailto:Jane@example.com)'), 'jane@example.com')
+  assert.strictEqual(normalizeEmail('mailto:buyer@example.com'), 'buyer@example.com')
   assert.strictEqual(normalizeEmail(''), null)
 })
 
-test('validateRow - blocks missing both email and phone', () => {
+test('validateRow - missing email and phone is not a hard blocker', () => {
   const row = { fullName: 'John', email: null, phone: null, personsAttending: 1 }
   const result = validateRow(row)
-  assert.strictEqual(result.status, 'blocked')
-  assert.ok(result.issues.includes('Missing both email and phone'))
+  assert.strictEqual(result.status, 'valid')
+  assert.strictEqual(result.issues.length, 0)
 })
 
 test('validateRow - valid if at least phone is present', () => {
@@ -79,13 +82,13 @@ test('generateStableId - differs across events for same email', async () => {
 test('findDuplicate - detects sourceRowId against existing registrations', () => {
   const existing = [{ sourceRowId: 'row-1', email: 'a@test.com', timestamp: new Date('2024-01-01') }]
   const row = { sourceRowId: 'row-1', email: 'b@test.com', timestamp: new Date('2024-01-02') }
-  assert.strictEqual(findDuplicate(existing, [], row), 'Duplicate source row ID')
+  assert.match(findDuplicate(existing, [], row), /already imported/)
 })
 
-test('findDuplicate - same email in different events is not compared here', async () => {
+test('findDuplicate - shared email is no longer a hard duplicate by itself', async () => {
   const existing = [{ email: 'test@example.com', timestamp: new Date('2024-01-01'), eventId: 'event-a' }]
   const row = { email: 'test@example.com', timestamp: new Date('2024-01-01') }
-  assert.strictEqual(findDuplicate(existing, [], row), 'Duplicate email and timestamp')
+  assert.strictEqual(findDuplicate(existing, [], row), null)
 })
 
 test('mapRows - maps CSV columns using field map', () => {

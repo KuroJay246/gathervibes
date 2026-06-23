@@ -80,9 +80,9 @@ test('event-day labels are plain and operator-friendly', () => {
 test('event-day CSV export is client-side text and includes status labels', () => {
   const csv = formatEventDayCsv(sampleRegistrations, { eventName: 'CODEX_TEST Live Verification Event' })
 
-  assert.match(csv, /Event,Full name,Group name,Persons attending,Payment status,Ticket code,Ticket status,Check-in status/)
-  assert.match(csv, /CODEX_TEST Live Verification Event,Beta Guest,Group B,2,Pending payment,,No ticket assigned,Not checked in/)
-  assert.match(csv, /CODEX_TEST Live Verification Event,Alpha Guest,Group A,1,Paid,CT-001,Ticket assigned,Checked in/)
+  assert.match(csv, /Event,Full name,Buyer name,Attendee names,Group name,Persons attending,Payment status,Ticket code,Ticket status,Check-in status/)
+  assert.match(csv, /CODEX_TEST Live Verification Event,Beta Guest,,,Group B,2,Pending payment,,No ticket assigned,Not checked in/)
+  assert.match(csv, /CODEX_TEST Live Verification Event,Alpha Guest,,,Group A,1,Paid,CT-001,Ticket assigned,Checked in/)
   assert.doesNotMatch(csv, /upload|storage|cloud functions/i)
 })
 

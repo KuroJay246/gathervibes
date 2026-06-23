@@ -105,7 +105,6 @@ export function CommunicationsPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#A48A7B]">Phase 6</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Communications</h2>
           <p className="mt-2 text-sm text-[#816D62]">
             Prepare copy-ready messages for <strong>{activeEvent.eventName}</strong>
@@ -132,7 +131,7 @@ export function CommunicationsPage() {
                   <input
                     id="search"
                     type="text"
-                    placeholder="Name, email, ticket..."
+                placeholder="Guest, buyer, attendee, email, ticket..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
@@ -153,7 +152,7 @@ export function CommunicationsPage() {
                   <option value="paid">Paid</option>
                   <option value="pending">Pending</option>
                   <option value="complimentary">Complimentary</option>
-                  <option value="door-list">Door List</option>
+                  <option value="door">Door</option>
                   <option value="unknown">Unknown</option>
                 </select>
               </div>
@@ -225,6 +224,14 @@ export function CommunicationsPage() {
                 <span className="font-medium text-[#2B1723]">{metrics.paidRegistrations} / {metrics.pendingRegistrations}</span>
               </div>
               <div className="flex justify-between">
+                <span>Complimentary / Door</span>
+                <span className="font-medium text-[#2B1723]">{metrics.complimentaryRegistrations} / {metrics.doorRegistrations}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Missing ticket codes</span>
+                <span className="font-medium text-[#2B1723]">{metrics.missingTicketRegistrations}</span>
+              </div>
+              <div className="flex justify-between">
                 <span>Checked In</span>
                 <span className="font-medium text-[#2B1723]">{metrics.checkedInRegistrations}</span>
               </div>
@@ -263,7 +270,7 @@ export function CommunicationsPage() {
                 placeholder="Write your message here..."
               />
               <p className="mt-2 text-xs text-[#8A7468]">
-                Placeholders: {'{{guestName}}'}, {'{{eventName}}'}, {'{{ticketCode}}'}, {'{{paymentStatus}}'}, {'{{personsAttending}}'}, {'{{groupName}}'}, {'{{eventDate}}'}, {'{{location}}'}
+                Placeholders: {'{{guestName}}'}, {'{{buyerName}}'}, {'{{attendeeNames}}'}, {'{{eventName}}'}, {'{{ticketCode}}'}, {'{{paymentStatus}}'}, {'{{personsAttending}}'}, {'{{groupName}}'}, {'{{eventDate}}'}, {'{{eventTime}}'}, {'{{venue}}'}
               </p>
             </div>
           </section>

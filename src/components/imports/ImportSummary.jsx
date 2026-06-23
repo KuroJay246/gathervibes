@@ -8,7 +8,7 @@ export function ImportSummary({ result, onReset }) {
         <CheckCircle2 className="size-8" strokeWidth={2} />
       </div>
       
-      <h3 className="mt-5 font-serif text-2xl text-[#2B1723]">Import Complete</h3>
+      <h3 className="mt-5 font-serif text-2xl text-[#2B1723]">Import succeeded</h3>
       <p className="mt-2 text-[#816D62]">
         Successfully imported <strong>{result.importedCount}</strong> registration{result.importedCount !== 1 && 's'}.
       </p>
@@ -24,7 +24,7 @@ export function ImportSummary({ result, onReset }) {
           to="/registrations"
           className="flex items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#B76E79]/30"
         >
-          View registrations
+          View Registrations
         </Link>
         <button
           type="button"
@@ -32,7 +32,7 @@ export function ImportSummary({ result, onReset }) {
           className="flex items-center justify-center gap-2 rounded-xl bg-[#FFF8F2] px-6 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1]"
         >
           <RotateCcw className="size-4" />
-          Import more
+          Import Another File
         </button>
       </div>
     </div>

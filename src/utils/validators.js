@@ -1,3 +1,5 @@
+import { PAYMENT_STATUSES, normalizePaymentStatus } from './paymentStatus.js'
+
 // ─── Event validation ──────────────────────────────────────────────────────
 
 export const VALID_TIER_NAMES = [
@@ -78,7 +80,7 @@ export function validateEvent(values) {
 
 // ─── Registration validation ───────────────────────────────────────────────
 
-export const validPaymentStatuses = ['paid', 'pending', 'complimentary', 'door-list', 'unknown']
+export const validPaymentStatuses = PAYMENT_STATUSES
 export const validTicketStatuses = ['no-ticket-assigned', 'partially-assigned', 'assigned']
 const MAX_PERSONS_ATTENDING = 100
 
@@ -94,7 +96,9 @@ export function validateRegistration(values) {
     errors.personsAttending = `Persons attending cannot exceed ${MAX_PERSONS_ATTENDING}.`
   }
 
-  if (values.paymentStatus && !validPaymentStatuses.includes(values.paymentStatus)) {
+  const normalizedPaymentStatus = normalizePaymentStatus(values.paymentStatus)
+  const rawPaymentStatus = String(values.paymentStatus || '').trim().toLowerCase()
+  if (values.paymentStatus && (!validPaymentStatuses.includes(normalizedPaymentStatus) || (normalizedPaymentStatus === 'unknown' && rawPaymentStatus !== 'unknown'))) {
     errors.paymentStatus = 'Invalid payment status.'
   }
 

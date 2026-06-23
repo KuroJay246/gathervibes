@@ -1,4 +1,5 @@
 import { buildCheckInSummary } from './checkInUtils.js'
+import { formatPaymentLabel as sharedFormatPaymentLabel, normalizePaymentStatus } from './paymentStatus.js'
 import { normalizeTicketCode } from './ticketUtils.js'
 
 export function buildEventDaySummary(registrations = []) {
@@ -20,7 +21,10 @@ export function getMissingTicketRegistrations(registrations = []) {
 }
 
 export function getPendingPaymentRegistrations(registrations = []) {
-  return registrations.filter((registration) => registration.paymentStatus === 'pending' || registration.paymentStatus === 'unknown')
+  return registrations.filter((registration) => {
+    const status = normalizePaymentStatus(registration.paymentStatus)
+    return status === 'pending' || status === 'unknown' || status === 'door'
+  })
 }
 
 export function getDoorListRegistrations(registrations = []) {
@@ -36,10 +40,10 @@ export function formatDoorStatus(registration = {}) {
 }
 
 export function formatPaymentLabel(status = '') {
-  if (status === 'paid') return 'Paid'
-  if (status === 'pending') return 'Pending payment'
-  if (status === 'complimentary') return 'Complimentary'
-  return 'Payment unknown'
+  const normalized = normalizePaymentStatus(status)
+  if (normalized === 'pending') return 'Pending payment'
+  if (normalized === 'door') return 'Door payment'
+  return sharedFormatPaymentLabel(normalized)
 }
 
 function csvValue(value) {
@@ -48,10 +52,16 @@ function csvValue(value) {
   return text
 }
 
+function attendeeNamesText(registration = {}) {
+  return Array.isArray(registration.attendeeNames) ? registration.attendeeNames.join('; ') : ''
+}
+
 export function formatEventDayCsv(registrations = [], event = {}) {
   const headers = [
     'Event',
     'Full name',
+    'Buyer name',
+    'Attendee names',
     'Group name',
     'Persons attending',
     'Payment status',
@@ -63,6 +73,8 @@ export function formatEventDayCsv(registrations = [], event = {}) {
   const rows = registrations.map((registration) => [
     event.eventName || '',
     registration.fullName || '',
+    registration.buyerName || '',
+    attendeeNamesText(registration),
     registration.groupName || '',
     registration.personsAttending || 1,
     formatPaymentLabel(registration.paymentStatus),

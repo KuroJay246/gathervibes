@@ -3,7 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ===============================================================
-    // Phase 4.5 data model
+    // Gather & Savor data model
     // ===============================================================
     // settings/accessControl
     //   approvedEmails: list<string> (created only in Firebase Console)
@@ -17,13 +17,15 @@ service cloud.firestore {
     //   status: supported enum
     //   capacity: int (1..100000)
     //   ticketPrice: number (0..1000000)  — backward-compat scalar
-    //   priceTiers: list<map> or null     — Phase 3.1 optional
+    //   priceTiers: list<map> or null
     //     { name: string, price: number>=0, status: enum }
     //   notes: string (0..10000)
     //   createdAt: timestamp (immutable)
     //   updatedAt: timestamp
     //
     // registrations/{registrationId}
+    //   buyerName: string|null
+    //   attendeeNames: list<string> (optional, max 100)
     //   ticketCode: string|null
     //   ticketAssignedAt: timestamp|null
     //   ticketAssignedBy: string|null
@@ -51,6 +53,10 @@ service cloud.firestore {
 
     function validOptionalString(value, maxLength) {
       return value == null || value == '' || (value is string && value.size() <= maxLength);
+    }
+
+    function validOptionalAttendeeNames(value) {
+      return value == null || (value is list && value.size() <= 100);
     }
 
     function validPerformedBy(value) {
@@ -152,6 +158,7 @@ service cloud.firestore {
         ])
         && data.keys().hasOnly([
           'registrationId', 'eventId', 'fullName', 'email', 'phone',
+          'buyerName', 'attendeeNames',
           'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
           'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy',
           'notes', 'checkedIn', 'checkInTime', 'checkedInBy', 'source', 'sourceRowId', 'timestamp',
@@ -163,13 +170,15 @@ service cloud.firestore {
         && data.fullName is string
         && data.fullName.size() > 0
         && data.fullName.size() <= 250
+        && (!('buyerName' in data) || validOptionalString(data.buyerName, 250))
+        && (!('attendeeNames' in data) || validOptionalAttendeeNames(data.attendeeNames))
         && validOptionalString(data.email, 320)
         && validOptionalString(data.phone, 32)
         && validOptionalString(data.groupName, 250)
         && data.personsAttending is int
         && data.personsAttending >= 1
         && data.personsAttending <= 100
-        && data.paymentStatus in ['paid', 'pending', 'complimentary', 'door-list', 'unknown']
+        && data.paymentStatus in ['paid', 'pending', 'complimentary', 'door', 'door-list', 'unknown']
         && validOptionalString(data.paymentReference, 250)
         && data.ticketStatus in ['no-ticket-assigned', 'partially-assigned', 'assigned']
         && validOptionalString(data.ticketCode, 32)
@@ -328,6 +337,8 @@ service cloud.firestore {
         && request.resource.data.fullName == resource.data.fullName
         && request.resource.data.email == resource.data.email
         && request.resource.data.phone == resource.data.phone
+        && (!('buyerName' in request.resource.data) || !('buyerName' in resource.data) || request.resource.data.buyerName == resource.data.buyerName)
+        && (!('attendeeNames' in request.resource.data) || !('attendeeNames' in resource.data) || request.resource.data.attendeeNames == resource.data.attendeeNames)
         && request.resource.data.groupName == resource.data.groupName
         && request.resource.data.personsAttending == resource.data.personsAttending
         && request.resource.data.paymentStatus == resource.data.paymentStatus
@@ -367,12 +378,20 @@ service cloud.firestore {
     function isRegistrationDetailsUpdate() {
       return registrationIdentityUnchanged()
         && ticketFieldsUnchanged()
-        && checkInFieldsUnchanged();
+        && checkInFieldsUnchanged()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'fullName', 'buyerName', 'attendeeNames', 'email', 'phone',
+          'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
+          'notes', 'updatedAt'
+        ]);
     }
 
     function isTicketAssignmentUpdate() {
       return registrationDetailsUnchanged()
         && checkInFieldsUnchanged()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy', 'updatedAt'
+        ])
         && request.resource.data.ticketStatus == 'assigned'
         && request.resource.data.ticketCode is string
         && request.resource.data.ticketCode.size() > 0
@@ -384,6 +403,9 @@ service cloud.firestore {
     function isTicketUnassignmentUpdate() {
       return registrationDetailsUnchanged()
         && checkInFieldsUnchanged()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy', 'updatedAt'
+        ])
         && resource.data.ticketStatus == 'assigned'
         && request.resource.data.ticketStatus == 'no-ticket-assigned'
         && request.resource.data.ticketCode == null
@@ -488,8 +510,8 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // Future phases remain unavailable until their schemas and rules are
-    // implemented and tested.
+    // Reserved collections remain unavailable until their schemas and rules
+    // are implemented and tested.
     match /tickets/{documentId} {
       allow read, write: if false;
     }

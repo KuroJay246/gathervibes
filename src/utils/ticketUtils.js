@@ -1,11 +1,13 @@
+import { normalizePaymentStatus } from './paymentStatus.js'
+
 export const TICKET_CODE_PREFIX = 'GSV'
 export const TICKET_CODE_PATTERN = /^GSV-[A-HJ-NP-Z2-9]{6}$/
-export const FLEXIBLE_TICKET_CODE_PATTERN = /^[A-Z0-9]{2,12}-[A-Z0-9]{3,12}$/
+export const FLEXIBLE_TICKET_CODE_PATTERN = /^[A-Z0-9][A-Z0-9 _-]{0,31}$/
 export const SEQUENTIAL_TICKET_CODE_PATTERN = /^([A-Z0-9]{2,12})-(\d{3,6})$/
 export const TICKET_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 
 export function normalizeTicketCode(value) {
-  return (value || '').trim().toUpperCase().replace(/\s+/g, '-')
+  return (value || '').trim().toUpperCase().replace(/\s+/g, ' ')
 }
 
 export function buildTicketPrefix(event = {}) {
@@ -67,7 +69,9 @@ export function generateSequentialTicketCode(existingCodes = [], event = {}, min
 export function validateTicketCode(value, existingRegistrations = [], currentRegistrationId = null) {
   const code = normalizeTicketCode(value)
   if (!code) return 'Ticket code is required.'
-  if (!FLEXIBLE_TICKET_CODE_PATTERN.test(code)) return 'Use format PREFIX-001 or PREFIX-CODE with letters and numbers only.'
+  if (code.length > 32 || !FLEXIBLE_TICKET_CODE_PATTERN.test(code)) {
+    return 'Use letters, numbers, spaces, hyphens, or underscores only.'
+  }
 
   const duplicate = existingRegistrations.find((registration) => (
     registration.registrationId !== currentRegistrationId
@@ -115,15 +119,19 @@ export function canCompleteCheckIn(registration) {
 export function checkInWarnings(registration) {
   const warnings = []
   if (!registration?.ticketCode) warnings.push('No ticket code is assigned.')
-  if (registration?.paymentStatus === 'pending' || registration?.paymentStatus === 'unknown') {
+  const paymentStatus = normalizePaymentStatus(registration?.paymentStatus)
+  if (paymentStatus === 'pending' || paymentStatus === 'unknown') {
     warnings.push('Payment is not marked paid.')
   }
+  if (paymentStatus === 'door') warnings.push('Door payment: collect or verify payment at check-in.')
   return warnings
 }
 
 export function searchableRegistrationText(registration) {
   return [
     registration.fullName,
+    registration.buyerName,
+    ...(Array.isArray(registration.attendeeNames) ? registration.attendeeNames : []),
     registration.email,
     registration.phone,
     registration.ticketCode,
