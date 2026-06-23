@@ -331,7 +331,8 @@ export function mapRows(parsedRows, headers, fieldMap, context = {}) {
     const attendeeNames = normalizeAttendeeNames(mappedValue('attendeeNames'))
     const buyerName = normalizeOptionalText(mappedText('buyerName'))
     const groupName = normalizeOptionalText(mappedText('groupName'))
-    const fullName = normalizeOptionalText(mappedText('fullName')) || attendeeNames[0] || buyerName || groupName || ''
+    const explicitFullName = normalizeOptionalText(mappedText('fullName'))
+    const fullName = explicitFullName || attendeeNames[0] || ''
     const rawPersons = mappedText('personsAttending')
     const rawPersonsTrimmed = String(rawPersons || '').trim()
     const suggestedPersons = attendeeNames.length > 0 ? attendeeNames.length : normalizePersonsAttending(rawPersons)
@@ -349,6 +350,7 @@ export function mapRows(parsedRows, headers, fieldMap, context = {}) {
       buyerName,
       attendeeNames,
       personsAttendingWasBlank: rawPersonsTrimmed === '',
+      displayNameFromFirstAttendee: !explicitFullName && attendeeNames.length > 0,
     }
 
     rowObj.fullName = fullName
@@ -374,7 +376,7 @@ export function validateRow(row) {
   const issues = []
   let status = 'valid'
 
-  if (!row.fullName?.trim() && !row.buyerName?.trim() && (!Array.isArray(row.attendeeNames) || row.attendeeNames.length === 0)) {
+  if (!row.fullName?.trim() && (!Array.isArray(row.attendeeNames) || row.attendeeNames.length === 0)) {
     issues.push('This row is blocked because required name information is missing.')
     status = 'blocked'
   }
@@ -525,6 +527,11 @@ function attendeeCountIssues(row) {
   return { review: [], warnings: [] }
 }
 
+function displayNameIssues(row) {
+  if (!row.displayNameFromFirstAttendee) return []
+  return ['Display name was set from the first attendee name.']
+}
+
 export function mergeRowsIntoGroupRegistration(rows = []) {
   const candidates = rows.filter((item) => item?.row ? item.status !== 'blocked' : true).map((item) => item.row || item)
   const ticketCodes = [...new Set(candidates.map((row) => normalizeTicketCode(row.ticketCode)).filter(Boolean))]
@@ -587,6 +594,7 @@ export async function processAndValidate(rows, eventId, existingRegistrations) {
     const warnings = status === 'blocked' ? [] : [
       ...sharedContactWarnings(existingRegistrations, processed, row),
       ...countIssues.warnings,
+      ...displayNameIssues(row),
       ...(!row.email && !row.phone ? ['No email or phone was found for this row. Confirm the buyer/contact details before import.'] : []),
     ]
     const finalStatus = dupReason || ticketDupReason

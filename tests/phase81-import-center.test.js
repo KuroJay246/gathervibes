@@ -110,8 +110,29 @@ test('attendee names map from Guest 1, Guest 2, and Guest 3 columns', () => {
   assert.equal(rows[0].fullName, 'Jayla Maynard')
 })
 
+test('buyerName alone does not replace attending guest name', async () => {
+  const parsed = parseCSV('Buyer Name,Email,Persons Attending\nJane Buyer,jane@example.com,1')
+  const rows = mapRows(parsed.rows, parsed.headers, buildInitialFieldMap(parsed.headers), { importBatchId: 'buyer-only' })
+  const processed = await processAndValidate(rows, 'codex-test', [])
+
+  assert.equal(rows[0].buyerName, 'Jane Buyer')
+  assert.equal(rows[0].fullName, '')
+  assert.equal(processed[0].status, 'blocked')
+  assert.ok(processed[0].issues.some((issue) => /required name information/.test(issue)))
+})
+
+test('missing fullName uses first attendee name with soft warning', async () => {
+  const parsed = parseCSV('Buyer Name,Attendee Names,Email,Persons Attending\nJane Buyer,"Jayla Maynard, Corey Bob",jane@example.com,2')
+  const rows = mapRows(parsed.rows, parsed.headers, buildInitialFieldMap(parsed.headers), { importBatchId: 'attendee-display' })
+  const processed = await processAndValidate(rows, 'codex-test', [])
+
+  assert.equal(rows[0].fullName, 'Jayla Maynard')
+  assert.equal(processed[0].status, 'warning')
+  assert.ok(processed[0].issues.some((issue) => /Display name was set from the first attendee name/.test(issue)))
+})
+
 test('persons attending matches attendee names count without warning', async () => {
-  const parsed = parseCSV('Buyer Name,Attendee Names,Persons Attending,Email\nJane Buyer,"Jayla Maynard, Corey Bob, Carl Griffith",3,jane@example.com')
+  const parsed = parseCSV('Full Name,Buyer Name,Attendee Names,Persons Attending,Email\nMaynard Group,Jane Buyer,"Jayla Maynard, Corey Bob, Carl Griffith",3,jane@example.com')
   const rows = mapRows(parsed.rows, parsed.headers, buildInitialFieldMap(parsed.headers), { importBatchId: 'attendee-match' })
   const processed = await processAndValidate(rows, 'codex-test', [])
 
