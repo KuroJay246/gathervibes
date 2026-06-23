@@ -11,6 +11,7 @@ import {
 import { doc, getDoc } from 'firebase/firestore'
 import { auth, db, isFirebaseConfigured } from '../lib/firebase'
 import { AuthContext } from './AuthContext'
+import { normalizeAccessEmail, resolveAccessRole, roleLabel } from '../utils/accessRoles'
 
 const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({ prompt: 'select_account' })
@@ -45,11 +46,12 @@ async function verifyAdminAccess(nextUser) {
     
     const data = accessDocument.data()
     const approvedEmails = Array.isArray(data?.approvedEmails) ? data.approvedEmails : []
-    const userEmail = typeof nextUser.email === 'string' ? nextUser.email.toLowerCase() : ''
+    const userEmail = normalizeAccessEmail(nextUser.email)
     
-    if (!approvedEmails.includes(userEmail)) {
+    if (!approvedEmails.map(normalizeAccessEmail).includes(userEmail)) {
       throw adminAccessError({ code: 'permission-denied' })
     }
+    return data
   } catch (error) {
     if (import.meta.env.DEV) {
       console.error('[Diagnostic] verifyAdminAccess failed:', {
@@ -73,8 +75,11 @@ async function verifyAdminAccess(nextUser) {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  const [accessControl, setAccessControl] = useState(null)
   const [loading, setLoading] = useState(isFirebaseConfigured)
   const [authError, setAuthError] = useState('')
+  const currentRole = useMemo(() => resolveAccessRole(accessControl, user?.email) || 'admin', [accessControl, user?.email])
+  const currentRoleLabel = useMemo(() => roleLabel(currentRole), [currentRole])
 
   useEffect(() => {
     if (!auth) {
@@ -89,15 +94,17 @@ export function AuthProvider({ children }) {
 
       setLoading(true)
       try {
-        await verifyAdminAccess(nextUser)
+        const accessData = await verifyAdminAccess(nextUser)
         if (active) {
           setUser(nextUser)
+          setAccessControl(accessData)
           setAuthError('')
           redirectToWebAppHostIfNeeded()
         }
       } catch (error) {
         if (active) {
           setUser(null)
+          setAccessControl(null)
           setAuthError(error.code || 'auth/access-check-failed')
         }
         await firebaseSignOut(auth)
@@ -136,6 +143,7 @@ export function AuthProvider({ children }) {
       if (!nextUser) {
         if (redirectSettled) {
           setUser(null)
+          setAccessControl(null)
           setLoading(false)
         }
         return
@@ -156,11 +164,13 @@ export function AuthProvider({ children }) {
 
     const result = await signInRequest()
     try {
-      await verifyAdminAccess(result.user)
+      const accessData = await verifyAdminAccess(result.user)
       setUser(result.user)
+      setAccessControl(accessData)
       return result
     } catch (error) {
       await firebaseSignOut(auth)
+      setAccessControl(null)
       setAuthError(error.code || 'auth/access-check-failed')
       throw error
     }
@@ -186,6 +196,9 @@ export function AuthProvider({ children }) {
   const value = useMemo(
     () => ({
       user,
+      accessControl,
+      currentRole,
+      currentRoleLabel,
       loading,
       authError,
       isConfigured: isFirebaseConfigured,
@@ -195,10 +208,11 @@ export function AuthProvider({ children }) {
       signOut: () => {
         if (!auth) return Promise.resolve()
         setUser(null)
+        setAccessControl(null)
         return firebaseSignOut(auth)
       },
     }),
-    [authError, completeSignIn, loading, startGoogleSignIn, user],
+    [accessControl, authError, completeSignIn, currentRole, currentRoleLabel, loading, startGoogleSignIn, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

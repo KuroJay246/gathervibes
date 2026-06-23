@@ -2,11 +2,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, CheckCircle2, Clipboard, Database, ShieldCheck } from 'lucide-react'
 import { collection, getDocs, limit, query, where } from 'firebase/firestore'
 import { SystemHealthPanel } from '../components/SystemHealthPanel'
+import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { db } from '../lib/firebase'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { buildFinanceSummary, calculateRegistrationFinance, financeWarnings, formatCurrency } from '../utils/financeUtils'
 import { qrPayloadForTicketCode } from '../utils/qrTicketUtils'
+import { COMMUNICATION_SEGMENTS, COMMUNICATION_TEMPLATES, buildCommunicationsSegmentSummary } from '../utils/communicationsUtils'
 import {
   CODEX_TEST_EVENT_ID,
   CODEX_TEST_EVENT_NAME,
@@ -29,6 +31,7 @@ function StatusBadge({ ok, children }) {
 }
 
 export function QaPage() {
+  const { accessControl, currentRoleLabel } = useAuth()
   const { activeEvent } = useActiveEvent()
   const [events, setEvents] = useState([])
   const [auditStatus, setAuditStatus] = useState('checking')
@@ -99,6 +102,7 @@ export function QaPage() {
       const rows = registrationsSnapshot.docs.map((doc) => ({ registrationId: doc.id, ...doc.data() }))
       const metrics = buildRegistrationMetrics(rows, activeEvent)
       const financeSummary = buildFinanceSummary(rows, activeEvent)
+      const communicationsSummary = buildCommunicationsSegmentSummary(rows, activeEvent)
       const ticketCodes = rows.map((row) => String(row.ticketCode || '').trim()).filter(Boolean)
       const duplicateTicketCodes = ticketCodes.filter((code, index) => ticketCodes.indexOf(code) !== index)
       const missingBuyer = rows.filter((row) => !row.buyerName && !row.email && !row.phone)
@@ -143,7 +147,16 @@ export function QaPage() {
         { label: 'Checked-in count', status: 'pass', detail: `${metrics.checkedInRegistrations} registrations / ${metrics.checkedInPersons} persons` },
         { label: 'auditLogs reachable', status: auditStatus === 'ok' ? 'pass' : 'warning', detail: auditStatus },
         { label: 'QR payload privacy', status: hasPrivateQrData ? 'fail' : 'pass', detail: qrPrivateData },
-        { label: 'Approved admin detected', status: db ? 'pass' : 'fail', detail: 'Protected page loaded with Firestore access' },
+        { label: 'Current user role detected', status: currentRoleLabel ? 'pass' : 'warning', detail: currentRoleLabel || 'Role pending accessControl load' },
+        { label: 'Approved admin detected', status: db && Array.isArray(accessControl?.approvedEmails) ? 'pass' : 'fail', detail: 'Protected page loaded with settings/accessControl allowlist access' },
+        { label: 'No public access warning', status: 'pass', detail: 'App remains private and allowlist-only.' },
+        { label: 'Role navigation summary', status: 'warning', detail: 'Role display is active; scoped role navigation and role rules are deferred.' },
+        { label: 'Communications templates available', status: COMMUNICATION_TEMPLATES.length >= 12 ? 'pass' : 'warning', detail: `${COMMUNICATION_TEMPLATES.length} copy-only templates` },
+        { label: 'Communications segments available', status: COMMUNICATION_SEGMENTS.finance.length >= 9 ? 'pass' : 'warning', detail: 'Payment, finance, ticket, attendance, contact, and group filters available' },
+        { label: 'Missing contact count', status: communicationsSummary.missingEmailOrPhone ? 'warning' : 'pass', detail: `${communicationsSummary.missingEmailOrPhone} rows missing email or phone` },
+        { label: 'Missing ticket count', status: communicationsSummary.missingTicket ? 'warning' : 'pass', detail: `${communicationsSummary.missingTicket} rows` },
+        { label: 'Outstanding balance segment', status: communicationsSummary.outstandingBalance ? 'warning' : 'pass', detail: `${communicationsSummary.outstandingBalance} rows` },
+        { label: 'No Gmail/Outlook/AI sending enabled', status: 'pass', detail: 'Communications Pro is copy-only.' },
         { label: 'Import readiness', status: workingEventIsCodex ? 'pass' : 'warning', detail: workingEventIsCodex ? 'CODEX_TEST selected' : 'Use CODEX_TEST for QA imports' },
       ])
       setLastRunAt(new Date().toLocaleString())

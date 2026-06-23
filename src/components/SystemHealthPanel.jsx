@@ -19,7 +19,7 @@ function StatusIcon({ status }) {
 }
 
 export function SystemHealthPanel({ compact = false }) {
-  const { user } = useAuth()
+  const { user, currentRoleLabel } = useAuth()
   const { activeEvent } = useActiveEvent()
   const [allowlistApproved, setAllowlistApproved] = useState(null)
   const [eventsStatus, setEventsStatus] = useState('warn')
@@ -83,6 +83,7 @@ export function SystemHealthPanel({ compact = false }) {
       firebaseConfigured: isFirebaseConfigured,
       projectId: firebaseProjectId,
       user,
+      currentRoleLabel,
       allowlistApproved,
       eventsStatus,
       registrationsStatus,
@@ -91,7 +92,7 @@ export function SystemHealthPanel({ compact = false }) {
       activeEvent,
       buildCommit: import.meta.env.VITE_BUILD_COMMIT,
     }),
-    [activeEvent, allowlistApproved, auditStatus, eventsStatus, registrationsStatus, user],
+    [activeEvent, allowlistApproved, auditStatus, currentRoleLabel, eventsStatus, registrationsStatus, user],
   )
 
   return (
