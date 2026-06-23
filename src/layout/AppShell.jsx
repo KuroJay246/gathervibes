@@ -42,7 +42,7 @@ const navGroups = [
   {
     label: 'Guest experience',
     items: [
-      { to: '/communications', label: 'Communication', icon: MessageSquareText, available: true },
+      { to: '/communications', label: 'Communications', icon: MessageSquareText, available: true },
       { to: '/ai-writing', label: 'AI Writing', icon: Bot, phase: 7 },
     ],
   },
@@ -71,12 +71,12 @@ function SidebarContent({ onNavigate, mobile = false }) {
         <BrandMark light />
       </div>
 
-      <div className="mx-4 rounded-2xl border border-white/10 bg-white/[0.06] p-3.5">
-        <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.24em] text-[#D7B8BD]">Current event</p>
-        <Link to="/events" onClick={onNavigate} className="flex w-full items-center justify-between gap-3 text-left">
-          <span>
-            <span className="block truncate text-sm font-medium text-white">{activeEvent?.eventName || 'No event selected'}</span>
-            <span className="mt-0.5 block text-[11px] text-white/45">
+      <div className="mx-4 max-w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-3.5">
+        <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.24em] text-[#D7B8BD]">Working Event</p>
+        <Link to="/events" onClick={onNavigate} className="flex w-full min-w-0 items-center justify-between gap-3 text-left">
+          <span className="min-w-0 flex-1 overflow-hidden">
+            <span className="block max-w-full truncate text-sm font-medium text-white">{activeEvent?.eventName || 'No event selected'}</span>
+            <span className="mt-0.5 block max-w-full truncate text-[11px] text-white/45">
               {activeEvent ? formatEventDate(activeEvent.eventDate) : 'Choose one from Events'}
             </span>
           </span>

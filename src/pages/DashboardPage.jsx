@@ -6,12 +6,16 @@ import {
   ChevronRight,
   Clock,
   Database,
+  FileInput,
   Flame,
   Gift,
   Info,
   LockKeyhole,
+  MessageSquareText,
+  ScanLine,
   MapPin,
   ShieldCheck,
+  TicketCheck,
   Users,
   X,
 } from 'lucide-react'
@@ -134,7 +138,7 @@ export function DashboardPage() {
 
             <h2 className="font-serif text-3xl leading-tight sm:text-4xl lg:text-[42px]">
               {activeEvent ? 'Working on ' : 'The table is set for your'}
-              <span className="italic text-[#E9B7C0]"> {activeEvent?.eventName || 'next gathering.'}</span>
+              <span className="break-words italic text-[#E9B7C0]"> {activeEvent?.eventName || 'next gathering.'}</span>
             </h2>
             {activeEvent && (
               <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/55">
@@ -164,9 +168,9 @@ export function DashboardPage() {
           {/* Selected / Working Event card */}
           <article className="safe-card rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
             <div className="mb-1 flex items-start justify-between gap-4">
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Working Event</p>
-                <h3 className="mt-1.5 font-serif text-2xl text-[#2B1723]">
+                <h3 className="mt-1.5 max-w-full break-words font-serif text-2xl leading-tight text-[#2B1723]">
                   {activeEvent ? activeEvent.eventName : 'No event selected'}
                 </h3>
               </div>
@@ -346,23 +350,28 @@ export function DashboardPage() {
           {/* Quick links */}
           <article className="safe-card rounded-[24px] border border-[#E6D4B4] bg-[#F8E9CB] p-6">
             <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Quick navigation</p>
-            <h3 className="mt-1.5 font-serif text-xl text-[#4E3928]">Workspace</h3>
-            <ul className="mt-5 space-y-2">
+            <h3 className="mt-1.5 font-serif text-xl text-[#4E3928]">Workspace tools</h3>
+            <ul className="mt-5 grid gap-2">
               {[
-                { to: '/events', label: 'Events', sub: 'Create and manage events' },
-                { to: '/registrations', label: 'Registrations', sub: 'Guest list for selected event' },
-                { to: '/tickets', label: 'Tickets', sub: 'Assign and track ticket codes' },
-                { to: '/check-in', label: 'Check-In', sub: 'Search and check in guests at the door' },
-                { to: '/imports', label: 'Import Center', sub: 'Upload CSV exports or paste table rows' },
-              ].map(({ to, label, sub }) => (
+                { to: '/events', label: 'Events', sub: 'Manage event details and select the Working Event.', icon: CalendarDays },
+                { to: '/registrations', label: 'Registrations', sub: 'View and manage guest records.', icon: Users },
+                { to: '/imports', label: 'Import Center', sub: 'Upload or paste guest lists.', icon: FileInput },
+                { to: '/tickets', label: 'Tickets', sub: 'Assign ticket codes and generate QR codes.', icon: TicketCheck },
+                { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Search, scan, check in, and undo check-ins.', icon: ScanLine },
+                { to: '/communications', label: 'Communications', sub: 'Prepare copy-ready guest messages.', icon: MessageSquareText },
+                { to: '/qa', label: 'QA Center / System Health', sub: 'Run safe checks using CODEX_TEST.', icon: ShieldCheck },
+              ].map(({ to, label, sub, icon: Icon }) => (
                 <li key={to}>
                   <Link
                     to={to}
-                    className="flex items-center justify-between rounded-xl bg-white/60 px-4 py-3 text-[#4E3928] transition hover:bg-white/90"
+                    className="flex min-w-0 items-center gap-3 rounded-xl bg-white/60 px-4 py-3 text-[#4E3928] transition hover:bg-white/90"
                   >
-                    <div>
-                      <p className="text-sm font-bold">{label}</p>
-                      <p className="mt-0.5 text-[11px] text-[#7A6548]">{sub}</p>
+                    <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#FFF8F2] text-[#86662C]">
+                      <Icon className="size-4" strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="break-words text-sm font-bold">{label}</p>
+                      <p className="mt-0.5 break-words text-[11px] leading-4 text-[#7A6548]">{sub}</p>
                     </div>
                     <ChevronRight className="size-4 shrink-0 text-[#A08550]" />
                   </Link>
@@ -371,18 +380,10 @@ export function DashboardPage() {
             </ul>
 
             <div className="mt-5 border-t border-[#E6D4B4] pt-4">
-              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Future phases</p>
-              <ul className="mt-2 space-y-1">
-                {[
-                  { label: 'Communications', phase: 'Phase 6' },
-                  { label: 'AI writing', phase: 'Phase 7' },
-                ].map(({ label, phase }) => (
-                  <li key={label} className="flex items-center justify-between rounded-lg px-2 py-1.5 text-[11px]">
-                    <span className="text-[#7A6548]">{label}</span>
-                    <span className="rounded-full bg-[#E6D4B4] px-2 py-0.5 text-[9px] font-bold text-[#86662C]">{phase}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Deferred</p>
+              <p className="mt-2 text-[11px] leading-5 text-[#7A6548]">
+                AI writing and external email integrations are not active in this workspace.
+              </p>
             </div>
 
             <div className="mt-4 flex items-start gap-2 rounded-xl bg-white/40 px-3 py-2.5">
