@@ -55,7 +55,7 @@ const TEMPLATES = [
     when: 'Use this for guests who are expected to pay when they arrive.',
     required: ['Full Name', 'Payment Status'],
     optional: ['Persons Attending', 'Price Tier', 'Ticket Price', 'Balance Due'],
-    exampleUse: 'Preparing the door list before event day.',
+    exampleUse: 'Preparing the event-day payment review list before guests arrive.',
     leaveBlank: 'Leave Amount Paid blank or zero until payment is confirmed.',
     doNotPut: 'Do not mark a row Door Paid unless the late or door payment was confirmed.',
     duplicates: 'Use ticket code or full name plus contact to avoid adding the same door guest twice.',

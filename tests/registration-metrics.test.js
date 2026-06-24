@@ -47,10 +47,10 @@ test('Dashboard and Check-In use shared count wording and helpers', async () => 
   assert.match(dashboard, /Registrations/)
   assert.match(dashboard, /Persons/)
   assert.match(dashboard, /capacity uses persons attending/)
-  assert.match(checkIn, /Total registrations/)
-  assert.match(checkIn, /Total persons attending/)
-  assert.match(checkIn, /Remaining persons/)
-  assert.match(checkIn, /Persons attending may be higher than registrations/)
+  assert.match(checkIn, /Total Registrations/)
+  assert.match(checkIn, /Total Guests/)
+  assert.match(checkIn, /Remaining Guests/)
+  assert.match(checkIn, /Some registrations include multiple guests/)
 })
 
 test('Check-In page waits for Firestore success and avoids false success on permission denied', async () => {

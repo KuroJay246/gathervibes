@@ -163,6 +163,9 @@ export function ImportPreviewTable({
               ? 'Review hard errors, shared-contact warnings, and possible true duplicates before the final preview.'
               : 'Preview the exact rows that will be written after confirmation. No Firestore write happens before this step.'}
           </p>
+          <p className="mt-1 text-xs leading-5 text-[#8C7567]">
+            Payment and finance columns use imported values only. Missing ticket price or amount due stays Needs Review instead of using the event base ticket price.
+          </p>
         </div>
         <div className="flex items-center gap-4 text-sm font-semibold">
           <div className="flex items-center gap-1.5 text-[#1E7345]">
@@ -233,9 +236,9 @@ export function ImportPreviewTable({
                 <th className="px-4 py-3">Row</th>
                 <th className="px-4 py-3">Guests</th>
                 <th className="px-4 py-3">Buyer</th>
-                <th className="px-4 py-3">Count</th>
-                <th className="px-4 py-3">Pay</th>
-                <th className="px-4 py-3">Money</th>
+                <th className="px-4 py-3">Guest Count</th>
+                <th className="px-4 py-3">Payment</th>
+                <th className="px-4 py-3">Finance Review</th>
                 <th className="px-4 py-3">Ticket</th>
                 <th className="px-4 py-3">Details</th>
                 <th className="px-4 py-3">Issues</th>

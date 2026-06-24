@@ -13,19 +13,39 @@ import { buildTicketPrefix, generateSequentialTicketCode, generateTicketCode, no
 import { formatPaymentLabel, normalizePaymentStatus, paymentStatusMatches } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency } from '../utils/financeUtils'
 
-const FILTERS = [
-  { value: 'all', label: 'All' },
-  { value: 'assigned', label: 'Assigned' },
-  { value: 'no-ticket', label: 'Missing Ticket' },
-  { value: 'paid', label: 'Paid' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'outstanding', label: 'Outstanding Balance' },
-  { value: 'door', label: 'Door Paid' },
-  { value: 'door-list', label: 'To Pay at Door' },
-  { value: 'checked-in', label: 'Checked In' },
-  { value: 'not-checked-in', label: 'Not Checked In' },
-  { value: 'complimentary', label: 'Complimentary' },
-  { value: 'review-needed', label: 'Review Needed' },
+const FILTER_GROUPS = [
+  {
+    label: 'Ticket Status',
+    items: [
+      { value: 'all', label: 'All Tickets' },
+      { value: 'assigned', label: 'Assigned' },
+      { value: 'no-ticket', label: 'Missing Ticket Code' },
+    ],
+  },
+  {
+    label: 'Payment Status',
+    items: [
+      { value: 'paid', label: 'Paid' },
+      { value: 'pending', label: 'Pending' },
+      { value: 'outstanding', label: 'Outstanding Balance' },
+      { value: 'door', label: 'Door Paid' },
+      { value: 'door-list', label: 'To Pay at Door' },
+      { value: 'complimentary', label: 'Complimentary' },
+    ],
+  },
+  {
+    label: 'Check-In Status',
+    items: [
+      { value: 'checked-in', label: 'Checked In' },
+      { value: 'not-checked-in', label: 'Not Checked In' },
+    ],
+  },
+  {
+    label: 'Review',
+    items: [
+      { value: 'review-needed', label: 'Needs Review' },
+    ],
+  },
 ]
 
 function titleCase(value = '') {
@@ -297,29 +317,34 @@ export function TicketsPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Advanced Filters</p>
           <p className="mt-1 text-xs text-[#816D62]">Search ticket code, guest, buyer, attendees, email, phone, group, payment status, or price tier.</p>
         </div>
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative max-w-md flex-1">
+        <div className="grid gap-4">
+        <div className="relative max-w-2xl">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
           <input
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search name, email, phone, ticket code…"
+            placeholder="Search guest, buyer, contact, group, ticket code, or payment..."
             className="w-full rounded-xl border border-[#E5D7CF] bg-white py-3 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
           />
         </div>
-        <div className="flex overflow-x-auto pb-2 lg:pb-0">
-          <div className="flex gap-2">
-            {FILTERS.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => setFilter(item.value)}
-                className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition ${filter === item.value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1]'}`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
+        <div className="grid gap-3 lg:grid-cols-4">
+          {FILTER_GROUPS.map((group) => (
+            <div key={group.label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">{group.label}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {group.items.map((item) => (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setFilter(item.value)}
+                    className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${filter === item.value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1]'}`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
         </div>
       </section>
@@ -379,8 +404,8 @@ export function TicketsPage() {
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
-                  <th className="px-4 py-3">Guest</th>
-                  <th className="px-4 py-3">Contact</th>
+                  <th className="px-4 py-3">Guest / Registration</th>
+                  <th className="px-4 py-3">Buyer / Contact</th>
                   <th className="px-4 py-3">Payment</th>
                   <th className="px-4 py-3">Ticket</th>
                   <th className="px-4 py-3">Check-in</th>
@@ -414,7 +439,7 @@ export function TicketsPage() {
                       })()}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'No ticket'}</div>
+                      <div className="font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'Missing ticket code'}</div>
                       <div className="mt-1"><TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{titleCase(registration.ticketStatus || 'no-ticket-assigned')}</TicketBadge></div>
                       {registration.ticketStatus === 'assigned' && registration.ticketCode && (
                         <div className="mt-3">

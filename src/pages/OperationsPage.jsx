@@ -35,14 +35,14 @@ const PAYMENT_METHOD_OPTIONS = [
   ['bank-transfer', 'Bank Transfer'],
   ['firstpay', 'FirstPay'],
   ['card', 'Card'],
-  ['unknown', 'Unknown / Not recorded'],
+  ['unknown', 'Unknown / Not Recorded'],
 ]
 
 const STATUS_HELP = {
-  expected: 'Expected means money should come later.',
-  received: 'Received means income is already collected.',
-  paid: 'Paid means an expense or refund already went out.',
-  pending: 'Pending means not settled yet.',
+  expected: 'Expected means the money or cost is planned but not settled yet.',
+  received: 'Received means income has already been collected.',
+  paid: 'Paid means an expense or refund has already gone out.',
+  pending: 'Pending means this entry is not settled yet.',
   cancelled: 'Cancelled keeps the entry visible but removes it from totals.',
 }
 
@@ -229,56 +229,56 @@ export function OperationsPage() {
               <select value={form.entryType} onChange={(event) => setForm((current) => ({ ...current, entryType: event.target.value }))} className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm">
                 {LEDGER_ENTRY_TYPES.map((type) => <option key={type} value={type}>{labelFor(type)}</option>)}
               </select>
-              <FieldHelp>Income is money coming in; Expense is money going out; Adjustment/refund corrects totals.</FieldHelp>
+              <FieldHelp>Choose whether this entry is money coming in, money going out, or an internal correction.</FieldHelp>
             </label>
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Status</span>
               <select value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm">
                 {LEDGER_STATUSES.map((status) => <option key={status} value={status}>{labelFor(status)}</option>)}
               </select>
-              <FieldHelp>{STATUS_HELP[form.status]}</FieldHelp>
+              <FieldHelp>Track whether this entry is planned, pending, paid, cancelled, or already received. {STATUS_HELP[form.status]}</FieldHelp>
             </label>
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Category</span>
               <input value={form.category} onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))} placeholder="Sponsor, Baker payment, Venue, Decor" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-              <FieldHelp>Example: Sponsor, Baker payment, Venue, Decor, Water, Printing.</FieldHelp>
+              <FieldHelp>Group this entry so event costs and income are easier to review later.</FieldHelp>
             </label>
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Amount</span>
               <input value={form.amount} onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))} placeholder="100.00" type="number" min="0" step="0.01" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-              <FieldHelp>Enter BBD amount only, e.g. 100.00.</FieldHelp>
+              <FieldHelp>Enter the amount for this operation. Leave blank only when no amount is known yet.</FieldHelp>
             </label>
             <label className="block sm:col-span-2">
               <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Short description / title</span>
               <input value={form.label} onChange={(event) => setForm((current) => ({ ...current, label: event.target.value }))} placeholder="Sponsor payment from Cake Co." className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-              <FieldHelp>Use a clear title so the ledger row is easy to recognize later.</FieldHelp>
+              <FieldHelp>Use a short name that makes this entry easy to recognize.</FieldHelp>
             </label>
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Payment Method</span>
               <select value={form.paymentMethod} onChange={(event) => setForm((current) => ({ ...current, paymentMethod: event.target.value }))} className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm">
                 {PAYMENT_METHOD_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
               </select>
-              <FieldHelp>Use Unknown / Not recorded when the method is unclear.</FieldHelp>
+              <FieldHelp>Choose how the payment was made or recorded. Use Unknown / Not Recorded only when the detail is genuinely not available yet.</FieldHelp>
             </label>
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Payment Reference</span>
               <input value={form.paymentReference} onChange={(event) => setForm((current) => ({ ...current, paymentReference: event.target.value }))} placeholder="Receipt or transaction reference" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-              <FieldHelp>Receipt number, transaction reference, or leave blank if unknown.</FieldHelp>
+              <FieldHelp>Add a receipt number, transfer note, FirstPay reference, invoice number, or other proof reference.</FieldHelp>
             </label>
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Paid By / Paid To</span>
               <input value={form.paidByOrPaidTo} onChange={(event) => setForm((current) => ({ ...current, paidByOrPaidTo: event.target.value }))} placeholder="Who paid you, or who you paid" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-              <FieldHelp>Who paid you, or who you paid.</FieldHelp>
+              <FieldHelp>Record who paid or who received the payment.</FieldHelp>
             </label>
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Date</span>
               <input value={form.date} onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))} type="date" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-              <FieldHelp>Use the expected or actual payment date.</FieldHelp>
+              <FieldHelp>Use the date the payment, expense, or note relates to.</FieldHelp>
             </label>
             <label className="block sm:col-span-2">
               <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Notes</span>
               <textarea value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} placeholder="Short internal note" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" rows={3} />
-              <FieldHelp>Internal note only. Do not store credentials, private exports, or payment proof links here.</FieldHelp>
+              <FieldHelp>Add any extra context needed for later review. Do not store credentials, private exports, or payment proof links here.</FieldHelp>
             </label>
           </div>
 
@@ -307,7 +307,7 @@ export function OperationsPage() {
           <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">
             {filteredEntries.length === 0 ? (
               <div className="p-6 text-sm leading-6 text-[#816D62]">
-                No operations entries yet. Add sponsor income, expenses, refunds, or adjustments here. This tracker is separate from ticket sales.
+                No operations entries yet. Add sponsor income, vendor or baker payments, expenses, refunds, or adjustments here. This tracker is separate from ticket sales and is scoped to the selected Working Event.
               </div>
             ) : (
               <div className="overflow-x-auto">

@@ -9,15 +9,15 @@ const REGISTRATION_FIELDS = [
   { value: 'phone', label: 'Phone Number' },
   { value: 'groupName', label: 'Group Name' },
   { value: 'preferredSchool', label: 'Preferred School / Organization Notes' },
-  { value: 'personsAttending', label: 'Persons Attending (Default 1)' },
-  { value: 'paymentStatus', label: 'Payment Status' },
-  { value: 'priceTier', label: 'Price Tier / Ticket Type' },
-  { value: 'ticketPrice', label: 'Ticket Price' },
-  { value: 'amountDue', label: 'Amount Due' },
-  { value: 'amountPaid', label: 'Amount Paid' },
-  { value: 'balanceDue', label: 'Balance Due' },
-  { value: 'paymentMethod', label: 'Payment Method' },
-  { value: 'paymentReference', label: 'Payment Reference' },
+  { value: 'personsAttending', label: 'Guest Count (Default 1)' },
+  { value: 'paymentStatus', label: 'Payment Status', help: 'Use Paid, Pending, Complimentary, Door Paid, or To Pay at Door. Unknown statuses stop for review.' },
+  { value: 'priceTier', label: 'Price Tier / Ticket Type', help: 'Use the named ticket tier, such as Early Bird, General, Door/Late, or Complimentary.' },
+  { value: 'ticketPrice', label: 'Ticket Price', help: 'Use the explicit price for one ticket. Leave blank if it is not known.' },
+  { value: 'amountDue', label: 'Amount Due', help: 'Use the expected total for this registration. Do not rely on the event base price for missing values.' },
+  { value: 'amountPaid', label: 'Amount Paid', help: 'Use only confirmed money collected. Leave blank or zero when not confirmed.' },
+  { value: 'balanceDue', label: 'Balance Due', help: 'Use the remaining balance. To Pay at Door rows should keep the balance due visible.' },
+  { value: 'paymentMethod', label: 'Payment Method', help: 'Map only proven methods. Use Unknown when the method is unclear.' },
+  { value: 'paymentReference', label: 'Payment Reference', help: 'Use a safe receipt or transfer reference. Do not paste Gmail, Drive, bank, or card links.' },
   { value: 'ticketCode', label: 'Ticket Code' },
   { value: 'timestamp', label: 'Timestamp (for duplicate detection)' },
   { value: 'notes', label: 'Notes' },
@@ -65,6 +65,7 @@ export function FieldMappingForm({
         {headers.map((header, index) => {
           // Find if this field is currently mapped. attendeeNames can map to several columns.
           const mappedKey = Object.keys(fieldMap).find(key => fieldMapsIndex(key, index))
+          const mappedField = REGISTRATION_FIELDS.find((field) => field.value === mappedKey)
           
           return (
             <div key={index} className="flex flex-col gap-3 rounded-xl border border-[#F2E8E1] p-4 sm:flex-row sm:items-center sm:gap-6">
@@ -111,6 +112,9 @@ export function FieldMappingForm({
                     </option>
                   ))}
                 </select>
+                {mappedField?.help && (
+                  <p className="mt-1 text-[11px] leading-4 text-[#8C7567]">{mappedField.help}</p>
+                )}
               </div>
             </div>
           )

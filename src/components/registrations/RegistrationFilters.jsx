@@ -14,7 +14,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
         <div>
           <h3 className="font-bold text-[#2B1723]">Advanced Filters</h3>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">
-            Search buyer, attendee, contact, group, ticket, payment, and review fields without covering the category tabs below.
+            Search buyer, guest, contact, group, ticket, payment, and review fields without covering the category tabs below.
           </p>
         </div>
         <button 
@@ -135,7 +135,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
             onChange={(e) => handleChange('missingTicket', e.target.checked)}
             className="rounded border-[#C4B4AA] text-[#B76E79] focus:ring-[#B76E79]"
           />
-          Missing Ticket
+          Missing Ticket Code
         </label>
 
         <label className="flex items-center gap-2 text-sm text-[#5D4A52]">
@@ -155,7 +155,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
             onChange={(e) => handleChange('reviewNeeded', e.target.checked)}
             className="rounded border-[#C4B4AA] text-[#B76E79] focus:ring-[#B76E79]"
           />
-          Review Needed
+          Needs Review
         </label>
       </div>
     </div>

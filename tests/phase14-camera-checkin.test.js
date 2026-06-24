@@ -86,15 +86,15 @@ test('CheckInPage has sticky header for mobile event-day use', async () => {
 test('CheckInPage shows inline checked-in count in header', async () => {
   const src = await readFile('src/pages/CheckInPage.jsx', 'utf8')
   assert.match(src, /Checked In:/)
-  assert.match(src, /registrations \/ .*persons/)
+  assert.match(src, /guestCountText\(summary\.checkedInRegistrations, summary\.checkedInPersons\)/)
 })
 
 test('CheckInPage includes organizer-review list filters and group badges', async () => {
   const page = await readFile('src/pages/CheckInPage.jsx', 'utf8')
   const utils = await readFile('src/utils/checkInUtils.js', 'utf8')
-  assert.match(utils, /Group registrations/)
+  assert.match(utils, /Group Registrations/)
   assert.match(utils, /Complimentary/)
-  assert.match(utils, /Review Needed/)
+  assert.match(utils, /Needs Review/)
   assert.match(page, /Bulk actions require confirmation/)
   assert.match(page, /Group of/)
 })

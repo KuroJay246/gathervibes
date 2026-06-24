@@ -65,7 +65,7 @@ Tickets now has a clearer Advanced Filters panel with All, Assigned, Missing Tic
 
 ## Check-In filter/list mode result
 
-Check-In list mode now includes All guests, Not checked in, Checked in, Door Paid, To Pay at Door, Outstanding Balance, Missing Ticket, Group registrations, Complimentary, and Review Needed. The list header shows registrations and persons for the current filter. Bulk check-in and undo still require confirmation and do not delete records.
+Check-In list mode now includes All guests, Not checked in, Checked in, Door Paid, To Pay at Door, Outstanding Balance, Missing Ticket Code, Group Registrations, Complimentary, and Needs Review. The list header shows registrations and guests for the current filter. Bulk check-in and undo still require confirmation and do not delete records.
 
 ## Operations ledger permission result
 
@@ -73,7 +73,7 @@ The listener now queries only `operationsLedger` rows where `eventId` equals the
 
 ## Operations helper text result
 
-The Add/Edit form now explains Entry Type, Category, Short description/title, Amount, Payment Method, Payment Reference, Paid By / Paid To, Date, Status, Unknown / Not recorded, and Notes. Empty state explains this tracker is separate from ticket sales.
+The Add/Edit form now explains Entry Type, Category, Short description/title, Amount, Payment Method, Payment Reference, Paid By / Paid To, Date, Status, Unknown / Not Recorded, and Notes. Empty state explains this tracker is separate from ticket sales.
 
 ## Import explanation result
 
@@ -144,3 +144,25 @@ Yes.
 ## Safe to merge after organizer approval
 
 Yes, after organizer retest confirms the Operations load fix and CPB dry-run review output. Do not merge before approval.
+
+## Second organizer wording-polish pass
+
+Completed after commit `343ff0d`.
+
+- Added a reusable info hint for registration count cards so explanations do not crowd the summary grid.
+- Replaced visible shorthand such as `regs / persons`, `rows`, and old finance warning labels with organizer-facing Registration, Guest, Finance Review, Missing Ticket Code, and Needs Review wording.
+- Grouped Tickets filters into Ticket Status, Payment Status, Check-In Status, and Review sections.
+- Grouped Check-In filters into Guest Lookup, Check-In Status, Payment Status, and Review sections.
+- Changed Check-In helper copy from door-list language to event-day guest/payment-review list language.
+- Added import mapping explanations for payment status, payment method, references, ticket price, amount due, amount paid, balance due, and price tier.
+- Tightened Operations helper copy for Entry Type, Category, Amount, Payment Method, Payment Reference, Paid By / Paid To, Date, Status, Unknown / Not Recorded, Notes, and the empty state.
+- Updated QA and static checks to enforce the polished labels and to keep QR privacy and dry-run safety checks in place.
+
+Verification for this second pass:
+
+- `npm run lint`: passed
+- `npm test`: passed, 208 tests total, 199 passed, 9 skipped because the Firestore emulator was not active
+- `npm run build`: passed with only the existing Vite large chunk warning
+- Hosting deploy: passed, Hosting only to `gathervibeshub`
+
+Firestore rules remained unchanged. CPB apply was not run. No CPB registrations or missing-registration candidates were created.

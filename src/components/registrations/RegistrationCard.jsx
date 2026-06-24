@@ -33,7 +33,7 @@ export function RegistrationCard({ registration, onEdit, onDelete }) {
         </div>
         <div className="flex items-center gap-1 rounded-full bg-[#FFF8F2] px-2 py-1 text-xs font-bold text-[#B76E79]">
           <User className="size-3" />
-          {persons > 1 ? `Group of ${persons}` : '1 person'}
+          {persons > 1 ? `Group of ${persons}` : '1 guest'}
         </div>
       </div>
 
@@ -49,14 +49,14 @@ export function RegistrationCard({ registration, onEdit, onDelete }) {
       )}
 
       <div className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-3 text-xs text-[#5D4A52]">
-        <div className="font-bold text-[#2B1723]">Finance</div>
+        <div className="font-bold text-[#2B1723]">Finance Review</div>
         <div className="mt-1 grid grid-cols-2 gap-2">
           <span>Tier: {registration.priceTier || finance.priceTier || 'Needs review'}</span>
           <span>Method: {formatPaymentMethod(finance.paymentMethod)}</span>
           <span>Due: {finance.amountDue === null ? 'Needs review' : formatCurrency(finance.amountDue)}</span>
           <span>Paid: {formatCurrency(finance.amountPaid)}</span>
           <span className={finance.balanceDue > 0 ? 'font-bold text-[#A32626]' : 'text-[#1E7345]'}>Balance: {finance.balanceDue === null ? 'Needs review' : formatCurrency(finance.balanceDue)}</span>
-          <span>Ref: {registration.paymentReference || 'Missing'}</span>
+          <span>Reference: {registration.paymentReference || 'Not recorded'}</span>
         </div>
       </div>
 
