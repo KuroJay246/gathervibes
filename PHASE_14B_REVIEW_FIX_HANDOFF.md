@@ -6,7 +6,9 @@
 
 ## Commit
 
-Review-fix commit: `2aabd27`
+Review-fix implementation commit: `947fad0`
+
+This handoff file was finalized in a follow-up metadata commit to avoid a self-referential commit hash loop.
 
 Base Phase 14B commit reviewed by organizer: `b390e98`
 
