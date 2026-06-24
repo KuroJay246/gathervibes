@@ -43,6 +43,47 @@ function attendeeNamesText(registration = {}) {
   return Array.isArray(registration.attendeeNames) ? registration.attendeeNames.join(', ') : ''
 }
 
+function personsLabel(registration = {}) {
+  const persons = Number(registration.personsAttending) || 1
+  return persons > 1 ? `Group of ${persons}` : '1 person'
+}
+
+function registrationNeedsReview(registration = {}, event = {}) {
+  const finance = calculateRegistrationFinance(registration, event)
+  return Boolean(finance.needsFinanceReview || registration.financeReviewRequired || !registration.ticketCode)
+}
+
+function matchesCardFilter(registration = {}, key, event = {}) {
+  const finance = calculateRegistrationFinance(registration, event)
+  if (!key) return true
+  if (key === 'finance-warning') return finance.needsFinanceReview || registration.financeReviewRequired
+  if (key === 'missing-ticket') return !registration.ticketCode
+  if (key === 'outstanding') return (finance.balanceDue || 0) > 0
+  if (key === 'door') return paymentStatusMatches(registration.paymentStatus, 'door')
+  if (key === 'door-list') return paymentStatusMatches(registration.paymentStatus, 'door-list')
+  if (key === 'checked-in') return Boolean(registration.checkedIn)
+  if (key === 'not-checked-in') return !registration.checkedIn
+  if (key === 'review-needed') return registrationNeedsReview(registration, event)
+  return true
+}
+
+function CountCard({ label, value, help, active, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-xl border px-4 py-3 text-left transition ${
+        active ? 'border-[#B76E79] bg-[#FFF8F2] ring-2 ring-[#B76E79]/20' : 'border-[#EEDFD6] bg-white hover:bg-[#FBF8F5]'
+      }`}
+      title={help}
+    >
+      <p className="text-lg font-bold text-[#2B1723]">{value}</p>
+      <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
+      {help && <p className="mt-1 text-[11px] leading-4 text-[#8C7567]">{help}</p>}
+    </button>
+  )
+}
+
 export function RegistrationsPage() {
   const { user } = useAuth()
   const { activeEvent } = useActiveEvent()
@@ -51,6 +92,7 @@ export function RegistrationsPage() {
   const [loadError, setLoadError] = useState('')
   const [filters, setFilters] = useState({})
   const [activeTab, setActiveTab] = useState('All')
+  const [cardFilter, setCardFilter] = useState('')
   const [success, setSuccess] = useState('')
   const [selectedIds, setSelectedIds] = useState(new Set())
 
@@ -106,12 +148,13 @@ export function RegistrationsPage() {
 
   const filteredRegistrations = registrations.filter((reg) => {
     const finance = calculateRegistrationFinance(reg, activeEvent)
+    if (!matchesCardFilter(reg, cardFilter, activeEvent)) return false
     // 1. Tab filtering
     if (activeTab === 'Checked In' && !reg.checkedIn) return false
     if (activeTab === 'Missing Ticket' && reg.ticketCode) return false
     if (activeTab === 'Door Paid' && !paymentStatusMatches(reg.paymentStatus, 'door')) return false
     if (activeTab === 'To Pay at Door' && !paymentStatusMatches(reg.paymentStatus, 'door-list')) return false
-    if (activeTab === 'Review Needed' && !finance.needsFinanceReview && !reg.financeReviewRequired && reg.ticketCode) return false
+    if (activeTab === 'Review Needed' && !registrationNeedsReview(reg, activeEvent)) return false
     if (['Paid', 'Pending', 'Complimentary', 'Outstanding Balance'].includes(activeTab)) {
       if (!financeFilterMatches(reg, activeTab, activeEvent)) return false
     }
@@ -140,7 +183,7 @@ export function RegistrationsPage() {
       if (finance.amountDue !== null && finance.amountPaid !== null) return false
     }
     if (filters.reviewNeeded) {
-      if (!finance.needsFinanceReview && !reg.financeReviewRequired && reg.ticketCode) return false
+      if (!registrationNeedsReview(reg, activeEvent)) return false
     }
     
     return true
@@ -148,6 +191,10 @@ export function RegistrationsPage() {
   const allMetrics = buildRegistrationMetrics(registrations, activeEvent)
   const filteredMetrics = buildRegistrationMetrics(filteredRegistrations, activeEvent)
   const financeSummary = buildFinanceSummary(registrations, activeEvent)
+  const isFiltering = activeTab !== 'All' || Boolean(cardFilter) || Object.values(filters).some(Boolean)
+  const showingText = isFiltering
+    ? `Showing ${filteredMetrics.totalRegistrations} of ${allMetrics.totalRegistrations} registrations and ${filteredMetrics.totalPersons} of ${allMetrics.totalPersons} persons.`
+    : `Showing all registrations: ${allMetrics.totalRegistrations} registration${allMetrics.totalRegistrations === 1 ? '' : 's'} / ${allMetrics.totalPersons} person${allMetrics.totalPersons === 1 ? '' : 's'}.`
   const selectedRegistrations = filteredRegistrations.filter((registration) => selectedIds.has(registration.registrationId))
   const allVisibleSelected = filteredRegistrations.length > 0 && filteredRegistrations.every((registration) => selectedIds.has(registration.registrationId))
 
@@ -273,7 +320,7 @@ export function RegistrationsPage() {
           </p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button
             type="button"
             onClick={() => setIsExportModalOpen(true)}
@@ -308,30 +355,44 @@ export function RegistrationsPage() {
         </div>
       )}
 
+      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 text-xs leading-5 text-[#816D62]">
+        <p>
+          <strong>Registrations</strong> are rows or groups. <strong>Persons</strong> counts guests through personsAttending, so checked-in persons can be higher than checked-in registrations. <strong>Finance warnings</strong> are rows with missing or inconsistent price, payment, or balance data.
+        </p>
+        <p className="mt-1 font-semibold text-[#6B564C]">{showingText}</p>
+      </section>
+
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
         {[
-          ['Total registrations', allMetrics.totalRegistrations],
-          ['Total persons', allMetrics.totalPersons],
-          ['Paid', `${allMetrics.paidRegistrations} / ${allMetrics.paidPersons}`],
-          ['Pending', `${allMetrics.pendingRegistrations} / ${allMetrics.pendingPersons}`],
-          ['Complimentary', `${allMetrics.complimentaryRegistrations} / ${allMetrics.complimentaryPersons}`],
-          ['Door', `${allMetrics.doorRegistrations} / ${allMetrics.doorPersons}`],
-          ['Total expected', formatCurrency(financeSummary.totalExpected)],
-          ['Collected', formatCurrency(financeSummary.totalCollected)],
-          ['Outstanding', formatCurrency(financeSummary.totalOutstanding)],
-          ['Door expected', formatCurrency(financeSummary.doorTotal)],
-          ['Complimentary value', formatCurrency(financeSummary.complimentaryValue)],
-          ['Finance warnings', financeSummary.financeWarningCount],
-          ['Checked in', `${allMetrics.checkedInRegistrations} / ${allMetrics.checkedInPersons}`],
-          ['Missing ticket', allMetrics.missingTicketRegistrations],
-          ['Filtered regs', filteredMetrics.totalRegistrations],
-          ['Filtered persons', filteredMetrics.totalPersons],
-          ['Selected rows', selectedIds.size],
-        ].map(([label, value]) => (
-          <div key={label} className="rounded-xl border border-[#EEDFD6] bg-white px-4 py-3">
-            <p className="text-lg font-bold text-[#2B1723]">{value}</p>
-            <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
-          </div>
+          { label: 'Total registrations', value: allMetrics.totalRegistrations, help: 'Registration rows or groups.', key: '' },
+          { label: 'Total persons', value: allMetrics.totalPersons, help: 'Total guests counted through personsAttending.', key: '' },
+          { label: 'Paid', value: `${allMetrics.paidRegistrations} regs / ${allMetrics.paidPersons} persons`, help: 'Payment status paid.', tab: 'Paid' },
+          { label: 'Pending', value: `${allMetrics.pendingRegistrations} regs / ${allMetrics.pendingPersons} persons`, help: 'Payment status pending.', tab: 'Pending' },
+          { label: 'Complimentary', value: `${allMetrics.complimentaryRegistrations} regs / ${allMetrics.complimentaryPersons} persons`, help: 'Comped guest rows.', tab: 'Complimentary' },
+          { label: 'Door Paid', value: `${allMetrics.doorRegistrations} regs / ${allMetrics.doorPersons} persons`, help: 'Confirmed paid at door or late.', tab: 'Door Paid', card: 'door' },
+          { label: 'Total expected', value: formatCurrency(financeSummary.totalExpected), help: 'Ticket totals from explicit ticketPrice or amountDue only.' },
+          { label: 'Collected', value: formatCurrency(financeSummary.totalCollected), help: 'Confirmed amountPaid across registrations.' },
+          { label: 'Outstanding Balance', value: formatCurrency(financeSummary.totalOutstanding), help: 'Click to see rows with balance due.', tab: 'Outstanding Balance', card: 'outstanding' },
+          { label: 'To Pay at Door', value: formatCurrency(financeSummary.doorTotal), help: 'Expected door balances, not confirmed paid.', tab: 'To Pay at Door', card: 'door-list' },
+          { label: 'Complimentary value', value: formatCurrency(financeSummary.complimentaryValue), help: 'Value of complimentary tickets when prices are explicit.' },
+          { label: 'Finance Warning', value: financeSummary.financeWarningCount, help: 'Click to see exact rows needing finance review.', card: 'finance-warning' },
+          { label: 'Checked In', value: `${allMetrics.checkedInRegistrations} regs / ${allMetrics.checkedInPersons} persons`, help: 'Rows checked in and guests represented.', card: 'checked-in' },
+          { label: 'Not Checked In', value: `${allMetrics.remainingRegistrations} regs / ${allMetrics.remainingPersons} persons`, help: 'Rows still not checked in.', card: 'not-checked-in' },
+          { label: 'Missing Ticket', value: allMetrics.missingTicketRegistrations, help: 'Missing ticket rows with no ticket code.', tab: 'Missing Ticket', card: 'missing-ticket' },
+          { label: 'Review Needed', value: registrations.filter((reg) => registrationNeedsReview(reg, activeEvent)).length, help: 'Rows from uncertain finance or missing ticket review.', tab: 'Review Needed', card: 'review-needed' },
+          { label: 'Selected rows', value: selectedIds.size, help: 'Rows currently selected for bulk actions.' },
+        ].map((item) => (
+          <CountCard
+            key={item.label}
+            label={item.label}
+            value={item.value}
+            help={item.help}
+            active={(item.card && cardFilter === item.card) || (item.tab && activeTab === item.tab)}
+            onClick={() => {
+              if (item.tab) setActiveTab(item.tab)
+              setCardFilter((current) => (item.card && current !== item.card ? item.card : ''))
+            }}
+          />
         ))}
       </section>
 
@@ -339,7 +400,7 @@ export function RegistrationsPage() {
         <RegistrationFilters 
           filters={filters} 
           onFilterChange={setFilters} 
-          onClearFilters={() => setFilters({})} 
+          onClearFilters={() => { setFilters({}); setActiveTab('All'); setCardFilter('') }} 
         />
 
         <div className="overflow-x-auto pb-2">
@@ -511,6 +572,10 @@ export function RegistrationsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="font-medium text-[#2B1723]">{reg.fullName}</div>
+                        <div className="mt-1 flex flex-wrap gap-2">
+                          <span className="rounded-full bg-[#FFF8F2] px-2 py-0.5 text-[10px] font-bold text-[#B76E79]">{personsLabel(reg)}</span>
+                          {registrationNeedsReview(reg, activeEvent) && <span className="rounded-full bg-[#FFF7E8] px-2 py-0.5 text-[10px] font-bold text-[#986F26]">Review needed</span>}
+                        </div>
                         {reg.buyerName && <div className="text-xs font-semibold text-[#8C7567]">Buyer: {reg.buyerName}</div>}
                         {attendeeNamesText(reg) && <div className="max-w-xs text-xs text-[#5D4A52]">Guests: {attendeeNamesText(reg)}</div>}
                         {reg.groupName && <div className="text-xs text-[#816D62]">{reg.groupName}</div>}

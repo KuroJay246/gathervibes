@@ -23,6 +23,7 @@ import {
 } from '../utils/eventDayUtils'
 import { normalizePaymentStatus } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
+import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 
 function StatusBadge({ children, tone = 'neutral' }) {
   const tones = {
@@ -38,7 +39,7 @@ function StatusBadge({ children, tone = 'neutral' }) {
 function paymentTone(status) {
   const normalized = normalizePaymentStatus(status)
   if (normalized === 'paid') return 'green'
-  if (normalized === 'pending' || normalized === 'unknown' || normalized === 'door') return 'gold'
+  if (normalized === 'pending' || normalized === 'unknown' || normalized === 'door' || normalized === 'door-list') return 'gold'
   if (normalized === 'complimentary') return 'plum'
   return 'neutral'
 }
@@ -101,9 +102,10 @@ export function CheckInPage() {
   const [selectedListIds, setSelectedListIds] = useState(new Set())
   const summary = useMemo(() => buildEventDaySummary(registrations), [registrations])
   const visibleRegistrations = useMemo(
-    () => filterCheckInRegistrations(registrations, activeView),
-    [activeView, registrations],
+    () => filterCheckInRegistrations(registrations, activeView, activeEvent),
+    [activeEvent, activeView, registrations],
   )
+  const visibleMetrics = useMemo(() => buildRegistrationMetrics(visibleRegistrations, activeEvent), [activeEvent, visibleRegistrations])
   const selectedListRows = visibleRegistrations.filter((registration) => selectedListIds.has(registration.registrationId))
   const allVisibleListRowsSelected = visibleRegistrations.length > 0 && visibleRegistrations.every((registration) => selectedListIds.has(registration.registrationId))
   const helperRows = useMemo(() => {
@@ -331,7 +333,7 @@ export function CheckInPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#1E7345]">Event-Day Mode</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Door Check-In / QR Scan</h2>
           <p className="mt-2 text-sm text-[#816D62]">
-            Checking in guests for <strong>{activeEvent.eventName}</strong>. <span className="ml-2 inline-block rounded-full bg-[#E5F3EC] px-2 py-0.5 text-[10px] font-bold tracking-widest text-[#1E7345]">Checked In: {summary.checkedInPersons}/{summary.totalPersons}</span>
+            Checking in guests for <strong>{activeEvent.eventName}</strong>. <span className="ml-2 inline-block rounded-full bg-[#E5F3EC] px-2 py-0.5 text-[10px] font-bold tracking-widest text-[#1E7345]">Checked In: {summary.checkedInRegistrations} registrations / {summary.checkedInPersons} persons</span>
           </p>
         </div>
         <div className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-3 text-xs text-[#6B564C]">
@@ -362,7 +364,7 @@ export function CheckInPage() {
       </section>
 
       <p className="rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-        Persons attending may be higher than registrations when one registration includes multiple guests.
+        Persons attending may be higher than registrations when one registration includes multiple guests. Registrations are rows or groups; persons are guests counted through personsAttending, so 5 registrations can equal 6 or more persons. QR scan selects a guest record only; check-in still requires a button click.
       </p>
 
       <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)] sm:p-5">
@@ -670,8 +672,9 @@ export function CheckInPage() {
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">{CHECK_IN_VIEWS.find((view) => view.value === activeView)?.label}</p>
               <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Guest list mode</h3>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">Browse manually by payment, ticket, group, review, or check-in state. Bulk actions require confirmation and never delete records.</p>
             </div>
-            <p className="text-xs font-semibold text-[#8C7567]">{visibleRegistrations.length} registrations shown</p>
+            <p className="text-xs font-semibold text-[#8C7567]">{visibleMetrics.totalRegistrations} registrations / {visibleMetrics.totalPersons} persons shown</p>
           </div>
 
           <div className="mt-4 flex flex-col gap-3 rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3 lg:flex-row lg:items-center lg:justify-between">
@@ -735,6 +738,7 @@ export function CheckInPage() {
                         </td>
                         <td className="px-4 py-3 font-medium text-[#2B1723]">
                           <div>{registration.fullName}</div>
+                          {Number(registration.personsAttending) > 1 && <div className="mt-1 w-fit rounded-full bg-[#FFF8F2] px-2 py-0.5 text-[10px] font-bold text-[#B76E79]">Group of {registration.personsAttending}</div>}
                           {attendeeNamesText(registration) && <div className="mt-1 text-xs font-normal text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}
                           {registration.buyerName && <div className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer: {registration.buyerName}</div>}
                         </td>

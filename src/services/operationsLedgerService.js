@@ -2,7 +2,6 @@ import {
   collection,
   doc,
   onSnapshot,
-  orderBy,
   query,
   serverTimestamp,
   where,
@@ -48,15 +47,18 @@ export function subscribeToOperationsLedger(eventId, onRows, onError) {
   const ledgerQuery = query(
     collection(firestore, 'operationsLedger'),
     where('eventId', '==', eventId),
-    orderBy('date', 'desc'),
   )
 
   return onSnapshot(
     ledgerQuery,
-    (snapshot) => onRows(snapshot.docs.map((entryDocument) => ({
-      ...entryDocument.data(),
-      ledgerEntryId: entryDocument.data().ledgerEntryId || entryDocument.id,
-    }))),
+    (snapshot) => {
+      const rows = snapshot.docs.map((entryDocument) => ({
+        ...entryDocument.data(),
+        ledgerEntryId: entryDocument.data().ledgerEntryId || entryDocument.id,
+      }))
+      rows.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))
+      onRows(rows)
+    },
     onError,
   )
 }

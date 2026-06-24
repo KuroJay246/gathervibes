@@ -30,8 +30,28 @@ const EMPTY_FORM = {
   notes: '',
 }
 
+const PAYMENT_METHOD_OPTIONS = [
+  ['cash', 'Cash'],
+  ['bank-transfer', 'Bank Transfer'],
+  ['firstpay', 'FirstPay'],
+  ['card', 'Card'],
+  ['unknown', 'Unknown / Not recorded'],
+]
+
+const STATUS_HELP = {
+  expected: 'Expected means money should come later.',
+  received: 'Received means income is already collected.',
+  paid: 'Paid means an expense or refund already went out.',
+  pending: 'Pending means not settled yet.',
+  cancelled: 'Cancelled keeps the entry visible but removes it from totals.',
+}
+
 function labelFor(value) {
   return String(value || '').split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+}
+
+function FieldHelp({ children }) {
+  return <p className="mt-1 text-[11px] leading-4 text-[#8C7567]">{children}</p>
 }
 
 export function OperationsPage() {
@@ -171,6 +191,10 @@ export function OperationsPage() {
         <Link to="/dashboard" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">Back to Dashboard</Link>
       </header>
 
+      <section className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
+        This tracker is separate from ticket sales. Ticket revenue comes from registrations; sponsor income, vendor/baker payments, expenses, refunds, and adjustments live here for the selected Working Event only.
+      </section>
+
       {error && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{error}</div>}
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
 
@@ -200,20 +224,62 @@ export function OperationsPage() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <select value={form.entryType} onChange={(event) => setForm((current) => ({ ...current, entryType: event.target.value }))} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm">
-              {LEDGER_ENTRY_TYPES.map((type) => <option key={type} value={type}>{labelFor(type)}</option>)}
-            </select>
-            <select value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm">
-              {LEDGER_STATUSES.map((status) => <option key={status} value={status}>{labelFor(status)}</option>)}
-            </select>
-            <input value={form.category} onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))} placeholder="Category, e.g. Sponsor" className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-            <input value={form.amount} onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))} placeholder="Amount" type="number" min="0" step="0.01" className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-            <input value={form.label} onChange={(event) => setForm((current) => ({ ...current, label: event.target.value }))} placeholder="Label" className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm sm:col-span-2" />
-            <input value={form.paymentMethod} onChange={(event) => setForm((current) => ({ ...current, paymentMethod: event.target.value }))} placeholder="Payment method" className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-            <input value={form.paymentReference} onChange={(event) => setForm((current) => ({ ...current, paymentReference: event.target.value }))} placeholder="Reference, if any" className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-            <input value={form.paidByOrPaidTo} onChange={(event) => setForm((current) => ({ ...current, paidByOrPaidTo: event.target.value }))} placeholder="Paid by / paid to" className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-            <input value={form.date} onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))} type="date" className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-            <textarea value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} placeholder="Notes" className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm sm:col-span-2" rows={3} />
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Entry Type</span>
+              <select value={form.entryType} onChange={(event) => setForm((current) => ({ ...current, entryType: event.target.value }))} className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm">
+                {LEDGER_ENTRY_TYPES.map((type) => <option key={type} value={type}>{labelFor(type)}</option>)}
+              </select>
+              <FieldHelp>Income is money coming in; Expense is money going out; Adjustment/refund corrects totals.</FieldHelp>
+            </label>
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Status</span>
+              <select value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm">
+                {LEDGER_STATUSES.map((status) => <option key={status} value={status}>{labelFor(status)}</option>)}
+              </select>
+              <FieldHelp>{STATUS_HELP[form.status]}</FieldHelp>
+            </label>
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Category</span>
+              <input value={form.category} onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))} placeholder="Sponsor, Baker payment, Venue, Decor" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
+              <FieldHelp>Example: Sponsor, Baker payment, Venue, Decor, Water, Printing.</FieldHelp>
+            </label>
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Amount</span>
+              <input value={form.amount} onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))} placeholder="100.00" type="number" min="0" step="0.01" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
+              <FieldHelp>Enter BBD amount only, e.g. 100.00.</FieldHelp>
+            </label>
+            <label className="block sm:col-span-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Short description / title</span>
+              <input value={form.label} onChange={(event) => setForm((current) => ({ ...current, label: event.target.value }))} placeholder="Sponsor payment from Cake Co." className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
+              <FieldHelp>Use a clear title so the ledger row is easy to recognize later.</FieldHelp>
+            </label>
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Payment Method</span>
+              <select value={form.paymentMethod} onChange={(event) => setForm((current) => ({ ...current, paymentMethod: event.target.value }))} className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm">
+                {PAYMENT_METHOD_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select>
+              <FieldHelp>Use Unknown / Not recorded when the method is unclear.</FieldHelp>
+            </label>
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Payment Reference</span>
+              <input value={form.paymentReference} onChange={(event) => setForm((current) => ({ ...current, paymentReference: event.target.value }))} placeholder="Receipt or transaction reference" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
+              <FieldHelp>Receipt number, transaction reference, or leave blank if unknown.</FieldHelp>
+            </label>
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Paid By / Paid To</span>
+              <input value={form.paidByOrPaidTo} onChange={(event) => setForm((current) => ({ ...current, paidByOrPaidTo: event.target.value }))} placeholder="Who paid you, or who you paid" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
+              <FieldHelp>Who paid you, or who you paid.</FieldHelp>
+            </label>
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Date</span>
+              <input value={form.date} onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))} type="date" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
+              <FieldHelp>Use the expected or actual payment date.</FieldHelp>
+            </label>
+            <label className="block sm:col-span-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Notes</span>
+              <textarea value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} placeholder="Short internal note" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" rows={3} />
+              <FieldHelp>Internal note only. Do not store credentials, private exports, or payment proof links here.</FieldHelp>
+            </label>
           </div>
 
           <button type="submit" disabled={saving} className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 text-sm font-bold text-white disabled:opacity-50">
@@ -240,7 +306,9 @@ export function OperationsPage() {
 
           <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">
             {filteredEntries.length === 0 ? (
-              <div className="p-6 text-sm text-[#816D62]">No operations ledger entries match these filters.</div>
+              <div className="p-6 text-sm leading-6 text-[#816D62]">
+                No operations entries yet. Add sponsor income, expenses, refunds, or adjustments here. This tracker is separate from ticket sales.
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-left text-sm">

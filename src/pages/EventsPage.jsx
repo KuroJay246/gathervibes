@@ -183,6 +183,7 @@ export function EventsPage() {
           </div>
           <h2 className="font-serif text-3xl text-[#2B1723]">Your gatherings</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-[#806C61]">Create each event once, keep its details current, and select the event your team is working on.</p>
+          <p className="mt-1 max-w-xl text-xs leading-5 text-[#8A7468]">Price tiers and explicit registration prices drive finance totals; the base ticket price column is legacy/default schema metadata.</p>
         </div>
         <button type="button" onClick={openCreate} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B]">
           <Plus className="size-4" strokeWidth={2.5} /> Create event

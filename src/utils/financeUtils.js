@@ -142,7 +142,8 @@ export function financeWarnings(registration = {}, event = {}, options = {}) {
   if (computed.paymentStatus === 'paid' && computed.amountPaid < (computed.amountDue || 0)) warnings.push('Paid row has amount paid below amount due.')
   if (computed.paymentStatus === 'paid' && options.requirePaymentReferenceForPaidStatus && !registration.paymentReference) warnings.push('Paid row is missing a payment reference.')
   if (computed.paymentStatus === 'complimentary' && computed.amountDue > 0) warnings.push('Complimentary row has amount due greater than zero.')
-  if (computed.paymentStatus === 'door' && computed.amountPaid === 0) warnings.push('Door payment expected at check-in.')
+  if (computed.paymentStatus === 'door' && computed.amountPaid === 0) warnings.push('Door Paid status has no confirmed amount paid.')
+  if (computed.paymentStatus === 'door-list' && computed.balanceDue === 0) warnings.push('To Pay at Door row has no balance due.')
 
   return warnings
 }
@@ -172,6 +173,12 @@ export function buildFinanceSummary(registrations = [], event = {}) {
     if (finance.paymentStatus === 'door') {
       summary.doorRegistrations += 1
       summary.doorPersons += persons
+      summary.doorPaidTotal += paid
+    }
+    if (finance.paymentStatus === 'door-list') {
+      summary.doorListRegistrations += 1
+      summary.doorListPersons += persons
+      summary.doorListTotal += balance
       summary.doorTotal += balance
     }
     if (finance.paymentStatus === 'complimentary') {
@@ -191,6 +198,8 @@ export function buildFinanceSummary(registrations = [], event = {}) {
     paidTotal: 0,
     pendingTotal: 0,
     doorTotal: 0,
+    doorPaidTotal: 0,
+    doorListTotal: 0,
     complimentaryValue: 0,
     paidRegistrations: 0,
     pendingRegistrations: 0,
@@ -199,6 +208,8 @@ export function buildFinanceSummary(registrations = [], event = {}) {
     paidPersons: 0,
     pendingPersons: 0,
     doorPersons: 0,
+    doorListRegistrations: 0,
+    doorListPersons: 0,
     complimentaryPersons: 0,
     missingFinanceInfo: 0,
     financeWarningCount: 0,

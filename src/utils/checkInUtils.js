@@ -11,6 +11,9 @@ export const CHECK_IN_VIEWS = [
   { value: 'door-list', label: 'To Pay at Door' },
   { value: 'outstanding', label: 'Outstanding Balance' },
   { value: 'missing-ticket', label: 'Missing Ticket' },
+  { value: 'group', label: 'Group registrations' },
+  { value: 'complimentary', label: 'Complimentary' },
+  { value: 'review-needed', label: 'Review Needed' },
 ]
 
 export function buildCheckInSummary(registrations = []) {
@@ -26,13 +29,19 @@ export function buildCheckInSummary(registrations = []) {
   }
 }
 
-export function filterCheckInRegistrations(registrations = [], view = 'search') {
+export function filterCheckInRegistrations(registrations = [], view = 'search', event = {}) {
   if (view === 'checked-in') return registrations.filter((registration) => registration.checkedIn)
   if (view === 'not-checked-in') return registrations.filter((registration) => !registration.checkedIn)
   if (view === 'door') return registrations.filter((registration) => normalizePaymentStatus(registration.paymentStatus) === 'door')
   if (view === 'door-list') return registrations.filter((registration) => normalizePaymentStatus(registration.paymentStatus) === 'door-list')
-  if (view === 'outstanding') return registrations.filter((registration) => (calculateRegistrationFinance(registration).balanceDue || 0) > 0)
+  if (view === 'outstanding') return registrations.filter((registration) => (calculateRegistrationFinance(registration, event).balanceDue || 0) > 0)
   if (view === 'missing-ticket') return registrations.filter((registration) => !registration.ticketCode)
+  if (view === 'group') return registrations.filter((registration) => Number(registration.personsAttending) > 1)
+  if (view === 'complimentary') return registrations.filter((registration) => normalizePaymentStatus(registration.paymentStatus) === 'complimentary')
+  if (view === 'review-needed') return registrations.filter((registration) => {
+    const finance = calculateRegistrationFinance(registration, event)
+    return finance.needsFinanceReview || registration.financeReviewRequired || !registration.ticketCode
+  })
   if (view === 'all') return registrations
   return []
 }

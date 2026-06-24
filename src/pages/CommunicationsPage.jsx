@@ -159,6 +159,7 @@ Data context for this segment:
 
       <div className="rounded-xl border border-[#EFE2DA] bg-[#FFF8F2] px-4 py-3 text-sm text-[#8A7468]">
         <strong>Safety Notice:</strong> This page only prepares text for clipboard copy. It does not send messages, write communication logs, or connect to external AI API keys.
+        <span className="mt-1 block text-xs">Use segments to choose recipients; buyer/contact can be different from attendee names, and Door Paid is not the same as To Pay at Door.</span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">

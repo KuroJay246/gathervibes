@@ -477,6 +477,7 @@ export function ImportsPage() {
                       {source.special && (
                         <span className="mt-2 block rounded-lg bg-white/70 px-3 py-2 text-[11px] font-bold leading-5 text-[#A32626]">
                           Dry-run first. No CPB writes until approval. Review unmatched rows before apply. Gmail links are not stored.
+                          <span className="mt-1 block font-semibold text-[#7A5818]">Cole also has the actual spreadsheet for independent verification. Use this dry-run as a helper, not as final proof.</span>
                         </span>
                       )}
                     </span>

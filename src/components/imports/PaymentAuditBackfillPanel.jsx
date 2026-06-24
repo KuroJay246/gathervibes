@@ -101,6 +101,8 @@ function AuditRowsTable({ title, rows, emptyText }) {
 export function PaymentAuditBackfillPanel({ sheet, existingRegistrations, event, onReset }) {
   const [copied, setCopied] = useState(false)
   const [approvalText, setApprovalText] = useState('')
+  const [rowView, setRowView] = useState('all')
+  const [confidenceFilter, setConfidenceFilter] = useState('all')
 
   const analysis = useMemo(() => {
     try {
@@ -114,6 +116,19 @@ export function PaymentAuditBackfillPanel({ sheet, existingRegistrations, event,
   const error = analysis.error
 
   const dryRunReport = useMemo(() => (matchesResult ? buildDryRunReport(matchesResult) : ''), [matchesResult])
+  const reviewRows = useMemo(() => {
+    if (!matchesResult) return []
+    const groups = {
+      all: [...matchesResult.matches, ...matchesResult.unmatched, ...matchesResult.reviewNeeded, ...matchesResult.createCandidates],
+      matched: matchesResult.matches,
+      unmatched: matchesResult.unmatched,
+      review: matchesResult.reviewNeeded,
+      candidates: matchesResult.createCandidates,
+    }
+    const rows = groups[rowView] || groups.all
+    if (confidenceFilter === 'all') return rows
+    return rows.filter((row) => String(row.confidence || '').toLowerCase() === confidenceFilter)
+  }, [confidenceFilter, matchesResult, rowView])
 
   async function copyDryRunReport() {
     try {
@@ -152,6 +167,9 @@ export function PaymentAuditBackfillPanel({ sheet, existingRegistrations, event,
             <h3 className="font-bold text-lg">CPB Payment Audit Backfill - Dry-Run Preview</h3>
             <p className="mt-1 text-sm leading-6">
               No Firestore writes have been performed. Review unmatched rows, review-needed rows, and missing registration candidates before any future apply step. Gmail links are not stored or exported in this report.
+            </p>
+            <p className="mt-2 text-sm font-semibold leading-6">
+              The organizer also shared the original audit spreadsheet with Cole for independent review. Backfill results should be cross-checked against the spreadsheet before CPB apply is approved.
             </p>
           </div>
         </div>
@@ -197,10 +215,41 @@ export function PaymentAuditBackfillPanel({ sheet, existingRegistrations, event,
         </div>
       </section>
 
-      <AuditRowsTable title="Matched registrations" rows={matchesResult.matches} emptyText="No matched registrations found." />
-      <AuditRowsTable title="Unmatched rows" rows={matchesResult.unmatched} emptyText="No unmatched rows found." />
-      <AuditRowsTable title="Review-needed rows" rows={matchesResult.reviewNeeded} emptyText="No review-needed rows found." />
-      <AuditRowsTable title="Missing registration candidates" rows={matchesResult.createCandidates} emptyText="No missing registration candidates found." />
+      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Dry-run row review</p>
+            <h4 className="mt-1 font-bold text-[#2B1723]">Review inside the app before approval</h4>
+            <p className="mt-1 text-xs leading-5 text-[#816D62]">Filter matched rows, unmatched rows, review-needed rows, create candidates, and confidence. Current values and proposed values are shown side by side.</p>
+          </div>
+          <select value={confidenceFilter} onChange={(event) => setConfidenceFilter(event.target.value)} className="rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-sm">
+            <option value="all">All confidence levels</option>
+            <option value="high">High confidence</option>
+            <option value="medium">Medium confidence</option>
+            <option value="low">Low confidence</option>
+          </select>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {[
+            ['all', 'All dry-run rows'],
+            ['matched', 'Matched rows'],
+            ['unmatched', 'Unmatched rows'],
+            ['review', 'Review-needed rows'],
+            ['candidates', 'Create candidates'],
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setRowView(value)}
+              className={`rounded-full px-4 py-2 text-xs font-bold ${rowView === value ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED] text-[#6B564C]'}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <AuditRowsTable title="Filtered dry-run review rows" rows={reviewRows} emptyText="No rows match this review filter." />
 
       <section className="rounded-2xl border border-[#F2C3C3] bg-[#FFF8F8] p-5 text-[#7E1E1E]">
         <div className="flex gap-3">

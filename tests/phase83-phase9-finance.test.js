@@ -48,7 +48,7 @@ test('finance summary separates expected, collected, outstanding, door, and comp
   const summary = buildFinanceSummary([
     { personsAttending: 2, ticketPrice: 50, amountPaid: 100, paymentStatus: 'paid' },
     { personsAttending: 1, ticketPrice: 40, amountPaid: 10, paymentStatus: 'pending' },
-    { personsAttending: 1, ticketPrice: 30, amountPaid: 0, paymentStatus: 'door' },
+    { personsAttending: 1, ticketPrice: 30, amountPaid: 0, paymentStatus: 'door-list' },
     { personsAttending: 1, ticketPrice: 20, amountDue: 0, amountPaid: 0, paymentStatus: 'complimentary' },
   ])
 
@@ -56,8 +56,9 @@ test('finance summary separates expected, collected, outstanding, door, and comp
   assert.equal(summary.totalCollected, 110)
   assert.equal(summary.totalOutstanding, 60)
   assert.equal(summary.doorTotal, 30)
+  assert.equal(summary.doorListTotal, 30)
   assert.equal(summary.complimentaryValue, 20)
-  assert.equal(summary.doorRegistrations, 1)
+  assert.equal(summary.doorListRegistrations, 1)
 })
 
 test('Import Center maps finance fields and flags missing event price for review', async () => {

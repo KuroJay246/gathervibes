@@ -119,7 +119,7 @@ const TEMPLATES = [
     leaveBlank: 'Leave transaction numbers and payment methods blank when not proven.',
     doNotPut: 'Do not store Gmail links, CPB exports, backups, or private proof in registration fields.',
     duplicates: 'Review unmatched rows, review-needed rows, Christina Morris, Gabriela missing guest, and Roger Walcott before approval.',
-    effect: 'Dry-run preview only by default; it does not apply CPB writes or create missing registrations.',
+    effect: 'Dry-run preview only by default; it does not apply CPB writes or create missing registrations. Cole also has the spreadsheet for independent verification.',
     headers: ['Source Register', 'Ticket/Door ID', 'Guest Name', 'Buyer/Contact', 'Email/Phone', 'Price Tier', 'Unit Price', 'Amount Paid Confirmed', 'Expected Total', 'Balance/Due', 'Payment Status', 'Evidence Summary', 'Evidence Date', 'Confidence', 'Notes'],
     sampleRow: ['CPB audit', 'CPB-001', 'Example Guest', 'Example Buyer', '', 'General', 100, 100, 100, 0, 'Paid - Confirmed', 'Safe summary only', '', 'High', 'No Gmail link'],
   },

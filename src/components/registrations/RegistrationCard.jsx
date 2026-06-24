@@ -12,6 +12,7 @@ export function RegistrationCard({ registration, onEdit, onDelete }) {
   const attendees = attendeesText(registration)
   const paymentStatus = normalizePaymentStatus(registration.paymentStatus)
   const finance = calculateRegistrationFinance(registration)
+  const persons = Number(registration.personsAttending) || 1
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
       <div className="flex items-start justify-between">
@@ -32,7 +33,7 @@ export function RegistrationCard({ registration, onEdit, onDelete }) {
         </div>
         <div className="flex items-center gap-1 rounded-full bg-[#FFF8F2] px-2 py-1 text-xs font-bold text-[#B76E79]">
           <User className="size-3" />
-          {registration.personsAttending}
+          {persons > 1 ? `Group of ${persons}` : '1 person'}
         </div>
       </div>
 

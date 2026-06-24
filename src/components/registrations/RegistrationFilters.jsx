@@ -11,8 +11,14 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
   return (
     <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm space-y-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="font-bold text-[#2B1723]">Advanced Filters</h3>
+        <div>
+          <h3 className="font-bold text-[#2B1723]">Advanced Filters</h3>
+          <p className="mt-1 text-xs leading-5 text-[#816D62]">
+            Search buyer, attendee, contact, group, ticket, payment, and review fields without covering the category tabs below.
+          </p>
+        </div>
         <button 
+          type="button"
           onClick={onClearFilters}
           className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold text-[#8C766A] hover:bg-[#F2E8E1] transition"
         >
