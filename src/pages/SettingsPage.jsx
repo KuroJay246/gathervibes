@@ -7,9 +7,11 @@ import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeU
 import { ACCESS_ROLES, ROLE_ORDER, listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
 
 const ROADMAP_ITEMS = [
+  ['Phase 12A Google Sheets-ready tools', 'Active/Complete'],
+  ['Google Sheets OAuth', 'Deferred'],
+  ['Phase 13A AI Draft Lab', 'Active/Complete'],
   ['AI writing', 'Deferred'],
   ['Gmail/Outlook OAuth', 'Deferred'],
-  ['Google Sheets OAuth', 'Deferred'],
   ['Cloud Functions', 'Deferred'],
   ['Storage', 'Deferred'],
   ['Staff roles', 'Phase 10 foundation'],

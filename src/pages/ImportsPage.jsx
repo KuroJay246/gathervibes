@@ -9,6 +9,7 @@ import { subscribeToRegistrations } from '../services/registrationService'
 import { FieldMappingForm } from '../components/imports/FieldMappingForm'
 import { ImportPreviewTable } from '../components/imports/ImportPreviewTable'
 import { ImportSummary } from '../components/imports/ImportSummary'
+import { ImportTemplatesPanel } from '../components/imports/ImportTemplatesPanel'
 import { EmptyState } from '../components/ui/EmptyState'
 import { IMPORT_SOURCES, getImportSource } from '../utils/importSources'
 import { readXlsxWorkbook } from '../utils/xlsxImport'
@@ -534,6 +535,12 @@ export function ImportsPage() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {step === 1 && (
+        <div className="mt-8">
+          <ImportTemplatesPanel />
         </div>
       )}
 
