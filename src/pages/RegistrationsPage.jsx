@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Trash2, Users } from 'lucide-react'
+import { Plus, Search, Trash2, Users, Download } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import {
@@ -17,6 +17,7 @@ import { EmptyState } from '../components/ui/EmptyState'
 import { RegistrationCard } from '../components/registrations/RegistrationCard'
 import { RegistrationFormModal } from '../components/registrations/RegistrationFormModal'
 import { DeleteRegistrationDialog } from '../components/registrations/DeleteRegistrationDialog'
+import { ExportModal } from '../components/registrations/ExportModal'
 import { Link } from 'react-router-dom'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { formatPaymentLabel, paymentStatusMatches } from '../utils/paymentStatus'
@@ -53,6 +54,7 @@ export function RegistrationsPage() {
   const [selectedIds, setSelectedIds] = useState(new Set())
 
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false)
   const [editingRegistration, setEditingRegistration] = useState(null)
   const [deletingRegistration, setDeletingRegistration] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -246,6 +248,15 @@ export function RegistrationsPage() {
         </div>
 
         <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setIsExportModalOpen(true)}
+            className="flex items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#8C766A] shadow-sm transition hover:bg-[#FBF8F5]"
+          >
+            <Download className="size-4" />
+            <span className="hidden sm:inline">Export CSV</span>
+            <span className="sm:hidden">Export</span>
+          </button>
           <Link
             to="/imports"
             className="flex items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#8C766A] shadow-sm transition hover:bg-[#FBF8F5]"
@@ -555,6 +566,13 @@ export function RegistrationsPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeletingRegistration(null)}
         deleting={saving}
+      />
+
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        registrations={filteredRegistrations}
+        event={activeEvent}
       />
     </div>
   )

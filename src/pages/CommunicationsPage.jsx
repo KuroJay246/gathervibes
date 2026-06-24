@@ -56,6 +56,8 @@ export function CommunicationsPage() {
   const [selectedTemplate, setSelectedTemplate] = useState(COMMUNICATION_TEMPLATES[0].id)
   const [draftContent, setDraftContent] = useState(COMMUNICATION_TEMPLATES[0].content)
   const [copiedAction, setCopiedAction] = useState('')
+  const [labMode, setLabMode] = useState('standard') // 'standard' or 'ai'
+  const [selectedTone, setSelectedTone] = useState('Professional')
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -131,6 +133,18 @@ export function CommunicationsPage() {
     }
   }
 
+  const aiPromptText = `Write a ${selectedTone.toLowerCase()} message for this event using the details below.
+Draft type: ${COMMUNICATION_TEMPLATES.find(t => t.id === selectedTemplate)?.label || 'Message'}
+Event Name: ${activeEvent?.eventName || 'Gather & Savor Event'}
+Event Date: ${activeEvent?.eventDate || 'TBD'}
+Location: ${activeEvent?.location || 'TBD'}
+
+Include placeholders like {{guestName}}, {{balanceDue}}, {{ticketCode}} where appropriate so I can bulk-replace them in my tool.
+
+Data context for this segment:
+- Total recipients: ${summary.totalRegistrations}
+- Outstanding balance for segment: ${formatCurrency(summary.finance.totalOutstanding)}`
+
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -144,7 +158,7 @@ export function CommunicationsPage() {
       </header>
 
       <div className="rounded-xl border border-[#EFE2DA] bg-[#FFF8F2] px-4 py-3 text-sm text-[#8A7468]">
-        <strong>Safety Notice:</strong> This page only prepares text for clipboard copy. It does not send messages, write communication logs, or create fake sent records.
+        <strong>Safety Notice:</strong> This page only prepares text for clipboard copy. It does not send messages, write communication logs, or connect to external AI API keys.
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
@@ -236,19 +250,63 @@ export function CommunicationsPage() {
         </div>
 
         <div className="space-y-6 lg:col-span-8">
-          <Section eyebrow="Template Library" title="Choose and edit copy">
+          <Section eyebrow="Message Editor" title={labMode === 'standard' ? "Template Library" : "AI Draft Lab — Draft Only"}>
+            <div className="mb-6 flex overflow-hidden rounded-xl border border-[#E5D7CF] bg-[#FBF8F5] p-1">
+              <button
+                type="button"
+                onClick={() => setLabMode('standard')}
+                className={`flex-1 rounded-lg py-2 text-sm font-bold transition ${labMode === 'standard' ? 'bg-white text-[#2B1723] shadow-sm' : 'text-[#8C766A] hover:bg-white/50'}`}
+              >
+                Standard Templates
+              </button>
+              <button
+                type="button"
+                onClick={() => setLabMode('ai')}
+                className={`flex-1 rounded-lg py-2 text-sm font-bold transition ${labMode === 'ai' ? 'bg-white text-[#B76E79] shadow-sm' : 'text-[#8C766A] hover:bg-white/50'}`}
+              >
+                AI Draft Lab
+              </button>
+            </div>
+
+            {labMode === 'ai' && (
+              <div className="mb-6 grid gap-4 md:grid-cols-2 rounded-xl border border-[#E5D7CF] bg-white p-4">
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Select Tone</label>
+                  <select value={selectedTone} onChange={(event) => setSelectedTone(event.target.value)} className="w-full rounded-xl border border-[#E5D7CF] bg-[#FBF8F5] py-2 pl-3 pr-8 text-sm">
+                    {['Professional', 'Warm', 'Friendly', 'Urgent but polite', 'Short WhatsApp style', 'Formal email', 'Social media caption', 'Luxury/event brand tone'].map((tone) => (
+                      <option key={tone} value={tone}>{tone}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-end">
+                  <button type="button" onClick={() => copyText('ai-prompt', aiPromptText)} className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#2B1723] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#3D2232]">
+                    {copiedAction === 'ai-prompt' ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
+                    Copy AI Prompt for ChatGPT
+                  </button>
+                </div>
+                <div className="col-span-full">
+                  <p className="text-xs text-[#8A7468]">
+                    Real AI generation is deferred. Use the button above to copy a prompt you can paste into ChatGPT to generate a message using your selected tone.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="grid gap-4 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Starter Template</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">{labMode === 'ai' ? 'Deterministic Draft Type' : 'Starter Template'}</label>
                 <select value={selectedTemplate} onChange={(event) => handleTemplateChange(event.target.value)} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm font-medium">
                   {COMMUNICATION_TEMPLATES.map((template) => <option key={template.id} value={template.id}>{template.label}</option>)}
                 </select>
                 <p className="mt-3 text-xs leading-5 text-[#8A7468]">Available templates include payment reminder, balance due, door payment, payment received, ticket/QR reminder, check-in instructions, missing ticket follow-up, event reminder, group reminder, thank-you, post-event, and internal note.</p>
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Editable Draft</label>
+                <div className="flex justify-between items-end mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Editable Draft</label>
+                  <button type="button" onClick={() => setDraftContent('')} className="text-[10px] font-bold text-[#A85F6B] hover:underline">Clear Draft</button>
+                </div>
                 <textarea value={draftContent} onChange={(event) => setDraftContent(event.target.value)} rows={6} className="w-full resize-y rounded-xl border border-[#E5D7CF] bg-white p-3 text-sm" />
-                <p className="mt-2 text-xs leading-5 text-[#8A7468]">
+                <p className="mt-2 text-[10px] leading-4 text-[#8A7468]">
                   Placeholders: {'{{eventName}}'}, {'{{eventDate}}'}, {'{{eventTime}}'}, {'{{venue}}'}, {'{{buyerName}}'}, {'{{guestName}}'}, {'{{attendeeNames}}'}, {'{{groupName}}'}, {'{{ticketCode}}'}, {'{{paymentStatus}}'}, {'{{amountDue}}'}, {'{{amountPaid}}'}, {'{{balanceDue}}'}, {'{{paymentMethod}}'}, {'{{paymentReference}}'}
                 </p>
               </div>
