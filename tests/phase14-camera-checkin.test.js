@@ -15,10 +15,11 @@ test('CSV injection prevention: sanitises formula-starting values', () => {
   assert.equal(escapeCsv(null), '""')
 })
 
-test('RegistrationsPage includes Door List tab', async () => {
+test('RegistrationsPage includes Door Paid and To Pay at Door tabs', async () => {
   const src = await readFile('src/pages/RegistrationsPage.jsx', 'utf8')
-  assert.match(src, /Door List/)
-  assert.match(src, /'Door List'/)
+  assert.match(src, /Door Paid/)
+  assert.match(src, /To Pay at Door/)
+  assert.match(src, /'door-list'/)
 })
 
 test('QA page includes empty allowlist check', async () => {

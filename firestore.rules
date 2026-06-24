@@ -69,6 +69,10 @@ service cloud.firestore {
       ];
     }
 
+    function validLedgerMoney(value) {
+      return value is number && value >= 0 && value <= 1000000;
+    }
+
     function validPerformedBy(value) {
       return value is string
         && value.size() > 0
@@ -262,6 +266,64 @@ service cloud.firestore {
         && data.details is map;
     }
 
+    function isValidOperationLedgerEntry(data, ledgerEntryId) {
+      return data.keys().hasAll([
+          'ledgerEntryId', 'eventId', 'entryType', 'category', 'label', 'amount',
+          'paymentMethod', 'paymentReference', 'paidByOrPaidTo', 'date', 'status',
+          'notes', 'createdAt', 'updatedAt', 'createdBy'
+        ])
+        && data.keys().hasOnly([
+          'ledgerEntryId', 'eventId', 'entryType', 'category', 'label', 'amount',
+          'paymentMethod', 'paymentReference', 'paidByOrPaidTo', 'date', 'status',
+          'notes', 'createdAt', 'updatedAt', 'createdBy'
+        ])
+        && data.ledgerEntryId == ledgerEntryId
+        && validShortId(data.ledgerEntryId)
+        && validShortId(data.eventId)
+        && data.entryType in ['income', 'expense', 'adjustment', 'refund']
+        && data.category is string
+        && data.category.size() > 0
+        && data.category.size() <= 120
+        && data.label is string
+        && data.label.size() > 0
+        && data.label.size() <= 180
+        && validLedgerMoney(data.amount)
+        && data.paymentMethod is string
+        && data.paymentMethod.size() > 0
+        && data.paymentMethod.size() <= 80
+        && validOptionalString(data.paymentReference, 180)
+        && validOptionalString(data.paidByOrPaidTo, 180)
+        && data.date is string
+        && data.date.size() > 0
+        && data.date.size() <= 20
+        && data.status in ['expected', 'received', 'paid', 'pending', 'cancelled']
+        && data.notes is string
+        && data.notes.size() <= 1000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && validPerformedBy(data.createdBy);
+    }
+
+    function isValidOperationAuditLog(data, logId) {
+      return data.keys().hasAll([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.keys().hasOnly([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.logId == logId
+        && validShortId(data.logId)
+        && validShortId(data.eventId)
+        && data.action in ['operation.create', 'operation.update', 'operation.cancel']
+        && data.targetType == 'operation'
+        && validShortId(data.targetId)
+        && validPerformedBy(data.performedBy)
+        && data.timestamp == request.time
+        && data.details is map;
+    }
+
     function matchesEventMutation(data) {
       return (
           data.action == 'event.create'
@@ -339,6 +401,21 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/registrations/$(data.targetId))
         && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
         && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedIn == true;
+    }
+
+    function matchesOperationMutation(data) {
+      return (
+        data.action == 'operation.create'
+        && !exists(/databases/$(database)/documents/operationsLedger/$(data.targetId))
+        && existsAfter(/databases/$(database)/documents/operationsLedger/$(data.targetId))
+        && getAfter(/databases/$(database)/documents/operationsLedger/$(data.targetId)).data.eventId == data.eventId
+      ) || (
+        data.action in ['operation.update', 'operation.cancel']
+        && exists(/databases/$(database)/documents/operationsLedger/$(data.targetId))
+        && existsAfter(/databases/$(database)/documents/operationsLedger/$(data.targetId))
+        && get(/databases/$(database)/documents/operationsLedger/$(data.targetId)).data.eventId == data.eventId
+        && getAfter(/databases/$(database)/documents/operationsLedger/$(data.targetId)).data.eventId == data.eventId
+      );
     }
 
     function registrationIdentityUnchanged() {
@@ -471,6 +548,14 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time;
     }
 
+    function operationIdentityUnchanged(ledgerEntryId) {
+      return request.resource.data.ledgerEntryId == ledgerEntryId
+        && request.resource.data.ledgerEntryId == resource.data.ledgerEntryId
+        && request.resource.data.eventId == resource.data.eventId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.createdBy == resource.data.createdBy;
+    }
+
     // The allowlist is bootstrapped in the Firebase Console. Client code can
     // never create, update, or delete it.
     match /settings/accessControl {
@@ -531,8 +616,22 @@ service cloud.firestore {
           || (isValidEventAuditLog(request.resource.data, logId) && matchesEventMutation(request.resource.data))
           || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesRegistrationMutation(request.resource.data))
           || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesDuplicateCheckInAttempt(request.resource.data))
+          || (isValidOperationAuditLog(request.resource.data, logId) && matchesOperationMutation(request.resource.data))
         );
       allow update, delete: if false;
+    }
+
+    match /operationsLedger/{ledgerEntryId} {
+      allow read: if isApprovedAdmin();
+      allow create: if isApprovedAdmin()
+        && isValidOperationLedgerEntry(request.resource.data, ledgerEntryId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isApprovedAdmin()
+        && isValidOperationLedgerEntry(request.resource.data, ledgerEntryId)
+        && operationIdentityUnchanged(ledgerEntryId)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
     }
 
     // Reserved collections remain unavailable until their schemas and rules

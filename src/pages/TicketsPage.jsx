@@ -15,12 +15,15 @@ import { calculateRegistrationFinance, formatCurrency } from '../utils/financeUt
 
 const FILTERS = [
   { value: 'all', label: 'All' },
-  { value: 'no-ticket', label: 'No ticket' },
   { value: 'assigned', label: 'Assigned' },
+  { value: 'no-ticket', label: 'Missing Ticket' },
   { value: 'paid', label: 'Paid' },
-  { value: 'pending', label: 'Pending' },
+  { value: 'outstanding', label: 'Outstanding Balance' },
+  { value: 'door', label: 'Door Paid' },
+  { value: 'door-list', label: 'To Pay at Door' },
+  { value: 'checked-in', label: 'Checked In' },
+  { value: 'not-checked-in', label: 'Not Checked In' },
   { value: 'complimentary', label: 'Complimentary' },
-  { value: 'door', label: 'Door' },
 ]
 
 function titleCase(value = '') {
@@ -93,12 +96,25 @@ export function TicketsPage() {
   const ticketPrefix = buildTicketPrefix(activeEvent)
 
   const filteredRegistrations = registrations.filter((registration) => {
-    if (filter === 'no-ticket' && registration.ticketStatus === 'assigned') return false
+    if (filter === 'no-ticket' && registration.ticketCode) return false
     if (filter === 'assigned' && registration.ticketStatus !== 'assigned') return false
-    if (['paid', 'pending', 'complimentary', 'door'].includes(filter) && !paymentStatusMatches(registration.paymentStatus, filter)) return false
+    if (filter === 'checked-in' && !registration.checkedIn) return false
+    if (filter === 'not-checked-in' && registration.checkedIn) return false
+    
+    if (['paid', 'complimentary'].includes(filter) && !paymentStatusMatches(registration.paymentStatus, filter)) return false
+    if (filter === 'door' && registration.paymentStatus !== 'door') return false
+    if (filter === 'door-list' && registration.paymentStatus !== 'door-list') return false
+    if (filter === 'outstanding') {
+      const fin = calculateRegistrationFinance(registration, activeEvent)
+      if (!fin.balanceDue || fin.balanceDue <= 0) return false
+    }
 
     if (!searchQuery.trim()) return true
-    return searchableRegistrationText(registration).includes(searchQuery.trim().toLowerCase())
+    // the existing searchableRegistrationText likely covers most of these, but let's make sure
+    const q = searchQuery.trim().toLowerCase()
+    return searchableRegistrationText(registration).includes(q) ||
+           (registration.groupName || '').toLowerCase().includes(q) ||
+           (registration.priceTier || '').toLowerCase().includes(q)
   })
   const assignedRegistrations = useMemo(
     () => filteredRegistrations.filter((registration) => registration.ticketStatus === 'assigned' && registration.ticketCode),

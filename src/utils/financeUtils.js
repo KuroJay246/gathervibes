@@ -86,25 +86,25 @@ export function calculateRegistrationFinance(registration = {}, event = {}) {
   const paymentStatus = normalizePaymentStatus(registration.paymentStatus)
   const paymentMethod = normalizePaymentMethod(registration.paymentMethod || (paymentStatus === 'door' ? 'door' : paymentStatus === 'complimentary' ? 'complimentary' : 'unknown'))
   const explicitTicketPrice = parseMoney(registration.ticketPrice)
-  const defaultPrice = defaultTicketPriceForEvent(event)
-  const ticketPrice = explicitTicketPrice !== null ? explicitTicketPrice : defaultPrice
+  // We no longer automatically inherit defaultPrice into the registration's calculated ticketPrice/amountDue
+  // unless explicitly requested by a configuration in the future.
   const explicitAmountDue = parseMoney(registration.amountDue)
   const amountDue = explicitAmountDue !== null
     ? explicitAmountDue
-    : ticketPrice !== null
-      ? roundMoney(ticketPrice * persons)
+    : explicitTicketPrice !== null
+      ? roundMoney(explicitTicketPrice * persons)
       : null
   const amountPaid = parseMoney(registration.amountPaid) ?? 0
   const balanceDue = parseMoney(registration.balanceDue) ?? (amountDue !== null ? Math.max(0, roundMoney(amountDue - amountPaid)) : null)
   const complimentaryValue = paymentStatus === 'complimentary'
-    ? (ticketPrice !== null ? roundMoney(ticketPrice * persons) : amountDue || 0)
+    ? (explicitTicketPrice !== null ? roundMoney(explicitTicketPrice * persons) : amountDue || 0)
     : 0
-  const needsFinanceReview = amountDue === null || ticketPrice === null
+  const needsFinanceReview = amountDue === null || explicitTicketPrice === null
 
   return {
     currency: registration.currency || event.currency || DEFAULT_CURRENCY,
     priceTier: registration.priceTier || event.defaultPriceTier || DEFAULT_FINANCE_SETTINGS.defaultPriceTier,
-    ticketPrice,
+    ticketPrice: explicitTicketPrice,
     personsAttending: persons,
     amountDue,
     amountPaid,

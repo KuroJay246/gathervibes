@@ -23,7 +23,7 @@ export function getMissingTicketRegistrations(registrations = []) {
 export function getPendingPaymentRegistrations(registrations = []) {
   return registrations.filter((registration) => {
     const status = normalizePaymentStatus(registration.paymentStatus)
-    return status === 'pending' || status === 'unknown' || status === 'door'
+    return status === 'pending' || status === 'unknown' || status === 'door-list'
   })
 }
 
@@ -42,7 +42,8 @@ export function formatDoorStatus(registration = {}) {
 export function formatPaymentLabel(status = '') {
   const normalized = normalizePaymentStatus(status)
   if (normalized === 'pending') return 'Pending payment'
-  if (normalized === 'door') return 'Door payment'
+  if (normalized === 'door') return 'Door Paid'
+  if (normalized === 'door-list') return 'To Pay at Door'
   return sharedFormatPaymentLabel(normalized)
 }
 

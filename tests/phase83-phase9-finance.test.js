@@ -30,14 +30,15 @@ test('Phase 8.3 canonical domain and route health stay loop-safe', async () => {
 
 test('finance calculations use amounts, not paymentStatus alone', () => {
   const event = { ticketPrice: 50, currency: 'BBD' }
-  const paid = calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'paid', amountPaid: 100 }, event)
-  const pending = calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'paid', amountPaid: 25 }, event)
+  const paid = calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'paid', ticketPrice: 50, amountPaid: 100 }, event)
+  const pending = calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'paid', ticketPrice: 50, amountPaid: 25 }, event)
   const comp = calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'complimentary', ticketPrice: 0, amountPaid: '' }, event)
 
   assert.equal(paid.amountDue, 100)
   assert.equal(paid.balanceDue, 0)
   assert.equal(pending.balanceDue, 75)
-  assert.ok(financeWarnings({ personsAttending: 2, paymentStatus: 'paid', amountPaid: 25 }, event).some((warning) => /outstanding/.test(warning)))
+  assert.ok(financeWarnings({ personsAttending: 2, paymentStatus: 'paid', ticketPrice: 50, amountPaid: 25 }, event).some((warning) => /outstanding/.test(warning)))
+  assert.equal(calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'paid', amountPaid: 25 }, event).amountDue, null)
   assert.equal(comp.amountDue, 0)
   assert.equal(comp.amountPaid, 0)
   assert.equal(formatCurrency(100), 'BBD $100.00')

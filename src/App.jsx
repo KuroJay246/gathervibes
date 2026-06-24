@@ -13,6 +13,7 @@ import { ImportsPage } from './pages/ImportsPage'
 import { TicketsPage } from './pages/TicketsPage'
 import { CheckInPage } from './pages/CheckInPage'
 import { CommunicationsPage } from './pages/CommunicationsPage'
+import { OperationsPage } from './pages/OperationsPage'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/imports" element={<ImportsPage />} />
           <Route path="/tickets" element={<TicketsPage />} />
           <Route path="/check-in" element={<CheckInPage />} />
+          <Route path="/operations" element={<OperationsPage />} />
           <Route path="/qa" element={<QaPage />} />
           <Route path="/communications" element={<CommunicationsPage />} />
           <Route path="/settings" element={<SettingsPage />} />

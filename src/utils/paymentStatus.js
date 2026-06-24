@@ -1,12 +1,12 @@
-export const PAYMENT_STATUSES = ['paid', 'pending', 'complimentary', 'door', 'unknown']
+export const PAYMENT_STATUSES = ['paid', 'pending', 'complimentary', 'door', 'door-list', 'unknown']
 
 export const PAYMENT_STATUS_LABELS = {
   paid: 'Paid',
   pending: 'Pending',
   complimentary: 'Complimentary',
-  door: 'Door',
+  door: 'Door Paid',
+  'door-list': 'To Pay at Door',
   unknown: 'Unknown',
-  'door-list': 'Door',
 }
 
 export function normalizePaymentStatus(value) {
@@ -20,12 +20,17 @@ export function normalizePaymentStatus(value) {
   if ([
     'door',
     'door payment',
-    'pay at door',
+    'door paid',
     'door sale',
     'walk in',
     'walk-in',
-    'door list',
   ].includes(normalized)) return 'door'
+  
+  if ([
+    'pay at door',
+    'to pay at door',
+    'door list',
+  ].includes(normalized)) return 'door-list'
 
   return 'unknown'
 }

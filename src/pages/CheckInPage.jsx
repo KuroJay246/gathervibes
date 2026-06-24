@@ -98,11 +98,14 @@ export function CheckInPage() {
   const [helperView, setHelperView] = useState('door')
   const [helperMessage, setHelperMessage] = useState('')
   const [resumeScanTrigger, setResumeScanTrigger] = useState(0)
+  const [selectedListIds, setSelectedListIds] = useState(new Set())
   const summary = useMemo(() => buildEventDaySummary(registrations), [registrations])
   const visibleRegistrations = useMemo(
     () => filterCheckInRegistrations(registrations, activeView),
     [activeView, registrations],
   )
+  const selectedListRows = visibleRegistrations.filter((registration) => selectedListIds.has(registration.registrationId))
+  const allVisibleListRowsSelected = visibleRegistrations.length > 0 && visibleRegistrations.every((registration) => selectedListIds.has(registration.registrationId))
   const helperRows = useMemo(() => {
     if (helperView === 'missing-ticket') return getMissingTicketRegistrations(registrations)
     if (helperView === 'pending-payment') return getPendingPaymentRegistrations(registrations)
@@ -188,6 +191,97 @@ export function CheckInPage() {
         : err.message || 'Undo check-in failed. The guest remains checked in.')
     } finally {
       setSaving(false)
+    }
+  }
+
+  function toggleListSelection(registrationId) {
+    setSelectedListIds((current) => {
+      const next = new Set(current)
+      if (next.has(registrationId)) next.delete(registrationId)
+      else next.add(registrationId)
+      return next
+    })
+  }
+
+  function clearListSelection() {
+    setSelectedListIds(new Set())
+  }
+
+  function toggleAllVisibleListRows() {
+    setSelectedListIds(allVisibleListRowsSelected ? new Set() : new Set(visibleRegistrations.map((registration) => registration.registrationId)))
+  }
+
+  async function handleBulkCheckIn() {
+    const candidates = selectedListRows.filter((registration) => canCompleteCheckIn(registration).allowed)
+    if (candidates.length === 0) return
+    if (!window.confirm(`Check in ${candidates.length} selected guest registration${candidates.length === 1 ? '' : 's'} for ${activeEvent.eventName}?`)) return
+
+    setSaving(true)
+    setMessage('')
+    setActionError('')
+    try {
+      for (const registration of candidates) {
+        await completeCheckIn(registration, user)
+      }
+      setMessage(`Checked in ${candidates.length} selected registration${candidates.length === 1 ? '' : 's'}.`)
+      clearListSelection()
+    } catch (err) {
+      if (import.meta.env.DEV) console.error(err)
+      setActionError(err.message || 'Bulk check-in stopped after a failed write.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleBulkUndoCheckIn() {
+    const candidates = selectedListRows.filter((registration) => registration.checkedIn)
+    if (candidates.length === 0) return
+    if (!window.confirm(`Undo check-in for ${candidates.length} selected guest registration${candidates.length === 1 ? '' : 's'}?`)) return
+
+    setSaving(true)
+    setMessage('')
+    setActionError('')
+    try {
+      for (const registration of candidates) {
+        await undoCheckIn(registration, user)
+      }
+      setMessage(`Undid check-in for ${candidates.length} selected registration${candidates.length === 1 ? '' : 's'}.`)
+      clearListSelection()
+    } catch (err) {
+      if (import.meta.env.DEV) console.error(err)
+      setActionError(err.message || 'Bulk undo stopped after a failed write.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function copySelectedList(kind = 'guest') {
+    const rows = selectedListRows.length > 0 ? selectedListRows : visibleRegistrations
+    const text = rows.map((registration) => {
+      const finance = calculateRegistrationFinance(registration, activeEvent)
+      if (kind === 'door') {
+        return [
+          registration.fullName,
+          attendeeNamesText(registration),
+          formatPaymentLabel(registration.paymentStatus),
+          finance.balanceDue === null ? 'Balance needs review' : `Balance ${formatCurrency(finance.balanceDue)}`,
+          registration.ticketCode || 'Missing ticket',
+        ].filter(Boolean).join(' | ')
+      }
+      return [
+        registration.fullName,
+        attendeeNamesText(registration),
+        registration.buyerName,
+        registration.groupName,
+        registration.ticketCode,
+      ].filter(Boolean).join(' | ')
+    }).join('\n')
+
+    try {
+      await navigator.clipboard.writeText(text)
+      setMessage(`${kind === 'door' ? 'Door' : 'Guest'} list copied.`)
+    } catch {
+      setActionError('Copy failed. Select and copy the list manually.')
     }
   }
 
@@ -370,6 +464,7 @@ export function CheckInPage() {
               setActiveView(view.value)
               setMessage('')
               setActionError('')
+              clearListSelection()
             }}
             className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition ${activeView === view.value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1]'}`}
           >
@@ -574,9 +669,36 @@ export function CheckInPage() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">{CHECK_IN_VIEWS.find((view) => view.value === activeView)?.label}</p>
-              <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Checked-in guest visibility</h3>
+              <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Guest list mode</h3>
             </div>
             <p className="text-xs font-semibold text-[#8C7567]">{visibleRegistrations.length} registrations shown</p>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-3 rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={toggleAllVisibleListRows} className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C]">
+                {allVisibleListRowsSelected ? 'Clear visible selection' : 'Select visible rows'}
+              </button>
+              {selectedListIds.size > 0 && (
+                <button type="button" onClick={clearListSelection} className="rounded-xl px-4 py-2 text-xs font-bold text-[#8C7567] hover:bg-[#F2E8E1]">
+                  Clear selected
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={handleBulkCheckIn} disabled={saving || selectedListRows.length === 0} className="rounded-xl bg-[#1E7345] px-4 py-2 text-xs font-bold text-white disabled:opacity-40">
+                Check in selected
+              </button>
+              <button type="button" onClick={handleBulkUndoCheckIn} disabled={saving || selectedListRows.length === 0} className="rounded-xl border border-[#F2C3C3] bg-white px-4 py-2 text-xs font-bold text-[#A32626] disabled:opacity-40">
+                Undo check-in selected
+              </button>
+              <button type="button" onClick={() => copySelectedList('guest')} className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C]">
+                Copy selected guest list
+              </button>
+              <button type="button" onClick={() => copySelectedList('door')} className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C]">
+                Copy selected door list
+              </button>
+            </div>
           </div>
 
           {visibleRegistrations.length === 0 ? (
@@ -589,6 +711,7 @@ export function CheckInPage() {
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
+                      <th className="px-4 py-3">Select</th>
                       <th className="px-4 py-3">Guest</th>
                       <th className="px-4 py-3">Contact</th>
                       <th className="px-4 py-3">Group</th>
@@ -602,6 +725,14 @@ export function CheckInPage() {
                   <tbody className="divide-y divide-[#F2E8E1]">
                     {visibleRegistrations.map((registration) => (
                       <tr key={registration.registrationId}>
+                        <td className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedListIds.has(registration.registrationId)}
+                            onChange={() => toggleListSelection(registration.registrationId)}
+                            aria-label={`Select ${registration.fullName}`}
+                          />
+                        </td>
                         <td className="px-4 py-3 font-medium text-[#2B1723]">
                           <div>{registration.fullName}</div>
                           {attendeeNamesText(registration) && <div className="mt-1 text-xs font-normal text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}

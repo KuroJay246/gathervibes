@@ -10,6 +10,7 @@ import { FieldMappingForm } from '../components/imports/FieldMappingForm'
 import { ImportPreviewTable } from '../components/imports/ImportPreviewTable'
 import { ImportSummary } from '../components/imports/ImportSummary'
 import { ImportTemplatesPanel } from '../components/imports/ImportTemplatesPanel'
+import { PaymentAuditBackfillPanel } from '../components/imports/PaymentAuditBackfillPanel'
 import { EmptyState } from '../components/ui/EmptyState'
 import { IMPORT_SOURCES, getImportSource } from '../utils/importSources'
 import { readXlsxWorkbook } from '../utils/xlsxImport'
@@ -173,6 +174,12 @@ export function ImportsPage() {
       return
     }
     setConfirmedSheetId(sheet.id)
+    
+    if (sourceType === 'cpb-payment-audit') {
+      setStep('cpb-audit-preview')
+      return
+    }
+
     loadParsedData(sheet.headers, sheet.rows, {
       sourceFileName: uploadedFileName,
       sourceSheetName: sheet.name,
@@ -452,13 +459,26 @@ export function ImportsPage() {
                   key={source.value}
                   type="button"
                   onClick={() => setSourceType(source.value)}
-                  className={`rounded-xl border p-4 text-left transition ${sourceType === source.value ? 'border-[#B76E79] bg-[#FFF8F2]' : 'border-[#F2E8E1] bg-white hover:bg-[#FBF8F5]'}`}
+                  className={`rounded-xl border p-4 text-left transition ${
+                    source.special
+                      ? sourceType === source.value
+                        ? 'border-[#A32626] bg-[#FFF1F1]'
+                        : 'border-[#F2C3C3] bg-[#FFF8F8] hover:bg-[#FFF1F1]'
+                      : sourceType === source.value
+                        ? 'border-[#B76E79] bg-[#FFF8F2]'
+                        : 'border-[#F2E8E1] bg-white hover:bg-[#FBF8F5]'
+                  }`}
                 >
                   <span className="flex items-start gap-3">
-                    <FileSpreadsheet className={`mt-0.5 size-5 shrink-0 ${sourceType === source.value ? 'text-[#B76E79]' : 'text-[#C4B4AA]'}`} />
+                    <FileSpreadsheet className={`mt-0.5 size-5 shrink-0 ${source.special ? 'text-[#A32626]' : sourceType === source.value ? 'text-[#B76E79]' : 'text-[#C4B4AA]'}`} />
                     <span>
                       <span className="block text-sm font-bold text-[#2B1723]">{source.label}</span>
                       <span className="mt-1 block text-xs leading-5 text-[#816D62]">{source.helperText}</span>
+                      {source.special && (
+                        <span className="mt-2 block rounded-lg bg-white/70 px-3 py-2 text-[11px] font-bold leading-5 text-[#A32626]">
+                          Dry-run first. No CPB writes until approval. Review unmatched rows before apply. Gmail links are not stored.
+                        </span>
+                      )}
                     </span>
                   </span>
                 </button>
@@ -639,13 +659,23 @@ export function ImportsPage() {
                 type="button"
                 onClick={confirmSheetSelection}
                 disabled={!canConfirmSheet}
-                className="rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#B76E79]/30 disabled:opacity-50"
+                className="rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B] disabled:opacity-50"
               >
                 Confirm Sheet Selection
               </button>
             </div>
           </section>
         </div>
+      )}
+
+      {step === 'cpb-audit-preview' && (
+        <PaymentAuditBackfillPanel 
+          sheet={selectedSheet}
+          existingRegistrations={existingRegistrations}
+          event={activeEvent}
+          user={user}
+          onReset={resetImportState}
+        />
       )}
 
       {step === 3 && (

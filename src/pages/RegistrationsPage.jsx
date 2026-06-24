@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Trash2, Users, Download } from 'lucide-react'
+import { Plus, Trash2, Users, Download } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import {
@@ -18,6 +18,7 @@ import { RegistrationCard } from '../components/registrations/RegistrationCard'
 import { RegistrationFormModal } from '../components/registrations/RegistrationFormModal'
 import { DeleteRegistrationDialog } from '../components/registrations/DeleteRegistrationDialog'
 import { ExportModal } from '../components/registrations/ExportModal'
+import { RegistrationFilters } from '../components/registrations/RegistrationFilters'
 import { Link } from 'react-router-dom'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { formatPaymentLabel, paymentStatusMatches } from '../utils/paymentStatus'
@@ -29,7 +30,7 @@ import {
   formatPaymentMethod,
 } from '../utils/financeUtils'
 
-const TABS = ['All', 'Paid', 'Pending', 'Complimentary', 'Door', 'Door List', 'Outstanding Balance', 'Missing Amount', 'Missing Payment Reference', 'Missing Ticket Price', 'Missing Ticket', 'Checked In']
+const TABS = ['All', 'Paid', 'Pending', 'Door Paid', 'To Pay at Door', 'Complimentary', 'Outstanding Balance', 'Missing Ticket', 'Review Needed', 'Checked In']
 
 function titleCase(value = '') {
   return value
@@ -48,7 +49,7 @@ export function RegistrationsPage() {
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState({})
   const [activeTab, setActiveTab] = useState('All')
   const [success, setSuccess] = useState('')
   const [selectedIds, setSelectedIds] = useState(new Set())
@@ -104,21 +105,45 @@ export function RegistrationsPage() {
   if (loading) return <LoadingState message="Loading registrations…" />
 
   const filteredRegistrations = registrations.filter((reg) => {
+    const finance = calculateRegistrationFinance(reg, activeEvent)
+    // 1. Tab filtering
     if (activeTab === 'Checked In' && !reg.checkedIn) return false
     if (activeTab === 'Missing Ticket' && reg.ticketCode) return false
-    if (activeTab === 'Door List' && reg.paymentStatus !== 'door-list') return false
-    if (!['All', 'Checked In', 'Missing Ticket', 'Door List'].includes(activeTab) && !paymentStatusMatches(reg.paymentStatus, activeTab) && !financeFilterMatches(reg, activeTab, activeEvent)) return false
-    if (!searchQuery) return true
+    if (activeTab === 'Door Paid' && !paymentStatusMatches(reg.paymentStatus, 'door')) return false
+    if (activeTab === 'To Pay at Door' && !paymentStatusMatches(reg.paymentStatus, 'door-list')) return false
+    if (activeTab === 'Review Needed' && !finance.needsFinanceReview && !reg.financeReviewRequired && reg.ticketCode) return false
+    if (['Paid', 'Pending', 'Complimentary', 'Outstanding Balance'].includes(activeTab)) {
+      if (!financeFilterMatches(reg, activeTab, activeEvent)) return false
+    }
 
-    const query = searchQuery.toLowerCase()
-    return (
-      reg.fullName?.toLowerCase().includes(query)
-      || reg.buyerName?.toLowerCase().includes(query)
-      || attendeeNamesText(reg).toLowerCase().includes(query)
-      || reg.email?.toLowerCase().includes(query)
-      || reg.phone?.toLowerCase().includes(query)
-      || reg.ticketCode?.toLowerCase().includes(query)
-    )
+    // 2. Advanced Filters
+    if (filters.keyword) {
+      const q = filters.keyword.toLowerCase()
+      if (![reg.fullName, reg.buyerName, attendeeNamesText(reg), reg.email, reg.phone, reg.ticketCode].some(v => v?.toLowerCase().includes(q))) {
+        return false
+      }
+    }
+    if (filters.guestName && !reg.fullName?.toLowerCase().includes(filters.guestName.toLowerCase())) return false
+    if (filters.buyerName && !reg.buyerName?.toLowerCase().includes(filters.buyerName.toLowerCase())) return false
+    if (filters.attendeeName && !attendeeNamesText(reg).toLowerCase().includes(filters.attendeeName.toLowerCase())) return false
+    if (filters.contact && !(reg.email?.toLowerCase().includes(filters.contact.toLowerCase()) || reg.phone?.toLowerCase().includes(filters.contact.toLowerCase()))) return false
+    if (filters.group && !reg.groupName?.toLowerCase().includes(filters.group.toLowerCase())) return false
+    if (filters.ticketCode && !reg.ticketCode?.toLowerCase().includes(filters.ticketCode.toLowerCase())) return false
+    if (filters.priceTier && !reg.priceTier?.toLowerCase().includes(filters.priceTier.toLowerCase())) return false
+    if (filters.paymentStatus && !paymentStatusMatches(reg.paymentStatus, filters.paymentStatus)) return false
+    if (filters.paymentMethod && reg.paymentMethod !== filters.paymentMethod) return false
+    if (filters.balanceDue) {
+      if (!finance.balanceDue || finance.balanceDue <= 0) return false
+    }
+    if (filters.missingTicket && reg.ticketCode) return false
+    if (filters.missingAmount) {
+      if (finance.amountDue !== null && finance.amountPaid !== null) return false
+    }
+    if (filters.reviewNeeded) {
+      if (!finance.needsFinanceReview && !reg.financeReviewRequired && reg.ticketCode) return false
+    }
+    
+    return true
   })
   const allMetrics = buildRegistrationMetrics(registrations, activeEvent)
   const filteredMetrics = buildRegistrationMetrics(filteredRegistrations, activeEvent)
@@ -310,20 +335,15 @@ export function RegistrationsPage() {
         ))}
       </section>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative max-w-sm flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
-          <input
-            type="text"
-          placeholder="Search guest, buyer, attendee, email, phone…"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
-          />
-        </div>
+      <div className="flex flex-col gap-6">
+        <RegistrationFilters 
+          filters={filters} 
+          onFilterChange={setFilters} 
+          onClearFilters={() => setFilters({})} 
+        />
 
-        <div className="flex overflow-x-auto pb-2 sm:pb-0">
-          <div className="flex gap-2">
+        <div className="overflow-x-auto pb-2">
+          <div className="flex flex-wrap gap-2">
             {TABS.map((tab) => (
               <button
                 key={tab}
@@ -332,7 +352,7 @@ export function RegistrationsPage() {
                 className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition ${
                   activeTab === tab
                     ? 'bg-[#2B1723] text-white'
-                    : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1]'
+                    : 'bg-white text-[#8C766A] border border-[#E5D7CF] hover:bg-[#F2E8E1]'
                 }`}
               >
                 {tab}
@@ -381,7 +401,7 @@ export function RegistrationsPage() {
               className="rounded-xl border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#6B564C]"
             >
               <option value="">Update payment...</option>
-              {['paid', 'pending', 'complimentary', 'door'].map((status) => (
+              {['paid', 'pending', 'complimentary', 'door', 'door-list'].map((status) => (
                 <option key={status} value={status}>{formatPaymentLabel(status)}</option>
               ))}
             </select>
@@ -448,7 +468,7 @@ export function RegistrationsPage() {
           icon={Users}
           title="No registrations found"
           description={
-            searchQuery || activeTab !== 'All'
+            Object.values(filters).some(Boolean) || activeTab !== 'All'
               ? 'Try adjusting your search or filters.'
               : 'Get started by manually adding one or importing a CSV.'
           }

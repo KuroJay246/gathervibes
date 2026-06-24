@@ -18,3 +18,7 @@ secrets/
 test_output.txt
 
 test_output.txt
+
+Cake_Piknik_Payment_Audit.xlsx
+*_backup.csv
+*.xlsx

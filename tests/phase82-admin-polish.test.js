@@ -13,7 +13,7 @@ import { normalizeTicketCode, validateTicketCode } from '../src/utils/ticketUtil
 
 test('door payment values normalize to door and unknown payment status requires review', async () => {
   for (const value of ['door', 'Door Payment', 'pay at door', 'Door Sale', 'walk-in', 'Unpaid']) {
-    const expected = value === 'Unpaid' ? 'pending' : 'door'
+    const expected = value === 'Unpaid' ? 'pending' : value === 'pay at door' ? 'door-list' : 'door'
     assert.equal(normalizePaymentStatus(value), expected)
   }
 
@@ -111,7 +111,6 @@ test('old internal labels are removed while roadmap backlog remains visible', as
     'src/layout/AppShell.jsx',
     'src/pages/DashboardPage.jsx',
     'src/pages/EventsPage.jsx',
-    // Note: RegistrationsPage intentionally contains 'Door List' as a tab (added Phase 14)
     'src/pages/TicketsPage.jsx',
     'src/pages/CommunicationsPage.jsx',
     'src/pages/SettingsPage.jsx',
