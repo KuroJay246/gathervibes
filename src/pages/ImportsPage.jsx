@@ -54,6 +54,7 @@ export function ImportsPage() {
   const [ticketMode, setTicketMode] = useState('use-imported')
 
   const [importing, setImporting] = useState(false)
+  const [importProgress, setImportProgress] = useState(0)
   const [error, setError] = useState('')
   const [importErrorDetails, setImportErrorDetails] = useState(null)
   const [importResult, setImportResult] = useState(null)
@@ -342,10 +343,11 @@ export function ImportsPage() {
     }
 
     setImporting(true)
+    setImportProgress(0)
     setError('')
     setImportErrorDetails(null)
     try {
-      await commitImport(validRows, activeEvent.eventId, user)
+      await commitImport(validRows, activeEvent.eventId, user, (current) => setImportProgress(current))
       setImportResult({
         importedCount: validRows.length,
         blockedCount: processedRows.length - validRows.length,
@@ -706,6 +708,7 @@ export function ImportsPage() {
             onCancel={reset}
             onImport={handleImport}
             importing={importing}
+            importProgress={importProgress}
             onStartOver={reset}
             onBack={handleBackToDuplicateReview}
           />

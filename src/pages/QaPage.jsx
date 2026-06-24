@@ -149,6 +149,7 @@ export function QaPage() {
         { label: 'QR payload privacy', status: hasPrivateQrData ? 'fail' : 'pass', detail: qrPrivateData },
         { label: 'Current user role detected', status: currentRoleLabel ? 'pass' : 'warning', detail: currentRoleLabel || 'Role pending accessControl load' },
         { label: 'Approved admin detected', status: db && Array.isArray(accessControl?.approvedEmails) ? 'pass' : 'fail', detail: 'Protected page loaded with settings/accessControl allowlist access' },
+        { label: 'Empty allowlist check', status: accessControl?.approvedEmails?.length > 0 ? 'pass' : 'fail', detail: accessControl?.approvedEmails?.length > 0 ? `${accessControl.approvedEmails.length} emails approved` : 'approvedEmails is missing or empty' },
         { label: 'No public access warning', status: 'pass', detail: 'App remains private and allowlist-only.' },
         { label: 'Role navigation summary', status: 'warning', detail: 'Role display is active; scoped role navigation and role rules are deferred.' },
         { label: 'Communications templates available', status: COMMUNICATION_TEMPLATES.length >= 12 ? 'pass' : 'warning', detail: `${COMMUNICATION_TEMPLATES.length} copy-only templates` },

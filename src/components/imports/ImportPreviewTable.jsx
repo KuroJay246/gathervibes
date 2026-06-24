@@ -35,6 +35,7 @@ export function ImportPreviewTable({
   onCancel,
   onImport,
   importing,
+  importProgress,
   mode = 'final',
   reviewActions = {},
   onActionChange,
@@ -417,7 +418,7 @@ export function ImportPreviewTable({
             {importing ? (
               <>
                 <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                Importing…
+                {importProgress > 0 ? `Importing ${importProgress} of ${importableCount}…` : 'Starting Import…'}
               </>
             ) : (
               `Confirm Import (${importableCount} rows)`

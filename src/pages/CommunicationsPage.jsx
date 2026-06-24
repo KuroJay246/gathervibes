@@ -288,6 +288,9 @@ Data context for this segment:
                   <p className="text-xs text-[#8A7468]">
                     Real AI generation is deferred. Use the button above to copy a prompt you can paste into ChatGPT to generate a message using your selected tone.
                   </p>
+                  <p className="mt-2 text-xs font-bold text-amber-700">
+                    Safety Notice: When you paste this prompt into ChatGPT or another AI tool, event details included in the prompt will be shared with that tool. Review before pasting.
+                  </p>
                 </div>
               </div>
             )}

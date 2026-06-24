@@ -29,7 +29,7 @@ import {
   formatPaymentMethod,
 } from '../utils/financeUtils'
 
-const TABS = ['All', 'Paid', 'Pending', 'Complimentary', 'Door', 'Outstanding Balance', 'Missing Amount', 'Missing Payment Reference', 'Missing Ticket Price', 'Missing Ticket', 'Checked In']
+const TABS = ['All', 'Paid', 'Pending', 'Complimentary', 'Door', 'Door List', 'Outstanding Balance', 'Missing Amount', 'Missing Payment Reference', 'Missing Ticket Price', 'Missing Ticket', 'Checked In']
 
 function titleCase(value = '') {
   return value
@@ -106,7 +106,8 @@ export function RegistrationsPage() {
   const filteredRegistrations = registrations.filter((reg) => {
     if (activeTab === 'Checked In' && !reg.checkedIn) return false
     if (activeTab === 'Missing Ticket' && reg.ticketCode) return false
-    if (!['All', 'Checked In', 'Missing Ticket'].includes(activeTab) && !paymentStatusMatches(reg.paymentStatus, activeTab) && !financeFilterMatches(reg, activeTab, activeEvent)) return false
+    if (activeTab === 'Door List' && reg.paymentStatus !== 'door-list') return false
+    if (!['All', 'Checked In', 'Missing Ticket', 'Door List'].includes(activeTab) && !paymentStatusMatches(reg.paymentStatus, activeTab) && !financeFilterMatches(reg, activeTab, activeEvent)) return false
     if (!searchQuery) return true
 
     const query = searchQuery.toLowerCase()

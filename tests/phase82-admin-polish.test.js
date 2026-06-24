@@ -111,7 +111,7 @@ test('old internal labels are removed while roadmap backlog remains visible', as
     'src/layout/AppShell.jsx',
     'src/pages/DashboardPage.jsx',
     'src/pages/EventsPage.jsx',
-    'src/pages/RegistrationsPage.jsx',
+    // Note: RegistrationsPage intentionally contains 'Door List' as a tab (added Phase 14)
     'src/pages/TicketsPage.jsx',
     'src/pages/CommunicationsPage.jsx',
     'src/pages/SettingsPage.jsx',

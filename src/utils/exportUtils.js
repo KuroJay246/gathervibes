@@ -171,26 +171,29 @@ export function buildExportRows(registrations, event, presetId = 'admin') {
   })
 }
 
+export function escapeCsv(val) {
+  if (val === null || val === undefined) return '""'
+  let str = String(val)
+  if (/^[=+\-@]/.test(str)) {
+    str = "'" + str
+  }
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`
+  }
+  return `"${str}"`
+}
+
 export function convertToCsv(dataRows) {
   if (!dataRows || dataRows.length === 0) return ''
   const headers = Object.keys(dataRows[0])
-  
-  const escapeCsv = (val) => {
-    if (val === null || val === undefined) return ''
-    const str = String(val)
-    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-      return `"${str.replace(/"/g, '""')}"`
-    }
-    return str
-  }
 
   const csvRows = []
   csvRows.push(headers.map(escapeCsv).join(','))
-  
+
   for (const row of dataRows) {
     csvRows.push(headers.map((header) => escapeCsv(row[header])).join(','))
   }
-  
+
   return csvRows.join('\n')
 }
 

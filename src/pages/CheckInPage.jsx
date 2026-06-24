@@ -97,6 +97,7 @@ export function CheckInPage() {
   const [confirmUndo, setConfirmUndo] = useState(false)
   const [helperView, setHelperView] = useState('door')
   const [helperMessage, setHelperMessage] = useState('')
+  const [resumeScanTrigger, setResumeScanTrigger] = useState(0)
   const summary = useMemo(() => buildEventDaySummary(registrations), [registrations])
   const visibleRegistrations = useMemo(
     () => filterCheckInRegistrations(registrations, activeView),
@@ -113,7 +114,7 @@ export function CheckInPage() {
     if (!query) return []
     return registrations
       .filter((registration) => searchableRegistrationText(registration).includes(query))
-      .slice(0, 8)
+      .slice(0, 20)
   }, [registrations, searchQuery])
 
   const selectedRegistration = registrations.find((registration) => registration.registrationId === selectedId) || matches[0]
@@ -145,6 +146,7 @@ export function CheckInPage() {
       setSearchQuery('')
       setSelectedId('')
       setConfirmUndo(false)
+      setResumeScanTrigger(t => t + 1)
     } catch (err) {
       if (import.meta.env.DEV) console.error(err)
       const permissionDenied = err?.code === 'permission-denied' || /permission|insufficient/i.test(err?.message || '')
@@ -230,12 +232,12 @@ export function CheckInPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+      <header className="sticky top-0 z-40 -mx-4 -mt-6 mb-6 flex flex-col gap-3 border-b border-[#EEDFD6] bg-[#FBF8F5]/95 px-4 py-4 backdrop-blur-md lg:static lg:mx-0 lg:mt-0 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#1E7345]">Event-Day Mode</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Door Check-In / QR Scan</h2>
           <p className="mt-2 text-sm text-[#816D62]">
-            Checking in guests for <strong>{activeEvent.eventName}</strong>.
+            Checking in guests for <strong>{activeEvent.eventName}</strong>. <span className="ml-2 inline-block rounded-full bg-[#E5F3EC] px-2 py-0.5 text-[10px] font-bold tracking-widest text-[#1E7345]">Checked In: {summary.checkedInPersons}/{summary.totalPersons}</span>
           </p>
         </div>
         <div className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-3 text-xs text-[#6B564C]">
@@ -384,6 +386,7 @@ export function CheckInPage() {
             onMatch={handleQrMatch}
             onMissing={handleQrMissing}
             onInvalid={handleQrInvalid}
+            resumeTrigger={resumeScanTrigger}
           />
 
           <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
@@ -417,7 +420,7 @@ export function CheckInPage() {
                 key={registration.registrationId}
                 type="button"
                 onClick={() => setSelectedId(registration.registrationId)}
-                className={`rounded-xl border p-4 text-left transition ${selectedRegistration?.registrationId === registration.registrationId ? 'border-[#B76E79] bg-[#FFF8F2]' : 'border-[#EEDFD6] bg-white hover:bg-[#FBF8F5]'}`}
+                className={`min-h-[72px] rounded-xl border p-4 text-left transition ${selectedRegistration?.registrationId === registration.registrationId ? 'border-[#B76E79] bg-[#FFF8F2] ring-2 ring-[#B76E79]/30 shadow-md' : 'border-[#EEDFD6] bg-white hover:bg-[#FBF8F5]'}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -636,6 +639,9 @@ export function CheckInPage() {
             <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">{registrationDisplayName(selectedRegistration)}</h3>
             <p className="mt-3 text-sm leading-6 text-[#6B564C]">
               Undo check-in for this guest? This should only be used if the check-in was accidental.
+            </p>
+            <p className="mt-2 text-sm font-semibold text-[#8C7567]">
+              Checked in at: {formatCheckInTime(selectedRegistration.checkInTime)}
             </p>
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
