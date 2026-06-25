@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Trash2, Users, Download } from 'lucide-react'
+import { Plus, Trash2, Users, Download } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import {
@@ -18,6 +18,8 @@ import { RegistrationCard } from '../components/registrations/RegistrationCard'
 import { RegistrationFormModal } from '../components/registrations/RegistrationFormModal'
 import { DeleteRegistrationDialog } from '../components/registrations/DeleteRegistrationDialog'
 import { ExportModal } from '../components/registrations/ExportModal'
+import { RegistrationFilters } from '../components/registrations/RegistrationFilters'
+import { InfoHint } from '../components/ui/InfoHint'
 import { Link } from 'react-router-dom'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { formatPaymentLabel, paymentStatusMatches } from '../utils/paymentStatus'
@@ -29,7 +31,7 @@ import {
   formatPaymentMethod,
 } from '../utils/financeUtils'
 
-const TABS = ['All', 'Paid', 'Pending', 'Complimentary', 'Door', 'Outstanding Balance', 'Missing Amount', 'Missing Payment Reference', 'Missing Ticket Price', 'Missing Ticket', 'Checked In']
+const TABS = ['All', 'Paid', 'Pending', 'Door Paid', 'To Pay at Door', 'Complimentary', 'Outstanding Balance', 'Missing Ticket Code', 'Needs Review', 'Checked In']
 
 function titleCase(value = '') {
   return value
@@ -42,14 +44,62 @@ function attendeeNamesText(registration = {}) {
   return Array.isArray(registration.attendeeNames) ? registration.attendeeNames.join(', ') : ''
 }
 
+function personsLabel(registration = {}) {
+  const persons = Number(registration.personsAttending) || 1
+  return persons > 1 ? `Group of ${persons}` : '1 guest'
+}
+
+function guestSummary(registrations, guests) {
+  const registrationText = `${registrations} registration${registrations === 1 ? '' : 's'}`
+  const guestText = `${guests} guest${guests === 1 ? '' : 's'}`
+  return `${registrationText} / ${guestText}`
+}
+
+function registrationNeedsReview(registration = {}, event = {}) {
+  const finance = calculateRegistrationFinance(registration, event)
+  return Boolean(finance.needsFinanceReview || registration.financeReviewRequired || !registration.ticketCode)
+}
+
+function matchesCardFilter(registration = {}, key, event = {}) {
+  const finance = calculateRegistrationFinance(registration, event)
+  if (!key) return true
+  if (key === 'finance-warning') return finance.needsFinanceReview || registration.financeReviewRequired
+  if (key === 'missing-ticket') return !registration.ticketCode
+  if (key === 'outstanding') return (finance.balanceDue || 0) > 0
+  if (key === 'door') return paymentStatusMatches(registration.paymentStatus, 'door')
+  if (key === 'door-list') return paymentStatusMatches(registration.paymentStatus, 'door-list')
+  if (key === 'checked-in') return Boolean(registration.checkedIn)
+  if (key === 'not-checked-in') return !registration.checkedIn
+  if (key === 'review-needed') return registrationNeedsReview(registration, event)
+  return true
+}
+
+function CountCard({ label, value, help, active, onClick }) {
+  return (
+    <div
+      className={`rounded-xl border px-4 py-3 text-left transition ${
+        active ? 'border-[#B76E79] bg-[#FFF8F2] ring-2 ring-[#B76E79]/20' : 'border-[#EEDFD6] bg-white hover:bg-[#FBF8F5]'
+      }`}
+      title={help}
+    >
+      <button type="button" onClick={onClick} className="block w-full text-left">
+        <p className="text-lg font-bold text-[#2B1723]">{value}</p>
+        <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
+      </button>
+      {help && <InfoHint className="mt-1" label={`${label} help`}>{help}</InfoHint>}
+    </div>
+  )
+}
+
 export function RegistrationsPage() {
   const { user } = useAuth()
   const { activeEvent } = useActiveEvent()
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState({})
   const [activeTab, setActiveTab] = useState('All')
+  const [cardFilter, setCardFilter] = useState('')
   const [success, setSuccess] = useState('')
   const [selectedIds, setSelectedIds] = useState(new Set())
 
@@ -104,24 +154,54 @@ export function RegistrationsPage() {
   if (loading) return <LoadingState message="Loading registrations…" />
 
   const filteredRegistrations = registrations.filter((reg) => {
+    const finance = calculateRegistrationFinance(reg, activeEvent)
+    if (!matchesCardFilter(reg, cardFilter, activeEvent)) return false
+    // 1. Tab filtering
     if (activeTab === 'Checked In' && !reg.checkedIn) return false
-    if (activeTab === 'Missing Ticket' && reg.ticketCode) return false
-    if (!['All', 'Checked In', 'Missing Ticket'].includes(activeTab) && !paymentStatusMatches(reg.paymentStatus, activeTab) && !financeFilterMatches(reg, activeTab, activeEvent)) return false
-    if (!searchQuery) return true
+    if (activeTab === 'Missing Ticket Code' && reg.ticketCode) return false
+    if (activeTab === 'Door Paid' && !paymentStatusMatches(reg.paymentStatus, 'door')) return false
+    if (activeTab === 'To Pay at Door' && !paymentStatusMatches(reg.paymentStatus, 'door-list')) return false
+    if (activeTab === 'Needs Review' && !registrationNeedsReview(reg, activeEvent)) return false
+    if (['Paid', 'Pending', 'Complimentary', 'Outstanding Balance'].includes(activeTab)) {
+      if (!financeFilterMatches(reg, activeTab, activeEvent)) return false
+    }
 
-    const query = searchQuery.toLowerCase()
-    return (
-      reg.fullName?.toLowerCase().includes(query)
-      || reg.buyerName?.toLowerCase().includes(query)
-      || attendeeNamesText(reg).toLowerCase().includes(query)
-      || reg.email?.toLowerCase().includes(query)
-      || reg.phone?.toLowerCase().includes(query)
-      || reg.ticketCode?.toLowerCase().includes(query)
-    )
+    // 2. Advanced Filters
+    if (filters.keyword) {
+      const q = filters.keyword.toLowerCase()
+      if (![reg.fullName, reg.buyerName, attendeeNamesText(reg), reg.email, reg.phone, reg.ticketCode].some(v => v?.toLowerCase().includes(q))) {
+        return false
+      }
+    }
+    if (filters.guestName && !reg.fullName?.toLowerCase().includes(filters.guestName.toLowerCase())) return false
+    if (filters.buyerName && !reg.buyerName?.toLowerCase().includes(filters.buyerName.toLowerCase())) return false
+    if (filters.attendeeName && !attendeeNamesText(reg).toLowerCase().includes(filters.attendeeName.toLowerCase())) return false
+    if (filters.contact && !(reg.email?.toLowerCase().includes(filters.contact.toLowerCase()) || reg.phone?.toLowerCase().includes(filters.contact.toLowerCase()))) return false
+    if (filters.group && !reg.groupName?.toLowerCase().includes(filters.group.toLowerCase())) return false
+    if (filters.ticketCode && !reg.ticketCode?.toLowerCase().includes(filters.ticketCode.toLowerCase())) return false
+    if (filters.priceTier && !reg.priceTier?.toLowerCase().includes(filters.priceTier.toLowerCase())) return false
+    if (filters.paymentStatus && !paymentStatusMatches(reg.paymentStatus, filters.paymentStatus)) return false
+    if (filters.paymentMethod && reg.paymentMethod !== filters.paymentMethod) return false
+    if (filters.balanceDue) {
+      if (!finance.balanceDue || finance.balanceDue <= 0) return false
+    }
+    if (filters.missingTicket && reg.ticketCode) return false
+    if (filters.missingAmount) {
+      if (finance.amountDue !== null && finance.amountPaid !== null) return false
+    }
+    if (filters.reviewNeeded) {
+      if (!registrationNeedsReview(reg, activeEvent)) return false
+    }
+    
+    return true
   })
   const allMetrics = buildRegistrationMetrics(registrations, activeEvent)
   const filteredMetrics = buildRegistrationMetrics(filteredRegistrations, activeEvent)
   const financeSummary = buildFinanceSummary(registrations, activeEvent)
+  const isFiltering = activeTab !== 'All' || Boolean(cardFilter) || Object.values(filters).some(Boolean)
+  const showingText = isFiltering
+    ? `Showing ${filteredMetrics.totalRegistrations} registration${filteredMetrics.totalRegistrations === 1 ? '' : 's'} covering ${filteredMetrics.totalPersons} guest${filteredMetrics.totalPersons === 1 ? '' : 's'}.`
+    : 'Showing all registrations.'
   const selectedRegistrations = filteredRegistrations.filter((registration) => selectedIds.has(registration.registrationId))
   const allVisibleSelected = filteredRegistrations.length > 0 && filteredRegistrations.every((registration) => selectedIds.has(registration.registrationId))
 
@@ -247,7 +327,7 @@ export function RegistrationsPage() {
           </p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button
             type="button"
             onClick={() => setIsExportModalOpen(true)}
@@ -282,47 +362,56 @@ export function RegistrationsPage() {
         </div>
       )}
 
+      <section className="flex items-center gap-2 rounded-2xl border border-[#EEDFD6] bg-white p-4 text-xs leading-5 text-[#816D62]">
+        <p className="font-semibold text-[#6B564C]">{showingText}</p>
+        <InfoHint label="Guest count explanation">
+          Some registrations include multiple guests. That is why the guest count may be higher than the registration count. Finance review means a registration has missing or inconsistent price, payment, or balance details.
+        </InfoHint>
+      </section>
+
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
         {[
-          ['Total registrations', allMetrics.totalRegistrations],
-          ['Total persons', allMetrics.totalPersons],
-          ['Paid', `${allMetrics.paidRegistrations} / ${allMetrics.paidPersons}`],
-          ['Pending', `${allMetrics.pendingRegistrations} / ${allMetrics.pendingPersons}`],
-          ['Complimentary', `${allMetrics.complimentaryRegistrations} / ${allMetrics.complimentaryPersons}`],
-          ['Door', `${allMetrics.doorRegistrations} / ${allMetrics.doorPersons}`],
-          ['Total expected', formatCurrency(financeSummary.totalExpected)],
-          ['Collected', formatCurrency(financeSummary.totalCollected)],
-          ['Outstanding', formatCurrency(financeSummary.totalOutstanding)],
-          ['Door expected', formatCurrency(financeSummary.doorTotal)],
-          ['Complimentary value', formatCurrency(financeSummary.complimentaryValue)],
-          ['Finance warnings', financeSummary.financeWarningCount],
-          ['Checked in', `${allMetrics.checkedInRegistrations} / ${allMetrics.checkedInPersons}`],
-          ['Missing ticket', allMetrics.missingTicketRegistrations],
-          ['Filtered regs', filteredMetrics.totalRegistrations],
-          ['Filtered persons', filteredMetrics.totalPersons],
-          ['Selected rows', selectedIds.size],
-        ].map(([label, value]) => (
-          <div key={label} className="rounded-xl border border-[#EEDFD6] bg-white px-4 py-3">
-            <p className="text-lg font-bold text-[#2B1723]">{value}</p>
-            <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
-          </div>
+          { label: 'Total Registrations', value: allMetrics.totalRegistrations, help: 'Registration records for this Working Event.', key: '' },
+          { label: 'Total Guests', value: allMetrics.totalPersons, help: 'Guests represented by those registrations, including groups.', key: '' },
+          { label: 'Paid', value: guestSummary(allMetrics.paidRegistrations, allMetrics.paidPersons), help: 'Registrations marked paid.', tab: 'Paid' },
+          { label: 'Pending', value: guestSummary(allMetrics.pendingRegistrations, allMetrics.pendingPersons), help: 'Registrations still pending payment review or collection.', tab: 'Pending' },
+          { label: 'Complimentary', value: guestSummary(allMetrics.complimentaryRegistrations, allMetrics.complimentaryPersons), help: 'Registrations marked complimentary.', tab: 'Complimentary' },
+          { label: 'Door Paid', value: guestSummary(allMetrics.doorRegistrations, allMetrics.doorPersons), help: 'Paid at door or late payment confirmed.', tab: 'Door Paid', card: 'door' },
+          { label: 'Ticket Expected Revenue', value: formatCurrency(financeSummary.totalExpected), help: 'Ticket totals from explicit ticket price or amount due only.' },
+          { label: 'Collected', value: formatCurrency(financeSummary.totalCollected), help: 'Confirmed amountPaid across registrations.' },
+          { label: 'Outstanding Balance', value: formatCurrency(financeSummary.totalOutstanding), help: 'Click to see rows with balance due.', tab: 'Outstanding Balance', card: 'outstanding' },
+          { label: 'To Pay at Door', value: formatCurrency(financeSummary.doorTotal), help: 'Expected door balances, not confirmed paid.', tab: 'To Pay at Door', card: 'door-list' },
+          { label: 'Complimentary Value', value: formatCurrency(financeSummary.complimentaryValue), help: 'Value of complimentary tickets when prices are explicit.' },
+          { label: 'Finance Review', value: financeSummary.financeWarningCount, help: 'Click to see registrations needing finance review.', card: 'finance-warning' },
+          { label: 'Checked In', value: guestSummary(allMetrics.checkedInRegistrations, allMetrics.checkedInPersons), help: 'Checked-in registrations and guests represented.', card: 'checked-in' },
+          { label: 'Not Checked In', value: guestSummary(allMetrics.remainingRegistrations, allMetrics.remainingPersons), help: 'Registrations and guests not checked in yet.', card: 'not-checked-in' },
+          { label: 'Missing Ticket Code', value: allMetrics.missingTicketRegistrations, help: 'Registrations with no ticket code assigned.', tab: 'Missing Ticket Code', card: 'missing-ticket' },
+          { label: 'Needs Review', value: registrations.filter((reg) => registrationNeedsReview(reg, activeEvent)).length, help: 'Registrations with finance review, ticket review, or missing ticket information.', tab: 'Needs Review', card: 'review-needed' },
+          { label: 'Selected Registrations', value: selectedIds.size, help: 'Registrations currently selected for bulk actions.' },
+        ].map((item) => (
+          <CountCard
+            key={item.label}
+            label={item.label}
+            value={item.value}
+            help={item.help}
+            active={(item.card && cardFilter === item.card) || (item.tab && activeTab === item.tab)}
+            onClick={() => {
+              if (item.tab) setActiveTab(item.tab)
+              setCardFilter((current) => (item.card && current !== item.card ? item.card : ''))
+            }}
+          />
         ))}
       </section>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative max-w-sm flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
-          <input
-            type="text"
-          placeholder="Search guest, buyer, attendee, email, phone…"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
-          />
-        </div>
+      <div className="flex flex-col gap-6">
+        <RegistrationFilters 
+          filters={filters} 
+          onFilterChange={setFilters} 
+          onClearFilters={() => { setFilters({}); setActiveTab('All'); setCardFilter('') }} 
+        />
 
-        <div className="flex overflow-x-auto pb-2 sm:pb-0">
-          <div className="flex gap-2">
+        <div className="overflow-x-auto pb-2">
+          <div className="flex flex-wrap gap-2">
             {TABS.map((tab) => (
               <button
                 key={tab}
@@ -331,7 +420,7 @@ export function RegistrationsPage() {
                 className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition ${
                   activeTab === tab
                     ? 'bg-[#2B1723] text-white'
-                    : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1]'
+                    : 'bg-white text-[#8C766A] border border-[#E5D7CF] hover:bg-[#F2E8E1]'
                 }`}
               >
                 {tab}
@@ -348,14 +437,14 @@ export function RegistrationsPage() {
             onClick={allVisibleSelected ? clearSelection : selectVisibleRows}
             className="rounded-xl border border-[#E7D6CC] px-4 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]"
           >
-            {allVisibleSelected ? 'Clear selection' : 'Select all visible rows'}
+            {allVisibleSelected ? 'Clear selection' : 'Select all visible registrations'}
           </button>
           <button
             type="button"
             onClick={selectVisibleRows}
             className="rounded-xl border border-[#E7D6CC] px-4 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]"
           >
-            Select all filtered rows
+            Select all filtered registrations
           </button>
           {selectedIds.size > 0 && (
             <button
@@ -380,7 +469,7 @@ export function RegistrationsPage() {
               className="rounded-xl border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#6B564C]"
             >
               <option value="">Update payment...</option>
-              {['paid', 'pending', 'complimentary', 'door'].map((status) => (
+              {['paid', 'pending', 'complimentary', 'door', 'door-list'].map((status) => (
                 <option key={status} value={status}>{formatPaymentLabel(status)}</option>
               ))}
             </select>
@@ -447,7 +536,7 @@ export function RegistrationsPage() {
           icon={Users}
           title="No registrations found"
           description={
-            searchQuery || activeTab !== 'All'
+            Object.values(filters).some(Boolean) || activeTab !== 'All'
               ? 'Try adjusting your search or filters.'
               : 'Get started by manually adding one or importing a CSV.'
           }
@@ -467,13 +556,13 @@ export function RegistrationsPage() {
                         aria-label="Select all visible rows"
                       />
                     </th>
-                    <th className="px-4 py-3">Guest</th>
-                    <th className="px-4 py-3">Contact</th>
-                    <th className="px-4 py-3">Party</th>
+                    <th className="px-4 py-3">Guest / Registration</th>
+                    <th className="px-4 py-3">Buyer / Contact</th>
+                    <th className="px-4 py-3">Guest Count</th>
                     <th className="px-4 py-3">Payment</th>
-                    <th className="px-4 py-3">Finance</th>
-                    <th className="px-4 py-3">Ticket status</th>
-                    <th className="px-4 py-3">Check-in</th>
+                    <th className="px-4 py-3">Finance Review</th>
+                    <th className="px-4 py-3">Ticket Status</th>
+                    <th className="px-4 py-3">Check-In Status</th>
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -490,6 +579,10 @@ export function RegistrationsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="font-medium text-[#2B1723]">{reg.fullName}</div>
+                        <div className="mt-1 flex flex-wrap gap-2">
+                          <span className="rounded-full bg-[#FFF8F2] px-2 py-0.5 text-[10px] font-bold text-[#B76E79]">{personsLabel(reg)}</span>
+                          {registrationNeedsReview(reg, activeEvent) && <span className="rounded-full bg-[#FFF7E8] px-2 py-0.5 text-[10px] font-bold text-[#986F26]">Needs review</span>}
+                        </div>
                         {reg.buyerName && <div className="text-xs font-semibold text-[#8C7567]">Buyer: {reg.buyerName}</div>}
                         {attendeeNamesText(reg) && <div className="max-w-xs text-xs text-[#5D4A52]">Guests: {attendeeNamesText(reg)}</div>}
                         {reg.groupName && <div className="text-xs text-[#816D62]">{reg.groupName}</div>}

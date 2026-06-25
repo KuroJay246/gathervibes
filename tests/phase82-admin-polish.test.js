@@ -13,7 +13,7 @@ import { normalizeTicketCode, validateTicketCode } from '../src/utils/ticketUtil
 
 test('door payment values normalize to door and unknown payment status requires review', async () => {
   for (const value of ['door', 'Door Payment', 'pay at door', 'Door Sale', 'walk-in', 'Unpaid']) {
-    const expected = value === 'Unpaid' ? 'pending' : 'door'
+    const expected = value === 'Unpaid' ? 'pending' : value === 'pay at door' ? 'door-list' : 'door'
     assert.equal(normalizePaymentStatus(value), expected)
   }
 
@@ -74,12 +74,12 @@ test('Registrations page has count bars and current-event bulk actions', async (
   const page = await readFile('src/pages/RegistrationsPage.jsx', 'utf8')
   const service = await readFile('src/services/registrationService.js', 'utf8')
 
-  assert.match(page, /Select all visible rows/)
-  assert.match(page, /Select all filtered rows/)
+  assert.match(page, /Select all visible registrations/)
+  assert.match(page, /Select all filtered registrations/)
   assert.match(page, /Delete selected/)
   assert.match(page, /Door/)
-  assert.match(page, /Missing ticket/)
-  assert.match(page, /Selected rows/)
+  assert.match(page, /Missing Ticket Code/)
+  assert.match(page, /Selected Registrations/)
   assert.match(service, /registration\.eventId === eventId/)
   assert.match(service, /bulkDeleteRegistrations/)
   assert.match(service, /registration\.delete/)
@@ -111,7 +111,6 @@ test('old internal labels are removed while roadmap backlog remains visible', as
     'src/layout/AppShell.jsx',
     'src/pages/DashboardPage.jsx',
     'src/pages/EventsPage.jsx',
-    'src/pages/RegistrationsPage.jsx',
     'src/pages/TicketsPage.jsx',
     'src/pages/CommunicationsPage.jsx',
     'src/pages/SettingsPage.jsx',

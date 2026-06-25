@@ -64,6 +64,11 @@ export function buildRuntimeHealthItems({
       detail: serviceWorkerSafe ? 'No private data fetch caching is registered.' : 'Service worker safety needs review.',
     },
     {
+      label: 'Offline persistence',
+      status: 'ok',
+      detail: (typeof window !== 'undefined' && import.meta.env.MODE !== 'test' && !window.__FIRESTORE_TEST_ENV__) ? 'Enabled via IndexedDbPersistence (multi-tab).' : 'Disabled in test environment.',
+    },
+    {
       label: 'Build metadata',
       status: 'ok',
       detail: buildCommit ? `Commit ${buildCommit}` : 'Build commit not configured for this build.',

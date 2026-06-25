@@ -27,14 +27,15 @@ function importNotes(row = {}) {
   ].filter(Boolean).join('\n')
 }
 
-export async function commitImport(validRows, eventId, user) {
+export async function commitImport(validRows, eventId, user, onProgress) {
   if (!db) throw new Error('Firebase is not configured')
 
   // Each imported registration also writes an audit log whose rule verifies
   // the paired registration create. Keep chunks below Firestore's batch rules
-  // document-access ceiling.
-  const chunkSize = 5
+  // document-access ceiling. 50 registrations = 100 writes per chunk.
+  const chunkSize = 50
   for (let i = 0; i < validRows.length; i += chunkSize) {
+    if (onProgress) onProgress(i, validRows.length)
     const chunk = validRows.slice(i, i + chunkSize)
     const batch = writeBatch(db)
 
@@ -86,6 +87,13 @@ export async function commitImport(validRows, eventId, user) {
       batch.set(audit.ref, audit.data)
     }
 
-    await batch.commit()
+    try {
+      await batch.commit()
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Chunk commit failed:', err)
+      throw new Error(`Failed to import batch starting at row ${i + 1}. Error: ${err.message}`)
+    }
   }
+  
+  if (onProgress) onProgress(validRows.length, validRows.length)
 }

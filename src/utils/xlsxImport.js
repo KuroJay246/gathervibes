@@ -1,22 +1,35 @@
-import readExcelFile from 'read-excel-file/browser'
+import * as XLSX from 'xlsx'
 import { rowsToParsedTable } from './importUtils.js'
 
-export async function readXlsxWorkbook(file) {
-  const sheets = await readExcelFile(file)
+async function workbookInputToArrayBuffer(input) {
+  if (input instanceof ArrayBuffer) return input
+  if (input?.arrayBuffer) return input.arrayBuffer()
+  throw new Error('Unsupported XLSX input. Upload a saved .xlsx workbook.')
+}
 
-  return sheets.map((sheet, index) => {
-    const sheetName = sheet.sheet || `Sheet ${index + 1}`
-    const parsed = rowsToParsedTable(sheet.data, { sourceKey: `sheet-${index + 1}` })
+export async function readXlsxWorkbook(file) {
+  const workbookBuffer = await workbookInputToArrayBuffer(file)
+  const workbook = XLSX.read(workbookBuffer, { type: 'array', cellDates: true })
+
+  return workbook.SheetNames.map((sheetName, index) => {
+    const worksheet = workbook.Sheets[sheetName]
+    const sheetRows = XLSX.utils.sheet_to_json(worksheet, {
+      header: 1,
+      blankrows: false,
+      defval: '',
+      raw: false,
+    })
+    const parsed = rowsToParsedTable(sheetRows, { sourceKey: `sheet-${index + 1}` })
+
     return {
       id: `${index}`,
-      name: sheetName,
+      name: sheetName || `Sheet ${index + 1}`,
       headers: parsed.headers,
       rows: parsed.rows,
-      rawRowCount: Array.isArray(sheet.data) ? sheet.data.length : 0,
+      rawRowCount: Array.isArray(sheetRows) ? sheetRows.length : 0,
       columnCount: parsed.headers.length,
-      sampleRows: Array.isArray(sheet.data) ? sheet.data.slice(0, 6) : [],
+      sampleRows: Array.isArray(sheetRows) ? sheetRows.slice(0, 6) : [],
       importable: parsed.headers.length > 0 && parsed.rows.length > 0,
     }
   })
 }
-

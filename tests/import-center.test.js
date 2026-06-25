@@ -15,6 +15,7 @@ test('Import Center source selector covers supported source types', () => {
       'pasted-table',
       'bank-payment-csv',
       'custom',
+      'cpb-payment-audit',
     ],
   )
 })

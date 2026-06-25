@@ -14,6 +14,7 @@ import {
   MessageSquareText,
   ScanLine,
   MapPin,
+  ReceiptText,
   ShieldCheck,
   TicketCheck,
   Users,
@@ -26,6 +27,7 @@ import { subscribeToRegistrations } from '../services/registrationService'
 import { formatEventDate, formatCountdown, upcomingEvents } from '../utils/dateUtils'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
+import { buildOperationsTotals, subscribeToOperationsLedger } from '../services/operationsLedgerService'
 
 // ── Local clock ──────────────────────────────────────────────────────────────
 
@@ -71,6 +73,15 @@ function useRegistrationMetrics(eventId) {
   return regs
 }
 
+function useOperationsLedger(eventId) {
+  const [entries, setEntries] = useState([])
+  useEffect(() => {
+    if (!eventId) return undefined
+    return subscribeToOperationsLedger(eventId, setEntries, () => {})
+  }, [eventId])
+  return entries
+}
+
 // ── Metric pill ──────────────────────────────────────────────────────────────
 
 function MetricPill({ label, value, color }) {
@@ -88,6 +99,7 @@ export function DashboardPage() {
   const { activeEvent, clearActiveEvent, setActiveEvent } = useActiveEvent()
   const now = useLocalClock()
   const registrations = useRegistrationMetrics(activeEvent?.eventId)
+  const operationsEntries = useOperationsLedger(activeEvent?.eventId)
 
   const [allEvents, setAllEvents] = useState([])
   const [eventsLoaded, setEventsLoaded] = useState(false)
@@ -108,6 +120,7 @@ export function DashboardPage() {
   const capacity = selectedFull?.capacity || 0
   const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedFull), [registrations, selectedFull])
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedFull), [registrations, selectedFull])
+  const operationsTotals = useMemo(() => buildOperationsTotals(operationsEntries), [operationsEntries])
   const capacityPct = metrics.capacityPercent
 
   // Price tiers for selected event
@@ -206,12 +219,12 @@ export function DashboardPage() {
                 {/* Registration metrics */}
                 {metrics.totalRegistrations > 0 && (
                   <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    <MetricPill label="Registrations" value={metrics.totalRegistrations} color="bg-[#FFF8F2] text-[#4E3A2C]" />
-                    <MetricPill label="Persons" value={metrics.totalPersons} color="bg-[#EAF6EF] text-[#2F5C3E]" />
-                    <MetricPill label="Paid regs" value={metrics.paidRegistrations} color="bg-[#EAF6EF] text-[#2F5C3E]" />
-                    <MetricPill label="Pending regs" value={metrics.pendingRegistrations} color="bg-[#FFFBEA] text-[#7A5700]" />
-                    <MetricPill label="Door regs" value={metrics.doorRegistrations} color="bg-[#E6F0FA] text-[#285E9E]" />
-                    <MetricPill label="Missing tickets" value={metrics.missingTicketRegistrations} color="bg-[#FCEEF1] text-[#A32626]" />
+                    <MetricPill label="Total Registrations" value={metrics.totalRegistrations} color="bg-[#FFF8F2] text-[#4E3A2C]" />
+                    <MetricPill label="Total Guests" value={metrics.totalPersons} color="bg-[#EAF6EF] text-[#2F5C3E]" />
+                    <MetricPill label="Paid Registrations" value={metrics.paidRegistrations} color="bg-[#EAF6EF] text-[#2F5C3E]" />
+                    <MetricPill label="Pending Registrations" value={metrics.pendingRegistrations} color="bg-[#FFFBEA] text-[#7A5700]" />
+                    <MetricPill label="Door Registrations" value={metrics.doorRegistrations} color="bg-[#E6F0FA] text-[#285E9E]" />
+                    <MetricPill label="Missing Ticket Code" value={metrics.missingTicketRegistrations} color="bg-[#FCEEF1] text-[#A32626]" />
                   </div>
                 )}
 
@@ -235,13 +248,13 @@ export function DashboardPage() {
                   <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Finance Snapshot</p>
                   <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
                     {[
-                      ['Expected revenue', formatCurrency(financeSummary.totalExpected)],
-                      ['Collected revenue', formatCurrency(financeSummary.totalCollected)],
-                      ['Outstanding balance', formatCurrency(financeSummary.totalOutstanding)],
-                      ['Door payment expected', formatCurrency(financeSummary.doorTotal)],
-                      ['Paid / Pending', `${financeSummary.paidRegistrations} / ${financeSummary.pendingRegistrations}`],
-                      ['Door / Comp', `${financeSummary.doorRegistrations} / ${financeSummary.complimentaryRegistrations}`],
-                      ['Missing finance info', financeSummary.missingFinanceInfo],
+                      ['Ticket expected revenue', formatCurrency(financeSummary.totalExpected)],
+                      ['Ticket collected', formatCurrency(financeSummary.totalCollected)],
+                      ['Ticket outstanding', formatCurrency(financeSummary.totalOutstanding)],
+                      ['Sponsor/other income', formatCurrency(operationsTotals.income)],
+                      ['Expenses', formatCurrency(operationsTotals.expenses)],
+                      ['Refunds/adjustments', formatCurrency(operationsTotals.refunds + operationsTotals.adjustments)],
+                      ['Net event position', formatCurrency(financeSummary.totalCollected + operationsTotals.income + operationsTotals.adjustments - operationsTotals.expenses - operationsTotals.refunds)],
                       ['Finance warnings', financeSummary.financeWarningCount],
                     ].map(([label, value]) => (
                       <div key={label} className="rounded-xl bg-white px-3 py-2">
@@ -360,6 +373,7 @@ export function DashboardPage() {
               {[
                 { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Scan, search, check in, and undo.' },
                 { to: '/tickets', label: 'Tickets / QR Print List', sub: 'Assign codes and print QR lists.' },
+                { to: '/operations', label: 'Event Operations / Money Tracker', sub: 'Track sponsor income, expenses, refunds, and adjustments.' },
                 { to: '/communications', label: 'Communications', sub: 'Prepare copy-ready guest messages.' },
                 { to: '/imports', label: 'Import Center', sub: 'Preview guest list uploads before saving.' },
                 { to: '/qa', label: 'QA Center', sub: 'Run CODEX_TEST and System Health checks.' },
@@ -411,6 +425,7 @@ export function DashboardPage() {
                 { to: '/imports', label: 'Import Center', sub: 'Upload or paste guest lists.', icon: FileInput },
                 { to: '/tickets', label: 'Tickets', sub: 'Assign ticket codes and generate QR codes.', icon: TicketCheck },
                 { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Search, scan, check in, and undo check-ins.', icon: ScanLine },
+                { to: '/operations', label: 'Event Operations / Money Tracker', sub: 'Track non-ticket money by Working Event.', icon: ReceiptText },
                 { to: '/communications', label: 'Communications', sub: 'Prepare copy-ready guest messages.', icon: MessageSquareText },
                 { to: '/qa', label: 'QA Center / System Health', sub: 'Run safe checks using CODEX_TEST.', icon: ShieldCheck },
               ].map(({ to, label, sub, icon: Icon }) => (

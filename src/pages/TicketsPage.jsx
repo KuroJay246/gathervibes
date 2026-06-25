@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Printer, RefreshCw, Search, TicketCheck, Trash2, Wand2 } from 'lucide-react'
+import { Printer, RefreshCw, Search, TicketCheck, Trash2, Wand2, X } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { subscribeToRegistrations } from '../services/registrationService'
@@ -12,15 +12,41 @@ import { TicketQrCode } from '../components/tickets/TicketQrCode'
 import { buildTicketPrefix, generateSequentialTicketCode, generateTicketCode, normalizeTicketCode, searchableRegistrationText } from '../utils/ticketUtils'
 import { formatPaymentLabel, normalizePaymentStatus, paymentStatusMatches } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency } from '../utils/financeUtils'
+import { InfoHint } from '../components/ui/InfoHint'
 
-const FILTERS = [
-  { value: 'all', label: 'All' },
-  { value: 'no-ticket', label: 'No ticket' },
-  { value: 'assigned', label: 'Assigned' },
-  { value: 'paid', label: 'Paid' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'complimentary', label: 'Complimentary' },
-  { value: 'door', label: 'Door' },
+const FILTER_GROUPS = [
+  {
+    label: 'Ticket Status',
+    items: [
+      { value: 'all', label: 'All Tickets' },
+      { value: 'assigned', label: 'Assigned' },
+      { value: 'no-ticket', label: 'Missing Ticket Code' },
+    ],
+  },
+  {
+    label: 'Payment Status',
+    items: [
+      { value: 'paid', label: 'Paid' },
+      { value: 'pending', label: 'Pending' },
+      { value: 'outstanding', label: 'Outstanding Balance' },
+      { value: 'door', label: 'Door Paid' },
+      { value: 'door-list', label: 'To Pay at Door' },
+      { value: 'complimentary', label: 'Complimentary' },
+    ],
+  },
+  {
+    label: 'Check-In Status',
+    items: [
+      { value: 'checked-in', label: 'Checked In' },
+      { value: 'not-checked-in', label: 'Not Checked In' },
+    ],
+  },
+  {
+    label: 'Review',
+    items: [
+      { value: 'review-needed', label: 'Needs Review' },
+    ],
+  },
 ]
 
 function titleCase(value = '') {
@@ -41,6 +67,11 @@ function attendeeNamesText(registration = {}) {
   return Array.isArray(registration.attendeeNames) && registration.attendeeNames.length > 0
     ? registration.attendeeNames.join(', ')
     : ''
+}
+
+function ticketNeedsReview(registration = {}, event = {}) {
+  const finance = calculateRegistrationFinance(registration, event)
+  return finance.needsFinanceReview || registration.financeReviewRequired || !registration.ticketCode
 }
 
 function useRegistrationList(activeEvent) {
@@ -93,12 +124,35 @@ export function TicketsPage() {
   const ticketPrefix = buildTicketPrefix(activeEvent)
 
   const filteredRegistrations = registrations.filter((registration) => {
-    if (filter === 'no-ticket' && registration.ticketStatus === 'assigned') return false
+    if (filter === 'no-ticket' && registration.ticketCode) return false
     if (filter === 'assigned' && registration.ticketStatus !== 'assigned') return false
-    if (['paid', 'pending', 'complimentary', 'door'].includes(filter) && !paymentStatusMatches(registration.paymentStatus, filter)) return false
+    if (filter === 'checked-in' && !registration.checkedIn) return false
+    if (filter === 'not-checked-in' && registration.checkedIn) return false
+    
+    if (['paid', 'pending', 'complimentary'].includes(filter) && !paymentStatusMatches(registration.paymentStatus, filter)) return false
+    if (filter === 'door' && !paymentStatusMatches(registration.paymentStatus, 'door')) return false
+    if (filter === 'door-list' && !paymentStatusMatches(registration.paymentStatus, 'door-list')) return false
+    if (filter === 'review-needed' && !ticketNeedsReview(registration, activeEvent)) return false
+    if (filter === 'outstanding') {
+      const fin = calculateRegistrationFinance(registration, activeEvent)
+      if (!fin.balanceDue || fin.balanceDue <= 0) return false
+    }
 
     if (!searchQuery.trim()) return true
-    return searchableRegistrationText(registration).includes(searchQuery.trim().toLowerCase())
+    // the existing searchableRegistrationText likely covers most of these, but let's make sure
+    const q = searchQuery.trim().toLowerCase()
+    return [
+      searchableRegistrationText(registration),
+      registration.ticketCode,
+      registration.fullName,
+      registration.buyerName,
+      attendeeNamesText(registration),
+      registration.email,
+      registration.phone,
+      registration.groupName,
+      registration.paymentStatus,
+      registration.priceTier,
+    ].some((value) => String(value || '').toLowerCase().includes(q))
   })
   const assignedRegistrations = useMemo(
     () => filteredRegistrations.filter((registration) => registration.ticketStatus === 'assigned' && registration.ticketCode),
@@ -251,31 +305,60 @@ export function TicketsPage() {
         </div>
       </header>
 
+      <section className="flex items-center gap-2 rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
+        <p><strong>Advanced ticket filters:</strong> use these to find assigned tickets, missing codes, payment states, check-in state, and review-needed rows.</p>
+        <InfoHint label="QR Payload Info">
+          QR codes still contain only <code>GSV:TICKET:ticketCode</code>.
+        </InfoHint>
+      </section>
+
       {error && <ErrorState message={error} onRetry={() => window.location.reload()} />}
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
       {actionError && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{actionError}</div>}
 
-      <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative max-w-md flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
-          <input
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search name, email, phone, ticket code…"
-            className="w-full rounded-xl border border-[#E5D7CF] bg-white py-3 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
-          />
+      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm space-y-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="font-bold text-[#2B1723]">Advanced Filters</h3>
+            <p className="mt-1 text-xs leading-5 text-[#816D62]">
+              Search ticket code, guest, buyer, attendees, email, phone, group, payment status, or price tier.
+            </p>
+          </div>
+          <button 
+            type="button"
+            onClick={() => { setFilter('all'); setSearchQuery(''); }}
+            className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold text-[#8C766A] hover:bg-[#F2E8E1] transition"
+          >
+            <X className="size-3" /> Clear filters
+          </button>
         </div>
-        <div className="flex overflow-x-auto pb-2 lg:pb-0">
-          <div className="flex gap-2">
-            {FILTERS.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => setFilter(item.value)}
-                className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition ${filter === item.value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1]'}`}
-              >
-                {item.label}
-              </button>
+        <div className="grid gap-4">
+          <div className="relative max-w-2xl">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
+            <input
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search keyword..."
+              className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-1 focus:ring-[#B76E79]"
+            />
+          </div>
+          <div className="grid gap-3 lg:grid-cols-4">
+            {FILTER_GROUPS.map((group) => (
+              <div key={group.label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">{group.label}</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {group.items.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => setFilter(item.value)}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${filter === item.value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1] border border-[#E5D7CF]'}`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -336,8 +419,8 @@ export function TicketsPage() {
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
-                  <th className="px-4 py-3">Guest</th>
-                  <th className="px-4 py-3">Contact</th>
+                  <th className="px-4 py-3">Guest / Registration</th>
+                  <th className="px-4 py-3">Buyer / Contact</th>
                   <th className="px-4 py-3">Payment</th>
                   <th className="px-4 py-3">Ticket</th>
                   <th className="px-4 py-3">Check-in</th>
@@ -349,6 +432,7 @@ export function TicketsPage() {
                   <tr key={registration.registrationId}>
                     <td className="px-4 py-3">
                       <div className="font-medium text-[#2B1723]">{registration.fullName}</div>
+                      {Number(registration.personsAttending) > 1 && <div className="mt-1"><TicketBadge tone="neutral">Group of {registration.personsAttending}</TicketBadge></div>}
                       {registration.buyerName && <div className="text-xs font-semibold text-[#8C7567]">Buyer / Contact: {registration.buyerName}</div>}
                       {attendeeNamesText(registration) && <div className="max-w-xs text-xs text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}
                       {registration.groupName && <div className="text-xs text-[#816D62]">{registration.groupName}</div>}
@@ -370,7 +454,7 @@ export function TicketsPage() {
                       })()}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'No ticket'}</div>
+                      <div className="font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'Missing ticket code'}</div>
                       <div className="mt-1"><TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{titleCase(registration.ticketStatus || 'no-ticket-assigned')}</TicketBadge></div>
                       {registration.ticketStatus === 'assigned' && registration.ticketCode && (
                         <div className="mt-3">
@@ -392,6 +476,7 @@ export function TicketsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="font-bold text-[#2B1723]">{registration.fullName}</h3>
+                    {Number(registration.personsAttending) > 1 && <p className="mt-1 text-xs font-bold text-[#B76E79]">Group of {registration.personsAttending}</p>}
                     {registration.buyerName && <p className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer / Contact: {registration.buyerName}</p>}
                     {attendeeNamesText(registration) && <p className="mt-1 text-xs text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</p>}
                     <p className="mt-1 text-xs text-[#816D62]">{registration.email || registration.phone || 'No contact'}</p>

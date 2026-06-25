@@ -148,7 +148,7 @@ export function SettingsPage() {
       <SettingsSection eyebrow="Event Defaults" title="Import and check-in defaults">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
           <InfoRow label="Default ticket prefix" value="Event initials, fallback GSV" />
-          <InfoRow label="Default payment statuses" value="Paid, Pending, Complimentary, Door" />
+          <InfoRow label="Default payment statuses" value="Paid, Pending, Complimentary, Door Paid, To Pay at Door" />
           <InfoRow label="Import behavior" value="Preview first; missing tickets may stay blank" />
           <InfoRow label="Check-in behavior" value="Warn on pending/door, do not auto-block" />
           <InfoRow label="Communication footer" value="Copy-ready messages only" />
@@ -158,7 +158,7 @@ export function SettingsPage() {
       <SettingsSection eyebrow="Finance Defaults" title="Money tracker defaults">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
           <InfoRow label="Default currency" value={DEFAULT_FINANCE_SETTINGS.currency} />
-          <InfoRow label="Default ticket price" value="Uses event ticket price when available" />
+          <InfoRow label="Default ticket price" value="Legacy event field only; explicit tiers/registration prices drive totals" />
           <InfoRow label="Default price tier" value={DEFAULT_FINANCE_SETTINGS.defaultPriceTier} />
           <InfoRow label="Default payment method" value={formatPaymentMethod(DEFAULT_FINANCE_SETTINGS.defaultPaymentMethod)} />
           <InfoRow label="Allow blank ticket codes" value={DEFAULT_FINANCE_SETTINGS.allowBlankTicketCodes ? 'Yes' : 'No'} />

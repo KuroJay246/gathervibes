@@ -92,10 +92,10 @@ test('Check-In page exposes event-day mode, helper lists, and clear QR feedback 
 
   assert.match(checkInPage, /Event-Day Mode/)
   assert.match(checkInPage, /Door Check-In \/ QR Scan/)
-  assert.match(checkInPage, /Print and export door lists/)
+  assert.match(checkInPage, /Print and export event-day lists/)
   assert.match(checkInPage, /Copy CSV text/)
-  assert.match(checkInPage, /Missing tickets/)
-  assert.match(checkInPage, /Pending payment/)
+  assert.match(checkInPage, /Missing ticket codes/)
+  assert.match(checkInPage, /Pending payments/)
   assert.match(checkInPage, /checked in successfully/)
   assert.match(scanner, /Scanning\.\.\./)
   assert.match(scanner, /No matching ticket code/)

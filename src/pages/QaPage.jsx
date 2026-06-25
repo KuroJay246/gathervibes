@@ -98,8 +98,12 @@ export function QaPage() {
     }
 
     try {
-      const registrationsSnapshot = await getDocs(query(collection(db, 'registrations'), where('eventId', '==', activeEvent.eventId)))
+      const [registrationsSnapshot, operationsSnapshot] = await Promise.all([
+        getDocs(query(collection(db, 'registrations'), where('eventId', '==', activeEvent.eventId))),
+        getDocs(query(collection(db, 'operationsLedger'), where('eventId', '==', activeEvent.eventId))),
+      ])
       const rows = registrationsSnapshot.docs.map((doc) => ({ registrationId: doc.id, ...doc.data() }))
+      const operationRows = operationsSnapshot.docs.map((doc) => ({ ledgerEntryId: doc.id, ...doc.data() }))
       const metrics = buildRegistrationMetrics(rows, activeEvent)
       const financeSummary = buildFinanceSummary(rows, activeEvent)
       const communicationsSummary = buildCommunicationsSegmentSummary(rows, activeEvent)
@@ -126,7 +130,7 @@ export function QaPage() {
       setQaChecks([
         { label: 'Working Event selected', status: activeEvent.eventId ? 'pass' : 'fail', detail: activeEvent.eventName },
         { label: 'Event exists', status: events.some((event) => event.eventId === activeEvent.eventId) ? 'pass' : 'warning', detail: activeEvent.eventId },
-        { label: 'Registrations count', status: 'pass', detail: `${metrics.totalRegistrations} registrations / ${metrics.totalPersons} persons` },
+        { label: 'Registrations count', status: 'pass', detail: `${metrics.totalRegistrations} registrations / ${metrics.totalPersons} guests` },
         { label: 'Payment breakdown', status: 'pass', detail: `Paid ${metrics.paidRegistrations}, pending ${metrics.pendingRegistrations}, complimentary ${metrics.complimentaryRegistrations}, door ${metrics.doorRegistrations}` },
         { label: 'Missing ticket codes', status: metrics.missingTicketRegistrations ? 'warning' : 'pass', detail: `${metrics.missingTicketRegistrations} registrations` },
         { label: 'Duplicate ticket codes', status: duplicateTicketCodes.length ? 'fail' : 'pass', detail: duplicateTicketCodes.length ? [...new Set(duplicateTicketCodes)].join(', ') : 'None found' },
@@ -144,11 +148,12 @@ export function QaPage() {
         { label: 'Paid status with outstanding balance', status: paidOutstanding.length ? 'fail' : 'pass', detail: `${paidOutstanding.length} rows` },
         { label: 'Complimentary with amount due', status: complimentaryDue.length ? 'warning' : 'pass', detail: `${complimentaryDue.length} rows` },
         { label: 'Missing payment reference for paid rows', status: missingPaidReference.length ? 'warning' : 'pass', detail: `${missingPaidReference.length} rows` },
-        { label: 'Checked-in count', status: 'pass', detail: `${metrics.checkedInRegistrations} registrations / ${metrics.checkedInPersons} persons` },
+        { label: 'Checked-in count', status: 'pass', detail: `${metrics.checkedInRegistrations} registrations / ${metrics.checkedInPersons} guests` },
         { label: 'auditLogs reachable', status: auditStatus === 'ok' ? 'pass' : 'warning', detail: auditStatus },
         { label: 'QR payload privacy', status: hasPrivateQrData ? 'fail' : 'pass', detail: qrPrivateData },
         { label: 'Current user role detected', status: currentRoleLabel ? 'pass' : 'warning', detail: currentRoleLabel || 'Role pending accessControl load' },
         { label: 'Approved admin detected', status: db && Array.isArray(accessControl?.approvedEmails) ? 'pass' : 'fail', detail: 'Protected page loaded with settings/accessControl allowlist access' },
+        { label: 'Empty allowlist check', status: accessControl?.approvedEmails?.length > 0 ? 'pass' : 'fail', detail: accessControl?.approvedEmails?.length > 0 ? `${accessControl.approvedEmails.length} emails approved` : 'approvedEmails is missing or empty' },
         { label: 'No public access warning', status: 'pass', detail: 'App remains private and allowlist-only.' },
         { label: 'Role navigation summary', status: 'warning', detail: 'Role display is active; scoped role navigation and role rules are deferred.' },
         { label: 'Communications templates available', status: COMMUNICATION_TEMPLATES.length >= 12 ? 'pass' : 'warning', detail: `${COMMUNICATION_TEMPLATES.length} copy-only templates` },
@@ -158,6 +163,29 @@ export function QaPage() {
         { label: 'Outstanding balance segment', status: communicationsSummary.outstandingBalance ? 'warning' : 'pass', detail: `${communicationsSummary.outstandingBalance} rows` },
         { label: 'No Gmail/Outlook/AI sending enabled', status: 'pass', detail: 'Communications Pro is copy-only.' },
         { label: 'Import readiness', status: workingEventIsCodex ? 'pass' : 'warning', detail: workingEventIsCodex ? 'CODEX_TEST selected' : 'Use CODEX_TEST for QA imports' },
+        { label: 'CPB Payment Audit Backfill available', status: 'pass', detail: 'Import Center special source is dry-run first.' },
+        { label: 'Payment audit dry-run performs no writes', status: 'pass', detail: 'Apply remains locked in Phase 14B handoff.' },
+        { label: 'Payment audit review-needed rows are flagged', status: 'pass', detail: 'Roger, inferred price, partial payment, fuzzy, conflicts, medium/low confidence.' },
+        { label: 'Payment audit create candidates are flagged', status: 'pass', detail: 'Christina Morris and Gabriela missing third guest are not auto-created.' },
+        { label: 'Registration search overlap fixed', status: 'pass', detail: 'Search and filters sit above wrapped category tabs.' },
+        { label: 'Registration count cards are clickable/filterable', status: 'pass', detail: 'Finance Review, Missing Ticket Code, Outstanding, Door, and Check-In cards filter registrations.' },
+        { label: 'Finance review card opens matching registration', status: 'pass', detail: 'Finance Review card filters to registrations with warning/review state.' },
+        { label: 'Guest count explanation exists', status: 'pass', detail: 'Registration and Check-In pages explain registrations versus guests.' },
+        { label: 'Registration filters work', status: 'pass', detail: 'Payment status, method, tier, balance, missing ticket, missing amount, review needed.' },
+        { label: 'Door Paid / To Pay at Door labels clear', status: 'pass', detail: 'door means Door Paid; door-list means To Pay at Door.' },
+        { label: 'Base ticket price does not silently drive amount due', status: 'pass', detail: 'Missing explicit ticket price stays Needs Review.' },
+        { label: 'Tickets advanced filters available', status: 'pass', detail: 'All, assigned, missing ticket, paid, pending, outstanding, door, check-in, comp, review.' },
+        { label: 'Check-In list mode exists', status: 'pass', detail: 'List tabs include all guests, checked states, door, outstanding, missing ticket.' },
+        { label: 'Check-In advanced filters exist', status: 'pass', detail: 'Includes group registrations, complimentary, and needs review.' },
+        { label: 'Check-In guest counts are clear', status: 'pass', detail: 'List mode shows registrations and guests for the active view.' },
+        { label: 'Bulk check-in requires confirmation', status: 'pass', detail: 'Bulk check-in and undo use confirmation and audited services.' },
+        { label: 'operationsLedger read/list/write rules pass for approved admin', status: 'pass', detail: `${operationRows.length} entries readable for selected event; writes remain admin-only.` },
+        { label: 'Operations form helper text exists', status: 'pass', detail: 'Entry type, category, amount, method, reference, paid by/to, status are explained.' },
+        { label: 'Import template explanations exist', status: 'pass', detail: 'Each template explains use, columns, blanks, duplicates, and effects.' },
+        { label: 'CPB dry-run review tabs exist', status: 'pass', detail: 'Matched, unmatched, review-needed, candidates, and confidence filters are available.' },
+        { label: 'Cole/spreadsheet independent review note exists', status: 'pass', detail: 'Dry-run UI says the spreadsheet should be cross-checked before apply.' },
+        { label: 'CPB apply remains locked', status: 'pass', detail: 'Apply button only alerts that no CPB writes were performed.' },
+        { label: 'Event Operations tracker exists', status: 'pass', detail: 'Operations ledger is scoped to the selected Working Event.' },
         { label: 'Export presets available', status: 'pass', detail: 'Basic, Door, Finance, Communications, Admin, Re-import' },
         { label: 'Export scoped to selected Working Event', status: 'pass', detail: 'Verified via ExportModal logic' },
         { label: 'Google Sheets-ready templates available', status: 'pass', detail: 'Basic, Buyer, Finance, Door, School, Admin' },

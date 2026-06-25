@@ -86,25 +86,25 @@ export function calculateRegistrationFinance(registration = {}, event = {}) {
   const paymentStatus = normalizePaymentStatus(registration.paymentStatus)
   const paymentMethod = normalizePaymentMethod(registration.paymentMethod || (paymentStatus === 'door' ? 'door' : paymentStatus === 'complimentary' ? 'complimentary' : 'unknown'))
   const explicitTicketPrice = parseMoney(registration.ticketPrice)
-  const defaultPrice = defaultTicketPriceForEvent(event)
-  const ticketPrice = explicitTicketPrice !== null ? explicitTicketPrice : defaultPrice
+  // We no longer automatically inherit defaultPrice into the registration's calculated ticketPrice/amountDue
+  // unless explicitly requested by a configuration in the future.
   const explicitAmountDue = parseMoney(registration.amountDue)
   const amountDue = explicitAmountDue !== null
     ? explicitAmountDue
-    : ticketPrice !== null
-      ? roundMoney(ticketPrice * persons)
+    : explicitTicketPrice !== null
+      ? roundMoney(explicitTicketPrice * persons)
       : null
   const amountPaid = parseMoney(registration.amountPaid) ?? 0
   const balanceDue = parseMoney(registration.balanceDue) ?? (amountDue !== null ? Math.max(0, roundMoney(amountDue - amountPaid)) : null)
   const complimentaryValue = paymentStatus === 'complimentary'
-    ? (ticketPrice !== null ? roundMoney(ticketPrice * persons) : amountDue || 0)
+    ? (explicitTicketPrice !== null ? roundMoney(explicitTicketPrice * persons) : amountDue || 0)
     : 0
-  const needsFinanceReview = amountDue === null || ticketPrice === null
+  const needsFinanceReview = amountDue === null || explicitTicketPrice === null
 
   return {
     currency: registration.currency || event.currency || DEFAULT_CURRENCY,
     priceTier: registration.priceTier || event.defaultPriceTier || DEFAULT_FINANCE_SETTINGS.defaultPriceTier,
-    ticketPrice,
+    ticketPrice: explicitTicketPrice,
     personsAttending: persons,
     amountDue,
     amountPaid,
@@ -142,7 +142,8 @@ export function financeWarnings(registration = {}, event = {}, options = {}) {
   if (computed.paymentStatus === 'paid' && computed.amountPaid < (computed.amountDue || 0)) warnings.push('Paid row has amount paid below amount due.')
   if (computed.paymentStatus === 'paid' && options.requirePaymentReferenceForPaidStatus && !registration.paymentReference) warnings.push('Paid row is missing a payment reference.')
   if (computed.paymentStatus === 'complimentary' && computed.amountDue > 0) warnings.push('Complimentary row has amount due greater than zero.')
-  if (computed.paymentStatus === 'door' && computed.amountPaid === 0) warnings.push('Door payment expected at check-in.')
+  if (computed.paymentStatus === 'door' && computed.amountPaid === 0) warnings.push('Door Paid status has no confirmed amount paid.')
+  if (computed.paymentStatus === 'door-list' && computed.balanceDue === 0) warnings.push('To Pay at Door row has no balance due.')
 
   return warnings
 }
@@ -172,6 +173,12 @@ export function buildFinanceSummary(registrations = [], event = {}) {
     if (finance.paymentStatus === 'door') {
       summary.doorRegistrations += 1
       summary.doorPersons += persons
+      summary.doorPaidTotal += paid
+    }
+    if (finance.paymentStatus === 'door-list') {
+      summary.doorListRegistrations += 1
+      summary.doorListPersons += persons
+      summary.doorListTotal += balance
       summary.doorTotal += balance
     }
     if (finance.paymentStatus === 'complimentary') {
@@ -191,6 +198,8 @@ export function buildFinanceSummary(registrations = [], event = {}) {
     paidTotal: 0,
     pendingTotal: 0,
     doorTotal: 0,
+    doorPaidTotal: 0,
+    doorListTotal: 0,
     complimentaryValue: 0,
     paidRegistrations: 0,
     pendingRegistrations: 0,
@@ -199,6 +208,8 @@ export function buildFinanceSummary(registrations = [], event = {}) {
     paidPersons: 0,
     pendingPersons: 0,
     doorPersons: 0,
+    doorListRegistrations: 0,
+    doorListPersons: 0,
     complimentaryPersons: 0,
     missingFinanceInfo: 0,
     financeWarningCount: 0,

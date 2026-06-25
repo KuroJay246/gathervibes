@@ -159,6 +159,7 @@ Data context for this segment:
 
       <div className="rounded-xl border border-[#EFE2DA] bg-[#FFF8F2] px-4 py-3 text-sm text-[#8A7468]">
         <strong>Safety Notice:</strong> This page only prepares text for clipboard copy. It does not send messages, write communication logs, or connect to external AI API keys.
+        <span className="mt-1 block text-xs">Use segments to choose recipients; buyer/contact can be different from attendee names, and Door Paid is not the same as To Pay at Door.</span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
@@ -287,6 +288,9 @@ Data context for this segment:
                 <div className="col-span-full">
                   <p className="text-xs text-[#8A7468]">
                     Real AI generation is deferred. Use the button above to copy a prompt you can paste into ChatGPT to generate a message using your selected tone.
+                  </p>
+                  <p className="mt-2 text-xs font-bold text-amber-700">
+                    Safety Notice: When you paste this prompt into ChatGPT or another AI tool, event details included in the prompt will be shared with that tool. Review before pasting.
                   </p>
                 </div>
               </div>

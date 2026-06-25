@@ -30,14 +30,15 @@ test('Phase 8.3 canonical domain and route health stay loop-safe', async () => {
 
 test('finance calculations use amounts, not paymentStatus alone', () => {
   const event = { ticketPrice: 50, currency: 'BBD' }
-  const paid = calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'paid', amountPaid: 100 }, event)
-  const pending = calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'paid', amountPaid: 25 }, event)
+  const paid = calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'paid', ticketPrice: 50, amountPaid: 100 }, event)
+  const pending = calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'paid', ticketPrice: 50, amountPaid: 25 }, event)
   const comp = calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'complimentary', ticketPrice: 0, amountPaid: '' }, event)
 
   assert.equal(paid.amountDue, 100)
   assert.equal(paid.balanceDue, 0)
   assert.equal(pending.balanceDue, 75)
-  assert.ok(financeWarnings({ personsAttending: 2, paymentStatus: 'paid', amountPaid: 25 }, event).some((warning) => /outstanding/.test(warning)))
+  assert.ok(financeWarnings({ personsAttending: 2, paymentStatus: 'paid', ticketPrice: 50, amountPaid: 25 }, event).some((warning) => /outstanding/.test(warning)))
+  assert.equal(calculateRegistrationFinance({ personsAttending: 2, paymentStatus: 'paid', amountPaid: 25 }, event).amountDue, null)
   assert.equal(comp.amountDue, 0)
   assert.equal(comp.amountPaid, 0)
   assert.equal(formatCurrency(100), 'BBD $100.00')
@@ -47,7 +48,7 @@ test('finance summary separates expected, collected, outstanding, door, and comp
   const summary = buildFinanceSummary([
     { personsAttending: 2, ticketPrice: 50, amountPaid: 100, paymentStatus: 'paid' },
     { personsAttending: 1, ticketPrice: 40, amountPaid: 10, paymentStatus: 'pending' },
-    { personsAttending: 1, ticketPrice: 30, amountPaid: 0, paymentStatus: 'door' },
+    { personsAttending: 1, ticketPrice: 30, amountPaid: 0, paymentStatus: 'door-list' },
     { personsAttending: 1, ticketPrice: 20, amountDue: 0, amountPaid: 0, paymentStatus: 'complimentary' },
   ])
 
@@ -55,8 +56,9 @@ test('finance summary separates expected, collected, outstanding, door, and comp
   assert.equal(summary.totalCollected, 110)
   assert.equal(summary.totalOutstanding, 60)
   assert.equal(summary.doorTotal, 30)
+  assert.equal(summary.doorListTotal, 30)
   assert.equal(summary.complimentaryValue, 20)
-  assert.equal(summary.doorRegistrations, 1)
+  assert.equal(summary.doorListRegistrations, 1)
 })
 
 test('Import Center maps finance fields and flags missing event price for review', async () => {

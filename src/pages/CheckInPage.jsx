@@ -23,6 +23,15 @@ import {
 } from '../utils/eventDayUtils'
 import { normalizePaymentStatus } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
+import { buildRegistrationMetrics } from '../utils/registrationMetrics'
+import { InfoHint } from '../components/ui/InfoHint'
+
+const CHECK_IN_FILTER_GROUPS = [
+  { label: 'Guest Lookup', values: ['search'] },
+  { label: 'Check-In Status', values: ['all', 'not-checked-in', 'checked-in'] },
+  { label: 'Payment Status', values: ['door', 'door-list', 'outstanding', 'complimentary'] },
+  { label: 'Review', values: ['missing-ticket', 'group', 'review-needed'] },
+]
 
 function StatusBadge({ children, tone = 'neutral' }) {
   const tones = {
@@ -38,7 +47,7 @@ function StatusBadge({ children, tone = 'neutral' }) {
 function paymentTone(status) {
   const normalized = normalizePaymentStatus(status)
   if (normalized === 'paid') return 'green'
-  if (normalized === 'pending' || normalized === 'unknown' || normalized === 'door') return 'gold'
+  if (normalized === 'pending' || normalized === 'unknown' || normalized === 'door' || normalized === 'door-list') return 'gold'
   if (normalized === 'complimentary') return 'plum'
   return 'neutral'
 }
@@ -51,6 +60,10 @@ function attendeeNamesText(registration = {}) {
 
 function registrationDisplayName(registration = {}) {
   return attendeeNamesText(registration) || registration.fullName || registration.buyerName || 'Guest'
+}
+
+function guestCountText(registrations, guests) {
+  return `${registrations} registration${registrations === 1 ? '' : 's'} / ${guests} guest${guests === 1 ? '' : 's'}`
 }
 
 function useRegistrations(activeEvent) {
@@ -74,7 +87,7 @@ function useRegistrations(activeEvent) {
       },
       (err) => {
         if (import.meta.env.DEV) console.error('Check-in registration fetch error:', err)
-        setError('Could not load the door list.')
+        setError('Could not load the event-day guest list.')
         setLoading(false)
       },
     )
@@ -97,11 +110,16 @@ export function CheckInPage() {
   const [confirmUndo, setConfirmUndo] = useState(false)
   const [helperView, setHelperView] = useState('door')
   const [helperMessage, setHelperMessage] = useState('')
+  const [resumeScanTrigger, setResumeScanTrigger] = useState(0)
+  const [selectedListIds, setSelectedListIds] = useState(new Set())
   const summary = useMemo(() => buildEventDaySummary(registrations), [registrations])
   const visibleRegistrations = useMemo(
-    () => filterCheckInRegistrations(registrations, activeView),
-    [activeView, registrations],
+    () => filterCheckInRegistrations(registrations, activeView, activeEvent),
+    [activeEvent, activeView, registrations],
   )
+  const visibleMetrics = useMemo(() => buildRegistrationMetrics(visibleRegistrations, activeEvent), [activeEvent, visibleRegistrations])
+  const selectedListRows = visibleRegistrations.filter((registration) => selectedListIds.has(registration.registrationId))
+  const allVisibleListRowsSelected = visibleRegistrations.length > 0 && visibleRegistrations.every((registration) => selectedListIds.has(registration.registrationId))
   const helperRows = useMemo(() => {
     if (helperView === 'missing-ticket') return getMissingTicketRegistrations(registrations)
     if (helperView === 'pending-payment') return getPendingPaymentRegistrations(registrations)
@@ -113,7 +131,7 @@ export function CheckInPage() {
     if (!query) return []
     return registrations
       .filter((registration) => searchableRegistrationText(registration).includes(query))
-      .slice(0, 8)
+      .slice(0, 20)
   }, [registrations, searchQuery])
 
   const selectedRegistration = registrations.find((registration) => registration.registrationId === selectedId) || matches[0]
@@ -132,7 +150,7 @@ export function CheckInPage() {
     )
   }
 
-  if (loading) return <LoadingState message="Loading door list…" />
+  if (loading) return <LoadingState message="Loading event-day guest list…" />
 
   async function handleCheckIn() {
     if (!selectedRegistration || !checkInState.allowed) return
@@ -145,6 +163,7 @@ export function CheckInPage() {
       setSearchQuery('')
       setSelectedId('')
       setConfirmUndo(false)
+      setResumeScanTrigger(t => t + 1)
     } catch (err) {
       if (import.meta.env.DEV) console.error(err)
       const permissionDenied = err?.code === 'permission-denied' || /permission|insufficient/i.test(err?.message || '')
@@ -189,6 +208,97 @@ export function CheckInPage() {
     }
   }
 
+  function toggleListSelection(registrationId) {
+    setSelectedListIds((current) => {
+      const next = new Set(current)
+      if (next.has(registrationId)) next.delete(registrationId)
+      else next.add(registrationId)
+      return next
+    })
+  }
+
+  function clearListSelection() {
+    setSelectedListIds(new Set())
+  }
+
+  function toggleAllVisibleListRows() {
+    setSelectedListIds(allVisibleListRowsSelected ? new Set() : new Set(visibleRegistrations.map((registration) => registration.registrationId)))
+  }
+
+  async function handleBulkCheckIn() {
+    const candidates = selectedListRows.filter((registration) => canCompleteCheckIn(registration).allowed)
+    if (candidates.length === 0) return
+    if (!window.confirm(`Check in ${candidates.length} selected guest registration${candidates.length === 1 ? '' : 's'} for ${activeEvent.eventName}?`)) return
+
+    setSaving(true)
+    setMessage('')
+    setActionError('')
+    try {
+      for (const registration of candidates) {
+        await completeCheckIn(registration, user)
+      }
+      setMessage(`Checked in ${candidates.length} selected registration${candidates.length === 1 ? '' : 's'}.`)
+      clearListSelection()
+    } catch (err) {
+      if (import.meta.env.DEV) console.error(err)
+      setActionError(err.message || 'Bulk check-in stopped after a failed write.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleBulkUndoCheckIn() {
+    const candidates = selectedListRows.filter((registration) => registration.checkedIn)
+    if (candidates.length === 0) return
+    if (!window.confirm(`Undo check-in for ${candidates.length} selected guest registration${candidates.length === 1 ? '' : 's'}?`)) return
+
+    setSaving(true)
+    setMessage('')
+    setActionError('')
+    try {
+      for (const registration of candidates) {
+        await undoCheckIn(registration, user)
+      }
+      setMessage(`Undid check-in for ${candidates.length} selected registration${candidates.length === 1 ? '' : 's'}.`)
+      clearListSelection()
+    } catch (err) {
+      if (import.meta.env.DEV) console.error(err)
+      setActionError(err.message || 'Bulk undo stopped after a failed write.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function copySelectedList(kind = 'guest') {
+    const rows = selectedListRows.length > 0 ? selectedListRows : visibleRegistrations
+    const text = rows.map((registration) => {
+      const finance = calculateRegistrationFinance(registration, activeEvent)
+      if (kind === 'door') {
+        return [
+          registration.fullName,
+          attendeeNamesText(registration),
+          formatPaymentLabel(registration.paymentStatus),
+          finance.balanceDue === null ? 'Balance needs review' : `Balance ${formatCurrency(finance.balanceDue)}`,
+          registration.ticketCode || 'Missing ticket',
+        ].filter(Boolean).join(' | ')
+      }
+      return [
+        registration.fullName,
+        attendeeNamesText(registration),
+        registration.buyerName,
+        registration.groupName,
+        registration.ticketCode,
+      ].filter(Boolean).join(' | ')
+    }).join('\n')
+
+    try {
+      await navigator.clipboard.writeText(text)
+      setMessage(`${kind === 'door' ? 'Payment review' : 'Guest'} list copied.`)
+    } catch {
+      setActionError('Copy failed. Select and copy the list manually.')
+    }
+  }
+
   async function handleDuplicateAttempt() {
     if (!selectedRegistration) return
     setSaving(true)
@@ -230,12 +340,12 @@ export function CheckInPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+      <header className="sticky top-0 z-40 -mx-4 -mt-6 mb-6 flex flex-col gap-3 border-b border-[#EEDFD6] bg-[#FBF8F5]/95 px-4 py-4 backdrop-blur-md lg:static lg:mx-0 lg:mt-0 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#1E7345]">Event-Day Mode</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Door Check-In / QR Scan</h2>
           <p className="mt-2 text-sm text-[#816D62]">
-            Checking in guests for <strong>{activeEvent.eventName}</strong>.
+            Checking in guests for <strong>{activeEvent.eventName}</strong>. <span className="ml-2 inline-block rounded-full bg-[#E5F3EC] px-2 py-0.5 text-[10px] font-bold tracking-widest text-[#1E7345]">Checked In: {guestCountText(summary.checkedInRegistrations, summary.checkedInPersons)}</span>
           </p>
         </div>
         <div className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-3 text-xs text-[#6B564C]">
@@ -249,12 +359,12 @@ export function CheckInPage() {
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          ['Total registrations', summary.totalRegistrations],
-          ['Total persons attending', summary.totalPersons],
-          ['Checked-in registrations', summary.checkedInRegistrations],
-          ['Checked-in persons', summary.checkedInPersons],
-          ['Remaining registrations', summary.remainingRegistrations],
-          ['Remaining persons', summary.remainingPersons],
+          ['Total Registrations', summary.totalRegistrations],
+          ['Total Guests', summary.totalPersons],
+          ['Checked-In Registrations', summary.checkedInRegistrations],
+          ['Checked-In Guests', summary.checkedInPersons],
+          ['Remaining Registrations', summary.remainingRegistrations],
+          ['Remaining Guests', summary.remainingPersons],
           ['Paid / pending / comp', `${summary.paidRegistrations}/${summary.pendingRegistrations}/${summary.complimentaryRegistrations}`],
           ['Tickets assigned / missing', `${summary.ticketAssignedRegistrations}/${summary.missingTicketRegistrations}`],
         ].map(([label, value]) => (
@@ -265,24 +375,27 @@ export function CheckInPage() {
         ))}
       </section>
 
-      <p className="rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-        Persons attending may be higher than registrations when one registration includes multiple guests.
-      </p>
+      <section className="flex items-center gap-2 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
+        <p className="font-semibold text-[#6B564C]">Guest count may be higher than registration count.</p>
+        <InfoHint label="Check-In Guest Count Info">
+          Some registrations include multiple guests. QR scan selects a guest record only; check-in still requires a button click.
+        </InfoHint>
+      </section>
 
       <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)] sm:p-5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Event-day helpers</p>
-            <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Print and export door lists</h3>
+            <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Print and export event-day lists</h3>
             <p className="mt-1 text-xs leading-5 text-[#816D62]">
               Client-side only. Nothing is uploaded and no new Firestore data is created.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             {[
-              ['door', 'Door list'],
-              ['missing-ticket', 'Missing tickets'],
-              ['pending-payment', 'Pending payment'],
+              ['door', 'Guest list'],
+              ['missing-ticket', 'Missing ticket codes'],
+              ['pending-payment', 'Pending payments'],
             ].map(([value, label]) => (
               <button
                 key={value}
@@ -328,7 +441,7 @@ export function CheckInPage() {
               <thead>
                 <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] font-bold uppercase tracking-wider text-[#8C7567]">
                   <th className="px-3 py-2">Guest</th>
-                  <th className="px-3 py-2">Persons</th>
+                  <th className="px-3 py-2">Guests</th>
                   <th className="px-3 py-2">Payment</th>
                   <th className="px-3 py-2">Ticket</th>
                   <th className="px-3 py-2">Door</th>
@@ -359,21 +472,38 @@ export function CheckInPage() {
         </div>
       </section>
 
-      <section className="flex gap-2 overflow-x-auto pb-2">
-        {CHECK_IN_VIEWS.map((view) => (
-          <button
-            key={view.value}
-            type="button"
-            onClick={() => {
-              setActiveView(view.value)
-              setMessage('')
-              setActionError('')
-            }}
-            className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition ${activeView === view.value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1]'}`}
-          >
-            {view.label}
-          </button>
-        ))}
+      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Advanced Filters</p>
+        <p className="mt-1 text-xs leading-5 text-[#816D62]">
+          Switch between QR lookup and manual guest lists. Bulk check-in and undo still require confirmation and never delete records.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-4">
+          {CHECK_IN_FILTER_GROUPS.map((group) => (
+            <div key={group.label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">{group.label}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {group.values.map((value) => {
+                  const view = CHECK_IN_VIEWS.find((item) => item.value === value)
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => {
+                        setActiveView(value)
+                        setMessage('')
+                        setActionError('')
+                        clearListSelection()
+                      }}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${activeView === value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1]'}`}
+                    >
+                      {view?.label || value}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {activeView === 'search' ? (
@@ -384,6 +514,7 @@ export function CheckInPage() {
             onMatch={handleQrMatch}
             onMissing={handleQrMissing}
             onInvalid={handleQrInvalid}
+            resumeTrigger={resumeScanTrigger}
           />
 
           <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
@@ -417,7 +548,7 @@ export function CheckInPage() {
                 key={registration.registrationId}
                 type="button"
                 onClick={() => setSelectedId(registration.registrationId)}
-                className={`rounded-xl border p-4 text-left transition ${selectedRegistration?.registrationId === registration.registrationId ? 'border-[#B76E79] bg-[#FFF8F2]' : 'border-[#EEDFD6] bg-white hover:bg-[#FBF8F5]'}`}
+                className={`min-h-[72px] rounded-xl border p-4 text-left transition ${selectedRegistration?.registrationId === registration.registrationId ? 'border-[#B76E79] bg-[#FFF8F2] ring-2 ring-[#B76E79]/30 shadow-md' : 'border-[#EEDFD6] bg-white hover:bg-[#FBF8F5]'}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -571,9 +702,37 @@ export function CheckInPage() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">{CHECK_IN_VIEWS.find((view) => view.value === activeView)?.label}</p>
-              <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Checked-in guest visibility</h3>
+              <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Guest list mode</h3>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">Browse manually by payment, ticket, group, review, or check-in state. Bulk actions require confirmation and never delete records.</p>
             </div>
-            <p className="text-xs font-semibold text-[#8C7567]">{visibleRegistrations.length} registrations shown</p>
+            <p className="text-xs font-semibold text-[#8C7567]">Showing {visibleMetrics.totalRegistrations} registration{visibleMetrics.totalRegistrations === 1 ? '' : 's'} covering {visibleMetrics.totalPersons} guest{visibleMetrics.totalPersons === 1 ? '' : 's'}.</p>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-3 rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={toggleAllVisibleListRows} className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C]">
+                {allVisibleListRowsSelected ? 'Clear visible selection' : 'Select visible registrations'}
+              </button>
+              {selectedListIds.size > 0 && (
+                <button type="button" onClick={clearListSelection} className="rounded-xl px-4 py-2 text-xs font-bold text-[#8C7567] hover:bg-[#F2E8E1]">
+                  Clear selected
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={handleBulkCheckIn} disabled={saving || selectedListRows.length === 0} className="rounded-xl bg-[#1E7345] px-4 py-2 text-xs font-bold text-white disabled:opacity-40">
+                Check in selected
+              </button>
+              <button type="button" onClick={handleBulkUndoCheckIn} disabled={saving || selectedListRows.length === 0} className="rounded-xl border border-[#F2C3C3] bg-white px-4 py-2 text-xs font-bold text-[#A32626] disabled:opacity-40">
+                Undo check-in selected
+              </button>
+              <button type="button" onClick={() => copySelectedList('guest')} className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C]">
+                Copy selected guest list
+              </button>
+              <button type="button" onClick={() => copySelectedList('door')} className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C]">
+                Copy selected payment review list
+              </button>
+            </div>
           </div>
 
           {visibleRegistrations.length === 0 ? (
@@ -586,10 +745,11 @@ export function CheckInPage() {
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
+                      <th className="px-4 py-3">Select</th>
                       <th className="px-4 py-3">Guest</th>
                       <th className="px-4 py-3">Contact</th>
                       <th className="px-4 py-3">Group</th>
-                      <th className="px-4 py-3">Persons</th>
+                      <th className="px-4 py-3">Guests</th>
                       <th className="px-4 py-3">Payment</th>
                       <th className="px-4 py-3">Ticket Code</th>
                       <th className="px-4 py-3">Check-in</th>
@@ -599,8 +759,17 @@ export function CheckInPage() {
                   <tbody className="divide-y divide-[#F2E8E1]">
                     {visibleRegistrations.map((registration) => (
                       <tr key={registration.registrationId}>
+                        <td className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedListIds.has(registration.registrationId)}
+                            onChange={() => toggleListSelection(registration.registrationId)}
+                            aria-label={`Select ${registration.fullName}`}
+                          />
+                        </td>
                         <td className="px-4 py-3 font-medium text-[#2B1723]">
                           <div>{registration.fullName}</div>
+                          {Number(registration.personsAttending) > 1 && <div className="mt-1 w-fit rounded-full bg-[#FFF8F2] px-2 py-0.5 text-[10px] font-bold text-[#B76E79]">Group of {registration.personsAttending}</div>}
                           {attendeeNamesText(registration) && <div className="mt-1 text-xs font-normal text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}
                           {registration.buyerName && <div className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer: {registration.buyerName}</div>}
                         </td>
@@ -636,6 +805,9 @@ export function CheckInPage() {
             <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">{registrationDisplayName(selectedRegistration)}</h3>
             <p className="mt-3 text-sm leading-6 text-[#6B564C]">
               Undo check-in for this guest? This should only be used if the check-in was accidental.
+            </p>
+            <p className="mt-2 text-sm font-semibold text-[#8C7567]">
+              Checked in at: {formatCheckInTime(selectedRegistration.checkInTime)}
             </p>
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button

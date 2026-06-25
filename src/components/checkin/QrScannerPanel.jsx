@@ -1,8 +1,8 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { Camera, Keyboard, ScanLine, Square } from 'lucide-react'
 import { findRegistrationByQrTicketCode, parseQrTicketCode } from '../../utils/qrTicketUtils'
 
-export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid }) {
+export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, resumeTrigger }) {
   const [manualValue, setManualValue] = useState('')
   const [scanning, setScanning] = useState(false)
   const [scannerError, setScannerError] = useState('')
@@ -10,6 +10,10 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
   const scannerRef = useRef(null)
   const reactId = useId()
   const regionId = `ticket-qr-reader-${reactId.replace(/:/g, '')}`
+
+  const [continuousScan, setContinuousScan] = useState(false)
+  const [torchSupported, setTorchSupported] = useState(false)
+  const [torchOn, setTorchOn] = useState(false)
 
   useEffect(() => () => {
     const scanner = scannerRef.current
@@ -26,6 +30,29 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
         })
     }
   }, [])
+
+  function playSuccessBeep() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+      const oscillator = audioCtx.createOscillator()
+      const gainNode = audioCtx.createGain()
+      oscillator.connect(gainNode)
+      gainNode.connect(audioCtx.destination)
+      oscillator.type = 'sine'
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime)
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime)
+      oscillator.start()
+      oscillator.stop(audioCtx.currentTime + 0.1)
+    } catch {
+      // Ignore audio failure
+    }
+  }
+
+  function triggerHaptic() {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([200])
+    }
+  }
 
   function resolveTicket(value, source = 'manual') {
     const parsed = parseQrTicketCode(value)
@@ -46,6 +73,11 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
       return
     }
 
+    if (!match.checkedIn && source === 'scan') {
+      playSuccessBeep()
+      triggerHaptic()
+    }
+
     setScannerNote(match.checkedIn
       ? `${match.fullName} is already checked in. Duplicate check-in is blocked.`
       : source === 'scan'
@@ -57,6 +89,8 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
   async function stopScanner() {
     const scanner = scannerRef.current
     scannerRef.current = null
+    setTorchSupported(false)
+    setTorchOn(false)
     if (!scanner) {
       setScanning(false)
       return
@@ -77,7 +111,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
     setScanning(false)
   }
 
-  async function startScanner() {
+  const startScanner = useCallback(async () => {
     setScannerError('')
     setScannerNote('Scanning... Point the camera at one ticket QR code.')
     setScanning(true)
@@ -101,14 +135,50 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
         },
       )
       setScanning(true)
+      
+      const track = scanner.getRunningTrack?.()
+      if (track) {
+        const capabilities = track.getCapabilities?.() || {}
+        if (capabilities.torch) {
+          setTorchSupported(true)
+        }
+      }
     } catch (err) {
       scannerRef.current = null
       setScanning(false)
       if (import.meta.env.DEV) console.error('QR scanner failed:', err)
       setScannerNote('')
-      setScannerError('Camera unavailable or permission denied. Use the manual ticket lookup fallback below.')
+      setScannerError('Camera unavailable or permission denied. Note: Camera access requires HTTPS. Use the manual ticket lookup fallback below.')
+    }
+  // regionId and stopScanner/resolveTicket are stable within a render cycle
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [regionId])
+
+  async function toggleTorch() {
+    const scanner = scannerRef.current
+    if (!scanner || !torchSupported) return
+    const track = scanner.getRunningTrack?.()
+    if (!track) return
+    
+    try {
+      await track.applyConstraints({
+        advanced: [{ torch: !torchOn }]
+      })
+      setTorchOn(!torchOn)
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Torch toggle failed:', err)
     }
   }
+
+  const previousTrigger = useRef(resumeTrigger)
+  useEffect(() => {
+    if (continuousScan && resumeTrigger !== previousTrigger.current && !scanning) {
+      previousTrigger.current = resumeTrigger
+      startScanner()
+    } else {
+      previousTrigger.current = resumeTrigger
+    }
+  }, [resumeTrigger, continuousScan, scanning, startScanner])
 
   return (
     <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
@@ -129,7 +199,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div className="space-y-3">
           <div id={regionId} className="min-h-56 overflow-hidden rounded-xl border border-[#E5D7CF] bg-[#FBF8F5]" />
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
               onClick={startScanner}
@@ -148,6 +218,17 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid })
               <Square className="size-4" />
               Stop
             </button>
+          </div>
+          <div className="flex items-center justify-between text-xs font-semibold text-[#8C7567]">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={continuousScan} onChange={(e) => setContinuousScan(e.target.checked)} className="rounded text-[#B76E79] focus:ring-[#B76E79]" />
+              Continuous Scan Mode
+            </label>
+            {torchSupported && (
+              <button type="button" onClick={toggleTorch} disabled={!scanning} className="text-[#6B564C] hover:text-[#2B1723] disabled:opacity-50">
+                {torchOn ? 'Turn off light' : 'Turn on light'}
+              </button>
+            )}
           </div>
         </div>
 
