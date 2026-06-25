@@ -362,11 +362,11 @@ export function RegistrationsPage() {
         </div>
       )}
 
-      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 text-xs leading-5 text-[#816D62]">
-        <p>
-          <strong>Some registrations include multiple guests.</strong> That is why the guest count may be higher than the registration count. <strong>Finance review</strong> means a registration has missing or inconsistent price, payment, or balance details.
-        </p>
-        <p className="mt-1 font-semibold text-[#6B564C]">{showingText}</p>
+      <section className="flex items-center gap-2 rounded-2xl border border-[#EEDFD6] bg-white p-4 text-xs leading-5 text-[#816D62]">
+        <p className="font-semibold text-[#6B564C]">{showingText}</p>
+        <InfoHint label="Guest count explanation">
+          Some registrations include multiple guests. That is why the guest count may be higher than the registration count. Finance review means a registration has missing or inconsistent price, payment, or balance details.
+        </InfoHint>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">

@@ -4,9 +4,9 @@ import { calculateRegistrationFinance } from './financeUtils.js'
 
 export const CHECK_IN_VIEWS = [
   { value: 'search', label: 'Find Guest' },
-  { value: 'all', label: 'All guests' },
-  { value: 'not-checked-in', label: 'Not checked in' },
-  { value: 'checked-in', label: 'Checked in' },
+  { value: 'all', label: 'All Guests' },
+  { value: 'not-checked-in', label: 'Not Checked In' },
+  { value: 'checked-in', label: 'Checked In' },
   { value: 'door', label: 'Door Paid' },
   { value: 'door-list', label: 'To Pay at Door' },
   { value: 'outstanding', label: 'Outstanding Balance' },

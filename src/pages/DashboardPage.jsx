@@ -219,12 +219,12 @@ export function DashboardPage() {
                 {/* Registration metrics */}
                 {metrics.totalRegistrations > 0 && (
                   <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    <MetricPill label="Registrations" value={metrics.totalRegistrations} color="bg-[#FFF8F2] text-[#4E3A2C]" />
-                    <MetricPill label="Persons" value={metrics.totalPersons} color="bg-[#EAF6EF] text-[#2F5C3E]" />
-                    <MetricPill label="Paid regs" value={metrics.paidRegistrations} color="bg-[#EAF6EF] text-[#2F5C3E]" />
-                    <MetricPill label="Pending regs" value={metrics.pendingRegistrations} color="bg-[#FFFBEA] text-[#7A5700]" />
-                    <MetricPill label="Door regs" value={metrics.doorRegistrations} color="bg-[#E6F0FA] text-[#285E9E]" />
-                    <MetricPill label="Missing tickets" value={metrics.missingTicketRegistrations} color="bg-[#FCEEF1] text-[#A32626]" />
+                    <MetricPill label="Total Registrations" value={metrics.totalRegistrations} color="bg-[#FFF8F2] text-[#4E3A2C]" />
+                    <MetricPill label="Total Guests" value={metrics.totalPersons} color="bg-[#EAF6EF] text-[#2F5C3E]" />
+                    <MetricPill label="Paid Registrations" value={metrics.paidRegistrations} color="bg-[#EAF6EF] text-[#2F5C3E]" />
+                    <MetricPill label="Pending Registrations" value={metrics.pendingRegistrations} color="bg-[#FFFBEA] text-[#7A5700]" />
+                    <MetricPill label="Door Registrations" value={metrics.doorRegistrations} color="bg-[#E6F0FA] text-[#285E9E]" />
+                    <MetricPill label="Missing Ticket Code" value={metrics.missingTicketRegistrations} color="bg-[#FCEEF1] text-[#A32626]" />
                   </div>
                 )}
 

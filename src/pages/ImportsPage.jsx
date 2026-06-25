@@ -12,6 +12,7 @@ import { ImportSummary } from '../components/imports/ImportSummary'
 import { ImportTemplatesPanel } from '../components/imports/ImportTemplatesPanel'
 import { PaymentAuditBackfillPanel } from '../components/imports/PaymentAuditBackfillPanel'
 import { EmptyState } from '../components/ui/EmptyState'
+import { InfoHint } from '../components/ui/InfoHint'
 import { IMPORT_SOURCES, getImportSource } from '../utils/importSources'
 import { readXlsxWorkbook } from '../utils/xlsxImport'
 import { calculateRegistrationFinance } from '../utils/financeUtils'
@@ -413,13 +414,19 @@ export function ImportsPage() {
         <Link to="/registrations" className="mb-4 inline-flex items-center gap-2 text-xs font-bold text-[#8C7567] hover:text-[#2B1723]">
           <ArrowLeft className="size-4" /> Back to Registrations
         </Link>
-        <h2 className="font-serif text-3xl text-[#2B1723]">Import Center</h2>
-        <p className="mt-2 text-sm text-[#816D62]">
-          For event: <strong>{activeEvent.eventName}</strong>. CSV, pasted table rows, and Excel/XLSX workbooks all use preview before saving.
-        </p>
-        <p className="mt-2 text-xs font-semibold text-[#8C7567]">
-          Flow: Upload/Paste -&gt; Select Sheet -&gt; Header Mapping Preview -&gt; Duplicate Review -&gt; Final Import Preview -&gt; Confirm Import -&gt; Results.
-        </p>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="font-serif text-3xl text-[#2B1723]">Import Center</h2>
+            <div className="mt-2 flex items-center gap-2">
+              <p className="text-sm text-[#816D62]">
+                For event: <strong>{activeEvent.eventName}</strong>. CSV, pasted table rows, and Excel/XLSX workbooks all use preview before saving.
+              </p>
+              <InfoHint label="Import Flow">
+                Flow: Upload/Paste &rarr; Select Sheet &rarr; Header Mapping Preview &rarr; Duplicate Review &rarr; Final Import Preview &rarr; Confirm Import &rarr; Results.
+              </InfoHint>
+            </div>
+          </div>
+        </div>
       </header>
 
       {error && (

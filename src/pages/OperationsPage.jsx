@@ -16,6 +16,7 @@ import {
   subscribeToOperationsLedger,
   updateLedgerEntry,
 } from '../services/operationsLedgerService'
+import { InfoHint } from '../components/ui/InfoHint'
 
 const EMPTY_FORM = {
   entryType: 'income',
@@ -191,8 +192,11 @@ export function OperationsPage() {
         <Link to="/dashboard" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">Back to Dashboard</Link>
       </header>
 
-      <section className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-        This tracker is separate from ticket sales. Ticket revenue comes from registrations; sponsor income, vendor/baker payments, expenses, refunds, and adjustments live here for the selected Working Event only.
+      <section className="flex items-center gap-2 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
+        <p className="font-semibold text-[#6B564C]">Track sponsor income, vendor payments, expenses, and refunds here.</p>
+        <InfoHint label="Operations Ledger Info">
+          This tracker is separate from ticket sales. Ticket revenue comes from registrations. Operations data is scoped to the selected Working Event only.
+        </InfoHint>
       </section>
 
       {error && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{error}</div>}

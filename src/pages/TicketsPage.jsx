@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Printer, RefreshCw, Search, TicketCheck, Trash2, Wand2 } from 'lucide-react'
+import { Printer, RefreshCw, Search, TicketCheck, Trash2, Wand2, X } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { subscribeToRegistrations } from '../services/registrationService'
@@ -12,6 +12,7 @@ import { TicketQrCode } from '../components/tickets/TicketQrCode'
 import { buildTicketPrefix, generateSequentialTicketCode, generateTicketCode, normalizeTicketCode, searchableRegistrationText } from '../utils/ticketUtils'
 import { formatPaymentLabel, normalizePaymentStatus, paymentStatusMatches } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency } from '../utils/financeUtils'
+import { InfoHint } from '../components/ui/InfoHint'
 
 const FILTER_GROUPS = [
   {
@@ -304,48 +305,62 @@ export function TicketsPage() {
         </div>
       </header>
 
-      <section className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-        <strong>Advanced ticket filters:</strong> use these to find assigned tickets, missing codes, payment states, check-in state, and review-needed rows. QR codes still contain only <code>GSV:TICKET:ticketCode</code>.
+      <section className="flex items-center gap-2 rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
+        <p><strong>Advanced ticket filters:</strong> use these to find assigned tickets, missing codes, payment states, check-in state, and review-needed rows.</p>
+        <InfoHint label="QR Payload Info">
+          QR codes still contain only <code>GSV:TICKET:ticketCode</code>.
+        </InfoHint>
       </section>
 
       {error && <ErrorState message={error} onRetry={() => window.location.reload()} />}
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
       {actionError && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{actionError}</div>}
 
-      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
-        <div className="mb-3">
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Advanced Filters</p>
-          <p className="mt-1 text-xs text-[#816D62]">Search ticket code, guest, buyer, attendees, email, phone, group, payment status, or price tier.</p>
+      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm space-y-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="font-bold text-[#2B1723]">Advanced Filters</h3>
+            <p className="mt-1 text-xs leading-5 text-[#816D62]">
+              Search ticket code, guest, buyer, attendees, email, phone, group, payment status, or price tier.
+            </p>
+          </div>
+          <button 
+            type="button"
+            onClick={() => { setFilter('all'); setSearchQuery(''); }}
+            className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold text-[#8C766A] hover:bg-[#F2E8E1] transition"
+          >
+            <X className="size-3" /> Clear filters
+          </button>
         </div>
         <div className="grid gap-4">
-        <div className="relative max-w-2xl">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
-          <input
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search guest, buyer, contact, group, ticket code, or payment..."
-            className="w-full rounded-xl border border-[#E5D7CF] bg-white py-3 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
-          />
-        </div>
-        <div className="grid gap-3 lg:grid-cols-4">
-          {FILTER_GROUPS.map((group) => (
-            <div key={group.label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">{group.label}</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {group.items.map((item) => (
-                  <button
-                    key={item.value}
-                    type="button"
-                    onClick={() => setFilter(item.value)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${filter === item.value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1]'}`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
+          <div className="relative max-w-2xl">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
+            <input
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search keyword..."
+              className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-1 focus:ring-[#B76E79]"
+            />
+          </div>
+          <div className="grid gap-3 lg:grid-cols-4">
+            {FILTER_GROUPS.map((group) => (
+              <div key={group.label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">{group.label}</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {group.items.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => setFilter(item.value)}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${filter === item.value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1] border border-[#E5D7CF]'}`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
         </div>
       </section>
 

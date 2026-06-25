@@ -24,6 +24,7 @@ import {
 import { normalizePaymentStatus } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
+import { InfoHint } from '../components/ui/InfoHint'
 
 const CHECK_IN_FILTER_GROUPS = [
   { label: 'Guest Lookup', values: ['search'] },
@@ -374,9 +375,12 @@ export function CheckInPage() {
         ))}
       </section>
 
-      <p className="rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-        Some registrations include multiple guests. The guest count may be higher than the registration count. QR scan selects a guest record only; check-in still requires a button click.
-      </p>
+      <section className="flex items-center gap-2 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
+        <p className="font-semibold text-[#6B564C]">Guest count may be higher than registration count.</p>
+        <InfoHint label="Check-In Guest Count Info">
+          Some registrations include multiple guests. QR scan selects a guest record only; check-in still requires a button click.
+        </InfoHint>
+      </section>
 
       <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)] sm:p-5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
