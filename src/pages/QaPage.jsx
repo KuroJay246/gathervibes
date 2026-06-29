@@ -21,6 +21,18 @@ import {
   qaChecklist,
 } from '../utils/qaHelper'
 
+const browserTroubleshootingSteps = [
+  'Confirm URL is https://gathervibeshub.web.app/login',
+  'Try Ctrl+Shift+R hard refresh',
+  'Try Incognito or Private Window',
+  'Update Chrome or Edge',
+  'Check laptop date and time',
+  'Disable extensions temporarily',
+  'Clear site data for gathervibeshub.web.app',
+  'Try another network or hotspot',
+  'Send a screenshot of the exact error',
+]
+
 function StatusBadge({ ok, children }) {
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold ${ok ? 'bg-[#E7F6ED] text-[#2F855A]' : 'bg-[#FFF4DF] text-[#986F26]'}`}>
@@ -351,12 +363,28 @@ export function QaPage() {
 
       <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
         <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Manual smoke checklist</p>
-        <h2 className="mt-2 font-serif text-2xl">Use CODEX_TEST only</h2>
+        <h2 className="mt-2 font-serif text-2xl">Phase 16 live browser and check-in QA</h2>
+        <p className="mt-3 text-sm leading-6 text-[#7B665C]">
+          Use CODEX_TEST only. This checklist is manual guidance and does not write to Firestore.
+        </p>
         <div className="mt-5 grid gap-3">
           {qaChecklist.map((item) => (
             <div key={item} className="flex items-start gap-3 rounded-2xl border border-[#EFE2DA] p-4">
               <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#2F855A]" aria-hidden="true" />
               <p className="text-sm leading-5 text-[#5F4A42]">{item}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
+        <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Browser help</p>
+        <h2 className="mt-2 font-serif text-2xl">Website does not load?</h2>
+        <div className="mt-5 grid gap-3">
+          {browserTroubleshootingSteps.map((step) => (
+            <div key={step} className="flex items-start gap-3 rounded-2xl border border-[#EFE2DA] p-4">
+              <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#2F855A]" aria-hidden="true" />
+              <p className="text-sm leading-5 text-[#5F4A42]">{step}</p>
             </div>
           ))}
         </div>

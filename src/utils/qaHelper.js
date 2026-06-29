@@ -5,7 +5,15 @@ export const CPB_EVENT_NAME = 'CPB'
 export const CODEX_TEST_NOTES = 'Permanent QA fixture. Do not use for real guests. Do not delete unless the organizer explicitly approves.'
 
 export const qaChecklist = [
+  'Confirm the live site loads on the primary browser',
+  'Confirm the live site loads in an Incognito or Private Window',
+  'Confirm the live site loads on the second laptop or browser',
+  'Confirm login works with the approved second Google account',
+  'Confirm CODEX_TEST is selected as the Working Event before write testing',
   'Start QA at https://gathervibeshub.web.app/login',
+  'Confirm ticket search works by ticket code, guest name, buyer/contact, email, phone, and group when present',
+  'Confirm QR camera lookup works and camera permission is not blocked',
+  'Confirm manual ticket-code fallback works when camera scanning is unavailable',
   'Test check-in permission with one CODEX_TEST guest',
   'Confirm the checked-in guest appears in the Checked In list',
   'Confirm checked-in persons count increases using personsAttending',
@@ -14,6 +22,8 @@ export const qaChecklist = [
   'Confirm remaining persons updates after check-in',
   'Confirm dashboard capacity equals persons attending divided by event capacity',
   'Confirm duplicate check-in is blocked',
+  'Confirm audit logs remain append-only after ticket and check-in actions',
+  'Confirm CPB is not selected and not touched during QA',
   'Confirm a Ticket Code can be manually entered or edited',
   'Confirm the next event-style ticket code can be generated',
   'Confirm an imported ticket code is preserved through preview and import',
