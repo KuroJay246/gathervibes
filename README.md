@@ -20,17 +20,18 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 - [x] **Phase 13A**: AI Draft Lab prompt builder (draft-only; no real AI API)
 - [x] **Phase 14B**: CPB Payment Audit UI Cleanup / Operations Review Fixes
 - [x] **Phase 15A**: Hosting Security Headers + Private Indexing
-- [ ] **Phase 15B**: XLSX Dependency Security Review + Roadmap/Access/Ops Update
+- [x] **Phase 15B**: XLSX Dependency Security Review + Roadmap/Access/Ops Update — complete, pending organizer approval/merge
 
 Phase 3.2 renames imports to **Import Center** and adds source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files. Phase 4.5 adds controlled ticket assignment and search-based door check-in. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. QR camera scanning, Communications Pro, AI Draft Lab, Event Operations, and Phase 15A security headers are live. Real AI API integration, Google Sheets OAuth, Gmail/Outlook OAuth, automatic email/WhatsApp sending, Cloud Functions, Storage, public attendee/baker/school portals, payment gateway integration, public sitemap/JSON-LD for this private admin app, and native app store builds remain deferred.
 
-## Phase 15B active status
+## Phase 15B status
 
 - `xlsx` was removed after audit because runtime XLSX import now uses the already-installed `read-excel-file/browser` parser.
 - XLSX import remains active with sheet selection, row normalization, preview, mapping, and confirm-before-write safety.
 - `npm audit --omit=dev` is expected to report no production vulnerabilities after `xlsx` removal.
 - Staff/scanner roles remain UI/display/navigation foundation only. Firestore access is still enforced by the approved-admin email allowlist until a future rules-level staff-role phase.
 - Event Operations Ledger is active and separate from ticket sales. Future operations modules such as tasks, supplies, vendors/suppliers, sponsors, school tracking, baker/vendor tracking, budget/expense reporting, reimbursements, and event-day run sheets are planned but not active.
+- Phase 15B is complete and pending organizer approval/merge. After merge and main deployment, it can be marked closed.
 
 ## Production and QA status
 
@@ -101,7 +102,7 @@ Phase 3.2 renames imports to **Import Center** and adds source-specific guidance
 - Check-In supports fast search by name, email, phone, or ticket code, large mobile-first guest cards, payment/ticket/check-in status, and reset for the next guest.
 - Check-in moves `checkedIn` from `false` to `true`, sets `checkInTime`, and writes `checkedInBy`.
 - Duplicate check-in is blocked; an explicit duplicate-attempt audit can be recorded.
-- QR scan is deferred: search by ticket code is active now.
+- QR camera lookup is active as a private-admin input method; search by ticket code remains the fallback.
 
 
 ## Stack
@@ -222,7 +223,7 @@ If you experience issues with Google sign-in (e.g., "This account is not approve
 | `/check-in` | Phase 4.5 | Search-based door check-in and duplicate prevention |
 | `/qa` | Phase 5 | Private QA Center for CODEX_TEST fixture status, sample CSV, checklist, and read-only health guidance |
 | `/communications` | Phase 6 boundary | Future guest filtering and message drafts |
-| `/ai-writing` | Phase 7 boundary | Future editable AI writing drafts |
+| `/ai-writing` | Redirected/deferred | AI Draft Lab prompt-builder tools live inside Communications; no real AI API |
 | `/settings` | Complete | Firebase and data-model status |
 
 ## Security rules

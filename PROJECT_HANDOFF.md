@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 29, 2026 (Phase 15B XLSX Dependency Security Review active)
+Last updated: June 29, 2026 (Phase 15B complete, pending organizer approval/merge)
 
 ## 1. Project overview
 
@@ -25,7 +25,7 @@ The repository currently contains:
 - Phase 13A: AI Draft Lab prompt builder only; no real AI API or sending.
 - Phase 14B: CPB Payment Audit UI Cleanup / Operations Review Fixes, dry-run first, no CPB apply.
 - Phase 15A: Hosting Security Headers + Private Indexing, deployed live.
-- Phase 15B: XLSX dependency security review plus roadmap/access/Event Operations status cleanup.
+- Phase 15B: XLSX dependency security review plus roadmap/access/Event Operations status cleanup — complete, pending organizer approval/merge.
 
 Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner roles remain UI/display foundation only; Firestore access is still enforced by the approved-admin email allowlist until a future rules-level role phase.
 
@@ -257,7 +257,7 @@ Communications Pro is active as copy-only tooling. AI Draft Lab is active as a p
 | `/check-in` | Phase 4.5 complete locally | Search-based door check-in and duplicate prevention |
 | `/qa` | Phase 5 in progress | Private QA Center for CODEX_TEST status, CPB warning, sample CSV, checklist, and fixture verification guidance |
 | `/communications` | Phase 6 boundary | Future guest filtering and message drafts |
-| `/ai-writing` | Phase 7 boundary | Future editable AI writing drafts |
+| `/ai-writing` | Redirected/deferred | AI Draft Lab prompt-builder tools live inside Communications; no real AI API |
 | `/settings` | Complete | Firebase and data-model status |
 
 Every route other than `/login` is protected by Firebase Authentication.
@@ -684,13 +684,12 @@ Registration, import, ticket, and check-in writes include an audit log entry in 
 After this feature branch is reviewed, approved, merged, and deployed, the next implementation phase should stay narrow:
 
 - Harden live ticket/check-in QA around CODEX_TEST
-- Consider QR scanning only if it can remain private-admin-only and does not require Cloud Functions, Storage, or public attendee flows
 - Keep automatic sending and real AI API deferred
 
 Phase boundaries remain:
 
 - Phase 4.5: Ticket Assignment + search-based Door Check-In foundation
-- Phase 6: Communications
-- Phase 7: AI Writing
+- Phase 11: Communications Pro copy-only tools
+- Phase 13A: AI Draft Lab prompt builder, draft-only
 
-Google Sheets OAuth remains deferred. There is no public attendee app, no native Android app, no Cloud Functions, and no Storage integration.
+Google Sheets OAuth, Gmail/Outlook OAuth, automatic sending, real AI API integration, public portals, payment gateways, native app builds, Cloud Functions, and Storage remain deferred.

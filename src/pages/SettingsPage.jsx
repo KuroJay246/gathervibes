@@ -9,7 +9,7 @@ import { ACCESS_ROLES, ROLE_ORDER, listApprovedAccessEntries, roleCapabilitySumm
 const ROADMAP_ITEMS = [
   ['Phase 14B CPB Payment Audit UI Cleanup / Operations Review Fixes', 'Closed'],
   ['Phase 15A Hosting Security Headers + Private Indexing', 'Closed'],
-  ['Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update', 'Active'],
+  ['Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update', 'Complete / pending approval'],
   ['Phase 12A Google Sheets-ready tools', 'Complete'],
   ['Google Sheets OAuth', 'Deferred'],
   ['Phase 13A AI Draft Lab', 'Complete / Draft-only'],
