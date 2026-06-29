@@ -10,9 +10,8 @@ export function normalizeTicketCode(value) {
   return (value || '').trim().toUpperCase().replace(/\s+/g, ' ')
 }
 
-export function buildTicketPrefix(event = {}) {
-  const candidate = event.ticketPrefix || event.eventCode || event.eventName || ''
-  const words = candidate
+export function normalizeTicketPrefix(value) {
+  const words = String(value || '')
     .toUpperCase()
     .replace(/[^A-Z0-9\s-]/g, ' ')
     .split(/[\s-]+/)
@@ -23,6 +22,14 @@ export function buildTicketPrefix(event = {}) {
 
   const initials = words.map((word) => word[0]).join('')
   return initials.slice(0, 6) || TICKET_CODE_PREFIX
+}
+
+export function getTicketPrefix(configOrEvent = null) {
+  return normalizeTicketPrefix(configOrEvent?.ticketPrefix || configOrEvent?.eventCode || configOrEvent?.eventName)
+}
+
+export function buildTicketPrefix(event = null) {
+  return getTicketPrefix(event)
 }
 
 export function ticketCodeForSort(value) {

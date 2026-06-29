@@ -9,7 +9,7 @@ import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { TicketQrCode } from '../components/tickets/TicketQrCode'
-import { buildTicketPrefix, generateSequentialTicketCode, generateTicketCode, normalizeTicketCode, searchableRegistrationText } from '../utils/ticketUtils'
+import { generateSequentialTicketCode, generateTicketCode, getTicketPrefix, normalizeTicketCode, searchableRegistrationText } from '../utils/ticketUtils'
 import { formatPaymentLabel, normalizePaymentStatus, paymentStatusMatches } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency } from '../utils/financeUtils'
 import { InfoHint } from '../components/ui/InfoHint'
@@ -121,7 +121,7 @@ export function TicketsPage() {
     () => new Set(registrations.map((registration) => normalizeTicketCode(registration.ticketCode)).filter(Boolean)),
     [registrations],
   )
-  const ticketPrefix = buildTicketPrefix(activeEvent)
+  const ticketPrefix = getTicketPrefix(activeEvent)
 
   const filteredRegistrations = registrations.filter((registration) => {
     if (filter === 'no-ticket' && registration.ticketCode) return false
