@@ -4,6 +4,8 @@ For the complete implementation, Firebase, security, testing, and deployment han
 
 Private event-operations dashboard for **Gather & Savor Vibes**. This is an admin-only workspace—not a public attendee app. Guests continue using Instagram, Linktree, Google Forms, and Google Sheets.
 
+This private admin app intentionally uses `noindex` and does not publish `sitemap.xml` or JSON-LD structured data. Public SEO should be handled by a separate public marketing landing page later.
+
 ## Implementation status
 
 - [x] **Phase 1**: Auth and base app shell
