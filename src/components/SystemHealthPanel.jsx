@@ -41,7 +41,8 @@ export function SystemHealthPanel({ compact = false }) {
       try {
         const accessDoc = await getDoc(doc(db, 'settings', 'accessControl'))
         const emails = Array.isArray(accessDoc.data()?.approvedEmails) ? accessDoc.data().approvedEmails : []
-        if (active) setAllowlistApproved(emails.includes(user.email.toLowerCase()))
+        const approvedEmails = emails.map((email) => String(email || '').trim().toLowerCase())
+        if (active) setAllowlistApproved(approvedEmails.includes(String(user.email || '').trim().toLowerCase()))
       } catch {
         if (active) setAllowlistApproved(false)
       }

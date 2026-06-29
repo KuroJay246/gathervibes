@@ -58,9 +58,22 @@ test('root render has a safe browser loading fallback', async () => {
 
   assert.match(main, /AppErrorBoundary/)
   assert.match(boundary, /Something went wrong loading Gather & Savor Hub/)
-  assert.match(boundary, /Refresh, try an incognito window, or contact the organizer/)
+  assert.match(boundary, /Incognito or Private window/)
+  assert.match(boundary, /clear\s+site\s+data\s+for\s+gathervibeshub\.web\.app/i)
+  assert.match(boundary, /Show technical details/)
+  assert.match(boundary, /Copy technical details/)
+  assert.match(boundary, /window\.location\.pathname/)
+  assert.match(boundary, /navigator\.userAgent/)
+  assert.match(boundary, /VITE_BUILD_COMMIT/)
   assert.match(boundary, /console\.error/)
   assert.doesNotMatch(boundary, /apiKey|approvedEmails|password|service account/i)
+})
+
+test('System Health normalizes allowlist email comparison defensively', async () => {
+  const panel = await readFile('src/components/SystemHealthPanel.jsx', 'utf8')
+
+  assert.match(panel, /String\(email \|\| ''\)\.trim\(\)\.toLowerCase\(\)/)
+  assert.match(panel, /String\(user\.email \|\| ''\)\.trim\(\)\.toLowerCase\(\)/)
 })
 
 test('QA Center includes Phase 16 browser and CODEX_TEST retest guidance', async () => {
