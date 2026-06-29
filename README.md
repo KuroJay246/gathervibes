@@ -24,7 +24,7 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 - [x] **Phase 16**: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — closed, merged, and deployed
 - [ ] **Phase 17A**: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — active
 
-Phase 3.2 renames imports to **Import Center** and adds source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files. Phase 4.5 adds controlled ticket assignment and search-based door check-in. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. Phase 16 is focused on live browser loading diagnostics and CODEX_TEST ticket/check-in QA hardening. QR camera scanning, Communications Pro, AI Draft Lab, Event Operations, and Phase 15A security headers are live. Real AI API integration, Google Sheets OAuth, Gmail/Outlook OAuth, automatic email/WhatsApp sending, Cloud Functions, Storage, public attendee/baker/school portals, payment gateway integration, public sitemap/JSON-LD for this private admin app, and native app store builds remain deferred.
+Phase 3.2 completed the **Import Center** rename and source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files; it was later deployed. Phase 4.5 completed controlled ticket assignment and search-based door check-in; it was later deployed. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. Phase 16 focused on live browser loading diagnostics and CODEX_TEST ticket/check-in QA hardening, then closed after merge and deployment. QR camera scanning, Communications Pro, AI Draft Lab, Event Operations, and Phase 15A security headers are live. Real AI API integration, Google Sheets OAuth, Gmail/Outlook OAuth, automatic email/WhatsApp sending, Cloud Functions, Storage, public attendee/baker/school portals, payment gateway integration, public sitemap/JSON-LD for this private admin app, and native app store builds remain deferred.
 
 ## Phase 16 closed status
 
@@ -257,11 +257,12 @@ If you experience issues with Google sign-in (e.g., "This account is not approve
 | `/dashboard` | Complete | Workspace and active-event summary |
 | `/events` | Complete | Firestore event CRUD and active-event selection |
 | `/registrations` | Phase 3 | Registration CRUD for the active event |
-| `/imports` | Phase 3.2 | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
-| `/tickets` | Phase 4.5 | Ticket-code assignment, generation, regeneration, and unassignment |
-| `/check-in` | Phase 4.5 | Search-based door check-in and duplicate prevention |
-| `/qa` | Phase 5 complete/live | Private QA Center for CODEX_TEST fixture status, sample CSV, checklist, and read-only health guidance |
-| `/communications` | Phase 11 live | Communications Pro copy-only message preparation and CSV/contact packets; no automatic sending |
+| `/imports` | Live/private-admin | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
+| `/tickets` | Live/private-admin | Ticket-code assignment, generation, regeneration, and unassignment |
+| `/check-in` | Live/private-admin | Search-based door check-in and duplicate prevention |
+| `/qa` | Live/private-admin | Private QA Center for CODEX_TEST fixture status, sample CSV, checklist, and read-only health guidance |
+| `/communications` | Live/private-admin | Communications Pro copy-only message preparation and CSV/contact packets; no automatic sending |
+| `/operations` | Live/private-admin | Event Operations Ledger for private-admin operational entries separate from ticket sales |
 | `/ai-writing` | Redirected/deferred | AI Draft Lab prompt-builder tools live inside Communications; no real AI API |
 | `/settings` | Complete | Firebase and data-model status |
 

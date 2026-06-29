@@ -202,7 +202,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Google Sheets OAuth: remains deferred
 - 52/52 tests pass; 0 lint errors; build clean
 
-### Phase 3.2 Import Center — Complete locally
+### Phase 3.2 Import Center — Completed and later deployed
 
 - `/imports` renamed **Import Center** in navigation, dashboard entry points, and page heading
 - Source selector added for Google Forms CSV, Google Sheets CSV, Excel/XLSX, pasted table text, bank/payment CSV, and custom files
@@ -213,7 +213,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - XLSX upload is active. Workbooks are parsed with `read-excel-file/browser`, multiple sheets show a selector, formulas are not executed, and rows still go through map -> preview -> confirm before Firestore writes
 - Google Sheets OAuth remains deferred
 
-### Phase 4.5 Ticketing + Door Check-In foundation — Complete locally
+### Phase 4.5 Ticketing + Door Check-In foundation — Completed and later deployed
 
 - `/tickets` route is live for approved admins
 - Tickets page requires a selected Working Event
@@ -277,11 +277,12 @@ Communications Pro is active as copy-only tooling. AI Draft Lab is active as a p
 | `/dashboard` | Complete | Secure workspace and selected-event context |
 | `/events` | Complete | Firestore event CRUD and active-event selection |
 | `/registrations` | Phase 3 complete | Registration CRUD for the active event |
-| `/imports` | Phase 3.2 complete locally | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
-| `/tickets` | Phase 4.5 complete locally | Ticket-code assignment, generation, regeneration, and unassignment |
-| `/check-in` | Phase 4.5 complete locally | Search-based door check-in and duplicate prevention |
-| `/qa` | Phase 5 complete/live | Private QA Center for CODEX_TEST status, CPB warning, sample CSV, checklist, and fixture verification guidance |
-| `/communications` | Phase 11 live | Communications Pro copy-only message preparation and CSV/contact packets; no automatic sending |
+| `/imports` | Live/private-admin | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
+| `/tickets` | Live/private-admin | Ticket-code assignment, generation, regeneration, and unassignment |
+| `/check-in` | Live/private-admin | Search-based door check-in and duplicate prevention |
+| `/qa` | Live/private-admin | Private QA Center for CODEX_TEST status, CPB warning, sample CSV, checklist, and fixture verification guidance |
+| `/communications` | Live/private-admin | Communications Pro copy-only message preparation and CSV/contact packets; no automatic sending |
+| `/operations` | Live/private-admin | Event Operations Ledger for private-admin operational entries separate from ticket sales |
 | `/ai-writing` | Redirected/deferred | AI Draft Lab prompt-builder tools live inside Communications; no real AI API |
 | `/settings` | Complete | Firebase and data-model status |
 
@@ -654,13 +655,13 @@ Unit tests now cover:
 - Ticket/check-in audit action coverage
 - Firestore rules text coverage for ticket/check-in fields and closed future collections
 
-### Phase 3.2 / Phase 4.5 local verification
+### Phase 3.2 / Phase 4.5 historical local verification before deployment
 
 - ESLint: 0 errors
 - Unit tests: 65/65 passing
 - Production Vite build: clean
 - Firestore rules dry-run compile: passed for project `gathervibeshub`
-- Deployment: not run; explicit approval required
+- Deployment at that historical checkpoint: not run yet; explicit approval was required before the later live deployment.
 - No service account JSON, private key, `.pem`, `.key`, or `.env.local` staged
 - Service worker still has no fetch handler and does not cache private admin data
 
