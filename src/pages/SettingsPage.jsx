@@ -7,16 +7,40 @@ import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeU
 import { ACCESS_ROLES, ROLE_ORDER, listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
 
 const ROADMAP_ITEMS = [
-  ['Phase 12A Google Sheets-ready tools', 'Active/Complete'],
+  ['Phase 14B CPB Payment Audit UI Cleanup / Operations Review Fixes', 'Closed'],
+  ['Phase 15A Hosting Security Headers + Private Indexing', 'Closed'],
+  ['Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update', 'Active'],
+  ['Phase 12A Google Sheets-ready tools', 'Complete'],
   ['Google Sheets OAuth', 'Deferred'],
-  ['Phase 13A AI Draft Lab', 'Active/Complete'],
-  ['AI writing', 'Deferred'],
+  ['Phase 13A AI Draft Lab', 'Complete / Draft-only'],
+  ['AI writing assistant UI', 'Draft-only'],
+  ['Real AI API integration', 'Deferred'],
   ['Gmail/Outlook OAuth', 'Deferred'],
+  ['Automatic email sending', 'Deferred'],
+  ['Automatic WhatsApp sending', 'Deferred'],
   ['Cloud Functions', 'Deferred'],
-  ['Storage', 'Deferred'],
-  ['Staff roles', 'Phase 10 foundation'],
+  ['Firebase Storage', 'Deferred'],
+  ['Public attendee / baker / school portals', 'Deferred'],
+  ['Public sitemap / JSON-LD for private admin app', 'Deferred'],
+  ['Payment gateway integration', 'Deferred'],
+  ['Native app / app store build', 'Deferred'],
+  ['Firestore-enforced staff roles', 'Future planned'],
+  ['Scanner/check-in-only role enforcement', 'Future planned'],
+  ['Mother/Event Manager simplified view', 'Future planned'],
+  ['Event Operations expansion', 'Future planned'],
   ['Finance tracker', 'Phase 9 active'],
   ['Communications Pro', 'Phase 11 copy-only'],
+]
+
+const EVENT_OPERATIONS_BACKLOG = [
+  'tasks',
+  'supplies checklist',
+  'vendors/suppliers',
+  'sponsors',
+  'school tracking',
+  'baker/vendor tracking',
+  'budget/expense reporting',
+  'event-day run sheet',
 ]
 
 function SettingsSection({ eyebrow, title, children }) {
@@ -90,7 +114,7 @@ export function SettingsPage() {
 
       <SettingsSection eyebrow="Admin Access" title="Private access controls">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Staff roles are allowlist-only. This release displays role foundations from <strong>settings/accessControl</strong>, but Firestore write permissions still use the existing approved-admin rules until scoped role rules are separately designed and tested.
+          Roles currently control the admin interface display. Firestore access is still enforced by the approved-admin email allowlist. Full rules-level staff restrictions are planned for a future phase.
         </div>
 
         <div className="mt-4 grid gap-3">
@@ -123,7 +147,7 @@ export function SettingsPage() {
             ))}
           </div>
           <p className="mt-2 text-xs leading-5 text-[#8A7468]">
-            If rolesByEmail is missing or a role is not recognized, approved emails continue as Admin for backward compatibility.
+            If rolesByEmail is missing or a role is not recognized, approved emails continue as Admin for backward compatibility. Temporary event-day helpers should not be given access until Firestore-enforced scanner/check-in-only rules are implemented, unless the organizer accepts the current UI-only limitation.
           </p>
         </div>
 
@@ -169,6 +193,19 @@ export function SettingsPage() {
         <p className="mt-3 text-xs leading-5 text-[#8A7468]">
           These are safe app defaults for this foundation. Persisted workspace-level finance settings are deferred until a dedicated settings schema is approved.
         </p>
+      </SettingsSection>
+
+      <SettingsSection eyebrow="Event Operations" title="Current status and future modules">
+        <div className="rounded-2xl border border-[#EFE2DA] p-4">
+          <InfoRow label="Operations Ledger" value="Active for selected Working Event" />
+          <InfoRow label="Ticket sales finance" value="Separate from operations ledger" />
+          <InfoRow label="Future modules" value="Planned, not active yet" />
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {EVENT_OPERATIONS_BACKLOG.map((item) => (
+            <span key={item} className="rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{item}</span>
+          ))}
+        </div>
       </SettingsSection>
 
       <SettingsSection eyebrow="Deferred Features / Roadmap" title="Backlog visibility">

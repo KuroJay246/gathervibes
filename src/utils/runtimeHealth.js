@@ -41,7 +41,22 @@ export function buildRuntimeHealthItems({
     {
       label: 'Current role detected',
       status: currentRoleLabel ? 'ok' : 'warn',
-      detail: currentRoleLabel ? `${currentRoleLabel} from settings/accessControl with approvedEmails fallback.` : 'Role display is pending accessControl load.',
+      detail: currentRoleLabel ? `${currentRoleLabel} from settings/accessControl with approvedEmails fallback. Role display is UI-only until Firestore role rules are added.` : 'Role display is pending accessControl load.',
+    },
+    {
+      label: 'Staff roles enforcement level',
+      status: 'warn',
+      detail: 'UI-only. Firestore access is still enforced by the approved-admin email allowlist.',
+    },
+    {
+      label: 'Approved-admin allowlist',
+      status: allowlistApproved === true ? 'ok' : allowlistApproved === false ? 'fail' : 'warn',
+      detail: 'Active server-side security boundary for private admin access.',
+    },
+    {
+      label: 'Firestore role enforcement',
+      status: 'warn',
+      detail: 'Future phase. Scanner/check-in-only and viewer restrictions are not rules-enforced yet.',
     },
     {
       label: 'Events read',
@@ -91,7 +106,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Deferred integrations',
       status: 'ok',
-      detail: 'AI writing, Gmail/Outlook OAuth, Google Sheets OAuth, Cloud Functions, Storage, and public attendee flows are not enabled.',
+      detail: 'Real AI API, Gmail/Outlook OAuth, Google Sheets OAuth, Cloud Functions, Storage, public portals, payment gateways, native apps, sitemap, and JSON-LD are not enabled.',
     },
     {
       label: 'Communications Pro safety',

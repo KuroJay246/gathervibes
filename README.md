@@ -16,10 +16,21 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 - [x] **Phase 3.2**: Import Center cleanup with source selector
 - [x] **Phase 4.5 foundation**: Ticket assignment and search-based door check-in
 - [x] **Phase 5**: Production QA Hardening with private QA Center and read-only fixture verification
-- [ ] **Phase 6**: Communications
-- [ ] **Phase 7**: AI writing assistant
+- [x] **Phase 11**: Communications Pro copy-only tools
+- [x] **Phase 13A**: AI Draft Lab prompt builder (draft-only; no real AI API)
+- [x] **Phase 14B**: CPB Payment Audit UI Cleanup / Operations Review Fixes
+- [x] **Phase 15A**: Hosting Security Headers + Private Indexing
+- [ ] **Phase 15B**: XLSX Dependency Security Review + Roadmap/Access/Ops Update
 
-Phase 3.2 renames imports to **Import Center** and adds source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files. Phase 4.5 adds controlled ticket assignment and search-based door check-in. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. QR scanning, communications, AI writing, Google Sheets OAuth, Cloud Functions, Storage, and public attendee flows remain deferred.
+Phase 3.2 renames imports to **Import Center** and adds source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files. Phase 4.5 adds controlled ticket assignment and search-based door check-in. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. QR camera scanning, Communications Pro, AI Draft Lab, Event Operations, and Phase 15A security headers are live. Real AI API integration, Google Sheets OAuth, Gmail/Outlook OAuth, automatic email/WhatsApp sending, Cloud Functions, Storage, public attendee/baker/school portals, payment gateway integration, public sitemap/JSON-LD for this private admin app, and native app store builds remain deferred.
+
+## Phase 15B active status
+
+- `xlsx` was removed after audit because runtime XLSX import now uses the already-installed `read-excel-file/browser` parser.
+- XLSX import remains active with sheet selection, row normalization, preview, mapping, and confirm-before-write safety.
+- `npm audit --omit=dev` is expected to report no production vulnerabilities after `xlsx` removal.
+- Staff/scanner roles remain UI/display/navigation foundation only. Firestore access is still enforced by the approved-admin email allowlist until a future rules-level staff-role phase.
+- Event Operations Ledger is active and separate from ticket sales. Future operations modules such as tasks, supplies, vendors/suppliers, sponsors, school tracking, baker/vendor tracking, budget/expense reporting, reimbursements, and event-day run sheets are planned but not active.
 
 ## Production and QA status
 
@@ -66,7 +77,7 @@ Phase 3.2 renames imports to **Import Center** and adds source-specific guidance
 - Dashboard: registration metrics (total, paid, pending, complimentary) for selected event
 - Dashboard: capacity progress bar
 - Dashboard: price tier summary chips for selected event
-- Excel/XLSX: implemented with `read-excel-file`, sheet selection, and preview-before-write safety
+- Excel/XLSX: implemented with `read-excel-file/browser`, sheet selection, and preview-before-write safety
 - Google Sheets OAuth: remains deferred
 
 ## Phase 3.2 Import Center
@@ -77,7 +88,7 @@ Phase 3.2 renames imports to **Import Center** and adds source-specific guidance
 - Pasted table/CSV text continues through the same map → preview → confirm import flow.
 - CSV upload still requires headers and still previews before Firestore writes.
 - Bank/payment CSV and custom file sources use the same safe mapping workflow.
-- XLSX upload is active. Workbooks are read with `read-excel-file`, multiple sheets show a selector, formulas are not executed, and rows still go through map -> preview -> confirm before Firestore writes.
+- XLSX upload is active. Workbooks are read with `read-excel-file/browser`, multiple sheets show a selector, formulas are not executed, and rows still go through map -> preview -> confirm before Firestore writes.
 
 ## Phase 4.5 Ticketing and Door Check-In
 
