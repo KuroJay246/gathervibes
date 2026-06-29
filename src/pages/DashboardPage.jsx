@@ -28,6 +28,7 @@ import { formatEventDate, formatCountdown, upcomingEvents } from '../utils/dateU
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
 import { buildOperationsTotals, subscribeToOperationsLedger } from '../services/operationsLedgerService'
+import { getSafePriceTiers, getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
 
 // ── Local clock ──────────────────────────────────────────────────────────────
 
@@ -122,9 +123,10 @@ export function DashboardPage() {
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedFull), [registrations, selectedFull])
   const operationsTotals = useMemo(() => buildOperationsTotals(operationsEntries), [operationsEntries])
   const capacityPct = metrics.capacityPercent
+  const currencyLabel = selectedFull?.currency ? financeSummary.currency : 'BBD default'
 
   // Price tiers for selected event
-  const priceTiers = selectedFull?.priceTiers
+  const priceTiers = getSafePriceTiers(selectedFull)
 
   const dateLabel = new Intl.DateTimeFormat('en-BB', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -152,10 +154,10 @@ export function DashboardPage() {
             </div>
 
             <h2 className="font-serif text-3xl leading-tight sm:text-4xl lg:text-[42px]">
-              {activeEvent ? 'Working on ' : 'The table is set for your'}
-              <span className="break-words italic text-[#E9B7C0]"> {activeEvent?.eventName || 'next gathering.'}</span>
+              {hasSelectedWorkingEvent(activeEvent) ? 'Working on ' : 'The table is set for your'}
+              <span className="break-words italic text-[#E9B7C0]"> {hasSelectedWorkingEvent(activeEvent) ? getWorkingEventDisplayName(activeEvent) : 'next gathering.'}</span>
             </h2>
-            {activeEvent && (
+            {hasSelectedWorkingEvent(activeEvent) && (
               <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/55">
                 <span className="inline-flex items-center gap-1"><CalendarDays className="size-3.5" />{formatEventDate(activeEvent.eventDate)}</span>
                 <span className="opacity-40">·</span>
@@ -168,7 +170,7 @@ export function DashboardPage() {
             to="/events"
             className="inline-flex w-fit shrink-0 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-black/15 transition hover:bg-[#C57C88]"
           >
-            {activeEvent ? 'Manage events' : 'Create an event'}
+            {hasSelectedWorkingEvent(activeEvent) ? 'Manage events' : 'Create an event'}
             <ArrowRight className="size-4" />
           </Link>
         </div>
@@ -186,10 +188,10 @@ export function DashboardPage() {
               <div className="min-w-0 flex-1">
                 <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Working Event</p>
                 <h3 className="mt-1.5 max-w-full break-words font-serif text-2xl leading-tight text-[#2B1723]">
-                  {activeEvent ? activeEvent.eventName : 'No event selected'}
+                  {getWorkingEventDisplayName(activeEvent)}
                 </h3>
               </div>
-              {activeEvent && (
+              {hasSelectedWorkingEvent(activeEvent) && (
                 <button
                   id="clear-selected-event"
                   type="button"
@@ -208,13 +210,13 @@ export function DashboardPage() {
               <Info className="mt-0.5 size-3.5 shrink-0 text-[#B76E79]" />
               <p className="text-[11px] leading-5 text-[#8A7468]">
                 The <strong>Working Event</strong> is the one event currently used for registrations, imports, tickets, and check-in. Dashboard can show several upcoming or active events, but operational pages use only this selected Working Event. Selecting one does not change its event status.
-                {activeEvent && (
+                {hasSelectedWorkingEvent(activeEvent) && (
                   <> To change it, <Link to="/events" className="font-bold text-[#B76E79] underline underline-offset-2">select another event</Link> from the Events page.</>
                 )}
               </p>
             </div>
 
-            {activeEvent ? (
+            {hasSelectedWorkingEvent(activeEvent) ? (
               <>
                 {/* Registration metrics */}
                 {metrics.totalRegistrations > 0 && (
@@ -245,16 +247,19 @@ export function DashboardPage() {
                 )}
 
                 <div className="mb-5 rounded-2xl border border-[#EEDFD6] bg-[#FBF8F5] p-4">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Finance Snapshot</p>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Finance Snapshot</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">Currency: {currencyLabel}</p>
+                  </div>
                   <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
                     {[
-                      ['Ticket expected revenue', formatCurrency(financeSummary.totalExpected)],
-                      ['Ticket collected', formatCurrency(financeSummary.totalCollected)],
-                      ['Ticket outstanding', formatCurrency(financeSummary.totalOutstanding)],
-                      ['Sponsor/other income', formatCurrency(operationsTotals.income)],
-                      ['Expenses', formatCurrency(operationsTotals.expenses)],
-                      ['Refunds/adjustments', formatCurrency(operationsTotals.refunds + operationsTotals.adjustments)],
-                      ['Net event position', formatCurrency(financeSummary.totalCollected + operationsTotals.income + operationsTotals.adjustments - operationsTotals.expenses - operationsTotals.refunds)],
+                      ['Ticket expected revenue', formatCurrency(financeSummary.totalExpected, financeSummary.currency)],
+                      ['Ticket collected', formatCurrency(financeSummary.totalCollected, financeSummary.currency)],
+                      ['Ticket outstanding', formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)],
+                      ['Sponsor/other income', formatCurrency(operationsTotals.income, financeSummary.currency)],
+                      ['Expenses', formatCurrency(operationsTotals.expenses, financeSummary.currency)],
+                      ['Refunds/adjustments', formatCurrency(operationsTotals.refunds + operationsTotals.adjustments, financeSummary.currency)],
+                      ['Net event position', formatCurrency(financeSummary.totalCollected + operationsTotals.income + operationsTotals.adjustments - operationsTotals.expenses - operationsTotals.refunds, financeSummary.currency)],
                       ['Finance warnings', financeSummary.financeWarningCount],
                     ].map(([label, value]) => (
                       <div key={label} className="rounded-xl bg-white px-3 py-2">
@@ -266,7 +271,7 @@ export function DashboardPage() {
                 </div>
 
                 {/* Price tier summary */}
-                {Array.isArray(priceTiers) && priceTiers.length > 0 && (
+                {priceTiers.length > 0 && (
                   <div>
                     <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Price tiers</p>
                     <div className="flex flex-wrap gap-2">
@@ -278,11 +283,14 @@ export function DashboardPage() {
                           {tier.name === 'Complimentary' ? <Gift className="size-3" /> : null}
                           {tier.name}
                           <span className="opacity-60">·</span>
-                          {tier.price === 0 ? 'Free' : `$${tier.price}`}
+                          {Number(tier.price) === 0 ? 'Free' : formatCurrency(tier.price, financeSummary.currency)}
                         </span>
                       ))}
                     </div>
                   </div>
+                )}
+                {priceTiers.length === 0 && (
+                  <p className="mb-5 text-[11px] leading-5 text-[#8A7468]">No pricing configured for this Working Event.</p>
                 )}
 
                 <p className="mb-5 text-[11px] leading-5 text-[#8A7468]">
@@ -295,7 +303,7 @@ export function DashboardPage() {
               </>
             ) : (
               <p className="text-xs leading-5 text-[#8A7468]">
-                Select an event from the <Link to="/events" className="font-bold text-[#B76E79]">Events page</Link> to see its registrations, capacity, and price tiers here.
+                No selected Working Event. Select an event from the <Link to="/events" className="font-bold text-[#B76E79]">Events page</Link> to see its registrations, capacity, and price tiers here.
               </p>
             )}
           </article>

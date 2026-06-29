@@ -21,8 +21,17 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 - [x] **Phase 14B**: CPB Payment Audit UI Cleanup / Operations Review Fixes
 - [x] **Phase 15A**: Hosting Security Headers + Private Indexing
 - [x] **Phase 15B**: XLSX Dependency Security Review + Roadmap/Access/Ops Update — closed, merged, and deployed
+- [ ] **Phase 16**: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — active
 
-Phase 3.2 renames imports to **Import Center** and adds source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files. Phase 4.5 adds controlled ticket assignment and search-based door check-in. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. QR camera scanning, Communications Pro, AI Draft Lab, Event Operations, and Phase 15A security headers are live. Real AI API integration, Google Sheets OAuth, Gmail/Outlook OAuth, automatic email/WhatsApp sending, Cloud Functions, Storage, public attendee/baker/school portals, payment gateway integration, public sitemap/JSON-LD for this private admin app, and native app store builds remain deferred.
+Phase 3.2 renames imports to **Import Center** and adds source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files. Phase 4.5 adds controlled ticket assignment and search-based door check-in. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. Phase 16 is focused on live browser loading diagnostics and CODEX_TEST ticket/check-in QA hardening. QR camera scanning, Communications Pro, AI Draft Lab, Event Operations, and Phase 15A security headers are live. Real AI API integration, Google Sheets OAuth, Gmail/Outlook OAuth, automatic email/WhatsApp sending, Cloud Functions, Storage, public attendee/baker/school portals, payment gateway integration, public sitemap/JSON-LD for this private admin app, and native app store builds remain deferred.
+
+## Phase 16 active status
+
+- Live Hosting routes `/`, `/login`, and `/dashboard` should return the private admin app shell through the SPA rewrite.
+- Phase 15A headers remain intentionally narrow: frame/object/base/form protections plus noindex and camera permission for same-origin QR scanning. They do not define `script-src`, `style-src`, or `connect-src`.
+- The service worker performs install/activate lifecycle only and has no fetch handler or private-data cache.
+- The root app has a safe loading error fallback with organizer-friendly refresh/incognito guidance.
+- QA Center includes Phase 16 manual checks for live browser loading, approved second-account login, CODEX_TEST ticket search, QR camera lookup, manual ticket-code fallback, check-in, duplicate blocking, append-only audit logs, and CPB protection.
 
 ## Phase 15B status
 
@@ -102,6 +111,7 @@ Phase 3.2 renames imports to **Import Center** and adds source-specific guidance
 - Check-In supports fast search by name, email, phone, or ticket code, large mobile-first guest cards, payment/ticket/check-in status, and reset for the next guest.
 - Check-in moves `checkedIn` from `false` to `true`, sets `checkInTime`, and writes `checkedInBy`.
 - Duplicate check-in is blocked; an explicit duplicate-attempt audit can be recorded.
+- Undo check-in is available for approved admins where implemented in the UI, requires confirmation, and writes `checkin.undo` in the same batch as the `checkedIn: false` update.
 - QR camera lookup is active as a private-admin input method; search by ticket code remains the fallback.
 
 

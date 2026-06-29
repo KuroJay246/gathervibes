@@ -8,6 +8,8 @@ import {
   financeFilterMatches,
   financeWarnings,
   formatCurrency,
+  getCurrencyCode,
+  normalizeCurrency,
   normalizePaymentMethod,
 } from '../src/utils/financeUtils.js'
 import { buildInitialFieldMap, mapRows, parseCSV, processAndValidate } from '../src/utils/importUtils.js'
@@ -61,6 +63,31 @@ test('finance summary separates expected, collected, outstanding, door, and comp
   assert.equal(summary.doorListRegistrations, 1)
 })
 
+test('finance currency helpers fall back safely for null clean-browser state', () => {
+  assert.equal(normalizeCurrency(null), 'BBD')
+  assert.equal(normalizeCurrency(undefined), 'BBD')
+  assert.equal(normalizeCurrency(''), 'BBD')
+  assert.equal(normalizeCurrency('usd'), 'USD')
+  assert.equal(getCurrencyCode(null), 'BBD')
+  assert.equal(getCurrencyCode({ currency: null }), 'BBD')
+  assert.equal(formatCurrency(100, null), 'BBD $100.00')
+})
+
+test('finance summary does not crash when selected event or registrations are null', () => {
+  const noEventSummary = buildFinanceSummary([
+    { personsAttending: 2, ticketPrice: 50, amountPaid: 25, paymentStatus: 'pending' },
+  ], null)
+  const noRowsSummary = buildFinanceSummary(null, null)
+  const missingCurrencySummary = buildFinanceSummary([], { eventName: 'No currency event' })
+
+  assert.equal(noEventSummary.currency, 'BBD')
+  assert.equal(noEventSummary.totalExpected, 100)
+  assert.equal(noEventSummary.totalCollected, 25)
+  assert.equal(noRowsSummary.currency, 'BBD')
+  assert.equal(noRowsSummary.totalExpected, 0)
+  assert.equal(missingCurrencySummary.currency, 'BBD')
+})
+
 test('Import Center maps finance fields and flags missing event price for review', async () => {
   const parsed = parseCSV('Full Name,Ticket Price,Amount Paid,Payment Method,Payment Reference,Persons Attending\nJane,50,25,FirstPay,FP-001,2\nDoor Guest,,0,door,,1')
   const fieldMap = buildInitialFieldMap(parsed.headers)
@@ -112,4 +139,14 @@ test('Phase 9 UI and Firestore rules expose finance without broad access', async
   assert.match(rules, /validOptionalMoney/)
   assert.match(rules, /registration\.finance-update/)
   assert.doesNotMatch(rules, /allow read, write: if true/)
+})
+
+test('Dashboard documents missing selected event, default currency, and missing pricing fallbacks', async () => {
+  const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
+
+  assert.match(dashboard, /BBD default/)
+  assert.match(dashboard, /No selected Working Event/)
+  assert.match(dashboard, /No pricing configured/)
+  assert.match(dashboard, /buildFinanceSummary\(registrations, selectedFull\)/)
+  assert.match(dashboard, /formatCurrency\(tier\.price, financeSummary\.currency\)/)
 })

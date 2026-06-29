@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 29, 2026 (Phase 15B closed, merged, and deployed)
+Last updated: June 29, 2026 (Phase 16 active; Phase 15B closed, merged, and deployed)
 
 ## 1. Project overview
 
@@ -26,8 +26,11 @@ The repository currently contains:
 - Phase 14B: CPB Payment Audit UI Cleanup / Operations Review Fixes, dry-run first, no CPB apply.
 - Phase 15A: Hosting Security Headers + Private Indexing, deployed live.
 - Phase 15B: XLSX dependency security review plus roadmap/access/Event Operations status cleanup — closed, merged, and deployed.
+- Phase 16: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — active on feature branch.
 
 Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner roles remain UI/display foundation only; Firestore access is still enforced by the approved-admin email allowlist until a future rules-level role phase.
+
+Phase 16 investigates live browser loading differences across devices, keeps the Phase 15A security headers intact, adds a safe root loading error fallback, and expands QA Center guidance for CODEX_TEST ticket/check-in retesting. It does not add public portals, automatic sending, real AI API calls, Cloud Functions, Storage, or Firestore rule changes.
 
 ## Production QA fixture
 
@@ -461,9 +464,10 @@ Rules:
 - Raw email and phone are never embedded in generated ticket codes
 - Ticket code must not change unless explicitly regenerated
 - Clear/unassign requires confirmation in the UI
-- Check-in is one-way in this phase; no undo is implemented
-- Duplicate check-in is blocked
-- QR camera lookup is active; search by ticket code remains the fallback
+- Check-in can be completed once; duplicate check-in is blocked
+- Undo check-in is available for approved admins where implemented in the UI
+- Undo check-in requires confirmation and writes `checkin.undo` in the same batch as the `checkedIn: false` update
+- QR camera lookup is active as a private-admin input method; manual ticket-code search remains the fallback
 
 ## 14. Audit log data model
 
@@ -483,7 +487,7 @@ details        map          Action-specific metadata
 ```
 
 Event actions: `event.create`, `event.update`, `event.delete`  
-Registration actions: `registration.create`, `registration.update`, `registration.delete`, `registration.import`, `ticket.assign`, `ticket.unassign`, `ticket.regenerate`, `checkin.complete`, `checkin.duplicate-attempt`
+Registration actions: `registration.create`, `registration.update`, `registration.delete`, `registration.import`, `ticket.assign`, `ticket.unassign`, `ticket.regenerate`, `checkin.complete`, `checkin.undo`, `checkin.duplicate-attempt`
 
 Registration audit examples include `fullName` and, for imports, `sourceRowId`. Event audits include `eventName`.
 
@@ -683,7 +687,7 @@ Registration, import, ticket, and check-in writes include an audit log entry in 
 
 After this feature branch is reviewed, approved, merged, and deployed, the next implementation phase should stay narrow:
 
-- Harden live ticket/check-in QA around CODEX_TEST
+- Complete organizer live browser/laptop retesting from the Phase 16 QA Center checklist
 - Keep automatic sending and real AI API deferred
 
 Phase boundaries remain:

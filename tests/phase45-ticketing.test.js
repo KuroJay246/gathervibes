@@ -10,11 +10,19 @@ import {
   findTicketCodeDuplicate,
   generateSequentialTicketCode,
   generateTicketCode,
+  getTicketPrefix,
+  normalizeTicketPrefix,
   normalizeTicketCode,
   searchableRegistrationText,
   validateTicketCode,
 } from '../src/utils/ticketUtils.js'
 import { buildCheckInSummary, filterCheckInRegistrations } from '../src/utils/checkInUtils.js'
+import {
+  getSafePriceTiers,
+  getSafeTicketPrice,
+  getWorkingEventDisplayName,
+  hasSelectedWorkingEvent,
+} from '../src/utils/eventDefaults.js'
 
 test('ticket code generation is readable, unique, and privacy-safe', () => {
   const code = generateTicketCode(new Set(), () => 0)
@@ -55,6 +63,29 @@ test('event-style ticket prefix and sequential generation use selected event con
   assert.equal(buildTicketPrefix({ eventName: 'Cake Picnic Barbados' }), 'CPB')
   assert.equal(generateSequentialTicketCode(['CPB-001', 'CPB-003'], { eventName: 'CPB' }), 'CPB-004')
   assert.equal(generateSequentialTicketCode(['CPB-001', 'CPB-002'], { eventName: 'Cake Picnic Barbados' }), 'CPB-003')
+})
+
+test('ticket prefix helpers fall back safely for null clean-browser state', () => {
+  assert.equal(normalizeTicketPrefix(null), 'GSV')
+  assert.equal(normalizeTicketPrefix(undefined), 'GSV')
+  assert.equal(normalizeTicketPrefix(''), 'GSV')
+  assert.equal(normalizeTicketPrefix('cake picnic barbados'), 'CPB')
+  assert.equal(getTicketPrefix(null), 'GSV')
+  assert.equal(getTicketPrefix({ ticketPrefix: null, eventName: null }), 'GSV')
+  assert.equal(buildTicketPrefix(null), 'GSV')
+  assert.equal(generateSequentialTicketCode([], null), 'GSV-001')
+})
+
+test('event default helpers return clean selected-event fallbacks', () => {
+  assert.deepEqual(getSafePriceTiers(null), [])
+  assert.deepEqual(getSafePriceTiers({ priceTiers: null }), [])
+  assert.deepEqual(getSafePriceTiers({ priceTiers: [{ name: 'General', price: 75 }] }), [{ name: 'General', price: 75 }])
+  assert.equal(getSafeTicketPrice(null), null)
+  assert.equal(getSafeTicketPrice({ ticketPrice: null }), null)
+  assert.equal(getSafeTicketPrice({ ticketPrice: '75.50' }), 75.5)
+  assert.equal(hasSelectedWorkingEvent(null), false)
+  assert.equal(hasSelectedWorkingEvent({ eventId: 'event-1' }), true)
+  assert.equal(getWorkingEventDisplayName(null), 'No selected Working Event')
 })
 
 test('ticket status transitions stay controlled', () => {
@@ -157,6 +188,18 @@ test('ticket and check-in services create registration audit actions', async () 
   assert.match(service, /checkedInBy:\s+performedBy\(user\)/)
   assert.doesNotMatch(service, /preserveRegistrationForCheckIn/)
   assert.doesNotMatch(service, /personsAttending:\s+Number\(registration\.personsAttending\)/)
+})
+
+test('Tickets and Check-In pages keep selected-event empty states ahead of event-specific fields', async () => {
+  const ticketsPage = await readFile('src/pages/TicketsPage.jsx', 'utf8')
+  const checkInPage = await readFile('src/pages/CheckInPage.jsx', 'utf8')
+
+  assert.match(ticketsPage, /if \(!activeEvent\?\.eventId\)/)
+  assert.match(ticketsPage, /Select a Working Event before assigning ticket codes/)
+  assert.match(ticketsPage, /getTicketPrefix\(activeEvent\)/)
+  assert.doesNotMatch(ticketsPage, /buildTicketPrefix\(activeEvent\)/)
+  assert.match(checkInPage, /if \(!activeEvent\?\.eventId\)/)
+  assert.match(checkInPage, /Select a Working Event before opening the door check-in screen/)
 })
 
 test('Firestore rules include ticket and check-in fields and actions', async () => {
