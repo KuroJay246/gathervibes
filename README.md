@@ -20,7 +20,7 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 - [x] **Phase 13A**: AI Draft Lab prompt builder (draft-only; no real AI API)
 - [x] **Phase 14B**: CPB Payment Audit UI Cleanup / Operations Review Fixes
 - [x] **Phase 15A**: Hosting Security Headers + Private Indexing
-- [x] **Phase 15B**: XLSX Dependency Security Review + Roadmap/Access/Ops Update — complete, pending organizer approval/merge
+- [x] **Phase 15B**: XLSX Dependency Security Review + Roadmap/Access/Ops Update — closed, merged, and deployed
 
 Phase 3.2 renames imports to **Import Center** and adds source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files. Phase 4.5 adds controlled ticket assignment and search-based door check-in. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. QR camera scanning, Communications Pro, AI Draft Lab, Event Operations, and Phase 15A security headers are live. Real AI API integration, Google Sheets OAuth, Gmail/Outlook OAuth, automatic email/WhatsApp sending, Cloud Functions, Storage, public attendee/baker/school portals, payment gateway integration, public sitemap/JSON-LD for this private admin app, and native app store builds remain deferred.
 
@@ -31,7 +31,7 @@ Phase 3.2 renames imports to **Import Center** and adds source-specific guidance
 - `npm audit --omit=dev` is expected to report no production vulnerabilities after `xlsx` removal.
 - Staff/scanner roles remain UI/display/navigation foundation only. Firestore access is still enforced by the approved-admin email allowlist until a future rules-level staff-role phase.
 - Event Operations Ledger is active and separate from ticket sales. Future operations modules such as tasks, supplies, vendors/suppliers, sponsors, school tracking, baker/vendor tracking, budget/expense reporting, reimbursements, and event-day run sheets are planned but not active.
-- Phase 15B is complete and pending organizer approval/merge. After merge and main deployment, it can be marked closed.
+- Phase 15B is closed, merged, and deployed.
 
 ## Production and QA status
 

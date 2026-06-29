@@ -30,7 +30,7 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
   assert.match(importsPage, /No Firestore write happens until you confirm valid rows/)
 })
 
-test('roadmap shows closed Phase 14B and 15A, complete pending-approval 15B, deferred integrations, and future ops backlog', async () => {
+test('roadmap shows closed Phase 14B and 15A, merged/deployed 15B docs, deferred integrations, and future ops backlog', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const readme = await readFile('README.md', 'utf8')
 
@@ -55,7 +55,7 @@ test('roadmap shows closed Phase 14B and 15A, complete pending-approval 15B, def
   }
 
   assert.match(readme, /Phase 15B status/)
-  assert.match(readme, /complete and pending organizer approval\/merge/)
+  assert.match(readme, /closed, merged, and deployed/)
   assert.match(settings, /Complete \/ pending approval/)
   assert.match(readme, /public sitemap\/JSON-LD/)
   assert.match(readme, /budget\/expense reporting/)

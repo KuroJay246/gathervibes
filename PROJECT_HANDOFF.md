@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 29, 2026 (Phase 15B complete, pending organizer approval/merge)
+Last updated: June 29, 2026 (Phase 15B closed, merged, and deployed)
 
 ## 1. Project overview
 
@@ -25,7 +25,7 @@ The repository currently contains:
 - Phase 13A: AI Draft Lab prompt builder only; no real AI API or sending.
 - Phase 14B: CPB Payment Audit UI Cleanup / Operations Review Fixes, dry-run first, no CPB apply.
 - Phase 15A: Hosting Security Headers + Private Indexing, deployed live.
-- Phase 15B: XLSX dependency security review plus roadmap/access/Event Operations status cleanup — complete, pending organizer approval/merge.
+- Phase 15B: XLSX dependency security review plus roadmap/access/Event Operations status cleanup — closed, merged, and deployed.
 
 Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner roles remain UI/display foundation only; Firestore access is still enforced by the approved-admin email allowlist until a future rules-level role phase.
 
