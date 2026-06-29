@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 22, 2026 (Phase 5 Production QA Hardening started on feature branch)
+Last updated: June 29, 2026 (Phase 15B complete, pending organizer approval/merge)
 
 ## 1. Project overview
 
@@ -21,6 +21,13 @@ The repository currently contains:
 - Phase 3.2: Import Center cleanup with source selector, CSV/pasted table import, and Excel/XLSX workbook import.
 - Phase 4.5 foundation: ticket assignment plus search-based door check-in for approved admins.
 - Phase 5: Production QA Hardening with a private QA Center, CODEX_TEST helper data, and read-only fixture verification.
+- Phase 11: Communications Pro copy-only message preparation and CSV/contact packets.
+- Phase 13A: AI Draft Lab prompt builder only; no real AI API or sending.
+- Phase 14B: CPB Payment Audit UI Cleanup / Operations Review Fixes, dry-run first, no CPB apply.
+- Phase 15A: Hosting Security Headers + Private Indexing, deployed live.
+- Phase 15B: XLSX dependency security review plus roadmap/access/Event Operations status cleanup — complete, pending organizer approval/merge.
+
+Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner roles remain UI/display foundation only; Firestore access is still enforced by the approved-admin email allowlist until a future rules-level role phase.
 
 ## Production QA fixture
 
@@ -166,7 +173,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Dashboard: registration metrics for selected event (total, paid, pending, complimentary)
 - Dashboard: capacity progress bar with color thresholds (green → amber → red)
 - Dashboard: price tier summary chips with sold-out and hidden visual states
-- Excel/XLSX: implemented with `read-excel-file`, sheet selection, and preview-before-write safety
+- Excel/XLSX: implemented with `read-excel-file/browser`, sheet selection, and preview-before-write safety
 - Google Sheets OAuth: remains deferred
 - 52/52 tests pass; 0 lint errors; build clean
 
@@ -178,7 +185,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Google Forms and Google Sheets remain export-to-CSV workflows
 - Pasted table text and CSV upload still reuse the existing parse, map, preview, and confirm-import flow
 - Header detection improved for payment references and notes
-- XLSX upload is active. Workbooks are parsed with `read-excel-file`, multiple sheets show a selector, formulas are not executed, and rows still go through map -> preview -> confirm before Firestore writes
+- XLSX upload is active. Workbooks are parsed with `read-excel-file/browser`, multiple sheets show a selector, formulas are not executed, and rows still go through map -> preview -> confirm before Firestore writes
 - Google Sheets OAuth remains deferred
 
 ### Phase 4.5 Ticketing + Door Check-In foundation — Complete locally
@@ -199,10 +206,10 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Guest card shows payment, ticket, and check-in status
 - Check-in moves `checkedIn` false -> true and sets `checkInTime` / `checkedInBy`
 - Duplicate check-in is blocked and can record `checkin.duplicate-attempt`
-- QR scanning is deferred with a visible note: search by ticket code is active now
-- No public attendee access, no QR scanner, no communications, no AI, no OAuth, no Cloud Functions
+- QR camera lookup is active as a private-admin input method; manual ticket-code search remains the fallback
+- No public attendee access, no real AI API, no OAuth, no automatic sending, no Cloud Functions
 
-### Phase 5 Production QA Hardening — In progress on feature branch
+### Phase 5 Production QA Hardening — Complete
 
 - `/qa` private QA Center route added for approved admins
 - CODEX_TEST fixture status and CPB warning displayed
@@ -216,13 +223,18 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 
 The following remain phase-gated or deferred:
 
-- QR scanning
-- Communications and bulk email sending (Phase 6)
-- AI writing drafts (Phase 7)
+- Firestore-enforced staff roles and scanner/check-in-only rules
+- Mother/Event Manager simplified view
+- Real AI API integration
+- Automatic email sending
+- Automatic WhatsApp sending
+- Gmail/Outlook OAuth
 - Google Sheets OAuth (deferred; use CSV export first)
-- Payment processing
-- Public registration forms
-- Attendee accounts
+- Public attendee portal
+- Public baker portal
+- Public school portal
+- Public sitemap / JSON-LD for this private admin app
+- Payment gateway integration
 - Firebase Cloud Functions
 - Firebase Storage
 - Native Android/iOS apps, Capacitor, React Native, or Flutter
@@ -230,7 +242,7 @@ The following remain phase-gated or deferred:
 - Offline Firestore writes
 - Service worker caching of private admin data
 
-The `/communications` and `/ai-writing` routes remain future-phase messages. `/tickets` and `/check-in` are live private-admin routes on this feature branch and are not deployed until explicit approval.
+Communications Pro is active as copy-only tooling. AI Draft Lab is active as a prompt builder only; no real AI API key or sending is enabled. `/tickets`, `/check-in`, `/communications`, `/operations`, and `/qa` are live private-admin routes.
 
 ## 5. Application routes
 
@@ -243,9 +255,9 @@ The `/communications` and `/ai-writing` routes remain future-phase messages. `/t
 | `/imports` | Phase 3.2 complete locally | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
 | `/tickets` | Phase 4.5 complete locally | Ticket-code assignment, generation, regeneration, and unassignment |
 | `/check-in` | Phase 4.5 complete locally | Search-based door check-in and duplicate prevention |
-| `/qa` | Phase 5 in progress | Private QA Center for CODEX_TEST status, CPB warning, sample CSV, checklist, and fixture verification guidance |
-| `/communications` | Phase 6 boundary | Future guest filtering and message drafts |
-| `/ai-writing` | Phase 7 boundary | Future editable AI writing drafts |
+| `/qa` | Phase 5 complete/live | Private QA Center for CODEX_TEST status, CPB warning, sample CSV, checklist, and fixture verification guidance |
+| `/communications` | Phase 11 live | Communications Pro copy-only message preparation and CSV/contact packets; no automatic sending |
+| `/ai-writing` | Redirected/deferred | AI Draft Lab prompt-builder tools live inside Communications; no real AI API |
 | `/settings` | Complete | Firebase and data-model status |
 
 Every route other than `/login` is protected by Firebase Authentication.
@@ -451,7 +463,7 @@ Rules:
 - Clear/unassign requires confirmation in the UI
 - Check-in is one-way in this phase; no undo is implemented
 - Duplicate check-in is blocked
-- QR scanning is deferred; search by ticket code is active now
+- QR camera lookup is active; search by ticket code remains the fallback
 
 ## 14. Audit log data model
 
@@ -589,8 +601,8 @@ npx firebase-tools deploy --only hosting --project gathervibeshub
 - No debug bypasses in `AuthProvider.jsx` or `firestore.rules`
 - Price tier schema verified in validators, form, service, and rules
 - Dashboard enhancements verified: clock, countdowns, selected-event UX, metrics, capacity bar
-- Excel/XLSX implemented with `read-excel-file`
-- New dependency added: `read-excel-file`
+- Excel/XLSX implemented with `read-excel-file/browser`
+- New dependency added: `read-excel-file/browser`
 - PR #3 merged to `main`; `main` redeployed to Firebase project `gathervibeshub`
 
 Unit tests now cover:
@@ -642,8 +654,8 @@ After deployment, verify:
 5. Import creates deterministic IDs and blocks duplicates
 6. Ticket assignment/generation/unassignment writes audit logs
 7. Check-in writes audit logs and blocks duplicate check-in
-8. QR scanning remains absent/deferred
-9. Communications and AI routes remain future placeholders
+8. QR camera lookup is active and private-admin-only
+9. Communications Pro and AI Draft Lab prompt builder are active without sending or real AI API
 
 ## 22. Design decisions
 
@@ -657,11 +669,11 @@ Import registration IDs hash event-scoped keys with SHA-256 so document IDs do n
 
 ### XLSX import
 
-XLSX upload is active in Import Center. The app uses `read-excel-file` to read workbook values in the browser, presents a sheet selector when multiple worksheets are present, and then reuses the same column mapping, preview, validation, and confirm-import flow as CSV. Formulas are not executed.
+XLSX upload is active in Import Center. The app uses `read-excel-file/browser` to read workbook values in the browser, presents a sheet selector when multiple worksheets are present, and then reuses the same column mapping, preview, validation, and confirm-import flow as CSV. The vulnerable SheetJS `xlsx` package was removed in Phase 15B. Formulas are not executed.
 
 ### Search before QR scanning
 
-Door check-in is implemented with fast search by name, email, phone, and ticket code. QR scanning remains deferred until it can be added without expanding public access or adding unsafe device/browser assumptions.
+Door check-in is implemented with fast search by name, email, phone, ticket code, and private-admin QR camera lookup. QR payload remains `GSV:TICKET:{ticketCode}` only.
 
 ### Atomic audit logging
 
@@ -672,13 +684,12 @@ Registration, import, ticket, and check-in writes include an audit log entry in 
 After this feature branch is reviewed, approved, merged, and deployed, the next implementation phase should stay narrow:
 
 - Harden live ticket/check-in QA around CODEX_TEST
-- Consider QR scanning only if it can remain private-admin-only and does not require Cloud Functions, Storage, or public attendee flows
-- Keep communications and AI deferred
+- Keep automatic sending and real AI API deferred
 
 Phase boundaries remain:
 
 - Phase 4.5: Ticket Assignment + search-based Door Check-In foundation
-- Phase 6: Communications
-- Phase 7: AI Writing
+- Phase 11: Communications Pro copy-only tools
+- Phase 13A: AI Draft Lab prompt builder, draft-only
 
-Google Sheets OAuth remains deferred. There is no public attendee app, no native Android app, no Cloud Functions, and no Storage integration.
+Google Sheets OAuth, Gmail/Outlook OAuth, automatic sending, real AI API integration, public portals, payment gateways, native app builds, Cloud Functions, and Storage remain deferred.

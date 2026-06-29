@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx'
+import readExcelFile from 'read-excel-file/browser'
 import { rowsToParsedTable } from './importUtils.js'
 
 async function workbookInputToArrayBuffer(input) {
@@ -9,16 +9,12 @@ async function workbookInputToArrayBuffer(input) {
 
 export async function readXlsxWorkbook(file) {
   const workbookBuffer = await workbookInputToArrayBuffer(file)
-  const workbook = XLSX.read(workbookBuffer, { type: 'array', cellDates: true })
+  const sheets = await readExcelFile(workbookBuffer)
 
-  return workbook.SheetNames.map((sheetName, index) => {
-    const worksheet = workbook.Sheets[sheetName]
-    const sheetRows = XLSX.utils.sheet_to_json(worksheet, {
-      header: 1,
-      blankrows: false,
-      defval: '',
-      raw: false,
-    })
+  return sheets.map(({ sheet: sheetName, data }, index) => {
+    const sheetRows = Array.isArray(data) ? data.map((row) => (
+      Array.isArray(row) ? row.map((cell) => cell ?? '') : []
+    )) : []
     const parsed = rowsToParsedTable(sheetRows, { sourceKey: `sheet-${index + 1}` })
 
     return {

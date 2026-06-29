@@ -193,9 +193,9 @@ export function OperationsPage() {
       </header>
 
       <section className="flex items-center gap-2 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-        <p className="font-semibold text-[#6B564C]">Track sponsor income, vendor payments, expenses, and refunds here.</p>
+        <p className="font-semibold text-[#6B564C]">Operations Ledger is active for sponsor income, vendor payments, expenses, reimbursements, and refunds.</p>
         <InfoHint label="Operations Ledger Info">
-          This tracker is separate from ticket sales. Ticket revenue comes from registrations. Operations data is scoped to the selected Working Event only.
+          This tracker is separate from ticket sales. Ticket revenue comes from registrations. Future modules for tasks, supplies, vendors, sponsors, school/baker tracking, event-day run sheets, reimbursements, and expense reporting are planned but not active yet.
         </InfoHint>
       </section>
 
@@ -311,7 +311,7 @@ export function OperationsPage() {
           <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">
             {filteredEntries.length === 0 ? (
               <div className="p-6 text-sm leading-6 text-[#816D62]">
-                No operations entries yet. Add sponsor income, vendor or baker payments, expenses, refunds, or adjustments here. This tracker is separate from ticket sales and is scoped to the selected Working Event.
+                No operations entries yet. Add sponsor income, vendor or baker payments, expenses, reimbursements, refunds, or adjustments here. This tracker is separate from ticket sales and is scoped to the selected Working Event. Tasks, supplies, sponsor tracking, school/baker tracking, run sheets, and expanded expense reporting remain future modules.
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -357,7 +357,7 @@ export function OperationsPage() {
 
       <p className="flex gap-2 rounded-xl border border-[#F2D6A3] bg-[#FFF7E8] px-4 py-3 text-xs leading-5 text-[#7A5818]">
         <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-        Operations ledger is admin-only, scoped to the selected Working Event, and does not add public access, sending, OAuth, Cloud Functions, Storage, or payment processing.
+        Operations ledger is admin-only, scoped to the selected Working Event, and does not add public access, sending, OAuth, Cloud Functions, Storage, payment processing, or new operations modules in this phase.
       </p>
     </div>
   )
