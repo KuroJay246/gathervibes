@@ -416,7 +416,7 @@ Event mutations and their audit records use a single Firestore batch. A failed a
 - [x] Lint: 0 errors
 - [x] Build: clean
 - [x] Firestore rules dry-run compile passed for `gathervibeshub`
-- [ ] Deployment: pending explicit approval
+- [x] Historical deployment approval completed; `/imports`, `/tickets`, and `/check-in` are now live private-admin routes
 
 Registration and import mutations share one Firestore batch with their audit records. Import chunking respects the 500-write limit (249 rows per chunk: registration + audit log per row).
 

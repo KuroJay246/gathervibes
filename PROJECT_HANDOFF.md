@@ -665,14 +665,14 @@ Unit tests now cover:
 - No service account JSON, private key, `.pem`, `.key`, or `.env.local` staged
 - Service worker still has no fetch handler and does not cache private admin data
 
-## 21. Remaining live testing limitations
+## 21. Organizer live retest checklist
 
-Live Firebase testing for this branch still requires:
+Live Firebase retesting should use:
 
 - An approved email in `settings/accessControl.approvedEmails`
-- Explicit approval to deploy rules/indexes/hosting from this feature branch
+- CODEX_TEST as the safe QA event
 
-After deployment, verify:
+Current live/private-admin status is deployed. For organizer retest, verify:
 
 1. Approved admin login succeeds
 2. Working Event selection enables registrations, Import Center, Tickets, and Check-In
