@@ -209,7 +209,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - QR camera lookup is active as a private-admin input method; manual ticket-code search remains the fallback
 - No public attendee access, no real AI API, no OAuth, no automatic sending, no Cloud Functions
 
-### Phase 5 Production QA Hardening — In progress on feature branch
+### Phase 5 Production QA Hardening — Complete
 
 - `/qa` private QA Center route added for approved admins
 - CODEX_TEST fixture status and CPB warning displayed
@@ -255,8 +255,8 @@ Communications Pro is active as copy-only tooling. AI Draft Lab is active as a p
 | `/imports` | Phase 3.2 complete locally | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
 | `/tickets` | Phase 4.5 complete locally | Ticket-code assignment, generation, regeneration, and unassignment |
 | `/check-in` | Phase 4.5 complete locally | Search-based door check-in and duplicate prevention |
-| `/qa` | Phase 5 in progress | Private QA Center for CODEX_TEST status, CPB warning, sample CSV, checklist, and fixture verification guidance |
-| `/communications` | Phase 6 boundary | Future guest filtering and message drafts |
+| `/qa` | Phase 5 complete/live | Private QA Center for CODEX_TEST status, CPB warning, sample CSV, checklist, and fixture verification guidance |
+| `/communications` | Phase 11 live | Communications Pro copy-only message preparation and CSV/contact packets; no automatic sending |
 | `/ai-writing` | Redirected/deferred | AI Draft Lab prompt-builder tools live inside Communications; no real AI API |
 | `/settings` | Complete | Firebase and data-model status |
 

@@ -221,8 +221,8 @@ If you experience issues with Google sign-in (e.g., "This account is not approve
 | `/imports` | Phase 3.2 | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
 | `/tickets` | Phase 4.5 | Ticket-code assignment, generation, regeneration, and unassignment |
 | `/check-in` | Phase 4.5 | Search-based door check-in and duplicate prevention |
-| `/qa` | Phase 5 | Private QA Center for CODEX_TEST fixture status, sample CSV, checklist, and read-only health guidance |
-| `/communications` | Phase 6 boundary | Future guest filtering and message drafts |
+| `/qa` | Phase 5 complete/live | Private QA Center for CODEX_TEST fixture status, sample CSV, checklist, and read-only health guidance |
+| `/communications` | Phase 11 live | Communications Pro copy-only message preparation and CSV/contact packets; no automatic sending |
 | `/ai-writing` | Redirected/deferred | AI Draft Lab prompt-builder tools live inside Communications; no real AI API |
 | `/settings` | Complete | Firebase and data-model status |
 
@@ -331,7 +331,7 @@ Event mutations and their audit records use a single Firestore batch. A failed a
 - [x] Loading, error, empty, saving, and success states
 - [x] Responsive mobile cards and desktop table
 - [x] Firestore rules for registrations with check-in fields locked
-- [x] Tickets, check-in, communications, and AI remain phase-boundary only
+- [x] Tickets, check-in, communications, and AI remained phase-boundary only during Phase 3
 - [x] Google Sheets OAuth remains deferred
 - [x] No Cloud Functions, Storage, public registration, or attendee accounts
 
