@@ -111,6 +111,7 @@ Phase 3.2 renames imports to **Import Center** and adds source-specific guidance
 - Check-In supports fast search by name, email, phone, or ticket code, large mobile-first guest cards, payment/ticket/check-in status, and reset for the next guest.
 - Check-in moves `checkedIn` from `false` to `true`, sets `checkInTime`, and writes `checkedInBy`.
 - Duplicate check-in is blocked; an explicit duplicate-attempt audit can be recorded.
+- Undo check-in is available for approved admins where implemented in the UI, requires confirmation, and writes `checkin.undo` in the same batch as the `checkedIn: false` update.
 - QR camera lookup is active as a private-admin input method; search by ticket code remains the fallback.
 
 

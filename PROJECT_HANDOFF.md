@@ -464,9 +464,10 @@ Rules:
 - Raw email and phone are never embedded in generated ticket codes
 - Ticket code must not change unless explicitly regenerated
 - Clear/unassign requires confirmation in the UI
-- Check-in is one-way in this phase; no undo is implemented
-- Duplicate check-in is blocked
-- QR camera lookup is active; search by ticket code remains the fallback
+- Check-in can be completed once; duplicate check-in is blocked
+- Undo check-in is available for approved admins where implemented in the UI
+- Undo check-in requires confirmation and writes `checkin.undo` in the same batch as the `checkedIn: false` update
+- QR camera lookup is active as a private-admin input method; manual ticket-code search remains the fallback
 
 ## 14. Audit log data model
 
@@ -486,7 +487,7 @@ details        map          Action-specific metadata
 ```
 
 Event actions: `event.create`, `event.update`, `event.delete`  
-Registration actions: `registration.create`, `registration.update`, `registration.delete`, `registration.import`, `ticket.assign`, `ticket.unassign`, `ticket.regenerate`, `checkin.complete`, `checkin.duplicate-attempt`
+Registration actions: `registration.create`, `registration.update`, `registration.delete`, `registration.import`, `ticket.assign`, `ticket.unassign`, `ticket.regenerate`, `checkin.complete`, `checkin.undo`, `checkin.duplicate-attempt`
 
 Registration audit examples include `fullName` and, for imports, `sourceRowId`. Event audits include `eventName`.
 
