@@ -2,7 +2,15 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-import { buildRegistrationMetrics, normalizePersonsAttending } from '../src/utils/registrationMetrics.js'
+import {
+  buildEventMetrics,
+  buildRegistrationMetrics,
+  countRegistrationRecords,
+  countTotalGuests,
+  formatRegistrationGuestSummary,
+  getRegistrationGuestSummary,
+  normalizePersonsAttending,
+} from '../src/utils/registrationMetrics.js'
 import { mapRows, parseCSV } from '../src/utils/importUtils.js'
 
 test('shared registration metrics separate registrations from persons attending', () => {
@@ -28,6 +36,24 @@ test('shared registration metrics separate registrations from persons attending'
   assert.equal(metrics.complimentaryPersons, 3)
 })
 
+test('registration and guest count helpers handle empty and missing persons safely', () => {
+  const rows = [
+    { personsAttending: 2 },
+    { personsAttending: null },
+    { personsAttending: undefined },
+    { personsAttending: '3' },
+  ]
+
+  assert.equal(countRegistrationRecords(rows), 4)
+  assert.equal(countTotalGuests(rows), 7)
+  assert.equal(getRegistrationGuestSummary(rows), '4 registrations / 7 guests')
+  assert.equal(getRegistrationGuestSummary([]), '0 registrations / 0 guests')
+  assert.equal(formatRegistrationGuestSummary(1, 1), '1 registration / 1 guest')
+  assert.equal(formatRegistrationGuestSummary(2, 5), '2 registrations / 5 guests')
+  assert.equal(buildEventMetrics(null, rows).eventId, null)
+  assert.equal(buildEventMetrics({ eventId: 'event-1', eventName: 'CODEX_TEST' }, rows).totalPersons, 7)
+})
+
 test('persons attending normalization defaults blanks and blocks invalid imports', () => {
   assert.equal(normalizePersonsAttending(''), 1)
   assert.equal(normalizePersonsAttending('2'), 2)
@@ -44,6 +70,7 @@ test('Dashboard and Check-In use shared count wording and helpers', async () => 
   const checkIn = await readFile('src/pages/CheckInPage.jsx', 'utf8')
 
   assert.match(dashboard, /buildRegistrationMetrics/)
+  assert.match(checkIn, /formatRegistrationGuestSummary/)
   assert.match(dashboard, /Registrations/)
   assert.match(dashboard, /Persons/)
   assert.match(dashboard, /capacity uses persons attending/)

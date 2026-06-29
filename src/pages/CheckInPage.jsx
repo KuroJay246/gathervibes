@@ -23,7 +23,7 @@ import {
 } from '../utils/eventDayUtils'
 import { normalizePaymentStatus } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
-import { buildRegistrationMetrics } from '../utils/registrationMetrics'
+import { buildRegistrationMetrics, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
 import { InfoHint } from '../components/ui/InfoHint'
 
 const CHECK_IN_FILTER_GROUPS = [
@@ -60,10 +60,6 @@ function attendeeNamesText(registration = {}) {
 
 function registrationDisplayName(registration = {}) {
   return attendeeNamesText(registration) || registration.fullName || registration.buyerName || 'Guest'
-}
-
-function guestCountText(registrations, guests) {
-  return `${registrations} registration${registrations === 1 ? '' : 's'} / ${guests} guest${guests === 1 ? '' : 's'}`
 }
 
 function useRegistrations(activeEvent) {
@@ -345,7 +341,7 @@ export function CheckInPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#1E7345]">Event-Day Mode</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Door Check-In / QR Scan</h2>
           <p className="mt-2 text-sm text-[#816D62]">
-            Checking in guests for <strong>{activeEvent.eventName}</strong>. <span className="ml-2 inline-block rounded-full bg-[#E5F3EC] px-2 py-0.5 text-[10px] font-bold tracking-widest text-[#1E7345]">Checked In: {guestCountText(summary.checkedInRegistrations, summary.checkedInPersons)}</span>
+            Checking in guests for <strong>{activeEvent.eventName}</strong>. <span className="ml-2 inline-block rounded-full bg-[#E5F3EC] px-2 py-0.5 text-[10px] font-bold tracking-widest text-[#1E7345]">Checked In: {formatRegistrationGuestSummary(summary.checkedInRegistrations, summary.checkedInPersons)}</span>
           </p>
         </div>
         <div className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-3 text-xs text-[#6B564C]">

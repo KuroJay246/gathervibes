@@ -6,30 +6,86 @@ import { SystemHealthPanel } from '../components/SystemHealthPanel'
 import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeUtils'
 import { ACCESS_ROLES, ROLE_ORDER, listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
 
-const ROADMAP_ITEMS = [
-  ['Phase 14B CPB Payment Audit UI Cleanup / Operations Review Fixes', 'Closed'],
-  ['Phase 15A Hosting Security Headers + Private Indexing', 'Closed'],
-  ['Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update', 'Complete / pending approval'],
-  ['Phase 12A Google Sheets-ready tools', 'Complete'],
-  ['Google Sheets OAuth', 'Deferred'],
-  ['Phase 13A AI Draft Lab', 'Complete / Draft-only'],
-  ['AI writing assistant UI', 'Draft-only'],
-  ['Real AI API integration', 'Deferred'],
-  ['Gmail/Outlook OAuth', 'Deferred'],
-  ['Automatic email sending', 'Deferred'],
-  ['Automatic WhatsApp sending', 'Deferred'],
-  ['Cloud Functions', 'Deferred'],
-  ['Firebase Storage', 'Deferred'],
-  ['Public attendee / baker / school portals', 'Deferred'],
-  ['Public sitemap / JSON-LD for private admin app', 'Deferred'],
-  ['Payment gateway integration', 'Deferred'],
-  ['Native app / app store build', 'Deferred'],
-  ['Firestore-enforced staff roles', 'Future planned'],
-  ['Scanner/check-in-only role enforcement', 'Future planned'],
-  ['Mother/Event Manager simplified view', 'Future planned'],
-  ['Event Operations expansion', 'Future planned'],
-  ['Finance tracker', 'Phase 9 active'],
-  ['Communications Pro', 'Phase 11 copy-only'],
+const ROADMAP_SECTIONS = [
+  {
+    title: '1. Closed / shipped phases',
+    items: [
+      ['Phase 14B CPB Payment Audit UI Cleanup / Operations Review Fixes', 'Closed'],
+      ['Phase 15A Hosting Security Headers + Private Indexing', 'Closed'],
+      ['Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update', 'Closed / merged / deployed'],
+      ['Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening', 'Closed / merged / deployed'],
+      ['Finance tracker', 'Phase 9 active'],
+      ['Communications Pro', 'Phase 11 copy-only'],
+      ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
+    ],
+  },
+  {
+    title: '2. Current active phase',
+    items: [['Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning', 'Active']],
+  },
+  {
+    title: '3. Next recommended phase',
+    items: [['Phase 17B Firestore-enforced staff/worker role design', 'Recommended next']],
+  },
+  {
+    title: '4. High-priority operational backlog',
+    items: [
+      ['Clean-account route smoke path for every future feature', 'Required standard'],
+      ['Registration/guest count wording consistency', 'Phase 17A review'],
+      ['CODEX_TEST-only QA workflows', 'Ongoing'],
+    ],
+  },
+  {
+    title: '5. Access / staff / worker permissions backlog',
+    items: [
+      ['Firestore-enforced staff roles', 'Future planned'],
+      ['Scanner/check-in-only role enforcement', 'Future planned'],
+      ['Event manager role', 'Future planned'],
+      ['Viewer/read-only role', 'Future planned'],
+      ['Operations helper role', 'Future planned'],
+      ['Mother/Event Manager simplified view', 'Future planned'],
+    ],
+  },
+  {
+    title: '6. Event Operations backlog',
+    items: [['Event Operations expansion', 'Future planned']],
+  },
+  {
+    title: '7. QA / reliability backlog',
+    items: [
+      ['Clean/new approved account regression checks', 'Required standard'],
+      ['No selected Working Event regression checks', 'Required standard'],
+      ['AppErrorBoundary fallback should not appear on normal protected routes', 'Required standard'],
+    ],
+  },
+  {
+    title: '8. Deferred integrations',
+    items: [
+      ['Google Sheets OAuth', 'Deferred'],
+      ['Real AI API integration', 'Deferred'],
+      ['Gmail/Outlook OAuth', 'Deferred'],
+      ['Automatic email sending', 'Deferred'],
+      ['Automatic WhatsApp sending', 'Deferred'],
+      ['Cloud Functions', 'Deferred'],
+      ['Firebase Storage', 'Deferred'],
+      ['Payment gateway integration', 'Deferred'],
+    ],
+  },
+  {
+    title: '9. Public portals / native app / future long-term ideas',
+    items: [
+      ['Public attendee / baker / school portals', 'Deferred'],
+      ['Native app / app store build', 'Deferred'],
+    ],
+  },
+  {
+    title: '10. Explicitly not implemented / out of scope',
+    items: [
+      ['Public sitemap / JSON-LD for private admin app', 'Out of scope'],
+      ['Public signup or guest accounts', 'Out of scope'],
+      ['CPB use for QA', 'Out of scope'],
+    ],
+  },
 ]
 
 const EVENT_OPERATIONS_BACKLOG = [
@@ -114,7 +170,7 @@ export function SettingsPage() {
 
       <SettingsSection eyebrow="Admin Access" title="Private access controls">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Roles currently control the admin interface display. Firestore access is still enforced by the approved-admin email allowlist. Full rules-level staff restrictions are planned for a future phase.
+          Roles currently control the admin interface display. Approved-admin allowlist is active Firestore enforcement. Firestore access is still enforced by the approved-admin email allowlist. Staff/scanner roles are planned and not rules-enforced yet. Do not add helpers or scanners to approvedEmails unless admin-level access is acceptable.
         </div>
 
         <div className="mt-4 grid gap-3">
@@ -209,11 +265,18 @@ export function SettingsPage() {
       </SettingsSection>
 
       <SettingsSection eyebrow="Deferred Features / Roadmap" title="Backlog visibility">
-        <div className="grid gap-3">
-          {ROADMAP_ITEMS.map(([label, status]) => (
-            <div key={label} className="flex items-center justify-between gap-3 rounded-2xl border border-[#EFE2DA] p-4">
-              <p className="text-sm font-bold text-[#2B1723]">{label}</p>
-              <span className="rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{status}</span>
+        <div className="grid gap-5">
+          {ROADMAP_SECTIONS.map((section) => (
+            <div key={section.title} className="rounded-2xl border border-[#EFE2DA] p-4">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#A48A7B]">{section.title}</p>
+              <div className="mt-3 grid gap-2">
+                {section.items.map(([label, status]) => (
+                  <div key={label} className="flex items-center justify-between gap-3 rounded-xl bg-[#FBF8F5] px-3 py-2">
+                    <p className="text-sm font-bold text-[#2B1723]">{label}</p>
+                    <span className="rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{status}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>

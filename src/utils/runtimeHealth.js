@@ -109,6 +109,11 @@ export function buildRuntimeHealthItems({
       detail: 'Real AI API, Gmail/Outlook OAuth, Google Sheets OAuth, Cloud Functions, Storage, public portals, payment gateways, native apps, sitemap, and JSON-LD are not enabled.',
     },
     {
+      label: 'Backlog visibility order',
+      status: 'ok',
+      detail: 'Closed, current, next, operational, access/staff, Event Operations, QA/reliability, deferred, long-term, and out-of-scope items are separated.',
+    },
+    {
       label: 'Communications Pro safety',
       status: 'ok',
       detail: 'Communications remain copy-only. No email, WhatsApp, OAuth, AI, or automatic sending is enabled.',

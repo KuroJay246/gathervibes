@@ -21,7 +21,7 @@ import { ExportModal } from '../components/registrations/ExportModal'
 import { RegistrationFilters } from '../components/registrations/RegistrationFilters'
 import { InfoHint } from '../components/ui/InfoHint'
 import { Link } from 'react-router-dom'
-import { buildRegistrationMetrics } from '../utils/registrationMetrics'
+import { buildRegistrationMetrics, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
 import { formatPaymentLabel, paymentStatusMatches } from '../utils/paymentStatus'
 import {
   buildFinanceSummary,
@@ -47,12 +47,6 @@ function attendeeNamesText(registration = {}) {
 function personsLabel(registration = {}) {
   const persons = Number(registration.personsAttending) || 1
   return persons > 1 ? `Group of ${persons}` : '1 guest'
-}
-
-function guestSummary(registrations, guests) {
-  const registrationText = `${registrations} registration${registrations === 1 ? '' : 's'}`
-  const guestText = `${guests} guest${guests === 1 ? '' : 's'}`
-  return `${registrationText} / ${guestText}`
 }
 
 function registrationNeedsReview(registration = {}, event = {}) {
@@ -373,18 +367,18 @@ export function RegistrationsPage() {
         {[
           { label: 'Total Registrations', value: allMetrics.totalRegistrations, help: 'Registration records for this Working Event.', key: '' },
           { label: 'Total Guests', value: allMetrics.totalPersons, help: 'Guests represented by those registrations, including groups.', key: '' },
-          { label: 'Paid', value: guestSummary(allMetrics.paidRegistrations, allMetrics.paidPersons), help: 'Registrations marked paid.', tab: 'Paid' },
-          { label: 'Pending', value: guestSummary(allMetrics.pendingRegistrations, allMetrics.pendingPersons), help: 'Registrations still pending payment review or collection.', tab: 'Pending' },
-          { label: 'Complimentary', value: guestSummary(allMetrics.complimentaryRegistrations, allMetrics.complimentaryPersons), help: 'Registrations marked complimentary.', tab: 'Complimentary' },
-          { label: 'Door Paid', value: guestSummary(allMetrics.doorRegistrations, allMetrics.doorPersons), help: 'Paid at door or late payment confirmed.', tab: 'Door Paid', card: 'door' },
+          { label: 'Paid', value: formatRegistrationGuestSummary(allMetrics.paidRegistrations, allMetrics.paidPersons), help: 'Registrations marked paid.', tab: 'Paid' },
+          { label: 'Pending', value: formatRegistrationGuestSummary(allMetrics.pendingRegistrations, allMetrics.pendingPersons), help: 'Registrations still pending payment review or collection.', tab: 'Pending' },
+          { label: 'Complimentary', value: formatRegistrationGuestSummary(allMetrics.complimentaryRegistrations, allMetrics.complimentaryPersons), help: 'Registrations marked complimentary.', tab: 'Complimentary' },
+          { label: 'Door Paid', value: formatRegistrationGuestSummary(allMetrics.doorRegistrations, allMetrics.doorPersons), help: 'Paid at door or late payment confirmed.', tab: 'Door Paid', card: 'door' },
           { label: 'Ticket Expected Revenue', value: formatCurrency(financeSummary.totalExpected), help: 'Ticket totals from explicit ticket price or amount due only.' },
           { label: 'Collected', value: formatCurrency(financeSummary.totalCollected), help: 'Confirmed amountPaid across registrations.' },
           { label: 'Outstanding Balance', value: formatCurrency(financeSummary.totalOutstanding), help: 'Click to see rows with balance due.', tab: 'Outstanding Balance', card: 'outstanding' },
           { label: 'To Pay at Door', value: formatCurrency(financeSummary.doorTotal), help: 'Expected door balances, not confirmed paid.', tab: 'To Pay at Door', card: 'door-list' },
           { label: 'Complimentary Value', value: formatCurrency(financeSummary.complimentaryValue), help: 'Value of complimentary tickets when prices are explicit.' },
           { label: 'Finance Review', value: financeSummary.financeWarningCount, help: 'Click to see registrations needing finance review.', card: 'finance-warning' },
-          { label: 'Checked In', value: guestSummary(allMetrics.checkedInRegistrations, allMetrics.checkedInPersons), help: 'Checked-in registrations and guests represented.', card: 'checked-in' },
-          { label: 'Not Checked In', value: guestSummary(allMetrics.remainingRegistrations, allMetrics.remainingPersons), help: 'Registrations and guests not checked in yet.', card: 'not-checked-in' },
+          { label: 'Checked In', value: formatRegistrationGuestSummary(allMetrics.checkedInRegistrations, allMetrics.checkedInPersons), help: 'Checked-in registrations and guests represented.', card: 'checked-in' },
+          { label: 'Not Checked In', value: formatRegistrationGuestSummary(allMetrics.remainingRegistrations, allMetrics.remainingPersons), help: 'Registrations and guests not checked in yet.', card: 'not-checked-in' },
           { label: 'Missing Ticket Code', value: allMetrics.missingTicketRegistrations, help: 'Registrations with no ticket code assigned.', tab: 'Missing Ticket Code', card: 'missing-ticket' },
           { label: 'Needs Review', value: registrations.filter((reg) => registrationNeedsReview(reg, activeEvent)).length, help: 'Registrations with finance review, ticket review, or missing ticket information.', tab: 'Needs Review', card: 'review-needed' },
           { label: 'Selected Registrations', value: selectedIds.size, help: 'Registrations currently selected for bulk actions.' },

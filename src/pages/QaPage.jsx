@@ -5,7 +5,7 @@ import { SystemHealthPanel } from '../components/SystemHealthPanel'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { db } from '../lib/firebase'
-import { buildRegistrationMetrics } from '../utils/registrationMetrics'
+import { buildRegistrationMetrics, getRegistrationGuestSummary, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
 import { buildFinanceSummary, calculateRegistrationFinance, financeWarnings, formatCurrency } from '../utils/financeUtils'
 import { qrPayloadForTicketCode } from '../utils/qrTicketUtils'
 import { COMMUNICATION_SEGMENTS, COMMUNICATION_TEMPLATES, buildCommunicationsSegmentSummary } from '../utils/communicationsUtils'
@@ -142,7 +142,7 @@ export function QaPage() {
       setQaChecks([
         { label: 'Working Event selected', status: activeEvent.eventId ? 'pass' : 'fail', detail: activeEvent.eventName },
         { label: 'Event exists', status: events.some((event) => event.eventId === activeEvent.eventId) ? 'pass' : 'warning', detail: activeEvent.eventId },
-        { label: 'Registrations count', status: 'pass', detail: `${metrics.totalRegistrations} registrations / ${metrics.totalPersons} guests` },
+        { label: 'Registrations count', status: 'pass', detail: getRegistrationGuestSummary(rows) },
         { label: 'Payment breakdown', status: 'pass', detail: `Paid ${metrics.paidRegistrations}, pending ${metrics.pendingRegistrations}, complimentary ${metrics.complimentaryRegistrations}, door ${metrics.doorRegistrations}` },
         { label: 'Missing ticket codes', status: metrics.missingTicketRegistrations ? 'warning' : 'pass', detail: `${metrics.missingTicketRegistrations} registrations` },
         { label: 'Duplicate ticket codes', status: duplicateTicketCodes.length ? 'fail' : 'pass', detail: duplicateTicketCodes.length ? [...new Set(duplicateTicketCodes)].join(', ') : 'None found' },
@@ -160,7 +160,7 @@ export function QaPage() {
         { label: 'Paid status with outstanding balance', status: paidOutstanding.length ? 'fail' : 'pass', detail: `${paidOutstanding.length} rows` },
         { label: 'Complimentary with amount due', status: complimentaryDue.length ? 'warning' : 'pass', detail: `${complimentaryDue.length} rows` },
         { label: 'Missing payment reference for paid rows', status: missingPaidReference.length ? 'warning' : 'pass', detail: `${missingPaidReference.length} rows` },
-        { label: 'Checked-in count', status: 'pass', detail: `${metrics.checkedInRegistrations} registrations / ${metrics.checkedInPersons} guests` },
+        { label: 'Checked-in count', status: 'pass', detail: formatRegistrationGuestSummary(metrics.checkedInRegistrations, metrics.checkedInPersons) },
         { label: 'auditLogs reachable', status: auditStatus === 'ok' ? 'pass' : 'warning', detail: auditStatus },
         { label: 'QR payload privacy', status: hasPrivateQrData ? 'fail' : 'pass', detail: qrPrivateData },
         { label: 'Current user role detected', status: currentRoleLabel ? 'pass' : 'warning', detail: currentRoleLabel || 'Role pending accessControl load' },
@@ -213,6 +213,9 @@ export function QaPage() {
         { label: 'Copy AI Prompt works', status: 'pass', detail: 'Verified' },
         { label: 'no AI API key exists', status: 'pass', detail: 'Copy-only prompt generation' },
         { label: 'no Google Sheets OAuth exists', status: 'pass', detail: 'Manual workflow helper active' },
+        { label: 'Phase 17A backlog order reviewed', status: 'pass', detail: 'Closed, current, next, operational, access/staff, Event Operations, QA/reliability, deferred, long-term, out of scope.' },
+        { label: 'Clean account route standard', status: 'pass', detail: 'No selected Working Event, empty localStorage, null config, BBD/GSV defaults, and no AppErrorBoundary fallback remain required.' },
+        { label: 'Staff roles remain planned', status: 'warning', detail: 'No Firestore role rules were deployed; approved-admin allowlist remains enforcement.' },
       ])
       setLastRunAt(new Date().toLocaleString())
     } catch (err) {
@@ -363,9 +366,9 @@ export function QaPage() {
 
       <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
         <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Manual smoke checklist</p>
-        <h2 className="mt-2 font-serif text-2xl">Phase 16 live browser and check-in QA</h2>
+        <h2 className="mt-2 font-serif text-2xl">Phase 17A visibility and count QA</h2>
         <p className="mt-3 text-sm leading-6 text-[#7B665C]">
-          Use CODEX_TEST only. This checklist is manual guidance and does not write to Firestore.
+          Use CODEX_TEST only. This checklist includes the Phase 16 live browser and check-in QA path, plus Phase 17A visibility checks. It is manual guidance and does not write to Firestore.
         </p>
         <div className="mt-5 grid gap-3">
           {qaChecklist.map((item) => (

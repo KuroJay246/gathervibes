@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 29, 2026 (Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
+Last updated: June 29, 2026 (Phase 17A active; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
 
 ## 1. Project overview
 
@@ -27,12 +27,32 @@ The repository currently contains:
 - Phase 15A: Hosting Security Headers + Private Indexing, deployed live.
 - Phase 15B: XLSX dependency security review plus roadmap/access/Event Operations status cleanup — closed, merged, and deployed.
 - Phase 16: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — closed, merged, and deployed.
+- Phase 17A: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — active correction/planning phase.
 
 Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner roles remain UI/display foundation only; Firestore access is still enforced by the approved-admin email allowlist until a future rules-level role phase.
 
 Phase 16 investigated live browser loading differences across devices, kept the Phase 15A security headers intact, added a safe root loading error fallback, expanded QA Center guidance for CODEX_TEST ticket/check-in retesting, and hardened clean-account/null-config route loading. It did not add public portals, automatic sending, real AI API calls, Cloud Functions, Storage, or Firestore rule changes.
 
 Permanent clean-account engineering standard: all future features must support clean/new approved account state, no selected Working Event, stale or empty localStorage, null or missing event config, null or missing currency with `BBD` fallback, null or missing ticket prefix with `GSV` fallback, null or missing `priceTiers` with `[]` fallback, and all protected routes rendering without the AppErrorBoundary fallback.
+
+Phase 17A is not a rules or access-broadening phase. It reorganizes backlog visibility, audits registration/guest count wording, preserves clean-account behavior, and prepares a Phase 17B staff/worker access plan without implementing Firestore role rules.
+
+Backlog/status visibility order:
+
+1. Closed / shipped phases
+2. Current active phase
+3. Next recommended phase
+4. High-priority operational backlog
+5. Access / staff / worker permissions backlog
+6. Event Operations backlog
+7. QA / reliability backlog
+8. Deferred integrations
+9. Public portals / native app / future long-term ideas
+10. Explicitly not implemented / out of scope
+
+Registration/guest count standard: registrations are registration records; guests are the sum of `personsAttending` across those records. One registration can represent more than one guest. If no Working Event is selected, routes must show a no-selected-event state instead of stale counts.
+
+Phase 17B staff access plan: future roles should include owner/admin, event manager, scanner/check-in-only, viewer/read-only, and operations helper. Scanner/check-in-only must be restricted to assigned event lookup/check-in and must not have Events CRUD, registration delete, import apply, finance/operations ledger edits, settings/accessControl edits, auditLog delete/update, or broad CPB access unless explicitly assigned. The current `settings/accessControl` approved-admin allowlist remains the real enforcement boundary. Possible future collections include `staffProfiles` and `eventStaffAssignments`; role restrictions must be enforced by Firestore rules, not only UI navigation.
 
 ## Production QA fixture
 
@@ -687,9 +707,9 @@ Registration, import, ticket, and check-in writes include an audit log entry in 
 
 ## 23. Recommended next phase
 
-After Phase 16 closeout, the next implementation phase should stay narrow and preserve the clean-account engineering standard:
+After Phase 17A, the next implementation phase should stay narrow and preserve the clean-account engineering standard:
 
-- Treat clean/new approved accounts as a required smoke path for every protected route
+- Phase 17B: design and test Firestore-enforced staff/worker roles without broadening access prematurely
 - Keep automatic sending and real AI API deferred
 
 Phase boundaries remain:

@@ -122,7 +122,8 @@ test('old internal labels are removed while roadmap backlog remains visible', as
   }
 
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
-  assert.match(settings, /AI writing/)
+  assert.match(settings, /Phase 13A AI Draft Lab/)
+  assert.match(settings, /Complete \/ draft-only/)
   assert.match(settings, /Finance tracker/)
   assert.match(settings, /Phase 9 active/)
 })
