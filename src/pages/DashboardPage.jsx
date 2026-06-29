@@ -122,6 +122,7 @@ export function DashboardPage() {
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedFull), [registrations, selectedFull])
   const operationsTotals = useMemo(() => buildOperationsTotals(operationsEntries), [operationsEntries])
   const capacityPct = metrics.capacityPercent
+  const currencyLabel = selectedFull?.currency ? financeSummary.currency : 'BBD default'
 
   // Price tiers for selected event
   const priceTiers = selectedFull?.priceTiers
@@ -245,16 +246,19 @@ export function DashboardPage() {
                 )}
 
                 <div className="mb-5 rounded-2xl border border-[#EEDFD6] bg-[#FBF8F5] p-4">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Finance Snapshot</p>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Finance Snapshot</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">Currency: {currencyLabel}</p>
+                  </div>
                   <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
                     {[
-                      ['Ticket expected revenue', formatCurrency(financeSummary.totalExpected)],
-                      ['Ticket collected', formatCurrency(financeSummary.totalCollected)],
-                      ['Ticket outstanding', formatCurrency(financeSummary.totalOutstanding)],
-                      ['Sponsor/other income', formatCurrency(operationsTotals.income)],
-                      ['Expenses', formatCurrency(operationsTotals.expenses)],
-                      ['Refunds/adjustments', formatCurrency(operationsTotals.refunds + operationsTotals.adjustments)],
-                      ['Net event position', formatCurrency(financeSummary.totalCollected + operationsTotals.income + operationsTotals.adjustments - operationsTotals.expenses - operationsTotals.refunds)],
+                      ['Ticket expected revenue', formatCurrency(financeSummary.totalExpected, financeSummary.currency)],
+                      ['Ticket collected', formatCurrency(financeSummary.totalCollected, financeSummary.currency)],
+                      ['Ticket outstanding', formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)],
+                      ['Sponsor/other income', formatCurrency(operationsTotals.income, financeSummary.currency)],
+                      ['Expenses', formatCurrency(operationsTotals.expenses, financeSummary.currency)],
+                      ['Refunds/adjustments', formatCurrency(operationsTotals.refunds + operationsTotals.adjustments, financeSummary.currency)],
+                      ['Net event position', formatCurrency(financeSummary.totalCollected + operationsTotals.income + operationsTotals.adjustments - operationsTotals.expenses - operationsTotals.refunds, financeSummary.currency)],
                       ['Finance warnings', financeSummary.financeWarningCount],
                     ].map(([label, value]) => (
                       <div key={label} className="rounded-xl bg-white px-3 py-2">
@@ -278,11 +282,14 @@ export function DashboardPage() {
                           {tier.name === 'Complimentary' ? <Gift className="size-3" /> : null}
                           {tier.name}
                           <span className="opacity-60">·</span>
-                          {tier.price === 0 ? 'Free' : `$${tier.price}`}
+                          {Number(tier.price) === 0 ? 'Free' : formatCurrency(tier.price, financeSummary.currency)}
                         </span>
                       ))}
                     </div>
                   </div>
+                )}
+                {(!Array.isArray(priceTiers) || priceTiers.length === 0) && (
+                  <p className="mb-5 text-[11px] leading-5 text-[#8A7468]">No pricing configured for this Working Event.</p>
                 )}
 
                 <p className="mb-5 text-[11px] leading-5 text-[#8A7468]">
@@ -295,7 +302,7 @@ export function DashboardPage() {
               </>
             ) : (
               <p className="text-xs leading-5 text-[#8A7468]">
-                Select an event from the <Link to="/events" className="font-bold text-[#B76E79]">Events page</Link> to see its registrations, capacity, and price tiers here.
+                No selected Working Event. Select an event from the <Link to="/events" className="font-bold text-[#B76E79]">Events page</Link> to see its registrations, capacity, and price tiers here.
               </p>
             )}
           </article>

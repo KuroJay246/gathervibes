@@ -34,6 +34,15 @@ export const DEFAULT_FINANCE_SETTINGS = {
   showFinanceWarnings: true,
 }
 
+export function normalizeCurrency(value) {
+  const code = String(value || '').trim().toUpperCase()
+  return /^[A-Z]{3}$/.test(code) ? code : DEFAULT_CURRENCY
+}
+
+export function getCurrencyCode(configOrEvent = {}) {
+  return normalizeCurrency(configOrEvent?.currency)
+}
+
 function roundMoney(value) {
   return Math.round((Number(value) + Number.EPSILON) * 100) / 100
 }
@@ -66,7 +75,7 @@ export function formatPaymentMethod(value) {
 
 export function formatCurrency(value, currency = DEFAULT_CURRENCY) {
   const amount = Number.isFinite(Number(value)) ? Number(value) : 0
-  return `${currency} $${roundMoney(amount).toFixed(2)}`
+  return `${normalizeCurrency(currency)} $${roundMoney(amount).toFixed(2)}`
 }
 
 export function defaultTicketPriceForEvent(event = {}) {
@@ -102,7 +111,7 @@ export function calculateRegistrationFinance(registration = {}, event = {}) {
   const needsFinanceReview = amountDue === null || explicitTicketPrice === null
 
   return {
-    currency: registration.currency || event.currency || DEFAULT_CURRENCY,
+    currency: normalizeCurrency(registration.currency || event.currency),
     priceTier: registration.priceTier || event.defaultPriceTier || DEFAULT_FINANCE_SETTINGS.defaultPriceTier,
     ticketPrice: explicitTicketPrice,
     personsAttending: persons,
@@ -149,7 +158,10 @@ export function financeWarnings(registration = {}, event = {}, options = {}) {
 }
 
 export function buildFinanceSummary(registrations = [], event = {}) {
-  return registrations.reduce((summary, registration) => {
+  const rows = Array.isArray(registrations) ? registrations : []
+  const safeEvent = event && typeof event === 'object' ? event : {}
+
+  return rows.reduce((summary, registration) => {
     const finance = calculateRegistrationFinance(registration, event)
     const persons = finance.personsAttending
     const due = finance.amountDue || 0
@@ -191,7 +203,7 @@ export function buildFinanceSummary(registrations = [], event = {}) {
 
     return summary
   }, {
-    currency: event.currency || DEFAULT_CURRENCY,
+    currency: getCurrencyCode(safeEvent),
     totalExpected: 0,
     totalCollected: 0,
     totalOutstanding: 0,
