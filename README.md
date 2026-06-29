@@ -22,7 +22,7 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 - [x] **Phase 15A**: Hosting Security Headers + Private Indexing
 - [x] **Phase 15B**: XLSX Dependency Security Review + Roadmap/Access/Ops Update — closed, merged, and deployed
 - [x] **Phase 16**: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — closed, merged, and deployed
-- [ ] **Phase 17A**: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — active
+- [x] **Phase 17A**: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — closed, merged, and deployed
 
 Phase 3.2 completed the **Import Center** rename and source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files; it was later deployed. Phase 4.5 completed controlled ticket assignment and search-based door check-in; it was later deployed. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. Phase 16 focused on live browser loading diagnostics and CODEX_TEST ticket/check-in QA hardening, then closed after merge and deployment. QR camera scanning, Communications Pro, AI Draft Lab, Event Operations, and Phase 15A security headers are live. Real AI API integration, Google Sheets OAuth, Gmail/Outlook OAuth, automatic email/WhatsApp sending, Cloud Functions, Storage, public attendee/baker/school portals, payment gateway integration, public sitemap/JSON-LD for this private admin app, and native app store builds remain deferred.
 
@@ -39,9 +39,9 @@ Phase 3.2 completed the **Import Center** rename and source-specific guidance fo
 
 All future features must support clean/new approved account state, no selected Working Event, stale or empty localStorage, null or missing event config, null or missing currency with `BBD` fallback, null or missing ticket prefix with `GSV` fallback, null or missing `priceTiers` with `[]` fallback, and all protected routes rendering without the AppErrorBoundary fallback.
 
-## Phase 17A status
+## Phase 17A closed status
 
-Phase 17A is active. It is a correction and planning phase for backlog visibility, registration/guest count wording, clean-account standards, and future staff access planning. It does not add staff/scanner Firestore access, broaden rules, modify CPB, create CPB registrations, delete audit logs, change QR payloads, or add dependencies.
+Phase 17A is closed, merged, and deployed. It was a correction and planning phase for backlog visibility, registration/guest count wording, clean-account standards, and future staff access planning. It did not add staff/scanner Firestore access, broaden rules, modify CPB, create CPB registrations, delete audit logs, change QR payloads, or add dependencies.
 
 Backlog/status visibility must appear in this order wherever roadmap content is shown:
 

@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 29, 2026 (Phase 17A active; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
+Last updated: June 29, 2026 (Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
 
 ## 1. Project overview
 
@@ -27,7 +27,7 @@ The repository currently contains:
 - Phase 15A: Hosting Security Headers + Private Indexing, deployed live.
 - Phase 15B: XLSX dependency security review plus roadmap/access/Event Operations status cleanup — closed, merged, and deployed.
 - Phase 16: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — closed, merged, and deployed.
-- Phase 17A: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — active correction/planning phase.
+- Phase 17A: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — closed, merged, and deployed.
 
 Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner roles remain UI/display foundation only; Firestore access is still enforced by the approved-admin email allowlist until a future rules-level role phase.
 
@@ -35,7 +35,7 @@ Phase 16 investigated live browser loading differences across devices, kept the 
 
 Permanent clean-account engineering standard: all future features must support clean/new approved account state, no selected Working Event, stale or empty localStorage, null or missing event config, null or missing currency with `BBD` fallback, null or missing ticket prefix with `GSV` fallback, null or missing `priceTiers` with `[]` fallback, and all protected routes rendering without the AppErrorBoundary fallback.
 
-Phase 17A is not a rules or access-broadening phase. It reorganizes backlog visibility, audits registration/guest count wording, preserves clean-account behavior, and prepares a Phase 17B staff/worker access plan without implementing Firestore role rules.
+Phase 17A was not a rules or access-broadening phase. It reorganized backlog visibility, audited registration/guest count wording, preserved clean-account behavior, and prepared a Phase 17B staff/worker access plan without implementing Firestore role rules.
 
 Backlog/status visibility order:
 
