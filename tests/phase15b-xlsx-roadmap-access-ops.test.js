@@ -30,14 +30,28 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
   assert.match(importsPage, /No Firestore write happens until you confirm valid rows/)
 })
 
-test('roadmap shows closed Phase 14B and 15A, merged/deployed 15B docs, deferred integrations, and future ops backlog', async () => {
+test('roadmap shows ordered Phase 17A backlog, closed shipped phases, deferred integrations, and future ops backlog', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const readme = await readFile('README.md', 'utf8')
+  const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
 
   for (const text of [
+    '1. Closed / shipped phases',
+    '2. Current active phase',
+    '3. Next recommended phase',
+    '4. High-priority operational backlog',
+    '5. Access / staff / worker permissions backlog',
+    '6. Event Operations backlog',
+    '7. QA / reliability backlog',
+    '8. Deferred integrations',
+    '9. Public portals / native app / future long-term ideas',
+    '10. Explicitly not implemented / out of scope',
     'Phase 14B CPB Payment Audit UI Cleanup / Operations Review Fixes',
     'Phase 15A Hosting Security Headers + Private Indexing',
     'Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update',
+    'Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening',
+    'Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning',
+    'Phase 17B Firestore-enforced staff/worker role design',
     'Google Sheets OAuth',
     'Gmail/Outlook OAuth',
     'Real AI API integration',
@@ -54,12 +68,28 @@ test('roadmap shows closed Phase 14B and 15A, merged/deployed 15B docs, deferred
     assert.match(settings, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
+  for (const text of [
+    'Closed / shipped phases',
+    'Current active phase',
+    'Next recommended phase',
+    'High-priority operational backlog',
+    'Access / staff / worker permissions backlog',
+    'Event Operations backlog',
+    'QA / reliability backlog',
+    'Deferred integrations',
+    'Public portals / native app / future long-term ideas',
+    'Explicitly not implemented / out of scope',
+  ]) {
+    assert.match(`${readme}\n${handoff}`, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  }
+
   assert.match(readme, /Phase 15B status/)
   assert.match(readme, /closed, merged, and deployed/)
-  assert.match(settings, /Complete \/ pending approval/)
+  assert.doesNotMatch(settings, /Complete \/ pending approval/)
   assert.match(readme, /public sitemap\/JSON-LD/)
   assert.match(readme, /budget\/expense reporting/)
   assert.match(readme, /event-day run sheet/)
+  assert.match(handoff, /Phase 17B staff access plan/)
 })
 
 test('private access status does not overclaim Firestore role enforcement', async () => {

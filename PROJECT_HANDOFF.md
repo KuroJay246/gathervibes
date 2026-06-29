@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 29, 2026 (Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
+Last updated: June 29, 2026 (Phase 17A active; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
 
 ## 1. Project overview
 
@@ -27,12 +27,32 @@ The repository currently contains:
 - Phase 15A: Hosting Security Headers + Private Indexing, deployed live.
 - Phase 15B: XLSX dependency security review plus roadmap/access/Event Operations status cleanup — closed, merged, and deployed.
 - Phase 16: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — closed, merged, and deployed.
+- Phase 17A: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — active correction/planning phase.
 
 Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner roles remain UI/display foundation only; Firestore access is still enforced by the approved-admin email allowlist until a future rules-level role phase.
 
 Phase 16 investigated live browser loading differences across devices, kept the Phase 15A security headers intact, added a safe root loading error fallback, expanded QA Center guidance for CODEX_TEST ticket/check-in retesting, and hardened clean-account/null-config route loading. It did not add public portals, automatic sending, real AI API calls, Cloud Functions, Storage, or Firestore rule changes.
 
 Permanent clean-account engineering standard: all future features must support clean/new approved account state, no selected Working Event, stale or empty localStorage, null or missing event config, null or missing currency with `BBD` fallback, null or missing ticket prefix with `GSV` fallback, null or missing `priceTiers` with `[]` fallback, and all protected routes rendering without the AppErrorBoundary fallback.
+
+Phase 17A is not a rules or access-broadening phase. It reorganizes backlog visibility, audits registration/guest count wording, preserves clean-account behavior, and prepares a Phase 17B staff/worker access plan without implementing Firestore role rules.
+
+Backlog/status visibility order:
+
+1. Closed / shipped phases
+2. Current active phase
+3. Next recommended phase
+4. High-priority operational backlog
+5. Access / staff / worker permissions backlog
+6. Event Operations backlog
+7. QA / reliability backlog
+8. Deferred integrations
+9. Public portals / native app / future long-term ideas
+10. Explicitly not implemented / out of scope
+
+Registration/guest count standard: registrations are registration records; guests are the sum of `personsAttending` across those records. One registration can represent more than one guest. If no Working Event is selected, routes must show a no-selected-event state instead of stale counts.
+
+Phase 17B staff access plan: future roles should include owner/admin, event manager, scanner/check-in-only, viewer/read-only, and operations helper. Scanner/check-in-only must be restricted to assigned event lookup/check-in and must not have Events CRUD, registration delete, import apply, finance/operations ledger edits, settings/accessControl edits, auditLog delete/update, or broad CPB access unless explicitly assigned. The current `settings/accessControl` approved-admin allowlist remains the real enforcement boundary. Possible future collections include `staffProfiles` and `eventStaffAssignments`; role restrictions must be enforced by Firestore rules, not only UI navigation.
 
 ## Production QA fixture
 
@@ -182,7 +202,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - Google Sheets OAuth: remains deferred
 - 52/52 tests pass; 0 lint errors; build clean
 
-### Phase 3.2 Import Center — Complete locally
+### Phase 3.2 Import Center — Completed and later deployed
 
 - `/imports` renamed **Import Center** in navigation, dashboard entry points, and page heading
 - Source selector added for Google Forms CSV, Google Sheets CSV, Excel/XLSX, pasted table text, bank/payment CSV, and custom files
@@ -193,7 +213,7 @@ Important dependency versions are recorded in `package.json` and locked in `pack
 - XLSX upload is active. Workbooks are parsed with `read-excel-file/browser`, multiple sheets show a selector, formulas are not executed, and rows still go through map -> preview -> confirm before Firestore writes
 - Google Sheets OAuth remains deferred
 
-### Phase 4.5 Ticketing + Door Check-In foundation — Complete locally
+### Phase 4.5 Ticketing + Door Check-In foundation — Completed and later deployed
 
 - `/tickets` route is live for approved admins
 - Tickets page requires a selected Working Event
@@ -257,11 +277,12 @@ Communications Pro is active as copy-only tooling. AI Draft Lab is active as a p
 | `/dashboard` | Complete | Secure workspace and selected-event context |
 | `/events` | Complete | Firestore event CRUD and active-event selection |
 | `/registrations` | Phase 3 complete | Registration CRUD for the active event |
-| `/imports` | Phase 3.2 complete locally | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
-| `/tickets` | Phase 4.5 complete locally | Ticket-code assignment, generation, regeneration, and unassignment |
-| `/check-in` | Phase 4.5 complete locally | Search-based door check-in and duplicate prevention |
-| `/qa` | Phase 5 complete/live | Private QA Center for CODEX_TEST status, CPB warning, sample CSV, checklist, and fixture verification guidance |
-| `/communications` | Phase 11 live | Communications Pro copy-only message preparation and CSV/contact packets; no automatic sending |
+| `/imports` | Live/private-admin | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
+| `/tickets` | Live/private-admin | Ticket-code assignment, generation, regeneration, and unassignment |
+| `/check-in` | Live/private-admin | Search-based door check-in and duplicate prevention |
+| `/qa` | Live/private-admin | Private QA Center for CODEX_TEST status, CPB warning, sample CSV, checklist, and fixture verification guidance |
+| `/communications` | Live/private-admin | Communications Pro copy-only message preparation and CSV/contact packets; no automatic sending |
+| `/operations` | Live/private-admin | Event Operations Ledger for private-admin operational entries separate from ticket sales |
 | `/ai-writing` | Redirected/deferred | AI Draft Lab prompt-builder tools live inside Communications; no real AI API |
 | `/settings` | Complete | Firebase and data-model status |
 
@@ -634,24 +655,24 @@ Unit tests now cover:
 - Ticket/check-in audit action coverage
 - Firestore rules text coverage for ticket/check-in fields and closed future collections
 
-### Phase 3.2 / Phase 4.5 local verification
+### Phase 3.2 / Phase 4.5 historical local verification before deployment
 
 - ESLint: 0 errors
 - Unit tests: 65/65 passing
 - Production Vite build: clean
 - Firestore rules dry-run compile: passed for project `gathervibeshub`
-- Deployment: not run; explicit approval required
+- Deployment at that historical checkpoint: not run yet; explicit approval was required before the later live deployment.
 - No service account JSON, private key, `.pem`, `.key`, or `.env.local` staged
 - Service worker still has no fetch handler and does not cache private admin data
 
-## 21. Remaining live testing limitations
+## 21. Organizer live retest checklist
 
-Live Firebase testing for this branch still requires:
+Live Firebase retesting should use:
 
 - An approved email in `settings/accessControl.approvedEmails`
-- Explicit approval to deploy rules/indexes/hosting from this feature branch
+- CODEX_TEST as the safe QA event
 
-After deployment, verify:
+Current live/private-admin status is deployed. For organizer retest, verify:
 
 1. Approved admin login succeeds
 2. Working Event selection enables registrations, Import Center, Tickets, and Check-In
@@ -687,9 +708,9 @@ Registration, import, ticket, and check-in writes include an audit log entry in 
 
 ## 23. Recommended next phase
 
-After Phase 16 closeout, the next implementation phase should stay narrow and preserve the clean-account engineering standard:
+After Phase 17A, the next implementation phase should stay narrow and preserve the clean-account engineering standard:
 
-- Treat clean/new approved accounts as a required smoke path for every protected route
+- Phase 17B: design and test Firestore-enforced staff/worker roles without broadening access prematurely
 - Keep automatic sending and real AI API deferred
 
 Phase boundaries remain:

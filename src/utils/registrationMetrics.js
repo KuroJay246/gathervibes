@@ -11,8 +11,29 @@ export function personsCount(registration) {
   return Number.isNaN(count) ? 1 : count
 }
 
+export function countRegistrationRecords(registrations = []) {
+  return Array.isArray(registrations) ? registrations.length : 0
+}
+
+export function countTotalGuests(registrations = []) {
+  return Array.isArray(registrations)
+    ? registrations.reduce((total, registration) => total + personsCount(registration), 0)
+    : 0
+}
+
+export function getRegistrationGuestSummary(registrations = []) {
+  const registrationCount = countRegistrationRecords(registrations)
+  const guestCount = countTotalGuests(registrations)
+  return `${registrationCount} registration${registrationCount === 1 ? '' : 's'} / ${guestCount} guest${guestCount === 1 ? '' : 's'}`
+}
+
+export function formatRegistrationGuestSummary(registrationCount = 0, guestCount = 0) {
+  return `${registrationCount} registration${registrationCount === 1 ? '' : 's'} / ${guestCount} guest${guestCount === 1 ? '' : 's'}`
+}
+
 export function buildRegistrationMetrics(registrations = [], event = {}) {
-  const metrics = registrations.reduce((summary, registration) => {
+  const rows = Array.isArray(registrations) ? registrations : []
+  const metrics = rows.reduce((summary, registration) => {
     const persons = personsCount(registration)
     summary.totalRegistrations += 1
     summary.totalPersons += persons
@@ -72,4 +93,12 @@ export function buildRegistrationMetrics(registrations = [], event = {}) {
     : 0
 
   return metrics
+}
+
+export function buildEventMetrics(event = {}, registrations = []) {
+  return {
+    eventId: event?.eventId || null,
+    eventName: event?.eventName || null,
+    ...buildRegistrationMetrics(registrations, event),
+  }
 }
