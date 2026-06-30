@@ -24,6 +24,7 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 - [x] **Phase 16**: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — closed, merged, and deployed
 - [x] **Phase 17A**: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — closed, merged, and deployed
 - [x] **Phase 17B**: Staff / Worker Roles Foundation — closed, merged, and Hosting-deployed; Firestore rules prototype merged for review but not deployed
+- [ ] **Phase 17C-A**: Firestore Rules Review + Deployment Readiness — active review only; Firestore rules and indexes not deployed
 
 Phase 3.2 completed the **Import Center** rename and source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files; it was later deployed. Phase 4.5 completed controlled ticket assignment and search-based door check-in; it was later deployed. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. Phase 16 focused on live browser loading diagnostics and CODEX_TEST ticket/check-in QA hardening, then closed after merge and deployment. QR camera scanning, Communications Pro, AI Draft Lab, Event Operations, and Phase 15A security headers are live. Real AI API integration, Google Sheets OAuth, Gmail/Outlook OAuth, automatic email/WhatsApp sending, Cloud Functions, Storage, public attendee/baker/school portals, payment gateway integration, public sitemap/JSON-LD for this private admin app, and native app store builds remain deferred.
 
@@ -66,6 +67,12 @@ Phase 17B closed the staff-role foundation and UI/access planning. The Firestore
 The planned data model is `staffProfiles/{uid}` plus `events/{eventId}/staffAssignments/{uid}` so Firestore rules can enforce assigned-event access after approval. Roles are owner/admin, event manager, scanner/check-in-only, viewer/read-only, and operations helper. Scanner/check-in-only users should only search and check in for assigned events; they should not have Events CRUD, registration delete, import apply, finance/operations ledger edits, settings/accessControl edits, auditLog delete/update, or broad CPB access unless explicitly assigned.
 
 Approved-admin access through `settings/accessControl.approvedEmails` remains the current live owner/admin enforcement boundary. Staff/scanner accounts must not be added to `approvedEmails`; live staff/scanner access is not active until Phase 17C reviews and deploys Firestore rules with organizer approval.
+
+## Phase 17C-A active status
+
+Phase 17C-A is a Firestore rules review and deployment readiness phase only. It reviews, documents, and tests the merged Phase 17B staff-role rules prototype before any live rules deployment. Current live enforcement remains `settings/accessControl.approvedEmails`, which is admin-level access only.
+
+Do not add staff/scanner/helper accounts to `approvedEmails`. Real staff/scanner access remains inactive until Phase 17C-B or another explicit organizer-approved step deploys reviewed Firestore rules and completes a live staff smoke test. Firestore rules and Firestore indexes are not deployed in Phase 17C-A.
 
 ## Phase 15B status
 

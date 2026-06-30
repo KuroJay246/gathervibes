@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 30, 2026 (Phase 17B closed, merged, and Hosting-deployed; Firestore rules prototype merged for review but not deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
+Last updated: June 30, 2026 (Phase 17C-A active for Firestore rules review and deployment readiness; Phase 17B closed, merged, and Hosting-deployed; Firestore rules prototype merged for review but not deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
 
 ## 1. Project overview
 
@@ -29,6 +29,7 @@ The repository currently contains:
 - Phase 16: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — closed, merged, and deployed.
 - Phase 17A: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — closed, merged, and deployed.
 - Phase 17B: Staff / Worker Roles Foundation — closed, merged, and Hosting-deployed; Firestore rules prototype is merged for review but not deployed.
+- Phase 17C-A: Firestore Rules Review + Deployment Readiness — active review only; Firestore rules and indexes are not deployed.
 
 Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner accounts must not be added to approvedEmails; Phase 17B introduced a prototype `staffProfiles/{uid}` and `events/{eventId}/staffAssignments/{uid}` rules-backed model for future scoped staff access.
 
@@ -39,6 +40,8 @@ Permanent clean-account engineering standard: all future features must support c
 Phase 17A was not a rules or access-broadening phase. It reorganized backlog visibility, audited registration/guest count wording, preserved clean-account behavior, and prepared a Phase 17B staff/worker access plan without implementing Firestore role rules.
 
 Phase 17B closed the staff-role foundation and UI/access planning. It keeps approved-admin access unchanged and merged prototype Firestore rules for staff profiles and assigned-event staff assignments for review only. Those Firestore rules remain undeployed; real staff/scanner access requires Phase 17C with explicit Firestore rules deployment approval and a live staff smoke test.
+
+Phase 17C-A reviews, hardens, documents, and tests the merged Phase 17B Firestore rules prototype without deploying it. Current live enforcement remains `settings/accessControl.approvedEmails`, which is admin-level access only. Staff/scanner/helper accounts must not be added to `approvedEmails`. Phase 17C-B is the next required step before real staff access: explicit organizer approval for Firestore rules deployment plus live staff smoke testing.
 
 Backlog/status visibility order:
 
@@ -711,9 +714,8 @@ Registration, import, ticket, and check-in writes include an audit log entry in 
 
 ## 23. Recommended next phase
 
-Phase 17C is the next recommended phase. It should stay narrow and preserve the clean-account engineering standard:
+Phase 17C-B is the next recommended phase after Phase 17C-A review. It should stay narrow and preserve the clean-account engineering standard:
 
-- Review Phase 17B Firestore rules prototype before any deployment
 - Require explicit organizer approval before deploying Firestore rules
 - Run a live staff smoke test only after approved rules deployment
 - Keep staff/scanner accounts out of `approvedEmails`

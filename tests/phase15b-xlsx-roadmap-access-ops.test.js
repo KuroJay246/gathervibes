@@ -30,7 +30,7 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
   assert.match(importsPage, /No Firestore write happens until you confirm valid rows/)
 })
 
-test('roadmap shows ordered Phase 17B backlog, closed shipped phases, deferred integrations, and future ops backlog', async () => {
+test('roadmap shows ordered Phase 17C-A status, closed shipped phases, deferred integrations, and future ops backlog', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const readme = await readFile('README.md', 'utf8')
   const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
@@ -51,7 +51,8 @@ test('roadmap shows ordered Phase 17B backlog, closed shipped phases, deferred i
     'Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update',
     'Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening',
     'Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning',
-    'Phase 17B Firestore-enforced staff/worker role foundation',
+    'Phase 17C-A Firestore rules review and deployment readiness',
+    'Phase 17C-B explicit rules deployment approval and live staff smoke',
     'Google Sheets OAuth',
     'Gmail/Outlook OAuth',
     'Real AI API integration',
@@ -92,7 +93,7 @@ test('roadmap shows ordered Phase 17B backlog, closed shipped phases, deferred i
   assert.match(handoff, /Phase 17B staff access model/)
 })
 
-test('private access status describes Phase 17B rules prototype without live deploy overclaim', async () => {
+test('private access status describes Phase 17C-A rules review without live deploy overclaim', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const healthItems = buildRuntimeHealthItems({
@@ -110,7 +111,7 @@ test('private access status describes Phase 17B rules prototype without live dep
   })
 
   assert.match(settings, /Approved-admin allowlist remains active owner\/admin enforcement/)
-  assert.match(settings, /Phase 17B adds a staffProfiles and event staffAssignments rules prototype/)
+  assert.match(settings, /Phase 17C-A reviews the merged staffProfiles and event staffAssignments rules prototype/)
   assert.match(settings, /Temporary event-day helpers should not be added to approvedEmails/)
   assert.match(qa, /Staff roles enforcement level/)
   assert.match(qa, /Staff rules deploy status/)
