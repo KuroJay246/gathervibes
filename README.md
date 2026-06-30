@@ -75,6 +75,8 @@ Phase 17C-A is closed, merged, and Hosting-deployed. It reviewed, documented, an
 
 Admin access remains controlled by `settings/accessControl.approvedEmails`, which is admin-level access only. Do not add staff/scanner/helper accounts to `approvedEmails`. Phase 17C-B2 deployed reviewed Firestore rules and created the CODEX_TEST scanner staff documents, but Phase 17C-B remains active until organizer scanner smoke and admin after-smoke confirmation pass.
 
+Before any future AI/Codex phase, read `AI_AGENT_RULES.md`, `PROJECT_HANDOFF.md`, and `README.md`. Future changes must check the full app flow, related docs, tests, rules, and UI copy so stale project knowledge does not conflict with current behavior.
+
 ## Phase 17C-B active status
 
 Phase 17C-B is active on the branch for Firestore rules deployment approval, live scanner/staff smoke, and scanner-only PWA mode. The scanner experience should use the private `/scanner` route, stay mobile-first, hide the admin shell for scanner users, look up tickets only within assigned-event access, show safe guest/ticket/check-in fields, and require one explicit Check In tap.
@@ -83,7 +85,7 @@ Phase 17C-B2 passed preflight, verified rollback readiness, verified `TEST_SCANN
 
 Phase 17C-B3 fixed the scanner login auth gate after the scanner signed in but was blocked by the approvedEmails-only message. approvedEmails is admin-level access only. Staff/scanner users must remain outside approvedEmails and must be admitted through active staffProfiles/{uid} plus active events/{eventId}/staffAssignments/{uid}. AuthProvider/ProtectedRoute must check both paths: approved admin first, then staff profile/assignment access before showing a not-approved message. Do not solve scanner login by adding the scanner to approvedEmails.
 
-Phase 17C-B testing must use CODEX_TEST only. CPB must not be selected, assigned, read as scanner, or used for QA. Native app work remains deferred; the current practical direction is a private PWA-style scanner shortcut/mode. Admin AppShell brand navigation returns approved admins to `/dashboard`; the isolated `/scanner` page does not gain admin-home logo navigation. Settings now uses category tabs with deep links such as `/settings?tab=access`.
+Phase 17C-B testing must use CODEX_TEST only. CPB must not be selected, assigned, read as scanner, or used for QA. Scanner/check-in-only access remains check-in only and must not receive Undo Check-In or Check Out. Approved admins may use the existing admin-only undo/check-out path where already implemented. Native app work remains deferred; the current practical direction is a private PWA-style scanner shortcut/mode. Admin AppShell brand navigation returns approved admins to `/dashboard`; the isolated `/scanner` page does not gain admin-home logo navigation. Settings now uses category tabs with deep links such as `/settings?tab=access`.
 
 ## Phase 15B status
 
