@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useActiveEvent } from '../events/useActiveEvent'
+import { useAuth } from '../auth/useAuth'
 import { subscribeToEvents } from '../services/eventService'
 import { subscribeToRegistrations } from '../services/registrationService'
 import { formatEventDate, formatCountdown, upcomingEvents } from '../utils/dateUtils'
@@ -29,6 +30,7 @@ import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
 import { buildOperationsTotals, subscribeToOperationsLedger } from '../services/operationsLedgerService'
 import { getSafePriceTiers, getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
+import { isApprovedAdmin } from '../utils/accessRoles'
 
 // ── Local clock ──────────────────────────────────────────────────────────────
 
@@ -98,6 +100,7 @@ function MetricPill({ label, value, color }) {
 
 export function DashboardPage() {
   const { activeEvent, clearActiveEvent, setActiveEvent } = useActiveEvent()
+  const { access, assignedEvents = [] } = useAuth()
   const now = useLocalClock()
   const registrations = useRegistrationMetrics(activeEvent?.eventId)
   const operationsEntries = useOperationsLedger(activeEvent?.eventId)
@@ -105,18 +108,23 @@ export function DashboardPage() {
   const [allEvents, setAllEvents] = useState([])
   const [eventsLoaded, setEventsLoaded] = useState(false)
 
+  const adminUser = isApprovedAdmin(access)
+
   useEffect(() => {
+    if (!adminUser) return undefined
     return subscribeToEvents(
       (events) => { setAllEvents(events); setEventsLoaded(true) },
       () => setEventsLoaded(true),
     )
-  }, [])
+  }, [adminUser])
 
-  const upcoming = useMemo(() => upcomingEvents(allEvents), [allEvents])
+  const visibleEvents = adminUser ? allEvents : assignedEvents
+  const visibleEventsLoaded = adminUser ? eventsLoaded : true
+  const upcoming = useMemo(() => upcomingEvents(visibleEvents), [visibleEvents])
 
   // Capacity progress (for selected event)
   const selectedFull = activeEvent
-    ? allEvents.find((e) => e.eventId === activeEvent.eventId)
+    ? visibleEvents.find((e) => e.eventId === activeEvent.eventId)
     : null
   const capacity = selectedFull?.capacity || 0
   const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedFull), [registrations, selectedFull])
@@ -315,19 +323,21 @@ export function DashboardPage() {
                 <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">On the calendar</p>
                 <h3 className="mt-1.5 font-serif text-2xl text-[#2B1723]">Upcoming events</h3>
               </div>
-              <Link to="/events" className="text-xs font-bold text-[#B76E79] hover:underline">View all</Link>
+              {adminUser && <Link to="/events" className="text-xs font-bold text-[#B76E79] hover:underline">View all</Link>}
             </div>
 
-            {!eventsLoaded ? (
+            {!visibleEventsLoaded ? (
               <p className="py-4 text-center text-xs text-[#A08578]">Loading…</p>
             ) : upcoming.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] px-5 py-8 text-center">
                 <CalendarDays className="mx-auto mb-3 size-8 text-[#DFC9BC]" />
                 <p className="text-sm font-bold text-[#3A2630]">No upcoming events</p>
-                <p className="mt-1 text-xs text-[#8A7468]">Create an event and set its status to upcoming or active.</p>
-                <Link to="/events" className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#B76E79] px-4 py-2 text-xs font-bold text-white">
-                  Create an event <ArrowRight className="size-3.5" />
-                </Link>
+                <p className="mt-1 text-xs text-[#8A7468]">{adminUser ? 'Create an event and set its status to upcoming or active.' : 'No assigned upcoming events are available for this staff account.'}</p>
+                {adminUser && (
+                  <Link to="/events" className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#B76E79] px-4 py-2 text-xs font-bold text-white">
+                    Create an event <ArrowRight className="size-3.5" />
+                  </Link>
+                )}
               </div>
             ) : (
               <ul className="divide-y divide-[#F5ECE6]">
