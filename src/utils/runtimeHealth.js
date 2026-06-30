@@ -41,12 +41,12 @@ export function buildRuntimeHealthItems({
     {
       label: 'Current role detected',
       status: currentRoleLabel ? 'ok' : 'warn',
-      detail: currentRoleLabel ? `${currentRoleLabel} from approved-admin allowlist or Phase 17B staff profile/assignment state.` : 'Role display is pending access load.',
+      detail: currentRoleLabel ? `${currentRoleLabel} from approved-admin allowlist or Phase 17C-A staff profile/assignment review state.` : 'Role display is pending access load.',
     },
     {
       label: 'Staff roles enforcement level',
       status: 'warn',
-      detail: 'Phase 17B prototype rules exist in this branch but are not deployed yet.',
+      detail: 'Phase 17C-A is reviewing the merged prototype rules; they are not deployed yet.',
     },
     {
       label: 'Approved-admin allowlist',

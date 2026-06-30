@@ -22,11 +22,11 @@ const ROADMAP_SECTIONS = [
   },
   {
     title: '2. Current active phase',
-    items: [['Phase 17B Firestore-enforced staff/worker role foundation', 'Active / rules not deployed']],
+    items: [['Phase 17C-A Firestore rules review and deployment readiness', 'Active / review only / rules not deployed']],
   },
   {
     title: '3. Next recommended phase',
-    items: [['Phase 17B rules review and separate deploy approval', 'Recommended next']],
+    items: [['Phase 17C-B explicit rules deployment approval and live staff smoke', 'Required before live staff access']],
   },
   {
     title: '4. High-priority operational backlog',
@@ -39,11 +39,11 @@ const ROADMAP_SECTIONS = [
   {
     title: '5. Access / staff / worker permissions backlog',
     items: [
-      ['Firestore-enforced staff roles', 'Phase 17B prototype'],
-      ['Scanner/check-in-only role enforcement', 'Phase 17B prototype'],
-      ['Event manager role', 'Phase 17B prototype'],
-      ['Viewer/read-only role', 'Phase 17B prototype'],
-      ['Operations helper role', 'Phase 17B prototype'],
+      ['Firestore-enforced staff roles', 'Phase 17C-A review'],
+      ['Scanner/check-in-only role enforcement', 'Phase 17C-A review'],
+      ['Event manager role', 'Phase 17C-A review'],
+      ['Viewer/read-only role', 'Phase 17C-A review'],
+      ['Operations helper role', 'Phase 17C-A review'],
       ['Mother/Event Manager simplified view', 'Future planned'],
     ],
   },
@@ -171,7 +171,7 @@ export function SettingsPage() {
 
       <SettingsSection eyebrow="Admin Access" title="Private access controls">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Phase 17B adds a staffProfiles and event staffAssignments rules prototype for assigned staff, but those Firestore rules are not deployed yet. Do not add helpers or scanners to approvedEmails unless admin-level access is acceptable.
+          Approved-admin allowlist remains active owner/admin enforcement. Phase 17C-A reviews the merged staffProfiles and event staffAssignments rules prototype for assigned staff, but those Firestore rules are not deployed yet. Do not add helpers or scanners to approvedEmails unless admin-level access is acceptable.
         </div>
 
         <div className="mt-4 grid gap-3">
@@ -221,7 +221,7 @@ export function SettingsPage() {
           <p className="text-sm font-bold text-[#2B1723]">Current role behavior</p>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
           <p className="mt-2 text-xs leading-5 text-[#8A7468]">
-            Role editing, owner-only controls, viewer read-only rules, and check-in staff scoped rules are deferred. They should be added only with matching Firestore rules and audit tests.
+            Role editing, owner-only controls, rules deployment, and live staff smoke testing remain deferred to an explicit Phase 17C-B approval step.
           </p>
         </div>
       </SettingsSection>

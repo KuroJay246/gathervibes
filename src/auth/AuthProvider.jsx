@@ -88,7 +88,7 @@ async function readStaffAccess(nextUser) {
   return { staffProfile, staffAssignments, assignedEvents }
 }
 
-// verifyAdminAccess remains the approved-admin branch inside this broader Phase 17B workspace access check.
+// verifyAdminAccess remains the approved-admin branch inside this broader staff-role workspace access check.
 async function verifyWorkspaceAccess(nextUser) {
   if (!nextUser || !db) throw workspaceAccessError()
 
