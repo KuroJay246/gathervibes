@@ -22,6 +22,7 @@ import { AdminSearch } from '../components/AdminSearch'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { formatEventDate } from '../utils/dateUtils'
+import { canUseSettings, canViewRoute, isApprovedAdmin } from '../utils/accessRoles'
 
 const navGroups = [
   {
@@ -62,8 +63,10 @@ const pageTitles = {
 }
 
 function SidebarContent({ onNavigate, mobile = false }) {
-  const { user, signOut, currentRoleLabel } = useAuth()
+  const { user, signOut, currentRoleLabel, access } = useAuth()
   const { activeEvent } = useActiveEvent()
+  const adminUser = isApprovedAdmin(access)
+  const settingsAllowed = canUseSettings(access)
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -73,11 +76,11 @@ function SidebarContent({ onNavigate, mobile = false }) {
 
       <div className="mx-4 max-w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-3.5">
         <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.24em] text-[#D7B8BD]">Working Event</p>
-        <Link to="/events" onClick={onNavigate} className="flex w-full min-w-0 items-center justify-between gap-3 text-left">
+        <Link to={adminUser ? '/events' : '/check-in'} onClick={onNavigate} className="flex w-full min-w-0 items-center justify-between gap-3 text-left">
           <span className="min-w-0 flex-1 overflow-hidden">
             <span className="block max-w-full truncate text-sm font-medium text-white">{activeEvent?.eventName || 'No event selected'}</span>
             <span className="mt-0.5 block max-w-full truncate text-[11px] text-white/45">
-              {activeEvent ? formatEventDate(activeEvent.eventDate) : 'Choose one from Events'}
+              {activeEvent ? formatEventDate(activeEvent.eventDate) : adminUser ? 'Choose one from Events' : 'Assigned event required'}
             </span>
           </span>
           <ChevronDown className="size-4 shrink-0 text-white/30" aria-hidden="true" />
@@ -89,7 +92,7 @@ function SidebarContent({ onNavigate, mobile = false }) {
           <div className="mb-5" key={group.label}>
             <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/30">{group.label}</p>
             <div className="space-y-1">
-              {group.items.map(({ to, label, icon: Icon }) => (
+              {group.items.filter(({ to }) => canViewRoute(access, to)).map(({ to, label, icon: Icon }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -112,18 +115,20 @@ function SidebarContent({ onNavigate, mobile = false }) {
       </nav>
 
       <div className={`shrink-0 border-t border-white/10 p-3 ${mobile ? 'pb-[max(1rem,env(safe-area-inset-bottom))]' : ''}`}>
-        <NavLink
-          to="/settings"
-          onClick={onNavigate}
-          className={({ isActive }) =>
-            `mb-2 flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition ${
-              isActive ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
-            }`
-          }
-        >
-          <Settings className="size-[17px]" strokeWidth={1.8} aria-hidden="true" />
-          Settings
-        </NavLink>
+        {settingsAllowed && (
+          <NavLink
+            to="/settings"
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              `mb-2 flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition ${
+                isActive ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
+              }`
+            }
+          >
+            <Settings className="size-[17px]" strokeWidth={1.8} aria-hidden="true" />
+            Settings
+          </NavLink>
+        )}
         <div className="flex items-center gap-3 rounded-xl bg-black/10 p-2.5">
           <div className="grid size-8 shrink-0 place-items-center rounded-full bg-[#F7DDE6] text-xs font-bold uppercase text-[#2B1723]">
             {user?.email?.slice(0, 1) || 'A'}
@@ -149,8 +154,9 @@ function SidebarContent({ onNavigate, mobile = false }) {
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
-  const { currentRoleLabel } = useAuth()
+  const { currentRoleLabel, access } = useAuth()
   const [title, subtitle] = pageTitles[location.pathname] || ['Event Hub', 'Gather & Savor Vibes']
+  const adminUser = isApprovedAdmin(access)
 
   return (
     <div className="min-h-screen bg-[#FFF8F2] text-[#2B1723]">
@@ -196,7 +202,7 @@ export function AppShell() {
               <h1 className="truncate font-serif text-xl sm:text-2xl">{title}</h1>
               <p className="mt-0.5 hidden text-xs text-[#8C766A] sm:block">{subtitle}</p>
             </div>
-            <AdminSearch />
+            {adminUser && <AdminSearch />}
             <div className="hidden items-center gap-2 rounded-full border border-[#E7D6CC] bg-white py-1.5 pl-2 pr-3 sm:flex">
               <span className="grid size-7 place-items-center rounded-full bg-[#F7DDE6]">
                 <Sparkles className="size-3.5 text-[#B76E79]" aria-hidden="true" />
@@ -213,14 +219,24 @@ export function AppShell() {
         </main>
 
         <nav className="mobile-tab-bar lg:hidden" aria-label="Mobile navigation">
-          <NavLink to="/dashboard" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
-            <LayoutDashboard className="size-5" strokeWidth={1.8} aria-hidden="true" />
-            <span>Home</span>
-          </NavLink>
-          <NavLink to="/events" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
-            <CalendarDays className="size-5" strokeWidth={1.8} aria-hidden="true" />
-            <span>Events</span>
-          </NavLink>
+          {canViewRoute(access, '/dashboard') && (
+            <NavLink to="/dashboard" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
+              <LayoutDashboard className="size-5" strokeWidth={1.8} aria-hidden="true" />
+              <span>Home</span>
+            </NavLink>
+          )}
+          {canViewRoute(access, '/check-in') && !canViewRoute(access, '/dashboard') && (
+            <NavLink to="/check-in" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
+              <ClipboardCheck className="size-5" strokeWidth={1.8} aria-hidden="true" />
+              <span>Check-In</span>
+            </NavLink>
+          )}
+          {canViewRoute(access, '/events') && (
+            <NavLink to="/events" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
+              <CalendarDays className="size-5" strokeWidth={1.8} aria-hidden="true" />
+              <span>Events</span>
+            </NavLink>
+          )}
           <button type="button" onClick={() => setMenuOpen(true)} className="mobile-tab-item" aria-label="Open all navigation">
             <Menu className="size-5" strokeWidth={1.8} aria-hidden="true" />
             <span>More</span>

@@ -41,12 +41,12 @@ export function buildRuntimeHealthItems({
     {
       label: 'Current role detected',
       status: currentRoleLabel ? 'ok' : 'warn',
-      detail: currentRoleLabel ? `${currentRoleLabel} from settings/accessControl with approvedEmails fallback. Role display is UI-only until Firestore role rules are added.` : 'Role display is pending accessControl load.',
+      detail: currentRoleLabel ? `${currentRoleLabel} from approved-admin allowlist or Phase 17B staff profile/assignment state.` : 'Role display is pending access load.',
     },
     {
       label: 'Staff roles enforcement level',
       status: 'warn',
-      detail: 'UI-only. Firestore access is still enforced by the approved-admin email allowlist.',
+      detail: 'Phase 17B prototype rules exist in this branch but are not deployed yet.',
     },
     {
       label: 'Approved-admin allowlist',
@@ -56,7 +56,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Firestore role enforcement',
       status: 'warn',
-      detail: 'Future phase. Scanner/check-in-only and viewer restrictions are not rules-enforced yet.',
+      detail: 'Staff profile and event assignment rules require review and explicit rules-deploy approval before live use.',
     },
     {
       label: 'Events read',

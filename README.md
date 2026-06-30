@@ -23,6 +23,7 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 - [x] **Phase 15B**: XLSX Dependency Security Review + Roadmap/Access/Ops Update — closed, merged, and deployed
 - [x] **Phase 16**: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — closed, merged, and deployed
 - [x] **Phase 17A**: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — closed, merged, and deployed
+- [ ] **Phase 17B**: Firestore-Enforced Staff / Worker Roles — active; rules prototype not deployed
 
 Phase 3.2 completed the **Import Center** rename and source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files; it was later deployed. Phase 4.5 completed controlled ticket assignment and search-based door check-in; it was later deployed. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. Phase 16 focused on live browser loading diagnostics and CODEX_TEST ticket/check-in QA hardening, then closed after merge and deployment. QR camera scanning, Communications Pro, AI Draft Lab, Event Operations, and Phase 15A security headers are live. Real AI API integration, Google Sheets OAuth, Gmail/Outlook OAuth, automatic email/WhatsApp sending, Cloud Functions, Storage, public attendee/baker/school portals, payment gateway integration, public sitemap/JSON-LD for this private admin app, and native app store builds remain deferred.
 
@@ -58,16 +59,18 @@ Backlog/status visibility must appear in this order wherever roadmap content is 
 
 Registration/guest count standard: registrations are registration records; guests are the sum of `personsAttending` across those records. If no Working Event is selected, protected routes must show a no-selected-event state rather than stale counts.
 
-## Phase 17B staff access plan
+## Phase 17B active status
 
-Phase 17B should design, test, and only then deploy Firestore-enforced roles. Planned roles are owner/admin, event manager, scanner/check-in-only, viewer/read-only, and operations helper. Scanner/check-in-only users should only search and check in for assigned events; they should not have Events CRUD, registration delete, import apply, finance/operations ledger edits, settings/accessControl edits, auditLog delete/update, or broad CPB access unless explicitly assigned. Possible future collections include `staffProfiles` and `eventStaffAssignments`. UI navigation may hide pages, but Firestore rules must enforce the access boundary.
+Phase 17B designs and implements a prototype rules-backed staff access foundation. The planned data model is `staffProfiles/{uid}` plus `events/{eventId}/staffAssignments/{uid}` so Firestore rules can enforce assigned-event access. Roles are owner/admin, event manager, scanner/check-in-only, viewer/read-only, and operations helper. Scanner/check-in-only users should only search and check in for assigned events; they should not have Events CRUD, registration delete, import apply, finance/operations ledger edits, settings/accessControl edits, auditLog delete/update, or broad CPB access unless explicitly assigned.
+
+Phase 17B does not deploy Firestore rules without separate organizer approval. Approved-admin access through `settings/accessControl.approvedEmails` remains the current live owner/admin enforcement boundary until the rules deployment step is approved.
 
 ## Phase 15B status
 
 - `xlsx` was removed after audit because runtime XLSX import now uses the already-installed `read-excel-file/browser` parser.
 - XLSX import remains active with sheet selection, row normalization, preview, mapping, and confirm-before-write safety.
 - `npm audit --omit=dev` is expected to report no production vulnerabilities after `xlsx` removal.
-- Staff/scanner roles remain UI/display/navigation foundation only. Firestore access is still enforced by the approved-admin email allowlist until a future rules-level staff-role phase.
+- Staff/scanner roles must not be added to `approvedEmails`. Phase 17B uses staff profile and assigned-event rule design for future scoped access; rules deployment requires separate approval.
 - Event Operations Ledger is active and separate from ticket sales. Future operations modules such as tasks, supplies, vendors/suppliers, sponsors, school tracking, baker/vendor tracking, budget/expense reporting, reimbursements, and event-day run sheets are planned but not active.
 - Phase 15B is closed, merged, and deployed.
 

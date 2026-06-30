@@ -11,6 +11,7 @@ import { LoadingState } from '../components/ui/LoadingState'
 import { QrScannerPanel } from '../components/checkin/QrScannerPanel'
 import { canCompleteCheckIn, checkInWarnings, searchableRegistrationText } from '../utils/ticketUtils'
 import { CHECK_IN_VIEWS, filterCheckInRegistrations, formatCheckInTime } from '../utils/checkInUtils'
+import { isApprovedAdmin } from '../utils/accessRoles'
 import {
   buildEventDaySummary,
   formatDoorStatus,
@@ -94,7 +95,7 @@ function useRegistrations(activeEvent) {
 }
 
 export function CheckInPage() {
-  const { user } = useAuth()
+  const { user, access } = useAuth()
   const { activeEvent } = useActiveEvent()
   const { registrations, loading, error } = useRegistrations(activeEvent)
   const [searchQuery, setSearchQuery] = useState('')
@@ -134,6 +135,7 @@ export function CheckInPage() {
   const selectedWarnings = selectedRegistration ? checkInWarnings(selectedRegistration) : []
   const selectedFinance = selectedRegistration ? calculateRegistrationFinance(selectedRegistration, activeEvent) : null
   const checkInState = selectedRegistration ? canCompleteCheckIn(selectedRegistration) : { allowed: false, reason: '' }
+  const canUndoCheckIn = isApprovedAdmin(access)
 
   if (!activeEvent?.eventId) {
     return (
@@ -182,6 +184,10 @@ export function CheckInPage() {
   }
 
   async function handleUndoCheckIn() {
+    if (!canUndoCheckIn) {
+      setActionError('Undo check-in is admin-only.')
+      return
+    }
     if (!selectedRegistration?.checkedIn) return
     setSaving(true)
     setMessage('')
@@ -244,6 +250,10 @@ export function CheckInPage() {
   }
 
   async function handleBulkUndoCheckIn() {
+    if (!canUndoCheckIn) {
+      setActionError('Undo check-in selected is admin-only.')
+      return
+    }
     const candidates = selectedListRows.filter((registration) => registration.checkedIn)
     if (candidates.length === 0) return
     if (!window.confirm(`Undo check-in for ${candidates.length} selected guest registration${candidates.length === 1 ? '' : 's'}?`)) return
@@ -634,7 +644,7 @@ export function CheckInPage() {
                     <CheckCircle2 className="mt-0.5 size-5 shrink-0" />
                     <div>
                       <p className="font-bold">Already checked in</p>
-                      <p className="mt-1">Duplicate check-in is blocked. Use Undo Check-In only for an accidental check-in.</p>
+                      <p className="mt-1">Duplicate check-in is blocked. Undo Check-In is admin-only and should only be used for an accidental check-in.</p>
                     </div>
                   </div>
                 </div>
@@ -667,18 +677,20 @@ export function CheckInPage() {
 
               {selectedRegistration.checkedIn && (
                 <div className="space-y-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setConfirmUndo(true)
-                      setMessage('')
-                      setActionError('')
-                    }}
-                  disabled={saving}
-                    className="w-full rounded-2xl border border-[#F2C3C3] bg-[#FFF8F8] px-4 py-4 text-base font-bold text-[#A32626] hover:bg-[#FFF1F1] disabled:opacity-50"
-                  >
-                    Undo Check-In
-                  </button>
+                  {canUndoCheckIn && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setConfirmUndo(true)
+                        setMessage('')
+                        setActionError('')
+                      }}
+                      disabled={saving}
+                      className="w-full rounded-2xl border border-[#F2C3C3] bg-[#FFF8F8] px-4 py-4 text-base font-bold text-[#A32626] hover:bg-[#FFF1F1] disabled:opacity-50"
+                    >
+                      Undo Check-In
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={handleDuplicateAttempt}
@@ -719,9 +731,11 @@ export function CheckInPage() {
               <button type="button" onClick={handleBulkCheckIn} disabled={saving || selectedListRows.length === 0} className="rounded-xl bg-[#1E7345] px-4 py-2 text-xs font-bold text-white disabled:opacity-40">
                 Check in selected
               </button>
-              <button type="button" onClick={handleBulkUndoCheckIn} disabled={saving || selectedListRows.length === 0} className="rounded-xl border border-[#F2C3C3] bg-white px-4 py-2 text-xs font-bold text-[#A32626] disabled:opacity-40">
-                Undo check-in selected
-              </button>
+              {canUndoCheckIn && (
+                <button type="button" onClick={handleBulkUndoCheckIn} disabled={saving || selectedListRows.length === 0} className="rounded-xl border border-[#F2C3C3] bg-white px-4 py-2 text-xs font-bold text-[#A32626] disabled:opacity-40">
+                  Undo check-in selected
+                </button>
+              )}
               <button type="button" onClick={() => copySelectedList('guest')} className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C]">
                 Copy selected guest list
               </button>
@@ -794,7 +808,7 @@ export function CheckInPage() {
         </section>
       )}
 
-      {confirmUndo && selectedRegistration?.checkedIn && (
+      {confirmUndo && selectedRegistration?.checkedIn && canUndoCheckIn && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-[#2B1723]/40 p-4">
           <div className="w-full max-w-md rounded-2xl border border-[#EEDFD6] bg-white p-6 shadow-2xl">
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#A32626]">Undo Check-In</p>

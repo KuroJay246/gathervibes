@@ -33,6 +33,13 @@ service cloud.firestore {
     //
     // auditLogs/{logId}
     //   append-only event/registration audit record created in the same batch.
+    //
+    // staffProfiles/{uid}
+    //   admin-managed staff profile. Staff can read only their own active profile.
+    //
+    // events/{eventId}/staffAssignments/{uid}
+    //   admin-managed assigned-event role document. Staff can read only their own
+    //   active assignments. Rules use this path to enforce assigned-event access.
 
     function isSignedIn() {
       return request.auth != null;
@@ -45,6 +52,42 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails is list
         && request.auth.token.email.lower() in
           get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails;
+    }
+
+    function activeStaffProfile() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/staffProfiles/$(request.auth.uid))
+        && get(/databases/$(database)/documents/staffProfiles/$(request.auth.uid)).data.uid == request.auth.uid
+        && get(/databases/$(database)/documents/staffProfiles/$(request.auth.uid)).data.status == 'active';
+    }
+
+    function activeStaffAssignment(eventId) {
+      return activeStaffProfile()
+        && exists(/databases/$(database)/documents/events/$(eventId)/staffAssignments/$(request.auth.uid))
+        && get(/databases/$(database)/documents/events/$(eventId)/staffAssignments/$(request.auth.uid)).data.uid == request.auth.uid
+        && get(/databases/$(database)/documents/events/$(eventId)/staffAssignments/$(request.auth.uid)).data.eventId == eventId
+        && get(/databases/$(database)/documents/events/$(eventId)/staffAssignments/$(request.auth.uid)).data.status == 'active';
+    }
+
+    function hasActiveEventAssignment(eventId, allowedRoles) {
+      return activeStaffAssignment(eventId)
+        && get(/databases/$(database)/documents/events/$(eventId)/staffAssignments/$(request.auth.uid)).data.role in allowedRoles;
+    }
+
+    function isAssignedScanner(eventId) {
+      return hasActiveEventAssignment(eventId, ['scanner']);
+    }
+
+    function isAssignedViewer(eventId) {
+      return hasActiveEventAssignment(eventId, ['viewer']);
+    }
+
+    function isAssignedEventManager(eventId) {
+      return hasActiveEventAssignment(eventId, ['event-manager']);
+    }
+
+    function isAssignedOperationsHelper(eventId) {
+      return hasActiveEventAssignment(eventId, ['operations-helper']);
     }
 
     function validShortId(value) {
@@ -81,6 +124,66 @@ service cloud.firestore {
           value == request.auth.token.email
           || (request.auth.uid != null && value == request.auth.uid)
         );
+    }
+
+    function validStaffProfile(data, uid) {
+      return data.keys().hasAll([
+          'uid', 'email', 'displayName', 'status', 'defaultRole',
+          'createdAt', 'updatedAt', 'createdBy', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'uid', 'email', 'displayName', 'status', 'defaultRole',
+          'createdAt', 'updatedAt', 'createdBy', 'updatedBy'
+        ])
+        && data.uid == uid
+        && data.uid is string
+        && data.uid.size() > 0
+        && data.uid.size() <= 128
+        && data.email is string
+        && data.email.size() > 0
+        && data.email.size() <= 320
+        && data.displayName is string
+        && data.displayName.size() <= 120
+        && data.status in ['active', 'inactive', 'revoked']
+        && data.defaultRole in ['event-manager', 'scanner', 'viewer', 'operations-helper']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && data.createdBy is string
+        && data.createdBy.size() > 0
+        && data.createdBy.size() <= 256
+        && data.updatedBy is string
+        && data.updatedBy.size() > 0
+        && data.updatedBy.size() <= 256;
+    }
+
+    function validStaffAssignment(data, eventId, uid) {
+      return data.keys().hasAll([
+          'uid', 'email', 'eventId', 'role', 'status',
+          'createdAt', 'updatedAt', 'createdBy', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'uid', 'email', 'eventId', 'role', 'status', 'permissions',
+          'createdAt', 'updatedAt', 'createdBy', 'updatedBy'
+        ])
+        && data.uid == uid
+        && data.uid is string
+        && data.uid.size() > 0
+        && data.uid.size() <= 128
+        && data.email is string
+        && data.email.size() > 0
+        && data.email.size() <= 320
+        && data.eventId == eventId
+        && data.role in ['event-manager', 'scanner', 'viewer', 'operations-helper']
+        && data.status in ['active', 'inactive', 'revoked']
+        && (!('permissions' in data) || (data.permissions is map && data.permissions.keys().size() <= 20))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && data.createdBy is string
+        && data.createdBy.size() > 0
+        && data.createdBy.size() <= 256
+        && data.updatedBy is string
+        && data.updatedBy.size() > 0
+        && data.updatedBy.size() <= 256;
     }
 
     // ── Price tier validation ──────────────────────────────────────────────
@@ -564,7 +667,11 @@ service cloud.firestore {
     }
 
     match /events/{eventId} {
-      allow read: if isApprovedAdmin();
+      allow read: if isApprovedAdmin()
+        || isAssignedEventManager(eventId)
+        || isAssignedScanner(eventId)
+        || isAssignedViewer(eventId)
+        || isAssignedOperationsHelper(eventId);
       allow create: if isApprovedAdmin()
         && isValidEvent(request.resource.data, eventId)
         && request.resource.data.createdAt == request.time
@@ -577,8 +684,42 @@ service cloud.firestore {
       allow delete: if isApprovedAdmin();
     }
 
+    match /events/{eventId}/staffAssignments/{uid} {
+      allow get: if isApprovedAdmin()
+        || (
+          isSignedIn()
+          && request.auth.uid == uid
+          && activeStaffProfile()
+          && resource.data.uid == request.auth.uid
+          && resource.data.eventId == eventId
+          && resource.data.status == 'active'
+        );
+      allow list: if isApprovedAdmin()
+        || (
+          isSignedIn()
+          && request.auth.uid == uid
+          && activeStaffProfile()
+          && resource.data.uid == request.auth.uid
+          && resource.data.status == 'active'
+        );
+      allow create: if isApprovedAdmin()
+        && validStaffAssignment(request.resource.data, eventId, uid)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isApprovedAdmin()
+        && validStaffAssignment(request.resource.data, eventId, uid)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.eventId == resource.data.eventId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isApprovedAdmin();
+    }
+
     match /registrations/{registrationId} {
-      allow read: if isApprovedAdmin();
+      allow read: if isApprovedAdmin()
+        || isAssignedEventManager(resource.data.eventId)
+        || isAssignedScanner(resource.data.eventId)
+        || isAssignedViewer(resource.data.eventId);
       allow create: if isApprovedAdmin()
         && isValidRegistration(request.resource.data, registrationId)
         && request.resource.data.checkedIn == false
@@ -587,42 +728,64 @@ service cloud.firestore {
         && (hasNoTicketAssigned(request.resource.data) || hasImportedTicketCode(request.resource.data))
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
-      allow update: if isApprovedAdmin()
-        && (
-          isCheckInCompletionUpdate(registrationId)
-          || isCheckInUndoUpdate(registrationId)
-          || (
-            isValidRegistration(request.resource.data, registrationId)
-            && request.resource.data.updatedAt == request.time
-            && (
-              isRegistrationDetailsUpdate()
-              || isTicketAssignmentUpdate()
-              || isTicketUnassignmentUpdate()
+      allow update: if (
+          isApprovedAdmin()
+          && (
+            isCheckInCompletionUpdate(registrationId)
+            || isCheckInUndoUpdate(registrationId)
+            || (
+              isValidRegistration(request.resource.data, registrationId)
+              && request.resource.data.updatedAt == request.time
+              && (
+                isRegistrationDetailsUpdate()
+                || isTicketAssignmentUpdate()
+                || isTicketUnassignmentUpdate()
+              )
             )
           )
+        ) || (
+          isAssignedScanner(resource.data.eventId)
+          && isValidRegistration(request.resource.data, registrationId)
+          && isCheckInCompletionUpdate(registrationId)
         );
       allow delete: if isApprovedAdmin();
     }
 
     match /auditLogs/{logId} {
       allow read: if isApprovedAdmin();
-      allow create: if isApprovedAdmin()
-        && (
-          (
-            request.resource.data.action in ['checkin.complete', 'checkin.undo']
-            && isValidRegistrationAuditLog(request.resource.data, logId)
-            && matchesRegistrationMutation(request.resource.data)
+      allow create: if (
+          isApprovedAdmin()
+          && (
+            (
+              request.resource.data.action in ['checkin.complete', 'checkin.undo']
+              && isValidRegistrationAuditLog(request.resource.data, logId)
+              && matchesRegistrationMutation(request.resource.data)
+            )
+            || (isValidEventAuditLog(request.resource.data, logId) && matchesEventMutation(request.resource.data))
+            || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesRegistrationMutation(request.resource.data))
+            || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesDuplicateCheckInAttempt(request.resource.data))
+            || (isValidOperationAuditLog(request.resource.data, logId) && matchesOperationMutation(request.resource.data))
           )
-          || (isValidEventAuditLog(request.resource.data, logId) && matchesEventMutation(request.resource.data))
-          || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesRegistrationMutation(request.resource.data))
-          || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesDuplicateCheckInAttempt(request.resource.data))
-          || (isValidOperationAuditLog(request.resource.data, logId) && matchesOperationMutation(request.resource.data))
+        ) || (
+          isAssignedScanner(request.resource.data.eventId)
+          && isValidRegistrationAuditLog(request.resource.data, logId)
+          && (
+            (
+              request.resource.data.action == 'checkin.complete'
+              && matchesRegistrationMutation(request.resource.data)
+            )
+            || (
+              request.resource.data.action == 'checkin.duplicate-attempt'
+              && matchesDuplicateCheckInAttempt(request.resource.data)
+            )
+          )
         );
       allow update, delete: if false;
     }
 
     match /operationsLedger/{ledgerEntryId} {
-      allow read: if isApprovedAdmin();
+      allow read: if isApprovedAdmin()
+        || isAssignedOperationsHelper(resource.data.eventId);
       allow create: if isApprovedAdmin()
         && isValidOperationLedgerEntry(request.resource.data, ledgerEntryId)
         && request.resource.data.createdAt == request.time
@@ -632,6 +795,27 @@ service cloud.firestore {
         && operationIdentityUnchanged(ledgerEntryId)
         && request.resource.data.updatedAt == request.time;
       allow delete: if false;
+    }
+
+    match /staffProfiles/{uid} {
+      allow get: if isApprovedAdmin()
+        || (
+          isSignedIn()
+          && request.auth.uid == uid
+          && resource.data.uid == request.auth.uid
+          && resource.data.status == 'active'
+        );
+      allow list: if isApprovedAdmin();
+      allow create: if isApprovedAdmin()
+        && validStaffProfile(request.resource.data, uid)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isApprovedAdmin()
+        && validStaffProfile(request.resource.data, uid)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isApprovedAdmin();
     }
 
     // Reserved collections remain unavailable until their schemas and rules

@@ -14,6 +14,7 @@ const ROADMAP_SECTIONS = [
       ['Phase 15A Hosting Security Headers + Private Indexing', 'Closed'],
       ['Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update', 'Closed / merged / deployed'],
       ['Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening', 'Closed / merged / deployed'],
+      ['Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning', 'Closed / merged / deployed'],
       ['Finance tracker', 'Phase 9 active'],
       ['Communications Pro', 'Phase 11 copy-only'],
       ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
@@ -21,28 +22,28 @@ const ROADMAP_SECTIONS = [
   },
   {
     title: '2. Current active phase',
-    items: [['Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning', 'Active']],
+    items: [['Phase 17B Firestore-enforced staff/worker role foundation', 'Active / rules not deployed']],
   },
   {
     title: '3. Next recommended phase',
-    items: [['Phase 17B Firestore-enforced staff/worker role design', 'Recommended next']],
+    items: [['Phase 17B rules review and separate deploy approval', 'Recommended next']],
   },
   {
     title: '4. High-priority operational backlog',
     items: [
       ['Clean-account route smoke path for every future feature', 'Required standard'],
-      ['Registration/guest count wording consistency', 'Phase 17A review'],
+      ['Registration/guest count wording consistency', 'Preserved'],
       ['CODEX_TEST-only QA workflows', 'Ongoing'],
     ],
   },
   {
     title: '5. Access / staff / worker permissions backlog',
     items: [
-      ['Firestore-enforced staff roles', 'Future planned'],
-      ['Scanner/check-in-only role enforcement', 'Future planned'],
-      ['Event manager role', 'Future planned'],
-      ['Viewer/read-only role', 'Future planned'],
-      ['Operations helper role', 'Future planned'],
+      ['Firestore-enforced staff roles', 'Phase 17B prototype'],
+      ['Scanner/check-in-only role enforcement', 'Phase 17B prototype'],
+      ['Event manager role', 'Phase 17B prototype'],
+      ['Viewer/read-only role', 'Phase 17B prototype'],
+      ['Operations helper role', 'Phase 17B prototype'],
       ['Mother/Event Manager simplified view', 'Future planned'],
     ],
   },
@@ -170,7 +171,7 @@ export function SettingsPage() {
 
       <SettingsSection eyebrow="Admin Access" title="Private access controls">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Roles currently control the admin interface display. Approved-admin allowlist is active Firestore enforcement. Firestore access is still enforced by the approved-admin email allowlist. Staff/scanner roles are planned and not rules-enforced yet. Do not add helpers or scanners to approvedEmails unless admin-level access is acceptable.
+          Approved-admin allowlist remains active owner/admin enforcement. Phase 17B adds a staffProfiles and event staffAssignments rules prototype for assigned staff, but those Firestore rules are not deployed yet. Do not add helpers or scanners to approvedEmails unless admin-level access is acceptable.
         </div>
 
         <div className="mt-4 grid gap-3">
@@ -203,7 +204,7 @@ export function SettingsPage() {
             ))}
           </div>
           <p className="mt-2 text-xs leading-5 text-[#8A7468]">
-            If rolesByEmail is missing or a role is not recognized, approved emails continue as Admin for backward compatibility. Temporary event-day helpers should not be given access until Firestore-enforced scanner/check-in-only rules are implemented, unless the organizer accepts the current UI-only limitation.
+            If rolesByEmail is missing or a role is not recognized, approved emails continue as Admin for backward compatibility. Temporary event-day helpers should not be added to approvedEmails; future staff access should use staffProfiles plus assigned event staffAssignments after rules review and deployment approval.
           </p>
         </div>
 

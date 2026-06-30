@@ -8,10 +8,17 @@ import {
   signInWithRedirect,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
+import { collectionGroup, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
 import { auth, db, isFirebaseConfigured } from '../lib/firebase'
 import { AuthContext } from './AuthContext'
-import { normalizeAccessEmail, resolveAccessRole, roleLabel } from '../utils/accessRoles'
+import {
+  defaultRouteForAccess,
+  getUserAccessLevel,
+  isApprovedAdmin,
+  normalizeAccessEmail,
+  resolveAccessRole,
+  roleLabel,
+} from '../utils/accessRoles'
 
 const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({ prompt: 'select_account' })
@@ -31,30 +38,86 @@ function redirectToWebAppHostIfNeeded() {
   return true
 }
 
-function adminAccessError(cause) {
+function workspaceAccessError(cause) {
   const error = new Error('This account is not approved for the private Gather & Savor workspace.', { cause })
   error.code = cause?.code === 'permission-denied' ? 'auth/unapproved-account' : 'auth/access-check-failed'
   return error
 }
 
-async function verifyAdminAccess(nextUser) {
-  if (!nextUser || !db) throw adminAccessError()
+async function readAdminAccessControl(nextUser) {
+  const accessDocument = await getDoc(doc(db, 'settings', 'accessControl'))
+  if (!accessDocument.exists()) return null
+
+  const data = accessDocument.data()
+  const approvedEmails = Array.isArray(data?.approvedEmails) ? data.approvedEmails : []
+  const userEmail = normalizeAccessEmail(nextUser.email)
+
+  if (!approvedEmails.map(normalizeAccessEmail).includes(userEmail)) return null
+  return data
+}
+
+async function readStaffAccess(nextUser) {
+  const profileSnapshot = await getDoc(doc(db, 'staffProfiles', nextUser.uid))
+  if (!profileSnapshot.exists()) return { staffProfile: null, staffAssignments: [], assignedEvents: [] }
+
+  const staffProfile = profileSnapshot.data()
+  const assignmentsSnapshot = await getDocs(query(
+    collectionGroup(db, 'staffAssignments'),
+    where('uid', '==', nextUser.uid),
+    where('status', '==', 'active'),
+  ))
+  const staffAssignments = assignmentsSnapshot.docs.map((assignmentDoc) => assignmentDoc.data())
+  const assignedEvents = []
+
+  for (const assignment of staffAssignments) {
+    if (!assignment?.eventId) continue
+    try {
+      const eventSnapshot = await getDoc(doc(db, 'events', assignment.eventId))
+      if (eventSnapshot.exists()) assignedEvents.push(eventSnapshot.data())
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.warn('[Diagnostic] Assigned event read failed:', {
+          eventId: assignment.eventId,
+          errorCode: error?.code,
+          errorMessage: error?.message,
+        })
+      }
+    }
+  }
+
+  return { staffProfile, staffAssignments, assignedEvents }
+}
+
+// verifyAdminAccess remains the approved-admin branch inside this broader Phase 17B workspace access check.
+async function verifyWorkspaceAccess(nextUser) {
+  if (!nextUser || !db) throw workspaceAccessError()
 
   try {
-    const accessDocument = await getDoc(doc(db, 'settings', 'accessControl'))
-    if (!accessDocument.exists()) throw adminAccessError()
-    
-    const data = accessDocument.data()
-    const approvedEmails = Array.isArray(data?.approvedEmails) ? data.approvedEmails : []
-    const userEmail = normalizeAccessEmail(nextUser.email)
-    
-    if (!approvedEmails.map(normalizeAccessEmail).includes(userEmail)) {
-      throw adminAccessError({ code: 'permission-denied' })
+    let accessControl = null
+    try {
+      accessControl = await readAdminAccessControl(nextUser)
+    } catch (error) {
+      if (!['permission-denied', 'firestore/permission-denied'].includes(error?.code) && import.meta.env.DEV) {
+        console.warn('[Diagnostic] accessControl read failed before staff fallback:', {
+          errorCode: error?.code,
+          errorMessage: error?.message,
+        })
+      }
     }
-    return data
+
+    if (accessControl) {
+      const access = getUserAccessLevel(nextUser, accessControl)
+      if (!isApprovedAdmin(access)) throw workspaceAccessError({ code: 'permission-denied' })
+      return { accessControl, staffProfile: null, staffAssignments: [], assignedEvents: [], access }
+    }
+
+    const { staffProfile, staffAssignments, assignedEvents } = await readStaffAccess(nextUser)
+    const access = getUserAccessLevel(nextUser, null, staffProfile, staffAssignments, assignedEvents)
+    if (access.level !== 'staff') throw workspaceAccessError({ code: 'permission-denied' })
+    return { accessControl: null, staffProfile, staffAssignments, assignedEvents, access }
   } catch (error) {
     if (import.meta.env.DEV) {
-      console.error('[Diagnostic] verifyAdminAccess failed:', {
+      console.error('[Diagnostic] verifyWorkspaceAccess failed:', {
         errorCode: error?.code,
         errorMessage: error?.message,
         authProvider: nextUser.providerData?.[0]?.providerId,
@@ -67,19 +130,23 @@ async function verifyAdminAccess(nextUser) {
     
     if (error?.code?.startsWith('auth/')) throw error
     if (error?.code === 'permission-denied' || error?.code === 'firestore/permission-denied') {
-      throw adminAccessError({ code: 'permission-denied' })
+      throw workspaceAccessError({ code: 'permission-denied' })
     }
-    throw adminAccessError(error)
+    throw workspaceAccessError(error)
   }
 }
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [accessControl, setAccessControl] = useState(null)
+  const [staffProfile, setStaffProfile] = useState(null)
+  const [staffAssignments, setStaffAssignments] = useState([])
+  const [assignedEvents, setAssignedEvents] = useState([])
+  const [access, setAccess] = useState(() => getUserAccessLevel(null))
   const [loading, setLoading] = useState(isFirebaseConfigured)
   const [authError, setAuthError] = useState('')
-  const currentRole = useMemo(() => resolveAccessRole(accessControl, user?.email) || 'admin', [accessControl, user?.email])
-  const currentRoleLabel = useMemo(() => roleLabel(currentRole), [currentRole])
+  const currentRole = useMemo(() => access.role || resolveAccessRole(accessControl, user?.email) || 'admin', [access.role, accessControl, user?.email])
+  const currentRoleLabel = useMemo(() => access.roleLabel || roleLabel(currentRole), [access.roleLabel, currentRole])
 
   useEffect(() => {
     if (!auth) {
@@ -94,10 +161,14 @@ export function AuthProvider({ children }) {
 
       setLoading(true)
       try {
-        const accessData = await verifyAdminAccess(nextUser)
+        const accessData = await verifyWorkspaceAccess(nextUser)
         if (active) {
           setUser(nextUser)
-          setAccessControl(accessData)
+          setAccessControl(accessData.accessControl)
+          setStaffProfile(accessData.staffProfile)
+          setStaffAssignments(accessData.staffAssignments)
+          setAssignedEvents(accessData.assignedEvents)
+          setAccess(accessData.access)
           setAuthError('')
           redirectToWebAppHostIfNeeded()
         }
@@ -105,6 +176,10 @@ export function AuthProvider({ children }) {
         if (active) {
           setUser(null)
           setAccessControl(null)
+          setStaffProfile(null)
+          setStaffAssignments([])
+          setAssignedEvents([])
+          setAccess(getUserAccessLevel(null))
           setAuthError(error.code || 'auth/access-check-failed')
         }
         await firebaseSignOut(auth)
@@ -125,6 +200,11 @@ export function AuthProvider({ children }) {
 
         if (!auth.currentUser) {
           setUser(null)
+          setAccessControl(null)
+          setStaffProfile(null)
+          setStaffAssignments([])
+          setAssignedEvents([])
+          setAccess(getUserAccessLevel(null))
           setLoading(false)
         }
       })
@@ -164,13 +244,21 @@ export function AuthProvider({ children }) {
 
     const result = await signInRequest()
     try {
-      const accessData = await verifyAdminAccess(result.user)
+      const accessData = await verifyWorkspaceAccess(result.user)
       setUser(result.user)
-      setAccessControl(accessData)
+      setAccessControl(accessData.accessControl)
+      setStaffProfile(accessData.staffProfile)
+      setStaffAssignments(accessData.staffAssignments)
+      setAssignedEvents(accessData.assignedEvents)
+      setAccess(accessData.access)
       return result
     } catch (error) {
       await firebaseSignOut(auth)
       setAccessControl(null)
+      setStaffProfile(null)
+      setStaffAssignments([])
+      setAssignedEvents([])
+      setAccess(getUserAccessLevel(null))
       setAuthError(error.code || 'auth/access-check-failed')
       throw error
     }
@@ -197,8 +285,13 @@ export function AuthProvider({ children }) {
     () => ({
       user,
       accessControl,
+      staffProfile,
+      staffAssignments,
+      assignedEvents,
+      access,
       currentRole,
       currentRoleLabel,
+      defaultRoute: defaultRouteForAccess(access),
       loading,
       authError,
       isConfigured: isFirebaseConfigured,
@@ -209,10 +302,14 @@ export function AuthProvider({ children }) {
         if (!auth) return Promise.resolve()
         setUser(null)
         setAccessControl(null)
+        setStaffProfile(null)
+        setStaffAssignments([])
+        setAssignedEvents([])
+        setAccess(getUserAccessLevel(null))
         return firebaseSignOut(auth)
       },
     }),
-    [accessControl, authError, completeSignIn, currentRole, currentRoleLabel, loading, startGoogleSignIn, user],
+    [access, accessControl, assignedEvents, authError, completeSignIn, currentRole, currentRoleLabel, loading, staffAssignments, staffProfile, startGoogleSignIn, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -30,7 +30,7 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
   assert.match(importsPage, /No Firestore write happens until you confirm valid rows/)
 })
 
-test('roadmap shows ordered Phase 17A backlog, closed shipped phases, deferred integrations, and future ops backlog', async () => {
+test('roadmap shows ordered Phase 17B backlog, closed shipped phases, deferred integrations, and future ops backlog', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const readme = await readFile('README.md', 'utf8')
   const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
@@ -51,7 +51,7 @@ test('roadmap shows ordered Phase 17A backlog, closed shipped phases, deferred i
     'Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update',
     'Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening',
     'Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning',
-    'Phase 17B Firestore-enforced staff/worker role design',
+    'Phase 17B Firestore-enforced staff/worker role foundation',
     'Google Sheets OAuth',
     'Gmail/Outlook OAuth',
     'Real AI API integration',
@@ -89,10 +89,10 @@ test('roadmap shows ordered Phase 17A backlog, closed shipped phases, deferred i
   assert.match(readme, /public sitemap\/JSON-LD/)
   assert.match(readme, /budget\/expense reporting/)
   assert.match(readme, /event-day run sheet/)
-  assert.match(handoff, /Phase 17B staff access plan/)
+  assert.match(handoff, /Phase 17B staff access model/)
 })
 
-test('private access status does not overclaim Firestore role enforcement', async () => {
+test('private access status describes Phase 17B rules prototype without live deploy overclaim', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const healthItems = buildRuntimeHealthItems({
@@ -109,13 +109,13 @@ test('private access status does not overclaim Firestore role enforcement', asyn
     buildCommit: 'abc123',
   })
 
-  assert.match(settings, /Roles currently control the admin interface display/)
-  assert.match(settings, /Firestore access is still enforced by the approved-admin email allowlist/)
-  assert.match(settings, /Temporary event-day helpers should not be given access/)
+  assert.match(settings, /Approved-admin allowlist remains active owner\/admin enforcement/)
+  assert.match(settings, /Phase 17B adds a staffProfiles and event staffAssignments rules prototype/)
+  assert.match(settings, /Temporary event-day helpers should not be added to approvedEmails/)
   assert.match(qa, /Staff roles enforcement level/)
-  assert.match(qa, /Firestore role enforcement/)
+  assert.match(qa, /Staff rules deploy status/)
   assert.equal(healthItems.find((item) => item.label === 'Staff roles enforcement level').status, 'warn')
-  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /Future phase/)
+  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /explicit rules-deploy approval/)
 })
 
 test('Event Operations page documents active ledger and future modules only', async () => {
@@ -125,7 +125,7 @@ test('Event Operations page documents active ledger and future modules only', as
   assert.match(operations, /Operations Ledger is active/)
   assert.match(operations, /separate from ticket sales/)
   assert.match(operations, /tasks, supplies, vendors, sponsors, school\/baker tracking/)
-  assert.match(operations, /does not add public access, sending, OAuth, Cloud Functions, Storage, payment processing, or new operations modules/)
+  assert.match(operations, /operations helpers can only view assigned-event entries/)
   assert.match(settings, /Operations Ledger/)
   assert.match(settings, /supplies checklist/)
   assert.match(settings, /baker\/vendor tracking/)

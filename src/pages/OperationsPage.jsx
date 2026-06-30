@@ -17,6 +17,7 @@ import {
   updateLedgerEntry,
 } from '../services/operationsLedgerService'
 import { InfoHint } from '../components/ui/InfoHint'
+import { canWriteOperations, isApprovedAdmin } from '../utils/accessRoles'
 
 const EMPTY_FORM = {
   entryType: 'income',
@@ -56,7 +57,7 @@ function FieldHelp({ children }) {
 }
 
 export function OperationsPage() {
-  const { user } = useAuth()
+  const { user, access } = useAuth()
   const { activeEvent } = useActiveEvent()
   const [registrations, setRegistrations] = useState([])
   const [entries, setEntries] = useState([])
@@ -67,11 +68,15 @@ export function OperationsPage() {
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const adminUser = isApprovedAdmin(access)
+  const canEditOperations = canWriteOperations(access, activeEvent?.eventId)
 
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
 
-    const unsubscribeRegs = subscribeToRegistrations(activeEvent.eventId, setRegistrations, () => {})
+    const unsubscribeRegs = adminUser
+      ? subscribeToRegistrations(activeEvent.eventId, setRegistrations, () => {})
+      : () => setRegistrations([])
     const unsubscribeLedger = subscribeToOperationsLedger(
       activeEvent.eventId,
       (rows) => {
@@ -89,7 +94,7 @@ export function OperationsPage() {
       unsubscribeRegs()
       unsubscribeLedger()
     }
-  }, [activeEvent?.eventId])
+  }, [activeEvent?.eventId, adminUser])
 
   const filteredEntries = entries.filter((entry) => {
     if (filters.type !== 'all' && entry.entryType !== filters.type) return false
@@ -121,6 +126,7 @@ export function OperationsPage() {
   }
 
   function editEntry(entry) {
+    if (!canEditOperations) return
     setEditing(entry)
     setForm({
       entryType: entry.entryType || 'income',
@@ -138,6 +144,10 @@ export function OperationsPage() {
 
   async function saveEntry(event) {
     event.preventDefault()
+    if (!canEditOperations) {
+      setError('This role can view assigned operations entries but cannot create or edit them.')
+      return
+    }
     if (!form.label.trim()) {
       setError('Entry label is required.')
       return
@@ -164,6 +174,10 @@ export function OperationsPage() {
   }
 
   async function cancelEntry(entry) {
+    if (!canEditOperations) {
+      setError('This role can view assigned operations entries but cannot cancel them.')
+      return
+    }
     if (!window.confirm(`Cancel ledger entry "${entry.label}" for ${activeEvent.eventName}?`)) return
     setSaving(true)
     setError('')
@@ -193,7 +207,10 @@ export function OperationsPage() {
       </header>
 
       <section className="flex items-center gap-2 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-        <p className="font-semibold text-[#6B564C]">Operations Ledger is active for sponsor income, vendor payments, expenses, reimbursements, and refunds.</p>
+        <p className="font-semibold text-[#6B564C]">
+          Operations Ledger is active for sponsor income, vendor payments, expenses, reimbursements, and refunds.
+          {!canEditOperations && ' Your role is read-only for this assigned event.'}
+        </p>
         <InfoHint label="Operations Ledger Info">
           This tracker is separate from ticket sales. Ticket revenue comes from registrations. Future modules for tasks, supplies, vendors, sponsors, school/baker tracking, event-day run sheets, reimbursements, and expense reporting are planned but not active yet.
         </InfoHint>
@@ -204,9 +221,11 @@ export function OperationsPage() {
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          ['Ticket expected revenue', formatCurrency(financeSummary.totalExpected)],
-          ['Ticket collected', formatCurrency(financeSummary.totalCollected)],
-          ['Ticket outstanding', formatCurrency(financeSummary.totalOutstanding)],
+          ...(adminUser ? [
+            ['Ticket expected revenue', formatCurrency(financeSummary.totalExpected)],
+            ['Ticket collected', formatCurrency(financeSummary.totalCollected)],
+            ['Ticket outstanding', formatCurrency(financeSummary.totalOutstanding)],
+          ] : []),
           ['Sponsor/other income', formatCurrency(operationsTotals.income)],
           ['Expenses', formatCurrency(operationsTotals.expenses)],
           ['Refunds', formatCurrency(operationsTotals.refunds)],
@@ -221,7 +240,7 @@ export function OperationsPage() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
-        <form onSubmit={saveEntry} className="rounded-2xl border border-[#EEDFD6] bg-white p-5">
+        {canEditOperations && <form onSubmit={saveEntry} className="rounded-2xl border border-[#EEDFD6] bg-white p-5">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="font-serif text-xl text-[#2B1723]">{editing ? 'Edit entry' : 'Add entry'}</h3>
             {editing && <button type="button" onClick={resetForm} className="rounded-lg p-2 text-[#8C7567] hover:bg-[#F2E8E1]" aria-label="Cancel edit"><X className="size-4" /></button>}
@@ -290,7 +309,17 @@ export function OperationsPage() {
             {editing ? <Save className="size-4" /> : <Plus className="size-4" />}
             {saving ? 'Saving...' : editing ? 'Save entry' : 'Add entry'}
           </button>
-        </form>
+        </form>}
+        {!canEditOperations && (
+          <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Read-only operations role</p>
+            <h3 className="mt-2 font-serif text-xl text-[#2B1723]">Assigned event ledger view</h3>
+            <p className="mt-3 text-sm leading-6 text-[#816D62]">
+              Operations helpers can review assigned-event ledger entries here. Creating, editing, cancelling, registration deletes,
+              import apply, payment edits, Settings, and admin controls remain unavailable.
+            </p>
+          </section>
+        )}
 
         <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -338,12 +367,18 @@ export function OperationsPage() {
                         <td className="px-3 py-3 font-bold">{formatCurrency(entry.amount)}</td>
                         <td className="px-3 py-3 text-xs text-[#816D62]">{entry.date}</td>
                         <td className="px-3 py-3 text-right">
-                          <button type="button" onClick={() => editEntry(entry)} disabled={saving || entry.status === 'cancelled'} className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#8C766A] hover:bg-[#FFF8F2] disabled:opacity-40">
-                            <Edit3 className="inline size-3.5" /> Edit
-                          </button>
-                          <button type="button" onClick={() => cancelEntry(entry)} disabled={saving || entry.status === 'cancelled'} className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#A32626] hover:bg-[#FFF1F1] disabled:opacity-40">
-                            Cancel
-                          </button>
+                          {canEditOperations ? (
+                            <>
+                              <button type="button" onClick={() => editEntry(entry)} disabled={saving || entry.status === 'cancelled'} className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#8C766A] hover:bg-[#FFF8F2] disabled:opacity-40">
+                                <Edit3 className="inline size-3.5" /> Edit
+                              </button>
+                              <button type="button" onClick={() => cancelEntry(entry)} disabled={saving || entry.status === 'cancelled'} className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#A32626] hover:bg-[#FFF1F1] disabled:opacity-40">
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-xs font-semibold text-[#8C7567]">Read-only</span>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -357,7 +392,7 @@ export function OperationsPage() {
 
       <p className="flex gap-2 rounded-xl border border-[#F2D6A3] bg-[#FFF7E8] px-4 py-3 text-xs leading-5 text-[#7A5818]">
         <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-        Operations ledger is admin-only, scoped to the selected Working Event, and does not add public access, sending, OAuth, Cloud Functions, Storage, payment processing, or new operations modules in this phase.
+        Operations ledger remains scoped to the selected Working Event. Admins can edit entries; operations helpers can only view assigned-event entries until a separately approved write scope is designed.
       </p>
     </div>
   )
