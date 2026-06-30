@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 29, 2026 (Phase 17B active; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
+Last updated: June 30, 2026 (Phase 17B closed, merged, and Hosting-deployed; Firestore rules prototype merged for review but not deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
 
 ## 1. Project overview
 
@@ -28,9 +28,9 @@ The repository currently contains:
 - Phase 15B: XLSX dependency security review plus roadmap/access/Event Operations status cleanup — closed, merged, and deployed.
 - Phase 16: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — closed, merged, and deployed.
 - Phase 17A: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — closed, merged, and deployed.
-- Phase 17B: Firestore-Enforced Staff / Worker Roles — active prototype; Firestore rules are not deployed yet.
+- Phase 17B: Staff / Worker Roles Foundation — closed, merged, and Hosting-deployed; Firestore rules prototype is merged for review but not deployed.
 
-Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner accounts must not be added to approvedEmails; Phase 17B introduces a prototype `staffProfiles/{uid}` and `events/{eventId}/staffAssignments/{uid}` rules-backed model for future scoped staff access.
+Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner accounts must not be added to approvedEmails; Phase 17B introduced a prototype `staffProfiles/{uid}` and `events/{eventId}/staffAssignments/{uid}` rules-backed model for future scoped staff access.
 
 Phase 16 investigated live browser loading differences across devices, kept the Phase 15A security headers intact, added a safe root loading error fallback, expanded QA Center guidance for CODEX_TEST ticket/check-in retesting, and hardened clean-account/null-config route loading. It did not add public portals, automatic sending, real AI API calls, Cloud Functions, Storage, or Firestore rule changes.
 
@@ -38,7 +38,7 @@ Permanent clean-account engineering standard: all future features must support c
 
 Phase 17A was not a rules or access-broadening phase. It reorganized backlog visibility, audited registration/guest count wording, preserved clean-account behavior, and prepared a Phase 17B staff/worker access plan without implementing Firestore role rules.
 
-Phase 17B is the active security phase for rules-enforced staff/worker roles. It keeps approved-admin access unchanged, adds prototype Firestore rules for staff profiles and assigned-event staff assignments, and requires a separate explicit Firestore rules deployment approval before any live staff access testing.
+Phase 17B closed the staff-role foundation and UI/access planning. It keeps approved-admin access unchanged and merged prototype Firestore rules for staff profiles and assigned-event staff assignments for review only. Those Firestore rules remain undeployed; real staff/scanner access requires Phase 17C with explicit Firestore rules deployment approval and a live staff smoke test.
 
 Backlog/status visibility order:
 
@@ -55,7 +55,7 @@ Backlog/status visibility order:
 
 Registration/guest count standard: registrations are registration records; guests are the sum of `personsAttending` across those records. One registration can represent more than one guest. If no Working Event is selected, routes must show a no-selected-event state instead of stale counts.
 
-Phase 17B staff access model: roles include owner/admin, event manager, scanner/check-in-only, viewer/read-only, and operations helper. Scanner/check-in-only must be restricted to assigned event lookup/check-in and must not have Events CRUD, registration delete, import apply, finance/operations ledger edits, settings/accessControl edits, auditLog delete/update, or broad CPB access unless explicitly assigned. The current `settings/accessControl` approved-admin allowlist remains the live owner/admin enforcement boundary. Prototype staff collections are `staffProfiles/{uid}` and `events/{eventId}/staffAssignments/{uid}`; role restrictions must be enforced by Firestore rules, not only UI navigation.
+Phase 17B staff access model: roles include owner/admin, event manager, scanner/check-in-only, viewer/read-only, and operations helper. Scanner/check-in-only must be restricted to assigned event lookup/check-in and must not have Events CRUD, registration delete, import apply, finance/operations ledger edits, settings/accessControl edits, auditLog delete/update, or broad CPB access unless explicitly assigned. The current `settings/accessControl` approved-admin allowlist remains the live owner/admin enforcement boundary and staff/scanner accounts must not be added to `approvedEmails`. Prototype staff collections are `staffProfiles/{uid}` and `events/{eventId}/staffAssignments/{uid}`; role restrictions must be enforced by Firestore rules, not only UI navigation. Live staff/scanner access is not active until Phase 17C reviews and deploys Firestore rules with organizer approval.
 
 ## Production QA fixture
 
@@ -711,10 +711,12 @@ Registration, import, ticket, and check-in writes include an audit log entry in 
 
 ## 23. Recommended next phase
 
-During Phase 17B, the implementation should stay narrow and preserve the clean-account engineering standard:
+Phase 17C is the next recommended phase. It should stay narrow and preserve the clean-account engineering standard:
 
-- Phase 17B: design and test Firestore-enforced staff/worker roles without broadening access prematurely
-- Separate follow-up: organizer-approved Firestore rules deployment and live staff smoke test
+- Review Phase 17B Firestore rules prototype before any deployment
+- Require explicit organizer approval before deploying Firestore rules
+- Run a live staff smoke test only after approved rules deployment
+- Keep staff/scanner accounts out of `approvedEmails`
 - Keep automatic sending and real AI API deferred
 
 Phase boundaries remain:
