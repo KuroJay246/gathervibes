@@ -81,6 +81,8 @@ Phase 17C-B is active on the branch for Firestore rules deployment approval, liv
 
 Phase 17C-B2 passed preflight, verified rollback readiness, verified `TEST_SCANNER_EMAIL` (`ojah13635@gmail.com`) as Firebase Auth UID `5WN4oTTesCYO14tX6HlUE6W5LM72`, confirmed it is outside `approvedEmails`, created/verified `staffProfiles/{uid}` and `events/xPfa0b3KZyLSDnAD2uGI/staffAssignments/{uid}`, and deployed Firestore rules only. Firestore indexes were not deployed. Staff/scanner/helper accounts must not be added to `approvedEmails`; approvedEmails remains admin-level access only.
 
+Phase 17C-B3 fixed the scanner login auth gate after the scanner signed in but was blocked by the approvedEmails-only message. approvedEmails is admin-level access only. Staff/scanner users must remain outside approvedEmails and must be admitted through active staffProfiles/{uid} plus active events/{eventId}/staffAssignments/{uid}. AuthProvider/ProtectedRoute must check both paths: approved admin first, then staff profile/assignment access before showing a not-approved message. Do not solve scanner login by adding the scanner to approvedEmails.
+
 Phase 17C-B testing must use CODEX_TEST only. CPB must not be selected, assigned, read as scanner, or used for QA. Native app work remains deferred; the current practical direction is a private PWA-style scanner shortcut/mode. Admin AppShell brand navigation returns approved admins to `/dashboard`; the isolated `/scanner` page does not gain admin-home logo navigation. Settings now uses category tabs with deep links such as `/settings?tab=access`.
 
 ## Phase 15B status

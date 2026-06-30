@@ -101,8 +101,8 @@ export function LoginPage() {
     setSubmitting('email')
 
     try {
-      await signIn(email.trim(), password)
-      navigate(from, { replace: true })
+      const result = await signIn(email.trim(), password)
+      navigate(result?.workspaceDefaultRoute || from, { replace: true })
     } catch (authError) {
       setError(getAuthErrorMessage(authError.code))
     } finally {

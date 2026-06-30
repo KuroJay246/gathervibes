@@ -153,7 +153,7 @@ test('Phase 17C-A regression helpers preserve clean account counts defaults and 
     [],
   )
 
-  assert.equal(scanner.level, 'staff')
+  assert.equal(scanner.level, 'none')
   assert.deepEqual(scanner.assignedEventIds, [])
   assert.equal(canCheckIn(scanner, STAFF_EVENT_ID), false)
   assert.equal(canCheckIn(scanner, CPB_EVENT_ID), false)

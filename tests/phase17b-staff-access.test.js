@@ -90,8 +90,9 @@ test('Phase 17B viewer and operations helper remain limited', () => {
 
 test('Phase 17B no assignment and clean local state are safe', () => {
   const access = getUserAccessLevel(scannerUser, null, { uid: scannerUser.uid, email: scannerUser.email, status: 'active', defaultRole: 'scanner' }, [])
-  assert.equal(access.level, 'staff')
+  assert.equal(access.level, 'none')
   assert.deepEqual(access.assignedEventIds, [])
+  assert.equal(canViewRoute(access, '/scanner'), false)
   assert.equal(canCheckIn(access, 'event-1'), false)
   assert.equal(getRegistrationGuestSummary([]), '0 registrations / 0 guests')
   assert.equal(getRegistrationGuestSummary([{ personsAttending: 3 }, {}]), '2 registrations / 4 guests')
@@ -112,7 +113,9 @@ test('Phase 17B UI surfaces staff role gating and assigned-event fallback', asyn
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
 
   assert.match(auth, /staffProfiles/)
-  assert.match(auth, /collectionGroup\(db, 'staffAssignments'\)/)
+  assert.match(auth, /STAFF_ASSIGNMENT_EVENT_IDS/)
+  assert.match(auth, /doc\(db, 'events', eventId, 'staffAssignments', nextUser\.uid\)/)
+  assert.doesNotMatch(auth, /collectionGroup\(db, 'staffAssignments'\)/)
   assert.match(protectedRoute, /canViewRoute/)
   assert.match(shell, /filter\(\(\{ to \}\) => canViewRoute\(access, to\)\)/)
   assert.match(app, /path="\/scanner"/)

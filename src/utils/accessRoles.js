@@ -192,14 +192,7 @@ export function getUserAccessLevel(user, accessControl = {}, staffProfile = null
       && ASSIGNED_STAFF_ROLES.has(assignment.role)
     ))
 
-  if (!activeAssignments.length) {
-    return {
-      ...DEFAULT_ACCESS,
-      level: 'staff',
-      role: normalizeAccessRole(profile.defaultRole) || null,
-      roleLabel: roleLabel(profile.defaultRole),
-    }
-  }
+  if (!activeAssignments.length) return DEFAULT_ACCESS
 
   const assignmentsByEvent = Object.fromEntries(activeAssignments.map((assignment) => [assignment.eventId, assignment]))
   const safeAssignedEvents = (Array.isArray(assignedEvents) ? assignedEvents : [])

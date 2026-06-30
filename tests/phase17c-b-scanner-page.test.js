@@ -76,10 +76,55 @@ test('Phase 17C-B no-assignment scanner state is safe', () => {
     [],
   )
 
-  assert.equal(scanner.level, 'staff')
+  assert.equal(scanner.level, 'none')
   assert.deepEqual(scanner.assignedEventIds, [])
+  assert.equal(canViewRoute(scanner, '/scanner'), false)
   assert.equal(canCheckIn(scanner, CODEX_TEST_EVENT_ID), false)
   assert.equal(canCheckIn(scanner, CPB_EVENT_ID), false)
+})
+
+test('Phase 17C-B3 staff auth path admits active scanner without approvedEmails', () => {
+  const scanner = getUserAccessLevel(
+    scannerUser,
+    { approvedEmails: ['admin@example.com'] },
+    { uid: scannerUser.uid, email: scannerUser.email, status: 'active', defaultRole: 'scanner' },
+    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_TEST_EVENT_ID, role: 'scanner', status: 'active' }],
+    [{ eventId: CODEX_TEST_EVENT_ID, eventName: 'CODEX_TEST Live Verification Event' }],
+  )
+
+  assert.equal(scanner.level, 'staff')
+  assert.equal(defaultRouteForAccess(scanner), '/scanner')
+  assert.equal(canViewRoute(scanner, '/scanner'), true)
+  assert.equal(canViewRoute(scanner, '/dashboard'), false)
+  assert.equal(canCheckIn(scanner, CODEX_TEST_EVENT_ID), true)
+})
+
+test('Phase 17C-B3 inactive staff profile and inactive assignments are denied', () => {
+  const inactiveProfile = getUserAccessLevel(
+    scannerUser,
+    null,
+    { uid: scannerUser.uid, email: scannerUser.email, status: 'inactive', defaultRole: 'scanner' },
+    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_TEST_EVENT_ID, role: 'scanner', status: 'active' }],
+    [{ eventId: CODEX_TEST_EVENT_ID, eventName: 'CODEX_TEST Live Verification Event' }],
+  )
+  const inactiveAssignment = getUserAccessLevel(
+    scannerUser,
+    null,
+    { uid: scannerUser.uid, email: scannerUser.email, status: 'active', defaultRole: 'scanner' },
+    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_TEST_EVENT_ID, role: 'scanner', status: 'inactive' }],
+    [{ eventId: CODEX_TEST_EVENT_ID, eventName: 'CODEX_TEST Live Verification Event' }],
+  )
+  const revokedAssignment = getUserAccessLevel(
+    scannerUser,
+    null,
+    { uid: scannerUser.uid, email: scannerUser.email, status: 'active', defaultRole: 'scanner' },
+    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_TEST_EVENT_ID, role: 'scanner', status: 'revoked' }],
+    [{ eventId: CODEX_TEST_EVENT_ID, eventName: 'CODEX_TEST Live Verification Event' }],
+  )
+
+  assert.equal(inactiveProfile.level, 'none')
+  assert.equal(inactiveAssignment.level, 'none')
+  assert.equal(revokedAssignment.level, 'none')
 })
 
 test('Phase 17C-B scanner route is outside AppShell and auto-selects a single assignment', async () => {
@@ -188,6 +233,25 @@ test('Phase 17C-B1b Settings tabs preserve required category content', async () 
   assert.match(settings, /Private admin app/)
   assert.match(settings, /noindex and robots\.txt Disallow: \//)
   assert.match(settings, /Google Sheets OAuth, Gmail\/Outlook OAuth, Cloud Functions, Storage, public portals, native app/)
+})
+
+test('Phase 17C-B3 AuthProvider checks staff path before not-approved error', async () => {
+  const authProvider = await readFile('src/auth/AuthProvider.jsx', 'utf8')
+  const protectedRoute = await readFile('src/auth/ProtectedRoute.jsx', 'utf8')
+  const loginPage = await readFile('src/pages/LoginPage.jsx', 'utf8')
+  const rules = await readFile('firestore.rules', 'utf8')
+
+  assert.match(authProvider, /STAFF_ASSIGNMENT_EVENT_IDS = \['xPfa0b3KZyLSDnAD2uGI'\]/)
+  assert.match(authProvider, /getDoc\(doc\(db, 'staffProfiles', nextUser\.uid\)\)/)
+  assert.match(authProvider, /getDoc\(doc\(db, 'events', eventId, 'staffAssignments', nextUser\.uid\)\)/)
+  assert.doesNotMatch(authProvider, /collectionGroup\(db, 'staffAssignments'\)/)
+  assert.match(authProvider, /access\.level !== 'staff' \|\| access\.assignedEventIds\.length === 0/)
+  assert.match(authProvider, /workspaceDefaultRoute: defaultRouteForAccess\(accessData\.access\)/)
+  assert.match(protectedRoute, /canViewRoute\(access, location\.pathname\)/)
+  assert.match(loginPage, /navigate\(result\?\.workspaceDefaultRoute \|\| from/)
+  assert.match(loginPage, /not approved in settings\/accessControl/)
+  assert.match(rules, /match \/staffProfiles\/\{uid\} \{[\s\S]*allow get: if isApprovedAdmin\(\)[\s\S]*request\.auth\.uid == uid[\s\S]*resource\.data\.status == 'active'/)
+  assert.match(rules, /match \/events\/\{eventId\}\/staffAssignments\/\{uid\} \{[\s\S]*allow get: if isApprovedAdmin\(\)[\s\S]*request\.auth\.uid == uid[\s\S]*resource\.data\.eventId == eventId[\s\S]*resource\.data\.status == 'active'/)
 })
 
 test('Phase 17C-B scanner lookup preserves QR privacy and manual fallback', async () => {
