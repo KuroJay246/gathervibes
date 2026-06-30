@@ -106,11 +106,58 @@ test('Phase 17C-B scanner page is narrow and excludes admin-only controls', asyn
   assert.match(scannerPage, /recordDuplicateCheckInAttempt/)
   assert.match(scannerPage, /Check-in requires one explicit button tap/)
   assert.match(scannerPage, /Duplicate check-in is blocked/)
-  assert.doesNotMatch(scannerPage, /undoCheckIn/)
+  assert.match(scannerPage, /undoCheckIn/)
+  assert.match(scannerPage, /isApprovedAdmin\(access\)/)
+  assert.match(scannerPage, /Admin Undo Check-In/)
+  assert.match(scannerPage, /window\.confirm/)
   assert.doesNotMatch(scannerPage, /saveTicketAssignment/)
   assert.doesNotMatch(scannerPage, /clearTicketAssignment/)
   assert.doesNotMatch(scannerPage, /bulkUpdatePaymentStatus/)
   assert.doesNotMatch(scannerPage, /bulkDeleteRegistrations/)
+})
+
+test('Phase 17C-B1 scanner undo is admin-only and reuses safe audited service', async () => {
+  const scannerPage = await readFile('src/pages/ScannerPage.jsx', 'utf8')
+  const ticketService = await readFile('src/services/ticketService.js', 'utf8')
+  const rules = await readFile('firestore.rules', 'utf8')
+
+  assert.match(scannerPage, /const canAdminUndoCheckIn = isApprovedAdmin\(access\)/)
+  assert.match(scannerPage, /if \(!canAdminUndoCheckIn\)/)
+  assert.match(scannerPage, /await undoCheckIn\(selectedRegistration, user\)/)
+  assert.match(scannerPage, /Admin Undo Check-In/)
+  assert.match(scannerPage, /checkedIn && \(/)
+  assert.match(ticketService, /action: 'checkin\.undo'/)
+  assert.match(ticketService, /batch\.update\(regRef,[\s\S]*checkedIn: false/)
+  assert.doesNotMatch(rules, /isAssignedScanner\(resource\.data\.eventId\)[\s\S]{0,240}isCheckInUndoUpdate/)
+})
+
+test('Phase 17C-B1 scanner shortcuts exist for approved admins without adding staff nav', async () => {
+  const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
+  const checkIn = await readFile('src/pages/CheckInPage.jsx', 'utf8')
+  const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
+  const app = await readFile('src/App.jsx', 'utf8')
+
+  assert.match(dashboard, /to: '\/scanner'[\s\S]*Scanner Mode/)
+  assert.match(checkIn, /to="\/scanner"[\s\S]*Open Scanner Mode/)
+  assert.match(settings, /href="\/scanner"[\s\S]*Open Scanner Mode/)
+  assert.match(app, /path="\/scanner"/)
+  assert.match(app, /<Route element=\{<ProtectedRoute \/>}/)
+})
+
+test('Phase 17C-B1 Settings documents future categories without rules rewriting UI', async () => {
+  const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
+
+  for (const category of ['General', 'Access & Roles', 'Scanner Mode', 'Events & Ticketing', 'Imports', 'Operations', 'Communications', 'QA & System Health', 'Security & Privacy', 'Integrations', 'Roadmap / About']) {
+    assert.match(settings, new RegExp(category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  }
+
+  for (const item of ['pending access requests', 'approve/decline staff access', 'assign role', 'assign event', 'revoke access', 'inactive/revoked status', 'staffProfiles/{uid}', 'events/{eventId}/staffAssignments/{uid}']) {
+    assert.match(settings, new RegExp(item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  }
+
+  assert.match(settings, /should not rewrite Firestore rules/)
+  assert.match(settings, /approvedEmails remains admin-level access only/)
+  assert.doesNotMatch(settings, /setDoc\(.*firestore\.rules|updateDoc\(.*firestore\.rules|rulesEditor|rulesTextarea/i)
 })
 
 test('Phase 17C-B scanner lookup preserves QR privacy and manual fallback', async () => {
@@ -123,6 +170,8 @@ test('Phase 17C-B scanner lookup preserves QR privacy and manual fallback', asyn
   assert.match(scannerPanel, /Check-in still requires confirmation/)
   assert.match(scannerPage, /Type a guest name or ticket code/)
   assert.match(scannerPage, /safeText\(selectedRegistration\.ticketCode/)
+  assert.match(scannerPage, /Check In/)
+  assert.match(scannerPage, /Record duplicate attempt/)
   assert.doesNotMatch(scannerPanel, /fullName.*GSV:TICKET|email.*GSV:TICKET|paymentStatus.*GSV:TICKET/)
 })
 

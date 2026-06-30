@@ -5,7 +5,8 @@ import { QrScannerPanel } from '../components/checkin/QrScannerPanel'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { subscribeToRegistrations } from '../services/registrationService'
-import { completeCheckIn, recordDuplicateCheckInAttempt } from '../services/ticketService'
+import { completeCheckIn, recordDuplicateCheckInAttempt, undoCheckIn } from '../services/ticketService'
+import { isApprovedAdmin } from '../utils/accessRoles'
 import { checkInWarnings, searchableRegistrationText } from '../utils/ticketUtils'
 import { formatCheckInTime } from '../utils/checkInUtils'
 import { normalizePaymentStatus } from '../utils/paymentStatus'
@@ -28,7 +29,7 @@ function ScannerField({ label, value }) {
 }
 
 export function ScannerPage() {
-  const { user, signOut } = useAuth()
+  const { user, signOut, access } = useAuth()
   const { activeEvent } = useActiveEvent()
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
@@ -77,6 +78,7 @@ export function ScannerPage() {
   const warnings = selectedRegistration ? checkInWarnings(selectedRegistration) : []
   const paymentStatus = normalizePaymentStatus(selectedRegistration?.paymentStatus)
   const checkedIn = Boolean(selectedRegistration?.checkedIn)
+  const canAdminUndoCheckIn = isApprovedAdmin(access)
 
   function selectRegistration(registration) {
     setSelectedRegistration(registration)
@@ -120,6 +122,37 @@ export function ScannerPage() {
     }
   }
 
+  async function handleAdminUndoCheckIn() {
+    if (!canAdminUndoCheckIn) {
+      setError('Undo Check-In is admin-only.')
+      return
+    }
+    if (!selectedRegistration?.checkedIn || saving) return
+    if (!window.confirm(`Undo check-in for ${selectedRegistration.fullName || 'this guest'}? This is an admin correction only.`)) return
+
+    setSaving(true)
+    setError('')
+    try {
+      await undoCheckIn(selectedRegistration, user)
+      setNotice(`Check-in undone for ${selectedRegistration.fullName || 'Guest'}.`)
+      setResumeScanTrigger((value) => value + 1)
+    } catch (undoError) {
+      setError(undoError?.message || 'Undo Check-In could not be completed.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function copyScannerLink() {
+    const scannerUrl = `${window.location.origin}/scanner`
+    try {
+      await navigator.clipboard.writeText(scannerUrl)
+      setNotice('Scanner Mode link copied.')
+    } catch {
+      setNotice(scannerUrl)
+    }
+  }
+
   return (
     <main className="min-h-[100dvh] bg-[#FBF8F5] px-4 py-4 sm:px-6 lg:px-8">
       <div className="mx-auto flex min-h-[calc(100dvh-2rem)] max-w-5xl flex-col gap-5">
@@ -134,14 +167,25 @@ export function ScannerPage() {
               <span>{safeText(activeEvent?.eventName, 'Assigned event')}</span>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={signOut}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 text-sm font-bold text-[#6B564C] hover:bg-[#FFF8F2]"
-          >
-            <LogOut className="size-4" />
-            Sign out
-          </button>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {canAdminUndoCheckIn && (
+              <button
+                type="button"
+                onClick={copyScannerLink}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 text-sm font-bold text-[#6B564C] hover:bg-[#FFF8F2]"
+              >
+                Copy Scanner Link
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={signOut}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 text-sm font-bold text-[#6B564C] hover:bg-[#FFF8F2]"
+            >
+              <LogOut className="size-4" />
+              Sign out
+            </button>
+          </div>
         </header>
 
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
@@ -248,15 +292,28 @@ export function ScannerPage() {
                       Check In
                     </button>
                     {checkedIn && (
-                      <button
-                        type="button"
-                        onClick={handleDuplicateAttempt}
-                        disabled={saving}
-                        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 text-sm font-bold text-[#6B564C] hover:bg-[#FFF8F2] disabled:opacity-50"
-                      >
-                        <RotateCcw className="size-4" />
-                        Record duplicate attempt
-                      </button>
+                      <>
+                        {canAdminUndoCheckIn && (
+                          <button
+                            type="button"
+                            onClick={handleAdminUndoCheckIn}
+                            disabled={saving}
+                            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#F2C3C3] bg-[#FFF8F8] px-4 text-sm font-bold text-[#A32626] hover:bg-[#FFF1F1] disabled:opacity-50"
+                          >
+                            <RotateCcw className="size-4" />
+                            Admin Undo Check-In
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={handleDuplicateAttempt}
+                          disabled={saving}
+                          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 text-sm font-bold text-[#6B564C] hover:bg-[#FFF8F2] disabled:opacity-50"
+                        >
+                          <RotateCcw className="size-4" />
+                          Record duplicate attempt
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>

@@ -102,6 +102,31 @@ const EVENT_OPERATIONS_BACKLOG = [
   'event-day run sheet',
 ]
 
+const SETTINGS_CENTER_CATEGORIES = [
+  'General',
+  'Access & Roles',
+  'Scanner Mode',
+  'Events & Ticketing',
+  'Imports',
+  'Operations',
+  'Communications',
+  'QA & System Health',
+  'Security & Privacy',
+  'Integrations',
+  'Roadmap / About',
+]
+
+const ACCESS_ROLES_FUTURE_PLAN = [
+  'pending access requests',
+  'approve/decline staff access',
+  'assign role',
+  'assign event',
+  'revoke access',
+  'inactive/revoked status',
+  'staffProfiles/{uid}',
+  'events/{eventId}/staffAssignments/{uid}',
+]
+
 function SettingsSection({ eyebrow, title, children }) {
   return (
     <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
@@ -208,6 +233,9 @@ export function SettingsPage() {
           <p className="mt-2 text-xs leading-5 text-[#8A7468]">
             If rolesByEmail is missing or a role is not recognized, approved emails continue as Admin for backward compatibility. Temporary event-day helpers should not be added to approvedEmails; future staff access should use staffProfiles plus assigned event staffAssignments after rules review and deployment approval.
           </p>
+          <a href="/scanner" className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1E7345] px-4 text-xs font-bold text-white hover:bg-[#17623A]">
+            Open Scanner Mode
+          </a>
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -264,6 +292,25 @@ export function SettingsPage() {
           {EVENT_OPERATIONS_BACKLOG.map((item) => (
             <span key={item} className="rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{item}</span>
           ))}
+        </div>
+      </SettingsSection>
+
+      <SettingsSection eyebrow="Phase 17D Candidate" title="Settings center planning">
+        <p className="text-sm leading-6 text-[#806C61]">
+          Future Settings can become a categorized app settings center. Access & Roles should manage role documents that stable Firestore rules enforce; the Settings UI should not rewrite Firestore rules. approvedEmails remains admin-level access only, and staff/scanner/helper accounts must not be added there.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {SETTINGS_CENTER_CATEGORIES.map((category) => (
+            <span key={category} className="rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{category}</span>
+          ))}
+        </div>
+        <div className="mt-4 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Access & Roles future plan</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {ACCESS_ROLES_FUTURE_PLAN.map((item) => (
+              <span key={item} className="rounded-full bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{item}</span>
+            ))}
+          </div>
         </div>
       </SettingsSection>
 
