@@ -14,6 +14,7 @@ import { TicketsPage } from './pages/TicketsPage'
 import { CheckInPage } from './pages/CheckInPage'
 import { CommunicationsPage } from './pages/CommunicationsPage'
 import { OperationsPage } from './pages/OperationsPage'
+import { ScannerPage } from './pages/ScannerPage'
 import { AssignedEventGate } from './components/AssignedEventGate'
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/security" element={<Navigate to="/settings" replace />} />
       <Route element={<ProtectedRoute />}>
+        <Route path="/scanner" element={<AssignedEventGate purpose="Scanner" autoSelectSingle><ScannerPage /></AssignedEventGate>} />
         <Route element={<AppShell />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />

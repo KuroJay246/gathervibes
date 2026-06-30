@@ -357,6 +357,12 @@ export function CheckInPage() {
         <div className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-3 text-xs text-[#6B564C]">
           QR scan, manual ticket lookup, and name search all use this Working Event only.
         </div>
+        <Link
+          to="/scanner"
+          className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1E7345] px-4 text-xs font-bold text-white hover:bg-[#17623A]"
+        >
+          Open Scanner Mode
+        </Link>
       </header>
 
       {error && <ErrorState message={error} onRetry={() => window.location.reload()} />}

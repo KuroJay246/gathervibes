@@ -46,6 +46,7 @@ export function LoginPage() {
     user,
     loading,
     authError,
+    defaultRoute,
     signIn,
     signInWithGoogle,
     isConfigured,
@@ -54,7 +55,7 @@ export function LoginPage() {
   const location = useLocation()
   const displayedError = error || (authError ? getAuthErrorMessage(authError) : '')
   const autoGoogleStarted = useRef(false)
-  const from = location.state?.from?.pathname || '/dashboard'
+  const from = location.state?.from?.pathname || defaultRoute || '/dashboard'
   const googleMode = new URLSearchParams(location.search).get('googleMode')
 
   const handleGoogleAuth = useCallback(async (mode) => {
@@ -90,7 +91,7 @@ export function LoginPage() {
   }, [googleMode, handleGoogleAuth, isConfigured, loading, user])
 
   if (loading) return <LoadingScreen />
-  if (user) return <Navigate to="/dashboard" replace />
+  if (user) return <Navigate to={defaultRoute || '/dashboard'} replace />
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -100,8 +101,8 @@ export function LoginPage() {
     setSubmitting('email')
 
     try {
-      await signIn(email.trim(), password)
-      navigate(from, { replace: true })
+      const result = await signIn(email.trim(), password)
+      navigate(result?.workspaceDefaultRoute || from, { replace: true })
     } catch (authError) {
       setError(getAuthErrorMessage(authError.code))
     } finally {

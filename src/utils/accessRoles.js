@@ -192,14 +192,7 @@ export function getUserAccessLevel(user, accessControl = {}, staffProfile = null
       && ASSIGNED_STAFF_ROLES.has(assignment.role)
     ))
 
-  if (!activeAssignments.length) {
-    return {
-      ...DEFAULT_ACCESS,
-      level: 'staff',
-      role: normalizeAccessRole(profile.defaultRole) || null,
-      roleLabel: roleLabel(profile.defaultRole),
-    }
-  }
+  if (!activeAssignments.length) return DEFAULT_ACCESS
 
   const assignmentsByEvent = Object.fromEntries(activeAssignments.map((assignment) => [assignment.eventId, assignment]))
   const safeAssignedEvents = (Array.isArray(assignedEvents) ? assignedEvents : [])
@@ -273,7 +266,7 @@ export function canViewRoute(access = DEFAULT_ACCESS, route = '') {
   if (isApprovedAdmin(access)) return true
   const normalizedRoute = route === '/' ? '/dashboard' : route
   const role = normalizeAccessRole(access?.role)
-  if (role === 'scanner') return normalizedRoute === '/check-in'
+  if (role === 'scanner') return normalizedRoute === '/scanner'
   if (role === 'operations-helper') return normalizedRoute === '/operations'
   if (role === 'viewer') return normalizedRoute === '/dashboard'
   if (role === 'event-manager') return ['/dashboard', '/check-in'].includes(normalizedRoute)
@@ -283,7 +276,7 @@ export function canViewRoute(access = DEFAULT_ACCESS, route = '') {
 export function defaultRouteForAccess(access = DEFAULT_ACCESS) {
   if (isApprovedAdmin(access)) return '/dashboard'
   const role = normalizeAccessRole(access?.role)
-  if (role === 'scanner') return '/check-in'
+  if (role === 'scanner') return '/scanner'
   if (role === 'operations-helper') return '/operations'
   return '/dashboard'
 }

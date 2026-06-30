@@ -389,6 +389,7 @@ export function DashboardPage() {
             </p>
             <div className="mt-5 grid gap-2">
               {[
+                { to: '/scanner', label: 'Scanner Mode', sub: 'Open the stripped-down event-day scanner.' },
                 { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Scan, search, check in, and undo.' },
                 { to: '/tickets', label: 'Tickets / QR Print List', sub: 'Assign codes and print QR lists.' },
                 { to: '/operations', label: 'Event Operations / Money Tracker', sub: 'Track sponsor income, expenses, refunds, and adjustments.' },
@@ -442,6 +443,7 @@ export function DashboardPage() {
                 { to: '/registrations', label: 'Registrations', sub: 'View and manage guest records.', icon: Users },
                 { to: '/imports', label: 'Import Center', sub: 'Upload or paste guest lists.', icon: FileInput },
                 { to: '/tickets', label: 'Tickets', sub: 'Assign ticket codes and generate QR codes.', icon: TicketCheck },
+                { to: '/scanner', label: 'Scanner Mode', sub: 'Open the focused event-day scanner.', icon: ScanLine },
                 { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Search, scan, check in, and undo check-ins.', icon: ScanLine },
                 { to: '/operations', label: 'Event Operations / Money Tracker', sub: 'Track non-ticket money by Working Event.', icon: ReceiptText },
                 { to: '/communications', label: 'Communications', sub: 'Prepare copy-ready guest messages.', icon: MessageSquareText },

@@ -8,7 +8,7 @@ import {
   signInWithRedirect,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
-import { collectionGroup, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
+import { doc, getDoc } from 'firebase/firestore'
 import { auth, db, isFirebaseConfigured } from '../lib/firebase'
 import { AuthContext } from './AuthContext'
 import {
@@ -25,6 +25,7 @@ googleProvider.setCustomParameters({ prompt: 'select_account' })
 
 const FIREBASE_APP_HOST = 'gathervibeshub.firebaseapp.com'
 const WEB_APP_HOST = 'gathervibeshub.web.app'
+const STAFF_ASSIGNMENT_EVENT_IDS = ['xPfa0b3KZyLSDnAD2uGI']
 
 function redirectToWebAppHostIfNeeded() {
   if (typeof window === 'undefined' || window.location.hostname !== FIREBASE_APP_HOST) {
@@ -61,23 +62,24 @@ async function readStaffAccess(nextUser) {
   if (!profileSnapshot.exists()) return { staffProfile: null, staffAssignments: [], assignedEvents: [] }
 
   const staffProfile = profileSnapshot.data()
-  const assignmentsSnapshot = await getDocs(query(
-    collectionGroup(db, 'staffAssignments'),
-    where('uid', '==', nextUser.uid),
-    where('status', '==', 'active'),
-  ))
-  const staffAssignments = assignmentsSnapshot.docs.map((assignmentDoc) => assignmentDoc.data())
+  const staffAssignments = []
   const assignedEvents = []
 
-  for (const assignment of staffAssignments) {
-    if (!assignment?.eventId) continue
+  for (const eventId of STAFF_ASSIGNMENT_EVENT_IDS) {
     try {
-      const eventSnapshot = await getDoc(doc(db, 'events', assignment.eventId))
+      const assignmentSnapshot = await getDoc(doc(db, 'events', eventId, 'staffAssignments', nextUser.uid))
+      if (!assignmentSnapshot.exists()) continue
+
+      const assignment = assignmentSnapshot.data()
+      if (assignment?.uid !== nextUser.uid || assignment?.status !== 'active' || assignment?.eventId !== eventId) continue
+
+      staffAssignments.push(assignment)
+      const eventSnapshot = await getDoc(doc(db, 'events', eventId))
       if (eventSnapshot.exists()) assignedEvents.push(eventSnapshot.data())
     } catch (error) {
       if (import.meta.env.DEV) {
-        console.warn('[Diagnostic] Assigned event read failed:', {
-          eventId: assignment.eventId,
+        console.warn('[Diagnostic] Staff assignment/event read failed:', {
+          eventId,
           errorCode: error?.code,
           errorMessage: error?.message,
         })
@@ -113,7 +115,7 @@ async function verifyWorkspaceAccess(nextUser) {
 
     const { staffProfile, staffAssignments, assignedEvents } = await readStaffAccess(nextUser)
     const access = getUserAccessLevel(nextUser, null, staffProfile, staffAssignments, assignedEvents)
-    if (access.level !== 'staff') throw workspaceAccessError({ code: 'permission-denied' })
+    if (access.level !== 'staff' || access.assignedEventIds.length === 0) throw workspaceAccessError({ code: 'permission-denied' })
     return { accessControl: null, staffProfile, staffAssignments, assignedEvents, access }
   } catch (error) {
     if (import.meta.env.DEV) {
@@ -251,7 +253,7 @@ export function AuthProvider({ children }) {
       setStaffAssignments(accessData.staffAssignments)
       setAssignedEvents(accessData.assignedEvents)
       setAccess(accessData.access)
-      return result
+      return { ...result, workspaceDefaultRoute: defaultRouteForAccess(accessData.access) }
     } catch (error) {
       await firebaseSignOut(auth)
       setAccessControl(null)
