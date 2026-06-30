@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 30, 2026 (Phase 17C-B active on branch for rules deployment approval, live scanner/staff smoke, and scanner-only PWA mode; Firestore rules not deployed unless required scanner test account and all preflight gates are satisfied; Phase 17C-A closed, merged, and Hosting-deployed; Phase 17B closed, merged, and Hosting-deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
+Last updated: June 30, 2026 (Phase 17C-B active on branch for rules deployment approval, live scanner/staff smoke, and scanner-only PWA mode; Phase 17C-B2 deployed Firestore rules after gates and is pending organizer scanner smoke confirmation; Phase 17C-A closed, merged, and Hosting-deployed; Phase 17B closed, merged, and Hosting-deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
 
 ## 1. Project overview
 
@@ -28,9 +28,9 @@ The repository currently contains:
 - Phase 15B: XLSX dependency security review plus roadmap/access/Event Operations status cleanup — closed, merged, and deployed.
 - Phase 16: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — closed, merged, and deployed.
 - Phase 17A: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — closed, merged, and deployed.
-- Phase 17B: Staff / Worker Roles Foundation — closed, merged, and Hosting-deployed; Firestore rules prototype is merged for review but not deployed.
-- Phase 17C-A: Firestore Rules Review + Deployment Readiness — closed, merged, and Hosting-deployed; Firestore rules were dry-run validated but not deployed.
-- Phase 17C-B: Firestore Rules Deployment Approval + Live Scanner/Staff Smoke + Scanner-Only PWA Mode — active on branch; rules deployment is gated by validation, rollback readiness, and a real scanner test account outside approvedEmails.
+- Phase 17B: Staff / Worker Roles Foundation — closed, merged, and Hosting-deployed; Firestore rules prototype was merged for review and not deployed at Phase 17B closeout.
+- Phase 17C-A: Firestore Rules Review + Deployment Readiness — closed, merged, and Hosting-deployed; Firestore rules were dry-run validated and not deployed at Phase 17C-A closeout.
+- Phase 17C-B: Firestore Rules Deployment Approval + Live Scanner/Staff Smoke + Scanner-Only PWA Mode — active on branch; Firestore rules deployed after B2 gates and pending organizer scanner smoke confirmation.
 
 Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner accounts must not be added to approvedEmails; Phase 17B introduced a prototype `staffProfiles/{uid}` and `events/{eventId}/staffAssignments/{uid}` rules-backed model for future scoped staff access.
 
@@ -40,11 +40,11 @@ Permanent clean-account engineering standard: all future features must support c
 
 Phase 17A was not a rules or access-broadening phase. It reorganized backlog visibility, audited registration/guest count wording, preserved clean-account behavior, and prepared a Phase 17B staff/worker access plan without implementing Firestore role rules.
 
-Phase 17B closed the staff-role foundation and UI/access planning. It keeps approved-admin access unchanged and merged prototype Firestore rules for staff profiles and assigned-event staff assignments for review only. Those Firestore rules remain undeployed; real staff/scanner access requires Phase 17C with explicit Firestore rules deployment approval and a live staff smoke test.
+Phase 17B closed the staff-role foundation and UI/access planning. It keeps approved-admin access unchanged and merged prototype Firestore rules for staff profiles and assigned-event staff assignments for review only. Those Firestore rules remained undeployed at Phase 17B closeout; real staff/scanner access requires Phase 17C with explicit Firestore rules deployment approval and a live staff smoke test.
 
-Phase 17C-A reviewed, hardened, documented, and tested the merged Phase 17B Firestore rules prototype without deploying it. Firestore rules were reviewed and dry-run validated; Firestore rules and Firestore indexes remain undeployed. Current live enforcement remains `settings/accessControl.approvedEmails`, which is admin-level access only. Staff/scanner/helper accounts must not be added to `approvedEmails`. Phase 17C-B is the next required step before real staff access: explicit organizer approval for Firestore rules deployment plus live staff smoke testing.
+Phase 17C-A reviewed, hardened, documented, and tested the merged Phase 17B Firestore rules prototype without deploying it. At Phase 17C-A closeout, Firestore rules were reviewed and dry-run validated while Firestore rules and Firestore indexes remained undeployed. Admin access remains controlled by `settings/accessControl.approvedEmails`, which is admin-level access only. Staff/scanner/helper accounts must not be added to `approvedEmails`. Phase 17C-B is the current required step before closeout: organizer scanner smoke and admin after-smoke confirmation.
 
-Phase 17C-B is active for explicit Firestore rules deployment approval, live scanner/staff smoke, and scanner-only PWA mode. The intended scanner surface is the private `/scanner` route: mobile-first, no AppShell admin navigation for scanner users, assigned-event-only lookup, safe guest/ticket/check-in fields, and one explicit Check In button tap. Firestore rules must not be deployed unless all validation passes, rollback readiness is prepared, and a real `TEST_SCANNER_EMAIL` exists as a Firebase Authentication user that is not in `approvedEmails`. If the test scanner account is missing, live staff/scanner access remains inactive. CODEX_TEST is the only allowed test event for scanner smoke; CPB must not be selected, assigned, read as scanner, or used for QA. Native app work remains deferred.
+Phase 17C-B is active for explicit Firestore rules deployment approval, live scanner/staff smoke, and scanner-only PWA mode. The intended scanner surface is the private `/scanner` route: mobile-first, no AppShell admin navigation for scanner users, assigned-event-only lookup, safe guest/ticket/check-in fields, and one explicit Check In button tap. Phase 17C-B2 passed preflight, verified rollback readiness, verified `TEST_SCANNER_EMAIL` (`ojah13635@gmail.com`) as Firebase Auth UID `5WN4oTTesCYO14tX6HlUE6W5LM72`, confirmed it is not in `approvedEmails`, created/verified `staffProfiles/{uid}` and `events/xPfa0b3KZyLSDnAD2uGI/staffAssignments/{uid}`, and deployed Firestore rules only. Firestore indexes were not deployed. CODEX_TEST is the only allowed test event for scanner smoke; CPB must not be selected, assigned, read as scanner, or used for QA. Native app work remains deferred.
 
 Phase 17C-B1b keeps scanner isolated while improving approved-admin navigation. The main admin AppShell brand mark links back to `/dashboard`; `/scanner` does not expose that admin-home brand behavior. Settings is organized into tabbed categories with query links such as `/settings?tab=access`, preserving approvedEmails warnings, TEST_SCANNER_EMAIL blocker status, CODEX_TEST/CPB guidance, deferred integrations, private indexing/security guidance, and the future Access & Roles plan without implementing an approval workflow or rules-rewrite UI.
 
@@ -726,7 +726,7 @@ Phase 17C-B is the current active branch phase after Phase 17C-A review. It shou
 - Keep staff/scanner accounts out of `approvedEmails`
 - Keep automatic sending and real AI API deferred
 
-Phase 17D should be considered only after Phase 17C-B gets organizer live confirmation. It can handle scanner polish such as scanner dashboard refinements, sound/haptic tuning, and event-day helper ergonomics without changing QR payloads or broadening access.
+Phase 17D should be considered only after Phase 17C-B gets organizer scanner smoke and admin after-smoke confirmation. It can handle scanner polish such as scanner dashboard refinements, sound/haptic tuning, and event-day helper ergonomics without changing QR payloads or broadening access.
 
 Phase boundaries remain:
 
