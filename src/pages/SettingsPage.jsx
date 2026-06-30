@@ -15,6 +15,8 @@ const ROADMAP_SECTIONS = [
       ['Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update', 'Closed / merged / deployed'],
       ['Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening', 'Closed / merged / deployed'],
       ['Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning', 'Closed / merged / deployed'],
+      ['Phase 17B Staff / Worker Roles Foundation', 'Closed / merged / Hosting-deployed'],
+      ['Phase 17C-A Firestore Rules Review + Deployment Readiness', 'Closed / merged / Hosting-deployed / rules not deployed'],
       ['Finance tracker', 'Phase 9 active'],
       ['Communications Pro', 'Phase 11 copy-only'],
       ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
@@ -22,11 +24,11 @@ const ROADMAP_SECTIONS = [
   },
   {
     title: '2. Current active phase',
-    items: [['Phase 17C-A Firestore rules review and deployment readiness', 'Active / review only / rules not deployed']],
+    items: [['Phase 17C-B rules deploy approval, live scanner smoke, and scanner-only PWA mode', 'Active / rules gated / TEST_SCANNER_EMAIL required']],
   },
   {
     title: '3. Next recommended phase',
-    items: [['Phase 17C-B explicit rules deployment approval and live staff smoke', 'Required before live staff access']],
+    items: [['Phase 17D scanner polish', 'Only after Phase 17C-B live confirmation']],
   },
   {
     title: '4. High-priority operational backlog',
@@ -39,11 +41,11 @@ const ROADMAP_SECTIONS = [
   {
     title: '5. Access / staff / worker permissions backlog',
     items: [
-      ['Firestore-enforced staff roles', 'Phase 17C-A review'],
-      ['Scanner/check-in-only role enforcement', 'Phase 17C-A review'],
-      ['Event manager role', 'Phase 17C-A review'],
-      ['Viewer/read-only role', 'Phase 17C-A review'],
-      ['Operations helper role', 'Phase 17C-A review'],
+      ['Firestore-enforced staff roles', 'Phase 17C-B deploy-gated'],
+      ['Scanner/check-in-only role enforcement', 'Phase 17C-B live-smoke gated'],
+      ['Event manager role', 'Phase 17C-B deploy-gated'],
+      ['Viewer/read-only role', 'Phase 17C-B deploy-gated'],
+      ['Operations helper role', 'Phase 17C-B deploy-gated'],
       ['Mother/Event Manager simplified view', 'Future planned'],
     ],
   },
@@ -171,7 +173,7 @@ export function SettingsPage() {
 
       <SettingsSection eyebrow="Admin Access" title="Private access controls">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Phase 17C-A reviews the merged staffProfiles and event staffAssignments rules prototype for assigned staff, but those Firestore rules are not deployed yet. Do not add helpers or scanners to approvedEmails unless admin-level access is acceptable.
+          Approved-admin allowlist remains active owner/admin enforcement. Phase 17C-B is preparing rules deployment approval and scanner smoke for assigned staff, but Firestore rules must remain undeployed until validation, rollback readiness, and TEST_SCANNER_EMAIL gates pass. Do not add helpers or scanners to approvedEmails unless admin-level access is acceptable.
         </div>
 
         <div className="mt-4 grid gap-3">
@@ -221,7 +223,7 @@ export function SettingsPage() {
           <p className="text-sm font-bold text-[#2B1723]">Current role behavior</p>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
           <p className="mt-2 text-xs leading-5 text-[#8A7468]">
-            Role editing, owner-only controls, rules deployment, and live staff smoke testing remain deferred to an explicit Phase 17C-B approval step.
+            Role editing, owner-only controls, and staff role live access remain deferred/gated by Phase 17C-B rules deployment approval and live scanner smoke. approvedEmails remains admin-level access only.
           </p>
         </div>
       </SettingsSection>

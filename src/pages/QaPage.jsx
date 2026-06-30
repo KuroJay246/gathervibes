@@ -167,9 +167,9 @@ export function QaPage() {
         { label: 'Approved admin detected', status: db && Array.isArray(accessControl?.approvedEmails) ? 'pass' : 'fail', detail: 'Protected page loaded with settings/accessControl allowlist access' },
         { label: 'Empty allowlist check', status: accessControl?.approvedEmails?.length > 0 ? 'pass' : 'fail', detail: accessControl?.approvedEmails?.length > 0 ? `${accessControl.approvedEmails.length} emails approved` : 'approvedEmails is missing or empty' },
         { label: 'No public access warning', status: 'pass', detail: 'App remains private and allowlist-only.' },
-        { label: 'Staff roles enforcement level', status: 'warning', detail: 'Phase 17C-A is reviewing the merged prototype rules; they are not deployed yet.' },
+        { label: 'Staff roles enforcement level', status: 'warning', detail: 'Phase 17C-B is active; rules deployment remains gated by validation, rollback readiness, and TEST_SCANNER_EMAIL.' },
         { label: 'Approved-admin allowlist active', status: 'pass', detail: 'settings/accessControl.approvedEmails remains owner/admin enforcement.' },
-        { label: 'Firestore role enforcement', status: 'warning', detail: 'Future phase for scanner/check-in-only and viewer restrictions.' },
+        { label: 'Firestore role enforcement', status: 'warning', detail: 'Scanner/check-in-only live access must wait for rules deploy approval and live smoke.' },
         { label: 'Communications templates available', status: COMMUNICATION_TEMPLATES.length >= 12 ? 'pass' : 'warning', detail: `${COMMUNICATION_TEMPLATES.length} copy-only templates` },
         { label: 'Communications segments available', status: COMMUNICATION_SEGMENTS.finance.length >= 9 ? 'pass' : 'warning', detail: 'Payment, finance, ticket, attendance, contact, and group filters available' },
         { label: 'Missing contact count', status: communicationsSummary.missingEmailOrPhone ? 'warning' : 'pass', detail: `${communicationsSummary.missingEmailOrPhone} rows missing email or phone` },
@@ -213,9 +213,9 @@ export function QaPage() {
         { label: 'Copy AI Prompt works', status: 'pass', detail: 'Verified' },
         { label: 'no AI API key exists', status: 'pass', detail: 'Copy-only prompt generation' },
         { label: 'no Google Sheets OAuth exists', status: 'pass', detail: 'Manual workflow helper active' },
-        { label: 'Phase 17C-A backlog order reviewed', status: 'pass', detail: 'Closed, current, next, operational, access/staff, Event Operations, QA/reliability, deferred, long-term, out of scope.' },
+        { label: 'Phase 17C-B backlog order reviewed', status: 'pass', detail: 'Closed, current, next, operational, access/staff, Event Operations, QA/reliability, deferred, long-term, out of scope.' },
         { label: 'Clean account route standard', status: 'pass', detail: 'No selected Working Event, empty localStorage, null config, BBD/GSV defaults, and no AppErrorBoundary fallback remain required.' },
-        { label: 'Staff rules deploy status', status: 'warning', detail: 'Do not live-test staff access until Firestore rules are reviewed and explicitly deployed.' },
+        { label: 'Staff rules deploy status', status: 'warning', detail: 'Do not live-test staff access until TEST_SCANNER_EMAIL exists and Firestore rules are explicitly deployed.' },
       ])
       setLastRunAt(new Date().toLocaleString())
     } catch (err) {

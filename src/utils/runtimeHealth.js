@@ -41,12 +41,12 @@ export function buildRuntimeHealthItems({
     {
       label: 'Current role detected',
       status: currentRoleLabel ? 'ok' : 'warn',
-      detail: currentRoleLabel ? `${currentRoleLabel} from approved-admin allowlist or Phase 17C-A staff profile/assignment review state.` : 'Role display is pending access load.',
+      detail: currentRoleLabel ? `${currentRoleLabel} from approved-admin allowlist or Phase 17C-B staff profile/assignment readiness state.` : 'Role display is pending access load.',
     },
     {
       label: 'Staff roles enforcement level',
       status: 'warn',
-      detail: 'Phase 17C-A is reviewing the merged prototype rules; they are not deployed yet.',
+      detail: 'Phase 17C-B is active; rules deployment remains gated by validation, rollback readiness, and TEST_SCANNER_EMAIL.',
     },
     {
       label: 'Approved-admin allowlist',
@@ -56,7 +56,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Firestore role enforcement',
       status: 'warn',
-      detail: 'Staff profile and event assignment rules require review and explicit rules-deploy approval before live use.',
+      detail: 'Staff profile and event assignment rules require explicit rules deployment and live scanner smoke before live use.',
     },
     {
       label: 'Events read',

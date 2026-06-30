@@ -1,16 +1,22 @@
+import { useEffect } from 'react'
 import { ClipboardCheck } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { formatEventDate } from '../utils/dateUtils'
 import { isApprovedAdmin, isAssignedStaff } from '../utils/accessRoles'
 
-export function AssignedEventGate({ children, purpose = 'this page' }) {
+export function AssignedEventGate({ children, purpose = 'this page', autoSelectSingle = false }) {
   const { access, assignedEvents = [] } = useAuth()
   const { activeEvent, setActiveEvent, clearActiveEvent } = useActiveEvent()
 
+  const activeEventIsAssigned = activeEvent?.eventId && isAssignedStaff(access, activeEvent.eventId)
+  useEffect(() => {
+    if (isApprovedAdmin(access) || !autoSelectSingle || activeEventIsAssigned || assignedEvents.length !== 1) return
+    setActiveEvent(assignedEvents[0])
+  }, [access, activeEventIsAssigned, assignedEvents, autoSelectSingle, setActiveEvent])
+
   if (isApprovedAdmin(access)) return children
 
-  const activeEventIsAssigned = activeEvent?.eventId && isAssignedStaff(access, activeEvent.eventId)
   if (activeEventIsAssigned) return children
 
   const handleSelect = (event) => {

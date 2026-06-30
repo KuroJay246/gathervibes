@@ -273,7 +273,7 @@ export function canViewRoute(access = DEFAULT_ACCESS, route = '') {
   if (isApprovedAdmin(access)) return true
   const normalizedRoute = route === '/' ? '/dashboard' : route
   const role = normalizeAccessRole(access?.role)
-  if (role === 'scanner') return normalizedRoute === '/check-in'
+  if (role === 'scanner') return normalizedRoute === '/scanner'
   if (role === 'operations-helper') return normalizedRoute === '/operations'
   if (role === 'viewer') return normalizedRoute === '/dashboard'
   if (role === 'event-manager') return ['/dashboard', '/check-in'].includes(normalizedRoute)
@@ -283,7 +283,7 @@ export function canViewRoute(access = DEFAULT_ACCESS, route = '') {
 export function defaultRouteForAccess(access = DEFAULT_ACCESS) {
   if (isApprovedAdmin(access)) return '/dashboard'
   const role = normalizeAccessRole(access?.role)
-  if (role === 'scanner') return '/check-in'
+  if (role === 'scanner') return '/scanner'
   if (role === 'operations-helper') return '/operations'
   return '/dashboard'
 }
