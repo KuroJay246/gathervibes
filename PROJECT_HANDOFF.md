@@ -46,6 +46,8 @@ Phase 17C-A reviewed, hardened, documented, and tested the merged Phase 17B Fire
 
 Phase 17C-B is active for explicit Firestore rules deployment approval, live scanner/staff smoke, and scanner-only PWA mode. The intended scanner surface is the private `/scanner` route: mobile-first, no AppShell admin navigation for scanner users, assigned-event-only lookup, safe guest/ticket/check-in fields, and one explicit Check In button tap. Firestore rules must not be deployed unless all validation passes, rollback readiness is prepared, and a real `TEST_SCANNER_EMAIL` exists as a Firebase Authentication user that is not in `approvedEmails`. If the test scanner account is missing, live staff/scanner access remains inactive. CODEX_TEST is the only allowed test event for scanner smoke; CPB must not be selected, assigned, read as scanner, or used for QA. Native app work remains deferred.
 
+Phase 17C-B1b keeps scanner isolated while improving approved-admin navigation. The main admin AppShell brand mark links back to `/dashboard`; `/scanner` does not expose that admin-home brand behavior. Settings is organized into tabbed categories with query links such as `/settings?tab=access`, preserving approvedEmails warnings, TEST_SCANNER_EMAIL blocker status, CODEX_TEST/CPB guidance, deferred integrations, private indexing/security guidance, and the future Access & Roles plan without implementing an approval workflow or rules-rewrite UI.
+
 Backlog/status visibility order:
 
 1. Closed / shipped phases

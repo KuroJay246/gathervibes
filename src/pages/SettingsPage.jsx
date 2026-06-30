@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { CheckCircle2, Database, KeyRound, LogOut, ShieldCheck, UserRound } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
@@ -7,88 +9,58 @@ import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeU
 import { ACCESS_ROLES, ROLE_ORDER, listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
 
 const ROADMAP_SECTIONS = [
-  {
-    title: '1. Closed / shipped phases',
-    items: [
-      ['Phase 14B CPB Payment Audit UI Cleanup / Operations Review Fixes', 'Closed'],
-      ['Phase 15A Hosting Security Headers + Private Indexing', 'Closed'],
-      ['Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update', 'Closed / merged / deployed'],
-      ['Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening', 'Closed / merged / deployed'],
-      ['Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning', 'Closed / merged / deployed'],
-      ['Phase 17B Staff / Worker Roles Foundation', 'Closed / merged / Hosting-deployed'],
-      ['Phase 17C-A Firestore Rules Review + Deployment Readiness', 'Closed / merged / Hosting-deployed / rules not deployed'],
-      ['Finance tracker', 'Phase 9 active'],
-      ['Communications Pro', 'Phase 11 copy-only'],
-      ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
-    ],
-  },
-  {
-    title: '2. Current active phase',
-    items: [['Phase 17C-B rules deploy approval, live scanner smoke, and scanner-only PWA mode', 'Active / rules gated / TEST_SCANNER_EMAIL required']],
-  },
-  {
-    title: '3. Next recommended phase',
-    items: [['Phase 17D scanner polish', 'Only after Phase 17C-B live confirmation']],
-  },
-  {
-    title: '4. High-priority operational backlog',
-    items: [
-      ['Clean-account route smoke path for every future feature', 'Required standard'],
-      ['Registration/guest count wording consistency', 'Preserved'],
-      ['CODEX_TEST-only QA workflows', 'Ongoing'],
-    ],
-  },
-  {
-    title: '5. Access / staff / worker permissions backlog',
-    items: [
-      ['Firestore-enforced staff roles', 'Phase 17C-B deploy-gated'],
-      ['Scanner/check-in-only role enforcement', 'Phase 17C-B live-smoke gated'],
-      ['Event manager role', 'Phase 17C-B deploy-gated'],
-      ['Viewer/read-only role', 'Phase 17C-B deploy-gated'],
-      ['Operations helper role', 'Phase 17C-B deploy-gated'],
-      ['Mother/Event Manager simplified view', 'Future planned'],
-    ],
-  },
-  {
-    title: '6. Event Operations backlog',
-    items: [['Event Operations expansion', 'Future planned']],
-  },
-  {
-    title: '7. QA / reliability backlog',
-    items: [
-      ['Clean/new approved account regression checks', 'Required standard'],
-      ['No selected Working Event regression checks', 'Required standard'],
-      ['AppErrorBoundary fallback should not appear on normal protected routes', 'Required standard'],
-    ],
-  },
-  {
-    title: '8. Deferred integrations',
-    items: [
-      ['Google Sheets OAuth', 'Deferred'],
-      ['Real AI API integration', 'Deferred'],
-      ['Gmail/Outlook OAuth', 'Deferred'],
-      ['Automatic email sending', 'Deferred'],
-      ['Automatic WhatsApp sending', 'Deferred'],
-      ['Cloud Functions', 'Deferred'],
-      ['Firebase Storage', 'Deferred'],
-      ['Payment gateway integration', 'Deferred'],
-    ],
-  },
-  {
-    title: '9. Public portals / native app / future long-term ideas',
-    items: [
-      ['Public attendee / baker / school portals', 'Deferred'],
-      ['Native app / app store build', 'Deferred'],
-    ],
-  },
-  {
-    title: '10. Explicitly not implemented / out of scope',
-    items: [
-      ['Public sitemap / JSON-LD for private admin app', 'Out of scope'],
-      ['Public signup or guest accounts', 'Out of scope'],
-      ['CPB use for QA', 'Out of scope'],
-    ],
-  },
+  { title: '1. Closed / shipped phases', items: [
+    ['Phase 14B CPB Payment Audit UI Cleanup / Operations Review Fixes', 'Closed'],
+    ['Phase 15A Hosting Security Headers + Private Indexing', 'Closed'],
+    ['Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update', 'Closed / merged / deployed'],
+    ['Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening', 'Closed / merged / deployed'],
+    ['Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning', 'Closed / merged / deployed'],
+    ['Phase 17B Staff / Worker Roles Foundation', 'Closed / merged / Hosting-deployed'],
+    ['Phase 17C-A Firestore Rules Review + Deployment Readiness', 'Closed / merged / Hosting-deployed / rules not deployed'],
+    ['Finance tracker', 'Phase 9 active'],
+    ['Communications Pro', 'Phase 11 copy-only'],
+    ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
+  ] },
+  { title: '2. Current active phase', items: [['Phase 17C-B rules deploy approval, live scanner smoke, and scanner-only PWA mode', 'Active / rules gated / TEST_SCANNER_EMAIL required']] },
+  { title: '3. Next recommended phase', items: [['Phase 17D scanner polish', 'Only after Phase 17C-B live confirmation']] },
+  { title: '4. High-priority operational backlog', items: [
+    ['Clean-account route smoke path for every future feature', 'Required standard'],
+    ['Registration/guest count wording consistency', 'Preserved'],
+    ['CODEX_TEST-only QA workflows', 'Ongoing'],
+  ] },
+  { title: '5. Access / staff / worker permissions backlog', items: [
+    ['Firestore-enforced staff roles', 'Phase 17C-B deploy-gated'],
+    ['Scanner/check-in-only role enforcement', 'Phase 17C-B live-smoke gated'],
+    ['Event manager role', 'Phase 17C-B deploy-gated'],
+    ['Viewer/read-only role', 'Phase 17C-B deploy-gated'],
+    ['Operations helper role', 'Phase 17C-B deploy-gated'],
+    ['Mother/Event Manager simplified view', 'Future planned'],
+  ] },
+  { title: '6. Event Operations backlog', items: [['Event Operations expansion', 'Future planned']] },
+  { title: '7. QA / reliability backlog', items: [
+    ['Clean/new approved account regression checks', 'Required standard'],
+    ['No selected Working Event regression checks', 'Required standard'],
+    ['AppErrorBoundary fallback should not appear on normal protected routes', 'Required standard'],
+  ] },
+  { title: '8. Deferred integrations', items: [
+    ['Google Sheets OAuth', 'Deferred'],
+    ['Real AI API integration', 'Deferred'],
+    ['Gmail/Outlook OAuth', 'Deferred'],
+    ['Automatic email sending', 'Deferred'],
+    ['Automatic WhatsApp sending', 'Deferred'],
+    ['Cloud Functions', 'Deferred'],
+    ['Firebase Storage', 'Deferred'],
+    ['Payment gateway integration', 'Deferred'],
+  ] },
+  { title: '9. Public portals / native app / future long-term ideas', items: [
+    ['Public attendee / baker / school portals', 'Deferred'],
+    ['Native app / app store build', 'Deferred'],
+  ] },
+  { title: '10. Explicitly not implemented / out of scope', items: [
+    ['Public sitemap / JSON-LD for private admin app', 'Out of scope'],
+    ['Public signup or guest accounts', 'Out of scope'],
+    ['CPB use for QA', 'Out of scope'],
+  ] },
 ]
 
 const EVENT_OPERATIONS_BACKLOG = [
@@ -102,20 +74,6 @@ const EVENT_OPERATIONS_BACKLOG = [
   'event-day run sheet',
 ]
 
-const SETTINGS_CENTER_CATEGORIES = [
-  'General',
-  'Access & Roles',
-  'Scanner Mode',
-  'Events & Ticketing',
-  'Imports',
-  'Operations',
-  'Communications',
-  'QA & System Health',
-  'Security & Privacy',
-  'Integrations',
-  'Roadmap / About',
-]
-
 const ACCESS_ROLES_FUTURE_PLAN = [
   'pending access requests',
   'approve/decline staff access',
@@ -125,6 +83,21 @@ const ACCESS_ROLES_FUTURE_PLAN = [
   'inactive/revoked status',
   'staffProfiles/{uid}',
   'events/{eventId}/staffAssignments/{uid}',
+]
+
+const SETTINGS_TABS = [
+  ['profile', 'Profile'],
+  ['workspace', 'Workspace'],
+  ['events', 'Events & Defaults'],
+  ['access', 'Access & Roles'],
+  ['scanner', 'Scanner Mode'],
+  ['tickets', 'Tickets & Check-In'],
+  ['imports', 'Imports & Data'],
+  ['finance', 'Finance & Operations'],
+  ['communications', 'Communications'],
+  ['qa', 'QA & System Health'],
+  ['security', 'Security & Privacy'],
+  ['roadmap', 'Integrations & Roadmap'],
 ]
 
 function SettingsSection({ eyebrow, title, children }) {
@@ -147,12 +120,16 @@ function InfoRow({ label, value }) {
 }
 
 function ProfileAvatar({ user }) {
-  if (user?.photoURL) {
-    return <img src={user.photoURL} alt="" className="size-16 rounded-full object-cover" referrerPolicy="no-referrer" />
-  }
+  if (user?.photoURL) return <img src={user.photoURL} alt="" className="size-16 rounded-full object-cover" referrerPolicy="no-referrer" />
+  return <div className="grid size-16 place-items-center rounded-full bg-[#F7DDE6] text-xl font-bold uppercase text-[#2B1723]">{user?.displayName?.slice(0, 1) || user?.email?.slice(0, 1) || 'A'}</div>
+}
+
+function PillList({ items, tone = 'plain' }) {
   return (
-    <div className="grid size-16 place-items-center rounded-full bg-[#F7DDE6] text-xl font-bold uppercase text-[#2B1723]">
-      {user?.displayName?.slice(0, 1) || user?.email?.slice(0, 1) || 'A'}
+    <div className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <span key={item} className={`${tone === 'white' ? 'bg-white' : 'bg-[#F7F1ED]'} rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]`}>{item}</span>
+      ))}
     </div>
   )
 }
@@ -160,64 +137,70 @@ function ProfileAvatar({ user }) {
 export function SettingsPage() {
   const { user, signOut, accessControl, currentRole, currentRoleLabel } = useAuth()
   const { activeEvent } = useActiveEvent()
+  const [searchParams, setSearchParams] = useSearchParams()
   const approvedEntries = listApprovedAccessEntries(accessControl || {})
   const rolesConfigured = Boolean(accessControl?.rolesByEmail && Object.keys(accessControl.rolesByEmail).length > 0)
+  const requestedTab = searchParams.get('tab') || 'profile'
+  const activeTab = SETTINGS_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'profile'
 
-  return (
-    <div className="grid min-w-0 gap-6 xl:grid-cols-2">
-      <SettingsSection eyebrow="My Admin Profile" title="Signed-in admin">
-        <div className="flex items-center gap-4">
-          <ProfileAvatar user={user} />
-          <div className="min-w-0">
-            <p className="break-words text-lg font-bold text-[#2B1723]">{user?.displayName || 'Gather & Savor Admin'}</p>
-            <p className="mt-1 break-words text-sm text-[#816D62]">{user?.email || 'No email available'}</p>
-            <p className="mt-2 inline-flex rounded-full bg-[#EAF6EF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#2F855A]">{currentRoleLabel}</p>
+  const tabPanels = useMemo(() => ({
+    profile: (
+      <div className="grid min-w-0 gap-6 xl:grid-cols-2">
+        <SettingsSection eyebrow="My Admin Profile" title="Signed-in admin">
+          <div className="flex items-center gap-4">
+            <ProfileAvatar user={user} />
+            <div className="min-w-0">
+              <p className="break-words text-lg font-bold text-[#2B1723]">{user?.displayName || 'Gather & Savor Admin'}</p>
+              <p className="mt-1 break-words text-sm text-[#816D62]">{user?.email || 'No email available'}</p>
+              <p className="mt-2 inline-flex rounded-full bg-[#EAF6EF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#2F855A]">{currentRoleLabel}</p>
+            </div>
           </div>
-        </div>
-        <div className="mt-6 rounded-2xl border border-[#EFE2DA] p-4">
-          <InfoRow label="Auth provider" value={user?.providerData?.[0]?.providerId || 'Firebase Auth'} />
-          <InfoRow label="Organizer display name" value={user?.displayName || 'Use Google profile name'} />
-          <InfoRow label="Role label" value={currentRoleLabel} />
-          <InfoRow label="Role source" value={rolesConfigured ? 'settings/accessControl.rolesByEmail' : 'approvedEmails fallback'} />
-        </div>
-        <button type="button" onClick={signOut} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#2B1723] px-5 py-3 text-sm font-bold text-white">
-          <LogOut className="size-4" />
-          Log out
-        </button>
-      </SettingsSection>
-
-      <SettingsSection eyebrow="Workspace / Organization" title="Gather & Savor workspace">
+          <div className="mt-6 rounded-2xl border border-[#EFE2DA] p-4">
+            <InfoRow label="Auth provider" value={user?.providerData?.[0]?.providerId || 'Firebase Auth'} />
+            <InfoRow label="Role label" value={currentRoleLabel} />
+            <InfoRow label="Role source" value={rolesConfigured ? 'settings/accessControl.rolesByEmail' : 'approvedEmails fallback'} />
+          </div>
+          <button type="button" onClick={signOut} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#2B1723] px-5 py-3 text-sm font-bold text-white">
+            <LogOut className="size-4" />
+            Log out
+          </button>
+        </SettingsSection>
+        <SettingsSection eyebrow="System Health" title="Connection summary">
+          <div className="grid gap-3">
+            <InfoRow label="Authentication" value="Google sign-in remains unchanged" />
+            <InfoRow label="Firebase project" value={firebaseProjectId || 'Configured at build time'} />
+            <InfoRow label="Firebase config" value={isFirebaseConfigured ? 'Loaded' : 'Missing'} />
+          </div>
+        </SettingsSection>
+      </div>
+    ),
+    workspace: (
+      <SettingsSection eyebrow="Workspace" title="Working Event and clean-account state">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
           <InfoRow label="App name" value="Gather & Savor Event Hub" />
           <InfoRow label="Organization" value="Gather & Savor Vibes" />
+          <InfoRow label="Current Working Event" value={activeEvent?.eventName || 'No event selected'} />
+          <InfoRow label="Clean-account state" value="Routes must not show stale Working Event data" />
+        </div>
+        <p className="mt-3 text-sm leading-6 text-[#806C61]">If no Working Event is selected, protected pages should show a safe no-selected-event state instead of stale counts or data.</p>
+      </SettingsSection>
+    ),
+    events: (
+      <SettingsSection eyebrow="Events & Defaults" title="Event configuration fallbacks">
+        <div className="rounded-2xl border border-[#EFE2DA] p-4">
           <InfoRow label="Default timezone" value="America/Halifax" />
-          <InfoRow label="Default currency" value="BBD / USD-ready" />
-          <InfoRow label="Logo" value="Brand mark enabled; uploads disabled" />
+          <InfoRow label="Default currency" value="BBD fallback" />
+          <InfoRow label="Default ticket prefix" value="GSV fallback" />
+          <InfoRow label="priceTiers fallback" value="[]" />
+          <InfoRow label="Default payment method" value={formatPaymentMethod(DEFAULT_FINANCE_SETTINGS.defaultPaymentMethod)} />
         </div>
       </SettingsSection>
-
-      <SettingsSection eyebrow="Admin Access" title="Private access controls">
+    ),
+    access: (
+      <SettingsSection eyebrow="Access & Roles" title="Admin allowlist and future staff access">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Phase 17C-B is preparing rules deployment approval and scanner smoke for assigned staff, but Firestore rules must remain undeployed until validation, rollback readiness, and TEST_SCANNER_EMAIL gates pass. Do not add helpers or scanners to approvedEmails unless admin-level access is acceptable.
+          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17C-B is preparing rules deployment approval and scanner smoke, but Phase 17C-B remains blocked until TEST_SCANNER_EMAIL is provided and rules deployment gates pass.
         </div>
-
-        <div className="mt-4 grid gap-3">
-          <div className="flex items-center gap-3 rounded-2xl border border-[#EFE2DA] p-4">
-            <ShieldCheck className="size-5 text-[#B76E79]" />
-            <div>
-              <p className="text-sm font-bold text-[#2B1723]">Approved admin allowlist</p>
-              <p className="text-xs text-[#816D62]">Active in settings/accessControl. Random signed-in users remain blocked.</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 rounded-2xl border border-[#EFE2DA] p-4">
-            <ShieldCheck className="size-5 text-[#B76E79]" />
-            <div>
-              <p className="text-sm font-bold text-[#2B1723]">Current user status</p>
-              <p className="text-xs text-[#816D62]">{user?.email ? `Signed in and approved as ${currentRoleLabel}` : 'Not signed in'}</p>
-            </div>
-          </div>
-        </div>
-
         <div className="mt-5">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Approved emails and roles</p>
           <div className="mt-3 overflow-hidden rounded-2xl border border-[#EFE2DA]">
@@ -230,14 +213,7 @@ export function SettingsPage() {
               </div>
             ))}
           </div>
-          <p className="mt-2 text-xs leading-5 text-[#8A7468]">
-            If rolesByEmail is missing or a role is not recognized, approved emails continue as Admin for backward compatibility. Temporary event-day helpers should not be added to approvedEmails; future staff access should use staffProfiles plus assigned event staffAssignments after rules review and deployment approval.
-          </p>
-          <a href="/scanner" className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1E7345] px-4 text-xs font-bold text-white hover:bg-[#17623A]">
-            Open Scanner Mode
-          </a>
         </div>
-
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {ROLE_ORDER.map((roleId) => (
             <div key={roleId} className="rounded-2xl border border-[#EFE2DA] p-4">
@@ -246,75 +222,99 @@ export function SettingsPage() {
             </div>
           ))}
         </div>
-
         <div className="mt-5 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
           <p className="text-sm font-bold text-[#2B1723]">Current role behavior</p>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
-          <p className="mt-2 text-xs leading-5 text-[#8A7468]">
-            Role editing, owner-only controls, and staff role live access remain deferred/gated by Phase 17C-B rules deployment approval and live scanner smoke. approvedEmails remains admin-level access only.
-          </p>
+          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Firestore rules stay stable; approved admins will manage staffProfiles and events/{'{eventId}'}/staffAssignments/{'{uid}'} documents later. Firestore rules must remain undeployed until validation, rollback readiness, and TEST_SCANNER_EMAIL gates pass.</p>
+        </div>
+        <div className="mt-4">
+          <PillList items={ACCESS_ROLES_FUTURE_PLAN} tone="white" />
         </div>
       </SettingsSection>
-
-      <SettingsSection eyebrow="Event Defaults" title="Import and check-in defaults">
+    ),
+    scanner: (
+      <SettingsSection eyebrow="Scanner Mode" title="Private scanner shortcut">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Link to="/scanner" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1E7345] px-4 text-xs font-bold text-white hover:bg-[#17623A]">Open Scanner Mode</Link>
+          <button type="button" onClick={() => navigator.clipboard?.writeText(`${window.location.origin}/scanner`)} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] bg-white px-4 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]">Copy Scanner Link</button>
+        </div>
+        <div className="mt-5 rounded-2xl border border-[#EFE2DA] p-4">
+          <InfoRow label="Route" value="/scanner" />
+          <InfoRow label="Mode" value="Scanner-only isolated layout" />
+          <InfoRow label="Admin correction" value="Admin-only Undo Check-In" />
+          <InfoRow label="Scanner role" value="Cannot undo check-in" />
+          <InfoRow label="Live smoke" value="CODEX_TEST only; TEST_SCANNER_EMAIL required" />
+        </div>
+      </SettingsSection>
+    ),
+    tickets: (
+      <SettingsSection eyebrow="Tickets & Check-In" title="Ticket assignment and event-day safety">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
-          <InfoRow label="Default ticket prefix" value="Event initials, fallback GSV" />
-          <InfoRow label="Default payment statuses" value="Paid, Pending, Complimentary, Door Paid, To Pay at Door" />
-          <InfoRow label="Import behavior" value="Preview first; missing tickets may stay blank" />
-          <InfoRow label="Check-in behavior" value="Warn on pending/door, do not auto-block" />
-          <InfoRow label="Communication footer" value="Copy-ready messages only" />
+          <InfoRow label="QR payload" value="GSV:TICKET:{ticketCode}" />
+          <InfoRow label="Duplicate check-in" value="Blocked and can record append-only audit attempt" />
+          <InfoRow label="Admin undo" value="Audited correction only" />
+          <InfoRow label="Scanner check-in" value="Requires explicit Check In tap" />
         </div>
       </SettingsSection>
-
-      <SettingsSection eyebrow="Finance Defaults" title="Money tracker defaults">
+    ),
+    imports: (
+      <SettingsSection eyebrow="Imports & Data" title="Preview-first data import">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
-          <InfoRow label="Default currency" value={DEFAULT_FINANCE_SETTINGS.currency} />
-          <InfoRow label="Default ticket price" value="Legacy event field only; explicit tiers/registration prices drive totals" />
-          <InfoRow label="Default price tier" value={DEFAULT_FINANCE_SETTINGS.defaultPriceTier} />
-          <InfoRow label="Default payment method" value={formatPaymentMethod(DEFAULT_FINANCE_SETTINGS.defaultPaymentMethod)} />
-          <InfoRow label="Allow blank ticket codes" value={DEFAULT_FINANCE_SETTINGS.allowBlankTicketCodes ? 'Yes' : 'No'} />
-          <InfoRow label="Allow door payment" value={DEFAULT_FINANCE_SETTINGS.allowDoorPayment ? 'Yes' : 'No'} />
-          <InfoRow label="Require payment reference for paid status" value={DEFAULT_FINANCE_SETTINGS.requirePaymentReferenceForPaidStatus ? 'Yes' : 'No'} />
-          <InfoRow label="Show finance warnings" value={DEFAULT_FINANCE_SETTINGS.showFinanceWarnings ? 'Yes' : 'No'} />
+          <InfoRow label="CSV import" value="Active, preview before write" />
+          <InfoRow label="XLSX import" value="Active with read-excel-file/browser" />
+          <InfoRow label="SheetJS xlsx" value="Absent" />
+          <InfoRow label="Google Sheets OAuth" value="Deferred" />
         </div>
-        <p className="mt-3 text-xs leading-5 text-[#8A7468]">
-          These are safe app defaults for this foundation. Persisted workspace-level finance settings are deferred until a dedicated settings schema is approved.
-        </p>
       </SettingsSection>
-
-      <SettingsSection eyebrow="Event Operations" title="Current status and future modules">
+    ),
+    finance: (
+      <SettingsSection eyebrow="Finance & Operations" title="Operations ledger and future modules">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
           <InfoRow label="Operations Ledger" value="Active for selected Working Event" />
           <InfoRow label="Ticket sales finance" value="Separate from operations ledger" />
-          <InfoRow label="Future modules" value="Planned, not active yet" />
+          <InfoRow label="Payment gateway" value="Not implemented" />
         </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {EVENT_OPERATIONS_BACKLOG.map((item) => (
-            <span key={item} className="rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{item}</span>
-          ))}
+        <div className="mt-4">
+          <PillList items={EVENT_OPERATIONS_BACKLOG} />
         </div>
       </SettingsSection>
-
-      <SettingsSection eyebrow="Phase 17D Candidate" title="Settings center planning">
-        <p className="text-sm leading-6 text-[#806C61]">
-          Future Settings can become a categorized app settings center. Access & Roles should manage role documents that stable Firestore rules enforce; the Settings UI should not rewrite Firestore rules. approvedEmails remains admin-level access only, and staff/scanner/helper accounts must not be added there.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {SETTINGS_CENTER_CATEGORIES.map((category) => (
-            <span key={category} className="rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{category}</span>
-          ))}
-        </div>
-        <div className="mt-4 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Access & Roles future plan</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {ACCESS_ROLES_FUTURE_PLAN.map((item) => (
-              <span key={item} className="rounded-full bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{item}</span>
-            ))}
-          </div>
+    ),
+    communications: (
+      <SettingsSection eyebrow="Communications" title="Copy-only communications">
+        <div className="rounded-2xl border border-[#EFE2DA] p-4">
+          <InfoRow label="Communications Pro" value="Copy-only" />
+          <InfoRow label="AI Draft Lab" value="Prompt builder only" />
+          <InfoRow label="Automatic sending" value="Not enabled" />
+          <InfoRow label="Real AI API" value="Not enabled" />
         </div>
       </SettingsSection>
-
-      <SettingsSection eyebrow="Deferred Features / Roadmap" title="Backlog visibility">
+    ),
+    qa: (
+      <SettingsSection eyebrow="QA & System Health" title="Production QA boundaries">
+        <div className="rounded-2xl border border-[#EFE2DA] p-4">
+          <InfoRow label="Safe QA event" value="CODEX_TEST Live Verification Event" />
+          <InfoRow label="CPB" value="Protected production data; do not use for QA" />
+          <InfoRow label="auditLogs" value="Append-only; do not delete" />
+          <InfoRow label="Manual QA" value="Use CODEX_TEST only" />
+        </div>
+        <div className="mt-6">
+          <SystemHealthPanel />
+        </div>
+      </SettingsSection>
+    ),
+    security: (
+      <SettingsSection eyebrow="Security & Privacy" title="Private admin app protections">
+        <div className="rounded-2xl border border-[#EFE2DA] p-4">
+          <InfoRow label="Private admin app" value="No public attendee access" />
+          <InfoRow label="Robots" value="noindex and robots.txt Disallow: /" />
+          <InfoRow label="Security headers" value="DENY framing, nosniff, strict referrer policy" />
+          <InfoRow label="Service worker" value="Lifecycle-only; no private-data fetch caching" />
+          <InfoRow label="Public sitemap / JSON-LD" value="Not implemented for private app" />
+        </div>
+      </SettingsSection>
+    ),
+    roadmap: (
+      <SettingsSection eyebrow="Integrations & Roadmap" title="Deferred integrations and backlog">
         <div className="grid gap-5">
           {ROADMAP_SECTIONS.map((section) => (
             <div key={section.title} className="rounded-2xl border border-[#EFE2DA] p-4">
@@ -330,47 +330,38 @@ export function SettingsPage() {
             </div>
           ))}
         </div>
+        <p className="mt-5 text-sm leading-6 text-[#806C61]">Deferred: Google Sheets OAuth, Gmail/Outlook OAuth, Cloud Functions, Storage, public portals, native app, automatic sending, real AI API, and payment gateway.</p>
       </SettingsSection>
+    ),
+  }), [activeEvent?.eventName, approvedEntries, currentRole, currentRoleLabel, rolesConfigured, signOut, user])
 
-      <SettingsSection eyebrow="System Health" title="Connection status">
-        <div className="grid gap-3">
-          <div className="flex items-center gap-4 rounded-2xl border border-[#EFE2DA] p-4">
-            <KeyRound className="size-5 text-[#B76E79]" />
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold">Authentication</p>
-              <p className="text-xs text-[#8A7468]">Google sign-in remains unchanged.</p>
-            </div>
-            <CheckCircle2 className="size-5 text-[#2F855A]" />
-          </div>
-          <div className="flex items-center gap-4 rounded-2xl border border-[#EFE2DA] p-4">
-            <Database className="size-5 text-[#B76E79]" />
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold">Firebase project</p>
-              <p className="break-all text-xs text-[#8A7468]">{firebaseProjectId || 'Configured at build time'}</p>
-            </div>
-            <CheckCircle2 className={`size-5 ${isFirebaseConfigured ? 'text-[#2F855A]' : 'text-[#A32626]'}`} />
-          </div>
-          <div className="flex items-center gap-4 rounded-2xl border border-[#EFE2DA] p-4">
-            <UserRound className="size-5 text-[#B76E79]" />
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold">Working Event</p>
-              <p className="break-words text-xs text-[#8A7468]">{activeEvent?.eventName || 'No event selected'}</p>
-            </div>
-          </div>
+  return (
+    <div className="min-w-0 space-y-6">
+      <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-4 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-5">
+        <div className="flex min-w-0 gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Settings categories">
+          {SETTINGS_TABS.map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === id}
+              aria-controls={`settings-panel-${id}`}
+              onClick={() => setSearchParams({ tab: id })}
+              className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#B76E79]/30 ${activeTab === id ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED] text-[#6B564C] hover:bg-[#EFE2DA]'}`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-      </SettingsSection>
-
-      <section className="min-w-0 rounded-[24px] border border-[#E6D4B4] bg-[#FFF8EA] p-6 sm:p-8">
+      </section>
+      <div id={`settings-panel-${activeTab}`} role="tabpanel">
+        {tabPanels[activeTab]}
+      </div>
+      <section className="rounded-[24px] border border-[#E6D4B4] bg-[#FFF8EA] p-6 sm:p-8">
         <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Danger Zone</p>
         <h2 className="mt-2 font-serif text-2xl text-[#4E3928]">Destructive actions disabled</h2>
-        <p className="mt-4 text-sm leading-6 text-[#715D46]">
-          Event deletion, CPB reset, audit log deletion, public access, Storage uploads, and external sending integrations are intentionally unavailable here.
-        </p>
+        <p className="mt-4 text-sm leading-6 text-[#715D46]">Event deletion, CPB reset, audit log deletion, public access, Storage uploads, and external sending integrations are intentionally unavailable here.</p>
       </section>
-
-      <div className="xl:col-span-2">
-        <SystemHealthPanel />
-      </div>
     </div>
   )
 }

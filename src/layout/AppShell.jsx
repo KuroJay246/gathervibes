@@ -70,9 +70,9 @@ function SidebarContent({ onNavigate, mobile = false }) {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="px-6 pb-7 pt-6">
+      <Link to="/dashboard" onClick={onNavigate} className="block px-6 pb-7 pt-6 focus:outline-none focus:ring-2 focus:ring-[#F5E6C8]/60" aria-label="Go to Dashboard">
         <BrandMark light />
-      </div>
+      </Link>
 
       <div className="mx-4 max-w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-3.5">
         <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.24em] text-[#D7B8BD]">Working Event</p>

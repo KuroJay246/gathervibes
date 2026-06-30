@@ -81,7 +81,7 @@ Phase 17C-B is active on the branch for Firestore rules deployment approval, liv
 
 Firestore rules deployment must happen only if preflight validation passes, rollback readiness is prepared, and a real `TEST_SCANNER_EMAIL` exists as a Firebase Authentication user outside `approvedEmails`. If that test scanner account is missing, rules must not be deployed and live staff/scanner access must remain inactive. Staff/scanner/helper accounts must not be added to `approvedEmails`; approvedEmails remains admin-level access only.
 
-Phase 17C-B testing must use CODEX_TEST only. CPB must not be selected, assigned, read as scanner, or used for QA. Native app work remains deferred; the current practical direction is a private PWA-style scanner shortcut/mode.
+Phase 17C-B testing must use CODEX_TEST only. CPB must not be selected, assigned, read as scanner, or used for QA. Native app work remains deferred; the current practical direction is a private PWA-style scanner shortcut/mode. Admin AppShell brand navigation returns approved admins to `/dashboard`; the isolated `/scanner` page does not gain admin-home logo navigation. Settings now uses category tabs with deep links such as `/settings?tab=access`.
 
 ## Phase 15B status
 
