@@ -45,8 +45,8 @@ export function buildRuntimeHealthItems({
     },
     {
       label: 'Staff roles enforcement level',
-      status: 'warn',
-      detail: 'Phase 17C-B is active; rules deployment remains gated by validation, rollback readiness, and TEST_SCANNER_EMAIL.',
+      status: 'ok',
+      detail: 'Phase 17C-B closed with deployed rules, scanner auth-gate fix, scanner smoke PASS, and admin after-smoke PASS.',
     },
     {
       label: 'Approved-admin allowlist',
@@ -55,8 +55,8 @@ export function buildRuntimeHealthItems({
     },
     {
       label: 'Firestore role enforcement',
-      status: 'warn',
-      detail: 'Staff profile and event assignment rules require explicit rules deployment and live scanner smoke before live use.',
+      status: 'ok',
+      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved.',
     },
     {
       label: 'Events read',

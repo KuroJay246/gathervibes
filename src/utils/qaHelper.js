@@ -51,7 +51,7 @@ export const qaChecklist = [
   'Confirm current user role appears in Settings and System Health',
   'Confirm approved-admin allowlist remains active and no public access is enabled',
   'Confirm backlog visibility order is closed, current, next, operational, access/staff, Event Operations, QA/reliability, deferred, long-term, out of scope',
-  'Confirm Phase 17C-B scanner smoke uses TEST_SCANNER_EMAIL, CODEX_TEST only, and no CPB access',
+  'Confirm Phase 17C-B scanner smoke PASS is preserved: CODEX_TEST only, no CPB access, no scanner undo',
   'Confirm Communications Pro segments and templates are copy-only',
   'Confirm copy packet, recipient list, and CSV packet work without sending messages',
   'Confirm AI writing, Gmail/Outlook OAuth, Google Sheets OAuth, Cloud Functions, and Storage remain deferred',

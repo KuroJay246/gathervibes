@@ -21,8 +21,8 @@ const ROADMAP_SECTIONS = [
     ['Communications Pro', 'Phase 11 copy-only'],
     ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
   ] },
-  { title: '2. Current active phase', items: [['Phase 17C-B rules deploy approval, live scanner smoke, and scanner-only PWA mode', 'Active / rules gated / TEST_SCANNER_EMAIL required']] },
-  { title: '3. Next recommended phase', items: [['Phase 17D scanner polish', 'Only after Phase 17C-B live confirmation']] },
+  { title: '2. Current active phase', items: [['Phase 17D scanner polish and Access & Roles planning', 'Recommended next phase / no access broadening by default']] },
+  { title: '3. Next recommended phase', items: [['Phase 17D scanner polish', 'Planning, ergonomics, and lead-scanner design only unless approved']] },
   { title: '4. High-priority operational backlog', items: [
     ['Clean-account route smoke path for every future feature', 'Required standard'],
     ['Registration/guest count wording consistency', 'Preserved'],
@@ -199,7 +199,7 @@ export function SettingsPage() {
     access: (
       <SettingsSection eyebrow="Access & Roles" title="Admin allowlist and future staff access">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17C-B is preparing rules deployment approval and scanner smoke, but Phase 17C-B remains blocked until TEST_SCANNER_EMAIL is provided and rules deployment gates pass.
+          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17C-B closed after Firestore rules deployment in B2, the scanner auth-gate fix in B3, organizer scanner smoke PASS, and organizer admin after-smoke PASS.
         </div>
         <div className="mt-5">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Approved emails and roles</p>
@@ -225,7 +225,7 @@ export function SettingsPage() {
         <div className="mt-5 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
           <p className="text-sm font-bold text-[#2B1723]">Current role behavior</p>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
-          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Firestore rules stay stable; approved admins will manage staffProfiles and events/{'{eventId}'}/staffAssignments/{'{uid}'} documents later. Firestore rules must remain undeployed until validation, rollback readiness, and TEST_SCANNER_EMAIL gates pass.</p>
+          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Firestore rules stay stable; approved admins manage staffProfiles and events/{'{eventId}'}/staffAssignments/{'{uid}'} documents with the current deployed rules while future workflow planning remains separate.</p>
         </div>
         <div className="mt-4">
           <PillList items={ACCESS_ROLES_FUTURE_PLAN} tone="white" />
@@ -243,7 +243,7 @@ export function SettingsPage() {
           <InfoRow label="Mode" value="Scanner-only isolated layout" />
           <InfoRow label="Admin correction" value="Admin-only Undo Check-In" />
           <InfoRow label="Scanner role" value="Cannot undo check-in" />
-          <InfoRow label="Live smoke" value="CODEX_TEST only; TEST_SCANNER_EMAIL required" />
+          <InfoRow label="Live smoke" value="Closed with PASS; CODEX_TEST-only scanner smoke" />
         </div>
       </SettingsSection>
     ),

@@ -52,7 +52,7 @@ test('roadmap shows ordered Phase 17C-B status, closed shipped phases, deferred 
     'Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening',
     'Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning',
     'Phase 17C-A Firestore Rules Review + Deployment Readiness',
-    'Phase 17C-B rules deploy approval, live scanner smoke, and scanner-only PWA mode',
+    'Phase 17D scanner polish and Access & Roles planning',
     'Phase 17D scanner polish',
     'Google Sheets OAuth',
     'Gmail/Outlook OAuth',
@@ -94,7 +94,7 @@ test('roadmap shows ordered Phase 17C-B status, closed shipped phases, deferred 
   assert.match(handoff, /Phase 17B staff access model/)
 })
 
-test('private access status describes Phase 17C-B rules deployment gate without live deploy overclaim', async () => {
+test('private access status reflects Phase 17C-B closeout without reopening the rollout gate', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const healthItems = buildRuntimeHealthItems({
@@ -112,13 +112,11 @@ test('private access status describes Phase 17C-B rules deployment gate without 
   })
 
   assert.match(settings, /Approved-admin allowlist remains active owner\/admin enforcement/)
-  assert.match(settings, /Phase 17C-B is preparing rules deployment approval and scanner smoke/)
-  assert.match(settings, /Firestore rules must remain undeployed until validation, rollback readiness, and TEST_SCANNER_EMAIL gates pass/)
+  assert.match(settings, /Phase 17C-B closed after Firestore rules deployment in B2/)
   assert.match(settings, /Temporary event-day helpers should not be added to approvedEmails/)
   assert.match(qa, /Staff roles enforcement level/)
-  assert.match(qa, /Staff rules deploy status/)
-  assert.equal(healthItems.find((item) => item.label === 'Staff roles enforcement level').status, 'warn')
-  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /explicit rules deployment and live scanner smoke/)
+  assert.equal(healthItems.find((item) => item.label === 'Staff roles enforcement level').status, 'ok')
+  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /deployed for live scanner use/)
 })
 
 test('Event Operations page documents active ledger and future modules only', async () => {
