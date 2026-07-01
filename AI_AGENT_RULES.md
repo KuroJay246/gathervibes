@@ -42,6 +42,7 @@ This project previously had a real stale-knowledge bug: Phase 17C-B deployed sta
 
 - Phase 17C-B is closed after Firestore rules deployment in B2, the scanner auth-gate fix in B3, organizer scanner smoke PASS, and admin after-smoke PASS.
 - Phase 17D-B is scanner-only polish work. It must not broaden access, rewrite Firestore rules dynamically, implement Access & Roles workflows, or implement lead-scanner permissions.
+- Phase 17D-C is read-only/admin UI foundation only. It must not add write mutations for staffProfiles, staffAssignments, approvedEmails, or auditLogs.
 - Phase 17C-B3 fixed the scanner login gate by allowing active staff profile plus active assignment access after approved-admin lookup.
 - Scanner/check-in-only users remain check-in only. Do not give the normal scanner role Undo Check-In or Check Out.
 - Approved admins may use existing admin-only undo/check-out paths where already implemented.

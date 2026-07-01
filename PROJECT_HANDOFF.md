@@ -4,6 +4,8 @@ Last updated: July 1, 2026 (Phase 17D-B closed as scanner day-of polish complete
 
 Phase 17D-B is now closed, merged-ready, and Hosting-deployed. Branch commit `d3b65aab0e4d7401013e463af4bb92e4de69b892` completed scanner day-of polish only on the private `/scanner` surface: clearer success/duplicate/pending/no-ticket messaging, faster next-guest flow, mobile touch/readability improvements, optional browser-native sound/haptic feedback, and no-offline-writes wording. Organizer scanner smoke PASS and organizer admin after-smoke PASS are recorded. Scanner remains assigned-event-only with no undo/check-out, admin undo remains admin-only where implemented, no permissions were broadened, no Access & Roles workflow or lead-scanner permission was implemented, CPB remained untouched, `approvedEmails` remained unchanged, QR payload remains `GSV:TICKET:{ticketCode}`, `xlsx` remains absent, `read-excel-file` remains active, and Firestore rules/indexes were not deployed in 17D-B.
 
+Phase 17D-C is now the active branch-only pass for Access & Roles read-only/admin UI foundation. It adds read-only admin guidance only: Admin Access Boundary, Staff Profiles Model, Event Assignments Model, Role Capability Matrix, Scanner Mode, Security Notes, and disabled future workflow controls explicitly marked not live. It does not add any write mutation for staffProfiles, staffAssignments, approvedEmails, or auditLogs. Phase 17D-D readiness planning is documented in `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md` and remains planning-only. No approval workflow, revoke workflow, staff assignment editing, lead-scanner permission, Firestore rules deploy, or Firestore indexes deploy are live in this pass.
+
 ## 1. Project overview
 
 **Project:** Gather & Savor Event Hub  
@@ -63,7 +65,7 @@ Phase 17D-A is closed, merge-ready, and approved as a planning-only blueprint. I
 
 Phase 17D-A preserved the live safety boundary exactly: no permissions were broadened, `approvedEmails` remains admin-level access only, staff/scanner access remains `staffProfiles/{uid}` plus `events/{eventId}/staffAssignments/{uid}`, scanner remains assigned-event-only and no-undo, admin undo remains admin-only where already implemented, CPB remains protected production data, CODEX_TEST remains QA/smoke only, QR payload remains `GSV:TICKET:{ticketCode}`, Firestore rules were not deployed in 17D-A, Firestore indexes were not deployed, `xlsx` remains absent, and `read-excel-file` remains active.
 
-No live approval/revoke workflow exists yet, and no live lead-scanner permission exists yet. The next recommended subphase is Phase 17D-C Access & Roles read-only/admin UI foundation only, if organizer approval is given for that later phase.
+No live approval/revoke workflow exists yet, no live staff assignment editing exists yet, and no live lead-scanner permission exists yet. The current active branch pass is Phase 17D-C Access & Roles read-only/admin UI foundation, and Phase 17D-D readiness remains planning-only in `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md`.
 
 Backlog/status visibility order:
 
