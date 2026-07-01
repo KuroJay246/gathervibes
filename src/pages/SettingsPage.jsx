@@ -21,19 +21,19 @@ const ROADMAP_SECTIONS = [
     ['Communications Pro', 'Phase 11 copy-only'],
     ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
   ] },
-  { title: '2. Current active phase', items: [['Phase 17D scanner polish and Access & Roles planning', 'Recommended next phase / no access broadening by default']] },
-  { title: '3. Next recommended phase', items: [['Phase 17D scanner polish', 'Planning, ergonomics, and lead-scanner design only unless approved']] },
+  { title: '2. Current active phase', items: [['Phase 17D-A Access & Roles Planning + Scanner Day-of Polish Blueprint', 'Closed / merged-ready / blueprint approved / no access broadening / no live workflow changes']] },
+  { title: '3. Next recommended phase', items: [['Phase 17D-B scanner day-of polish', 'Recommended next subphase / scanner polish only'], ['Phase 17D-C Access & Roles read-only/admin UI foundation', 'Later follow-on phase']] },
   { title: '4. High-priority operational backlog', items: [
     ['Clean-account route smoke path for every future feature', 'Required standard'],
     ['Registration/guest count wording consistency', 'Preserved'],
     ['CODEX_TEST-only QA workflows', 'Ongoing'],
   ] },
   { title: '5. Access / staff / worker permissions backlog', items: [
-    ['Firestore-enforced staff roles', 'Phase 17C-B deploy-gated'],
-    ['Scanner/check-in-only role enforcement', 'Phase 17C-B live-smoke gated'],
-    ['Event manager role', 'Phase 17C-B deploy-gated'],
-    ['Viewer/read-only role', 'Phase 17C-B deploy-gated'],
-    ['Operations helper role', 'Phase 17C-B deploy-gated'],
+    ['Firestore-enforced staff roles', 'Live after Phase 17C-B rules deploy'],
+    ['Scanner/check-in-only role enforcement', 'Live / assigned-event-only / no undo'],
+    ['Event manager role', 'Planned surface only'],
+    ['Viewer/read-only role', 'Planned surface only'],
+    ['Operations helper role', 'Planned surface only'],
     ['Mother/Event Manager simplified view', 'Future planned'],
   ] },
   { title: '6. Event Operations backlog', items: [['Event Operations expansion', 'Future planned']] },
@@ -199,7 +199,7 @@ export function SettingsPage() {
     access: (
       <SettingsSection eyebrow="Access & Roles" title="Admin allowlist and future staff access">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17C-B closed after Firestore rules deployment in B2, the scanner auth-gate fix in B3, organizer scanner smoke PASS, and organizer admin after-smoke PASS.
+          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-A is closed as the approved planning blueprint for Access & Roles and scanner day-of polish. No live approval, revoke, or lead-scanner workflow is implemented here. Phase 17D-B scanner day-of polish is the recommended next subphase, while Phase 17D-C Access & Roles read-only/admin UI foundation remains later.
         </div>
         <div className="mt-5">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Approved emails and roles</p>
@@ -225,7 +225,7 @@ export function SettingsPage() {
         <div className="mt-5 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
           <p className="text-sm font-bold text-[#2B1723]">Current role behavior</p>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
-          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Firestore rules stay stable; approved admins manage staffProfiles and events/{'{eventId}'}/staffAssignments/{'{uid}'} documents with the current deployed rules while future workflow planning remains separate.</p>
+          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Firestore rules stay stable; approved admins manage staffProfiles and events/{'{eventId}'}/staffAssignments/{'{uid}'} documents with the current deployed rules while future workflow planning remains separate. `PHASE_17D_PLAN.md` is the blueprint for that work.</p>
         </div>
         <div className="mt-4">
           <PillList items={ACCESS_ROLES_FUTURE_PLAN} tone="white" />

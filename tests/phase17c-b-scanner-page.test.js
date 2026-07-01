@@ -226,7 +226,7 @@ test('Phase 17C-B1b Settings tabs preserve required category content', async () 
 
   assert.match(settings, /Approved-admin allowlist remains active owner\/admin enforcement/)
   assert.match(settings, /Do not add staff\/scanners\/helpers to approvedEmails/)
-  assert.match(settings, /Phase 17C-B closed after Firestore rules deployment in B2/)
+  assert.match(settings, /Phase 17D-A is closed as the approved planning blueprint/)
   assert.match(settings, /Scanner-only isolated layout/)
   assert.match(settings, /Admin-only Undo Check-In/)
   assert.match(settings, /Cannot undo check-in/)
