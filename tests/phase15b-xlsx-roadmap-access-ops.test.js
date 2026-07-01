@@ -30,7 +30,7 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
   assert.match(importsPage, /No Firestore write happens until you confirm valid rows/)
 })
 
-test('roadmap shows Phase 17D-B active scanner-only status, deferred integrations, and future ops backlog', async () => {
+test('roadmap shows Phase 17D-B closed scanner-only status, deferred integrations, and future ops backlog', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const readme = await readFile('README.md', 'utf8')
   const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
@@ -53,7 +53,6 @@ test('roadmap shows Phase 17D-B active scanner-only status, deferred integration
     'Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning',
     'Phase 17C-A Firestore Rules Review + Deployment Readiness',
     'Phase 17D-B Scanner Day-of Polish Implementation Only',
-    'Phase 17D-B organizer review and manual scanner smoke',
     'Phase 17D-C Access & Roles read-only/admin UI foundation',
     'Google Sheets OAuth',
     'Gmail/Outlook OAuth',
@@ -95,7 +94,7 @@ test('roadmap shows Phase 17D-B active scanner-only status, deferred integration
   assert.match(handoff, /Phase 17B staff access model/)
 })
 
-test('private access status reflects Phase 17C-B live closeout while Phase 17D-B stays scanner-only', async () => {
+test('private access status reflects Phase 17C-B live closeout while Phase 17D-B is closed scanner-only polish', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const healthItems = buildRuntimeHealthItems({
@@ -114,11 +113,11 @@ test('private access status reflects Phase 17C-B live closeout while Phase 17D-B
 
   assert.match(settings, /Approved-admin allowlist remains active owner\/admin enforcement/)
   assert.match(settings, /Phase 17D-A remains closed as the approved planning blueprint/)
-  assert.match(settings, /Phase 17D-B is now the active scanner-only polish phase/)
+  assert.match(settings, /Phase 17D-B is closed after scanner\/admin smoke PASS and did not broaden permissions/)
   assert.match(settings, /Temporary event-day helpers should not be added to approvedEmails/)
   assert.match(qa, /Staff roles enforcement level/)
   assert.equal(healthItems.find((item) => item.label === 'Staff roles enforcement level').status, 'ok')
-  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /17D-B scanner polish does not change rules/)
+  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /Phase 17D-B closed without changing rules/)
 })
 
 test('Phase 17D planning docs exist and preserve current live safety boundaries', async () => {

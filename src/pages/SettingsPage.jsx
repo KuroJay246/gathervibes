@@ -21,8 +21,8 @@ const ROADMAP_SECTIONS = [
     ['Communications Pro', 'Phase 11 copy-only'],
     ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
   ] },
-  { title: '2. Current active phase', items: [['Phase 17D-B Scanner Day-of Polish Implementation Only', 'Active / scanner-only polish / no access broadening / no live workflow changes outside scanner UX']] },
-  { title: '3. Next recommended phase', items: [['Phase 17D-B organizer review and manual scanner smoke', 'Required before merge'], ['Phase 17D-C Access & Roles read-only/admin UI foundation', 'Later follow-on phase']] },
+  { title: '2. Current active phase', items: [['Phase 17D-B Scanner Day-of Polish Implementation Only', 'Closed after scanner/admin smoke PASS / merge-ready / Hosting-deployed / no access broadening']] },
+  { title: '3. Next recommended phase', items: [['Phase 17D-C Access & Roles read-only/admin UI foundation', 'Later follow-on phase / organizer approval required']] },
   { title: '4. High-priority operational backlog', items: [
     ['Clean-account route smoke path for every future feature', 'Required standard'],
     ['Registration/guest count wording consistency', 'Preserved'],
@@ -199,7 +199,7 @@ export function SettingsPage() {
     access: (
       <SettingsSection eyebrow="Access & Roles" title="Admin allowlist and future staff access">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-A remains closed as the approved planning blueprint. Phase 17D-B is now the active scanner-only polish phase. No live approval, revoke, or lead-scanner workflow is implemented here, and Phase 17D-C Access & Roles read-only/admin UI foundation remains later.
+          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-A remains closed as the approved planning blueprint. Phase 17D-B is closed after scanner/admin smoke PASS and did not broaden permissions. No live approval, revoke, or lead-scanner workflow is implemented here, and Phase 17D-C Access & Roles read-only/admin UI foundation remains later if organizer approval is given.
         </div>
         <div className="mt-5">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Approved emails and roles</p>

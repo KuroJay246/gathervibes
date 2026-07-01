@@ -1,8 +1,8 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: July 1, 2026 (Phase 17D-A closed as an approved planning-only blueprint and is merge-ready; Phase 17C-B closed with Firestore rules deployed in B2, Hosting-deployed, organizer scanner smoke passed, and admin after-smoke passed; Phase 17C-A closed, merged, and Hosting-deployed; Phase 17B closed, merged, and Hosting-deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
+Last updated: July 1, 2026 (Phase 17D-B closed as scanner day-of polish completed, merge-ready, and Hosting-deployed with organizer scanner smoke PASS and admin after-smoke PASS; Phase 17D-A closed as an approved planning-only blueprint and is merge-ready; Phase 17C-B closed with Firestore rules deployed in B2, Hosting-deployed, organizer scanner smoke passed, and admin after-smoke passed; Phase 17C-A closed, merged, and Hosting-deployed; Phase 17B closed, merged, and Hosting-deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
 
-Phase 17D-B has now started as the active scanner-only implementation phase from `main`. It is limited to private `/scanner` event-day polish: clearer success/duplicate/pending/no-ticket messaging, faster next-guest flow, mobile touch/readability improvements, optional browser-native sound/haptic feedback, and no-offline-writes wording. It must not broaden permissions, implement Access & Roles workflows, implement lead-scanner permissions, change Firestore rules, or change QR payload behavior.
+Phase 17D-B is now closed, merged-ready, and Hosting-deployed. Branch commit `d3b65aab0e4d7401013e463af4bb92e4de69b892` completed scanner day-of polish only on the private `/scanner` surface: clearer success/duplicate/pending/no-ticket messaging, faster next-guest flow, mobile touch/readability improvements, optional browser-native sound/haptic feedback, and no-offline-writes wording. Organizer scanner smoke PASS and organizer admin after-smoke PASS are recorded. Scanner remains assigned-event-only with no undo/check-out, admin undo remains admin-only where implemented, no permissions were broadened, no Access & Roles workflow or lead-scanner permission was implemented, CPB remained untouched, `approvedEmails` remained unchanged, QR payload remains `GSV:TICKET:{ticketCode}`, `xlsx` remains absent, `read-excel-file` remains active, and Firestore rules/indexes were not deployed in 17D-B.
 
 ## 1. Project overview
 
@@ -63,7 +63,7 @@ Phase 17D-A is closed, merge-ready, and approved as a planning-only blueprint. I
 
 Phase 17D-A preserved the live safety boundary exactly: no permissions were broadened, `approvedEmails` remains admin-level access only, staff/scanner access remains `staffProfiles/{uid}` plus `events/{eventId}/staffAssignments/{uid}`, scanner remains assigned-event-only and no-undo, admin undo remains admin-only where already implemented, CPB remains protected production data, CODEX_TEST remains QA/smoke only, QR payload remains `GSV:TICKET:{ticketCode}`, Firestore rules were not deployed in 17D-A, Firestore indexes were not deployed, `xlsx` remains absent, and `read-excel-file` remains active.
 
-No live approval/revoke workflow exists yet, and no live lead-scanner permission exists yet. The next recommended subphase is Phase 17D-B scanner day-of polish only. Phase 17D-C Access & Roles read-only/admin UI foundation remains later.
+No live approval/revoke workflow exists yet, and no live lead-scanner permission exists yet. The next recommended subphase is Phase 17D-C Access & Roles read-only/admin UI foundation only, if organizer approval is given for that later phase.
 
 Backlog/status visibility order:
 
