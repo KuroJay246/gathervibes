@@ -46,7 +46,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Staff roles enforcement level',
       status: 'ok',
-      detail: 'Phase 17C-B remains closed and live. Phase 17D-A is planning-only and does not broaden access.',
+      detail: 'Phase 17C-B remains closed and live. Phase 17D-A closed as the approved planning blueprint and did not broaden access.',
     },
     {
       label: 'Approved-admin allowlist',
@@ -56,7 +56,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Firestore role enforcement',
       status: 'ok',
-      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved. 17D-A planning does not change rules.',
+      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved. 17D-A closeout did not change rules, and 17D-B is the next recommended subphase.',
     },
     {
       label: 'Events read',
