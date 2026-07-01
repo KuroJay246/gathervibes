@@ -82,12 +82,14 @@ const ROADMAP_SECTIONS = [
     ['Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning', 'Closed / merged / deployed'],
     ['Phase 17B Staff / Worker Roles Foundation', 'Closed / merged / Hosting-deployed'],
     ['Phase 17C-A Firestore Rules Review + Deployment Readiness', 'Closed / merged / Hosting-deployed / rules not deployed'],
+    ['Phase 17D-C Access & Roles Read-Only/Admin UI Foundation', 'Closed / merge-ready / admin review PASS / scanner review PASS'],
+    ['Phase 17D-D Access workflow/rules-readiness planning only', 'Closed / merge-ready / planning-only'],
     ['Finance tracker', 'Phase 9 active'],
     ['Communications Pro', 'Phase 11 copy-only'],
     ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
   ] },
-  { title: '2. Current active phase', items: [['Phase 17D-C Access & Roles Read-Only/Admin UI Foundation', 'Active on branch / read-only only / no write workflow / no access broadening']] },
-  { title: '3. Next recommended phase', items: [['Phase 17D-D Access workflow/rules-readiness planning only', 'Readiness document only / no live workflow / organizer review required']] },
+  { title: '2. Current active phase', items: [['No active implementation phase selected', 'Phase 17D-C and Phase 17D-D are closed on this branch and awaiting merge review']] },
+  { title: '3. Next recommended phase', items: [['Phase 17E-A Access Workflow Rules + Data Model Review only', 'Rules/data-model review only / no live workflow / no rules deploy without separate approval']] },
   { title: '4. High-priority operational backlog', items: [
     ['Clean-account route smoke path for every future feature', 'Required standard'],
     ['Registration/guest count wording consistency', 'Preserved'],
@@ -271,7 +273,7 @@ export function SettingsPage() {
     access: (
       <SettingsSection eyebrow="Access & Roles" title="Read-only admin foundation">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is active as a read-only/admin UI foundation only. No live approval, revoke, assignment editing, or lead-scanner workflow is implemented here.
+          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is now closed after organizer admin review PASS and organizer scanner review PASS. Phase 17D-D readiness planning is now closed as planning-only. No live approval, revoke, assignment editing, or lead-scanner workflow is implemented here.
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
           <ReadOnlyStatusPill>Read-only foundation</ReadOnlyStatusPill>

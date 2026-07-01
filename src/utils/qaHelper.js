@@ -52,7 +52,7 @@ export const qaChecklist = [
   'Confirm approved-admin allowlist remains active and no public access is enabled',
   'Confirm backlog visibility order is closed, current, next, operational, access/staff, Event Operations, QA/reliability, deferred, long-term, out of scope',
   'Confirm Phase 17C-B scanner smoke PASS is preserved: CODEX_TEST only, no CPB access, no scanner undo',
-  'Confirm Phase 17D-C Access & Roles area is admin-only, read-only, and does not claim live approval, revoke, assign, edit, or lead-scanner features',
+  'Confirm Phase 17D-C closeout is preserved: Access & Roles stays admin-only, read-only, and does not claim live approval, revoke, assign, edit, or lead-scanner features',
   'Confirm scanner success, duplicate, pending-payment, and no-ticket messaging is clear on /scanner',
   'Confirm scanner next guest flow clears safely and returns focus to manual lookup where practical',
   'Confirm scanner offline wording says no offline writes are supported',
