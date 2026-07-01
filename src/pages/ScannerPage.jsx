@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Check, LogOut, RotateCcw, Search, ShieldCheck, Ticket, UserRound } from 'lucide-react'
+import { AlertTriangle, Check, CircleAlert, LogOut, RotateCcw, Search, ShieldCheck, Ticket, UserRound, WifiOff } from 'lucide-react'
 import { BrandMark } from '../components/BrandMark'
 import { QrScannerPanel } from '../components/checkin/QrScannerPanel'
 import { useAuth } from '../auth/useAuth'
@@ -39,6 +39,8 @@ export function ScannerPage() {
   const [notice, setNotice] = useState('')
   const [saving, setSaving] = useState(false)
   const [resumeScanTrigger, setResumeScanTrigger] = useState(0)
+  const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine)
+  const [lastResult, setLastResult] = useState(null)
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -67,6 +69,19 @@ export function ScannerPage() {
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [activeEvent?.eventId])
 
+  useEffect(() => {
+    function updateOnlineStatus() {
+      setOnline(typeof navigator === 'undefined' ? true : navigator.onLine)
+    }
+
+    window.addEventListener('online', updateOnlineStatus)
+    window.addEventListener('offline', updateOnlineStatus)
+    return () => {
+      window.removeEventListener('online', updateOnlineStatus)
+      window.removeEventListener('offline', updateOnlineStatus)
+    }
+  }, [])
+
   const filteredRegistrations = useMemo(() => {
     const term = searchTerm.trim().toLowerCase()
     if (!term) return []
@@ -82,12 +97,20 @@ export function ScannerPage() {
 
   function selectRegistration(registration) {
     setSelectedRegistration(registration)
+    setLastResult(null)
     setNotice(`${registration.fullName || 'Guest'} selected. Review before check-in.`)
   }
 
   async function handleCheckIn() {
     if (!selectedRegistration || saving) return
     if (selectedRegistration.checkedIn) {
+      setLastResult({
+        type: 'duplicate',
+        title: 'Already checked in',
+        fullName: safeText(selectedRegistration.fullName, 'Guest'),
+        ticketCode: safeText(selectedRegistration.ticketCode, 'No ticket code'),
+        detail: 'Duplicate check-in remains blocked. No new check-in write happened.',
+      })
       setNotice('Duplicate check-in is blocked. This guest is already checked in.')
       return
     }
@@ -96,6 +119,13 @@ export function ScannerPage() {
     setError('')
     try {
       await completeCheckIn(selectedRegistration, user)
+      setLastResult({
+        type: 'success',
+        title: 'Check-in complete',
+        fullName: safeText(selectedRegistration.fullName, 'Guest'),
+        ticketCode: safeText(selectedRegistration.ticketCode, 'No ticket code'),
+        detail: 'Guest status is now checked in. Scan or search for the next guest.',
+      })
       setNotice(`${selectedRegistration.fullName || 'Guest'} checked in. Ready for next guest.`)
       setSelectedRegistration(null)
       setSearchTerm('')
@@ -114,6 +144,13 @@ export function ScannerPage() {
     setError('')
     try {
       await recordDuplicateCheckInAttempt(selectedRegistration, user)
+      setLastResult({
+        type: 'duplicate',
+        title: 'Duplicate attempt recorded',
+        fullName: safeText(selectedRegistration.fullName, 'Guest'),
+        ticketCode: safeText(selectedRegistration.ticketCode, 'No ticket code'),
+        detail: 'The guest was already checked in. A duplicate-attempt audit entry may be appended, but check-in remains blocked.',
+      })
       setNotice('Duplicate attempt recorded. Check-in remains blocked.')
     } catch (duplicateError) {
       setError(duplicateError?.message || 'Duplicate attempt could not be recorded.')
@@ -134,6 +171,13 @@ export function ScannerPage() {
     setError('')
     try {
       await undoCheckIn(selectedRegistration, user)
+      setLastResult({
+        type: 'admin',
+        title: 'Admin correction saved',
+        fullName: safeText(selectedRegistration.fullName, 'Guest'),
+        ticketCode: safeText(selectedRegistration.ticketCode, 'No ticket code'),
+        detail: 'Check-in was undone through the existing admin-only correction path.',
+      })
       setNotice(`Check-in undone for ${selectedRegistration.fullName || 'Guest'}.`)
       setResumeScanTrigger((value) => value + 1)
     } catch (undoError) {
@@ -151,6 +195,20 @@ export function ScannerPage() {
     } catch {
       setNotice(scannerUrl)
     }
+  }
+
+  function clearScannerSelection() {
+    setSelectedRegistration(null)
+    setSearchTerm('')
+    setNotice('Ready for the next guest.')
+    setError('')
+    setResumeScanTrigger((value) => value + 1)
+  }
+
+  function warningTone(warning) {
+    if (/outstanding|door payment|not marked paid/i.test(warning)) return 'gold'
+    if (/No ticket code/i.test(warning)) return 'blush'
+    return 'neutral'
   }
 
   return (
@@ -190,6 +248,18 @@ export function ScannerPage() {
 
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
           <div className="space-y-4">
+            {!online && (
+              <div className="rounded-2xl border border-[#F2C3C3] bg-[#FFF4F4] px-4 py-3 text-sm font-semibold text-[#A32626]">
+                <div className="flex items-start gap-2">
+                  <WifiOff className="mt-0.5 size-4 shrink-0" />
+                  <div>
+                    <p>Connection looks offline.</p>
+                    <p className="mt-1 text-xs font-medium text-[#8E4A4A]">No offline writes are supported on `/scanner`. Reconnect before trying to check guests in.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <QrScannerPanel
               registrations={registrations}
               onMatch={(registration) => selectRegistration(registration)}
@@ -231,12 +301,49 @@ export function ScannerPage() {
                 </div>
               )}
             </div>
+
+            <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8C7567]">Event-day guidance</p>
+              <div className="mt-3 grid gap-2">
+                <p className="rounded-xl bg-[#FBF8F5] px-4 py-3 text-sm font-semibold text-[#2B1723]">Scan or search, review the guest card, then tap <span className="font-bold">Check In</span>.</p>
+                <p className="rounded-xl bg-[#FFF8EA] px-4 py-3 text-sm font-semibold text-[#715D46]">Scanner/check-in-only access cannot undo or check out a guest.</p>
+                <p className="rounded-xl bg-[#FFF8EA] px-4 py-3 text-sm font-semibold text-[#715D46]">If a correction is needed, an approved admin handles the existing admin-only undo path.</p>
+                <p className="rounded-xl bg-[#FFF8EA] px-4 py-3 text-sm font-semibold text-[#715D46]">No offline writes are supported. Keep a live connection before checking guests in.</p>
+              </div>
+            </div>
           </div>
 
           <aside className="space-y-4">
             {(notice || error) && (
               <div className={error ? 'rounded-2xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm font-semibold text-[#A32626]' : 'rounded-2xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm font-semibold text-[#1E7345]'}>
                 {error || notice}
+              </div>
+            )}
+
+            {lastResult && (
+              <div className={`rounded-2xl border px-4 py-4 ${
+                lastResult.type === 'success'
+                  ? 'border-[#CFE8D8] bg-[#E5F3EC]'
+                  : lastResult.type === 'duplicate'
+                    ? 'border-[#F3DFC0] bg-[#FFF8EA]'
+                    : 'border-[#E7D6CC] bg-[#FBF8F5]'
+              }`}>
+                <div className="flex items-start gap-3">
+                  {lastResult.type === 'success' ? <Check className="mt-1 size-5 text-[#1E7345]" /> : lastResult.type === 'duplicate' ? <AlertTriangle className="mt-1 size-5 text-[#986F26]" /> : <CircleAlert className="mt-1 size-5 text-[#6B564C]" />}
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C7567]">{lastResult.title}</p>
+                    <h2 className="mt-1 break-words font-serif text-2xl text-[#2B1723]">{lastResult.fullName}</h2>
+                    <p className="mt-1 text-sm font-semibold text-[#6B564C]">{lastResult.ticketCode}</p>
+                    <p className="mt-2 text-sm font-semibold text-[#2B1723]">{lastResult.detail}</p>
+                    <button
+                      type="button"
+                      onClick={clearScannerSelection}
+                      className="mt-3 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-4 text-sm font-bold text-white hover:bg-[#3B2430]"
+                    >
+                      Scan next guest
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -276,7 +383,15 @@ export function ScannerPage() {
                   {warnings.length > 0 && (
                     <div className="space-y-2">
                       {warnings.map((warning) => (
-                        <p key={warning} className="rounded-xl bg-[#FFF8EA] px-4 py-3 text-sm font-semibold text-[#715D46]">{warning}</p>
+                        <p key={warning} className={`rounded-xl px-4 py-3 text-sm font-semibold ${
+                          warningTone(warning) === 'blush'
+                            ? 'bg-[#FFF1F1] text-[#A32626]'
+                            : warningTone(warning) === 'gold'
+                              ? 'bg-[#FFF8EA] text-[#715D46]'
+                              : 'bg-[#FBF8F5] text-[#6B564C]'
+                        }`}>
+                          {warning}
+                        </p>
                       ))}
                     </div>
                   )}
@@ -290,6 +405,14 @@ export function ScannerPage() {
                     >
                       <Check className="size-5" />
                       Check In
+                    </button>
+                    <button
+                      type="button"
+                      onClick={clearScannerSelection}
+                      disabled={saving}
+                      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 text-sm font-bold text-[#6B564C] hover:bg-[#FFF8F2] disabled:opacity-50"
+                    >
+                      Next guest
                     </button>
                     {checkedIn && (
                       <>
