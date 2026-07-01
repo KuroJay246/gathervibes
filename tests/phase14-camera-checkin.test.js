@@ -38,7 +38,7 @@ test('QrScannerPanel includes success beep via Web Audio API', async () => {
   const src = await readFile('src/components/checkin/QrScannerPanel.jsx', 'utf8')
   assert.match(src, /AudioContext|webkitAudioContext/)
   assert.match(src, /createOscillator/)
-  assert.match(src, /playSuccessBeep/)
+  assert.match(src, /playTone/)
 })
 
 test('QrScannerPanel includes haptic feedback via navigator.vibrate', async () => {
@@ -66,9 +66,9 @@ test('QrScannerPanel mentions HTTPS requirement in camera error message', async 
 
 test('QrScannerPanel beep and haptic only fire for new (non-duplicate) scan match', async () => {
   const src = await readFile('src/components/checkin/QrScannerPanel.jsx', 'utf8')
-  // playSuccessBeep must be inside a block guarded by !match.checkedIn
-  assert.match(src, /!match\.checkedIn/)
-  assert.match(src, /playSuccessBeep/)
+  assert.match(src, /playTone\(match\.checkedIn \? 'duplicate' : 'success'\)/)
+  assert.match(src, /triggerHaptic\(match\.checkedIn \? 'duplicate' : 'success'\)/)
+  assert.match(src, /Duplicate check-in is blocked and no new check-in write happened/)
 })
 
 test('QrScannerPanel accepts resumeTrigger prop', async () => {

@@ -2,6 +2,9 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { Camera, Keyboard, ScanLine, Square } from 'lucide-react'
 import { findRegistrationByQrTicketCode, parseQrTicketCode } from '../../utils/qrTicketUtils'
 
+const SOUND_PREF_KEY = 'gsv-scanner-sound-enabled'
+const HAPTIC_PREF_KEY = 'gsv-scanner-haptic-enabled'
+
 export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, resumeTrigger }) {
   const [manualValue, setManualValue] = useState('')
   const [scanning, setScanning] = useState(false)
@@ -14,6 +17,21 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
   const [continuousScan, setContinuousScan] = useState(false)
   const [torchSupported, setTorchSupported] = useState(false)
   const [torchOn, setTorchOn] = useState(false)
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    try {
+      return window.localStorage.getItem(SOUND_PREF_KEY) === 'true'
+    } catch {
+      return false
+    }
+  })
+  const [hapticEnabled, setHapticEnabled] = useState(() => {
+    try {
+      return window.localStorage.getItem(HAPTIC_PREF_KEY) === 'true'
+    } catch {
+      return false
+    }
+  })
+  const manualInputRef = useRef(null)
 
   useEffect(() => () => {
     const scanner = scannerRef.current
@@ -31,26 +49,28 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
     }
   }, [])
 
-  function playSuccessBeep() {
+  function playTone(type = 'success') {
+    if (!soundEnabled) return
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
       const oscillator = audioCtx.createOscillator()
       const gainNode = audioCtx.createGain()
       oscillator.connect(gainNode)
       gainNode.connect(audioCtx.destination)
-      oscillator.type = 'sine'
-      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime)
-      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime)
+      oscillator.type = type === 'error' ? 'square' : type === 'duplicate' ? 'triangle' : 'sine'
+      oscillator.frequency.setValueAtTime(type === 'error' ? 320 : type === 'duplicate' ? 540 : 880, audioCtx.currentTime)
+      gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime)
       oscillator.start()
-      oscillator.stop(audioCtx.currentTime + 0.1)
+      oscillator.stop(audioCtx.currentTime + (type === 'error' ? 0.16 : 0.1))
     } catch {
       // Ignore audio failure
     }
   }
 
-  function triggerHaptic() {
+  function triggerHaptic(type = 'success') {
+    if (!hapticEnabled) return
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate([200])
+      navigator.vibrate(type === 'duplicate' ? [120, 80, 120] : type === 'error' ? [200, 120, 200] : [140])
     }
   }
 
@@ -61,6 +81,8 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
 
     if (parsed.error) {
       setScannerError(parsed.error)
+      playTone('error')
+      triggerHaptic('error')
       onInvalid?.(parsed.error)
       return
     }
@@ -69,17 +91,17 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
     if (!match) {
       const message = `No matching ticket code: ${parsed.ticketCode} was found for the selected Working Event.`
       setScannerError(message)
+      playTone('error')
+      triggerHaptic('error')
       onMissing?.(parsed.ticketCode)
       return
     }
 
-    if (!match.checkedIn && source === 'scan') {
-      playSuccessBeep()
-      triggerHaptic()
-    }
+    playTone(match.checkedIn ? 'duplicate' : 'success')
+    triggerHaptic(match.checkedIn ? 'duplicate' : 'success')
 
     setScannerNote(match.checkedIn
-      ? `${match.fullName} is already checked in. Duplicate check-in is blocked.`
+      ? `${match.fullName} is already checked in. Duplicate check-in is blocked and no new check-in write happened.`
       : source === 'scan'
         ? `${match.fullName} matched from QR. Review the guest card before check-in.`
         : `${match.fullName} matched from manual ticket lookup. Review the guest card before check-in.`)
@@ -178,7 +200,28 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
     } else {
       previousTrigger.current = resumeTrigger
     }
+    manualInputRef.current?.focus()
   }, [resumeTrigger, continuousScan, scanning, startScanner])
+
+  function handleSoundToggle() {
+    const next = !soundEnabled
+    setSoundEnabled(next)
+    try {
+      window.localStorage.setItem(SOUND_PREF_KEY, String(next))
+    } catch {
+      // Preference persistence is best effort only.
+    }
+  }
+
+  function handleHapticToggle() {
+    const next = !hapticEnabled
+    setHapticEnabled(next)
+    try {
+      window.localStorage.setItem(HAPTIC_PREF_KEY, String(next))
+    } catch {
+      // Preference persistence is best effort only.
+    }
+  }
 
   return (
     <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
@@ -230,6 +273,16 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
               </button>
             )}
           </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-[#E7D6CC] bg-[#FFFDFC] px-3 text-xs font-semibold text-[#6B564C]">
+              Sound feedback
+              <input type="checkbox" checked={soundEnabled} onChange={handleSoundToggle} className="rounded text-[#B76E79] focus:ring-[#B76E79]" />
+            </label>
+            <label className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-[#E7D6CC] bg-[#FFFDFC] px-3 text-xs font-semibold text-[#6B564C]">
+              Vibration / haptic
+              <input type="checkbox" checked={hapticEnabled} onChange={handleHapticToggle} className="rounded text-[#B76E79] focus:ring-[#B76E79]" />
+            </label>
+          </div>
         </div>
 
         <div className="space-y-3">
@@ -239,6 +292,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
               <Keyboard className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
               <input
                 id="manual-ticket-code"
+                ref={manualInputRef}
                 value={manualValue}
                 onChange={(event) => setManualValue(event.target.value.toUpperCase())}
                 placeholder="CPB-001 or GSV:TICKET:CPB-001"

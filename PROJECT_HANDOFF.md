@@ -2,6 +2,8 @@
 
 Last updated: July 1, 2026 (Phase 17D-A closed as an approved planning-only blueprint and is merge-ready; Phase 17C-B closed with Firestore rules deployed in B2, Hosting-deployed, organizer scanner smoke passed, and admin after-smoke passed; Phase 17C-A closed, merged, and Hosting-deployed; Phase 17B closed, merged, and Hosting-deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
 
+Phase 17D-B has now started as the active scanner-only implementation phase from `main`. It is limited to private `/scanner` event-day polish: clearer success/duplicate/pending/no-ticket messaging, faster next-guest flow, mobile touch/readability improvements, optional browser-native sound/haptic feedback, and no-offline-writes wording. It must not broaden permissions, implement Access & Roles workflows, implement lead-scanner permissions, change Firestore rules, or change QR payload behavior.
+
 ## 1. Project overview
 
 **Project:** Gather & Savor Event Hub  
