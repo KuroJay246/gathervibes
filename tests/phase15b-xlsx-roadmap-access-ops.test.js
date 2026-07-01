@@ -30,7 +30,7 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
   assert.match(importsPage, /No Firestore write happens until you confirm valid rows/)
 })
 
-test('roadmap shows Phase 17E-A current review-only status, prior access phases closed, and future ops backlog', async () => {
+test('roadmap shows Phase 17E-A closed review status, prior access phases closed, and future ops backlog', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const readme = await readFile('README.md', 'utf8')
   const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
@@ -54,7 +54,7 @@ test('roadmap shows Phase 17E-A current review-only status, prior access phases 
     'Phase 17C-A Firestore Rules Review + Deployment Readiness',
     'Phase 17D-C Access & Roles Read-Only/Admin UI Foundation',
     'Phase 17D-D Access workflow/rules-readiness planning only',
-    'Phase 17E-A Access Workflow Rules + Data Model Review only',
+    'Phase 17E-B Access Request Rules Prototype + Tests',
     'Google Sheets OAuth',
     'Gmail/Outlook OAuth',
     'Real AI API integration',
@@ -116,7 +116,7 @@ test('private access status reflects Phase 17C-B live closeout while Phase 17D-C
   assert.match(settings, /Phase 17D-B remains closed after scanner\/admin smoke PASS/)
   assert.match(settings, /Phase 17D-C is closed and merged after organizer admin review PASS and organizer scanner review PASS/)
   assert.match(settings, /Phase 17D-D readiness planning is closed and merged as planning-only/)
-  assert.match(settings, /Phase 17E-A is review-only for access workflow rules and data model readiness/)
+  assert.match(settings, /Phase 17E-A is closed after organizer artifact review PASS as accepted rules\/data-model review only/)
   assert.match(settings, /Approve access: not live/)
   assert.match(settings, /Revoke access: not live/)
   assert.match(settings, /Assign event: not live/)

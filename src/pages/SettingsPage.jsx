@@ -88,8 +88,8 @@ const ROADMAP_SECTIONS = [
     ['Communications Pro', 'Phase 11 copy-only'],
     ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
   ] },
-  { title: '2. Current active phase', items: [['Phase 17E-A Access Workflow Rules + Data Model Review only', 'Review-only / no live workflow / no rules deploy / no index deploy']] },
-  { title: '3. Next recommended phase', items: [['Post-17E-A approval step', 'Only after review acceptance: choose a separately approved workflow or rules-deploy phase']] },
+  { title: '2. Current active phase', items: [['No active implementation phase selected', 'Phase 17E-A is closed after organizer artifact review PASS / accepted review only']] },
+  { title: '3. Next recommended phase', items: [['Phase 17E-B Access Request Rules Prototype + Tests', 'Dry-run only / no live workflow / no rules deploy / no index deploy by default']] },
   { title: '4. High-priority operational backlog', items: [
     ['Clean-account route smoke path for every future feature', 'Required standard'],
     ['Registration/guest count wording consistency', 'Preserved'],
@@ -273,7 +273,7 @@ export function SettingsPage() {
     access: (
       <SettingsSection eyebrow="Access & Roles" title="Read-only admin foundation">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is closed and merged after organizer admin review PASS and organizer scanner review PASS. Phase 17D-D readiness planning is closed and merged as planning-only. Phase 17E-A is review-only for access workflow rules and data model readiness. No live approval, revoke, assignment editing, lead-scanner, or rules-deploy workflow is implemented here.
+          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is closed and merged after organizer admin review PASS and organizer scanner review PASS. Phase 17D-D readiness planning is closed and merged as planning-only. Phase 17E-A is closed after organizer artifact review PASS as accepted rules/data-model review only. No live approval, revoke, assignment editing, lead-scanner, or rules-deploy workflow is implemented here.
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
           <ReadOnlyStatusPill>Read-only foundation</ReadOnlyStatusPill>

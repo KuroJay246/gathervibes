@@ -167,7 +167,7 @@ export function QaPage() {
         { label: 'Approved admin detected', status: db && Array.isArray(accessControl?.approvedEmails) ? 'pass' : 'fail', detail: 'Protected page loaded with settings/accessControl allowlist access' },
         { label: 'Empty allowlist check', status: accessControl?.approvedEmails?.length > 0 ? 'pass' : 'fail', detail: accessControl?.approvedEmails?.length > 0 ? `${accessControl.approvedEmails.length} emails approved` : 'approvedEmails is missing or empty' },
         { label: 'No public access warning', status: 'pass', detail: 'App remains private and allowlist-only.' },
-        { label: 'Staff roles enforcement level', status: 'pass', detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged, and Phase 17E-A is review-only with no live workflow change.' },
+        { label: 'Staff roles enforcement level', status: 'pass', detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged, and Phase 17E-A is closed after organizer artifact review PASS with no live workflow change.' },
         { label: 'Approved-admin allowlist active', status: 'pass', detail: 'settings/accessControl.approvedEmails remains owner/admin enforcement.' },
         { label: 'Firestore role enforcement', status: 'pass', detail: 'Scanner/check-in-only live access is enforced through deployed rules, active staffProfiles, and active staffAssignments. Phase 17D-C and Phase 17D-D closed without changing live rules, and Phase 17E-A does not deploy rules.' },
         { label: 'Communications templates available', status: COMMUNICATION_TEMPLATES.length >= 12 ? 'pass' : 'warning', detail: `${COMMUNICATION_TEMPLATES.length} copy-only templates` },

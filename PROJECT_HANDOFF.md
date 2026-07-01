@@ -1,12 +1,12 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: July 1, 2026 (Phase 17E-A started as Access Workflow Rules + Data Model Review only; Phase 17D-C closed and merged as the Access & Roles read-only/admin UI foundation completed with organizer admin review PASS and organizer scanner review PASS; Phase 17D-D closed and merged as access workflow/rules-readiness planning completed; Phase 17D-B closed as scanner day-of polish completed, merge-ready, and Hosting-deployed with organizer scanner smoke PASS and admin after-smoke PASS; Phase 17D-A closed and merged as an approved planning-only blueprint; Phase 17C-B closed and merged with Firestore rules deployed in B2, Hosting-deployed, organizer scanner smoke passed, and admin after-smoke passed; Phase 17C-A closed, merged, and Hosting-deployed; Phase 17B closed, merged, and Hosting-deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
+Last updated: July 1, 2026 (Phase 17E-A closed as Access Workflow Rules + Data Model Review only after organizer artifact review PASS; Phase 17D-C closed and merged as the Access & Roles read-only/admin UI foundation completed with organizer admin review PASS and organizer scanner review PASS; Phase 17D-D closed and merged as access workflow/rules-readiness planning completed; Phase 17D-B closed as scanner day-of polish completed, merge-ready, and Hosting-deployed with organizer scanner smoke PASS and admin after-smoke PASS; Phase 17D-A closed and merged as an approved planning-only blueprint; Phase 17C-B closed and merged with Firestore rules deployed in B2, Hosting-deployed, organizer scanner smoke passed, and admin after-smoke passed; Phase 17C-A closed, merged, and Hosting-deployed; Phase 17B closed, merged, and Hosting-deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
 
 Phase 17D-B is now closed, merged-ready, and Hosting-deployed. Branch commit `d3b65aab0e4d7401013e463af4bb92e4de69b892` completed scanner day-of polish only on the private `/scanner` surface: clearer success/duplicate/pending/no-ticket messaging, faster next-guest flow, mobile touch/readability improvements, optional browser-native sound/haptic feedback, and no-offline-writes wording. Organizer scanner smoke PASS and organizer admin after-smoke PASS are recorded. Scanner remains assigned-event-only with no undo/check-out, admin undo remains admin-only where implemented, no permissions were broadened, no Access & Roles workflow or lead-scanner permission was implemented, CPB remained untouched, `approvedEmails` remained unchanged, QR payload remains `GSV:TICKET:{ticketCode}`, `xlsx` remains absent, `read-excel-file` remains active, and Firestore rules/indexes were not deployed in 17D-B.
 
 Phase 17D-C is now closed, merged, and Hosting-review-deployed after organizer admin review PASS and organizer scanner review PASS. Branch implementation commit `b7e1fc1b0a454ec11570ebac81fecd84f8af2b9a` delivered the Access & Roles read-only/admin UI foundation only: Admin Access Boundary, Staff Profiles Model, Event Assignments Model, Role Capability Matrix, Scanner Mode, Security Notes, and disabled future workflow controls explicitly marked not live. It does not add any write mutation for staffProfiles, staffAssignments, approvedEmails, or auditLogs. Phase 17D-D is now closed, merged, and planning-only. Its readiness artifact `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md` is preserved. The permanent Chat-to-Codex handoff rule was added in commit `1a1f43d336f7101af603b086b287e5bd9ace2595`. No approval workflow, revoke workflow, staff assignment editing, lead-scanner permission, Firestore rules deploy, or Firestore indexes deploy are live in this closeout.
 
-Phase 17E-A is now the current review-only phase. Its artifact is `PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md`. This phase is limited to access-workflow rules review, staff profile and assignment model review, audit-log action review, and future index/readiness review only. It does not implement a live approval workflow, revoke workflow, staff assignment editing workflow, lead-scanner permission, Firestore rules deployment, or Firestore indexes deployment.
+Phase 17E-A is now closed, merged-ready, and accepted by organizer artifact review PASS. Branch `codex/phase-17e-a-access-workflow-rules-data-model-review` at commit `cb0047f310f1bbf61515088328e7f65410d20400` preserved `PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md` as the accepted artifact. This phase was limited to access-workflow rules review, staff profile and assignment model review, audit-log action review, and future index/readiness review only. It did not implement a live approval workflow, revoke workflow, staff assignment editing workflow, lead-scanner permission, Firestore rules deployment, or Firestore indexes deployment. It did not broaden permissions; `approvedEmails` remained unchanged and admin-only; scanner remained assigned-event-only with no undo/check-out; admin undo remained admin-only where implemented; CPB remained untouched; CODEX_TEST remained QA/smoke only; QR payload remained `GSV:TICKET:{ticketCode}`; `xlsx` remained absent; and `read-excel-file` remained active.
 
 Organizer manual review PASS is preserved for this closeout. Admin review PASS: admin login works; Settings opens; Access & Roles is visible to admin and remains read-only; Admin Access Boundary, Staff Profiles Model, Event Assignments Model, Role Capability Matrix, Scanner Mode guidance, and Security Notes are clear; Approve access, Revoke access, Assign event, Edit role, and Lead scanner are marked Not Live / disabled; no staff profile write action, no staff assignment write action, and no approvedEmails edit action are available; no error screen appears. Scanner review PASS: scanner login works; scanner lands on `/scanner`; no admin nav; no Settings access; no Access & Roles access; only CODEX_TEST is available; CPB is not visible or accessed; no Undo Check-In / Check Out button is available.
 
@@ -71,7 +71,7 @@ Phase 17D-A is closed, merged, and approved as a planning-only blueprint. Its de
 
 Phase 17D-A preserved the live safety boundary exactly: no permissions were broadened, `approvedEmails` remains admin-level access only, staff/scanner access remains `staffProfiles/{uid}` plus `events/{eventId}/staffAssignments/{uid}`, scanner remains assigned-event-only and no-undo, admin undo remains admin-only where already implemented, CPB remains protected production data, CODEX_TEST remains QA/smoke only, QR payload remains `GSV:TICKET:{ticketCode}`, Firestore rules were not deployed in 17D-A, Firestore indexes were not deployed, `xlsx` remains absent, and `read-excel-file` remains active.
 
-No live approval/revoke workflow exists yet, no live staff assignment editing exists yet, and no live lead-scanner permission exists yet. Phase 17D-C is closed and merged after organizer admin/scanner review PASS, and Phase 17D-D readiness planning is closed and merged as planning-only in `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md`. Phase 17E-A review-only work is documented in `PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md`.
+No live approval/revoke workflow exists yet, no live staff assignment editing exists yet, and no live lead-scanner permission exists yet. Phase 17D-C is closed and merged after organizer admin/scanner review PASS, and Phase 17D-D readiness planning is closed and merged as planning-only in `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md`. Phase 17E-A is now closed after organizer artifact review PASS, and its accepted review artifact is documented in `PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md`.
 
 Backlog/status visibility order:
 
@@ -742,7 +742,7 @@ Door check-in is implemented with fast search by name, email, phone, ticket code
 
 Registration, import, ticket, and check-in writes include an audit log entry in the same batch, matching the Phase 2 event pattern. Duplicate check-in attempts can be recorded as append-only audit logs without reversing check-in state.
 
-## 23. Current review-only phase and next gate
+## 23. Phase 17E-A closeout and recommended next gate
 
 Phase 17D-A is closed after organizer blueprint approval. Its closeout preserved the clean-account engineering standard:
 
@@ -752,9 +752,10 @@ Phase 17D-A is closed after organizer blueprint approval. Its closeout preserved
 - Improve scanner day-of polish, sound/haptic feedback, success/error UI, and event-day helper ergonomics
 - Limit any lead-scanner work to planning unless explicit approval is given
 
-Current active review-only phase:
+Phase 17E-A closeout status:
 
 - Phase 17E-A: Access Workflow Rules + Data Model Review only
+- Closed and merged-ready after organizer artifact review PASS
 - No live approval/revoke workflow yet
 - No staff assignment editing yet
 - No lead-scanner implementation yet
@@ -762,9 +763,16 @@ Current active review-only phase:
 - No CPB QA
 - No approvedEmails workaround
 
-Next gate after 17E-A review acceptance:
+Recommended next phase after 17E-A closeout:
 
-- Choose a separately approved workflow implementation phase or separately approved rules/index deployment phase
+- Phase 17E-B: Access Request Rules Prototype + Tests — dry-run only
+- No live approval/revoke workflow yet
+- No staff assignment editing yet
+- No lead-scanner implementation yet
+- No Firestore rules deploy unless separately approved
+- No Firestore indexes deploy unless separately approved
+- No CPB QA
+- No approvedEmails workaround
 
 Phase boundaries remain:
 

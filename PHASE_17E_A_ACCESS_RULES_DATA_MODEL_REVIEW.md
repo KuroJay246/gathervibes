@@ -1,8 +1,9 @@
 # Phase 17E-A — Access Workflow Rules + Data Model Review
 
-Status: review-only  
+Status: accepted review artifact  
 Branch: `codex/phase-17e-a-access-workflow-rules-data-model-review`  
 Base main commit: `b2070f5656d28ec76919c3d12e5401ece7d419b2`
+Branch review commit: `cb0047f310f1bbf61515088328e7f65410d20400`
 
 ## Scope
 
@@ -32,7 +33,7 @@ Phase 17E-A is limited to rules and data-model review readiness. It does not imp
   - `settings/accessControl`
   - `staffProfiles/{uid}`
   - `events/{eventId}/staffAssignments/{uid}`
-- Current scanner assignment lookup remains pinned to CODEX_TEST in client auth flow.
+- Current test scanner smoke remains CODEX_TEST-only in the current client auth flow. Future assigned-event discovery requires a separately approved phase.
 
 ## Reviewed model surfaces
 
@@ -180,4 +181,4 @@ Preliminary review:
 
 ## Output of Phase 17E-A
 
-Phase 17E-A closes only after rules/data-model review is accepted. Any live workflow, rules deployment, index deployment, or permission broadening belongs to a later explicitly approved phase.
+Phase 17E-A is closed as an accepted rules/data-model review artifact. Any live workflow, rules deployment, index deployment, or permission broadening belongs to a later explicitly approved phase.

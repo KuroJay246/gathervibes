@@ -46,7 +46,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Staff roles enforcement level',
       status: 'ok',
-      detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged, and Phase 17E-A is review-only with no live workflow change.',
+      detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged, and Phase 17E-A is closed after organizer artifact review PASS with no live workflow change.',
     },
     {
       label: 'Approved-admin allowlist',
