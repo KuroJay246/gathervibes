@@ -8,6 +8,71 @@ import { SystemHealthPanel } from '../components/SystemHealthPanel'
 import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeUtils'
 import { ACCESS_ROLES, ROLE_ORDER, listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
 
+const ACCESS_ROLE_MATRIX = [
+  ['Owner/Admin', 'Dashboard, Settings, Access & Roles, events, registrations, imports, tickets, check-in, operations, QA, communications, scanner, and admin-only undo where already implemented.'],
+  ['Event Manager', 'Planned assigned-event operational surface only. Not live in this phase.'],
+  ['Scanner / Check-In Only', 'Assigned-event scanner route, lookup, and check-in only. No undo, no check-out, no admin routes.'],
+  ['Viewer / Read-Only', 'Planned assigned-event read-only surface only. Not live in this phase.'],
+  ['Operations Helper', 'Planned assigned-event operations visibility only. Not live in this phase.'],
+  ['Lead Scanner', 'Not live. Planning/readiness only.'],
+]
+
+const ACCESS_MODEL_SECTIONS = [
+  {
+    title: 'Admin Access Boundary',
+    body: 'approvedEmails remains the admin-level boundary. This surface is read-only and must never add staff/scanner/helper accounts to approvedEmails.',
+    rows: [
+      ['Live boundary', 'settings/accessControl.approvedEmails'],
+      ['Admin writes from this UI', 'Not live'],
+      ['approvedEmails editing', 'Not live'],
+    ],
+  },
+  {
+    title: 'Staff Profiles Model',
+    body: 'Future staff access uses staffProfiles/{uid}. This phase documents the model only and does not create, edit, revoke, or suspend profiles.',
+    rows: [
+      ['Collection', 'staffProfiles/{uid}'],
+      ['Expected fields', 'uid, email, displayName, status, defaultRole'],
+      ['Profile editing', 'Not live'],
+    ],
+  },
+  {
+    title: 'Event Assignments Model',
+    body: 'Future event-scoped access uses events/{eventId}/staffAssignments/{uid}. This phase does not assign staff to events or edit assignments.',
+    rows: [
+      ['Collection', 'events/{eventId}/staffAssignments/{uid}'],
+      ['Expected fields', 'uid, email, eventId, role, status, createdAt, updatedAt'],
+      ['Assignment editing', 'Not live'],
+    ],
+  },
+  {
+    title: 'Scanner Mode',
+    body: 'Scanner remains assigned-event-only with no undo or check-out. Admin undo remains admin-only where already implemented.',
+    rows: [
+      ['Safe QA event', 'CODEX_TEST only'],
+      ['CPB access', 'Protected / do not use for QA'],
+      ['Undo / Check Out', 'Scanner: not live / Admin: admin-only where implemented'],
+    ],
+  },
+  {
+    title: 'Security Notes',
+    body: 'No Firestore rules deploy, no Firestore index deploy, no permission broadening, and no write mutations are introduced in this phase.',
+    rows: [
+      ['Firestore rules changes', 'Not deployed here'],
+      ['Firestore indexes', 'Not deployed here'],
+      ['Lead-scanner permission', 'Not live'],
+    ],
+  },
+]
+
+const FUTURE_ACTIONS = [
+  'Approve access',
+  'Revoke access',
+  'Assign event',
+  'Edit role',
+  'Lead scanner',
+]
+
 const ROADMAP_SECTIONS = [
   { title: '1. Closed / shipped phases', items: [
     ['Phase 14B CPB Payment Audit UI Cleanup / Operations Review Fixes', 'Closed'],
@@ -17,12 +82,14 @@ const ROADMAP_SECTIONS = [
     ['Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning', 'Closed / merged / deployed'],
     ['Phase 17B Staff / Worker Roles Foundation', 'Closed / merged / Hosting-deployed'],
     ['Phase 17C-A Firestore Rules Review + Deployment Readiness', 'Closed / merged / Hosting-deployed / rules not deployed'],
+    ['Phase 17D-C Access & Roles Read-Only/Admin UI Foundation', 'Closed / merge-ready / admin review PASS / scanner review PASS'],
+    ['Phase 17D-D Access workflow/rules-readiness planning only', 'Closed / merge-ready / planning-only'],
     ['Finance tracker', 'Phase 9 active'],
     ['Communications Pro', 'Phase 11 copy-only'],
     ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
   ] },
-  { title: '2. Current active phase', items: [['Phase 17D-B Scanner Day-of Polish Implementation Only', 'Closed after scanner/admin smoke PASS / merge-ready / Hosting-deployed / no access broadening']] },
-  { title: '3. Next recommended phase', items: [['Phase 17D-C Access & Roles read-only/admin UI foundation', 'Later follow-on phase / organizer approval required']] },
+  { title: '2. Current active phase', items: [['No active implementation phase selected', 'Phase 17D-C and Phase 17D-D are closed on this branch and awaiting merge review']] },
+  { title: '3. Next recommended phase', items: [['Phase 17E-A Access Workflow Rules + Data Model Review only', 'Rules/data-model review only / no live workflow / no rules deploy without separate approval']] },
   { title: '4. High-priority operational backlog', items: [
     ['Clean-account route smoke path for every future feature', 'Required standard'],
     ['Registration/guest count wording consistency', 'Preserved'],
@@ -134,6 +201,13 @@ function PillList({ items, tone = 'plain' }) {
   )
 }
 
+function ReadOnlyStatusPill({ children, tone = 'plain' }) {
+  const className = tone === 'warning'
+    ? 'bg-[#FFF4DF] text-[#986F26]'
+    : 'bg-[#F7F1ED] text-[#6B564C]'
+  return <span className={`inline-flex rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${className}`}>{children}</span>
+}
+
 export function SettingsPage() {
   const { user, signOut, accessControl, currentRole, currentRoleLabel } = useAuth()
   const { activeEvent } = useActiveEvent()
@@ -197,9 +271,16 @@ export function SettingsPage() {
       </SettingsSection>
     ),
     access: (
-      <SettingsSection eyebrow="Access & Roles" title="Admin allowlist and future staff access">
+      <SettingsSection eyebrow="Access & Roles" title="Read-only admin foundation">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-A remains closed as the approved planning blueprint. Phase 17D-B is closed after scanner/admin smoke PASS and did not broaden permissions. No live approval, revoke, or lead-scanner workflow is implemented here, and Phase 17D-C Access & Roles read-only/admin UI foundation remains later if organizer approval is given.
+          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is now closed after organizer admin review PASS and organizer scanner review PASS. Phase 17D-D readiness planning is now closed as planning-only. No live approval, revoke, assignment editing, or lead-scanner workflow is implemented here.
+        </div>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <ReadOnlyStatusPill>Read-only foundation</ReadOnlyStatusPill>
+          <ReadOnlyStatusPill>Approve access: not live</ReadOnlyStatusPill>
+          <ReadOnlyStatusPill>Revoke access: not live</ReadOnlyStatusPill>
+          <ReadOnlyStatusPill>Assign event: not live</ReadOnlyStatusPill>
+          <ReadOnlyStatusPill tone="warning">Lead scanner: not live</ReadOnlyStatusPill>
         </div>
         <div className="mt-5">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Approved emails and roles</p>
@@ -214,6 +295,22 @@ export function SettingsPage() {
             ))}
           </div>
         </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          {ACCESS_MODEL_SECTIONS.map((section) => (
+            <div key={section.title} className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-bold text-[#2B1723]">{section.title}</p>
+                <ReadOnlyStatusPill>{section.title === 'Security Notes' ? 'No deploy' : 'Read-only'}</ReadOnlyStatusPill>
+              </div>
+              <p className="mt-2 text-xs leading-5 text-[#816D62]">{section.body}</p>
+              <div className="mt-4 rounded-2xl border border-[#EFE2DA] bg-white p-3">
+                {section.rows.map(([label, value]) => (
+                  <InfoRow key={label} label={label} value={value} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {ROLE_ORDER.map((roleId) => (
             <div key={roleId} className="rounded-2xl border border-[#EFE2DA] p-4">
@@ -222,10 +319,40 @@ export function SettingsPage() {
             </div>
           ))}
         </div>
+        <div className="mt-5 rounded-2xl border border-[#EFE2DA] p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Role capability matrix</p>
+          <div className="mt-3 grid gap-3">
+            {ACCESS_ROLE_MATRIX.map(([role, detail]) => (
+              <div key={role} className="rounded-2xl border border-[#EFE2DA] bg-white p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-bold text-[#2B1723]">{role}</p>
+                  <ReadOnlyStatusPill>{/Not live/.test(detail) ? 'Not live' : 'Current guidance'}</ReadOnlyStatusPill>
+                </div>
+                <p className="mt-2 text-xs leading-5 text-[#816D62]">{detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
         <div className="mt-5 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
           <p className="text-sm font-bold text-[#2B1723]">Current role behavior</p>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
-          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Firestore rules stay stable; approved admins manage staffProfiles and events/{'{eventId}'}/staffAssignments/{'{uid}'} documents with the current deployed rules while future workflow planning remains separate. `PHASE_17D_PLAN.md` is the blueprint for that work.</p>
+          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Firestore rules stay stable; this phase intentionally exposes no live write action for staffProfiles, staffAssignments, approvedEmails, or auditLogs. `PHASE_17D_PLAN.md` remains the blueprint for 17D-A and `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md` is the readiness document for the later workflow phase.</p>
+        </div>
+        <div className="mt-5 rounded-2xl border border-[#EFE2DA] p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-bold text-[#2B1723]">Future approval workflow</p>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">These actions are intentionally visible as disabled planning markers only.</p>
+            </div>
+            <ReadOnlyStatusPill tone="warning">Workflow not live</ReadOnlyStatusPill>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            {FUTURE_ACTIONS.map((action) => (
+              <button key={action} type="button" disabled className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] bg-[#F7F1ED] px-4 text-xs font-bold text-[#9A8479] opacity-80">
+                {action}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="mt-4">
           <PillList items={ACCESS_ROLES_FUTURE_PLAN} tone="white" />

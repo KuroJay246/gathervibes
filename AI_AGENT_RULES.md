@@ -38,10 +38,33 @@ This project previously had a real stale-knowledge bug: Phase 17C-B deployed sta
 19. State clearly what changed, what did not change, what was deployed, and what remains blocked.
 20. Stop if current docs, rules, app behavior, and tests contradict each other.
 
+## Chat-to-Codex handoff update rule
+
+Before every future AI/Codex phase, the AI must use the latest ChatGPT conversation update together with `AI_AGENT_RULES.md`, `PROJECT_HANDOFF.md`, `README.md`, and any active phase plan documents.
+
+The AI must not rely only on older repository docs if the current chat contains newer organizer decisions, manual smoke results, safety instructions, branch status, deployment status, or closeout approvals.
+
+Every handoff must clearly include:
+
+- current phase
+- active branch
+- latest commit
+- merge status
+- deploy status
+- manual smoke status
+- organizer approvals or blockers
+- what changed
+- what did not change
+- what remains forbidden
+- what docs/status pages/tests must be updated
+
+If chat decisions and repo docs contradict each other, stop and reconcile them before coding.
+
 ## Current standing rules to preserve
 
 - Phase 17C-B is closed after Firestore rules deployment in B2, the scanner auth-gate fix in B3, organizer scanner smoke PASS, and admin after-smoke PASS.
 - Phase 17D-B is scanner-only polish work. It must not broaden access, rewrite Firestore rules dynamically, implement Access & Roles workflows, or implement lead-scanner permissions.
+- Phase 17D-C is read-only/admin UI foundation only. It must not add write mutations for staffProfiles, staffAssignments, approvedEmails, or auditLogs.
 - Phase 17C-B3 fixed the scanner login gate by allowing active staff profile plus active assignment access after approved-admin lookup.
 - Scanner/check-in-only users remain check-in only. Do not give the normal scanner role Undo Check-In or Check Out.
 - Approved admins may use existing admin-only undo/check-out paths where already implemented.
