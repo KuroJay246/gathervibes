@@ -30,7 +30,7 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
   assert.match(importsPage, /No Firestore write happens until you confirm valid rows/)
 })
 
-test('roadmap shows ordered Phase 17C-B status, closed shipped phases, deferred integrations, and future ops backlog', async () => {
+test('roadmap shows ordered Phase 17D-A planning status, closed shipped phases, deferred integrations, and future ops backlog', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const readme = await readFile('README.md', 'utf8')
   const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
@@ -52,8 +52,8 @@ test('roadmap shows ordered Phase 17C-B status, closed shipped phases, deferred 
     'Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening',
     'Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning',
     'Phase 17C-A Firestore Rules Review + Deployment Readiness',
-    'Phase 17D scanner polish and Access & Roles planning',
-    'Phase 17D scanner polish',
+    'Phase 17D-A Access & Roles Planning + Scanner Day-of Polish Blueprint',
+    'Phase 17D-B or 17D-C after plan review',
     'Google Sheets OAuth',
     'Gmail/Outlook OAuth',
     'Real AI API integration',
@@ -94,7 +94,7 @@ test('roadmap shows ordered Phase 17C-B status, closed shipped phases, deferred 
   assert.match(handoff, /Phase 17B staff access model/)
 })
 
-test('private access status reflects Phase 17C-B closeout without reopening the rollout gate', async () => {
+test('private access status reflects Phase 17C-B closeout while Phase 17D-A stays planning-only', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const healthItems = buildRuntimeHealthItems({
@@ -112,11 +112,32 @@ test('private access status reflects Phase 17C-B closeout without reopening the 
   })
 
   assert.match(settings, /Approved-admin allowlist remains active owner\/admin enforcement/)
-  assert.match(settings, /Phase 17C-B closed after Firestore rules deployment in B2/)
+  assert.match(settings, /Phase 17D-A is active as a planning-only phase/)
   assert.match(settings, /Temporary event-day helpers should not be added to approvedEmails/)
   assert.match(qa, /Staff roles enforcement level/)
   assert.equal(healthItems.find((item) => item.label === 'Staff roles enforcement level').status, 'ok')
-  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /deployed for live scanner use/)
+  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /17D-A planning does not change rules/)
+})
+
+test('Phase 17D planning docs exist and preserve current live safety boundaries', async () => {
+  const aiRules = await readFile('AI_AGENT_RULES.md', 'utf8')
+  const readme = await readFile('README.md', 'utf8')
+  const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
+  const plan = await readFile('PHASE_17D_PLAN.md', 'utf8')
+
+  assert.match(aiRules, /Phase 17D-A is planning-only/)
+  assert.match(readme, /Phase 17D-A active planning status/)
+  assert.match(handoff, /Phase 17D-A: Access & Roles Planning \+ Scanner Day-of Polish Blueprint/)
+  assert.match(plan, /Role capability matrix/)
+  assert.match(plan, /lead-scanner role planning only/i)
+  assert.match(plan, /Settings must not rewrite Firestore rules dynamically/i)
+  assert.match(plan, /`approvedEmails` remains admin-level access only/i)
+  assert.match(plan, /staffProfiles\/\{uid\}/)
+  assert.match(plan, /events\/\{eventId\}\/staffAssignments\/\{uid\}/)
+  assert.match(plan, /Scanner\/check-in-only remains assigned-event-only check-in access with no undo\/check-out/i)
+  assert.match(plan, /CPB remains protected production data/i)
+  assert.match(plan, /QR payload exactly as `GSV:TICKET:\{ticketCode\}`/i)
+  assert.doesNotMatch(plan, /approve users live|revoke users live|lead scanner implemented/i)
 })
 
 test('Event Operations page documents active ledger and future modules only', async () => {

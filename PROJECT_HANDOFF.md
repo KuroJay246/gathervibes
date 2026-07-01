@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub — Complete Implementation Handoff
 
-Last updated: June 30, 2026 (Phase 17C-B closed, merged-ready, Firestore-rules-deployed in B2, Hosting-deployed, organizer scanner smoke passed, and admin after-smoke passed; Phase 17C-A closed, merged, and Hosting-deployed; Phase 17B closed, merged, and Hosting-deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
+Last updated: July 1, 2026 (Phase 17D-A active as a planning-only phase for Access & Roles blueprinting and scanner day-of polish planning; Phase 17C-B closed with Firestore rules deployed in B2, Hosting-deployed, organizer scanner smoke passed, and admin after-smoke passed; Phase 17C-A closed, merged, and Hosting-deployed; Phase 17B closed, merged, and Hosting-deployed; Phase 17A closed, merged, and deployed; Phase 16 closed, merged, and deployed; Phase 15B closed, merged, and deployed)
 
 ## 1. Project overview
 
@@ -31,6 +31,7 @@ The repository currently contains:
 - Phase 17B: Staff / Worker Roles Foundation — closed, merged, and Hosting-deployed; Firestore rules prototype was merged for review and not deployed at Phase 17B closeout.
 - Phase 17C-A: Firestore Rules Review + Deployment Readiness — closed, merged, and Hosting-deployed; Firestore rules were dry-run validated and not deployed at Phase 17C-A closeout.
 - Phase 17C-B: Firestore Rules Deployment Approval + Live Scanner/Staff Smoke + Scanner-Only PWA Mode — closed, merged-ready, Firestore rules deployed in B2, Hosting-deployed, organizer scanner smoke passed, admin after-smoke passed.
+- Phase 17D-A: Access & Roles Planning + Scanner Day-of Polish Blueprint — active planning only; no new live permissions or workflow changes.
 
 Phase 15B removes the vulnerable SheetJS `xlsx` package from production dependencies and keeps XLSX import on the already-installed `read-excel-file/browser` parser. Staff/scanner accounts must not be added to approvedEmails; Phase 17B introduced a prototype `staffProfiles/{uid}` and `events/{eventId}/staffAssignments/{uid}` rules-backed model for future scoped staff access.
 
@@ -55,6 +56,8 @@ Scanner/check-in-only access remains check-in only. Do not give the normal scann
 Phase 17C-B1b keeps scanner isolated while improving approved-admin navigation. The main admin AppShell brand mark links back to `/dashboard`; `/scanner` does not expose that admin-home brand behavior. Settings is organized into tabbed categories with query links such as `/settings?tab=access`, preserving approvedEmails warnings, TEST_SCANNER_EMAIL blocker status, CODEX_TEST/CPB guidance, deferred integrations, private indexing/security guidance, and the future Access & Roles plan without implementing an approval workflow or rules-rewrite UI.
 
 Organizer-provided closeout PASS is recorded for Phase 17C-B. Scanner login works, no approvedEmails error appears, scanner lands on `/scanner`, no admin nav is shown, only CODEX_TEST is available, CPB is not visible or accessed, check-in works, duplicate check-in blocks, and the normal scanner role has no Undo Check-In button. Approved admin login works, Dashboard/Settings/QA/Registrations/Tickets/Check-In/Scanner open, CODEX_TEST reflects the scanner check-in, CPB is not selected, and no error screen appears. `AI_AGENT_RULES.md` is required reading for future AI/Codex phases.
+
+Phase 17D-A is the current active planning phase only. Its deliverable is `PHASE_17D_PLAN.md`: a blueprint for Access & Roles Management Center planning, Settings approval-flow planning, scanner day-of polish, sound/haptic feedback planning, scanner success/error UI planning, event-day helper ergonomics, and lead-scanner role planning only. It does not implement live approval or revoke workflows, does not change Firestore rules, does not create staff users or assignments, and does not change current permissions.
 
 Backlog/status visibility order:
 
@@ -727,13 +730,18 @@ Registration, import, ticket, and check-in writes include an audit log entry in 
 
 ## 23. Recommended next phase
 
-Phase 17D is now the recommended next phase after Phase 17C-B closeout. It should stay narrow and preserve the clean-account engineering standard:
+Phase 17D-A is the current active planning phase after Phase 17C-B closeout. It should stay narrow and preserve the clean-account engineering standard:
 
 - Keep staff/scanner accounts out of `approvedEmails`
 - Keep automatic sending and real AI API deferred
 - Plan Access & Roles management UI without broadening access by default
 - Improve scanner day-of polish, sound/haptic feedback, success/error UI, and event-day helper ergonomics
 - Limit any lead-scanner work to planning unless explicit approval is given
+
+After 17D-A planning review, choose one narrow implementation subphase:
+
+- Phase 17D-B: scanner day-of polish implementation only
+- Phase 17D-C: Access & Roles read-only/admin UI foundation only
 
 Phase boundaries remain:
 

@@ -41,12 +41,12 @@ export function buildRuntimeHealthItems({
     {
       label: 'Current role detected',
       status: currentRoleLabel ? 'ok' : 'warn',
-      detail: currentRoleLabel ? `${currentRoleLabel} from approved-admin allowlist or Phase 17C-B staff profile/assignment readiness state.` : 'Role display is pending access load.',
+      detail: currentRoleLabel ? `${currentRoleLabel} from approved-admin allowlist or Phase 17C-B staff profile/assignment live state.` : 'Role display is pending access load.',
     },
     {
       label: 'Staff roles enforcement level',
       status: 'ok',
-      detail: 'Phase 17C-B closed with deployed rules, scanner auth-gate fix, scanner smoke PASS, and admin after-smoke PASS.',
+      detail: 'Phase 17C-B remains closed and live. Phase 17D-A is planning-only and does not broaden access.',
     },
     {
       label: 'Approved-admin allowlist',
@@ -56,7 +56,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Firestore role enforcement',
       status: 'ok',
-      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved.',
+      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved. 17D-A planning does not change rules.',
     },
     {
       label: 'Events read',
