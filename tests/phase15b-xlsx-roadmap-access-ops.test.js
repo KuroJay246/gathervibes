@@ -30,7 +30,7 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
   assert.match(importsPage, /No Firestore write happens until you confirm valid rows/)
 })
 
-test('roadmap shows Phase 17E-A closed review status, prior access phases closed, and future ops backlog', async () => {
+test('roadmap shows Phase 17E-B active dry-run status, prior access phases closed, and future ops backlog', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const readme = await readFile('README.md', 'utf8')
   const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
@@ -55,6 +55,8 @@ test('roadmap shows Phase 17E-A closed review status, prior access phases closed
     'Phase 17D-C Access & Roles Read-Only/Admin UI Foundation',
     'Phase 17D-D Access workflow/rules-readiness planning only',
     'Phase 17E-B Access Request Rules Prototype + Tests',
+    'Active / dry-run only / no live workflow / rules dry-run only / no index deploy',
+    'Complete 17E-B prototype review and dry-run validation',
     'Google Sheets OAuth',
     'Gmail/Outlook OAuth',
     'Real AI API integration',
@@ -95,7 +97,7 @@ test('roadmap shows Phase 17E-A closed review status, prior access phases closed
   assert.match(handoff, /Phase 17B staff access model/)
 })
 
-test('private access status reflects Phase 17C-B live closeout while Phase 17D-C and 17D-D close without workflow writes', async () => {
+test('private access status reflects Phase 17C-B live closeout while Phase 17E-B stays dry-run only', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const healthItems = buildRuntimeHealthItems({
@@ -117,15 +119,17 @@ test('private access status reflects Phase 17C-B live closeout while Phase 17D-C
   assert.match(settings, /Phase 17D-C is closed and merged after organizer admin review PASS and organizer scanner review PASS/)
   assert.match(settings, /Phase 17D-D readiness planning is closed and merged as planning-only/)
   assert.match(settings, /Phase 17E-A is closed after organizer artifact review PASS as accepted rules\/data-model review only/)
+  assert.match(settings, /Phase 17E-B is now active as an undeployed access-request rules prototype and test pass only/)
   assert.match(settings, /Approve access: not live/)
   assert.match(settings, /Revoke access: not live/)
   assert.match(settings, /Assign event: not live/)
   assert.match(settings, /Lead scanner: not live/)
-  assert.match(settings, /this phase intentionally exposes no live write action for staffProfiles, staffAssignments, approvedEmails, or auditLogs/i)
+  assert.match(settings, /Phase 17E-B is limited to an undeployed <code>accessRequests\/&#123;requestId&#125;<\/code> rules prototype plus tests and status copy only/)
+  assert.match(settings, /this phase intentionally exposes no live write action for accessRequests, staffProfiles, staffAssignments, approvedEmails, or auditLogs/i)
   assert.match(settings, /Temporary event-day helpers should not be added to approvedEmails/)
   assert.match(qa, /Staff roles enforcement level/)
   assert.equal(healthItems.find((item) => item.label === 'Staff roles enforcement level').status, 'ok')
-  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /Phase 17D-C and Phase 17D-D closed without changing rules, and Phase 17E-A does not deploy rules/)
+  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /Phase 17D-C and Phase 17D-D closed without changing rules, Phase 17E-A did not deploy rules, and Phase 17E-B remains dry-run only for future accessRequests workflow review/)
 })
 
 test('Phase 17D planning docs and readiness docs exist and preserve current live safety boundaries', async () => {

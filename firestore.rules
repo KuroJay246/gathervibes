@@ -40,6 +40,10 @@ service cloud.firestore {
     // events/{eventId}/staffAssignments/{uid}
     //   admin-managed assigned-event role document. Staff can read only their own
     //   active assignments. Rules use this path to enforce assigned-event access.
+    //
+    // accessRequests/{requestId}
+    //   future requester-submitted access workflow document. Prototype only in
+    //   repository review: not deployed, no live UI writes, admin review only.
 
     function isSignedIn() {
       return request.auth != null;
@@ -184,6 +188,74 @@ service cloud.firestore {
         && data.updatedBy is string
         && data.updatedBy.size() > 0
         && data.updatedBy.size() <= 256;
+    }
+
+    function validRequestedRole(role) {
+      return role in ['event-manager', 'scanner', 'viewer', 'operations-helper'];
+    }
+
+    function validAccessRequestStatus(status) {
+      return status in ['pending', 'approved', 'declined', 'revoked'];
+    }
+
+    function validAccessRequest(data, requestId) {
+      return data.keys().hasAll([
+          'requestId', 'requesterUid', 'requesterEmail', 'requesterName',
+          'requestedRole', 'requestedEventId', 'status', 'notes',
+          'createdAt', 'updatedAt', 'createdBy', 'reviewedAt', 'reviewedBy'
+        ])
+        && data.keys().hasOnly([
+          'requestId', 'requesterUid', 'requesterEmail', 'requesterName',
+          'requestedRole', 'requestedEventId', 'status', 'notes',
+          'createdAt', 'updatedAt', 'createdBy', 'reviewedAt', 'reviewedBy'
+        ])
+        && data.requestId == requestId
+        && validShortId(data.requestId)
+        && data.requesterUid is string
+        && data.requesterUid.size() > 0
+        && data.requesterUid.size() <= 128
+        && data.requesterEmail is string
+        && data.requesterEmail.size() > 0
+        && data.requesterEmail.size() <= 320
+        && data.requesterName is string
+        && data.requesterName.size() > 0
+        && data.requesterName.size() <= 120
+        && validRequestedRole(data.requestedRole)
+        && validShortId(data.requestedEventId)
+        && validAccessRequestStatus(data.status)
+        && data.notes is string
+        && data.notes.size() <= 1000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && data.createdBy is string
+        && data.createdBy.size() > 0
+        && data.createdBy.size() <= 256
+        && (data.reviewedAt == null || data.reviewedAt is timestamp)
+        && validOptionalString(data.reviewedBy, 256);
+    }
+
+    function accessRequestImmutableFieldsUnchanged(requestId) {
+      return request.resource.data.requestId == requestId
+        && request.resource.data.requestId == resource.data.requestId
+        && request.resource.data.requesterUid == resource.data.requesterUid
+        && request.resource.data.requesterEmail == resource.data.requesterEmail
+        && request.resource.data.requesterName == resource.data.requesterName
+        && request.resource.data.requestedRole == resource.data.requestedRole
+        && request.resource.data.requestedEventId == resource.data.requestedEventId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.createdBy == resource.data.createdBy;
+    }
+
+    function accessRequestReviewFieldsValid() {
+      return (
+          request.resource.data.status == 'pending'
+          && request.resource.data.reviewedAt == null
+          && request.resource.data.reviewedBy == null
+        ) || (
+          request.resource.data.status in ['approved', 'declined', 'revoked']
+          && request.resource.data.reviewedAt == request.time
+          && validPerformedBy(request.resource.data.reviewedBy)
+        );
     }
 
     // ── Price tier validation ──────────────────────────────────────────────
@@ -793,6 +865,30 @@ service cloud.firestore {
       allow update: if isApprovedAdmin()
         && isValidOperationLedgerEntry(request.resource.data, ledgerEntryId)
         && operationIdentityUnchanged(ledgerEntryId)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    match /accessRequests/{requestId} {
+      allow get: if isApprovedAdmin()
+        || (
+          isSignedIn()
+          && resource.data.requesterUid == request.auth.uid
+        );
+      allow list: if isApprovedAdmin();
+      allow create: if isSignedIn()
+        && validAccessRequest(request.resource.data, requestId)
+        && request.resource.data.requesterUid == request.auth.uid
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.reviewedAt == null
+        && request.resource.data.reviewedBy == null
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isApprovedAdmin()
+        && validAccessRequest(request.resource.data, requestId)
+        && accessRequestImmutableFieldsUnchanged(requestId)
+        && accessRequestReviewFieldsValid()
         && request.resource.data.updatedAt == request.time;
       allow delete: if false;
     }

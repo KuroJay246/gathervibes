@@ -88,8 +88,8 @@ const ROADMAP_SECTIONS = [
     ['Communications Pro', 'Phase 11 copy-only'],
     ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
   ] },
-  { title: '2. Current active phase', items: [['No active implementation phase selected', 'Phase 17E-A is closed after organizer artifact review PASS / accepted review only']] },
-  { title: '3. Next recommended phase', items: [['Phase 17E-B Access Request Rules Prototype + Tests', 'Dry-run only / no live workflow / no rules deploy / no index deploy by default']] },
+  { title: '2. Current active phase', items: [['Phase 17E-B Access Request Rules Prototype + Tests', 'Active / dry-run only / no live workflow / rules dry-run only / no index deploy']] },
+  { title: '3. Next recommended phase', items: [['Complete 17E-B prototype review and dry-run validation', 'Confirm rules shape, tests, and safety copy before any later workflow phase']] },
   { title: '4. High-priority operational backlog', items: [
     ['Clean-account route smoke path for every future feature', 'Required standard'],
     ['Registration/guest count wording consistency', 'Preserved'],
@@ -273,7 +273,7 @@ export function SettingsPage() {
     access: (
       <SettingsSection eyebrow="Access & Roles" title="Read-only admin foundation">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is closed and merged after organizer admin review PASS and organizer scanner review PASS. Phase 17D-D readiness planning is closed and merged as planning-only. Phase 17E-A is closed after organizer artifact review PASS as accepted rules/data-model review only. No live approval, revoke, assignment editing, lead-scanner, or rules-deploy workflow is implemented here.
+          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is closed and merged after organizer admin review PASS and organizer scanner review PASS. Phase 17D-D readiness planning is closed and merged as planning-only. Phase 17E-A is closed after organizer artifact review PASS as accepted rules/data-model review only. Phase 17E-B is now active as an undeployed access-request rules prototype and test pass only. No live approval, revoke, assignment editing, lead-scanner, or rules-deploy workflow is implemented here.
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
           <ReadOnlyStatusPill>Read-only foundation</ReadOnlyStatusPill>
@@ -336,7 +336,7 @@ export function SettingsPage() {
         <div className="mt-5 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
           <p className="text-sm font-bold text-[#2B1723]">Current role behavior</p>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
-          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Firestore rules stay stable; this phase intentionally exposes no live write action for staffProfiles, staffAssignments, approvedEmails, or auditLogs. `PHASE_17D_PLAN.md` remains the blueprint for 17D-A, `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md` remains the workflow-readiness document, and `PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md` is the current review-only artifact.</p>
+          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Phase 17E-B is limited to an undeployed <code>accessRequests/&#123;requestId&#125;</code> rules prototype plus tests and status copy only. Firestore rules stay stable in production; this phase intentionally exposes no live write action for accessRequests, staffProfiles, staffAssignments, approvedEmails, or auditLogs. <code>PHASE_17D_PLAN.md</code> remains the blueprint for 17D-A, <code>PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md</code> remains the workflow-readiness document, and <code>PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md</code> is the accepted review artifact.</p>
         </div>
         <div className="mt-5 rounded-2xl border border-[#EFE2DA] p-4">
           <div className="flex items-center justify-between gap-3">
