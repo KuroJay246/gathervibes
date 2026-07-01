@@ -82,14 +82,14 @@ const ROADMAP_SECTIONS = [
     ['Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning', 'Closed / merged / deployed'],
     ['Phase 17B Staff / Worker Roles Foundation', 'Closed / merged / Hosting-deployed'],
     ['Phase 17C-A Firestore Rules Review + Deployment Readiness', 'Closed / merged / Hosting-deployed / rules not deployed'],
-    ['Phase 17D-C Access & Roles Read-Only/Admin UI Foundation', 'Closed / merge-ready / admin review PASS / scanner review PASS'],
-    ['Phase 17D-D Access workflow/rules-readiness planning only', 'Closed / merge-ready / planning-only'],
+    ['Phase 17D-C Access & Roles Read-Only/Admin UI Foundation', 'Closed / merged / admin review PASS / scanner review PASS'],
+    ['Phase 17D-D Access workflow/rules-readiness planning only', 'Closed / merged / planning-only'],
     ['Finance tracker', 'Phase 9 active'],
     ['Communications Pro', 'Phase 11 copy-only'],
     ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
   ] },
-  { title: '2. Current active phase', items: [['No active implementation phase selected', 'Phase 17D-C and Phase 17D-D are closed on this branch and awaiting merge review']] },
-  { title: '3. Next recommended phase', items: [['Phase 17E-A Access Workflow Rules + Data Model Review only', 'Rules/data-model review only / no live workflow / no rules deploy without separate approval']] },
+  { title: '2. Current active phase', items: [['Phase 17E-A Access Workflow Rules + Data Model Review only', 'Review-only / no live workflow / no rules deploy / no index deploy']] },
+  { title: '3. Next recommended phase', items: [['Post-17E-A approval step', 'Only after review acceptance: choose a separately approved workflow or rules-deploy phase']] },
   { title: '4. High-priority operational backlog', items: [
     ['Clean-account route smoke path for every future feature', 'Required standard'],
     ['Registration/guest count wording consistency', 'Preserved'],
@@ -273,7 +273,7 @@ export function SettingsPage() {
     access: (
       <SettingsSection eyebrow="Access & Roles" title="Read-only admin foundation">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is now closed after organizer admin review PASS and organizer scanner review PASS. Phase 17D-D readiness planning is now closed as planning-only. No live approval, revoke, assignment editing, or lead-scanner workflow is implemented here.
+          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is closed and merged after organizer admin review PASS and organizer scanner review PASS. Phase 17D-D readiness planning is closed and merged as planning-only. Phase 17E-A is review-only for access workflow rules and data model readiness. No live approval, revoke, assignment editing, lead-scanner, or rules-deploy workflow is implemented here.
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
           <ReadOnlyStatusPill>Read-only foundation</ReadOnlyStatusPill>
@@ -336,7 +336,7 @@ export function SettingsPage() {
         <div className="mt-5 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
           <p className="text-sm font-bold text-[#2B1723]">Current role behavior</p>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
-          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Firestore rules stay stable; this phase intentionally exposes no live write action for staffProfiles, staffAssignments, approvedEmails, or auditLogs. `PHASE_17D_PLAN.md` remains the blueprint for 17D-A and `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md` is the readiness document for the later workflow phase.</p>
+          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Firestore rules stay stable; this phase intentionally exposes no live write action for staffProfiles, staffAssignments, approvedEmails, or auditLogs. `PHASE_17D_PLAN.md` remains the blueprint for 17D-A, `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md` remains the workflow-readiness document, and `PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md` is the current review-only artifact.</p>
         </div>
         <div className="mt-5 rounded-2xl border border-[#EFE2DA] p-4">
           <div className="flex items-center justify-between gap-3">
