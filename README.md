@@ -80,7 +80,7 @@ Phase 17C-A is closed, merged, and Hosting-deployed. It reviewed, documented, an
 
 Admin access remains controlled by `settings/accessControl.approvedEmails`, which is admin-level access only. Do not add staff/scanner/helper accounts to `approvedEmails`. Phase 17C-B2 deployed reviewed Firestore rules and created the CODEX_TEST scanner staff documents, and Phase 17C-B later closed after organizer scanner smoke and admin after-smoke confirmation passed.
 
-Before any future AI/Codex phase, read `AI_AGENT_RULES.md`, `PROJECT_HANDOFF.md`, and `README.md`. Future changes must check the full app flow, related docs, tests, rules, and UI copy so stale project knowledge does not conflict with current behavior.
+Before any future AI/Codex phase, read `AI_AGENT_RULES.md`, `PROJECT_HANDOFF.md`, and `README.md`, then use the latest ChatGPT conversation update together with those repository docs and any active phase plan documents. Future changes must check the full app flow, related docs, tests, rules, and UI copy so stale project knowledge does not conflict with current behavior. If current chat decisions and repository docs disagree, stop and reconcile them before coding or handoff.
 
 ## Phase 17C-B closed status
 
