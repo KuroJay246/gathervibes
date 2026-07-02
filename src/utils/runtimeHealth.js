@@ -46,7 +46,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Staff roles enforcement level',
       status: 'ok',
-      detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged, Phase 17E-A is closed after organizer artifact review PASS, and Phase 17E-B is active as a dry-run rules prototype with no live workflow change.',
+      detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged, Phase 17E-A is closed after organizer artifact review PASS, and Phase 17E-B is closed after organizer prototype review PASS with no live workflow change.',
     },
     {
       label: 'Approved-admin allowlist',
@@ -56,7 +56,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Firestore role enforcement',
       status: 'ok',
-      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved. Phase 17D-C and Phase 17D-D closed without changing rules, Phase 17E-A did not deploy rules, and Phase 17E-B remains dry-run only for future accessRequests workflow review.',
+      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved. Phase 17D-C and Phase 17D-D closed without changing rules, Phase 17E-A did not deploy rules, and Phase 17E-B closed as a dry-run-only accessRequests prototype with Firestore rules still undeployed.',
     },
     {
       label: 'Events read',
