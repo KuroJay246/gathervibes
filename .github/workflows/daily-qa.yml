@@ -43,11 +43,19 @@ jobs:
           import { readFile, readdir } from 'node:fs/promises'
 
           const assets = await readdir('dist/assets')
-          const appAsset = assets.find((name) => name.startsWith('index-') && name.endsWith('.js'))
-          if (!appAsset) throw new Error('Built app bundle was not found.')
+          const appAssets = assets.filter((name) => name.endsWith('.js'))
+          if (appAssets.length === 0) throw new Error('Built app bundles were not found.')
 
-          const appCode = await readFile(`dist/assets/${appAsset}`, 'utf8')
-          for (const expected of ['Sign up with Google', 'Log in with Google', 'Sign in with email']) {
+          const appCode = (
+            await Promise.all(appAssets.map((name) => readFile(`dist/assets/${name}`, 'utf8')))
+          ).join('\n')
+          const expectedAuthText = [
+            'Continue with Google',
+            'Sign in with email',
+            'Sign in securely',
+          ]
+
+          for (const expected of expectedAuthText) {
             if (!appCode.includes(expected)) {
               throw new Error(`Built app is missing expected auth UI text: ${expected}`)
             }

@@ -46,7 +46,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Staff roles enforcement level',
       status: 'ok',
-      detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged, Phase 17E-A is closed after organizer artifact review PASS, and Phase 17E-B is closed after organizer prototype review PASS with no live workflow change.',
+      detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged. Phase 17E-A and 17E-B are closed. Phase 17E-C, Phase 17E-D, and Phase 17E-E are closed after organizer review PASS. Phase 17F-A, Phase 17F-B, and Phase 17F-C are closed after organizer review PASS. No live workflow change is introduced.',
     },
     {
       label: 'Approved-admin allowlist',
@@ -56,7 +56,12 @@ export function buildRuntimeHealthItems({
     {
       label: 'Firestore role enforcement',
       status: 'ok',
-      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved. Phase 17D-C and Phase 17D-D closed without changing rules, Phase 17E-A did not deploy rules, and Phase 17E-B closed as a dry-run-only accessRequests prototype with Firestore rules still undeployed.',
+      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved. Phase 17D-C and Phase 17D-D closed without changing rules, Phase 17E-A did not deploy rules, Phase 17E-B closed as a dry-run-only accessRequests prototype, and Phase 17E-C / 17E-D / 17E-E / 17F-A / 17F-B / 17F-C closed without deploying Firestore rules or indexes.',
+    },
+    {
+      label: 'Daily QA workflow',
+      status: 'warn',
+      detail: 'Latest current-head Daily QA run 28875120502 succeeded for branch commit ca93b260 on July 7, 2026. Older failed GitHub UI badges can reflect stale built-auth smoke history from commit 1e48154 and are not blocking unless the current head fails.',
     },
     {
       label: 'Events read',
