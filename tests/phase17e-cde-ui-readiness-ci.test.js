@@ -7,6 +7,8 @@ test('Daily QA workflow stays read-only and matches the current login surface', 
 
   assert.match(workflow, /permissions:\s*[\s\S]*contents: read/)
   assert.match(workflow, /node-version: 22/)
+  assert.match(workflow, /const appAssets = assets\.filter\(\(name\) => name\.endsWith\('\.js'\)\)/)
+  assert.match(workflow, /Promise\.all\(appAssets\.map\(\(name\) => readFile\(`dist\/assets\/\$\{name\}`, 'utf8'\)\)\)/)
   assert.match(workflow, /Continue with Google/)
   assert.match(workflow, /Sign in with email/)
   assert.match(workflow, /Sign in securely/)
