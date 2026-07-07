@@ -20,7 +20,7 @@ const ACCESS_ROLE_MATRIX = [
 const ACCESS_MODEL_SECTIONS = [
   {
     title: 'Access Requests Model',
-    body: 'Phase 17E-C adds an admin-visible, read-only foundation for future access requests. This phase documents the request shape only and does not approve, decline, revoke, or submit anything.',
+    body: 'Phase 17E-C closed after organizer review PASS with an admin-visible, read-only foundation for future access requests. This phase documents the request shape only and does not approve, decline, revoke, or submit anything.',
     rows: [
       ['Collection', 'accessRequests/{requestId}'],
       ['Expected fields', 'requesterUid, requesterEmail, requestedRole, requestedEventId, status, createdAt, updatedAt, reviewedAt, reviewedBy, notes'],
@@ -95,20 +95,21 @@ const ROADMAP_SECTIONS = [
     ['Phase 17D-D Access workflow/rules-readiness planning only', 'Closed / merged / planning-only'],
     ['Phase 17E-A Access Workflow Rules + Data Model Review', 'Closed / merged-ready / organizer artifact review PASS'],
     ['Phase 17E-B Access Request Rules Prototype + Tests', 'Closed / merged / dry-run only / rules undeployed'],
+    ['Phase 17E-C Access Requests read-only/admin UI foundation', 'Closed / merged-ready / organizer review PASS / read-only only'],
+    ['Phase 17E-D Requester access-request form UX prototype', 'Closed / merged-ready / organizer review PASS / disabled preview only'],
+    ['Phase 17E-E Access workflow deployment readiness package', 'Closed / merged-ready / organizer review PASS / rules undeployed'],
+    ['Phase 17F-A Access workflow implementation plan', 'Closed / merged-ready / organizer review PASS / planning-only'],
+    ['Phase 17F-B Disabled access request service contract', 'Closed / merged-ready / organizer review PASS / disabled contract only'],
+    ['Phase 17F-C Access workflow manual smoke checklist', 'Closed / merged-ready / organizer review PASS / manual checklist only'],
     ['Finance tracker', 'Phase 9 active'],
     ['Communications Pro', 'Phase 11 copy-only'],
     ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
   ] },
   { title: '2. Current active phase', items: [
-    ['Phase 17E-C Access Requests read-only/admin UI foundation', 'Admin-visible only / no live workflow / no Firestore writes'],
-    ['Phase 17E-D Requester access-request form UX prototype', 'Disabled preview only / no public route / no submit'],
-    ['Phase 17E-E Access workflow deployment readiness package', 'Readiness and rollback planning only / no rules deploy / no index deploy'],
-    ['Phase 17F-A Access workflow implementation plan', 'Planning artifact only / no live workflow / no rules deploy'],
-    ['Phase 17F-B Disabled access request service contract', 'Disabled contract only / not wired to UI / no Firestore writes'],
-    ['Phase 17F-C Access workflow manual smoke checklist', 'Manual checklist only / CODEX_TEST-only / no approvedEmails workaround'],
+    ['No active implementation phase on main', 'Phase 17E-C / 17E-D / 17E-E / 17F-A / 17F-B / 17F-C closed after organizer review PASS / no live workflow'],
     ['Daily QA preflight', 'Latest current-head run succeeded; older failed UI badges can be stale and are not blocking unless the current head fails'],
   ] },
-  { title: '3. Next recommended phase', items: [['Organizer review for 17E-C / 17E-D / 17E-E / 17F-A / 17F-B / 17F-C', 'Required before any live workflow, rules deploy, or index deploy']] },
+  { title: '3. Next recommended phase', items: [['Phase 17G-A Live Workflow Go/No-Go Review + Rules Deployment Approval Package only', 'No automatic rules deploy / no index deploy unless separately approved / no live workflow until explicit organizer approval']] },
   { title: '4. High-priority operational backlog', items: [
     ['Clean-account route smoke path for every future feature', 'Required standard'],
     ['Registration/guest count wording consistency', 'Preserved'],
@@ -292,7 +293,7 @@ export function SettingsPage() {
     access: (
       <SettingsSection eyebrow="Access & Roles" title="Read-only admin foundation">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is closed and merged after organizer admin review PASS and organizer scanner review PASS. Phase 17D-D readiness planning is closed and merged as planning-only. Phase 17E-A is closed after organizer artifact review PASS as accepted rules/data-model review only. Phase 17E-B is closed after organizer prototype review PASS as an undeployed access-request rules prototype and test pass only. Phase 17E-C is active here as a read-only/admin UI foundation only. Phase 17E-D is active here as a disabled requester form preview only. Phase 17E-E remains readiness and rollback planning only. Phase 17F-A is active as implementation planning only. Phase 17F-B is active as a disabled service contract only. Phase 17F-C is active as a manual smoke checklist only. No live approval, decline, revoke, assignment editing, lead-scanner, or rules-deploy workflow is implemented here.
+          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is closed and merged after organizer admin review PASS and organizer scanner review PASS. Phase 17D-D readiness planning is closed and merged as planning-only. Phase 17E-A is closed after organizer artifact review PASS as accepted rules/data-model review only. Phase 17E-B is closed after organizer prototype review PASS as an undeployed access-request rules prototype and test pass only. Phase 17E-C is closed after organizer review PASS as a read-only/admin UI foundation only. Phase 17E-D is closed after organizer review PASS as a disabled requester form preview only. Phase 17E-E is closed after organizer review PASS as readiness and rollback planning only. Phase 17F-A is closed after organizer review PASS as implementation planning only. Phase 17F-B is closed after organizer review PASS as a disabled service contract only. Phase 17F-C is closed after organizer review PASS as a manual smoke checklist only. No live approval, decline, revoke, assignment editing, lead-scanner, or rules-deploy workflow is implemented here.
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
           <ReadOnlyStatusPill>Read-only foundation</ReadOnlyStatusPill>
@@ -359,7 +360,7 @@ export function SettingsPage() {
         <div className="mt-5 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
           <p className="text-sm font-bold text-[#2B1723]">Current role behavior</p>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
-          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Phase 17E-B closed after organizer prototype review PASS and remains limited to an undeployed <code>accessRequests/&#123;requestId&#125;</code> rules prototype plus tests and status copy only. Phase 17E-C adds an admin-visible read-only request surface only, Phase 17E-D adds a disabled requester form preview only, Phase 17E-E adds readiness/rollback planning only, Phase 17F-A adds implementation planning only, Phase 17F-B adds a disabled service contract only, and Phase 17F-C adds a manual smoke checklist only. Firestore rules stay stable in production and were not deployed for this batch; no live workflow exists and this batch intentionally exposes no live write action for accessRequests, staffProfiles, staffAssignments, approvedEmails, or auditLogs. <code>PHASE_17D_PLAN.md</code> remains the blueprint for 17D-A, <code>PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md</code> remains the workflow-readiness document, <code>PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md</code> is the accepted review artifact, <code>PHASE_17E_E_ACCESS_WORKFLOW_DEPLOYMENT_READINESS.md</code> is the current deployment-readiness package, <code>PHASE_17F_A_ACCESS_WORKFLOW_IMPLEMENTATION_PLAN.md</code> is the current implementation plan artifact, and <code>PHASE_17F_C_ACCESS_WORKFLOW_SMOKE_CHECKLIST.md</code> is the current manual smoke checklist.</p>
+          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Phase 17E-B closed after organizer prototype review PASS and remains limited to an undeployed <code>accessRequests/&#123;requestId&#125;</code> rules prototype plus tests and status copy only. Phase 17E-C closed after organizer review PASS with an admin-visible read-only request surface only, Phase 17E-D closed after organizer review PASS with a disabled requester form preview only, Phase 17E-E closed after organizer review PASS with readiness/rollback planning only, Phase 17F-A closed after organizer review PASS with implementation planning only, Phase 17F-B closed after organizer review PASS with a disabled service contract only, and Phase 17F-C closed after organizer review PASS with a manual smoke checklist only. Firestore rules stay stable in production and were not deployed for this batch; no live workflow exists and this batch intentionally exposes no live write action for accessRequests, staffProfiles, staffAssignments, approvedEmails, or auditLogs. <code>PHASE_17D_PLAN.md</code> remains the blueprint for 17D-A, <code>PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md</code> remains the workflow-readiness document, <code>PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md</code> is the accepted review artifact, <code>PHASE_17E_E_ACCESS_WORKFLOW_DEPLOYMENT_READINESS.md</code> is the preserved deployment-readiness artifact, <code>PHASE_17F_A_ACCESS_WORKFLOW_IMPLEMENTATION_PLAN.md</code> is the preserved implementation plan artifact, and <code>PHASE_17F_C_ACCESS_WORKFLOW_SMOKE_CHECKLIST.md</code> is the preserved manual smoke checklist.</p>
         </div>
         <div className="mt-5 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-2xl border border-[#EFE2DA] p-4">
