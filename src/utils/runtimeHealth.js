@@ -46,7 +46,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Staff roles enforcement level',
       status: 'ok',
-      detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged, Phase 17E-A is closed after organizer artifact review PASS, and Phase 17E-B is closed after organizer prototype review PASS with no live workflow change.',
+      detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged. Phase 17E-A and 17E-B are closed. Phase 17E-C is active as a read-only admin request surface, Phase 17E-D is active as a disabled requester prototype, and Phase 17E-E is active as readiness planning only with no live workflow change.',
     },
     {
       label: 'Approved-admin allowlist',
@@ -56,7 +56,12 @@ export function buildRuntimeHealthItems({
     {
       label: 'Firestore role enforcement',
       status: 'ok',
-      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved. Phase 17D-C and Phase 17D-D closed without changing rules, Phase 17E-A did not deploy rules, and Phase 17E-B closed as a dry-run-only accessRequests prototype with Firestore rules still undeployed.',
+      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved. Phase 17D-C and Phase 17D-D closed without changing rules, Phase 17E-A did not deploy rules, Phase 17E-B closed as a dry-run-only accessRequests prototype, and Phase 17E-C / 17E-D / 17E-E keep Firestore rules and indexes undeployed.',
+    },
+    {
+      label: 'Daily QA workflow',
+      status: 'warn',
+      detail: 'Scheduled failures before July 2, 2026 at 12:47 UTC were traced to stale built-auth smoke text expecting Sign up with Google on commit 1e48154; the Node 20 deprecation warning was not the root cause. This branch aligns the read-only workflow with the current login copy.',
     },
     {
       label: 'Events read',
