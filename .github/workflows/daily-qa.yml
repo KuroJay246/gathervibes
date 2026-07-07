@@ -47,7 +47,13 @@ jobs:
           if (!appAsset) throw new Error('Built app bundle was not found.')
 
           const appCode = await readFile(`dist/assets/${appAsset}`, 'utf8')
-          for (const expected of ['Sign up with Google', 'Log in with Google', 'Sign in with email']) {
+          const expectedAuthText = [
+            'Continue with Google',
+            'Sign in with email',
+            'Sign in securely',
+          ]
+
+          for (const expected of expectedAuthText) {
             if (!appCode.includes(expected)) {
               throw new Error(`Built app is missing expected auth UI text: ${expected}`)
             }
