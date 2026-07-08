@@ -65,6 +65,10 @@ export function ImportsPage() {
   const canConfirmSheet = Boolean(selectedSheet?.importable)
 
   useEffect(() => {
+    resetImportState()
+  }, [activeEvent?.eventId])
+
+  useEffect(() => {
     if (!activeEvent?.eventId) return
     const unsubscribe = subscribeToRegistrations(
       activeEvent.eventId,

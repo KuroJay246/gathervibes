@@ -130,6 +130,17 @@ export function RegistrationsPage() {
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [activeEvent?.eventId])
 
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setSelectedIds(new Set())
+    setEditingRegistration(null)
+    setDeletingRegistration(null)
+    setIsModalOpen(false)
+    setIsExportModalOpen(false)
+    setSuccess('')
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [activeEvent?.eventId])
+
   if (!activeEvent?.eventId) {
     return (
       <EmptyState
@@ -146,6 +157,7 @@ export function RegistrationsPage() {
   }
 
   if (loading) return <LoadingState message="Loading registrations…" />
+  if (loadError) return <ErrorState message={loadError} onRetry={() => window.location.reload()} />
 
   const filteredRegistrations = registrations.filter((reg) => {
     const finance = calculateRegistrationFinance(reg, activeEvent)
@@ -349,7 +361,6 @@ export function RegistrationsPage() {
         </div>
       </header>
 
-      {loadError && <ErrorState message={loadError} onRetry={() => window.location.reload()} />}
       {success && (
         <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">
           {success}
