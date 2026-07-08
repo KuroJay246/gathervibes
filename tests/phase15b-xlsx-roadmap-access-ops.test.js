@@ -30,7 +30,7 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
   assert.match(importsPage, /No Firestore write happens until you confirm valid rows/)
 })
 
-test('roadmap shows 17G-A as approval-only current phase while preserving closed access phases and future ops backlog', async () => {
+test('roadmap shows 17G-A closed and 17G-B as the next recommended gate while preserving closed access phases and future ops backlog', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const readme = await readFile('README.md', 'utf8')
   const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
@@ -56,11 +56,10 @@ test('roadmap shows 17G-A as approval-only current phase while preserving closed
     'Phase 17D-D Access workflow/rules-readiness planning only',
     'Phase 17E-A Access Workflow Rules + Data Model Review',
     'Phase 17E-B Access Request Rules Prototype + Tests',
-    'Phase 17G-A Live Workflow Go/No-Go Review + Rules Deployment Approval Package only',
-    'Active on this branch / no Firestore rules deploy / no Firestore index deploy / no live workflow',
+    'No active implementation phase on main',
+    'Phase 17G-A closed after organizer review PASS / approval package accepted / no Firestore rules deploy / no Firestore index deploy / no live workflow',
     'Latest current-head run succeeded; older failed UI badges can be stale and are not blocking unless the current head fails',
-    'Organizer decision after Phase 17G-A',
-    'Choose 17G-B dry-run final review only, 17G-C disabled requester create workflow, or 17G-D disabled admin review workflow',
+    'Phase 17G-B Firestore Rules Deployment Approval + Dry-Run Final Review only',
     'Google Sheets OAuth',
     'Gmail/Outlook OAuth',
     'Real AI API integration',
@@ -103,7 +102,7 @@ test('roadmap shows 17G-A as approval-only current phase while preserving closed
   assert.match(handoff, /Phase 17B staff access model/)
 })
 
-test('private access status reflects Phase 17C-B live closeout while 17G-A stays approval-only', async () => {
+test('private access status reflects Phase 17C-B live closeout while 17G-A is closed after organizer review PASS', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const healthItems = buildRuntimeHealthItems({
@@ -132,7 +131,7 @@ test('private access status reflects Phase 17C-B live closeout while 17G-A stays
   assert.match(settings, /Phase 17F-A is closed after organizer review PASS as implementation planning only/)
   assert.match(settings, /Phase 17F-B is closed after organizer review PASS as a disabled service contract only/)
   assert.match(settings, /Phase 17F-C is closed after organizer review PASS as a manual smoke checklist only/)
-  assert.match(settings, /Phase 17G-A is active as an approval package only and records that deploying the current repository rules would make server-side accessRequests rules live/)
+  assert.match(settings, /Phase 17G-A is closed after organizer review PASS, the approval package is accepted, and deploying the current repository rules would make backend accessRequests rules live while the current UI remains disabled\/non-live/)
   assert.match(settings, /Approve request: not live/)
   assert.match(settings, /Decline request: not live/)
   assert.match(settings, /Revoke access: not live/)
@@ -142,7 +141,7 @@ test('private access status reflects Phase 17C-B live closeout while 17G-A stays
   assert.match(settings, /Smoke checklist: manual only/)
   assert.match(settings, /Lead scanner: not live/)
   assert.match(settings, /Phase 17E-B closed after organizer prototype review PASS and remains limited to an undeployed <code>accessRequests\/&#123;requestId&#125;<\/code> rules prototype plus tests and status copy only/)
-  assert.match(settings, /Phase 17E-C closed after organizer review PASS with an admin-visible read-only request surface only, Phase 17E-D closed after organizer review PASS with a disabled requester form preview only, Phase 17E-E closed after organizer review PASS with readiness\/rollback planning only, Phase 17F-A closed after organizer review PASS with implementation planning only, Phase 17F-B closed after organizer review PASS with a disabled service contract only, and Phase 17F-C closed after organizer review PASS with a manual smoke checklist only\. Phase 17G-A is active as an approval package only/)
+  assert.match(settings, /Phase 17E-C closed after organizer review PASS with an admin-visible read-only request surface only, Phase 17E-D closed after organizer review PASS with a disabled requester form preview only, Phase 17E-E closed after organizer review PASS with readiness\/rollback planning only, Phase 17F-A closed after organizer review PASS with implementation planning only, Phase 17F-B closed after organizer review PASS with a disabled service contract only, and Phase 17F-C closed after organizer review PASS with a manual smoke checklist only\. Phase 17G-A is closed after organizer review PASS/)
   assert.match(settings, /no live workflow exists and this batch intentionally exposes no live write action for accessRequests, staffProfiles, staffAssignments, approvedEmails, or auditLogs/i)
   assert.match(settings, /Temporary event-day helpers should not be added to approvedEmails/)
   assert.match(settings, /Requester form prototype/)
@@ -150,8 +149,8 @@ test('private access status reflects Phase 17C-B live closeout while 17G-A stays
   assert.match(settings, /No request is submitted here\. No Firestore write occurs\. No service call occurs\./)
   assert.match(qa, /Staff roles enforcement level/)
   assert.equal(healthItems.find((item) => item.label === 'Staff roles enforcement level').status, 'ok')
-  assert.match(healthItems.find((item) => item.label === 'Staff roles enforcement level').detail, /Phase 17E-C, Phase 17E-D, and Phase 17E-E are closed after organizer review PASS\. Phase 17F-A, Phase 17F-B, and Phase 17F-C are closed after organizer review PASS\. Phase 17G-A is active as an approval package only/)
-  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /Phase 17E-B closed as a dry-run-only accessRequests prototype, Phase 17E-C \/ 17E-D \/ 17E-E \/ 17F-A \/ 17F-B \/ 17F-C closed without deploying Firestore rules or indexes, and Phase 17G-A remains approval-only with no rules or index deploy/)
+  assert.match(healthItems.find((item) => item.label === 'Staff roles enforcement level').detail, /Phase 17E-C, Phase 17E-D, and Phase 17E-E are closed after organizer review PASS\. Phase 17F-A, Phase 17F-B, and Phase 17F-C are closed after organizer review PASS\. Phase 17G-A is closed after organizer review PASS and the approval package is accepted/)
+  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /Phase 17E-B closed as a dry-run-only accessRequests prototype, Phase 17E-C \/ 17E-D \/ 17E-E \/ 17F-A \/ 17F-B \/ 17F-C closed without deploying Firestore rules or indexes, and Phase 17G-A closed after organizer review PASS with no rules or index deploy/)
   assert.match(healthItems.find((item) => item.label === 'Daily QA workflow').detail, /Latest current-head Daily QA run 28875120502 succeeded/)
 })
 

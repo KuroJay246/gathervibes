@@ -1,7 +1,8 @@
 # Phase 17G-A — Live Workflow Go/No-Go Review + Rules Deployment Approval Package
 
-Status: active approval package only  
+Status: closed, merged-ready, and organizer accepted approval package only  
 Branch: `codex/phase-17g-a-live-workflow-go-no-go-rules-approval-package`  
+Branch commit: `e098315c29e5b085bdbd11218ce6b5211d2c9832`  
 Base main commit: `8801419fb580d7430bf9c29e31807bd6ef4d80e9`
 
 ## 1. Scope
