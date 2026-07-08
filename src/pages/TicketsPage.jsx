@@ -117,6 +117,18 @@ export function TicketsPage() {
   const [actionError, setActionError] = useState('')
   const [showPrintableQrs, setShowPrintableQrs] = useState(false)
 
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setSearchQuery('')
+    setFilter('all')
+    setDraftCodes({})
+    setSavingId('')
+    setMessage('')
+    setActionError('')
+    setShowPrintableQrs(false)
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [activeEvent?.eventId])
+
   const existingCodes = useMemo(
     () => new Set(registrations.map((registration) => normalizeTicketCode(registration.ticketCode)).filter(Boolean)),
     [registrations],
@@ -171,6 +183,7 @@ export function TicketsPage() {
   }
 
   if (loading) return <LoadingState message="Loading ticket assignments…" />
+  if (error) return <ErrorState message={error} onRetry={() => window.location.reload()} />
 
   async function assignCode(registration, code, action = 'ticket.assign') {
     setSavingId(registration.registrationId)
@@ -312,7 +325,6 @@ export function TicketsPage() {
         </InfoHint>
       </section>
 
-      {error && <ErrorState message={error} onRetry={() => window.location.reload()} />}
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
       {actionError && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{actionError}</div>}
 
