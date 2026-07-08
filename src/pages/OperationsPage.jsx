@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, Edit3, Plus, ReceiptText, Save, X } from 'lucide-react'
+import { AlertTriangle, Copy, Edit3, Plus, Printer, ReceiptText, Save, Search, X } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -10,12 +10,12 @@ import { subscribeToRegistrations } from '../services/registrationService'
 import {
   LEDGER_ENTRY_TYPES,
   LEDGER_STATUSES,
-  buildOperationsTotals,
   cancelLedgerEntry,
   createLedgerEntry,
   subscribeToOperationsLedger,
   updateLedgerEntry,
 } from '../services/operationsLedgerService'
+import { buildOperationsEntryCounts, buildOperationsLedgerReport, buildOperationsTotals } from '../utils/operationsReport'
 import { InfoHint } from '../components/ui/InfoHint'
 import { canWriteOperations, isApprovedAdmin } from '../utils/accessRoles'
 
@@ -63,7 +63,7 @@ export function OperationsPage() {
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [filters, setFilters] = useState({ type: 'all', category: '', status: 'all' })
+  const [filters, setFilters] = useState({ type: 'all', category: '', status: 'all', search: '' })
   const [form, setForm] = useState(EMPTY_FORM)
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -100,11 +100,27 @@ export function OperationsPage() {
     if (filters.type !== 'all' && entry.entryType !== filters.type) return false
     if (filters.status !== 'all' && entry.status !== filters.status) return false
     if (filters.category && !String(entry.category || '').toLowerCase().includes(filters.category.toLowerCase())) return false
+    if (filters.search) {
+      const query = filters.search.toLowerCase()
+      const haystack = [
+        entry.label,
+        entry.category,
+        entry.paidByOrPaidTo,
+        entry.paymentReference,
+        entry.notes,
+        entry.date,
+        entry.entryType,
+        entry.status,
+      ].map((value) => String(value || '').toLowerCase())
+      if (!haystack.some((value) => value.includes(query))) return false
+    }
     return true
   })
 
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, activeEvent), [registrations, activeEvent])
   const operationsTotals = useMemo(() => buildOperationsTotals(entries), [entries])
+  const filteredTotals = useMemo(() => buildOperationsTotals(filteredEntries), [filteredEntries])
+  const filteredCounts = useMemo(() => buildOperationsEntryCounts(filteredEntries), [filteredEntries])
   const netEventPosition = financeSummary.totalCollected + operationsTotals.income + operationsTotals.adjustments - operationsTotals.expenses - operationsTotals.refunds
 
   if (!activeEvent?.eventId) {
@@ -191,6 +207,25 @@ export function OperationsPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  async function copyCurrentViewReport() {
+    const report = buildOperationsLedgerReport(filteredEntries, {
+      eventName: activeEvent?.eventName,
+      currency: financeSummary.currency,
+    })
+
+    try {
+      await navigator.clipboard.writeText(report)
+      setMessage('Current operations ledger view copied.')
+    } catch (err) {
+      if (import.meta.env.DEV) console.error(err)
+      setError('Could not copy the current ledger view.')
+    }
+  }
+
+  function clearFilters() {
+    setFilters({ type: 'all', category: '', status: 'all', search: '' })
   }
 
   return (
@@ -325,6 +360,15 @@ export function OperationsPage() {
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <h3 className="font-serif text-xl text-[#2B1723]">Ledger entries</h3>
             <div className="flex flex-wrap gap-2">
+              <label className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[#B8A49A]" />
+                <input
+                  value={filters.search}
+                  onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
+                  placeholder="Search entry, category, note, reference"
+                  className="rounded-xl border border-[#E5D7CF] py-2 pl-9 pr-3 text-xs font-bold"
+                />
+              </label>
               <select value={filters.type} onChange={(event) => setFilters((current) => ({ ...current, type: event.target.value }))} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
                 <option value="all">All types</option>
                 {LEDGER_ENTRY_TYPES.map((type) => <option key={type} value={type}>{labelFor(type)}</option>)}
@@ -334,7 +378,36 @@ export function OperationsPage() {
                 {LEDGER_STATUSES.map((status) => <option key={status} value={status}>{labelFor(status)}</option>)}
               </select>
               <input value={filters.category} onChange={(event) => setFilters((current) => ({ ...current, category: event.target.value }))} placeholder="Category" className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold" />
+              <button type="button" onClick={clearFilters} className="rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]">
+                Clear filters
+              </button>
+              <button type="button" onClick={copyCurrentViewReport} className="inline-flex items-center gap-2 rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]">
+                <Copy className="size-3.5" />
+                Copy view
+              </button>
+              <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]">
+                <Printer className="size-3.5" />
+                Print view
+              </button>
             </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              ['Entries in current view', filteredCounts.total],
+              ['Pending / expected', filteredCounts.pending],
+              ['Settled', filteredCounts.settled],
+              ['Cancelled', filteredCounts.cancelled],
+              ['Visible income', formatCurrency(filteredTotals.income)],
+              ['Visible expenses', formatCurrency(filteredTotals.expenses)],
+              ['Visible refunds', formatCurrency(filteredTotals.refunds)],
+              ['Visible net', formatCurrency(filteredTotals.net)],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
+                <p className="text-sm font-bold text-[#2B1723]">{value}</p>
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
+              </div>
+            ))}
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">

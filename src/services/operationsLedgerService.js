@@ -131,21 +131,3 @@ export async function cancelLedgerEntry(entry, user) {
   await batch.commit()
 }
 
-export function buildOperationsTotals(entries = []) {
-  return entries.reduce((totals, entry) => {
-    if (entry.status === 'cancelled') return totals
-    const amount = Number(entry.amount) || 0
-    if (entry.entryType === 'income') totals.income += amount
-    if (entry.entryType === 'expense') totals.expenses += amount
-    if (entry.entryType === 'refund') totals.refunds += amount
-    if (entry.entryType === 'adjustment') totals.adjustments += amount
-    totals.net = totals.income + totals.adjustments - totals.expenses - totals.refunds
-    return totals
-  }, {
-    income: 0,
-    expenses: 0,
-    refunds: 0,
-    adjustments: 0,
-    net: 0,
-  })
-}
