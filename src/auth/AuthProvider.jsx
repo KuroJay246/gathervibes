@@ -4,7 +4,6 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signInWithRedirect,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
@@ -25,6 +24,7 @@ googleProvider.setCustomParameters({ prompt: 'select_account' })
 
 const FIREBASE_APP_HOST = 'gathervibeshub.firebaseapp.com'
 const WEB_APP_HOST = 'gathervibeshub.web.app'
+const GOOGLE_SIGN_IN_REDIRECT_PATH_KEY = 'gsv.googleSignInRedirectPath'
 const STAFF_ASSIGNMENT_EVENT_IDS = ['xPfa0b3KZyLSDnAD2uGI']
 
 function redirectToWebAppHostIfNeeded() {
@@ -37,6 +37,17 @@ function redirectToWebAppHostIfNeeded() {
   targetUrl.hostname = WEB_APP_HOST
   window.location.replace(targetUrl.toString())
   return true
+}
+
+function storeGoogleSignInRedirectPath(path) {
+  if (typeof window === 'undefined') return
+
+  const redirectPath = typeof path === 'string' && path.startsWith('/') ? path : '/dashboard'
+  try {
+    window.sessionStorage.setItem(GOOGLE_SIGN_IN_REDIRECT_PATH_KEY, redirectPath)
+  } catch {
+    // Ignore storage errors so auth can still proceed.
+  }
 }
 
 function workspaceAccessError(cause) {
@@ -266,22 +277,13 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  const startGoogleSignIn = useCallback(async (mode) => {
+  const startGoogleSignIn = useCallback(async (returnTo) => {
     if (!auth) throw new Error('Firebase is not configured')
     setAuthError('')
-    void mode
-
-    try {
-      return await completeSignIn(() => signInWithPopup(auth, googleProvider))
-    } catch (error) {
-      if (error?.code === 'auth/popup-blocked' || error?.code === 'auth/cancelled-popup-request') {
-        setAuthError('')
-        return signInWithRedirect(auth, googleProvider)
-      }
-
-      throw error
-    }
-  }, [completeSignIn])
+    setLoading(true)
+    storeGoogleSignInRedirectPath(returnTo)
+    return signInWithRedirect(auth, googleProvider)
+  }, [])
 
   const value = useMemo(
     () => ({
@@ -298,8 +300,8 @@ export function AuthProvider({ children }) {
       authError,
       isConfigured: isFirebaseConfigured,
       signIn: (email, password) => completeSignIn(() => signInWithEmailAndPassword(auth, email, password)),
-      signInWithGoogle: () => startGoogleSignIn('login'),
-      signUpWithGoogle: () => startGoogleSignIn('signup'),
+      signInWithGoogle: (returnTo) => startGoogleSignIn(returnTo),
+      signUpWithGoogle: (returnTo) => startGoogleSignIn(returnTo),
       signOut: () => {
         if (!auth) return Promise.resolve()
         setUser(null)

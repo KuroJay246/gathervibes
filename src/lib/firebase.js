@@ -2,9 +2,21 @@ import { getApp, getApps, initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 
+function resolveAuthDomain() {
+  const configuredDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN
+  if (typeof window === 'undefined') return configuredDomain
+
+  const currentHost = window.location.hostname
+  if (currentHost.endsWith('.web.app') || currentHost.endsWith('.firebaseapp.com')) {
+    return currentHost
+  }
+
+  return configuredDomain
+}
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  authDomain: resolveAuthDomain(),
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
