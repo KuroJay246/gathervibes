@@ -1,18 +1,39 @@
 # Phase 17G-B - Firestore Rules Deployment Approval + Dry-Run Final Review
 
-Status: active on branch only, review-only, and dry-run-only  
+Status: closed after organizer review PASS, merged-ready, accepted final review only, and dry-run-only  
 Branch: `codex/phase-17g-b-firestore-rules-deployment-final-review`  
+Branch commit: `c998700d7882c3c5feaa52f59e9f21fd57c72b10`  
 Base main commit: `7f54a217adcac954d200a9ba7606fed521369e77`  
 Last deployed-rules comparison baseline: `dc62cade23313eb0ab6a3b06d5318c379b8a4cbb`  
 Comparison method: git-history baseline only; `firebase-tools` help in this workflow did not expose a Firestore rules fetch/get command for pulling the currently deployed rules text directly
 
 ## 1. Scope
 
-Phase 17G-B is final review only.
+Phase 17G-B is closed after organizer review PASS as final review only.
 
 It does not:
 
-- merge to `main`
+- deploy Firestore rules
+- deploy Firestore indexes
+- make requester submit live
+- make admin approve, decline, or revoke workflow live
+- make staff profile or staff assignment editing live
+- make lead-scanner workflow live
+
+Organizer review PASS accepted:
+
+- `PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md`
+- the git-history-based deployed-rules comparison
+- last deployed rules baseline `dc62cade23313eb0ab6a3b06d5318c379b8a4cbb`
+- current undeployed `accessRequests/{requestId}` rules prototype delta
+- the line-by-line `firestore.rules` review
+- the GO / HOLD / NO-GO matrix
+- the dry-run command pack
+- the rollback warning
+- the Phase 17G-B2 recommended next gate
+
+Phase 17G-B did not:
+
 - deploy Firestore rules
 - deploy Firestore indexes
 - make requester submit live
@@ -120,7 +141,7 @@ That deployment would not, by itself:
 
 | Decision area | Current 17G-B result | Reason |
 | --- | --- | --- |
-| Review package completeness | GO | The current repository rules, last deployed baseline, dry-run command pack, and no-go criteria are documented for organizer review. |
+| Review package completeness | GO | The current repository rules, last deployed baseline, dry-run command pack, no-go criteria, and rollback warning were documented and organizer-accepted in Phase 17G-B. |
 | Real Firestore rules deploy in 17G-B | HOLD | This phase is dry-run final review only. Real deploy requires explicit next-step authorization. |
 | Real Firestore index deploy in 17G-B | HOLD | No index deploy is approved in this phase. |
 | Immediate no-go conditions | NO-GO if triggered | Stop if project mismatch, rules/index deploy attempt without explicit approval, CPB exposure, permission broadening, `approvedEmails` workaround, QR payload change, or audit-log mutation appears. |
