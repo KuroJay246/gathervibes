@@ -30,6 +30,10 @@ test('Phase 19 operations page keeps existing design while adding practical filt
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
 
   assert.match(operations, /Search entry, category, note, reference/)
+  assert.match(operations, /setEntries\(\[\]\)/)
+  assert.match(operations, /setRegistrations\(\[\]\)/)
+  assert.match(operations, /setFilters\(DEFAULT_FILTERS\)/)
+  assert.match(operations, /setLoading\(Boolean\(activeEvent\?\.eventId\)\)/)
   assert.match(operations, /Clear filters/)
   assert.match(operations, /Copy view/)
   assert.match(operations, /Print view/)

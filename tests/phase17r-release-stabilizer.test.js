@@ -54,3 +54,13 @@ test('Phase 17R preserves CPB, approvedEmails, and QR payload guardrails', async
   assert.match(handoff, /`approvedEmails` remains unchanged and admin-only/)
   assert.match(handoff, /CPB remains untouched/)
 })
+
+test('Phase 17R clears stale dashboard event scope and syncs selected Working Event snapshots', async () => {
+  const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
+
+  assert.match(dashboard, /setRegs\(\[\]\)/)
+  assert.match(dashboard, /setEntries\(\[\]\)/)
+  assert.match(dashboard, /function sameActiveEventSnapshot\(activeEvent, nextEvent\)/)
+  assert.match(dashboard, /if \(!matchedEvent\) \{\s*clearActiveEvent\(\)/)
+  assert.match(dashboard, /if \(!sameActiveEventSnapshot\(activeEvent, matchedEvent\)\) \{\s*setActiveEvent\(matchedEvent\)/)
+})

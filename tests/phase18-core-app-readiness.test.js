@@ -6,6 +6,7 @@ test('Phase 18 resets import state when the Working Event changes', async () => 
   const imports = await readFile('src/pages/ImportsPage.jsx', 'utf8')
 
   assert.match(imports, /useEffect\(\(\) => \{\s*resetImportState\(\)\s*\}, \[activeEvent\?\.eventId\]\)/)
+  assert.match(imports, /setExistingRegistrations\(\[\]\)/)
   assert.match(imports, /setWorkbookSheets\(\[\]\)/)
   assert.match(imports, /setConfirmedSheetId\(''\)/)
   assert.match(imports, /setReviewActions\(\{\}\)/)

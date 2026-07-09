@@ -25,7 +25,7 @@ import { useActiveEvent } from '../events/useActiveEvent'
 import { useAuth } from '../auth/useAuth'
 import { subscribeToEvents } from '../services/eventService'
 import { subscribeToRegistrations } from '../services/registrationService'
-import { formatEventDate, formatCountdown, upcomingEvents } from '../utils/dateUtils'
+import { formatEventDate, formatCountdown, upcomingEvents, toDateInput } from '../utils/dateUtils'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
 import { subscribeToOperationsLedger } from '../services/operationsLedgerService'
@@ -66,12 +66,13 @@ function CountdownBadge({ eventDate }) {
 function useRegistrationMetrics(eventId) {
   const [regs, setRegs] = useState([])
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setRegs([])
     if (!eventId) {
-      const clear = () => setRegs([])
-      clear()
       return undefined
     }
     return subscribeToRegistrations(eventId, setRegs, () => {})
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [eventId])
 
   return regs
@@ -80,10 +81,24 @@ function useRegistrationMetrics(eventId) {
 function useOperationsLedger(eventId) {
   const [entries, setEntries] = useState([])
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setEntries([])
     if (!eventId) return undefined
     return subscribeToOperationsLedger(eventId, setEntries, () => {})
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [eventId])
   return entries
+}
+
+function sameActiveEventSnapshot(activeEvent, nextEvent) {
+  if (!activeEvent || !nextEvent) return false
+  return (
+    activeEvent.eventId === nextEvent.eventId
+    && activeEvent.eventName === nextEvent.eventName
+    && toDateInput(activeEvent.eventDate) === toDateInput(nextEvent.eventDate)
+    && activeEvent.location === nextEvent.location
+    && activeEvent.status === nextEvent.status
+  )
 }
 
 // ── Metric pill ──────────────────────────────────────────────────────────────
@@ -122,6 +137,20 @@ export function DashboardPage() {
   const visibleEvents = adminUser ? allEvents : assignedEvents
   const visibleEventsLoaded = adminUser ? eventsLoaded : true
   const upcoming = useMemo(() => upcomingEvents(visibleEvents), [visibleEvents])
+
+  useEffect(() => {
+    if (!hasSelectedWorkingEvent(activeEvent) || !visibleEventsLoaded) return
+
+    const matchedEvent = visibleEvents.find((event) => event.eventId === activeEvent.eventId)
+    if (!matchedEvent) {
+      clearActiveEvent()
+      return
+    }
+
+    if (!sameActiveEventSnapshot(activeEvent, matchedEvent)) {
+      setActiveEvent(matchedEvent)
+    }
+  }, [activeEvent, clearActiveEvent, setActiveEvent, visibleEvents, visibleEventsLoaded])
 
   // Capacity progress (for selected event)
   const selectedFull = activeEvent

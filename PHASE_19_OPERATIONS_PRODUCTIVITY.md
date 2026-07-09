@@ -24,6 +24,7 @@ This branch does not:
 2. Added visible-view summaries so the filtered ledger can be reviewed without mental math.
 3. Added copy-current-view and print-current-view helpers for organizer day-to-day operations.
 4. Preserved selected-event scope, admin-write boundaries, and read-only helper access.
+5. Reset ledger entries, registrations, filters, and edit/form state immediately when the Working Event changes so stale event data does not linger in the operations screen.
 
 ## Guardrails preserved
 

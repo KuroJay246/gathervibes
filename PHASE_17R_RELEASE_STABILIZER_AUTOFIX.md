@@ -47,6 +47,8 @@ It is not allowed to:
 - route-readiness guardrail coverage for core no-selected-event states
 - explicit checks that auth routing still preserves login redirect and route gating
 - focused branch-only documentation for the stabilizer lane
+- stale selected-event snapshot correction coverage for dashboard and operations pass-through work
+- timing-headroom hardening for the existing countdown regression test
 
 ## B2 dependency
 

@@ -23,6 +23,8 @@ No redesign, no new dashboard concept, no access-workflow activation, no index d
 3. Registrations page continued rendering its main surface after a load failure instead of cleanly short-circuiting to the error state.
 4. Tickets page could carry stale search/filter/draft/print state across Working Event changes.
 5. Tickets page continued rendering its main surface after a load failure instead of cleanly short-circuiting to the error state.
+6. Import Center could carry stale selected-event registration scope into duplicate checks until the next snapshot arrived.
+7. Dashboard could keep stale selected-event details or selected-event metrics briefly visible across event changes or deletes.
 
 ## Intent
 

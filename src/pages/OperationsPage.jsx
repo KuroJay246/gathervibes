@@ -48,6 +48,8 @@ const STATUS_HELP = {
   cancelled: 'Cancelled keeps the entry visible but removes it from totals.',
 }
 
+const DEFAULT_FILTERS = { type: 'all', category: '', status: 'all', search: '' }
+
 function labelFor(value) {
   return String(value || '').split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 }
@@ -63,13 +65,26 @@ export function OperationsPage() {
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [filters, setFilters] = useState({ type: 'all', category: '', status: 'all', search: '' })
+  const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [form, setForm] = useState(EMPTY_FORM)
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const adminUser = isApprovedAdmin(access)
   const canEditOperations = canWriteOperations(access, activeEvent?.eventId)
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setEntries([])
+    setRegistrations([])
+    setFilters(DEFAULT_FILTERS)
+    setForm(EMPTY_FORM)
+    setEditing(null)
+    setMessage('')
+    setError('')
+    setLoading(Boolean(activeEvent?.eventId))
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [activeEvent?.eventId])
 
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
@@ -225,7 +240,7 @@ export function OperationsPage() {
   }
 
   function clearFilters() {
-    setFilters({ type: 'all', category: '', status: 'all', search: '' })
+    setFilters(DEFAULT_FILTERS)
   }
 
   return (
