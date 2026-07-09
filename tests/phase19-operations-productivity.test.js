@@ -18,6 +18,7 @@ test('Phase 19 operations ledger report summarizes the visible view safely', () 
   assert.equal(totals.expenses, 100)
   assert.equal(totals.refunds, 0)
   assert.match(report, /Operations ledger report: CODEX_TEST Live Verification Event/)
+  assert.match(report, /Scope: Current filtered view/)
   assert.match(report, /Entries in current view: 3/)
   assert.match(report, /Pending \/ expected: 1/)
   assert.match(report, /Settled: 1/)
@@ -32,9 +33,10 @@ test('Phase 19 operations helper keeps filtered summaries scoped to the copied c
     { entryType: 'expense', status: 'pending', amount: 75, date: '2026-07-12', category: 'Decor', label: 'Visible decor' },
   ]
   const hiddenEntry = { entryType: 'income', status: 'received', amount: 999, date: '2026-07-13', category: 'Hidden', label: 'Hidden row' }
-  const report = buildOperationsLedgerReport(visibleEntries, { eventName: 'CODEX_TEST only', currency: 'BBD' })
+  const report = buildOperationsLedgerReport(visibleEntries, { eventName: 'CODEX_TEST only', currency: 'BBD', scopeLabel: 'Current filtered view (status: Pending)' })
 
   assert.match(report, /Operations ledger report: CODEX_TEST only/)
+  assert.match(report, /Scope: Current filtered view \(status: Pending\)/)
   assert.match(report, /Entries in current view: 2/)
   assert.match(report, /Visible sponsor/)
   assert.match(report, /Visible decor/)
@@ -52,7 +54,10 @@ test('Phase 19 operations page keeps existing design while adding practical filt
   assert.match(operations, /Clear filters/)
   assert.match(operations, /Copy view/)
   assert.match(operations, /Print view/)
+  assert.match(operations, /Current view scope:/)
+  assert.match(operations, /Copy view and Print view use only the rows currently visible under this scope/)
   assert.match(operations, /buildOperationsLedgerReport\(filteredEntries/)
+  assert.match(operations, /scopeLabel: filterScopeLabel/)
   assert.match(operations, /navigator\.clipboard\.writeText\(report\)/)
   assert.match(operations, /onClick=\{\(\) => window\.print\(\)\}/)
   assert.match(operations, /Entries in current view/)

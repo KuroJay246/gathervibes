@@ -60,6 +60,14 @@ function StatusBadge({ status }) {
   )
 }
 
+function pricingModeLabel(event = {}) {
+  const tiers = Array.isArray(event.priceTiers) ? event.priceTiers.filter(Boolean) : []
+  if (tiers.length > 0) return `${tiers.length} price tier${tiers.length === 1 ? '' : 's'} active`
+  const legacyPrice = Number(event.ticketPrice) || 0
+  if (legacyPrice > 0) return 'Legacy base ticket price only'
+  return 'No pricing configured'
+}
+
 export function EventsPage() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
@@ -222,7 +230,7 @@ export function EventsPage() {
                   const isActive = activeEvent?.eventId === event.eventId
                   return (
                     <tr key={event.eventId} className={isActive ? 'bg-[#FFF8F2]' : 'hover:bg-[#FFFCFA]'}>
-                      <td className="px-6 py-4"><div className="flex items-center gap-3"><span className={`grid size-10 shrink-0 place-items-center rounded-xl ${isActive ? 'bg-[#B76E79] text-white' : 'bg-[#FCEEF1] text-[#B76E79]'}`}><CalendarDays className="size-[17px]" /></span><div><p className="text-sm font-bold text-[#3A2630]">{event.eventName}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-[#8A7468]"><MapPin className="size-3" />{event.location}</p></div></div></td>
+                      <td className="px-6 py-4"><div className="flex items-center gap-3"><span className={`grid size-10 shrink-0 place-items-center rounded-xl ${isActive ? 'bg-[#B76E79] text-white' : 'bg-[#FCEEF1] text-[#B76E79]'}`}><CalendarDays className="size-[17px]" /></span><div><p className="text-sm font-bold text-[#3A2630]">{event.eventName}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-[#8A7468]"><MapPin className="size-3" />{event.location}</p><p className="mt-1 text-[10px] font-semibold text-[#8A7468]">{pricingModeLabel(event)}</p></div></div></td>
                       <td className="px-4 py-4 text-xs text-[#6D594F]">{formatEventDate(event.eventDate)}</td>
                       <td className="px-4 py-4"><StatusBadge status={event.status} /></td>
                       <td className="px-4 py-4 text-xs font-semibold text-[#6D594F]">{Number(event.capacity).toLocaleString('en-BB')}</td>
@@ -249,6 +257,7 @@ export function EventsPage() {
                     <StatusBadge status={event.status} />
                   </div>
                   <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-white p-3 text-center"><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Date</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{formatEventDate(event.eventDate, { year: undefined })}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Capacity</p><p className="mt-1 flex items-center justify-center gap-1 text-[10px] font-semibold text-[#59454E]"><UsersRound className="size-3" /> {event.capacity}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Legacy</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{currency.format(Number(event.ticketPrice) || 0)}</p></div></div>
+                  <p className="mt-3 text-[11px] font-semibold text-[#8A7468]">{pricingModeLabel(event)}</p>
                   <div className="mt-4 flex gap-2"><button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`min-h-11 flex-1 rounded-lg py-2.5 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#2F855A]' : 'border border-[#E1D1C8] text-[#806C61]'}`}>{isActive ? 'Selected event' : 'Select'}</button><button type="button" onClick={() => openEdit(event)} className="grid size-11 place-items-center rounded-lg border border-[#E1D1C8] text-[#806C61]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button><button type="button" onClick={() => requestDelete(event)} className="grid size-11 place-items-center rounded-lg border border-[#F0D3D3] text-[#C53030]" aria-label={`Delete ${event.eventName}`}><Trash2 className="size-4" /></button></div>
                 </article>
               )

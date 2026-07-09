@@ -27,12 +27,13 @@ export function buildOperationsEntryCounts(entries = []) {
   }, { total: 0, pending: 0, settled: 0, cancelled: 0 })
 }
 
-export function buildOperationsLedgerReport(entries = [], { eventName = 'Selected Working Event', currency = 'BBD' } = {}) {
+export function buildOperationsLedgerReport(entries = [], { eventName = 'Selected Working Event', currency = 'BBD', scopeLabel = 'Current filtered view' } = {}) {
   const totals = buildOperationsTotals(entries)
   const counts = buildOperationsEntryCounts(entries)
 
   const lines = [
     `Operations ledger report: ${eventName}`,
+    `Scope: ${scopeLabel}`,
     `Entries in current view: ${counts.total}`,
     `Pending / expected: ${counts.pending}`,
     `Settled: ${counts.settled}`,

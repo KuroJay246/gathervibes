@@ -165,6 +165,7 @@ export function DashboardPage() {
 
   // Price tiers for selected event
   const priceTiers = getSafePriceTiers(selectedFull)
+  const legacyTicketPrice = Number(selectedFull?.ticketPrice) || 0
 
   const dateLabel = new Intl.DateTimeFormat('en-BB', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -328,7 +329,14 @@ export function DashboardPage() {
                   </div>
                 )}
                 {priceTiers.length === 0 && (
-                  <p className="mb-5 text-[11px] leading-5 text-[#8A7468]">No pricing configured for this Working Event.</p>
+                  <div className="mb-5 rounded-xl border border-[#EFE2DA] bg-white p-3">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A48A7B]">Pricing setup</p>
+                    <p className="mt-2 text-[11px] leading-5 text-[#8A7468]">
+                      {legacyTicketPrice > 0
+                        ? <>This event is still using the legacy base ticket price only: <strong>{formatCurrency(legacyTicketPrice, financeSummary.currency)}</strong>. Price tiers have not been set yet.</>
+                        : 'No pricing configured for this Working Event yet.'}
+                    </p>
+                  </div>
                 )}
 
                 <p className="mb-5 text-[11px] leading-5 text-[#8A7468]">

@@ -53,6 +53,7 @@ export function ImportsPage() {
   const [reviewActions, setReviewActions] = useState({})
   const [finalRows, setFinalRows] = useState([])
   const [existingRegistrations, setExistingRegistrations] = useState([])
+  const [existingRegistrationsLoaded, setExistingRegistrationsLoaded] = useState(false)
   const [ticketMode, setTicketMode] = useState('use-imported')
 
   const [importing, setImporting] = useState(false)
@@ -71,12 +72,17 @@ export function ImportsPage() {
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     setExistingRegistrations([])
+    setExistingRegistrationsLoaded(false)
     if (!activeEvent?.eventId) return
     const unsubscribe = subscribeToRegistrations(
       activeEvent.eventId,
-      (data) => setExistingRegistrations(data),
+      (data) => {
+        setExistingRegistrations(data)
+        setExistingRegistrationsLoaded(true)
+      },
       (err) => {
         if (import.meta.env.DEV) console.error(err)
+        setExistingRegistrationsLoaded(true)
       },
     )
     return () => unsubscribe()
@@ -224,6 +230,10 @@ export function ImportsPage() {
   }
 
   async function handleProceedToPreview() {
+    if (!existingRegistrationsLoaded) {
+      setError('Still loading the current Working Event registrations. Wait a moment so duplicate checks use the latest event data.')
+      return
+    }
     setImportErrorDetails(null)
     const mapped = mapRows(parsedData.rows, parsedData.headers, fieldMap, { ...importContext, event: activeEvent })
     const processed = await processAndValidate(mapped, activeEvent.eventId, existingRegistrations)
@@ -704,6 +714,12 @@ export function ImportsPage() {
           onChangeSheet={workbookSheets.length > 0 ? handleChangeSheet : undefined}
           onStartOver={reset}
         />
+      )}
+
+      {step === 3 && !existingRegistrationsLoaded && (
+        <div className="rounded-xl border border-[#E6D4B4] bg-[#FFF7E8] px-4 py-3 text-xs leading-5 text-[#7A5818]">
+          Loading current registrations for <strong>{activeEvent.eventName}</strong> so duplicate checks stay event-accurate before preview.
+        </div>
       )}
 
       {step === 4 && (

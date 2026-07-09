@@ -58,6 +58,15 @@ function FieldHelp({ children }) {
   return <p className="mt-1 text-[11px] leading-4 text-[#8C7567]">{children}</p>
 }
 
+function buildFilterScopeLabel(filters = DEFAULT_FILTERS) {
+  const parts = []
+  if (filters.type && filters.type !== 'all') parts.push(`type: ${labelFor(filters.type)}`)
+  if (filters.status && filters.status !== 'all') parts.push(`status: ${labelFor(filters.status)}`)
+  if (filters.category) parts.push(`category: ${filters.category}`)
+  if (filters.search) parts.push(`search: ${filters.search}`)
+  return parts.length > 0 ? `Current filtered view (${parts.join(' / ')})` : 'Current filtered view (all visible ledger rows)'
+}
+
 export function OperationsPage() {
   const { user, access } = useAuth()
   const { activeEvent } = useActiveEvent()
@@ -136,6 +145,7 @@ export function OperationsPage() {
   const operationsTotals = useMemo(() => buildOperationsTotals(entries), [entries])
   const filteredTotals = useMemo(() => buildOperationsTotals(filteredEntries), [filteredEntries])
   const filteredCounts = useMemo(() => buildOperationsEntryCounts(filteredEntries), [filteredEntries])
+  const filterScopeLabel = useMemo(() => buildFilterScopeLabel(filters), [filters])
   const netEventPosition = financeSummary.totalCollected + operationsTotals.income + operationsTotals.adjustments - operationsTotals.expenses - operationsTotals.refunds
 
   if (!activeEvent?.eventId) {
@@ -228,6 +238,7 @@ export function OperationsPage() {
     const report = buildOperationsLedgerReport(filteredEntries, {
       eventName: activeEvent?.eventName,
       currency: financeSummary.currency,
+      scopeLabel: filterScopeLabel,
     })
 
     try {
@@ -423,6 +434,10 @@ export function OperationsPage() {
                 <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] px-4 py-3 text-xs leading-5 text-[#816D62]">
+            <strong className="text-[#6B564C]">Current view scope:</strong> {filterScopeLabel}. Copy view and Print view use only the rows currently visible under this scope.
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">
