@@ -1,4 +1,22 @@
 {
+  "auth": {
+    "authorizedDomains": [
+      "gathervibeshub.web.app",
+      "gathervibeshub.firebaseapp.com",
+      "localhost"
+    ],
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Gather & Savor Event Hub",
+        "supportEmail": "support@gatherandsavor.com",
+        "authorizedRedirectUris": [
+          "https://gathervibeshub.firebaseapp.com/__/auth/handler",
+          "https://gathervibeshub.web.app/__/auth/handler"
+        ]
+      }
+    }
+  },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"

@@ -5,6 +5,8 @@ import { BrandMark } from '../components/BrandMark'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { useAuth } from '../auth/useAuth'
 
+const GOOGLE_SIGN_IN_REDIRECT_PATH_KEY = 'gsv.googleSignInRedirectPath'
+
 function GoogleMark() {
   return (
     <svg viewBox="0 0 24 24" className="size-[18px]" aria-hidden="true">
@@ -55,7 +57,21 @@ export function LoginPage() {
   const location = useLocation()
   const displayedError = error || (authError ? getAuthErrorMessage(authError) : '')
   const autoGoogleStarted = useRef(false)
-  const from = location.state?.from?.pathname || defaultRoute || '/dashboard'
+  const [storedRedirectPath] = useState(() => {
+    if (typeof window === 'undefined') return ''
+
+    try {
+      const storedPath = window.sessionStorage.getItem(GOOGLE_SIGN_IN_REDIRECT_PATH_KEY) || ''
+      if (storedPath) window.sessionStorage.removeItem(GOOGLE_SIGN_IN_REDIRECT_PATH_KEY)
+      return storedPath
+    } catch {
+      return ''
+    }
+  })
+  const fromState = location.state?.from
+  const from = fromState
+    ? `${fromState.pathname || ''}${fromState.search || ''}${fromState.hash || ''}` || '/dashboard'
+    : defaultRoute || '/dashboard'
   const googleMode = new URLSearchParams(location.search).get('googleMode')
 
   const handleGoogleAuth = useCallback(async (mode) => {
@@ -65,12 +81,12 @@ export function LoginPage() {
     setSubmitting(mode)
 
     try {
-      await signInWithGoogle()
+      await signInWithGoogle(from)
     } catch (authFailure) {
       setError(getAuthErrorMessage(authFailure.code))
       setSubmitting('')
     }
-  }, [isConfigured, signInWithGoogle])
+  }, [from, isConfigured, signInWithGoogle])
 
   useEffect(() => {
     if (loading || user || !isConfigured || autoGoogleStarted.current) return
@@ -91,7 +107,7 @@ export function LoginPage() {
   }, [googleMode, handleGoogleAuth, isConfigured, loading, user])
 
   if (loading) return <LoadingScreen />
-  if (user) return <Navigate to={defaultRoute || '/dashboard'} replace />
+  if (user) return <Navigate to={storedRedirectPath || defaultRoute || '/dashboard'} replace />
 
   async function handleSubmit(event) {
     event.preventDefault()
