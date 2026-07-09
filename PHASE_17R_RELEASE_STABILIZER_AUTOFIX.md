@@ -49,6 +49,8 @@ It is not allowed to:
 - focused branch-only documentation for the stabilizer lane
 - stale selected-event snapshot correction coverage for dashboard and operations pass-through work
 - timing-headroom hardening for the existing countdown regression test
+- audit-boundary coverage for event create/update/delete, registration create/update/delete, and ticket assign/unassign flows
+- explicit coverage that event tier removal still clears stale `priceTiers` data instead of leaving hidden legacy values behind
 
 ## B2 dependency
 

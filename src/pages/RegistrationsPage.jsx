@@ -106,6 +106,8 @@ export function RegistrationsPage() {
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     if (!activeEvent?.eventId) {
+      setRegistrations([])
+      setLoadError('')
       setLoading(false)
       return
     }

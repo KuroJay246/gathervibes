@@ -25,6 +25,7 @@ This branch does not:
 3. Added copy-current-view and print-current-view helpers for organizer day-to-day operations.
 4. Preserved selected-event scope, admin-write boundaries, and read-only helper access.
 5. Reset ledger entries, registrations, filters, and edit/form state immediately when the Working Event changes so stale event data does not linger in the operations screen.
+6. Added explicit report-scope regression coverage so copied and printed current-view summaries stay tied to filtered visible rows only.
 
 ## Guardrails preserved
 

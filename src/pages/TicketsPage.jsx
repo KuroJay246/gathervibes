@@ -82,6 +82,8 @@ function useRegistrationList(activeEvent) {
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     if (!activeEvent?.eventId) {
+      setRegistrations([])
+      setError('')
       setLoading(false)
       return undefined
     }

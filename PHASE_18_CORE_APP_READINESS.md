@@ -25,12 +25,16 @@ No redesign, no new dashboard concept, no access-workflow activation, no index d
 5. Tickets page continued rendering its main surface after a load failure instead of cleanly short-circuiting to the error state.
 6. Import Center could carry stale selected-event registration scope into duplicate checks until the next snapshot arrived.
 7. Dashboard could keep stale selected-event details or selected-event metrics briefly visible across event changes or deletes.
+8. Registrations and Tickets data hooks could leave prior-event rows in memory when the selected Working Event was cleared before the next subscription cycle.
+9. Manual registration edits were writing a finance-only audit action name even when non-finance fields were updated.
 
 ## Intent
 
 This branch makes existing flows safer without changing the approved layout:
 
 - reset transient page state when the selected Working Event changes
+- clear prior-event rows and load errors immediately when the selected Working Event is removed
 - prevent stale selected-event operations from leaking into the next event context
 - keep route loading explicit on failures
 - preserve existing CRUD, ticket, import, audit, CPB, and access boundaries
+- keep registration edit audit logs aligned to full registration updates instead of finance-only wording

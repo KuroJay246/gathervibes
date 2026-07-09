@@ -16,6 +16,7 @@ test('Phase 18 resets import state when the Working Event changes', async () => 
 test('Phase 18 clears stale registrations page selection and modal state on Working Event changes', async () => {
   const registrations = await readFile('src/pages/RegistrationsPage.jsx', 'utf8')
 
+  assert.match(registrations, /if \(!activeEvent\?\.eventId\) \{\s*setRegistrations\(\[\]\)\s*setLoadError\(''\)\s*setLoading\(false\)/)
   assert.match(registrations, /useEffect\(\(\) => \{[\s\S]*setSelectedIds\(new Set\(\)\)/)
   assert.match(registrations, /setEditingRegistration\(null\)/)
   assert.match(registrations, /setDeletingRegistration\(null\)/)
@@ -27,6 +28,7 @@ test('Phase 18 clears stale registrations page selection and modal state on Work
 test('Phase 18 clears stale ticket assignment state on Working Event changes and short-circuits load errors', async () => {
   const tickets = await readFile('src/pages/TicketsPage.jsx', 'utf8')
 
+  assert.match(tickets, /if \(!activeEvent\?\.eventId\) \{\s*setRegistrations\(\[\]\)\s*setError\(''\)\s*setLoading\(false\)/)
   assert.match(tickets, /useEffect\(\(\) => \{[\s\S]*setSearchQuery\(''\)/)
   assert.match(tickets, /setFilter\('all'\)/)
   assert.match(tickets, /setDraftCodes\(\{\}\)/)

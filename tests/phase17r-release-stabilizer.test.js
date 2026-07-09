@@ -64,3 +64,19 @@ test('Phase 17R clears stale dashboard event scope and syncs selected Working Ev
   assert.match(dashboard, /if \(!matchedEvent\) \{\s*clearActiveEvent\(\)/)
   assert.match(dashboard, /if \(!sameActiveEventSnapshot\(activeEvent, matchedEvent\)\) \{\s*setActiveEvent\(matchedEvent\)/)
 })
+
+test('Phase 17R preserves event, registration, and ticket audit action boundaries', async () => {
+  const eventService = await readFile('src/services/eventService.js', 'utf8')
+  const registrationService = await readFile('src/services/registrationService.js', 'utf8')
+  const ticketService = await readFile('src/services/ticketService.js', 'utf8')
+
+  assert.match(eventService, /action: 'event\.create'/)
+  assert.match(eventService, /action: 'event\.update'/)
+  assert.match(eventService, /action: 'event\.delete'/)
+  assert.match(eventService, /payload\.priceTiers = null/)
+  assert.match(registrationService, /action: 'registration\.create'/)
+  assert.match(registrationService, /action: 'registration\.update'/)
+  assert.match(registrationService, /action: 'registration\.delete'/)
+  assert.match(ticketService, /action = 'ticket\.assign'/)
+  assert.match(ticketService, /action: 'ticket\.unassign'/)
+})
