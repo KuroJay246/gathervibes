@@ -125,11 +125,11 @@ export async function updateRegistration(registrationId, eventId, values, user, 
   const regRef = doc(firestore, 'registrations', registrationId)
   const audit = createAuditLogWrite({
     eventId,
-    action: 'registration.finance-update',
+    action: 'registration.update',
     targetType: 'registration',
     targetId: registrationId,
     performedBy: user,
-    details: { fullName: values.fullName?.trim(), financeFieldsUpdated: true },
+    details: { fullName: values.fullName?.trim(), registrationUpdated: true },
   })
   const batch = writeBatch(firestore)
 

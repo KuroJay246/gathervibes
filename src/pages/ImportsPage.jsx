@@ -65,6 +65,12 @@ export function ImportsPage() {
   const canConfirmSheet = Boolean(selectedSheet?.importable)
 
   useEffect(() => {
+    resetImportState()
+  }, [activeEvent?.eventId])
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setExistingRegistrations([])
     if (!activeEvent?.eventId) return
     const unsubscribe = subscribeToRegistrations(
       activeEvent.eventId,
@@ -74,6 +80,7 @@ export function ImportsPage() {
       },
     )
     return () => unsubscribe()
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [activeEvent?.eventId])
 
   useEffect(() => {
