@@ -57,9 +57,9 @@ test('roadmap shows 17G-B2 as the current in-progress phase while preserving clo
     'Phase 17E-A Access Workflow Rules + Data Model Review',
     'Phase 17E-B Access Request Rules Prototype + Tests',
     'Phase 17G-B2 Firestore Rules Real Deploy + Immediate Smoke',
-    'In progress on current branch / Firestore rules deployed / Firestore indexes not deployed / admin smoke verified / scanner smoke pending / no live workflow',
+    'Closed on branch / Firestore rules deployed live / Firestore indexes not deployed / admin smoke passed / scanner smoke passed / no live workflow',
     'Latest current-head run succeeded; older failed UI badges can be stale and are not blocking unless the current head fails',
-    'Complete Phase 17G-B2 scanner smoke + closeout',
+    'Release-train main review for Dashboard, Events, Registrations, Import Center, Tickets, and Operations',
     'Google Sheets OAuth',
     'Gmail/Outlook OAuth',
     'Real AI API integration',
@@ -102,7 +102,7 @@ test('roadmap shows 17G-B2 as the current in-progress phase while preserving clo
   assert.match(handoff, /Phase 17B staff access model/)
 })
 
-test('private access status reflects Phase 17C-B live closeout while 17G-B2 remains in-progress and blocked on scanner smoke', async () => {
+test('private access status reflects Phase 17C-B live closeout while 17G-B2 is closed after live smoke', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const healthItems = buildRuntimeHealthItems({
@@ -133,7 +133,7 @@ test('private access status reflects Phase 17C-B live closeout while 17G-B2 rema
   assert.match(settings, /Phase 17F-C is closed after organizer review PASS as a manual smoke checklist only/)
   assert.match(settings, /Phase 17G-A is closed after organizer review PASS and the approval package is accepted\./)
   assert.match(settings, /Phase 17G-B is closed after organizer review PASS and the final rules deployment review is accepted\./)
-  assert.match(settings, /Phase 17G-B2 is currently in progress on this branch: Firestore rules were deployed, Firestore indexes were not deployed, the login redirect compatibility fix was deployed, admin smoke passed, and scanner smoke is still pending\./)
+  assert.match(settings, /Phase 17G-B2 is now closed on this branch: Firestore rules were deployed, Firestore indexes were not deployed, the login redirect compatibility fix was deployed, admin smoke passed, scanner smoke passed, and admin route sanity confirmed no admin lock into \/scanner\./)
   assert.match(settings, /Approve request: not live/)
   assert.match(settings, /Decline request: not live/)
   assert.match(settings, /Revoke access: not live/)
@@ -144,14 +144,14 @@ test('private access status reflects Phase 17C-B live closeout while 17G-B2 rema
   assert.match(settings, /Lead scanner: not live/)
   assert.match(settings, /Phase 17E-B closed after organizer prototype review PASS and remains limited to an undeployed <code>accessRequests\/&#123;requestId&#125;<\/code> rules prototype plus tests and status copy only/)
   assert.match(settings, /Phase 17E-C closed after organizer review PASS with an admin-visible read-only request surface only, Phase 17E-D closed after organizer review PASS with a disabled requester form preview only, Phase 17E-E closed after organizer review PASS with readiness\/rollback planning only, Phase 17F-A closed after organizer review PASS with implementation planning only, and Phase 17F-B \/ 17F-C closed after organizer review PASS as the disabled contract and manual smoke checklist only\. Phase 17G-A is closed after organizer review PASS/)
-  assert.match(settings, /Phase 17G-B2 is in progress on the current branch: backend accessRequests rules are live, Firestore indexes remain undeployed, the login redirect compatibility fix is deployed, scanner smoke is still pending, and no live workflow exists\./i)
+  assert.match(settings, /Phase 17G-B2 is closed on the current branch: backend accessRequests rules are live, Firestore indexes remain undeployed, the login redirect compatibility fix is deployed, admin and scanner smoke passed, admin route sanity confirmed no admin lock into \/scanner, and no live workflow exists\./i)
   assert.match(settings, /Temporary event-day helpers should not be added to approvedEmails/)
   assert.match(settings, /Requester form prototype/)
   assert.match(settings, /Submit request \(not live\)/)
   assert.match(settings, /No request is submitted here\. No Firestore write occurs\. No service call occurs\./)
   assert.match(qa, /Staff roles enforcement level/)
   assert.equal(healthItems.find((item) => item.label === 'Staff roles enforcement level').status, 'ok')
-  assert.match(healthItems.find((item) => item.label === 'Staff roles enforcement level').detail, /Phase 17E-C, Phase 17E-D, and Phase 17E-E are closed after organizer review PASS\. Phase 17F-A, Phase 17F-B, and Phase 17F-C are closed after organizer review PASS\. Phase 17G-A is closed after organizer review PASS and the approval package is accepted\. Phase 17G-B is closed after organizer review PASS as the accepted final dry-run review only\. Phase 17G-B2 is in progress on the current branch with Firestore rules deployed, admin smoke passed, and scanner smoke still pending\./)
+  assert.match(healthItems.find((item) => item.label === 'Staff roles enforcement level').detail, /Phase 17E-C, Phase 17E-D, and Phase 17E-E are closed after organizer review PASS\. Phase 17F-A, Phase 17F-B, and Phase 17F-C are closed after organizer review PASS\. Phase 17G-A is closed after organizer review PASS and the approval package is accepted\. Phase 17G-B is closed after organizer review PASS as the accepted final dry-run review only\. Phase 17G-B2 is closed on the current branch with Firestore rules deployed, admin smoke passed, scanner smoke passed, and admin route sanity checked\./)
   assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /Phase 17E-B closed as a dry-run-only accessRequests prototype, Phase 17E-C \/ 17E-D \/ 17E-E \/ 17F-A \/ 17F-B \/ 17F-C closed without deploying Firestore rules or indexes, Phase 17G-A closed after organizer review PASS with no rules or index deploy, and Phase 17G-B2 deployed backend accessRequests rules without deploying indexes\./)
   assert.match(healthItems.find((item) => item.label === 'Daily QA workflow').detail, /Latest current-head Daily QA run 28875120502 succeeded/)
 })

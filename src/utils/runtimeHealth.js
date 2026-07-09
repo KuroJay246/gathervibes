@@ -46,7 +46,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Staff roles enforcement level',
       status: 'ok',
-      detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged. Phase 17E-A and 17E-B are closed. Phase 17E-C, Phase 17E-D, and Phase 17E-E are closed after organizer review PASS. Phase 17F-A, Phase 17F-B, and Phase 17F-C are closed after organizer review PASS. Phase 17G-A is closed after organizer review PASS and the approval package is accepted. Phase 17G-B is closed after organizer review PASS as the accepted final dry-run review only. Phase 17G-B2 is in progress on the current branch with Firestore rules deployed, admin smoke passed, and scanner smoke still pending. No live approval workflow is introduced.',
+      detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged. Phase 17E-A and 17E-B are closed. Phase 17E-C, Phase 17E-D, and Phase 17E-E are closed after organizer review PASS. Phase 17F-A, Phase 17F-B, and Phase 17F-C are closed after organizer review PASS. Phase 17G-A is closed after organizer review PASS and the approval package is accepted. Phase 17G-B is closed after organizer review PASS as the accepted final dry-run review only. Phase 17G-B2 is closed on the current branch with Firestore rules deployed, admin smoke passed, scanner smoke passed, and admin route sanity checked. No live approval workflow is introduced.',
     },
     {
       label: 'Approved-admin allowlist',
