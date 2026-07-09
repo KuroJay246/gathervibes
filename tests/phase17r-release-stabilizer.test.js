@@ -38,7 +38,7 @@ test('Phase 17R preserves auth route gating and blocked access workflow boundari
   assert.match(settings, /Decline request: not live/)
   assert.match(settings, /Revoke access: not live/)
   assert.match(qa, /Phase 17G-B2 deployed backend accessRequests rules and did not deploy Firestore indexes/)
-  assert.match(health, /Phase 17G-B2 is in progress on the current branch with Firestore rules deployed, admin smoke passed, and scanner smoke still pending/)
+  assert.match(health, /Phase 17G-B2 is closed on the current branch with Firestore rules deployed, admin smoke passed, scanner smoke passed, and admin route sanity checked/)
 })
 
 test('Phase 17R preserves CPB, approvedEmails, and QR payload guardrails', async () => {
