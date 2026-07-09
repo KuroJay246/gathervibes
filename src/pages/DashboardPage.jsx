@@ -32,6 +32,7 @@ import { subscribeToOperationsLedger } from '../services/operationsLedgerService
 import { buildOperationsTotals } from '../utils/operationsReport'
 import { getSafePriceTiers, getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
 import { isApprovedAdmin } from '../utils/accessRoles'
+import { buildEventReadiness } from '../utils/eventReadiness'
 
 // ── Local clock ──────────────────────────────────────────────────────────────
 
@@ -160,6 +161,10 @@ export function DashboardPage() {
   const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedFull), [registrations, selectedFull])
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedFull), [registrations, selectedFull])
   const operationsTotals = useMemo(() => buildOperationsTotals(operationsEntries), [operationsEntries])
+  const readiness = useMemo(
+    () => buildEventReadiness(selectedFull, registrations, operationsEntries),
+    [selectedFull, registrations, operationsEntries],
+  )
   const capacityPct = metrics.capacityPercent
   const currencyLabel = selectedFull?.currency ? financeSummary.currency : 'BBD default'
 
@@ -284,6 +289,63 @@ export function DashboardPage() {
                     </div>
                   </div>
                 )}
+
+                <div className="mb-5 rounded-2xl border border-[#EEDFD6] bg-[#FBF8F5] p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Event command center</p>
+                      <h4 className="mt-1 text-sm font-bold text-[#2B1723]">Needs attention</h4>
+                    </div>
+                    <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                      readiness.readinessLabel === 'Ready'
+                        ? 'bg-[#EAF6EF] text-[#1E7345]'
+                        : readiness.readinessLabel === 'Needs attention'
+                          ? 'bg-[#FFF1F1] text-[#A32626]'
+                          : 'bg-[#FFF7E8] text-[#7A5818]'
+                    }`}>
+                      {readiness.readinessLabel}
+                    </span>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    {readiness.categories.map((category) => (
+                      <div key={category.key} className="rounded-xl border border-[#EFE2DA] bg-white p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="text-xs font-bold text-[#2B1723]">{category.label}</p>
+                          <span className={`rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider ${
+                            category.status === 'ready'
+                              ? 'bg-[#EAF6EF] text-[#1E7345]'
+                              : category.status === 'needs-attention'
+                                ? 'bg-[#FFF1F1] text-[#A32626]'
+                                : 'bg-[#FFF7E8] text-[#7A5818]'
+                          }`}>
+                            {category.statusLabel}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-[11px] leading-5 text-[#8A7468]">{category.summary}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {readiness.actionItems.length > 0 && (
+                    <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                      {readiness.actionItems.map((item) => (
+                        <div key={item.key} className="rounded-xl border border-[#EFE2DA] bg-white p-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-xs font-bold text-[#2B1723]">{item.label}</p>
+                              <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{item.statusLabel}</p>
+                            </div>
+                            <Link to={item.to} className="shrink-0 text-[11px] font-bold text-[#B76E79] hover:underline">
+                              {item.linkLabel}
+                            </Link>
+                          </div>
+                          <p className="mt-2 text-[11px] leading-5 text-[#8A7468]">{item.summary}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
                 <div className="mb-5 rounded-2xl border border-[#EEDFD6] bg-[#FBF8F5] p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -427,12 +489,12 @@ export function DashboardPage() {
             </p>
             <div className="mt-5 grid gap-2">
               {[
-                { to: '/scanner', label: 'Scanner Mode', sub: 'Open the stripped-down event-day scanner.' },
-                { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Scan, search, check in, and undo.' },
-                { to: '/tickets', label: 'Tickets / QR Print List', sub: 'Assign codes and print QR lists.' },
+                { to: '/registrations', label: 'Registrations', sub: 'Review payment follow-up, contact gaps, and guest details.' },
+                { to: '/tickets', label: 'Tickets / QR Print List', sub: 'Assign codes and review missing ticket gaps.' },
+                { to: '/imports', label: 'Import Center', sub: 'Review duplicate/data-quality issues before saving.' },
                 { to: '/operations', label: 'Event Operations / Money Tracker', sub: 'Track sponsor income, expenses, refunds, and adjustments.' },
-                { to: '/communications', label: 'Communications', sub: 'Prepare copy-ready guest messages.' },
-                { to: '/imports', label: 'Import Center', sub: 'Preview guest list uploads before saving.' },
+                { to: '/events', label: 'Events', sub: 'Check capacity, status, pricing, and Working Event setup.' },
+                { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Review event-day check-in progress when the event is live.' },
                 { to: '/qa', label: 'QA Center', sub: 'Run CODEX_TEST and System Health checks.' },
               ].map(({ to, label, sub }) => (
                 <Link
