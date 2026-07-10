@@ -237,6 +237,8 @@ test('Phase 22 route, guardrails, and read-only page structure are present witho
   assert.match(app, /path="\/event-review"/)
   assert.match(dashboard, /to: '\/event-review'/)
   assert.match(operations, /to="\/event-review"/)
+  assert.match(page, /subscribeToEvents/)
+  assert.match(page, /buildEventReview\(resolvedActiveEvent, registrations, operationsEntries\)/)
   assert.match(page, /read-only/i)
   assert.doesNotMatch(page, /createLedgerEntry|updateLedgerEntry|deleteRegistration|commitImport|submitAccessRequest|approveAccessRequest/)
   assert.doesNotMatch(page, /collection\(|doc\(|setDoc\(|updateDoc\(|addDoc\(/)

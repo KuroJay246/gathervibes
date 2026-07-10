@@ -14,6 +14,7 @@ import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { subscribeToRegistrations } from '../services/registrationService'
 import { subscribeToOperationsLedger } from '../services/operationsLedgerService'
+import { subscribeToEvents } from '../services/eventService'
 import { buildEventReview, formatEventReviewMoney } from '../utils/eventReview'
 import { formatEventDate } from '../utils/dateUtils'
 import { getWorkingEventDisplayName } from '../utils/eventDefaults'
@@ -70,6 +71,7 @@ export function EventReviewPage() {
   const { activeEvent } = useActiveEvent()
   const [registrations, setRegistrations] = useState([])
   const [operationsEntries, setOperationsEntries] = useState([])
+  const [resolvedActiveEvent, setResolvedActiveEvent] = useState(activeEvent)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -77,13 +79,26 @@ export function EventReviewPage() {
     /* eslint-disable react-hooks/set-state-in-effect */
     setRegistrations([])
     setOperationsEntries([])
+    setResolvedActiveEvent(activeEvent)
     setError('')
     setLoading(Boolean(activeEvent?.eventId))
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, [activeEvent?.eventId])
+  }, [activeEvent])
 
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
+
+    return subscribeToEvents(
+      (events) => {
+        const matchedEvent = events.find((event) => event?.eventId === activeEvent.eventId)
+        if (matchedEvent) setResolvedActiveEvent(matchedEvent)
+      },
+      () => {},
+    )
+  }, [activeEvent?.eventId])
+
+  useEffect(() => {
+    if (!resolvedActiveEvent?.eventId) return undefined
 
     let registrationLoaded = false
     let operationsLoaded = false
@@ -93,7 +108,7 @@ export function EventReviewPage() {
     }
 
     const unsubscribeRegistrations = subscribeToRegistrations(
-      activeEvent.eventId,
+      resolvedActiveEvent.eventId,
       (rows) => {
         registrationLoaded = true
         setRegistrations(rows)
@@ -108,7 +123,7 @@ export function EventReviewPage() {
     )
 
     const unsubscribeOperations = subscribeToOperationsLedger(
-      activeEvent.eventId,
+      resolvedActiveEvent.eventId,
       (rows) => {
         operationsLoaded = true
         setOperationsEntries(rows)
@@ -126,14 +141,14 @@ export function EventReviewPage() {
       unsubscribeRegistrations()
       unsubscribeOperations()
     }
-  }, [activeEvent?.eventId])
+  }, [resolvedActiveEvent?.eventId])
 
   const review = useMemo(
-    () => buildEventReview(activeEvent, registrations, operationsEntries),
-    [activeEvent, operationsEntries, registrations],
+    () => buildEventReview(resolvedActiveEvent, registrations, operationsEntries),
+    [resolvedActiveEvent, operationsEntries, registrations],
   )
 
-  if (!activeEvent?.eventId) {
+  if (!resolvedActiveEvent?.eventId) {
     return (
       <EmptyState
         icon={FileSearch}
@@ -163,12 +178,12 @@ export function EventReviewPage() {
               Event Review
             </p>
             <h1 className="mt-4 font-serif text-3xl leading-tight sm:text-4xl">
-              {getWorkingEventDisplayName(activeEvent)}
+              {getWorkingEventDisplayName(resolvedActiveEvent)}
             </h1>
             <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/60">
-              <span className="inline-flex items-center gap-1"><CalendarDays className="size-3.5" />{formatEventDate(activeEvent.eventDate)}</span>
+              <span className="inline-flex items-center gap-1"><CalendarDays className="size-3.5" />{formatEventDate(resolvedActiveEvent.eventDate)}</span>
               <span className="opacity-40">·</span>
-              <span>Status: {activeEvent.status || 'unknown'}</span>
+              <span>Status: {resolvedActiveEvent.status || 'unknown'}</span>
             </p>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-white/70">
               This page is read-only. It combines follow-up items, registration payment records, Operations Ledger figures, and a current or post-event summary using the selected Working Event only.
