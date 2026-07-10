@@ -55,7 +55,7 @@ function FollowUpItem({ item }) {
         <div className="mt-3 rounded-xl border border-[#E7D6CC] bg-white p-3">
           <p className="text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">Examples</p>
           <ul className="mt-2 space-y-1 text-xs text-[#5D4A52]">
-            {item.preview.map((name) => <li key={name}>{name}</li>)}
+            {item.preview.map((name, index) => <li key={`${item.key}-${name}-${index}`}>{name}</li>)}
           </ul>
           {item.remainingCount > 0 && (
             <p className="mt-2 text-[11px] text-[#816D62]">Plus {item.remainingCount} more.</p>

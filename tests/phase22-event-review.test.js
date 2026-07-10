@@ -247,3 +247,10 @@ test('Phase 22 route, guardrails, and read-only page structure are present witho
   assert.match(rules, /match \/accessRequests\/\{requestId\}/)
   assert.match(indexes, /registrations/)
 })
+
+test('Phase 22 event review preview rows use stable unique keys for duplicate names', async () => {
+  const page = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
+
+  assert.match(page, /key=\{`\$\{item\.key\}-\$\{name\}-\$\{index\}`\}/)
+  assert.doesNotMatch(page, /item\.preview\.map\(\(name\) => <li key=\{name\}>/)
+})
