@@ -56,6 +56,7 @@ const pageTitles = {
   '/tickets': ['Tickets', 'Assign and track ticket codes'],
   '/check-in': ['Check-In', 'Fast, confident event-day admissions'],
   '/operations': ['Event Operations', 'Track non-ticket event money'],
+  '/event-review': ['Event Review', 'Read-only organizer follow-up, payment review, and event summary'],
   '/imports': ['Import Center', 'Bring in CSV exports and pasted table rows safely'],
   '/qa': ['QA Center', 'Production smoke testing without touching CPB'],
   '/communications': ['Communication Center', 'Prepare messages for the right guests'],

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowRight,
   CalendarDays,
+  ClipboardCheck,
   CheckCircle2,
   ChevronRight,
   Clock,
@@ -490,13 +491,14 @@ export function DashboardPage() {
             <div className="mt-5 grid gap-2">
               {[
                 { to: '/registrations', label: 'Registrations', sub: 'Review payment follow-up, contact gaps, and guest details.' },
+                adminUser ? { to: '/event-review', label: 'Event Review', sub: 'See read-only follow-up, payment review, and current or post-event summary.' } : null,
                 { to: '/tickets', label: 'Tickets / QR Print List', sub: 'Assign codes and review missing ticket gaps.' },
                 { to: '/imports', label: 'Import Center', sub: 'Review duplicate/data-quality issues before saving.' },
                 { to: '/operations', label: 'Event Operations / Money Tracker', sub: 'Track sponsor income, expenses, refunds, and adjustments.' },
                 { to: '/events', label: 'Events', sub: 'Check capacity, status, pricing, and Working Event setup.' },
                 { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Review event-day check-in progress when the event is live.' },
                 { to: '/qa', label: 'QA Center', sub: 'Run CODEX_TEST and System Health checks.' },
-              ].map(({ to, label, sub }) => (
+              ].filter(Boolean).map(({ to, label, sub }) => (
                 <Link
                   key={to}
                   to={to}
@@ -541,6 +543,7 @@ export function DashboardPage() {
               {[
                 { to: '/events', label: 'Events', sub: 'Manage event details and select the Working Event.', icon: CalendarDays },
                 { to: '/registrations', label: 'Registrations', sub: 'View and manage guest records.', icon: Users },
+                adminUser ? { to: '/event-review', label: 'Event Review', sub: 'Open the organizer follow-up and summary page.', icon: ClipboardCheck } : null,
                 { to: '/imports', label: 'Import Center', sub: 'Upload or paste guest lists.', icon: FileInput },
                 { to: '/tickets', label: 'Tickets', sub: 'Assign ticket codes and generate QR codes.', icon: TicketCheck },
                 { to: '/scanner', label: 'Scanner Mode', sub: 'Open the focused event-day scanner.', icon: ScanLine },
@@ -548,7 +551,7 @@ export function DashboardPage() {
                 { to: '/operations', label: 'Event Operations / Money Tracker', sub: 'Track non-ticket money by Working Event.', icon: ReceiptText },
                 { to: '/communications', label: 'Communications', sub: 'Prepare copy-ready guest messages.', icon: MessageSquareText },
                 { to: '/qa', label: 'QA Center / System Health', sub: 'Run safe checks using CODEX_TEST.', icon: ShieldCheck },
-              ].map(({ to, label, sub, icon: Icon }) => (
+              ].filter(Boolean).map(({ to, label, sub, icon: Icon }) => (
                 <li key={to}>
                   <Link
                     to={to}

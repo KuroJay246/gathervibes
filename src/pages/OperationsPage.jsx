@@ -270,7 +270,14 @@ export function OperationsPage() {
             Tracking non-ticket money for <strong>{activeEvent.eventName}</strong>. No payment processing is enabled.
           </p>
         </div>
-        <Link to="/dashboard" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">Back to Dashboard</Link>
+        <div className="flex flex-wrap gap-2">
+          {adminUser && (
+            <Link to="/event-review" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">
+              Open Event Review
+            </Link>
+          )}
+          <Link to="/dashboard" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">Back to Dashboard</Link>
+        </div>
       </header>
 
       <section className="flex items-center gap-2 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
