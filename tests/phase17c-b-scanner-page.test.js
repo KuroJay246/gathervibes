@@ -253,7 +253,7 @@ test('Phase 17C-B3 AuthProvider checks staff path before not-approved error', as
   assert.match(authProvider, /getDoc\(doc\(db, 'events', eventId, 'staffAssignments', nextUser\.uid\)\)/)
   assert.doesNotMatch(authProvider, /collectionGroup\(db, 'staffAssignments'\)/)
   assert.match(authProvider, /access\.level !== 'staff' \|\| access\.assignedEventIds\.length === 0/)
-  assert.match(authProvider, /workspaceDefaultRoute: defaultRouteForAccess\(accessData\.access\)/)
+  assert.match(authProvider, /workspaceDefaultRoute: sanitizeReturnPath\(requestedReturnPath/)
   assert.match(protectedRoute, /canViewRoute\(access, location\.pathname\)/)
   assert.match(loginPage, /navigate\(result\?\.workspaceDefaultRoute \|\| from/)
   assert.match(loginPage, /not approved in settings\/accessControl/)
