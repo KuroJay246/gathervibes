@@ -7,10 +7,13 @@ test('Phase 18 resets import state when the Working Event changes', async () => 
 
   assert.match(imports, /useEffect\(\(\) => \{\s*resetImportState\(\)\s*\}, \[activeEvent\?\.eventId\]\)/)
   assert.match(imports, /setExistingRegistrations\(\[\]\)/)
+  assert.match(imports, /setExistingRegistrationsLoaded\(false\)/)
+  assert.match(imports, /setExistingRegistrationsLoaded\(true\)/)
   assert.match(imports, /setWorkbookSheets\(\[\]\)/)
   assert.match(imports, /setConfirmedSheetId\(''\)/)
   assert.match(imports, /setReviewActions\(\{\}\)/)
   assert.match(imports, /setFinalRows\(\[\]\)/)
+  assert.match(imports, /Still loading the current Working Event registrations\. Wait a moment so duplicate checks use the latest event data\./)
 })
 
 test('Phase 18 clears stale registrations page selection and modal state on Working Event changes', async () => {
@@ -22,7 +25,9 @@ test('Phase 18 clears stale registrations page selection and modal state on Work
   assert.match(registrations, /setDeletingRegistration\(null\)/)
   assert.match(registrations, /setIsModalOpen\(false\)/)
   assert.match(registrations, /setIsExportModalOpen\(false\)/)
-  assert.match(registrations, /if \(loadError\) return <ErrorState message=\{loadError\} onRetry=\{\(\) => window\.location\.reload\(\)\} \/>/)
+  assert.match(registrations, /function retryRegistrationsLoad\(\)/)
+  assert.match(registrations, /setReloadKey\(\(current\) => current \+ 1\)/)
+  assert.match(registrations, /if \(loadError\) return <ErrorState message=\{loadError\} onRetry=\{retryRegistrationsLoad\} \/>/)
 })
 
 test('Phase 18 clears stale ticket assignment state on Working Event changes and short-circuits load errors', async () => {
@@ -33,5 +38,7 @@ test('Phase 18 clears stale ticket assignment state on Working Event changes and
   assert.match(tickets, /setFilter\('all'\)/)
   assert.match(tickets, /setDraftCodes\(\{\}\)/)
   assert.match(tickets, /setShowPrintableQrs\(false\)/)
-  assert.match(tickets, /if \(error\) return <ErrorState message=\{error\} onRetry=\{\(\) => window\.location\.reload\(\)\} \/>/)
+  assert.match(tickets, /function retry\(\)/)
+  assert.match(tickets, /setReloadKey\(\(current\) => current \+ 1\)/)
+  assert.match(tickets, /if \(error\) return <ErrorState message=\{error\} onRetry=\{retry\} \/>/)
 })

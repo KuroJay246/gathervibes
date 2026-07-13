@@ -78,6 +78,7 @@ function useRegistrationList(activeEvent) {
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [reloadKey, setReloadKey] = useState(0)
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -102,15 +103,21 @@ function useRegistrationList(activeEvent) {
       },
     )
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, [activeEvent?.eventId])
+  }, [activeEvent?.eventId, reloadKey])
 
-  return { registrations, loading, error }
+  function retry() {
+    setLoading(true)
+    setError('')
+    setReloadKey((current) => current + 1)
+  }
+
+  return { registrations, loading, error, retry }
 }
 
 export function TicketsPage() {
   const { user } = useAuth()
   const { activeEvent } = useActiveEvent()
-  const { registrations, loading, error } = useRegistrationList(activeEvent)
+  const { registrations, loading, error, retry } = useRegistrationList(activeEvent)
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState('all')
   const [draftCodes, setDraftCodes] = useState({})
@@ -185,7 +192,7 @@ export function TicketsPage() {
   }
 
   if (loading) return <LoadingState message="Loading ticket assignments…" />
-  if (error) return <ErrorState message={error} onRetry={() => window.location.reload()} />
+  if (error) return <ErrorState message={error} onRetry={retry} />
 
   async function assignCode(registration, code, action = 'ticket.assign') {
     setSavingId(registration.registrationId)
@@ -325,6 +332,15 @@ export function TicketsPage() {
         <InfoHint label="QR Payload Info">
           QR codes still contain only <code>GSV:TICKET:ticketCode</code>.
         </InfoHint>
+      </section>
+
+      <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
+        <p className="font-semibold text-[#6B564C]">
+          Showing {filteredRegistrations.length} registration{filteredRegistrations.length === 1 ? '' : 's'} for <strong>{activeEvent.eventName}</strong>.
+        </p>
+        <p>
+          Assigned tickets in this view: <strong>{assignedRegistrations.length}</strong>.
+        </p>
       </section>
 
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}

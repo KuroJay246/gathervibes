@@ -91,6 +91,7 @@ export function RegistrationsPage() {
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [reloadKey, setReloadKey] = useState(0)
   const [filters, setFilters] = useState({})
   const [activeTab, setActiveTab] = useState('All')
   const [cardFilter, setCardFilter] = useState('')
@@ -130,7 +131,7 @@ export function RegistrationsPage() {
 
     return () => unsubscribe()
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, [activeEvent?.eventId])
+  }, [activeEvent?.eventId, reloadKey])
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -158,8 +159,14 @@ export function RegistrationsPage() {
     )
   }
 
+  function retryRegistrationsLoad() {
+    setLoading(true)
+    setLoadError('')
+    setReloadKey((current) => current + 1)
+  }
+
   if (loading) return <LoadingState message="Loading registrations…" />
-  if (loadError) return <ErrorState message={loadError} onRetry={() => window.location.reload()} />
+  if (loadError) return <ErrorState message={loadError} onRetry={retryRegistrationsLoad} />
 
   const filteredRegistrations = registrations.filter((reg) => {
     const finance = calculateRegistrationFinance(reg, activeEvent)

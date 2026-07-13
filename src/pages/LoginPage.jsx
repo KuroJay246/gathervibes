@@ -4,8 +4,12 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { BrandMark } from '../components/BrandMark'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { useAuth } from '../auth/useAuth'
-
-const GOOGLE_SIGN_IN_REDIRECT_PATH_KEY = 'gsv.googleSignInRedirectPath'
+import {
+  clearGoogleSignInState,
+  getRequestedReturnPath,
+  readGoogleSignInState,
+  sanitizeReturnPath,
+} from '../auth/authFlow'
 
 function GoogleMark() {
   return (
@@ -33,6 +37,7 @@ function getAuthErrorMessage(code) {
     'auth/unapproved-account': 'This account signed in successfully but is not approved in settings/accessControl.',
     'auth/access-check-failed': 'Your admin access could not be verified. Check your connection and try again.',
     'auth/redirect-failed': 'Google sign-in could not be completed. Please try again.',
+    'auth/persistence-failed': 'This browser could not persist Firebase sign-in state. Check browser storage settings and try again.',
   }
 
   return messages[code] || 'Sign-in failed. Please try again.'
@@ -49,29 +54,20 @@ export function LoginPage() {
     loading,
     authError,
     defaultRoute,
+    isAuthorized,
     signIn,
     signInWithGoogle,
+    signOut,
     isConfigured,
   } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const displayedError = error || (authError ? getAuthErrorMessage(authError) : '')
   const autoGoogleStarted = useRef(false)
-  const [storedRedirectPath] = useState(() => {
-    if (typeof window === 'undefined') return ''
-
-    try {
-      const storedPath = window.sessionStorage.getItem(GOOGLE_SIGN_IN_REDIRECT_PATH_KEY) || ''
-      if (storedPath) window.sessionStorage.removeItem(GOOGLE_SIGN_IN_REDIRECT_PATH_KEY)
-      return storedPath
-    } catch {
-      return ''
-    }
+  const [storedRedirectPath] = useState(() => readGoogleSignInState()?.path || '')
+  const from = getRequestedReturnPath(location.state, defaultRoute || '/dashboard', {
+    allowScanner: Boolean(location.state?.from?.pathname?.startsWith('/scanner')),
   })
-  const fromState = location.state?.from
-  const from = fromState
-    ? `${fromState.pathname || ''}${fromState.search || ''}${fromState.hash || ''}` || '/dashboard'
-    : defaultRoute || '/dashboard'
   const googleMode = new URLSearchParams(location.search).get('googleMode')
 
   const handleGoogleAuth = useCallback(async (mode) => {
@@ -81,12 +77,18 @@ export function LoginPage() {
     setSubmitting(mode)
 
     try {
-      await signInWithGoogle(from)
+      const result = await signInWithGoogle(from)
+      if (result?.workspaceDefaultRoute) {
+        navigate(sanitizeReturnPath(result.workspaceDefaultRoute, {
+          defaultRoute,
+          allowScanner: result.workspaceDefaultRoute.startsWith('/scanner'),
+        }), { replace: true })
+      }
     } catch (authFailure) {
       setError(getAuthErrorMessage(authFailure.code))
       setSubmitting('')
     }
-  }, [from, isConfigured, signInWithGoogle])
+  }, [defaultRoute, from, isConfigured, navigate, signInWithGoogle])
 
   useEffect(() => {
     if (loading || user || !isConfigured || autoGoogleStarted.current) return
@@ -106,8 +108,19 @@ export function LoginPage() {
     return () => window.clearTimeout(authTimer)
   }, [googleMode, handleGoogleAuth, isConfigured, loading, user])
 
+  useEffect(() => {
+    if (user && isAuthorized) {
+      clearGoogleSignInState()
+    }
+  }, [isAuthorized, user])
+
   if (loading) return <LoadingScreen />
-  if (user) return <Navigate to={storedRedirectPath || defaultRoute || '/dashboard'} replace />
+  if (user && isAuthorized) {
+    return <Navigate to={sanitizeReturnPath(storedRedirectPath || defaultRoute || '/dashboard', {
+      defaultRoute,
+      allowScanner: Boolean((storedRedirectPath || defaultRoute || '/dashboard').startsWith('/scanner')),
+    })} replace />
+  }
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -117,13 +130,47 @@ export function LoginPage() {
     setSubmitting('email')
 
     try {
-      const result = await signIn(email.trim(), password)
+      const result = await signIn(email.trim(), password, from)
       navigate(result?.workspaceDefaultRoute || from, { replace: true })
     } catch (authError) {
       setError(getAuthErrorMessage(authError.code))
     } finally {
       setSubmitting('')
     }
+  }
+
+  if (user && !isAuthorized) {
+    return (
+      <main className="login-safe-area min-h-[100dvh] bg-[#FFF8F2] p-3 sm:p-5 lg:p-6">
+        <div className="mx-auto flex min-h-[calc(100dvh-1.5rem)] max-w-[760px] items-center justify-center sm:min-h-[calc(100dvh-2.5rem)]">
+          <section className="w-full rounded-[24px] bg-white p-8 shadow-[0_24px_80px_rgba(69,35,50,0.13)]">
+            <BrandMark />
+            <p className="mt-8 text-[10px] font-bold uppercase tracking-[0.24em] text-[#B76E79]">Authenticated account</p>
+            <h1 className="mt-3 font-serif text-3xl tracking-[-0.02em] text-[#2B1723]">Access still needs verification</h1>
+            <p className="mt-4 text-sm leading-6 text-[#806C61]">
+              Google sign-in succeeded, but this workspace could not complete admin or staff access verification for the current session.
+            </p>
+            {displayedError && (
+              <p className="mt-6 rounded-xl border border-[#F2C6C6] bg-[#FFF1F1] px-4 py-3 text-xs text-[#A32626]" role="alert">
+                {displayedError}
+              </p>
+            )}
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button type="button" className="primary-button" onClick={() => window.location.reload()}>
+                Retry access check
+              </button>
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] bg-white px-4 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]"
+              >
+                Sign out
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
+    )
   }
 
   return (

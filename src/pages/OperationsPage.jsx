@@ -15,7 +15,12 @@ import {
   subscribeToOperationsLedger,
   updateLedgerEntry,
 } from '../services/operationsLedgerService'
-import { buildOperationsEntryCounts, buildOperationsLedgerReport, buildOperationsTotals } from '../utils/operationsReport'
+import {
+  buildOperationsControlSummary,
+  buildOperationsEntryCounts,
+  buildOperationsLedgerReport,
+  buildOperationsTotals,
+} from '../utils/operationsReport'
 import { InfoHint } from '../components/ui/InfoHint'
 import { canWriteOperations, isApprovedAdmin } from '../utils/accessRoles'
 
@@ -56,6 +61,15 @@ function labelFor(value) {
 
 function FieldHelp({ children }) {
   return <p className="mt-1 text-[11px] leading-4 text-[#8C7567]">{children}</p>
+}
+
+function buildFilterScopeLabel(filters = DEFAULT_FILTERS) {
+  const parts = []
+  if (filters.type && filters.type !== 'all') parts.push(`type: ${labelFor(filters.type)}`)
+  if (filters.status && filters.status !== 'all') parts.push(`status: ${labelFor(filters.status)}`)
+  if (filters.category) parts.push(`category: ${filters.category}`)
+  if (filters.search) parts.push(`search: ${filters.search}`)
+  return parts.length > 0 ? `Current filtered view (${parts.join(' / ')})` : 'Current filtered view (all visible ledger rows)'
 }
 
 export function OperationsPage() {
@@ -136,6 +150,8 @@ export function OperationsPage() {
   const operationsTotals = useMemo(() => buildOperationsTotals(entries), [entries])
   const filteredTotals = useMemo(() => buildOperationsTotals(filteredEntries), [filteredEntries])
   const filteredCounts = useMemo(() => buildOperationsEntryCounts(filteredEntries), [filteredEntries])
+  const filteredControl = useMemo(() => buildOperationsControlSummary(filteredEntries), [filteredEntries])
+  const filterScopeLabel = useMemo(() => buildFilterScopeLabel(filters), [filters])
   const netEventPosition = financeSummary.totalCollected + operationsTotals.income + operationsTotals.adjustments - operationsTotals.expenses - operationsTotals.refunds
 
   if (!activeEvent?.eventId) {
@@ -228,6 +244,7 @@ export function OperationsPage() {
     const report = buildOperationsLedgerReport(filteredEntries, {
       eventName: activeEvent?.eventName,
       currency: financeSummary.currency,
+      scopeLabel: filterScopeLabel,
     })
 
     try {
@@ -253,7 +270,14 @@ export function OperationsPage() {
             Tracking non-ticket money for <strong>{activeEvent.eventName}</strong>. No payment processing is enabled.
           </p>
         </div>
-        <Link to="/dashboard" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">Back to Dashboard</Link>
+        <div className="flex flex-wrap gap-2">
+          {adminUser && (
+            <Link to="/event-review" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">
+              Open Event Review
+            </Link>
+          )}
+          <Link to="/dashboard" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">Back to Dashboard</Link>
+        </div>
       </header>
 
       <section className="flex items-center gap-2 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
@@ -413,6 +437,10 @@ export function OperationsPage() {
               ['Pending / expected', filteredCounts.pending],
               ['Settled', filteredCounts.settled],
               ['Cancelled', filteredCounts.cancelled],
+              ['Open ledger items', filteredControl.openEntries],
+              ['Pending income', formatCurrency(filteredControl.pendingIncome)],
+              ['Pending expenses', formatCurrency(filteredControl.pendingExpenses)],
+              ['Pending refunds', formatCurrency(filteredControl.pendingRefunds)],
               ['Visible income', formatCurrency(filteredTotals.income)],
               ['Visible expenses', formatCurrency(filteredTotals.expenses)],
               ['Visible refunds', formatCurrency(filteredTotals.refunds)],
@@ -423,6 +451,14 @@ export function OperationsPage() {
                 <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] px-4 py-3 text-xs leading-5 text-[#816D62]">
+            <strong className="text-[#6B564C]">Current view scope:</strong> {filterScopeLabel}. Copy view and Print view use only the rows currently visible under this scope.
+          </div>
+
+          <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
+            <strong className="text-[#6B564C]">What this means:</strong> open ledger items are still expected or pending, while visible net reflects only the filtered rows on screen. This tracker stays separate from ticket sales and registration payment totals.
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">

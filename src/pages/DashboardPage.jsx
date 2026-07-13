@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowRight,
   CalendarDays,
+  ClipboardCheck,
   CheckCircle2,
   ChevronRight,
   Clock,
@@ -32,6 +33,7 @@ import { subscribeToOperationsLedger } from '../services/operationsLedgerService
 import { buildOperationsTotals } from '../utils/operationsReport'
 import { getSafePriceTiers, getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
 import { isApprovedAdmin } from '../utils/accessRoles'
+import { buildEventReadiness } from '../utils/eventReadiness'
 
 // ── Local clock ──────────────────────────────────────────────────────────────
 
@@ -160,11 +162,16 @@ export function DashboardPage() {
   const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedFull), [registrations, selectedFull])
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedFull), [registrations, selectedFull])
   const operationsTotals = useMemo(() => buildOperationsTotals(operationsEntries), [operationsEntries])
+  const readiness = useMemo(
+    () => buildEventReadiness(selectedFull, registrations, operationsEntries),
+    [selectedFull, registrations, operationsEntries],
+  )
   const capacityPct = metrics.capacityPercent
   const currencyLabel = selectedFull?.currency ? financeSummary.currency : 'BBD default'
 
   // Price tiers for selected event
   const priceTiers = getSafePriceTiers(selectedFull)
+  const legacyTicketPrice = Number(selectedFull?.ticketPrice) || 0
 
   const dateLabel = new Intl.DateTimeFormat('en-BB', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -285,6 +292,63 @@ export function DashboardPage() {
                 )}
 
                 <div className="mb-5 rounded-2xl border border-[#EEDFD6] bg-[#FBF8F5] p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Event command center</p>
+                      <h4 className="mt-1 text-sm font-bold text-[#2B1723]">Needs attention</h4>
+                    </div>
+                    <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                      readiness.readinessLabel === 'Ready'
+                        ? 'bg-[#EAF6EF] text-[#1E7345]'
+                        : readiness.readinessLabel === 'Needs attention'
+                          ? 'bg-[#FFF1F1] text-[#A32626]'
+                          : 'bg-[#FFF7E8] text-[#7A5818]'
+                    }`}>
+                      {readiness.readinessLabel}
+                    </span>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    {readiness.categories.map((category) => (
+                      <div key={category.key} className="rounded-xl border border-[#EFE2DA] bg-white p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="text-xs font-bold text-[#2B1723]">{category.label}</p>
+                          <span className={`rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider ${
+                            category.status === 'ready'
+                              ? 'bg-[#EAF6EF] text-[#1E7345]'
+                              : category.status === 'needs-attention'
+                                ? 'bg-[#FFF1F1] text-[#A32626]'
+                                : 'bg-[#FFF7E8] text-[#7A5818]'
+                          }`}>
+                            {category.statusLabel}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-[11px] leading-5 text-[#8A7468]">{category.summary}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {readiness.actionItems.length > 0 && (
+                    <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                      {readiness.actionItems.map((item) => (
+                        <div key={item.key} className="rounded-xl border border-[#EFE2DA] bg-white p-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-xs font-bold text-[#2B1723]">{item.label}</p>
+                              <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{item.statusLabel}</p>
+                            </div>
+                            <Link to={item.to} className="shrink-0 text-[11px] font-bold text-[#B76E79] hover:underline">
+                              {item.linkLabel}
+                            </Link>
+                          </div>
+                          <p className="mt-2 text-[11px] leading-5 text-[#8A7468]">{item.summary}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="mb-5 rounded-2xl border border-[#EEDFD6] bg-[#FBF8F5] p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Finance Snapshot</p>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">Currency: {currencyLabel}</p>
@@ -328,7 +392,14 @@ export function DashboardPage() {
                   </div>
                 )}
                 {priceTiers.length === 0 && (
-                  <p className="mb-5 text-[11px] leading-5 text-[#8A7468]">No pricing configured for this Working Event.</p>
+                  <div className="mb-5 rounded-xl border border-[#EFE2DA] bg-white p-3">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A48A7B]">Pricing setup</p>
+                    <p className="mt-2 text-[11px] leading-5 text-[#8A7468]">
+                      {legacyTicketPrice > 0
+                        ? <>This event is still using the legacy base ticket price only: <strong>{formatCurrency(legacyTicketPrice, financeSummary.currency)}</strong>. Price tiers have not been set yet.</>
+                        : 'No pricing configured for this Working Event yet.'}
+                    </p>
+                  </div>
                 )}
 
                 <p className="mb-5 text-[11px] leading-5 text-[#8A7468]">
@@ -419,14 +490,15 @@ export function DashboardPage() {
             </p>
             <div className="mt-5 grid gap-2">
               {[
-                { to: '/scanner', label: 'Scanner Mode', sub: 'Open the stripped-down event-day scanner.' },
-                { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Scan, search, check in, and undo.' },
-                { to: '/tickets', label: 'Tickets / QR Print List', sub: 'Assign codes and print QR lists.' },
+                { to: '/registrations', label: 'Registrations', sub: 'Review payment follow-up, contact gaps, and guest details.' },
+                adminUser ? { to: '/event-review', label: 'Event Review', sub: 'See read-only follow-up, payment review, and current or post-event summary.' } : null,
+                { to: '/tickets', label: 'Tickets / QR Print List', sub: 'Assign codes and review missing ticket gaps.' },
+                { to: '/imports', label: 'Import Center', sub: 'Review duplicate/data-quality issues before saving.' },
                 { to: '/operations', label: 'Event Operations / Money Tracker', sub: 'Track sponsor income, expenses, refunds, and adjustments.' },
-                { to: '/communications', label: 'Communications', sub: 'Prepare copy-ready guest messages.' },
-                { to: '/imports', label: 'Import Center', sub: 'Preview guest list uploads before saving.' },
+                { to: '/events', label: 'Events', sub: 'Check capacity, status, pricing, and Working Event setup.' },
+                { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Review event-day check-in progress when the event is live.' },
                 { to: '/qa', label: 'QA Center', sub: 'Run CODEX_TEST and System Health checks.' },
-              ].map(({ to, label, sub }) => (
+              ].filter(Boolean).map(({ to, label, sub }) => (
                 <Link
                   key={to}
                   to={to}
@@ -471,6 +543,7 @@ export function DashboardPage() {
               {[
                 { to: '/events', label: 'Events', sub: 'Manage event details and select the Working Event.', icon: CalendarDays },
                 { to: '/registrations', label: 'Registrations', sub: 'View and manage guest records.', icon: Users },
+                adminUser ? { to: '/event-review', label: 'Event Review', sub: 'Open the organizer follow-up and summary page.', icon: ClipboardCheck } : null,
                 { to: '/imports', label: 'Import Center', sub: 'Upload or paste guest lists.', icon: FileInput },
                 { to: '/tickets', label: 'Tickets', sub: 'Assign ticket codes and generate QR codes.', icon: TicketCheck },
                 { to: '/scanner', label: 'Scanner Mode', sub: 'Open the focused event-day scanner.', icon: ScanLine },
@@ -478,7 +551,7 @@ export function DashboardPage() {
                 { to: '/operations', label: 'Event Operations / Money Tracker', sub: 'Track non-ticket money by Working Event.', icon: ReceiptText },
                 { to: '/communications', label: 'Communications', sub: 'Prepare copy-ready guest messages.', icon: MessageSquareText },
                 { to: '/qa', label: 'QA Center / System Health', sub: 'Run safe checks using CODEX_TEST.', icon: ShieldCheck },
-              ].map(({ to, label, sub, icon: Icon }) => (
+              ].filter(Boolean).map(({ to, label, sub, icon: Icon }) => (
                 <li key={to}>
                   <Link
                     to={to}
