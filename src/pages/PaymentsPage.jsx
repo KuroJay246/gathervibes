@@ -148,6 +148,9 @@ export function PaymentsPage() {
           <Link to="/event-review" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">
             Open Reports
           </Link>
+          <Link to="/payments/reconciliation" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">
+            Reconciliation Preview
+          </Link>
         </div>
       </header>
 
