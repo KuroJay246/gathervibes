@@ -17,18 +17,16 @@ test('Daily QA workflow stays read-only and matches the current login surface', 
   assert.doesNotMatch(workflow, /firebase deploy|firestore:rules|firestore:indexes/)
 })
 
-test('Phase 17E-C and 17E-D remain disabled admin-visible prototypes only', async () => {
+test('access workflow remains disabled in organizer Settings', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
 
-  assert.match(settings, /accessRequests\/\{requestId\}/)
-  assert.match(settings, /requesterUid, requesterEmail, requestedRole, requestedEventId, status, createdAt, updatedAt, reviewedAt, reviewedBy, notes/)
-  assert.match(settings, /Approve request: not live/)
-  assert.match(settings, /Decline request: not live/)
-  assert.match(settings, /Create staff profile: not live/)
-  assert.match(settings, /Requester form prototype/)
-  assert.match(settings, /Phase 17E-D preview only\. This is admin-visible mock UX, not a public route\./)
-  assert.match(settings, /Submit request \(not live\)/)
-  assert.match(settings, /No request is submitted here\. No Firestore write occurs\. No service call occurs\./)
+  assert.match(settings, /Access request actions disabled/)
+  assert.match(settings, /Staff profile editing disabled/)
+  assert.match(settings, /Assignment editing disabled/)
+  assert.match(settings, /Role editing is not exposed/)
+  assert.doesNotMatch(settings, /Approve request: not live/)
+  assert.doesNotMatch(settings, /Submit request \(not live\)/)
+  assert.doesNotMatch(settings, /Requester form prototype/)
 })
 
 test('Phase 17E-E readiness artifact preserves deployment gates and rollback boundaries', async () => {

@@ -104,14 +104,14 @@ test('Check-In page exposes event-day mode, helper lists, and clear QR feedback 
   assert.match(scanner, /manual ticket lookup/)
 })
 
-test('Dashboard includes event-day command links without enabling deferred integrations', async () => {
+test('Overview includes event-day actions without enabling external integrations', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
 
-  assert.match(dashboard, /Event-day command center/)
-  assert.match(dashboard, /Check-In \/ QR Scan/)
-  assert.match(dashboard, /Tickets \/ QR Print List/)
-  assert.match(dashboard, /Communications/)
-  assert.match(dashboard, /Import Center/)
-  assert.match(dashboard, /QA Center/)
+  assert.match(dashboard, /Quick Actions/)
+  assert.match(dashboard, /Open check-in/)
+  assert.match(dashboard, /Manage tickets/)
+  assert.match(dashboard, /Import registrations/)
+  assert.doesNotMatch(dashboard, /System QA/)
+  assert.doesNotMatch(dashboard, /Message Builder/)
   assert.doesNotMatch(dashboard, /Gmail|Outlook|Google Sheets|Cloud Functions|Storage/)
 })

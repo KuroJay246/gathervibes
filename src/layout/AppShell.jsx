@@ -26,41 +26,40 @@ import { canUseSettings, canViewRoute, isApprovedAdmin } from '../utils/accessRo
 
 const navGroups = [
   {
-    label: 'Overview',
-    items: [{ to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, phase: 1 }],
-  },
-  {
-    label: 'Event operations',
+    label: 'Daily workspace',
     items: [
-      { to: '/events', label: 'Events', icon: CalendarDays, available: true },
-      { to: '/registrations', label: 'Registrations', icon: UsersRound, available: true },
-      { to: '/tickets', label: 'Tickets', icon: TicketCheck, available: true },
-      { to: '/check-in', label: 'Check-In', icon: ClipboardCheck, available: true },
-      { to: '/operations', label: 'Operations', icon: ReceiptText, available: true },
-      { to: '/imports', label: 'Import Center', icon: FileInput, available: true },
-      { to: '/qa', label: 'QA Center', icon: ShieldCheck, available: true },
+      { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+      { to: '/events', label: 'Events', icon: CalendarDays },
+      { to: '/registrations', label: 'Guests & Registrations', icon: UsersRound },
+      { to: '/tickets', label: 'Tickets', icon: TicketCheck },
+      { to: '/check-in', label: 'Check-In', icon: ClipboardCheck },
+      { to: '/operations', label: 'Operations', icon: ReceiptText },
+      { to: '/communications', label: 'Message Builder', icon: MessageSquareText },
+      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
     ],
   },
   {
-    label: 'Guest experience',
+    label: 'Admin',
     items: [
-      { to: '/communications', label: 'Communications', icon: MessageSquareText, available: true },
+      { to: '/imports', label: 'Import Center', icon: FileInput },
+      { to: '/settings', label: 'Settings', icon: Settings },
+      { to: '/qa', label: 'System QA', icon: ShieldCheck },
     ],
   },
 ]
 
 const pageTitles = {
-  '/dashboard': ['Dashboard', 'Your event operations at a glance'],
+  '/dashboard': ['Overview', 'Current event status, priorities, and next actions'],
   '/events': ['Events', 'Plan and organize every gathering'],
-  '/registrations': ['Registrations', 'Keep your guest list beautifully organized'],
-  '/tickets': ['Tickets', 'Assign and track ticket codes'],
-  '/check-in': ['Check-In', 'Fast, confident event-day admissions'],
-  '/operations': ['Event Operations', 'Track non-ticket event money'],
-  '/event-review': ['Event Review', 'Read-only organizer follow-up, payment review, and event summary'],
+  '/registrations': ['Guests & Registrations', 'Manage registration records and guest counts'],
+  '/tickets': ['Tickets', 'Assign ticket codes and prepare QR access'],
+  '/check-in': ['Check-In', 'Track event-day attendance'],
+  '/operations': ['Operations', 'Track event-level money and obligations'],
+  '/event-review': ['Reports', 'Read-only follow-up, payments, operations, and summary'],
   '/imports': ['Import Center', 'Bring in CSV exports and pasted table rows safely'],
-  '/qa': ['QA Center', 'Production smoke testing without touching CPB'],
-  '/communications': ['Communication Center', 'Prepare messages for the right guests'],
-  '/settings': ['Settings', 'Manage workspace configuration'],
+  '/qa': ['System QA', 'Production diagnostics and CODEX_TEST guardrails'],
+  '/communications': ['Message Builder', 'Create, personalize, and copy event messages'],
+  '/settings': ['Settings', 'Practical workspace and event defaults'],
 }
 
 function SidebarContent({ onNavigate, mobile = false }) {
@@ -71,7 +70,7 @@ function SidebarContent({ onNavigate, mobile = false }) {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <Link to="/dashboard" onClick={onNavigate} className="block px-6 pb-7 pt-6 focus:outline-none focus:ring-2 focus:ring-[#F5E6C8]/60" aria-label="Go to Dashboard">
+      <Link to="/dashboard" onClick={onNavigate} className="block px-6 pb-7 pt-6 focus:outline-none focus:ring-2 focus:ring-[#F5E6C8]/60" aria-label="Go to Overview">
         <BrandMark light />
       </Link>
 
@@ -81,7 +80,7 @@ function SidebarContent({ onNavigate, mobile = false }) {
           <span className="min-w-0 flex-1 overflow-hidden">
             <span className="block max-w-full truncate text-sm font-medium text-white">{activeEvent?.eventName || 'No event selected'}</span>
             <span className="mt-0.5 block max-w-full truncate text-[11px] text-white/45">
-              {activeEvent ? formatEventDate(activeEvent.eventDate) : adminUser ? 'Choose one from Events' : 'Assigned event required'}
+              {activeEvent ? `${formatEventDate(activeEvent.eventDate)} · ${activeEvent.status || 'status not set'}` : adminUser ? 'Choose one from Events' : 'Assigned event required'}
             </span>
           </span>
           <ChevronDown className="size-4 shrink-0 text-white/30" aria-hidden="true" />
@@ -116,20 +115,7 @@ function SidebarContent({ onNavigate, mobile = false }) {
       </nav>
 
       <div className={`shrink-0 border-t border-white/10 p-3 ${mobile ? 'pb-[max(1rem,env(safe-area-inset-bottom))]' : ''}`}>
-        {settingsAllowed && (
-          <NavLink
-            to="/settings"
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              `mb-2 flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition ${
-                isActive ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
-              }`
-            }
-          >
-            <Settings className="size-[17px]" strokeWidth={1.8} aria-hidden="true" />
-            Settings
-          </NavLink>
-        )}
+        {settingsAllowed && <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/30">Account</p>}
         <div className="flex items-center gap-3 rounded-xl bg-black/10 p-2.5">
           <div className="grid size-8 shrink-0 place-items-center rounded-full bg-[#F7DDE6] text-xs font-bold uppercase text-[#2B1723]">
             {user?.email?.slice(0, 1) || 'A'}
@@ -156,6 +142,7 @@ export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
   const { currentRoleLabel, access } = useAuth()
+  const { activeEvent } = useActiveEvent()
   const [title, subtitle] = pageTitles[location.pathname] || ['Event Hub', 'Gather & Savor Vibes']
   const adminUser = isApprovedAdmin(access)
 
@@ -215,6 +202,20 @@ export function AppShell() {
 
         <main className="px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-6 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
           <div className="mx-auto max-w-[1480px] min-w-0 overflow-x-clip">
+            <div className="mb-5 rounded-2xl border border-[#EEDDD3] bg-white px-4 py-3 shadow-[0_6px_18px_rgba(84,53,67,0.04)]">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Everything here is scoped to</p>
+                  <p className="mt-1 truncate text-sm font-bold text-[#2B1723]">{activeEvent?.eventName || 'No selected Working Event'}</p>
+                  <p className="mt-0.5 text-xs text-[#8C766A]">
+                    {activeEvent ? `${formatEventDate(activeEvent.eventDate)} · ${activeEvent.status || 'status not set'}` : 'Choose an event before using event-scoped pages.'}
+                  </p>
+                </div>
+                <Link to="/events" className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#6B564C] hover:bg-[#FFF8F2]">
+                  Change event
+                </Link>
+              </div>
+            </div>
             <Outlet />
           </div>
         </main>
@@ -223,7 +224,7 @@ export function AppShell() {
           {canViewRoute(access, '/dashboard') && (
             <NavLink to="/dashboard" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
               <LayoutDashboard className="size-5" strokeWidth={1.8} aria-hidden="true" />
-              <span>Home</span>
+              <span>Overview</span>
             </NavLink>
           )}
           {canViewRoute(access, '/check-in') && !canViewRoute(access, '/dashboard') && (
@@ -232,10 +233,22 @@ export function AppShell() {
               <span>Check-In</span>
             </NavLink>
           )}
-          {canViewRoute(access, '/events') && (
-            <NavLink to="/events" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
-              <CalendarDays className="size-5" strokeWidth={1.8} aria-hidden="true" />
-              <span>Events</span>
+          {canViewRoute(access, '/registrations') && (
+            <NavLink to="/registrations" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
+              <UsersRound className="size-5" strokeWidth={1.8} aria-hidden="true" />
+              <span>Guests</span>
+            </NavLink>
+          )}
+          {canViewRoute(access, '/tickets') && (
+            <NavLink to="/tickets" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
+              <TicketCheck className="size-5" strokeWidth={1.8} aria-hidden="true" />
+              <span>Tickets</span>
+            </NavLink>
+          )}
+          {canViewRoute(access, '/check-in') && (
+            <NavLink to="/check-in" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
+              <ClipboardCheck className="size-5" strokeWidth={1.8} aria-hidden="true" />
+              <span>Check-In</span>
             </NavLink>
           )}
           <button type="button" onClick={() => setMenuOpen(true)} className="mobile-tab-item" aria-label="Open all navigation">

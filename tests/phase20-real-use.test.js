@@ -9,8 +9,8 @@ test('Phase 20 dashboard and events preserve approved layout while clarifying wo
   const events = await readFile('src/pages/EventsPage.jsx', 'utf8')
 
   assert.match(dashboard, /Working Event/)
-  assert.match(dashboard, /legacy base ticket price only/i)
-  assert.match(dashboard, /No pricing configured for this Working Event yet\./)
+  assert.match(dashboard, /Registration money collected/)
+  assert.match(dashboard, /Capacity used/)
   assert.match(events, /function pricingModeLabel\(event = \{\}\)/)
   assert.match(events, /Legacy base ticket price only/)
   assert.match(events, /No pricing configured/)
@@ -24,7 +24,7 @@ test('Phase 20 keeps registration audit wording and ticket QR guardrails intact'
   assert.equal(qrPayloadForTicketCode('PH20-001'), 'GSV:TICKET:PH20-001')
 })
 
-test('Phase 20 keeps import preview-first, xlsx absent, read-excel-file active, and access workflow non-live', async () => {
+test('Phase 20 keeps import preview-first, xlsx absent, read-excel-file active, and access workflow disabled', async () => {
   const imports = await readFile('src/pages/ImportsPage.jsx', 'utf8')
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'))
@@ -37,9 +37,9 @@ test('Phase 20 keeps import preview-first, xlsx absent, read-excel-file active, 
   assert.equal(packageJson.dependencies['read-excel-file'], '^9.2.0')
   assert.doesNotMatch(packageLock, /node_modules\/xlsx/)
   assert.match(xlsxImport, /read-excel-file\/browser/)
-  assert.match(settings, /Approve request: not live/)
-  assert.match(settings, /Decline request: not live/)
-  assert.match(settings, /Revoke access: not live/)
+  assert.match(settings, /Access request actions disabled/)
+  assert.match(settings, /Staff profile editing disabled/)
+  assert.match(settings, /Assignment editing disabled/)
 })
 
 test('Phase 20 operational handoff guide stays practical and preserves CPB and CODEX_TEST guardrails', async () => {

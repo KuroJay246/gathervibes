@@ -27,9 +27,9 @@ test('QA page includes empty allowlist check', async () => {
   assert.match(src, /Empty allowlist|approvedEmails/)
 })
 
-test('CommunicationsPage includes AI prompt safety notice', async () => {
+test('CommunicationsPage includes prompt-builder safety notice', async () => {
   const src = await readFile('src/pages/CommunicationsPage.jsx', 'utf8')
-  assert.match(src, /AI Prompt Safety|paste.*third.party|third.party.*AI|Prompt.*Safety|Draft Only/i)
+  assert.match(src, /Message Prompt Builder|Copy prompt for drafting|Review the prompt before pasting/i)
 })
 
 // ─── 2. QR Scanner Polish ─────────────────────────────────────────────────────

@@ -33,13 +33,13 @@ test('QA helper recognizes only the CODEX_TEST Working Event', () => {
   assert.equal(isCodexTestWorkingEvent({ eventId: CPB_EVENT_ID, eventName: 'CPB' }), false)
 })
 
-test('QA Center route and text keep production QA scoped to CODEX_TEST', async () => {
+test('System QA route and text keep production QA scoped to CODEX_TEST', async () => {
   const app = await readFile('src/App.jsx', 'utf8')
   const shell = await readFile('src/layout/AppShell.jsx', 'utf8')
   const page = await readFile('src/pages/QaPage.jsx', 'utf8')
 
   assert.match(app, /path="\/qa"/)
-  assert.match(shell, /QA Center/)
+  assert.match(shell, /System QA/)
   assert.match(page, /CODEX_TEST smoke testing/)
   assert.match(page, /Do not use CPB for QA/)
   assert.match(page, /does not create registrations/)

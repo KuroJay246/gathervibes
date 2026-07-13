@@ -71,9 +71,9 @@ test('Dashboard and Check-In use shared count wording and helpers', async () => 
 
   assert.match(dashboard, /buildRegistrationMetrics/)
   assert.match(checkIn, /formatRegistrationGuestSummary/)
-  assert.match(dashboard, /Registrations/)
-  assert.match(dashboard, /Persons/)
-  assert.match(dashboard, /capacity uses persons attending/)
+  assert.match(dashboard, /Registration records/)
+  assert.match(dashboard, /Guests/)
+  assert.match(dashboard, /Capacity used/)
   assert.match(checkIn, /Total Registrations/)
   assert.match(checkIn, /Total Guests/)
   assert.match(checkIn, /Remaining Guests/)

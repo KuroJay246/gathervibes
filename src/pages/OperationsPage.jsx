@@ -276,7 +276,7 @@ export function OperationsPage() {
               Open Event Review
             </Link>
           )}
-          <Link to="/dashboard" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">Back to Dashboard</Link>
+          <Link to="/dashboard" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">Back to Overview</Link>
         </div>
       </header>
 

@@ -3,20 +3,8 @@ import {
   ArrowRight,
   CalendarDays,
   ClipboardCheck,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  Database,
   FileInput,
-  Flame,
-  Gift,
-  Info,
-  LockKeyhole,
-  MessageSquareText,
-  ScanLine,
-  MapPin,
   ReceiptText,
-  ShieldCheck,
   TicketCheck,
   Users,
   X,
@@ -26,62 +14,32 @@ import { useActiveEvent } from '../events/useActiveEvent'
 import { useAuth } from '../auth/useAuth'
 import { subscribeToEvents } from '../services/eventService'
 import { subscribeToRegistrations } from '../services/registrationService'
-import { formatEventDate, formatCountdown, upcomingEvents, toDateInput } from '../utils/dateUtils'
+import { subscribeToOperationsLedger } from '../services/operationsLedgerService'
+import { formatCountdown, formatEventDate, toDateInput, upcomingEvents } from '../utils/dateUtils'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
-import { subscribeToOperationsLedger } from '../services/operationsLedgerService'
 import { buildOperationsTotals } from '../utils/operationsReport'
-import { getSafePriceTiers, getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
+import { getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
 import { isApprovedAdmin } from '../utils/accessRoles'
 import { buildEventReadiness } from '../utils/eventReadiness'
 
-// ── Local clock ──────────────────────────────────────────────────────────────
+function useEventRegistrations(eventId) {
+  const [rows, setRows] = useState([])
 
-function useLocalClock() {
-  const [now, setNow] = useState(() => new Date())
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000)
-    return () => clearInterval(id)
-  }, [])
-  return now
-}
-
-// ── Countdown ticker ─────────────────────────────────────────────────────────
-
-function CountdownBadge({ eventDate }) {
-  const [label, setLabel] = useState(() => formatCountdown(eventDate))
-  useEffect(() => {
-    const tick = () => setLabel(formatCountdown(eventDate))
-    const id = setInterval(tick, 30000)
-    return () => clearInterval(id)
-  }, [eventDate])
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-[#FCEEF1] px-2.5 py-1 text-[10px] font-bold text-[#B76E79]">
-      <Clock className="size-3" />
-      {label}
-    </span>
-  )
-}
-
-// ── Registration metrics ─────────────────────────────────────────────────────
-
-function useRegistrationMetrics(eventId) {
-  const [regs, setRegs] = useState([])
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
-    setRegs([])
-    if (!eventId) {
-      return undefined
-    }
-    return subscribeToRegistrations(eventId, setRegs, () => {})
+    setRows([])
+    if (!eventId) return undefined
+    return subscribeToRegistrations(eventId, setRows, () => {})
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [eventId])
 
-  return regs
+  return rows
 }
 
-function useOperationsLedger(eventId) {
+function useEventOperations(eventId) {
   const [entries, setEntries] = useState([])
+
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     setEntries([])
@@ -89,6 +47,7 @@ function useOperationsLedger(eventId) {
     return subscribeToOperationsLedger(eventId, setEntries, () => {})
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [eventId])
+
   return entries
 }
 
@@ -103,489 +62,252 @@ function sameActiveEventSnapshot(activeEvent, nextEvent) {
   )
 }
 
-// ── Metric pill ──────────────────────────────────────────────────────────────
-
-function MetricPill({ label, value, color }) {
+function Metric({ label, value, detail }) {
   return (
-    <div className={`flex flex-col items-center rounded-xl px-3 py-2.5 ${color}`}>
-      <span className="text-lg font-bold leading-none">{value}</span>
-      <span className="mt-1 text-[9px] font-bold uppercase tracking-wider opacity-70">{label}</span>
+    <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3">
+      <p className="text-xl font-bold text-[#2B1723]">{value}</p>
+      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8C7567]">{label}</p>
+      {detail && <p className="mt-1 text-xs text-[#816D62]">{detail}</p>}
     </div>
   )
 }
 
-// ── Dashboard ────────────────────────────────────────────────────────────────
+function ProgressBar({ value }) {
+  const safeValue = Math.max(0, Math.min(100, Number(value) || 0))
+  return (
+    <div className="h-2.5 overflow-hidden rounded-full bg-[#F2E8E1]">
+      <div
+        className={`h-full rounded-full ${safeValue >= 90 ? 'bg-[#C53030]' : safeValue >= 70 ? 'bg-[#D4890A]' : 'bg-[#B76E79]'}`}
+        style={{ width: `${safeValue}%` }}
+      />
+    </div>
+  )
+}
 
 export function DashboardPage() {
   const { activeEvent, clearActiveEvent, setActiveEvent } = useActiveEvent()
   const { access, assignedEvents = [] } = useAuth()
-  const now = useLocalClock()
-  const registrations = useRegistrationMetrics(activeEvent?.eventId)
-  const operationsEntries = useOperationsLedger(activeEvent?.eventId)
-
   const [allEvents, setAllEvents] = useState([])
   const [eventsLoaded, setEventsLoaded] = useState(false)
 
   const adminUser = isApprovedAdmin(access)
+  const visibleEvents = adminUser ? allEvents : assignedEvents
+  const visibleEventsLoaded = adminUser ? eventsLoaded : true
+  const selectedEvent = activeEvent ? visibleEvents.find((event) => event.eventId === activeEvent.eventId) : null
+  const registrations = useEventRegistrations(activeEvent?.eventId)
+  const operationsEntries = useEventOperations(activeEvent?.eventId)
 
   useEffect(() => {
     if (!adminUser) return undefined
     return subscribeToEvents(
-      (events) => { setAllEvents(events); setEventsLoaded(true) },
+      (events) => {
+        setAllEvents(events)
+        setEventsLoaded(true)
+      },
       () => setEventsLoaded(true),
     )
   }, [adminUser])
 
-  const visibleEvents = adminUser ? allEvents : assignedEvents
-  const visibleEventsLoaded = adminUser ? eventsLoaded : true
-  const upcoming = useMemo(() => upcomingEvents(visibleEvents), [visibleEvents])
-
   useEffect(() => {
     if (!hasSelectedWorkingEvent(activeEvent) || !visibleEventsLoaded) return
-
     const matchedEvent = visibleEvents.find((event) => event.eventId === activeEvent.eventId)
     if (!matchedEvent) {
       clearActiveEvent()
       return
     }
-
-    if (!sameActiveEventSnapshot(activeEvent, matchedEvent)) {
-      setActiveEvent(matchedEvent)
-    }
+    if (!sameActiveEventSnapshot(activeEvent, matchedEvent)) setActiveEvent(matchedEvent)
   }, [activeEvent, clearActiveEvent, setActiveEvent, visibleEvents, visibleEventsLoaded])
 
-  // Capacity progress (for selected event)
-  const selectedFull = activeEvent
-    ? visibleEvents.find((e) => e.eventId === activeEvent.eventId)
-    : null
-  const capacity = selectedFull?.capacity || 0
-  const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedFull), [registrations, selectedFull])
-  const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedFull), [registrations, selectedFull])
+  const upcoming = useMemo(() => upcomingEvents(visibleEvents), [visibleEvents])
+  const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedEvent), [registrations, selectedEvent])
+  const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedEvent), [registrations, selectedEvent])
   const operationsTotals = useMemo(() => buildOperationsTotals(operationsEntries), [operationsEntries])
   const readiness = useMemo(
-    () => buildEventReadiness(selectedFull, registrations, operationsEntries),
-    [selectedFull, registrations, operationsEntries],
+    () => buildEventReadiness(selectedEvent, registrations, operationsEntries),
+    [operationsEntries, registrations, selectedEvent],
   )
-  const capacityPct = metrics.capacityPercent
-  const currencyLabel = selectedFull?.currency ? financeSummary.currency : 'BBD default'
 
-  // Price tiers for selected event
-  const priceTiers = getSafePriceTiers(selectedFull)
-  const legacyTicketPrice = Number(selectedFull?.ticketPrice) || 0
-
-  const dateLabel = new Intl.DateTimeFormat('en-BB', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-  }).format(now)
-
-  const timeLabel = new Intl.DateTimeFormat('en-BB', {
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true,
-  }).format(now)
+  const needsAttention = readiness.actionItems.slice(0, 5)
+  const openOperations = operationsEntries.filter((entry) => ['expected', 'pending'].includes(String(entry.status || '').toLowerCase())).length
+  const capacityLabel = selectedEvent?.capacity
+    ? `${metrics.capacityUsed} / ${selectedEvent.capacity} guests`
+    : 'Capacity not set'
 
   return (
     <div className="space-y-6">
-      {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <section className="safe-card relative overflow-hidden rounded-[28px] bg-[#2B1723] px-6 py-8 text-white shadow-[0_18px_50px_rgba(43,23,35,0.15)] sm:px-9 sm:py-10 lg:px-12">
-        <div className="absolute -right-16 -top-24 size-72 rounded-full bg-[#C98291]/20 blur-3xl" />
-        <div className="absolute -bottom-24 right-40 size-56 rounded-full bg-[#F5E6C8]/10 blur-3xl" />
-
-        <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-xl">
-            {/* Live clock */}
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#F5E6C8]/15 bg-[#F5E6C8]/10 px-3 py-1.5 text-[10px] font-bold tracking-[0.15em] text-[#F5E6C8]">
-              <Clock className="size-3.5 shrink-0" />
-              <span id="dashboard-date">{dateLabel}</span>
-              <span className="opacity-50">·</span>
-              <span id="dashboard-time" className="font-mono">{timeLabel}</span>
-            </div>
-
-            <h2 className="font-serif text-3xl leading-tight sm:text-4xl lg:text-[42px]">
-              {hasSelectedWorkingEvent(activeEvent) ? 'Working on ' : 'The table is set for your'}
-              <span className="break-words italic text-[#E9B7C0]"> {hasSelectedWorkingEvent(activeEvent) ? getWorkingEventDisplayName(activeEvent) : 'next gathering.'}</span>
+      <section className="rounded-[28px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Overview</p>
+            <h2 className="mt-2 break-words font-serif text-3xl text-[#2B1723]">
+              {getWorkingEventDisplayName(activeEvent)}
             </h2>
-            {hasSelectedWorkingEvent(activeEvent) && (
-              <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/55">
-                <span className="inline-flex items-center gap-1"><CalendarDays className="size-3.5" />{formatEventDate(activeEvent.eventDate)}</span>
-                <span className="opacity-40">·</span>
-                <span className="inline-flex items-center gap-1"><MapPin className="size-3.5" />{activeEvent.location}</span>
-              </p>
+            <p className="mt-2 text-sm leading-6 text-[#816D62]">
+              {activeEvent
+                ? `${formatEventDate(activeEvent.eventDate)} · ${activeEvent.location || 'Location not set'} · ${activeEvent.status || 'status not set'}`
+                : 'Select a Working Event to see event-scoped numbers and next actions.'}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link to="/events" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-4 text-xs font-bold text-white">
+              Change event
+            </Link>
+            {activeEvent && (
+              <button
+                type="button"
+                id="clear-selected-event"
+                onClick={clearActiveEvent}
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#E1D1C8] bg-white px-4 text-xs font-bold text-[#6B564C]"
+              >
+                <X className="size-4" />
+                Clear selection
+              </button>
             )}
           </div>
-
-          <Link
-            to="/events"
-            className="inline-flex w-fit shrink-0 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-black/15 transition hover:bg-[#C57C88]"
-          >
-            {hasSelectedWorkingEvent(activeEvent) ? 'Manage events' : 'Create an event'}
-            <ArrowRight className="size-4" />
-          </Link>
         </div>
       </section>
 
-      {/* ── Two-column layout ─────────────────────────────────────────── */}
-      <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+      {!activeEvent?.eventId ? (
+        <section className="rounded-[24px] border border-dashed border-[#EEDFD6] bg-white p-8 text-center">
+          <CalendarDays className="mx-auto mb-3 size-9 text-[#DFC9BC]" />
+          <h2 className="font-serif text-2xl text-[#2B1723]">Choose a Working Event</h2>
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#816D62]">
+            Registrations, tickets, check-in, operations, messages, and reports are scoped to one selected event at a time.
+          </p>
+          <Link to="/events" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#B76E79] px-5 text-xs font-bold text-white">
+            Go to Events
+          </Link>
+        </section>
+      ) : (
+        <>
+          <section className="grid gap-3 md:grid-cols-4" aria-label="Key event numbers">
+            <Metric label="Registration records" value={metrics.totalRegistrations} detail="Form entries" />
+            <Metric label="Guests" value={metrics.totalPersons} detail="From persons attending" />
+            <Metric label="Registration money collected" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
+            <Metric label="Capacity used" value={selectedEvent?.capacity ? `${metrics.capacityPercent}%` : 'Not set'} detail={capacityLabel} />
+          </section>
 
-        {/* LEFT COLUMN */}
-        <div className="space-y-6">
-
-          {/* Selected / Working Event card */}
-          <article className="safe-card rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
-            <div className="mb-1 flex items-start justify-between gap-4">
-              <div className="min-w-0 flex-1">
-                <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Working Event</p>
-                <h3 className="mt-1.5 max-w-full break-words font-serif text-2xl leading-tight text-[#2B1723]">
-                  {getWorkingEventDisplayName(activeEvent)}
-                </h3>
+          <section className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+            <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Needs Attention</p>
+                  <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Priorities for this event</h2>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                  readiness.readinessLabel === 'Ready' ? 'bg-[#EAF6EF] text-[#1E7345]' : readiness.readinessLabel === 'Needs attention' ? 'bg-[#FFF1F1] text-[#A32626]' : 'bg-[#FFF7E8] text-[#7A5818]'
+                }`}>
+                  {readiness.readinessLabel}
+                </span>
               </div>
-              {hasSelectedWorkingEvent(activeEvent) && (
-                <button
-                  id="clear-selected-event"
-                  type="button"
-                  onClick={clearActiveEvent}
-                  className="shrink-0 rounded-xl border border-[#E1D1C8] p-2 text-[#9B867A] transition hover:bg-[#FFF0F0] hover:text-[#C53030]"
-                  aria-label="Clear selected event"
-                  title="Clear selected event"
-                >
-                  <X className="size-4" />
-                </button>
-              )}
-            </div>
 
-            {/* Workspace explanation */}
-            <div className="mb-5 flex items-start gap-2 rounded-xl bg-[#FFF8F2] px-3 py-2.5">
-              <Info className="mt-0.5 size-3.5 shrink-0 text-[#B76E79]" />
-              <p className="text-[11px] leading-5 text-[#8A7468]">
-                The <strong>Working Event</strong> is the one event currently used for registrations, imports, tickets, and check-in. Dashboard can show several upcoming or active events, but operational pages use only this selected Working Event. Selecting one does not change its event status.
-                {hasSelectedWorkingEvent(activeEvent) && (
-                  <> To change it, <Link to="/events" className="font-bold text-[#B76E79] underline underline-offset-2">select another event</Link> from the Events page.</>
-                )}
-              </p>
-            </div>
-
-            {hasSelectedWorkingEvent(activeEvent) ? (
-              <>
-                {/* Registration metrics */}
-                {metrics.totalRegistrations > 0 && (
-                  <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    <MetricPill label="Total Registrations" value={metrics.totalRegistrations} color="bg-[#FFF8F2] text-[#4E3A2C]" />
-                    <MetricPill label="Total Guests" value={metrics.totalPersons} color="bg-[#EAF6EF] text-[#2F5C3E]" />
-                    <MetricPill label="Paid Registrations" value={metrics.paidRegistrations} color="bg-[#EAF6EF] text-[#2F5C3E]" />
-                    <MetricPill label="Pending Registrations" value={metrics.pendingRegistrations} color="bg-[#FFFBEA] text-[#7A5700]" />
-                    <MetricPill label="Door Registrations" value={metrics.doorRegistrations} color="bg-[#E6F0FA] text-[#285E9E]" />
-                    <MetricPill label="Missing Ticket Code" value={metrics.missingTicketRegistrations} color="bg-[#FCEEF1] text-[#A32626]" />
-                  </div>
-                )}
-
-                {/* Capacity bar */}
-                {capacity > 0 && (
-                  <div className="mb-5">
-                    <div className="mb-1.5 flex items-center justify-between text-xs text-[#8A7468]">
-                      <span className="font-bold text-[#3A2630]">Capacity</span>
-                      <span>{metrics.capacityUsed} / {capacity} persons ({capacityPct}%)</span>
-                    </div>
-                    <div className="h-2.5 overflow-hidden rounded-full bg-[#F2E8E1]">
-                      <div
-                        className={`h-full rounded-full transition-all duration-500 ${capacityPct >= 90 ? 'bg-[#C53030]' : capacityPct >= 70 ? 'bg-[#D4890A]' : 'bg-[#B76E79]'}`}
-                        style={{ width: `${capacityPct}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="mb-5 rounded-2xl border border-[#EEDFD6] bg-[#FBF8F5] p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Event command center</p>
-                      <h4 className="mt-1 text-sm font-bold text-[#2B1723]">Needs attention</h4>
-                    </div>
-                    <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                      readiness.readinessLabel === 'Ready'
-                        ? 'bg-[#EAF6EF] text-[#1E7345]'
-                        : readiness.readinessLabel === 'Needs attention'
-                          ? 'bg-[#FFF1F1] text-[#A32626]'
-                          : 'bg-[#FFF7E8] text-[#7A5818]'
-                    }`}>
-                      {readiness.readinessLabel}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                    {readiness.categories.map((category) => (
-                      <div key={category.key} className="rounded-xl border border-[#EFE2DA] bg-white p-3">
-                        <div className="flex items-start justify-between gap-3">
-                          <p className="text-xs font-bold text-[#2B1723]">{category.label}</p>
-                          <span className={`rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider ${
-                            category.status === 'ready'
-                              ? 'bg-[#EAF6EF] text-[#1E7345]'
-                              : category.status === 'needs-attention'
-                                ? 'bg-[#FFF1F1] text-[#A32626]'
-                                : 'bg-[#FFF7E8] text-[#7A5818]'
-                          }`}>
-                            {category.statusLabel}
-                          </span>
-                        </div>
-                        <p className="mt-2 text-[11px] leading-5 text-[#8A7468]">{category.summary}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {readiness.actionItems.length > 0 && (
-                    <div className="mt-4 grid gap-3 lg:grid-cols-2">
-                      {readiness.actionItems.map((item) => (
-                        <div key={item.key} className="rounded-xl border border-[#EFE2DA] bg-white p-3">
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="text-xs font-bold text-[#2B1723]">{item.label}</p>
-                              <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{item.statusLabel}</p>
-                            </div>
-                            <Link to={item.to} className="shrink-0 text-[11px] font-bold text-[#B76E79] hover:underline">
-                              {item.linkLabel}
-                            </Link>
-                          </div>
-                          <p className="mt-2 text-[11px] leading-5 text-[#8A7468]">{item.summary}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="mb-5 rounded-2xl border border-[#EEDFD6] bg-[#FBF8F5] p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Finance Snapshot</p>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">Currency: {currencyLabel}</p>
-                  </div>
-                  <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
-                    {[
-                      ['Ticket expected revenue', formatCurrency(financeSummary.totalExpected, financeSummary.currency)],
-                      ['Ticket collected', formatCurrency(financeSummary.totalCollected, financeSummary.currency)],
-                      ['Ticket outstanding', formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)],
-                      ['Sponsor/other income', formatCurrency(operationsTotals.income, financeSummary.currency)],
-                      ['Expenses', formatCurrency(operationsTotals.expenses, financeSummary.currency)],
-                      ['Refunds/adjustments', formatCurrency(operationsTotals.refunds + operationsTotals.adjustments, financeSummary.currency)],
-                      ['Net event position', formatCurrency(financeSummary.totalCollected + operationsTotals.income + operationsTotals.adjustments - operationsTotals.expenses - operationsTotals.refunds, financeSummary.currency)],
-                      ['Finance warnings', financeSummary.financeWarningCount],
-                    ].map(([label, value]) => (
-                      <div key={label} className="rounded-xl bg-white px-3 py-2">
-                        <p className="text-sm font-bold text-[#2B1723]">{value}</p>
-                        <p className="mt-1 text-[9px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Price tier summary */}
-                {priceTiers.length > 0 && (
-                  <div>
-                    <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Price tiers</p>
-                    <div className="flex flex-wrap gap-2">
-                      {priceTiers.map((tier, i) => (
-                        <span
-                          key={i}
-                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold ${tier.status === 'sold-out' ? 'bg-[#FFF4F4] text-[#A32626] line-through' : tier.status === 'hidden' ? 'bg-[#F3F3F3] text-[#888]' : 'bg-[#FFF8F2] text-[#4E3A2C]'}`}
-                        >
-                          {tier.name === 'Complimentary' ? <Gift className="size-3" /> : null}
-                          {tier.name}
-                          <span className="opacity-60">·</span>
-                          {Number(tier.price) === 0 ? 'Free' : formatCurrency(tier.price, financeSummary.currency)}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {priceTiers.length === 0 && (
-                  <div className="mb-5 rounded-xl border border-[#EFE2DA] bg-white p-3">
-                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A48A7B]">Pricing setup</p>
-                    <p className="mt-2 text-[11px] leading-5 text-[#8A7468]">
-                      {legacyTicketPrice > 0
-                        ? <>This event is still using the legacy base ticket price only: <strong>{formatCurrency(legacyTicketPrice, financeSummary.currency)}</strong>. Price tiers have not been set yet.</>
-                        : 'No pricing configured for this Working Event yet.'}
-                    </p>
-                  </div>
-                )}
-
-                <p className="mb-5 text-[11px] leading-5 text-[#8A7468]">
-                  Registrations are form entries. Persons attending is the guest count inside those entries, and capacity uses persons attending.
+              {needsAttention.length === 0 ? (
+                <p className="mt-5 rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
+                  No urgent follow-up is detected from the current registration and operations data.
                 </p>
-
-                {metrics.totalRegistrations === 0 && (
-                  <p className="text-xs leading-5 text-[#8A7468]">No registrations yet for this event. <Link to="/registrations" className="font-bold text-[#B76E79]">Add registrations</Link> or <Link to="/imports" className="font-bold text-[#B76E79]">import a CSV</Link>.</p>
-                )}
-              </>
-            ) : (
-              <p className="text-xs leading-5 text-[#8A7468]">
-                No selected Working Event. Select an event from the <Link to="/events" className="font-bold text-[#B76E79]">Events page</Link> to see its registrations, capacity, and price tiers here.
-              </p>
-            )}
-          </article>
-
-          {/* Upcoming events */}
-          <article className="safe-card rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
-            <div className="mb-5 flex items-center justify-between gap-4">
-              <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">On the calendar</p>
-                <h3 className="mt-1.5 font-serif text-2xl text-[#2B1723]">Upcoming events</h3>
-              </div>
-              {adminUser && <Link to="/events" className="text-xs font-bold text-[#B76E79] hover:underline">View all</Link>}
-            </div>
-
-            {!visibleEventsLoaded ? (
-              <p className="py-4 text-center text-xs text-[#A08578]">Loading…</p>
-            ) : upcoming.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] px-5 py-8 text-center">
-                <CalendarDays className="mx-auto mb-3 size-8 text-[#DFC9BC]" />
-                <p className="text-sm font-bold text-[#3A2630]">No upcoming events</p>
-                <p className="mt-1 text-xs text-[#8A7468]">{adminUser ? 'Create an event and set its status to upcoming or active.' : 'No assigned upcoming events are available for this staff account.'}</p>
-                {adminUser && (
-                  <Link to="/events" className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#B76E79] px-4 py-2 text-xs font-bold text-white">
-                    Create an event <ArrowRight className="size-3.5" />
-                  </Link>
-                )}
-              </div>
-            ) : (
-              <ul className="divide-y divide-[#F5ECE6]">
-                {upcoming.slice(0, 5).map((ev) => {
-                  const isSelected = activeEvent?.eventId === ev.eventId
-                  return (
-                    <li key={ev.eventId} className="group flex items-center gap-4 py-3.5">
-                      <span className={`grid size-10 shrink-0 place-items-center rounded-xl text-xs font-bold ${isSelected ? 'bg-[#B76E79] text-white' : 'bg-[#FFF0EE] text-[#B76E79]'}`}>
-                        <CalendarDays className="size-4" />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold text-[#2B1723]">{ev.eventName}</p>
-                        <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11px] text-[#8A7468]">
-                          <span>{formatEventDate(ev.eventDate)}</span>
-                          {ev.location && <><span className="opacity-40">·</span><span>{ev.location}</span></>}
-                        </p>
+              ) : (
+                <div className="mt-5 divide-y divide-[#F2E8E1]">
+                  {needsAttention.map((item) => (
+                    <div key={item.key} className="grid gap-3 py-4 sm:grid-cols-[1fr_auto] sm:items-center">
+                      <div>
+                        <p className="text-sm font-bold text-[#2B1723]">{item.label}</p>
+                        <p className="mt-1 text-xs leading-5 text-[#816D62]">{item.summary}</p>
                       </div>
-                      <div className="flex shrink-0 flex-col items-end gap-1.5">
-                        <CountdownBadge eventDate={ev.eventDate} />
-                        {!isSelected && (
-                          <button
-                            type="button"
-                            id={`select-event-${ev.eventId}`}
-                            onClick={() => setActiveEvent(ev)}
-                            className="text-[10px] font-bold text-[#B76E79] transition hover:underline lg:opacity-0 lg:group-hover:opacity-100"
-                          >
+                      <Link to={item.to} className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#B76E79]">
+                        {item.linkLabel}
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </article>
+
+            <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Quick Actions</p>
+              <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Do next</h2>
+              <div className="mt-5 grid gap-2">
+                {[
+                  { to: '/registrations', label: 'Add registration', icon: Users },
+                  { to: '/imports', label: 'Import registrations', icon: FileInput },
+                  { to: '/tickets', label: 'Manage tickets', icon: TicketCheck },
+                  { to: '/check-in', label: 'Open check-in', icon: ClipboardCheck },
+                  { to: '/operations', label: 'Review Operations', icon: ReceiptText },
+                ].map(({ to, label, icon: Icon }) => (
+                  <Link key={to} to={to} className="flex min-h-12 items-center gap-3 rounded-xl border border-[#EFE2DA] px-4 text-sm font-bold text-[#2B1723] hover:bg-[#FFF8F2]">
+                    <Icon className="size-4 text-[#B76E79]" />
+                    {label}
+                    <ArrowRight className="ml-auto size-4 text-[#B8A49A]" />
+                  </Link>
+                ))}
+              </div>
+            </article>
+          </section>
+
+          <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
+            <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Event Progress</p>
+              <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Snapshot</h2>
+              <div className="mt-5 space-y-4">
+                <div>
+                  <div className="mb-2 flex justify-between gap-3 text-xs font-bold text-[#6B564C]">
+                    <span>Capacity</span>
+                    <span>{capacityLabel}</span>
+                  </div>
+                  <ProgressBar value={metrics.capacityPercent} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Metric label="Tickets missing" value={metrics.missingTicketRegistrations} />
+                  <Metric label="Open operations" value={openOperations} />
+                  <Metric label="Outstanding" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
+                  <Metric label="Other event income" value={formatCurrency(operationsTotals.income, financeSummary.currency)} />
+                </div>
+                <p className="text-xs leading-5 text-[#816D62]">
+                  Registration payments and Operations Ledger entries are separate records. Use Reports for the read-only event review.
+                </p>
+                {adminUser && <Link to="/event-review" className="text-xs font-bold text-[#B76E79] hover:underline">Open Reports</Link>}
+              </div>
+            </article>
+
+            <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Upcoming Events</p>
+                  <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Calendar</h2>
+                </div>
+                {adminUser && <Link to="/events" className="text-xs font-bold text-[#B76E79] hover:underline">View all</Link>}
+              </div>
+              <div className="mt-5 divide-y divide-[#F2E8E1]">
+                {!visibleEventsLoaded ? (
+                  <p className="py-4 text-sm text-[#816D62]">Loading events...</p>
+                ) : upcoming.length === 0 ? (
+                  <p className="py-4 text-sm text-[#816D62]">No upcoming events.</p>
+                ) : upcoming.slice(0, 4).map((event) => {
+                  const selected = event.eventId === activeEvent.eventId
+                  return (
+                    <div key={event.eventId} className="flex items-center gap-4 py-3">
+                      <CalendarDays className="size-5 shrink-0 text-[#B76E79]" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold text-[#2B1723]">{event.eventName}</p>
+                        <p className="mt-0.5 text-xs text-[#816D62]">{formatEventDate(event.eventDate)} · {event.location || 'Location not set'}</p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{formatCountdown(event.eventDate)}</p>
+                        {selected ? (
+                          <span className="text-[10px] font-bold text-[#2F855A]">Selected</span>
+                        ) : (
+                          <button type="button" onClick={() => setActiveEvent(event)} className="text-[10px] font-bold text-[#B76E79] hover:underline">
                             Select
                           </button>
                         )}
-                        {isSelected && (
-                          <span className="text-[10px] font-bold text-[#2F855A]">Selected</span>
-                        )}
                       </div>
-                    </li>
+                    </div>
                   )
                 })}
-              </ul>
-            )}
-          </article>
-        </div>
-
-        {/* RIGHT COLUMN */}
-        <div className="space-y-6">
-          <article className="safe-card rounded-[24px] border border-[#D9EBD8] bg-[#EAF6EF] p-6">
-            <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Event-day command center</p>
-            <h3 className="mt-1.5 font-serif text-xl text-[#244B32]">Fast links for live operations</h3>
-            <p className="mt-2 text-[11px] leading-5 text-[#456B50]">
-              Use these when the Working Event is selected and staff are checking guests in.
-            </p>
-            <div className="mt-5 grid gap-2">
-              {[
-                { to: '/registrations', label: 'Registrations', sub: 'Review payment follow-up, contact gaps, and guest details.' },
-                adminUser ? { to: '/event-review', label: 'Event Review', sub: 'See read-only follow-up, payment review, and current or post-event summary.' } : null,
-                { to: '/tickets', label: 'Tickets / QR Print List', sub: 'Assign codes and review missing ticket gaps.' },
-                { to: '/imports', label: 'Import Center', sub: 'Review duplicate/data-quality issues before saving.' },
-                { to: '/operations', label: 'Event Operations / Money Tracker', sub: 'Track sponsor income, expenses, refunds, and adjustments.' },
-                { to: '/events', label: 'Events', sub: 'Check capacity, status, pricing, and Working Event setup.' },
-                { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Review event-day check-in progress when the event is live.' },
-                { to: '/qa', label: 'QA Center', sub: 'Run CODEX_TEST and System Health checks.' },
-              ].filter(Boolean).map(({ to, label, sub }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  className="flex min-w-0 items-center justify-between gap-3 rounded-xl bg-white/70 px-4 py-3 text-[#244B32] transition hover:bg-white"
-                >
-                  <span className="min-w-0">
-                    <span className="block break-words text-sm font-bold">{label}</span>
-                    <span className="mt-0.5 block break-words text-[11px] leading-4 text-[#58745F]">{sub}</span>
-                  </span>
-                  <ChevronRight className="size-4 shrink-0 text-[#1E7345]" />
-                </Link>
-              ))}
-            </div>
-          </article>
-
-          {/* Foundation status */}
-          <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1" aria-label="Workspace status">
-            {[
-              { label: 'Private sign-in', detail: 'Google sign-in with email allowlist', icon: LockKeyhole },
-              { label: 'Protected workspace', detail: 'Every route requires approved admin access', icon: ShieldCheck },
-              { label: 'Firestore rules', detail: 'Default-deny with strict schema validation', icon: Database },
-              { label: 'Mobile-ready PWA', detail: 'Installable on Firebase Hosting', icon: Flame },
-            ].map(({ label, detail, icon: Icon }) => (
-              <article key={label} className="flex items-center gap-3 rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_12px_rgba(84,53,67,0.04)]">
-                <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#FCEEF1] text-[#B76E79]">
-                  <Icon className="size-[16px]" strokeWidth={1.8} />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-[#3A2630]">{label}</p>
-                  <p className="mt-0.5 truncate text-[11px] leading-4 text-[#8A7468]">{detail}</p>
-                </div>
-                <CheckCircle2 className="ml-auto size-4 shrink-0 text-[#2F855A]" />
-              </article>
-            ))}
+              </div>
+            </article>
           </section>
-
-          {/* Quick links */}
-          <article className="safe-card rounded-[24px] border border-[#E6D4B4] bg-[#F8E9CB] p-6">
-            <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Quick navigation</p>
-            <h3 className="mt-1.5 font-serif text-xl text-[#4E3928]">Workspace tools</h3>
-            <ul className="mt-5 grid gap-2">
-              {[
-                { to: '/events', label: 'Events', sub: 'Manage event details and select the Working Event.', icon: CalendarDays },
-                { to: '/registrations', label: 'Registrations', sub: 'View and manage guest records.', icon: Users },
-                adminUser ? { to: '/event-review', label: 'Event Review', sub: 'Open the organizer follow-up and summary page.', icon: ClipboardCheck } : null,
-                { to: '/imports', label: 'Import Center', sub: 'Upload or paste guest lists.', icon: FileInput },
-                { to: '/tickets', label: 'Tickets', sub: 'Assign ticket codes and generate QR codes.', icon: TicketCheck },
-                { to: '/scanner', label: 'Scanner Mode', sub: 'Open the focused event-day scanner.', icon: ScanLine },
-                { to: '/check-in', label: 'Check-In / QR Scan', sub: 'Search, scan, check in, and undo check-ins.', icon: ScanLine },
-                { to: '/operations', label: 'Event Operations / Money Tracker', sub: 'Track non-ticket money by Working Event.', icon: ReceiptText },
-                { to: '/communications', label: 'Communications', sub: 'Prepare copy-ready guest messages.', icon: MessageSquareText },
-                { to: '/qa', label: 'QA Center / System Health', sub: 'Run safe checks using CODEX_TEST.', icon: ShieldCheck },
-              ].filter(Boolean).map(({ to, label, sub, icon: Icon }) => (
-                <li key={to}>
-                  <Link
-                    to={to}
-                    className="flex min-w-0 items-center gap-3 rounded-xl bg-white/60 px-4 py-3 text-[#4E3928] transition hover:bg-white/90"
-                  >
-                    <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#FFF8F2] text-[#86662C]">
-                      <Icon className="size-4" strokeWidth={1.8} />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="break-words text-sm font-bold">{label}</p>
-                      <p className="mt-0.5 break-words text-[11px] leading-4 text-[#7A6548]">{sub}</p>
-                    </div>
-                    <ChevronRight className="size-4 shrink-0 text-[#A08550]" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-5 border-t border-[#E6D4B4] pt-4">
-              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Deferred</p>
-              <p className="mt-2 text-[11px] leading-5 text-[#7A6548]">
-                External sending integrations are not active in this workspace.
-              </p>
-            </div>
-
-            <div className="mt-4 flex items-start gap-2 rounded-xl bg-white/40 px-3 py-2.5">
-              <Users className="mt-0.5 size-3.5 shrink-0 text-[#86662C]" />
-              <p className="text-[11px] leading-5 text-[#7A6548]">
-                This is a private admin workspace — not a public attendee app, not a native Android or iOS application.
-              </p>
-            </div>
-          </article>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   )
 }

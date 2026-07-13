@@ -56,7 +56,7 @@ export function CommunicationsPage() {
   const [selectedTemplate, setSelectedTemplate] = useState(COMMUNICATION_TEMPLATES[0].id)
   const [draftContent, setDraftContent] = useState(COMMUNICATION_TEMPLATES[0].content)
   const [copiedAction, setCopiedAction] = useState('')
-  const [labMode, setLabMode] = useState('standard') // 'standard' or 'ai'
+  const [labMode, setLabMode] = useState('standard') // 'standard' or 'prompt'
   const [selectedTone, setSelectedTone] = useState('Professional')
 
   useEffect(() => {
@@ -149,22 +149,22 @@ Data context for this segment:
     <div className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#B76E79]">Copy-only command center</p>
-          <h2 className="mt-1 font-serif text-3xl text-[#2B1723]">Communications Pro</h2>
+          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#B76E79]">Message Builder</p>
+          <h2 className="mt-1 font-serif text-3xl text-[#2B1723]">Create Message</h2>
           <p className="mt-2 text-sm text-[#816D62]">
-            Build copy-ready packets for <strong>{activeEvent.eventName}</strong>. No email, WhatsApp, OAuth, or AI sending is enabled.
+            Create, personalize, and copy event messages for <strong>{activeEvent.eventName}</strong>. Messages are not sent automatically.
           </p>
         </div>
       </header>
 
       <div className="rounded-xl border border-[#EFE2DA] bg-[#FFF8F2] px-4 py-3 text-sm text-[#8A7468]">
-        <strong>Safety Notice:</strong> This page only prepares text for clipboard copy. It does not send messages, write communication logs, or connect to external AI API keys.
+        <strong>Copy-only:</strong> This page prepares text for clipboard copy. It does not send email or WhatsApp messages, write delivery logs, or connect to an AI API.
         <span className="mt-1 block text-xs">Use segments to choose recipients; buyer/contact can be different from attendee names, and Door Paid is not the same as To Pay at Door.</span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
         <div className="space-y-6 lg:col-span-4">
-          <Section eyebrow="Segment Builder" title="Choose recipients">
+          <Section eyebrow="Recipients" title="Choose recipients">
             <div className="space-y-4">
               <div>
                 <label htmlFor="search" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Search Guest</label>
@@ -238,7 +238,7 @@ Data context for this segment:
             </div>
           </Section>
 
-          <Section eyebrow="Counts" title="Segment summary">
+          <Section eyebrow="Contact List" title="Segment summary">
             <div className="grid grid-cols-2 gap-3">
               <SummaryCard label="Registrations" value={summary.totalRegistrations} />
               <SummaryCard label="Persons" value={summary.totalPersons} />
@@ -251,7 +251,7 @@ Data context for this segment:
         </div>
 
         <div className="space-y-6 lg:col-span-8">
-          <Section eyebrow="Message Editor" title={labMode === 'standard' ? "Template Library" : "AI Draft Lab — Draft Only"}>
+          <Section eyebrow="Templates" title={labMode === 'standard' ? 'Template Library' : 'Message Prompt Builder'}>
             <div className="mb-6 flex overflow-hidden rounded-xl border border-[#E5D7CF] bg-[#FBF8F5] p-1">
               <button
                 type="button"
@@ -265,7 +265,7 @@ Data context for this segment:
                 onClick={() => setLabMode('ai')}
                 className={`flex-1 rounded-lg py-2 text-sm font-bold transition ${labMode === 'ai' ? 'bg-white text-[#B76E79] shadow-sm' : 'text-[#8C766A] hover:bg-white/50'}`}
               >
-                AI Draft Lab
+                Prompt Builder
               </button>
             </div>
 
@@ -282,15 +282,15 @@ Data context for this segment:
                 <div className="flex items-end">
                   <button type="button" onClick={() => copyText('ai-prompt', aiPromptText)} className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#2B1723] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#3D2232]">
                     {copiedAction === 'ai-prompt' ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
-                    Copy AI Prompt for ChatGPT
+                    Copy prompt for drafting
                   </button>
                 </div>
                 <div className="col-span-full">
                   <p className="text-xs text-[#8A7468]">
-                    Real AI generation is deferred. Use the button above to copy a prompt you can paste into ChatGPT to generate a message using your selected tone.
+                    This helper only builds a prompt you can copy into your own drafting tool. It does not generate text inside the app.
                   </p>
                   <p className="mt-2 text-xs font-bold text-amber-700">
-                    Safety Notice: When you paste this prompt into ChatGPT or another AI tool, event details included in the prompt will be shared with that tool. Review before pasting.
+                    Review the prompt before pasting it into any external tool.
                   </p>
                 </div>
               </div>
@@ -298,7 +298,7 @@ Data context for this segment:
 
             <div className="grid gap-4 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">{labMode === 'ai' ? 'Deterministic Draft Type' : 'Starter Template'}</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">{labMode === 'ai' ? 'Prompt starter' : 'Starter Template'}</label>
                 <select value={selectedTemplate} onChange={(event) => handleTemplateChange(event.target.value)} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm font-medium">
                   {COMMUNICATION_TEMPLATES.map((template) => <option key={template.id} value={template.id}>{template.label}</option>)}
                 </select>
@@ -338,7 +338,7 @@ Data context for this segment:
             )}
           </Section>
 
-          <Section eyebrow="Copy Packet" title="Copy one message, all messages, recipients, or CSV">
+          <Section eyebrow="Copy & Use" title="Copy one message, all messages, recipients, or CSV">
             <div className="flex flex-wrap gap-2">
               <button type="button" onClick={() => copyText('one', firstMessage?.message || '')} disabled={!firstMessage} className="inline-flex items-center gap-2 rounded-xl bg-[#2B1723] px-4 py-2 text-xs font-bold text-white disabled:opacity-50">
                 {copiedAction === 'one' ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}

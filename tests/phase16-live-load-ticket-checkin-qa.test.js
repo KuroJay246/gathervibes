@@ -76,7 +76,7 @@ test('System Health normalizes allowlist email comparison defensively', async ()
   assert.match(panel, /String\(user\.email \|\| ''\)\.trim\(\)\.toLowerCase\(\)/)
 })
 
-test('QA Center includes Phase 16 browser and CODEX_TEST retest guidance', async () => {
+test('System QA includes browser and CODEX_TEST retest guidance', async () => {
   const qaPage = await readFile('src/pages/QaPage.jsx', 'utf8')
   const qaHelper = await readFile('src/utils/qaHelper.js', 'utf8')
 
@@ -84,7 +84,7 @@ test('QA Center includes Phase 16 browser and CODEX_TEST retest guidance', async
     'Website does not load?',
     'Ctrl+Shift+R hard refresh',
     'clear site data for gathervibeshub.web.app',
-    'Phase 16 live browser and check-in QA',
+    'CODEX_TEST smoke testing',
     'login works with the approved second Google account',
     'QR camera lookup works',
     'manual ticket-code fallback works',
