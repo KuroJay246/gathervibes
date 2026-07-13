@@ -48,6 +48,25 @@ const navGroups = [
   },
 ]
 
+const mobileMoreGroups = [
+  {
+    label: 'More workspace',
+    items: [
+      { to: '/events', label: 'Events', icon: CalendarDays },
+      { to: '/operations', label: 'Operations', icon: ReceiptText },
+      { to: '/communications', label: 'Message Builder', icon: MessageSquareText },
+      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
+    ],
+  },
+  {
+    label: 'Admin',
+    items: [
+      { to: '/settings', label: 'Settings', icon: Settings },
+      { to: '/qa', label: 'System QA', icon: ShieldCheck },
+    ],
+  },
+]
+
 const pageTitles = {
   '/dashboard': ['Overview', 'Current event status, priorities, and next actions'],
   '/events': ['Events', 'Plan and organize every gathering'],
@@ -62,7 +81,7 @@ const pageTitles = {
   '/settings': ['Settings', 'Practical workspace and event defaults'],
 }
 
-function SidebarContent({ onNavigate, mobile = false }) {
+function SidebarContent({ onNavigate, mobile = false, groups = navGroups }) {
   const { user, signOut, currentRoleLabel, access } = useAuth()
   const { activeEvent } = useActiveEvent()
   const adminUser = isApprovedAdmin(access)
@@ -88,7 +107,7 @@ function SidebarContent({ onNavigate, mobile = false }) {
       </div>
 
       <nav className="mt-5 min-h-0 flex-1 overflow-y-auto px-3 pb-4" aria-label="Main navigation">
-        {navGroups.map((group) => (
+        {groups.map((group) => (
           <div className="mb-5" key={group.label}>
             <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/30">{group.label}</p>
             <div className="space-y-1">
@@ -169,7 +188,7 @@ export function AppShell() {
             >
               <X className="size-5" />
             </button>
-            <SidebarContent onNavigate={() => setMenuOpen(false)} mobile />
+            <SidebarContent onNavigate={() => setMenuOpen(false)} mobile groups={mobileMoreGroups} />
           </aside>
         </div>
       )}
