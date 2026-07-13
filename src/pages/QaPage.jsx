@@ -167,19 +167,19 @@ export function QaPage() {
         { label: 'Approved admin detected', status: db && Array.isArray(accessControl?.approvedEmails) ? 'pass' : 'fail', detail: 'Protected page loaded with settings/accessControl allowlist access' },
         { label: 'Empty allowlist check', status: accessControl?.approvedEmails?.length > 0 ? 'pass' : 'fail', detail: accessControl?.approvedEmails?.length > 0 ? `${accessControl.approvedEmails.length} emails approved` : 'approvedEmails is missing or empty' },
         { label: 'No public access warning', status: 'pass', detail: 'App remains private and allowlist-only.' },
-        { label: 'Staff roles enforcement level', status: 'pass', detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged. Phase 17E-A and 17E-B are closed. Phase 17E-C, Phase 17E-D, and Phase 17E-E are closed after organizer review PASS. Phase 17F-A, Phase 17F-B, and Phase 17F-C are closed after organizer review PASS. Phase 17G-A is closed after organizer review PASS and the approval package is accepted. Phase 17G-B is closed after organizer review PASS as the accepted final dry-run review only. Phase 17G-B2 is closed with Firestore rules deployed, admin smoke passed, scanner smoke passed, and admin route sanity checked. No live workflow change is introduced.' },
+        { label: 'Staff role boundary', status: 'pass', detail: 'Scanner/check-in-only access remains assigned-event-only. Admin routes and settings stay unavailable to scanner roles.' },
         { label: 'Approved-admin allowlist active', status: 'pass', detail: 'settings/accessControl.approvedEmails remains owner/admin enforcement.' },
-        { label: 'Firestore role enforcement', status: 'pass', detail: 'Scanner/check-in-only live access is enforced through deployed rules, active staffProfiles, and active staffAssignments. Phase 17D-C and Phase 17D-D closed without changing live rules, Phase 17E-A did not deploy rules, Phase 17E-B closed as a dry-run-only accessRequests prototype, Phase 17E-C / 17E-D / 17E-E / 17F-A / 17F-B / 17F-C closed without deploying Firestore rules or indexes, Phase 17G-A closed after organizer review PASS with no rules or index deploy, and Phase 17G-B2 deployed backend accessRequests rules without deploying indexes.' },
-        { label: 'Daily QA workflow status', status: 'warning', detail: 'Latest current-head Daily QA run 28875120502 succeeded for branch commit ca93b260 on July 7, 2026. Older failed GitHub UI badges can reflect stale built-auth smoke history from commit 1e48154 and are not blocking unless the current head fails.' },
+        { label: 'Firestore role enforcement', status: 'pass', detail: 'Rules enforce private admin access, assigned scanner access, and append-only audit-log behavior. Firestore indexes were not changed in this release.' },
+        { label: 'Daily QA workflow status', status: 'warning', detail: 'Use the current production smoke result as the source of truth when older GitHub badges are stale.' },
         { label: 'Communications templates available', status: COMMUNICATION_TEMPLATES.length >= 12 ? 'pass' : 'warning', detail: `${COMMUNICATION_TEMPLATES.length} copy-only templates` },
         { label: 'Communications segments available', status: COMMUNICATION_SEGMENTS.finance.length >= 9 ? 'pass' : 'warning', detail: 'Payment, finance, ticket, attendance, contact, and group filters available' },
         { label: 'Missing contact count', status: communicationsSummary.missingEmailOrPhone ? 'warning' : 'pass', detail: `${communicationsSummary.missingEmailOrPhone} rows missing email or phone` },
         { label: 'Missing ticket count', status: communicationsSummary.missingTicket ? 'warning' : 'pass', detail: `${communicationsSummary.missingTicket} rows` },
         { label: 'Outstanding balance segment', status: communicationsSummary.outstandingBalance ? 'warning' : 'pass', detail: `${communicationsSummary.outstandingBalance} rows` },
-        { label: 'No Gmail/Outlook/AI sending enabled', status: 'pass', detail: 'Communications Pro is copy-only.' },
+        { label: 'No external message sending enabled', status: 'pass', detail: 'Message Builder is copy-only.' },
         { label: 'Import readiness', status: workingEventIsCodex ? 'pass' : 'warning', detail: workingEventIsCodex ? 'CODEX_TEST selected' : 'Use CODEX_TEST for QA imports' },
         { label: 'CPB Payment Audit Backfill available', status: 'pass', detail: 'Import Center special source is dry-run first.' },
-        { label: 'Payment audit dry-run performs no writes', status: 'pass', detail: 'Apply remains locked in Phase 14B handoff.' },
+        { label: 'Payment audit dry-run performs no writes', status: 'pass', detail: 'Apply remains locked by release guardrail.' },
         { label: 'Payment audit review-needed rows are flagged', status: 'pass', detail: 'Roger, inferred price, partial payment, fuzzy, conflicts, medium/low confidence.' },
         { label: 'Payment audit create candidates are flagged', status: 'pass', detail: 'Christina Morris and Gabriela missing third guest are not auto-created.' },
         { label: 'Registration search overlap fixed', status: 'pass', detail: 'Search and filters sit above wrapped category tabs.' },
@@ -201,22 +201,22 @@ export function QaPage() {
         { label: 'Cole/spreadsheet independent review note exists', status: 'pass', detail: 'Dry-run UI says the spreadsheet should be cross-checked before apply.' },
         { label: 'CPB apply remains locked', status: 'pass', detail: 'Apply button only alerts that no CPB writes were performed.' },
         { label: 'Event Operations tracker exists', status: 'pass', detail: 'Operations ledger is scoped to the selected Working Event.' },
-        { label: 'Event Operations future backlog visible', status: 'pass', detail: 'Tasks, supplies, vendors, sponsors, school/baker tracking, run sheet, reimbursements, and expense reporting remain planned, not active.' },
+        { label: 'Event Operations boundaries visible', status: 'pass', detail: 'Operations remains scoped to ledger entries; broader task and supplier modules are not active.' },
         { label: 'Export presets available', status: 'pass', detail: 'Basic, Door, Finance, Communications, Admin, Re-import' },
         { label: 'Export scoped to selected Working Event', status: 'pass', detail: 'Verified via ExportModal logic' },
         { label: 'Google Sheets-ready templates available', status: 'pass', detail: 'Basic, Buyer, Finance, Door, School, Admin' },
         { label: 'Import templates include buyerName/attendeeNames', status: 'pass', detail: 'Verified in ImportTemplatesPanel' },
         { label: 'Import templates include finance fields', status: 'pass', detail: 'Verified in ImportTemplatesPanel' },
         { label: 'Import template roundtrip check', status: 'pass', detail: 'Headers match Import Center mapped fields' },
-        { label: 'AI Draft Lab visible', status: 'pass', detail: 'Standard/AI modes available' },
-        { label: 'AI Draft Lab marked Draft Only', status: 'pass', detail: 'Verified in CommunicationsPage' },
+        { label: 'Prompt Builder visible', status: 'pass', detail: 'Standard templates and copyable prompt helper are available' },
+        { label: 'Prompt Builder is copy-only', status: 'pass', detail: 'Verified in CommunicationsPage' },
         { label: 'Copy Draft works', status: 'pass', detail: 'Verified' },
         { label: 'Copy AI Prompt works', status: 'pass', detail: 'Verified' },
         { label: 'no AI API key exists', status: 'pass', detail: 'Copy-only prompt generation' },
         { label: 'no Google Sheets OAuth exists', status: 'pass', detail: 'Manual workflow helper active' },
-        { label: 'Phase 17C-B backlog order reviewed', status: 'pass', detail: 'Closed, current, next, operational, access/staff, Event Operations, QA/reliability, deferred, long-term, out of scope.' },
+        { label: 'Product boundaries reviewed', status: 'pass', detail: 'Private admin app, CODEX_TEST QA, event operations, access, and external integrations remain separated.' },
         { label: 'Clean account route standard', status: 'pass', detail: 'No selected Working Event, empty localStorage, null config, BBD/GSV defaults, and no AppErrorBoundary fallback remain required.' },
-        { label: 'Staff rules deploy status', status: 'pass', detail: 'Phase 17G-B2 deployed backend accessRequests rules and did not deploy Firestore indexes. Admin smoke passed. Scanner smoke passed. B2 is ready for closeout and merge.' },
+        { label: 'Staff rules deploy status', status: 'pass', detail: 'Backend access boundaries are active; Firestore indexes were not deployed by this UI reset.' },
       ])
       setLastRunAt(new Date().toLocaleString())
     } catch (err) {
@@ -246,7 +246,7 @@ export function QaPage() {
       <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Production QA Center</p>
+            <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">System QA</p>
             <h2 className="mt-2 font-serif text-2xl">CODEX_TEST smoke testing</h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[#7B665C]">
               Use this page to keep production QA scoped to the dedicated fixture. It does not create registrations,
@@ -367,9 +367,9 @@ export function QaPage() {
 
       <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
         <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Manual smoke checklist</p>
-        <h2 className="mt-2 font-serif text-2xl">Phase 17C-A staff rules readiness</h2>
+        <h2 className="mt-2 font-serif text-2xl">Staff access readiness</h2>
         <p className="mt-3 text-sm leading-6 text-[#7B665C]">
-          Use CODEX_TEST only. This checklist includes Phase 16 live browser and check-in QA, Phase 17A visibility checks, and Phase 17C-A staff-rule review. It is manual guidance and does not write to Firestore.
+          Use CODEX_TEST only. This checklist is manual guidance and does not write to Firestore.
         </p>
         <div className="mt-5 grid gap-3">
           {qaChecklist.map((item) => (

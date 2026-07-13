@@ -1,190 +1,22 @@
 import { useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { CheckCircle2, Database, KeyRound, LogOut, ShieldCheck, UserRound } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
-import { SystemHealthPanel } from '../components/SystemHealthPanel'
 import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeUtils'
 import { ACCESS_ROLES, ROLE_ORDER, listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
-
-const ACCESS_ROLE_MATRIX = [
-  ['Owner/Admin', 'Dashboard, Settings, Access & Roles, events, registrations, imports, tickets, check-in, operations, QA, communications, scanner, and admin-only undo where already implemented.'],
-  ['Event Manager', 'Planned assigned-event operational surface only. Not live in this phase.'],
-  ['Scanner / Check-In Only', 'Assigned-event scanner route, lookup, and check-in only. No undo, no check-out, no admin routes.'],
-  ['Viewer / Read-Only', 'Planned assigned-event read-only surface only. Not live in this phase.'],
-  ['Operations Helper', 'Planned assigned-event operations visibility only. Not live in this phase.'],
-  ['Lead Scanner', 'Not live. Planning/readiness only.'],
-]
-
-const ACCESS_MODEL_SECTIONS = [
-  {
-    title: 'Access Requests Model',
-    body: 'Phase 17E-C closed after organizer review PASS with an admin-visible, read-only foundation for future access requests. Phase 17G-A is closed after organizer review PASS as the accepted approval package only. Phase 17G-B is closed after organizer review PASS as the accepted final rules deployment review only. Phase 17G-B2 is closed: backend accessRequests rules are live, the login redirect compatibility fix is deployed, admin and scanner smoke passed, and this surface remains read-only. It does not approve, decline, revoke, or submit anything.',
-    rows: [
-      ['Collection', 'accessRequests/{requestId}'],
-      ['Expected fields', 'requesterUid, requesterEmail, requestedRole, requestedEventId, status, createdAt, updatedAt, reviewedAt, reviewedBy, notes'],
-      ['Request writes', 'Not live'],
-    ],
-  },
-  {
-    title: 'Admin Access Boundary',
-    body: 'approvedEmails remains the admin-level boundary. This surface is read-only and must never add staff/scanner/helper accounts to approvedEmails.',
-    rows: [
-      ['Live boundary', 'settings/accessControl.approvedEmails'],
-      ['Admin writes from this UI', 'Not live'],
-      ['approvedEmails editing', 'Not live'],
-    ],
-  },
-  {
-    title: 'Staff Profiles Model',
-    body: 'Future staff access uses staffProfiles/{uid}. This phase documents the model only and does not create, edit, revoke, or suspend profiles.',
-    rows: [
-      ['Collection', 'staffProfiles/{uid}'],
-      ['Expected fields', 'uid, email, displayName, status, defaultRole'],
-      ['Profile editing', 'Not live'],
-    ],
-  },
-  {
-    title: 'Event Assignments Model',
-    body: 'Future event-scoped access uses events/{eventId}/staffAssignments/{uid}. This phase does not assign staff to events or edit assignments.',
-    rows: [
-      ['Collection', 'events/{eventId}/staffAssignments/{uid}'],
-      ['Expected fields', 'uid, email, eventId, role, status, createdAt, updatedAt'],
-      ['Assignment editing', 'Not live'],
-    ],
-  },
-  {
-    title: 'Scanner Mode',
-    body: 'Scanner remains assigned-event-only with no undo or check-out. Admin undo remains admin-only where already implemented.',
-    rows: [
-      ['Safe QA event', 'CODEX_TEST only'],
-      ['CPB access', 'Protected / do not use for QA'],
-      ['Undo / Check Out', 'Scanner: not live / Admin: admin-only where implemented'],
-    ],
-  },
-  {
-    title: 'Security Notes',
-    body: 'Phase 17G-B2 deployed Firestore rules only for the current approved accessRequests boundary and deployed a login redirect compatibility fix only. Firestore indexes are still not deployed. Admin and scanner smoke passed, admin route sanity confirmed no admin lock into /scanner, and no permission broadening or live access-workflow write mutation is introduced in this branch.',
-    rows: [
-      ['Firestore rules changes', 'Deployed in Phase 17G-B2 / backend accessRequests rules live'],
-      ['Firestore indexes', 'Not deployed'],
-      ['Lead-scanner permission', 'Not live'],
-    ],
-  },
-]
-
-const FUTURE_ACTIONS = [
-  'Approve request',
-  'Decline request',
-  'Revoke access',
-  'Create staff profile',
-  'Assign event',
-]
-
-const ROADMAP_SECTIONS = [
-  { title: '1. Closed / shipped phases', items: [
-    ['Phase 14B CPB Payment Audit UI Cleanup / Operations Review Fixes', 'Closed'],
-    ['Phase 15A Hosting Security Headers + Private Indexing', 'Closed'],
-    ['Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update', 'Closed / merged / deployed'],
-    ['Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening', 'Closed / merged / deployed'],
-    ['Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning', 'Closed / merged / deployed'],
-    ['Phase 17B Staff / Worker Roles Foundation', 'Closed / merged / Hosting-deployed'],
-    ['Phase 17C-A Firestore Rules Review + Deployment Readiness', 'Closed / merged / Hosting-deployed / rules not deployed'],
-    ['Phase 17D-C Access & Roles Read-Only/Admin UI Foundation', 'Closed / merged / admin review PASS / scanner review PASS'],
-    ['Phase 17D-D Access workflow/rules-readiness planning only', 'Closed / merged / planning-only'],
-    ['Phase 17E-A Access Workflow Rules + Data Model Review', 'Closed / merged-ready / organizer artifact review PASS'],
-    ['Phase 17E-B Access Request Rules Prototype + Tests', 'Closed / merged / dry-run only / rules undeployed'],
-    ['Phase 17E-C Access Requests read-only/admin UI foundation', 'Closed / merged-ready / organizer review PASS / read-only only'],
-    ['Phase 17E-D Requester access-request form UX prototype', 'Closed / merged-ready / organizer review PASS / disabled preview only'],
-    ['Phase 17E-E Access workflow deployment readiness package', 'Closed / merged-ready / organizer review PASS / rules undeployed'],
-    ['Phase 17F-A Access workflow implementation plan', 'Closed / merged-ready / organizer review PASS / planning-only'],
-    ['Phase 17F-B Disabled access request service contract', 'Closed / merged-ready / organizer review PASS / disabled contract only'],
-    ['Phase 17F-C Access workflow manual smoke checklist', 'Closed / merged-ready / organizer review PASS / manual checklist only'],
-    ['Finance tracker', 'Phase 9 active'],
-    ['Communications Pro', 'Phase 11 copy-only'],
-    ['Phase 13A AI Draft Lab', 'Complete / draft-only'],
-  ] },
-  { title: '2. Current active phase', items: [
-    ['Phase 17G-B2 Firestore Rules Real Deploy + Immediate Smoke', 'Closed on branch / Firestore rules deployed live / Firestore indexes not deployed / admin smoke passed / scanner smoke passed / no live workflow'],
-    ['Daily QA preflight', 'Latest current-head run succeeded; older failed UI badges can be stale and are not blocking unless the current head fails'],
-  ] },
-  { title: '3. Next recommended phase', items: [['Release-train main review for Dashboard, Events, Registrations, Import Center, Tickets, and Operations', 'Create codex/release-train-17r-18-19-main-review from latest main after B2 merge and preserve Pass 3 fixes only']] },
-  { title: '4. High-priority operational backlog', items: [
-    ['Clean-account route smoke path for every future feature', 'Required standard'],
-    ['Registration/guest count wording consistency', 'Preserved'],
-    ['CODEX_TEST-only QA workflows', 'Ongoing'],
-  ] },
-  { title: '5. Access / staff / worker permissions backlog', items: [
-    ['Firestore-enforced staff roles', 'Live after Phase 17C-B rules deploy'],
-    ['Scanner/check-in-only role enforcement', 'Live / assigned-event-only / no undo'],
-    ['Event manager role', 'Planned surface only'],
-    ['Viewer/read-only role', 'Planned surface only'],
-    ['Operations helper role', 'Planned surface only'],
-    ['Mother/Event Manager simplified view', 'Future planned'],
-  ] },
-  { title: '6. Event Operations backlog', items: [['Event Operations expansion', 'Future planned']] },
-  { title: '7. QA / reliability backlog', items: [
-    ['Clean/new approved account regression checks', 'Required standard'],
-    ['No selected Working Event regression checks', 'Required standard'],
-    ['AppErrorBoundary fallback should not appear on normal protected routes', 'Required standard'],
-  ] },
-  { title: '8. Deferred integrations', items: [
-    ['Google Sheets OAuth', 'Deferred'],
-    ['Real AI API integration', 'Deferred'],
-    ['Gmail/Outlook OAuth', 'Deferred'],
-    ['Automatic email sending', 'Deferred'],
-    ['Automatic WhatsApp sending', 'Deferred'],
-    ['Cloud Functions', 'Deferred'],
-    ['Firebase Storage', 'Deferred'],
-    ['Payment gateway integration', 'Deferred'],
-  ] },
-  { title: '9. Public portals / native app / future long-term ideas', items: [
-    ['Public attendee / baker / school portals', 'Deferred'],
-    ['Native app / app store build', 'Deferred'],
-  ] },
-  { title: '10. Explicitly not implemented / out of scope', items: [
-    ['Public sitemap / JSON-LD for private admin app', 'Out of scope'],
-    ['Public signup or guest accounts', 'Out of scope'],
-    ['CPB use for QA', 'Out of scope'],
-  ] },
-]
-
-const EVENT_OPERATIONS_BACKLOG = [
-  'tasks',
-  'supplies checklist',
-  'vendors/suppliers',
-  'sponsors',
-  'school tracking',
-  'baker/vendor tracking',
-  'budget/expense reporting',
-  'event-day run sheet',
-]
-
-const ACCESS_ROLES_FUTURE_PLAN = [
-  'pending access requests',
-  'approve/decline staff access',
-  'assign role',
-  'assign event',
-  'revoke access',
-  'inactive/revoked status',
-  'staffProfiles/{uid}',
-  'events/{eventId}/staffAssignments/{uid}',
-]
 
 const SETTINGS_TABS = [
   ['profile', 'Profile'],
   ['workspace', 'Workspace'],
   ['events', 'Events & Defaults'],
-  ['access', 'Access & Roles'],
-  ['scanner', 'Scanner Mode'],
-  ['tickets', 'Tickets & Check-In'],
-  ['imports', 'Imports & Data'],
+  ['access', 'Access Summary'],
+  ['scanner', 'Scanner & Tickets'],
+  ['imports', 'Imports'],
   ['finance', 'Finance & Operations'],
-  ['communications', 'Communications'],
-  ['qa', 'QA & System Health'],
-  ['security', 'Security & Privacy'],
-  ['roadmap', 'Integrations & Roadmap'],
+  ['messages', 'Message Builder'],
+  ['security', 'Security'],
 ]
 
 function SettingsSection({ eyebrow, title, children }) {
@@ -211,20 +43,8 @@ function ProfileAvatar({ user }) {
   return <div className="grid size-16 place-items-center rounded-full bg-[#F7DDE6] text-xl font-bold uppercase text-[#2B1723]">{user?.displayName?.slice(0, 1) || user?.email?.slice(0, 1) || 'A'}</div>
 }
 
-function PillList({ items, tone = 'plain' }) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {items.map((item) => (
-        <span key={item} className={`${tone === 'white' ? 'bg-white' : 'bg-[#F7F1ED]'} rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]`}>{item}</span>
-      ))}
-    </div>
-  )
-}
-
-function ReadOnlyStatusPill({ children, tone = 'plain' }) {
-  const className = tone === 'warning'
-    ? 'bg-[#FFF4DF] text-[#986F26]'
-    : 'bg-[#F7F1ED] text-[#6B564C]'
+function Pill({ children, tone = 'plain' }) {
+  const className = tone === 'warning' ? 'bg-[#FFF4DF] text-[#986F26]' : tone === 'success' ? 'bg-[#EAF6EF] text-[#2F855A]' : 'bg-[#F7F1ED] text-[#6B564C]'
   return <span className={`inline-flex rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${className}`}>{children}</span>
 }
 
@@ -240,7 +60,7 @@ export function SettingsPage() {
   const tabPanels = useMemo(() => ({
     profile: (
       <div className="grid min-w-0 gap-6 xl:grid-cols-2">
-        <SettingsSection eyebrow="My Admin Profile" title="Signed-in admin">
+        <SettingsSection eyebrow="My Profile" title="Signed-in account">
           <div className="flex items-center gap-4">
             <ProfileAvatar user={user} />
             <div className="min-w-0">
@@ -252,86 +72,63 @@ export function SettingsPage() {
           <div className="mt-6 rounded-2xl border border-[#EFE2DA] p-4">
             <InfoRow label="Auth provider" value={user?.providerData?.[0]?.providerId || 'Firebase Auth'} />
             <InfoRow label="Role label" value={currentRoleLabel} />
-            <InfoRow label="Role source" value={rolesConfigured ? 'settings/accessControl.rolesByEmail' : 'approvedEmails fallback'} />
+            <InfoRow label="Role source" value={rolesConfigured ? 'rolesByEmail' : 'approvedEmails fallback'} />
           </div>
-          <button type="button" onClick={signOut} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#2B1723] px-5 py-3 text-sm font-bold text-white">
+          <button type="button" onClick={signOut} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">
             <LogOut className="size-4" />
             Log out
           </button>
         </SettingsSection>
-        <SettingsSection eyebrow="System Health" title="Connection summary">
-          <div className="grid gap-3">
-            <InfoRow label="Authentication" value="Google sign-in remains unchanged" />
+        <SettingsSection eyebrow="Connection" title="Workspace connection">
+          <div className="rounded-2xl border border-[#EFE2DA] p-4">
             <InfoRow label="Firebase project" value={firebaseProjectId || 'Configured at build time'} />
             <InfoRow label="Firebase config" value={isFirebaseConfigured ? 'Loaded' : 'Missing'} />
+            <InfoRow label="App access" value="Private approved-account workspace" />
           </div>
         </SettingsSection>
       </div>
     ),
     workspace: (
-      <SettingsSection eyebrow="Workspace" title="Working Event and clean-account state">
+      <SettingsSection eyebrow="Workspace" title="Working Event context">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
           <InfoRow label="App name" value="Gather & Savor Event Hub" />
           <InfoRow label="Organization" value="Gather & Savor Vibes" />
           <InfoRow label="Current Working Event" value={activeEvent?.eventName || 'No event selected'} />
-          <InfoRow label="Clean-account state" value="Routes must not show stale Working Event data" />
+          <InfoRow label="Event scoping" value="Registrations, tickets, check-in, messages, operations, and reports use the selected event." />
         </div>
-        <p className="mt-3 text-sm leading-6 text-[#806C61]">If no Working Event is selected, protected pages should show a safe no-selected-event state instead of stale counts or data.</p>
       </SettingsSection>
     ),
     events: (
-      <SettingsSection eyebrow="Events & Defaults" title="Event configuration fallbacks">
+      <SettingsSection eyebrow="Events & Defaults" title="Current defaults">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
           <InfoRow label="Default timezone" value="America/Halifax" />
           <InfoRow label="Default currency" value="BBD fallback" />
           <InfoRow label="Default ticket prefix" value="GSV fallback" />
-          <InfoRow label="priceTiers fallback" value="[]" />
+          <InfoRow label="Price tiers fallback" value="No tiers until configured on the event" />
           <InfoRow label="Default payment method" value={formatPaymentMethod(DEFAULT_FINANCE_SETTINGS.defaultPaymentMethod)} />
         </div>
       </SettingsSection>
     ),
     access: (
-      <SettingsSection eyebrow="Access & Roles" title="Read-only admin foundation">
+      <SettingsSection eyebrow="Access Summary" title="Approved accounts and staff boundaries">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved-admin allowlist remains active owner/admin enforcement. Approved admin allowlist access remains admin-level only; approvedEmails remains admin-level access only. Do not add staff/scanners/helpers to approvedEmails. Temporary event-day helpers should not be added to approvedEmails. Phase 17D-B remains closed after scanner/admin smoke PASS. Phase 17D-C is closed and merged after organizer admin review PASS and organizer scanner review PASS. Phase 17D-D readiness planning is closed and merged as planning-only. Phase 17E-A is closed after organizer artifact review PASS as accepted rules/data-model review only. Phase 17E-B is closed after organizer prototype review PASS as an undeployed access-request rules prototype and test pass only. Phase 17E-C is closed after organizer review PASS as a read-only/admin UI foundation only. Phase 17E-D is closed after organizer review PASS as a disabled requester form preview only. Phase 17E-E is closed after organizer review PASS as readiness and rollback planning only. Phase 17F-A is closed after organizer review PASS as implementation planning only. Phase 17F-B is closed after organizer review PASS as a disabled service contract only. Phase 17F-C is closed after organizer review PASS as a manual smoke checklist only. Phase 17G-A is closed after organizer review PASS and the approval package is accepted. Phase 17G-B is closed after organizer review PASS and the final rules deployment review is accepted. Phase 17G-B2 is now closed on this branch: Firestore rules were deployed, Firestore indexes were not deployed, the login redirect compatibility fix was deployed, admin smoke passed, scanner smoke passed, and admin route sanity confirmed no admin lock into /scanner. No live approval, decline, revoke, assignment editing, or lead-scanner workflow is implemented here.
+          Approved admin access is controlled by <code>settings/accessControl.approvedEmails</code>. Staff and scanner helpers are not added to that allowlist as a shortcut.
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
-          <ReadOnlyStatusPill>Read-only foundation</ReadOnlyStatusPill>
-          <ReadOnlyStatusPill>Approve request: not live</ReadOnlyStatusPill>
-          <ReadOnlyStatusPill>Decline request: not live</ReadOnlyStatusPill>
-          <ReadOnlyStatusPill>Revoke access: not live</ReadOnlyStatusPill>
-          <ReadOnlyStatusPill>Create staff profile: not live</ReadOnlyStatusPill>
-          <ReadOnlyStatusPill>Assign event: not live</ReadOnlyStatusPill>
-          <ReadOnlyStatusPill>Service contract: disabled</ReadOnlyStatusPill>
-          <ReadOnlyStatusPill>Smoke checklist: manual only</ReadOnlyStatusPill>
-          <ReadOnlyStatusPill tone="warning">Lead scanner: not live</ReadOnlyStatusPill>
+          <Pill tone="success">Approved admin allowlist active</Pill>
+          <Pill>Access request actions disabled</Pill>
+          <Pill>Role editing is not exposed</Pill>
+          <Pill>Staff profile editing disabled</Pill>
+          <Pill>Assignment editing disabled</Pill>
+          <Pill tone="warning">Lead scanner disabled</Pill>
         </div>
-        <div className="mt-5">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Approved emails and roles</p>
-          <div className="mt-3 overflow-hidden rounded-2xl border border-[#EFE2DA]">
-            {approvedEntries.length === 0 ? (
-              <p className="p-4 text-sm text-[#816D62]">No approved emails were loaded.</p>
-            ) : approvedEntries.map((entry) => (
-              <div key={entry.email} className="flex flex-col gap-1 border-b border-[#F2E8E1] p-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
-                <p className="break-all text-sm font-bold text-[#2B1723]">{entry.email}</p>
-                <span className="w-fit rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{ACCESS_ROLES[entry.role]?.label || 'Admin'}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          {ACCESS_MODEL_SECTIONS.map((section) => (
-            <div key={section.title} className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-bold text-[#2B1723]">{section.title}</p>
-                <ReadOnlyStatusPill>{section.title === 'Security Notes' ? 'No deploy' : 'Read-only'}</ReadOnlyStatusPill>
-              </div>
-              <p className="mt-2 text-xs leading-5 text-[#816D62]">{section.body}</p>
-              <div className="mt-4 rounded-2xl border border-[#EFE2DA] bg-white p-3">
-                {section.rows.map(([label, value]) => (
-                  <InfoRow key={label} label={label} value={value} />
-                ))}
-              </div>
+        <div className="mt-5 overflow-hidden rounded-2xl border border-[#EFE2DA]">
+          {approvedEntries.length === 0 ? (
+            <p className="p-4 text-sm text-[#816D62]">No approved emails were loaded.</p>
+          ) : approvedEntries.map((entry) => (
+            <div key={entry.email} className="flex flex-col gap-1 border-b border-[#F2E8E1] p-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
+              <p className="break-all text-sm font-bold text-[#2B1723]">{entry.email}</p>
+              <span className="w-fit rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{ACCESS_ROLES[entry.role]?.label || 'Admin'}</span>
             </div>
           ))}
         </div>
@@ -343,207 +140,61 @@ export function SettingsPage() {
             </div>
           ))}
         </div>
-        <div className="mt-5 rounded-2xl border border-[#EFE2DA] p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Role capability matrix</p>
-          <div className="mt-3 grid gap-3">
-            {ACCESS_ROLE_MATRIX.map(([role, detail]) => (
-              <div key={role} className="rounded-2xl border border-[#EFE2DA] bg-white p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-bold text-[#2B1723]">{role}</p>
-                  <ReadOnlyStatusPill>{/Not live/.test(detail) ? 'Not live' : 'Current guidance'}</ReadOnlyStatusPill>
-                </div>
-                <p className="mt-2 text-xs leading-5 text-[#816D62]">{detail}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="mt-5 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
-          <p className="text-sm font-bold text-[#2B1723]">Current role behavior</p>
-          <p className="mt-1 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
-          <p className="mt-2 text-xs leading-5 text-[#8A7468]">Future Access & Roles workflow only: pending access requests, approve/decline staff access, assign role, assign event, revoke access, and set inactive/revoked status. Role editing remains deferred to a later approved workflow. Settings should not rewrite Firestore rules; do NOT rewrite Firestore rules from Settings UI. Phase 17E-B closed after organizer prototype review PASS and remains limited to an undeployed <code>accessRequests/&#123;requestId&#125;</code> rules prototype plus tests and status copy only. Phase 17E-C closed after organizer review PASS with an admin-visible read-only request surface only, Phase 17E-D closed after organizer review PASS with a disabled requester form preview only, Phase 17E-E closed after organizer review PASS with readiness/rollback planning only, Phase 17F-A closed after organizer review PASS with implementation planning only, and Phase 17F-B / 17F-C closed after organizer review PASS as the disabled contract and manual smoke checklist only. Phase 17G-A is closed after organizer review PASS and preserves all non-live boundaries. Phase 17G-B is closed after organizer review PASS and documents the accepted final dry-run comparison between the current repository rules and the last deployed baseline. Phase 17G-B2 is closed on the current branch: backend accessRequests rules are live, Firestore indexes remain undeployed, the login redirect compatibility fix is deployed, admin and scanner smoke passed, admin route sanity confirmed no admin lock into /scanner, and no live workflow exists. This branch intentionally exposes no live write action for accessRequests, staffProfiles, staffAssignments, approvedEmails, or auditLogs. <code>PHASE_17D_PLAN.md</code> remains the blueprint for 17D-A, <code>PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md</code> remains the workflow-readiness document, <code>PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md</code> is the accepted review artifact, <code>PHASE_17E_E_ACCESS_WORKFLOW_DEPLOYMENT_READINESS.md</code> is the preserved deployment-readiness artifact, <code>PHASE_17F_A_ACCESS_WORKFLOW_IMPLEMENTATION_PLAN.md</code> is the preserved implementation plan artifact, <code>PHASE_17F_C_ACCESS_WORKFLOW_SMOKE_CHECKLIST.md</code> is the preserved manual smoke checklist, <code>PHASE_17G_A_LIVE_WORKFLOW_GO_NO_GO_RULES_APPROVAL.md</code> is the preserved accepted approval package artifact, and <code>PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md</code> is the accepted final-review artifact. The next required gate is the release-train main review for Dashboard, Events, Registrations, Import Center, Tickets, and Operations.</p>
-        </div>
-        <div className="mt-5 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-          <div className="rounded-2xl border border-[#EFE2DA] p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-bold text-[#2B1723]">Access request review states</p>
-                <p className="mt-1 text-xs leading-5 text-[#816D62]">Prototype-only labels for the future admin review queue.</p>
-              </div>
-              <ReadOnlyStatusPill>Review-only</ReadOnlyStatusPill>
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {[
-                ['pending', 'Requester submitted details are waiting for admin review.'],
-                ['approved', 'Future approved state would still require explicit profile and assignment workflow.'],
-                ['declined', 'Future decline state preserves history and does not delete the request.'],
-                ['revoked', 'Future revoked state removes access without deleting audit history.'],
-              ].map(([status, detail]) => (
-                <div key={status} className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#A48A7B]">{status}</p>
-                  <p className="mt-2 text-xs leading-5 text-[#816D62]">{detail}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 text-xs leading-5 text-[#816D62]">
-              <p><strong className="text-[#2B1723]">Admin boundary:</strong> only approved admins may review future access requests.</p>
-              <p className="mt-2"><strong className="text-[#2B1723]">Requester boundary:</strong> requester preview remains disabled, non-public, and submits nothing in this phase.</p>
-            </div>
-          </div>
-          <div className="rounded-2xl border border-[#EFE2DA] p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-bold text-[#2B1723]">Requester form prototype</p>
-                <p className="mt-1 text-xs leading-5 text-[#816D62]">Phase 17E-D preview only. This is admin-visible mock UX, not a public route.</p>
-              </div>
-              <ReadOnlyStatusPill tone="warning">Submission disabled</ReadOnlyStatusPill>
-            </div>
-            <div className="mt-4 grid gap-3">
-              {[
-                ['Display name', 'Future requester name'],
-                ['Email', 'future.requester@gatherandsavor.com'],
-                ['Requested role', 'scanner'],
-                ['Requested event', 'CODEX_TEST Live Verification Event'],
-                ['Reason / notes', 'Need day-of check-in coverage for CODEX_TEST rehearsal.'],
-              ].map(([label, placeholder]) => (
-                <label key={label} className="grid gap-1.5 text-xs font-semibold text-[#6B564C]">
-                  <span>{label}</span>
-                  <input
-                    type="text"
-                    disabled
-                    value={placeholder}
-                    readOnly
-                    className="min-h-11 rounded-xl border border-[#E7D6CC] bg-[#F7F1ED] px-3 text-sm text-[#9A8479] opacity-80"
-                  />
-                </label>
-              ))}
-              <button type="button" disabled className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] bg-[#F7F1ED] px-4 text-xs font-bold text-[#9A8479] opacity-80">
-                Submit request (not live)
-              </button>
-            </div>
-            <p className="mt-3 text-xs leading-5 text-[#8A7468]">No request is submitted here. No Firestore write occurs. No service call occurs. A separate approved workflow phase is required before any accessRequests document can be created from the UI.</p>
-          </div>
-        </div>
-        <div className="mt-5 rounded-2xl border border-[#EFE2DA] p-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-bold text-[#2B1723]">Future approval workflow</p>
-              <p className="mt-1 text-xs leading-5 text-[#816D62]">These actions are intentionally visible as disabled planning markers only.</p>
-            </div>
-            <ReadOnlyStatusPill tone="warning">Workflow not live</ReadOnlyStatusPill>
-          </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-            {FUTURE_ACTIONS.map((action) => (
-              <button key={action} type="button" disabled className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] bg-[#F7F1ED] px-4 text-xs font-bold text-[#9A8479] opacity-80">
-                {action}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="mt-4">
-          <PillList items={ACCESS_ROLES_FUTURE_PLAN} tone="white" />
-        </div>
+        <p className="mt-5 text-xs leading-5 text-[#816D62]">{roleCapabilitySummary(currentRole)}</p>
       </SettingsSection>
     ),
     scanner: (
-      <SettingsSection eyebrow="Scanner Mode" title="Private scanner shortcut">
+      <SettingsSection eyebrow="Scanner & Tickets" title="Event-day access settings">
         <div className="grid gap-3 sm:grid-cols-2">
           <Link to="/scanner" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1E7345] px-4 text-xs font-bold text-white hover:bg-[#17623A]">Open Scanner Mode</Link>
           <button type="button" onClick={() => navigator.clipboard?.writeText(`${window.location.origin}/scanner`)} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] bg-white px-4 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]">Copy Scanner Link</button>
         </div>
         <div className="mt-5 rounded-2xl border border-[#EFE2DA] p-4">
-          <InfoRow label="Route" value="/scanner" />
-          <InfoRow label="Mode" value="Scanner-only isolated layout" />
-          <InfoRow label="Admin correction" value="Admin-only Undo Check-In" />
-          <InfoRow label="Scanner role" value="Cannot undo check-in" />
-          <InfoRow label="Live smoke" value="Closed with PASS; CODEX_TEST-only scanner smoke" />
-          <InfoRow label="Phase 17D-B scope" value="Success, warnings, next-guest flow, mobile polish, optional sound/haptic, and no offline writes wording" />
-        </div>
-      </SettingsSection>
-    ),
-    tickets: (
-      <SettingsSection eyebrow="Tickets & Check-In" title="Ticket assignment and event-day safety">
-        <div className="rounded-2xl border border-[#EFE2DA] p-4">
+          <InfoRow label="Scanner route" value="/scanner" />
           <InfoRow label="QR payload" value="GSV:TICKET:{ticketCode}" />
-          <InfoRow label="Duplicate check-in" value="Blocked and can record append-only audit attempt" />
-          <InfoRow label="Admin undo" value="Audited correction only" />
           <InfoRow label="Scanner check-in" value="Requires explicit Check In tap" />
+          <InfoRow label="Scanner undo/check-out" value="Disabled for normal scanner use" />
+          <InfoRow label="Admin correction" value="Admin-only audited Undo Check-In where implemented" />
         </div>
       </SettingsSection>
     ),
     imports: (
-      <SettingsSection eyebrow="Imports & Data" title="Preview-first data import">
+      <SettingsSection eyebrow="Imports" title="Preview-first data import">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
           <InfoRow label="CSV import" value="Active, preview before write" />
           <InfoRow label="XLSX import" value="Active with read-excel-file/browser" />
           <InfoRow label="SheetJS xlsx" value="Absent" />
-          <InfoRow label="Google Sheets OAuth" value="Deferred" />
+          <InfoRow label="Google Sheets connection" value="Manual export/import only" />
         </div>
       </SettingsSection>
     ),
     finance: (
-      <SettingsSection eyebrow="Finance & Operations" title="Operations ledger and future modules">
+      <SettingsSection eyebrow="Finance & Operations" title="Financial boundaries">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
-          <InfoRow label="Operations Ledger" value="Active for selected Working Event" />
-          <InfoRow label="Ticket sales finance" value="Separate from operations ledger" />
-          <InfoRow label="Payment gateway" value="Not implemented" />
-        </div>
-        <div className="mt-4">
-          <PillList items={EVENT_OPERATIONS_BACKLOG} />
+          <InfoRow label="Registration payments" value="Guest-facing payment fields on registration records" />
+          <InfoRow label="Operations Ledger" value="Sponsor income, vendor or supplier payments, expenses, refunds, reimbursements, and adjustments" />
+          <InfoRow label="Payment processing" value="No payment gateway is connected" />
         </div>
       </SettingsSection>
     ),
-    communications: (
-      <SettingsSection eyebrow="Communications" title="Copy-only communications">
+    messages: (
+      <SettingsSection eyebrow="Message Builder" title="Copy-only messaging">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
-          <InfoRow label="Communications Pro" value="Copy-only" />
-          <InfoRow label="AI Draft Lab" value="Prompt builder only" />
-          <InfoRow label="Automatic sending" value="Not enabled" />
-          <InfoRow label="Real AI API" value="Not enabled" />
-        </div>
-      </SettingsSection>
-    ),
-    qa: (
-      <SettingsSection eyebrow="QA & System Health" title="Production QA boundaries">
-        <div className="rounded-2xl border border-[#EFE2DA] p-4">
-          <InfoRow label="Safe QA event" value="CODEX_TEST Live Verification Event" />
-          <InfoRow label="CPB" value="Protected production data; do not use for QA" />
-          <InfoRow label="auditLogs" value="Append-only; do not delete" />
-          <InfoRow label="Manual QA" value="Use CODEX_TEST only" />
-        </div>
-        <div className="mt-6">
-          <SystemHealthPanel />
+          <InfoRow label="Message creation" value="Templates, segments, editable draft, and copy packet" />
+          <InfoRow label="Automatic sending" value="Disabled" />
+          <InfoRow label="Prompt helper" value="Copies a drafting prompt only" />
+          <InfoRow label="Delivery tracking" value="No delivery status is tracked" />
         </div>
       </SettingsSection>
     ),
     security: (
-      <SettingsSection eyebrow="Security & Privacy" title="Private admin app protections">
+      <SettingsSection eyebrow="Security" title="Private admin protections">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
-          <InfoRow label="Private admin app" value="No public attendee access" />
-          <InfoRow label="Robots" value="noindex and robots.txt Disallow: /" />
-          <InfoRow label="Security headers" value="DENY framing, nosniff, strict referrer policy" />
+          <InfoRow label="Public access" value="No public attendee, vendor, or payment portal" />
+          <InfoRow label="Search indexing" value="Blocked by robots and private-app headers" />
           <InfoRow label="Service worker" value="Lifecycle-only; no private-data fetch caching" />
-          <InfoRow label="Public sitemap / JSON-LD" value="Not implemented for private app" />
+          <InfoRow label="Destructive actions" value="No CPB reset, audit-log deletion, or external sending controls here" />
         </div>
-      </SettingsSection>
-    ),
-    roadmap: (
-      <SettingsSection eyebrow="Integrations & Roadmap" title="Deferred integrations and backlog">
-        <div className="grid gap-5">
-          {ROADMAP_SECTIONS.map((section) => (
-            <div key={section.title} className="rounded-2xl border border-[#EFE2DA] p-4">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#A48A7B]">{section.title}</p>
-              <div className="mt-3 grid gap-2">
-                {section.items.map(([label, status]) => (
-                  <div key={label} className="flex items-center justify-between gap-3 rounded-xl bg-[#FBF8F5] px-3 py-2">
-                    <p className="text-sm font-bold text-[#2B1723]">{label}</p>
-                    <span className="rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{status}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-        <p className="mt-5 text-sm leading-6 text-[#806C61]">Deferred: Google Sheets OAuth, Gmail/Outlook OAuth, Cloud Functions, Storage, public portals, native app, automatic sending, real AI API, and payment gateway.</p>
       </SettingsSection>
     ),
   }), [activeEvent?.eventName, approvedEntries, currentRole, currentRoleLabel, rolesConfigured, signOut, user])
@@ -570,11 +221,6 @@ export function SettingsPage() {
       <div id={`settings-panel-${activeTab}`} role="tabpanel">
         {tabPanels[activeTab]}
       </div>
-      <section className="rounded-[24px] border border-[#E6D4B4] bg-[#FFF8EA] p-6 sm:p-8">
-        <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#86662C]">Danger Zone</p>
-        <h2 className="mt-2 font-serif text-2xl text-[#4E3928]">Destructive actions disabled</h2>
-        <p className="mt-4 text-sm leading-6 text-[#715D46]">Event deletion, CPB reset, audit log deletion, public access, Storage uploads, and external sending integrations are intentionally unavailable here.</p>
-      </section>
     </div>
   )
 }

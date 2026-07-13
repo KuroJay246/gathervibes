@@ -70,7 +70,7 @@ test('Phase 17F-B disabled contract exposes no live write path', async () => {
   }
 })
 
-test('17F status copy keeps 17E-C/D/E read-only and records current-head Daily QA success as non-blocking', async () => {
+test('17F status stays in docs while UI keeps access workflows disabled', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const health = await readFile('src/utils/runtimeHealth.js', 'utf8')
@@ -78,17 +78,13 @@ test('17F status copy keeps 17E-C/D/E read-only and records current-head Daily Q
   const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
   const phase17gB = await readFile('PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md', 'utf8')
 
-  assert.match(settings, /Phase 17F-A Access workflow implementation plan/)
-  assert.match(settings, /Phase 17F-B Disabled access request service contract/)
-  assert.match(settings, /Phase 17F-C Access workflow manual smoke checklist/)
-  assert.match(settings, /Service contract: disabled/)
-  assert.match(settings, /Smoke checklist: manual only/)
-  assert.match(settings, /Phase 17G-B2 Firestore Rules Real Deploy \+ Immediate Smoke/)
-  assert.match(settings, /Closed on branch \/ Firestore rules deployed live \/ Firestore indexes not deployed \/ admin smoke passed \/ scanner smoke passed \/ no live workflow/)
-  assert.match(settings, /Release-train main review for Dashboard, Events, Registrations, Import Center, Tickets, and Operations/)
-  assert.match(qa, /Latest current-head Daily QA run 28875120502 succeeded for branch commit ca93b260/)
-  assert.match(health, /Older failed GitHub UI badges can reflect stale built-auth smoke history/)
-  assert.match(health, /Phase 17G-A closed after organizer review PASS with no rules or index deploy, and Phase 17G-B2 deployed backend accessRequests rules without deploying indexes\./)
+  assert.match(settings, /Access request actions disabled/)
+  assert.match(settings, /Staff profile editing disabled/)
+  assert.match(settings, /Assignment editing disabled/)
+  assert.match(settings, /Lead scanner disabled/)
+  assert.match(qa, /Daily QA workflow/)
+  assert.match(health, /CODEX_TEST checks/)
+  assert.match(health, /Rules enforce private admin access/)
   assert.match(readme, /Phase 17F-A is now closed, merged-ready, and organizer accepted on branch `codex\/phase-17e-cde-access-requests-ui-readiness-ci` as the Access Workflow Implementation Plan only\./)
   assert.match(readme, /Phase 17F-C is now closed, merged-ready, and organizer accepted on branch `codex\/phase-17e-cde-access-requests-ui-readiness-ci` as the Access Workflow manual smoke checklist only\./)
   assert.match(readme, /Phase 17G-A is now closed, merged-ready, and organizer accepted on branch `codex\/phase-17g-a-live-workflow-go-no-go-rules-approval-package` at commit `e098315c29e5b085bdbd11218ce6b5211d2c9832` as a Live Workflow Go\/No-Go Review \+ Rules Deployment Approval Package only\./)

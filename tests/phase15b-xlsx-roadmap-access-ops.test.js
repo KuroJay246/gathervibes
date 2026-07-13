@@ -30,79 +30,34 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
   assert.match(importsPage, /No Firestore write happens until you confirm valid rows/)
 })
 
-test('roadmap shows 17G-B2 as the current in-progress phase while preserving closed access phases and future ops backlog', async () => {
+test('Settings removes the roadmap archive while documentation retains release history', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const readme = await readFile('README.md', 'utf8')
   const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
 
-  for (const text of [
-    '1. Closed / shipped phases',
-    '2. Current active phase',
-    '3. Next recommended phase',
-    '4. High-priority operational backlog',
-    '5. Access / staff / worker permissions backlog',
-    '6. Event Operations backlog',
-    '7. QA / reliability backlog',
-    '8. Deferred integrations',
-    '9. Public portals / native app / future long-term ideas',
-    '10. Explicitly not implemented / out of scope',
-    'Phase 14B CPB Payment Audit UI Cleanup / Operations Review Fixes',
-    'Phase 15A Hosting Security Headers + Private Indexing',
-    'Phase 15B XLSX Dependency Security Review + Roadmap/Access/Ops Update',
-    'Phase 16 Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening',
-    'Phase 17A Visibility, Counts, Backlog Reorganization, and Staff Access Planning',
-    'Phase 17C-A Firestore Rules Review + Deployment Readiness',
-    'Phase 17D-C Access & Roles Read-Only/Admin UI Foundation',
-    'Phase 17D-D Access workflow/rules-readiness planning only',
-    'Phase 17E-A Access Workflow Rules + Data Model Review',
-    'Phase 17E-B Access Request Rules Prototype + Tests',
-    'Phase 17G-B2 Firestore Rules Real Deploy + Immediate Smoke',
-    'Closed on branch / Firestore rules deployed live / Firestore indexes not deployed / admin smoke passed / scanner smoke passed / no live workflow',
-    'Latest current-head run succeeded; older failed UI badges can be stale and are not blocking unless the current head fails',
-    'Release-train main review for Dashboard, Events, Registrations, Import Center, Tickets, and Operations',
-    'Google Sheets OAuth',
-    'Gmail/Outlook OAuth',
-    'Real AI API integration',
-    'Automatic email sending',
-    'Automatic WhatsApp sending',
-    'Cloud Functions',
-    'Firebase Storage',
-    'Public attendee / baker / school portals',
-    'Payment gateway integration',
-    'Native app / app store build',
-    'Firestore-enforced staff roles',
-    'Mother/Event Manager simplified view',
-  ]) {
+  for (const text of ['Settings', 'Current defaults', 'Default currency', 'Default ticket prefix', 'Access Summary', 'Scanner & Tickets', 'Message Builder', 'Security']) {
     assert.match(settings, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
-
-  assert.match(`${readme}\n${handoff}`, /Access Request Rules Prototype \+ Tests/)
 
   for (const text of [
     'Closed / shipped phases',
     'Current active phase',
-    'Next recommended phase',
     'High-priority operational backlog',
-    'Access / staff / worker permissions backlog',
-    'Event Operations backlog',
-    'QA / reliability backlog',
     'Deferred integrations',
-    'Public portals / native app / future long-term ideas',
-    'Explicitly not implemented / out of scope',
+    'Phase 17G-B2',
+    'Automatic email sending',
+    'Automatic WhatsApp sending',
   ]) {
-    assert.match(`${readme}\n${handoff}`, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+    assert.doesNotMatch(settings, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
+  assert.match(`${readme}\n${handoff}`, /Access Request Rules Prototype \+ Tests/)
+  assert.match(`${readme}\n${handoff}`, /Deferred integrations/)
   assert.match(readme, /Phase 15B status/)
-  assert.match(readme, /closed, merged, and deployed/)
-  assert.doesNotMatch(settings, /Complete \/ pending approval/)
-  assert.match(readme, /public sitemap\/JSON-LD/)
-  assert.match(readme, /budget\/expense reporting/)
-  assert.match(readme, /event-day run sheet/)
   assert.match(handoff, /Phase 17B staff access model/)
 })
 
-test('private access status reflects Phase 17C-B live closeout while 17G-B2 is closed after live smoke', async () => {
+test('private access status reflects disabled workflow boundaries without roadmap copy', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const healthItems = buildRuntimeHealthItems({
@@ -119,41 +74,21 @@ test('private access status reflects Phase 17C-B live closeout while 17G-B2 is c
     buildCommit: 'abc123',
   })
 
-  assert.match(settings, /Approved-admin allowlist remains active owner\/admin enforcement/)
-  assert.match(settings, /Phase 17D-B remains closed after scanner\/admin smoke PASS/)
-  assert.match(settings, /Phase 17D-C is closed and merged after organizer admin review PASS and organizer scanner review PASS/)
-  assert.match(settings, /Phase 17D-D readiness planning is closed and merged as planning-only/)
-  assert.match(settings, /Phase 17E-A is closed after organizer artifact review PASS as accepted rules\/data-model review only/)
-  assert.match(settings, /Phase 17E-B is closed after organizer prototype review PASS as an undeployed access-request rules prototype and test pass only/)
-  assert.match(settings, /Phase 17E-C is closed after organizer review PASS as a read-only\/admin UI foundation only/)
-  assert.match(settings, /Phase 17E-D is closed after organizer review PASS as a disabled requester form preview only/)
-  assert.match(settings, /Phase 17E-E is closed after organizer review PASS as readiness and rollback planning only/)
-  assert.match(settings, /Phase 17F-A is closed after organizer review PASS as implementation planning only/)
-  assert.match(settings, /Phase 17F-B is closed after organizer review PASS as a disabled service contract only/)
-  assert.match(settings, /Phase 17F-C is closed after organizer review PASS as a manual smoke checklist only/)
-  assert.match(settings, /Phase 17G-A is closed after organizer review PASS and the approval package is accepted\./)
-  assert.match(settings, /Phase 17G-B is closed after organizer review PASS and the final rules deployment review is accepted\./)
-  assert.match(settings, /Phase 17G-B2 is now closed on this branch: Firestore rules were deployed, Firestore indexes were not deployed, the login redirect compatibility fix was deployed, admin smoke passed, scanner smoke passed, and admin route sanity confirmed no admin lock into \/scanner\./)
-  assert.match(settings, /Approve request: not live/)
-  assert.match(settings, /Decline request: not live/)
-  assert.match(settings, /Revoke access: not live/)
-  assert.match(settings, /Create staff profile: not live/)
-  assert.match(settings, /Assign event: not live/)
-  assert.match(settings, /Service contract: disabled/)
-  assert.match(settings, /Smoke checklist: manual only/)
-  assert.match(settings, /Lead scanner: not live/)
-  assert.match(settings, /Phase 17E-B closed after organizer prototype review PASS and remains limited to an undeployed <code>accessRequests\/&#123;requestId&#125;<\/code> rules prototype plus tests and status copy only/)
-  assert.match(settings, /Phase 17E-C closed after organizer review PASS with an admin-visible read-only request surface only, Phase 17E-D closed after organizer review PASS with a disabled requester form preview only, Phase 17E-E closed after organizer review PASS with readiness\/rollback planning only, Phase 17F-A closed after organizer review PASS with implementation planning only, and Phase 17F-B \/ 17F-C closed after organizer review PASS as the disabled contract and manual smoke checklist only\. Phase 17G-A is closed after organizer review PASS/)
-  assert.match(settings, /Phase 17G-B2 is closed on the current branch: backend accessRequests rules are live, Firestore indexes remain undeployed, the login redirect compatibility fix is deployed, admin and scanner smoke passed, admin route sanity confirmed no admin lock into \/scanner, and no live workflow exists\./i)
-  assert.match(settings, /Temporary event-day helpers should not be added to approvedEmails/)
-  assert.match(settings, /Requester form prototype/)
-  assert.match(settings, /Submit request \(not live\)/)
-  assert.match(settings, /No request is submitted here\. No Firestore write occurs\. No service call occurs\./)
-  assert.match(qa, /Staff roles enforcement level/)
-  assert.equal(healthItems.find((item) => item.label === 'Staff roles enforcement level').status, 'ok')
-  assert.match(healthItems.find((item) => item.label === 'Staff roles enforcement level').detail, /Phase 17E-C, Phase 17E-D, and Phase 17E-E are closed after organizer review PASS\. Phase 17F-A, Phase 17F-B, and Phase 17F-C are closed after organizer review PASS\. Phase 17G-A is closed after organizer review PASS and the approval package is accepted\. Phase 17G-B is closed after organizer review PASS as the accepted final dry-run review only\. Phase 17G-B2 is closed on the current branch with Firestore rules deployed, admin smoke passed, scanner smoke passed, and admin route sanity checked\./)
-  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /Phase 17E-B closed as a dry-run-only accessRequests prototype, Phase 17E-C \/ 17E-D \/ 17E-E \/ 17F-A \/ 17F-B \/ 17F-C closed without deploying Firestore rules or indexes, Phase 17G-A closed after organizer review PASS with no rules or index deploy, and Phase 17G-B2 deployed backend accessRequests rules without deploying indexes\./)
-  assert.match(healthItems.find((item) => item.label === 'Daily QA workflow').detail, /Latest current-head Daily QA run 28875120502 succeeded/)
+  assert.match(settings, /Approved admin allowlist active/)
+  assert.match(settings, /Access request actions disabled/)
+  assert.match(settings, /Staff profile editing disabled/)
+  assert.match(settings, /Assignment editing disabled/)
+  assert.match(settings, /Lead scanner disabled/)
+  assert.match(settings, /Role editing is not exposed/)
+  assert.match(settings, /Scanner undo\/check-out/)
+  assert.doesNotMatch(settings, /Submit request \(not live\)/)
+  assert.doesNotMatch(settings, /Approve request: not live/)
+  assert.doesNotMatch(settings, /Phase 17/)
+  assert.match(qa, /Staff role boundary/)
+  assert.equal(healthItems.find((item) => item.label === 'Staff role boundary').status, 'ok')
+  assert.match(healthItems.find((item) => item.label === 'Approved-admin allowlist').detail, /Active server-side security boundary/)
+  assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /Rules enforce private admin access/)
+  assert.match(healthItems.find((item) => item.label === 'Daily QA workflow').detail, /CODEX_TEST checks/)
 })
 
 test('Phase 17D planning docs and readiness docs exist and preserve current live safety boundaries', async () => {
@@ -192,11 +127,11 @@ test('Event Operations page documents active ledger and future modules only', as
 
   assert.match(operations, /Operations Ledger is active/)
   assert.match(operations, /separate from ticket sales/)
-  assert.match(operations, /tasks, supplies, vendors, sponsors, school\/baker tracking/)
+  assert.match(operations, /sponsor income/)
   assert.match(operations, /operations helpers can only view assigned-event entries/)
   assert.match(settings, /Operations Ledger/)
-  assert.match(settings, /supplies checklist/)
-  assert.match(settings, /baker\/vendor tracking/)
+  assert.match(settings, /Registration payments/)
+  assert.match(settings, /Payment processing/)
 })
 
 test('Phase 15B keeps QR privacy and Phase 15A private indexing protections', async () => {

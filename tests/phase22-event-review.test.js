@@ -235,7 +235,7 @@ test('Phase 22 route, guardrails, and read-only page structure are present witho
   const packageLock = await readFile('package-lock.json', 'utf8')
 
   assert.match(app, /path="\/event-review"/)
-  assert.match(dashboard, /to: '\/event-review'/)
+  assert.match(dashboard, /to="\/event-review"/)
   assert.match(operations, /to="\/event-review"/)
   assert.match(page, /subscribeToEvents/)
   assert.match(page, /buildEventReview\(resolvedActiveEvent, registrations, operationsEntries\)/)

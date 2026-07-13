@@ -71,7 +71,7 @@ test('mobile navigation keeps More, Settings, and logout reachable', async () =>
   assert.match(shell, /aria-label="Open all navigation"/)
   assert.match(shell, /mobile-tab-bar lg:hidden/)
   assert.match(shell, />More</)
-  assert.match(shell, /to="\/settings"/)
+  assert.match(shell, /to: '\/settings'/)
   assert.match(shell, /aria-label="Sign out"/)
   assert.match(settingsPage, /Log out/)
   assert.match(styles, /@media \(min-width: 1024px\)[\s\S]*\.mobile-tab-bar[\s\S]*display: none/)
@@ -89,21 +89,20 @@ test('sidebar Working Event box contains long event text safely', async () => {
   assert.doesNotMatch(shell, />Active Event</)
 })
 
-test('Dashboard quick navigation reflects current production tools', async () => {
+test('Overview quick actions prioritize daily event work', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
 
-  for (const route of ['/events', '/registrations', '/imports', '/tickets', '/check-in', '/communications', '/qa']) {
+  for (const route of ['/registrations', '/imports', '/tickets', '/check-in', '/operations']) {
     assert.match(dashboard, new RegExp(`to: '${route}'`))
   }
 
-  for (const label of ['Events', 'Registrations', 'Import Center', 'Tickets', 'Check-In / QR Scan', 'Communications', 'QA Center / System Health']) {
+  for (const label of ['Add registration', 'Import registrations', 'Manage tickets', 'Open check-in', 'Review Operations']) {
     assert.match(dashboard, new RegExp(label.replace('/', '\\/')))
   }
 
-  assert.match(dashboard, /Assign ticket codes and generate QR codes/)
-  assert.match(dashboard, /Search, scan, check in, and undo check-ins/)
-  assert.match(dashboard, /Prepare copy-ready guest messages/)
-  assert.match(dashboard, /Run safe checks using CODEX_TEST/)
+  assert.match(dashboard, /Open Reports/)
+  assert.match(dashboard, /Needs Attention/)
   assert.doesNotMatch(dashboard, /Future phases/)
-  assert.doesNotMatch(dashboard, /Communications', phase/)
+  assert.doesNotMatch(dashboard, /System QA/)
+  assert.doesNotMatch(dashboard, /Message Builder', phase/)
 })

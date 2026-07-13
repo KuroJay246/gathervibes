@@ -17,7 +17,6 @@ import { subscribeToOperationsLedger } from '../services/operationsLedgerService
 import { subscribeToEvents } from '../services/eventService'
 import { buildEventReview, formatEventReviewMoney } from '../utils/eventReview'
 import { formatEventDate } from '../utils/dateUtils'
-import { getWorkingEventDisplayName } from '../utils/eventDefaults'
 
 function SummaryCard({ label, value, help }) {
   return (
@@ -163,7 +162,7 @@ export function EventReviewPage() {
     )
   }
 
-  if (loading) return <LoadingState message="Loading Event Review..." />
+  if (loading) return <LoadingState message="Loading Reports..." />
   if (error) return <ErrorState message={error} onRetry={() => window.location.reload()} />
 
   const currency = review?.paymentReview?.registrationRecords?.currency || 'BBD'
@@ -175,10 +174,10 @@ export function EventReviewPage() {
           <div className="max-w-3xl">
             <p className="inline-flex items-center gap-2 rounded-full border border-[#F5E6C8]/15 bg-[#F5E6C8]/10 px-3 py-1.5 text-[10px] font-bold tracking-[0.15em] text-[#F5E6C8]">
               <ClipboardList className="size-3.5" />
-              Event Review
+              Reports
             </p>
             <h1 className="mt-4 font-serif text-3xl leading-tight sm:text-4xl">
-              {getWorkingEventDisplayName(resolvedActiveEvent)}
+              Event Report & Review
             </h1>
             <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/60">
               <span className="inline-flex items-center gap-1"><CalendarDays className="size-3.5" />{formatEventDate(resolvedActiveEvent.eventDate)}</span>
@@ -186,19 +185,19 @@ export function EventReviewPage() {
               <span>Status: {resolvedActiveEvent.status || 'unknown'}</span>
             </p>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-white/70">
-              This page is read-only. It combines follow-up items, registration payment records, Operations Ledger figures, and a current or post-event summary using the selected Working Event only.
+              This read-only report combines follow-up items, registration payment records, Operations Ledger figures, and a current or post-event summary for the selected Working Event only.
             </p>
           </div>
           <Link
             to="/dashboard"
             className="inline-flex w-fit items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-3 text-xs font-bold text-white transition hover:bg-[#C57C88]"
           >
-            Back to Dashboard
+            Back to Overview
           </Link>
         </div>
       </section>
 
-      <Section eyebrow="Follow-Up" title="What needs attention now">
+      <Section eyebrow="Needs Follow-Up" title="What needs attention now">
         {review.followUp.items.length === 0 ? (
           <div className="rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
             No immediate follow-up items were detected for the selected Working Event from current registration and operations data.
@@ -210,7 +209,7 @@ export function EventReviewPage() {
         )}
       </Section>
 
-      <Section eyebrow="Payment Review" title="Registration payments and Operations Ledger">
+      <Section eyebrow="Registration Payments" title="Registration payments and Operations Summary">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
           Registration payment records track what guests owe and have paid. The Operations Ledger tracks manually recorded event income, expenses, refunds, and adjustments. These are separate records and may not match automatically.
         </div>

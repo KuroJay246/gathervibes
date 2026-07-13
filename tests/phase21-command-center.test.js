@@ -4,16 +4,20 @@ import { readFile } from 'node:fs/promises'
 
 import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
 
-test('Phase 21 adds an event command center without redesigning the dashboard', async () => {
+test('Overview keeps event priorities and high-frequency action destinations', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
   const readiness = await readFile('src/utils/eventReadiness.js', 'utf8')
 
-  assert.match(dashboard, /Event command center/)
-  assert.match(dashboard, /Needs attention/)
+  assert.match(dashboard, /Needs Attention/)
+  assert.match(dashboard, /Quick Actions/)
+  assert.match(dashboard, /Registration records/)
+  assert.match(dashboard, /Registration money collected/)
   assert.match(dashboard, /to: '\/registrations'/)
   assert.match(dashboard, /to: '\/tickets'/)
   assert.match(dashboard, /to: '\/operations'/)
-  assert.match(dashboard, /to: '\/events'/)
+  assert.match(dashboard, /to="\/event-review"/)
+  assert.doesNotMatch(dashboard, /Event command center/)
+  assert.doesNotMatch(dashboard, /Quick navigation/)
   assert.match(readiness, /Payment pending/)
   assert.match(readiness, /Missing ticket/)
   assert.match(readiness, /Data incomplete/)
@@ -41,10 +45,9 @@ test('Phase 21 preserves QR, dependency, access, and private-data guardrails', a
   assert.equal(packageJson.dependencies.xlsx, undefined)
   assert.equal(packageJson.dependencies['read-excel-file'], '^9.2.0')
   assert.doesNotMatch(packageLock, /node_modules\/xlsx/)
-  assert.match(settings, /Approve request: not live/)
-  assert.match(settings, /Decline request: not live/)
-  assert.match(settings, /Revoke access: not live/)
-  assert.match(settings, /Assign event: not live/)
+  assert.match(settings, /Access request actions disabled/)
+  assert.match(settings, /Assignment editing disabled/)
+  assert.match(settings, /Lead scanner disabled/)
   assert.match(options, /Event readiness checklist/)
   assert.match(options, /Staff \/ access workflow later/)
   assert.match(options, /Scanner only when event day is near/)

@@ -140,8 +140,8 @@ test('Phase 17C-B scanner route is outside AppShell and auto-selects a single as
   assert.match(gate, /setActiveEvent\(assignedEvents\[0\]\)/)
   assert.match(gate, /No assigned events\. Please contact the organizer\./)
   assert.match(shell, /filter\(\(\{ to \}\) => canViewRoute\(access, to\)\)/)
-  assert.match(shell, /to="\/dashboard"[\s\S]*aria-label="Go to Dashboard"/)
-  assert.doesNotMatch(scannerPage, /to="\/dashboard"|aria-label="Go to Dashboard"/)
+  assert.match(shell, /to="\/dashboard"[\s\S]*aria-label="Go to Overview"/)
+  assert.doesNotMatch(scannerPage, /to="\/dashboard"|aria-label="Go to Overview"/)
 })
 
 test('Phase 17C-B scanner page is narrow and excludes admin-only controls', async () => {
@@ -192,26 +192,25 @@ test('Phase 17C-B1 scanner shortcuts exist for approved admins without adding st
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const app = await readFile('src/App.jsx', 'utf8')
 
-  assert.match(dashboard, /to: '\/scanner'[\s\S]*Scanner Mode/)
+  assert.doesNotMatch(dashboard, /to: '\/scanner'[\s\S]*Scanner Mode/)
   assert.match(checkIn, /to="\/scanner"[\s\S]*Open Scanner Mode/)
   assert.match(settings, /to="\/scanner"[\s\S]*Open Scanner Mode/)
   assert.match(app, /path="\/scanner"/)
   assert.match(app, /<Route element=\{<ProtectedRoute \/>}/)
 })
 
-test('Phase 17C-B1 Settings documents future categories without rules rewriting UI', async () => {
+test('Settings documents current access categories without rules rewriting UI', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
 
-  for (const category of ['Profile', 'Workspace', 'Events & Defaults', 'Access & Roles', 'Scanner Mode', 'Tickets & Check-In', 'Imports & Data', 'Finance & Operations', 'Communications', 'QA & System Health', 'Security & Privacy', 'Integrations & Roadmap']) {
+  for (const category of ['Profile', 'Workspace', 'Events & Defaults', 'Access Summary', 'Scanner & Tickets', 'Imports', 'Finance & Operations', 'Message Builder', 'Security']) {
     assert.match(settings, new RegExp(category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
-  for (const item of ['pending access requests', 'approve/decline staff access', 'assign role', 'assign event', 'revoke access', 'inactive/revoked status', 'staffProfiles/{uid}', 'events/{eventId}/staffAssignments/{uid}']) {
+  for (const item of ['Access request actions disabled', 'Role editing is not exposed', 'Assignment editing disabled', 'Lead scanner disabled', 'approvedEmails']) {
     assert.match(settings, new RegExp(item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
-  assert.match(settings, /should not rewrite Firestore rules/)
-  assert.match(settings, /approvedEmails remains admin-level access only/)
+  assert.match(settings, /Staff and scanner helpers are not added to that allowlist as a shortcut/)
   assert.doesNotMatch(settings, /setDoc\(.*firestore\.rules|updateDoc\(.*firestore\.rules|rulesEditor|rulesTextarea/i)
 })
 
@@ -228,18 +227,17 @@ test('Phase 17C-B1b Settings uses accessible query-linked tabs', async () => {
   assert.match(settings, /role="tabpanel"/)
 })
 
-test('Phase 17C-B1b Settings tabs preserve required category content', async () => {
+test('Settings tabs preserve required guardrail content', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
 
-  assert.match(settings, /Approved-admin allowlist remains active owner\/admin enforcement/)
-  assert.match(settings, /Do not add staff\/scanners\/helpers to approvedEmails/)
-  assert.match(settings, /Phase 17D-B remains closed after scanner\/admin smoke PASS/)
-  assert.match(settings, /Scanner-only isolated layout/)
-  assert.match(settings, /Admin-only Undo Check-In/)
-  assert.match(settings, /Cannot undo check-in/)
-  assert.match(settings, /Private admin app/)
-  assert.match(settings, /noindex and robots\.txt Disallow: \//)
-  assert.match(settings, /Google Sheets OAuth, Gmail\/Outlook OAuth, Cloud Functions, Storage, public portals, native app/)
+  assert.match(settings, /Approved admin allowlist active/)
+  assert.match(settings, /Staff and scanner helpers are not added to that allowlist/)
+  assert.match(settings, /Scanner route/)
+  assert.match(settings, /Admin-only audited Undo Check-In/)
+  assert.match(settings, /Scanner undo\/check-out/)
+  assert.match(settings, /Private approved-account workspace/)
+  assert.match(settings, /Search indexing/)
+  assert.match(settings, /No public attendee, vendor, or payment portal/)
 })
 
 test('Phase 17C-B3 AuthProvider checks staff path before not-approved error', async () => {

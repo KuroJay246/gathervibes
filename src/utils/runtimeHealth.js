@@ -41,12 +41,12 @@ export function buildRuntimeHealthItems({
     {
       label: 'Current role detected',
       status: currentRoleLabel ? 'ok' : 'warn',
-      detail: currentRoleLabel ? `${currentRoleLabel} from approved-admin allowlist or Phase 17C-B staff profile/assignment live state.` : 'Role display is pending access load.',
+      detail: currentRoleLabel ? `${currentRoleLabel} from approved-admin allowlist or staff profile/assignment state.` : 'Role display is pending access load.',
     },
     {
-      label: 'Staff roles enforcement level',
+      label: 'Staff role boundary',
       status: 'ok',
-      detail: 'Phase 17C-B remains closed and live. Phase 17D-C and Phase 17D-D are closed and merged. Phase 17E-A and 17E-B are closed. Phase 17E-C, Phase 17E-D, and Phase 17E-E are closed after organizer review PASS. Phase 17F-A, Phase 17F-B, and Phase 17F-C are closed after organizer review PASS. Phase 17G-A is closed after organizer review PASS and the approval package is accepted. Phase 17G-B is closed after organizer review PASS as the accepted final dry-run review only. Phase 17G-B2 is closed on the current branch with Firestore rules deployed, admin smoke passed, scanner smoke passed, and admin route sanity checked. No live approval workflow is introduced.',
+      detail: 'Scanner and staff access remain assigned-event scoped. Approval, revocation, assignment editing, and lead-scanner management are disabled in the organizer UI.',
     },
     {
       label: 'Approved-admin allowlist',
@@ -56,12 +56,12 @@ export function buildRuntimeHealthItems({
     {
       label: 'Firestore role enforcement',
       status: 'ok',
-      detail: 'Staff profile and event assignment rules are deployed for live scanner use with CODEX_TEST-only assignment scope preserved. Phase 17D-C and Phase 17D-D closed without changing rules, Phase 17E-A did not deploy rules, Phase 17E-B closed as a dry-run-only accessRequests prototype, Phase 17E-C / 17E-D / 17E-E / 17F-A / 17F-B / 17F-C closed without deploying Firestore rules or indexes, Phase 17G-A closed after organizer review PASS with no rules or index deploy, and Phase 17G-B2 deployed backend accessRequests rules without deploying indexes.',
+      detail: 'Rules enforce private admin access, assigned scanner access, and append-only audit-log behavior. Firestore indexes are managed outside this UI.',
     },
     {
       label: 'Daily QA workflow',
       status: 'warn',
-      detail: 'Latest current-head Daily QA run 28875120502 succeeded for branch commit ca93b260 on July 7, 2026. Older failed GitHub UI badges can reflect stale built-auth smoke history from commit 1e48154 and are not blocking unless the current head fails.',
+      detail: 'Use current production smoke results and CODEX_TEST checks as the source of truth.',
     },
     {
       label: 'Events read',
@@ -109,19 +109,19 @@ export function buildRuntimeHealthItems({
       detail: 'Start daily and manual QA at https://gathervibeshub.web.app/login.',
     },
     {
-      label: 'Deferred integrations',
+      label: 'External integrations',
       status: 'ok',
       detail: 'Real AI API, Gmail/Outlook OAuth, Google Sheets OAuth, Cloud Functions, Storage, public portals, payment gateways, native apps, sitemap, and JSON-LD are not enabled.',
     },
     {
-      label: 'Backlog visibility order',
+      label: 'Product boundaries',
       status: 'ok',
-      detail: 'Closed, current, next, operational, access/staff, Event Operations, QA/reliability, deferred, long-term, and out-of-scope items are separated.',
+      detail: 'Private admin app, CODEX_TEST QA, operations, access, and external integrations remain separated.',
     },
     {
-      label: 'Communications Pro safety',
+      label: 'Message Builder safety',
       status: 'ok',
-      detail: 'Communications remain copy-only. No email, WhatsApp, OAuth, AI, or automatic sending is enabled.',
+      detail: 'Message Builder remains copy-only. No email, WhatsApp, OAuth, AI generation, or automatic sending is enabled.',
     },
   ]
 }

@@ -99,8 +99,8 @@ test('Phase 10 UI displays roles without weakening Firestore rules', async () =>
   const rules = await readFile('firestore.rules', 'utf8')
 
   assert.match(auth, /rolesByEmail|resolveAccessRole/)
-  assert.match(settings, /Approved emails and roles/)
-  assert.match(settings, /role editing.*deferred/i)
+  assert.match(settings, /Approved accounts and staff boundaries/)
+  assert.match(settings, /Role editing is not exposed/)
   assert.match(shell, /currentRoleLabel/)
   assert.match(rules, /isApprovedAdmin/)
   assert.doesNotMatch(rules, /allow read, write: if true/)
@@ -180,9 +180,9 @@ test('Phase 11 UI has packet builder and no sending or OAuth implementation', as
   const page = await readFile('src/pages/CommunicationsPage.jsx', 'utf8')
   const packageJson = await readFile('package.json', 'utf8')
 
-  assert.match(page, /Segment Builder/)
+  assert.match(page, /Recipients/)
   assert.match(page, /Template Library/)
-  assert.match(page, /Copy Packet/)
+  assert.match(page, /Copy & Use/)
   assert.match(page, /Missing email\/phone/)
   assert.match(page, /Copy One Message/)
   assert.match(page, /Copy All Messages/)
@@ -194,15 +194,15 @@ test('Phase 11 UI has packet builder and no sending or OAuth implementation', as
   assert.doesNotMatch(qrPayloadForTicketCode('QA-001'), /paid|balance|@|phone|guest/i)
 })
 
-test('QA Center includes Phase 10 and Phase 11 checks', async () => {
+test('System QA includes access and copy-only message checks', async () => {
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const helper = await readFile('src/utils/qaHelper.js', 'utf8')
   const health = await readFile('src/utils/runtimeHealth.js', 'utf8')
 
   assert.match(qa, /Current user role detected/)
   assert.match(qa, /Communications templates available/)
-  assert.match(qa, /No Gmail\/Outlook\/AI sending enabled/)
+  assert.match(qa, /No external message sending enabled/)
   assert.match(helper, /staff roles\/admin access|current user role/i)
-  assert.match(helper, /Communications Pro/)
-  assert.match(health, /Communications Pro safety/)
+  assert.match(helper, /Message Builder/)
+  assert.match(health, /Message Builder safety/)
 })

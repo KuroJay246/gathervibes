@@ -130,7 +130,7 @@ test('Phase 9 UI and Firestore rules expose finance without broad access', async
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const rules = await readFile('firestore.rules', 'utf8')
 
-  assert.match(dashboard, /Finance Snapshot/)
+  assert.match(dashboard, /Registration money collected/)
   assert.match(registrations, /Outstanding Balance/)
   assert.match(registrations, /bulkUpdateFinanceFields/)
   assert.match(tickets, /Balance/)
@@ -144,9 +144,8 @@ test('Phase 9 UI and Firestore rules expose finance without broad access', async
 test('Dashboard documents missing selected event, default currency, and missing pricing fallbacks', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
 
-  assert.match(dashboard, /BBD default/)
-  assert.match(dashboard, /No selected Working Event/)
-  assert.match(dashboard, /No pricing configured/)
-  assert.match(dashboard, /buildFinanceSummary\(registrations, selectedFull\)/)
-  assert.match(dashboard, /formatCurrency\(tier\.price, financeSummary\.currency\)/)
+  assert.match(dashboard, /Choose a Working Event/)
+  assert.match(dashboard, /Registration money collected/)
+  assert.match(dashboard, /buildFinanceSummary\(registrations, selectedEvent\)/)
+  assert.match(dashboard, /formatCurrency\(financeSummary\.totalCollected, financeSummary\.currency\)/)
 })

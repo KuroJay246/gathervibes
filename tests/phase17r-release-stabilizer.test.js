@@ -13,7 +13,7 @@ test('Phase 17R core routes keep clean no-selected-event boundaries and explicit
   const checkIn = await readFile('src/pages/CheckInPage.jsx', 'utf8')
 
   assert.match(dashboard, /Working Event/)
-  assert.match(dashboard, /No selected Working Event/)
+  assert.match(dashboard, /Choose a Working Event/)
   assert.match(registrations, /Select an event from Events or the dashboard before managing registrations/)
   assert.match(imports, /Select an event before importing registrations/)
   assert.match(tickets, /Select a Working Event before assigning ticket codes/)
@@ -33,12 +33,12 @@ test('Phase 17R preserves auth route gating and blocked access workflow boundari
   assert.match(authProvider, /readAdminAccessControl/)
   assert.match(authProvider, /readStaffAccess/)
   assert.match(authProvider, /if \(accessControl\)/)
-  assert.match(settings, /Submit request \(not live\)/)
-  assert.match(settings, /Approve request: not live/)
-  assert.match(settings, /Decline request: not live/)
-  assert.match(settings, /Revoke access: not live/)
-  assert.match(qa, /Phase 17G-B2 deployed backend accessRequests rules and did not deploy Firestore indexes/)
-  assert.match(health, /Phase 17G-B2 is closed on the current branch with Firestore rules deployed, admin smoke passed, scanner smoke passed, and admin route sanity checked/)
+  assert.match(settings, /Access request actions disabled/)
+  assert.match(settings, /Staff profile editing disabled/)
+  assert.match(settings, /Assignment editing disabled/)
+  assert.match(settings, /Role editing is not exposed/)
+  assert.match(qa, /Firestore role enforcement/)
+  assert.match(health, /Rules enforce private admin access/)
 })
 
 test('Phase 17R preserves CPB, approvedEmails, and QR payload guardrails', async () => {
@@ -58,11 +58,11 @@ test('Phase 17R preserves CPB, approvedEmails, and QR payload guardrails', async
 test('Phase 17R clears stale dashboard event scope and syncs selected Working Event snapshots', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
 
-  assert.match(dashboard, /setRegs\(\[\]\)/)
+  assert.match(dashboard, /setRows\(\[\]\)/)
   assert.match(dashboard, /setEntries\(\[\]\)/)
   assert.match(dashboard, /function sameActiveEventSnapshot\(activeEvent, nextEvent\)/)
   assert.match(dashboard, /if \(!matchedEvent\) \{\s*clearActiveEvent\(\)/)
-  assert.match(dashboard, /if \(!sameActiveEventSnapshot\(activeEvent, matchedEvent\)\) \{\s*setActiveEvent\(matchedEvent\)/)
+  assert.match(dashboard, /if \(!sameActiveEventSnapshot\(activeEvent, matchedEvent\)\) setActiveEvent\(matchedEvent\)/)
 })
 
 test('Phase 17R preserves event, registration, and ticket audit action boundaries', async () => {

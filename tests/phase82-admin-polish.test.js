@@ -93,10 +93,10 @@ test('Settings, QA, and Communications pages expose practical admin polish', asy
   const communications = await readFile('src/pages/CommunicationsPage.jsx', 'utf8')
   const templates = await readFile('src/utils/communicationsUtils.js', 'utf8')
 
-  assert.match(settings, /My Admin Profile/)
+  assert.match(settings, /My Profile/)
   assert.match(settings, /photoURL/)
   assert.match(settings, /Approved admin allowlist/)
-  assert.match(settings, /Danger Zone/)
+  assert.match(settings, /Destructive actions/)
   assert.match(qa, /Run QA checks/)
   assert.match(qa, /Copy QA report/)
   assert.match(qa, /QR payload privacy/)
@@ -105,7 +105,7 @@ test('Settings, QA, and Communications pages expose practical admin polish', asy
   assert.match(templates, /\{\{venue\}\}/)
 })
 
-test('old internal labels are removed while roadmap backlog remains visible', async () => {
+test('old internal labels are removed from organizer-facing UI', async () => {
   const files = [
     'src/App.jsx',
     'src/layout/AppShell.jsx',
@@ -122,8 +122,9 @@ test('old internal labels are removed while roadmap backlog remains visible', as
   }
 
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
-  assert.match(settings, /Phase 13A AI Draft Lab/)
-  assert.match(settings, /Complete \/ draft-only/)
-  assert.match(settings, /Finance tracker/)
-  assert.match(settings, /Phase 9 active/)
+  assert.match(settings, /Message Builder/)
+  assert.match(settings, /Finance & Operations/)
+  assert.doesNotMatch(settings, /Phase 13A AI Draft Lab/)
+  assert.doesNotMatch(settings, /Complete \/ draft-only/)
+  assert.doesNotMatch(settings, /Phase 9 active/)
 })
