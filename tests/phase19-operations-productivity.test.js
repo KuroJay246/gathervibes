@@ -77,5 +77,5 @@ test('Phase 19 operations page keeps existing design while adding practical filt
   assert.match(operations, /Visible income/)
   assert.match(operations, /Visible net/)
   assert.match(operations, /What this means:/)
-  assert.match(operations, /This tracker is separate from ticket sales/)
+  assert.match(operations, /This tracker is separate from registration payment records/)
 })

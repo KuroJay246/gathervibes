@@ -96,6 +96,23 @@ export function buildOperationsLedgerReport(entries = [], { eventName = 'Selecte
   return lines.join('\n')
 }
 
+export function operationEntryLooksLikeRegistrationPayment(entry = {}) {
+  if (entry?.entryType !== 'income') return false
+  const haystack = [
+    entry.category,
+    entry.label,
+    entry.paidByOrPaidTo,
+    entry.paymentReference,
+    entry.notes,
+  ].join(' ').toLowerCase()
+
+  return /\b(ticket|registration|guest|attendee|firstpay|door paid|pay at door|ticket sale|ticket revenue)\b/.test(haystack)
+}
+
+export function findPossibleRegistrationPaymentOverlap(entries = []) {
+  return (Array.isArray(entries) ? entries : []).filter(operationEntryLooksLikeRegistrationPayment)
+}
+
 function labelForReport(value = '') {
   return String(value || '')
     .split('-')

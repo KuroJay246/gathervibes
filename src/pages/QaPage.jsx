@@ -6,7 +6,7 @@ import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { db } from '../lib/firebase'
 import { buildRegistrationMetrics, getRegistrationGuestSummary, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
-import { buildFinanceSummary, calculateRegistrationFinance, financeWarnings, formatCurrency } from '../utils/financeUtils'
+import { buildFinanceSummary, buildPaymentsWorkspace, calculateRegistrationFinance, financeWarnings, formatCurrency } from '../utils/financeUtils'
 import { qrPayloadForTicketCode } from '../utils/qrTicketUtils'
 import { COMMUNICATION_SEGMENTS, COMMUNICATION_TEMPLATES, buildCommunicationsSegmentSummary } from '../utils/communicationsUtils'
 import {
@@ -118,6 +118,7 @@ export function QaPage() {
       const operationRows = operationsSnapshot.docs.map((doc) => ({ ledgerEntryId: doc.id, ...doc.data() }))
       const metrics = buildRegistrationMetrics(rows, activeEvent)
       const financeSummary = buildFinanceSummary(rows, activeEvent)
+      const paymentsWorkspace = buildPaymentsWorkspace(rows, activeEvent)
       const communicationsSummary = buildCommunicationsSegmentSummary(rows, activeEvent)
       const ticketCodes = rows.map((row) => String(row.ticketCode || '').trim()).filter(Boolean)
       const duplicateTicketCodes = ticketCodes.filter((code, index) => ticketCodes.indexOf(code) !== index)
@@ -154,6 +155,8 @@ export function QaPage() {
         { label: 'Total expected', status: 'pass', detail: formatCurrency(financeSummary.totalExpected) },
         { label: 'Total collected', status: 'pass', detail: formatCurrency(financeSummary.totalCollected) },
         { label: 'Total outstanding', status: financeSummary.totalOutstanding > 0 ? 'warning' : 'pass', detail: formatCurrency(financeSummary.totalOutstanding) },
+        { label: 'Payments workspace boundary', status: 'pass', detail: `${paymentsWorkspace.summary.registrationCount} registration payment records reviewed; Operations Ledger records are not included.` },
+        { label: 'Payment follow-up records', status: paymentsWorkspace.summary.needsFollowUpCount ? 'warning' : 'pass', detail: `${paymentsWorkspace.summary.needsFollowUpCount} registration records need follow-up` },
         { label: 'Missing ticket price', status: missingTicketPrice.length ? 'warning' : 'pass', detail: `${missingTicketPrice.length} rows` },
         { label: 'Missing amount paid on paid rows', status: missingPaidAmount.length ? 'warning' : 'pass', detail: `${missingPaidAmount.length} rows` },
         { label: 'Balance due mismatch', status: balanceMismatch.length ? 'warning' : 'pass', detail: `${balanceMismatch.length} rows` },

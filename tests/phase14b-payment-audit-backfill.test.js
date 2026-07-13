@@ -225,7 +225,7 @@ test('Phase 14B UI and rules expose required safe surfaces', async () => {
   assert.match(checkInPage, /window\.confirm/)
   assert.doesNotMatch(checkInPage, /bulkDelete/)
   assert.match(templatesPanel, /What to leave blank|What not to put|CPB Payment Audit Backfill/)
-  assert.match(operationsPage, /Event Operations \/ Money Tracker|Unknown \/ Not Recorded|Short description \/ title|This tracker is separate from ticket sales/)
+  assert.match(operationsPage, /Event Operations \/ Money Tracker|Unknown \/ Not Recorded|Short description \/ title|This tracker is separate from registration payment records/)
   assert.match(await readFile('src/components/imports/FieldMappingForm.jsx', 'utf8'), /Map only proven methods|Do not paste Gmail/)
   assert.match(await readFile('src/components/imports/ImportPreviewTable.jsx', 'utf8'), /Missing ticket price or amount due stays Needs Review/)
   assert.doesNotMatch(operationsService, /orderBy\('date'/)

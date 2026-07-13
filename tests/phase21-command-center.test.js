@@ -11,7 +11,7 @@ test('Overview keeps event priorities and high-frequency action destinations', a
   assert.match(dashboard, /Needs Attention/)
   assert.match(dashboard, /Quick Actions/)
   assert.match(dashboard, /Registration records/)
-  assert.match(dashboard, /Registration money collected/)
+  assert.match(dashboard, /Registration payments recorded/)
   assert.match(dashboard, /to: '\/registrations'/)
   assert.match(dashboard, /to: '\/tickets'/)
   assert.match(dashboard, /to: '\/operations'/)

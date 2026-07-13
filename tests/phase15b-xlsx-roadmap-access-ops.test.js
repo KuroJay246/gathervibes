@@ -126,7 +126,7 @@ test('Event Operations page documents active ledger and future modules only', as
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
 
   assert.match(operations, /Operations Ledger is active/)
-  assert.match(operations, /separate from ticket sales/)
+  assert.match(operations, /separate from registration payment records/)
   assert.match(operations, /sponsor income/)
   assert.match(operations, /operations helpers can only view assigned-event entries/)
   assert.match(settings, /Operations Ledger/)

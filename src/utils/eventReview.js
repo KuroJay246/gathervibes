@@ -403,11 +403,11 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
         netPosition: ledger.totals.net,
       },
       comparison: {
-        label: 'Comparison for review only',
+        label: 'Boundary comparison for review only',
         registrationCollected: finance.totalCollected,
         ledgerReceivedIncome: ledger.receivedIncome,
         difference: comparisonDifference,
-        note: 'This is not an accounting reconciliation and may be incomplete if registration or ledger records are missing details.',
+        note: 'Registration payments and Operations income are separate record sets. Do not add them together or treat the difference as a reconciliation result unless each overlapping entry has been manually confirmed.',
       },
     },
     summary: {

@@ -20,6 +20,7 @@ import {
   buildOperationsEntryCounts,
   buildOperationsLedgerReport,
   buildOperationsTotals,
+  findPossibleRegistrationPaymentOverlap,
 } from '../utils/operationsReport'
 import { InfoHint } from '../components/ui/InfoHint'
 import { canWriteOperations, isApprovedAdmin } from '../utils/accessRoles'
@@ -151,8 +152,8 @@ export function OperationsPage() {
   const filteredTotals = useMemo(() => buildOperationsTotals(filteredEntries), [filteredEntries])
   const filteredCounts = useMemo(() => buildOperationsEntryCounts(filteredEntries), [filteredEntries])
   const filteredControl = useMemo(() => buildOperationsControlSummary(filteredEntries), [filteredEntries])
+  const possibleRegistrationPaymentOverlap = useMemo(() => findPossibleRegistrationPaymentOverlap(entries), [entries])
   const filterScopeLabel = useMemo(() => buildFilterScopeLabel(filters), [filters])
-  const netEventPosition = financeSummary.totalCollected + operationsTotals.income + operationsTotals.adjustments - operationsTotals.expenses - operationsTotals.refunds
 
   if (!activeEvent?.eventId) {
     return (
@@ -267,10 +268,15 @@ export function OperationsPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Selected Working Event only</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Event Operations / Money Tracker</h2>
           <p className="mt-2 text-sm text-[#816D62]">
-            Tracking non-ticket money for <strong>{activeEvent.eventName}</strong>. No payment processing is enabled.
+            Track event-level obligations for <strong>{activeEvent.eventName}</strong>. Registration payments are reviewed separately in Payments.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {adminUser && (
+            <Link to="/payments" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">
+              Open Payments
+            </Link>
+          )}
           {adminUser && (
             <Link to="/event-review" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">
               Open Event Review
@@ -286,9 +292,19 @@ export function OperationsPage() {
           {!canEditOperations && ' Your role is read-only for this assigned event.'}
         </p>
         <InfoHint label="Operations Ledger Info">
-          This tracker is separate from ticket sales. Ticket revenue comes from registrations. Future modules for tasks, supplies, vendors, sponsors, school/baker tracking, event-day run sheets, reimbursements, and expense reporting are planned but not active yet.
+          This tracker is separate from registration payment records. Use Payments for guest charges, recorded payments, balances, and payment follow-up. Use Operations for sponsor income, vendor or supplier payments, expenses, refunds, reimbursements, and adjustments.
         </InfoHint>
       </section>
+
+      {possibleRegistrationPaymentOverlap.length > 0 && (
+        <section className="flex gap-2 rounded-xl border border-[#F2D6A3] bg-[#FFF7E8] px-4 py-3 text-xs leading-5 text-[#7A5818]">
+          <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+          <p>
+            {possibleRegistrationPaymentOverlap.length} Operations income {possibleRegistrationPaymentOverlap.length === 1 ? 'entry looks' : 'entries look'} like registration or ticket revenue.
+            Review before adding Operations income to registration payment totals.
+          </p>
+        </section>
+      )}
 
       {error && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{error}</div>}
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
@@ -296,15 +312,15 @@ export function OperationsPage() {
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {[
           ...(adminUser ? [
-            ['Ticket expected revenue', formatCurrency(financeSummary.totalExpected)],
-            ['Ticket collected', formatCurrency(financeSummary.totalCollected)],
-            ['Ticket outstanding', formatCurrency(financeSummary.totalOutstanding)],
+            ['Registration expected income', formatCurrency(financeSummary.totalExpected)],
+            ['Registration payments recorded', formatCurrency(financeSummary.totalCollected)],
+            ['Registration balance outstanding', formatCurrency(financeSummary.totalOutstanding)],
           ] : []),
-          ['Sponsor/other income', formatCurrency(operationsTotals.income)],
+          ['Operations income received', formatCurrency(operationsTotals.income)],
           ['Expenses', formatCurrency(operationsTotals.expenses)],
           ['Refunds', formatCurrency(operationsTotals.refunds)],
           ['Adjustments', formatCurrency(operationsTotals.adjustments)],
-          ['Net event position', formatCurrency(netEventPosition)],
+          ['Operations net', formatCurrency(operationsTotals.net)],
         ].map(([label, value]) => (
           <div key={label} className="rounded-xl border border-[#EEDFD6] bg-white p-4">
             <p className="text-lg font-bold text-[#2B1723]">{value}</p>
@@ -360,7 +376,7 @@ export function OperationsPage() {
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Payment Reference</span>
               <input value={form.paymentReference} onChange={(event) => setForm((current) => ({ ...current, paymentReference: event.target.value }))} placeholder="Receipt or transaction reference" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
-              <FieldHelp>Add a receipt number, transfer note, FirstPay reference, invoice number, or other proof reference.</FieldHelp>
+              <FieldHelp>Add a receipt number, transfer note, invoice number, or other proof reference. Registration payment references belong on registration records unless this is intentionally separate Operations income.</FieldHelp>
             </label>
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Paid By / Paid To</span>
@@ -458,13 +474,13 @@ export function OperationsPage() {
           </div>
 
           <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-            <strong className="text-[#6B564C]">What this means:</strong> open ledger items are still expected or pending, while visible net reflects only the filtered rows on screen. This tracker stays separate from ticket sales and registration payment totals.
+            <strong className="text-[#6B564C]">What this means:</strong> open ledger items are still expected or pending, while visible net reflects only the filtered Operations rows on screen. Do not add this automatically to registration payment totals.
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">
             {filteredEntries.length === 0 ? (
               <div className="p-6 text-sm leading-6 text-[#816D62]">
-                No operations entries yet. Add sponsor income, vendor or baker payments, expenses, reimbursements, refunds, or adjustments here. This tracker is separate from ticket sales and is scoped to the selected Working Event. Tasks, supplies, sponsor tracking, school/baker tracking, run sheets, and expanded expense reporting remain future modules.
+                No operations entries yet. Add sponsor income, vendor or supplier payments, expenses, reimbursements, refunds, or adjustments here. This tracker is separate from registration payment records and is scoped to the selected Working Event.
               </div>
             ) : (
               <div className="overflow-x-auto">

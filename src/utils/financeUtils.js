@@ -55,6 +55,19 @@ export function parseMoney(value) {
   return Number.isFinite(number) && number >= 0 ? roundMoney(number) : null
 }
 
+function hasRawValue(value) {
+  return value !== null && value !== undefined && String(value).trim() !== ''
+}
+
+function rawMoneyIssue(value) {
+  if (!hasRawValue(value)) return null
+  const cleaned = String(value).replace(/BBD|USD|\$/gi, '').replace(/,/g, '').trim()
+  const number = Number(cleaned)
+  if (!Number.isFinite(number)) return 'invalid'
+  if (number < 0) return 'negative'
+  return null
+}
+
 export function normalizePaymentMethod(value) {
   const raw = String(value || '').trim()
   if (!raw) return 'unknown'
@@ -155,6 +168,245 @@ export function financeWarnings(registration = {}, event = {}, options = {}) {
   if (computed.paymentStatus === 'door-list' && computed.balanceDue === 0) warnings.push('To Pay at Door row has no balance due.')
 
   return warnings
+}
+
+function normalizePaymentReference(value) {
+  return String(value || '').trim().toLowerCase()
+}
+
+function warning(level, code, message) {
+  return { level, code, message }
+}
+
+export function buildPaymentReferenceCounts(registrations = []) {
+  const counts = new Map()
+  ;(Array.isArray(registrations) ? registrations : []).forEach((registration) => {
+    const reference = normalizePaymentReference(registration?.paymentReference)
+    if (reference) counts.set(reference, (counts.get(reference) || 0) + 1)
+  })
+  return counts
+}
+
+export function classifyRegistrationFinance(registration = {}, event = {}, context = {}) {
+  const computed = calculateRegistrationFinance(registration, event)
+  const warnings = []
+  const personsRaw = hasRawValue(registration?.personsAttending) ? Number(registration.personsAttending) : 1
+  const explicitBalance = parseMoney(registration?.balanceDue)
+  const expectedBalance = computed.amountDue !== null ? Math.max(0, roundMoney(computed.amountDue - computed.amountPaid)) : null
+  const reference = normalizePaymentReference(registration?.paymentReference)
+  const referenceCounts = context?.paymentReferenceCounts
+  const duplicateReference = reference && referenceCounts?.get(reference) > 1
+  const paymentStatusRaw = String(registration?.paymentStatus || '').trim()
+  const moneyFields = [
+    ['ticketPrice', 'Ticket price'],
+    ['amountDue', 'Amount due'],
+    ['amountPaid', 'Amount paid'],
+    ['balanceDue', 'Balance due'],
+  ]
+
+  if (!Number.isInteger(personsRaw) || personsRaw < 1) {
+    warnings.push(warning('blocking', 'invalid-persons', 'Persons attending must be a whole number of 1 or more.'))
+  }
+
+  moneyFields.forEach(([field, label]) => {
+    const issue = rawMoneyIssue(registration?.[field])
+    if (issue === 'invalid') warnings.push(warning('blocking', `invalid-${field}`, `${label} is not a valid money amount.`))
+    if (issue === 'negative') warnings.push(warning('blocking', `negative-${field}`, `${label} cannot be negative.`))
+  })
+
+  if (computed.ticketPrice === null) warnings.push(warning('warning', 'missing-ticket-price', 'Ticket price is missing, so the price basis needs review.'))
+  if (computed.amountDue === null) warnings.push(warning('blocking', 'missing-amount-due', 'Amount due is missing, so expected registration income cannot be trusted.'))
+
+  const expectedDue = computed.ticketPrice !== null ? roundMoney(computed.ticketPrice * computed.personsAttending) : null
+  if (expectedDue !== null && computed.amountDue !== null && Math.abs(expectedDue - computed.amountDue) > 0.009) {
+    warnings.push(warning('warning', 'amount-due-mismatch', 'Amount due does not match ticket price times persons attending.'))
+  }
+
+  if (computed.paymentStatus === 'paid' && !hasRawValue(registration?.amountPaid)) {
+    warnings.push(warning('blocking', 'paid-missing-amount', 'Paid status is missing a recorded amount paid.'))
+  }
+  if (computed.amountDue !== null && computed.amountPaid > computed.amountDue) {
+    warnings.push(warning('warning', 'overpaid', 'Amount paid is greater than amount due; review before using totals.'))
+  }
+  if (explicitBalance !== null && expectedBalance !== null && Math.abs(explicitBalance - expectedBalance) > 0.009) {
+    warnings.push(warning('warning', 'balance-mismatch', 'Balance due does not match amount due minus amount paid.'))
+  }
+  if (!paymentStatusRaw || computed.paymentStatus === 'unknown') {
+    warnings.push(warning('warning', 'unknown-payment-status', 'Payment status is unknown or not recorded.'))
+  }
+  if (computed.paymentStatus === 'paid' && computed.balanceDue > 0) {
+    warnings.push(warning('blocking', 'paid-outstanding-balance', 'Paid status has an outstanding balance.'))
+  }
+  if (computed.paymentStatus === 'complimentary' && computed.balanceDue > 0) {
+    warnings.push(warning('warning', 'complimentary-balance', 'Complimentary registration still has a positive balance.'))
+  }
+  if (computed.paymentStatus === 'complimentary' && computed.amountDue > 0) {
+    warnings.push(warning('warning', 'complimentary-amount-due', 'Complimentary registration has amount due greater than zero.'))
+  }
+  if (computed.paymentStatus === 'door' && computed.amountPaid === 0) {
+    warnings.push(warning('warning', 'door-missing-paid-amount', 'Door Paid status has no confirmed amount paid.'))
+  }
+  if (computed.paymentStatus === 'door-list' && computed.balanceDue === 0) {
+    warnings.push(warning('warning', 'door-list-no-balance', 'To Pay at Door row has no balance due.'))
+  }
+  if (computed.paymentStatus === 'pending' && computed.balanceDue === 0 && computed.amountDue !== null) {
+    warnings.push(warning('warning', 'pending-no-balance', 'Pending payment has no balance due.'))
+  }
+  if (duplicateReference) {
+    warnings.push(warning('warning', 'duplicate-payment-reference', 'Payment reference appears on more than one registration for this event.'))
+  }
+
+  const hasBlockingWarning = warnings.some((item) => item.level === 'blocking')
+  const isPartial = computed.paymentStatus === 'partial' || (computed.amountPaid > 0 && (computed.balanceDue || 0) > 0)
+  const statusGroup = hasBlockingWarning
+    ? 'needs-review'
+    : isPartial
+      ? 'partial'
+      : computed.paymentStatus === 'door'
+        ? 'door'
+        : computed.paymentStatus === 'door-list'
+          ? 'door-list'
+          : computed.paymentStatus === 'complimentary'
+            ? 'complimentary'
+            : computed.paymentStatus === 'paid' || (computed.balanceDue === 0 && computed.amountDue !== null)
+              ? 'paid'
+              : computed.paymentStatus === 'pending'
+                ? 'pending'
+                : 'unknown'
+
+  return {
+    ...computed,
+    statusGroup,
+    displayStatus: formatPaymentStatusGroup(statusGroup),
+    warnings,
+    blockingWarnings: warnings.filter((item) => item.level === 'blocking'),
+    needsFollowUp: statusGroup !== 'paid' || warnings.length > 0,
+  }
+}
+
+export function formatPaymentStatusGroup(value = '') {
+  const labels = {
+    paid: 'Paid',
+    partial: 'Partial payment',
+    pending: 'Pending',
+    door: 'Door Paid',
+    'door-list': 'To Pay at Door',
+    complimentary: 'Complimentary',
+    unknown: 'Unknown',
+    'needs-review': 'Needs Review',
+  }
+  return labels[value] || labels.unknown
+}
+
+function registrationDisplayName(registration = {}) {
+  return registration.fullName || registration.buyerName || registration.name || registration.email || 'Unnamed registration'
+}
+
+export function buildPaymentsWorkspace(registrations = [], event = {}) {
+  const rows = Array.isArray(registrations) ? registrations : []
+  const paymentReferenceCounts = buildPaymentReferenceCounts(rows)
+  const summary = {
+    currency: getCurrencyCode(event || {}),
+    registrationCount: 0,
+    guestCount: 0,
+    expectedRegistrationIncome: 0,
+    recordedPayments: 0,
+    outstandingBalance: 0,
+    paidRegistrations: 0,
+    partialPaymentRegistrations: 0,
+    pendingRegistrations: 0,
+    doorPaidRegistrations: 0,
+    doorListRegistrations: 0,
+    complimentaryRegistrations: 0,
+    complimentaryGuests: 0,
+    unknownPaymentStates: 0,
+    financeReviewCount: 0,
+    needsFollowUpCount: 0,
+  }
+
+  const paymentRows = rows.map((registration) => {
+    const finance = classifyRegistrationFinance(registration, event, { paymentReferenceCounts })
+    const row = {
+      registrationId: registration?.registrationId || registration?.id || '',
+      name: registrationDisplayName(registration),
+      email: registration?.email || '',
+      phone: registration?.phone || '',
+      personsAttending: finance.personsAttending,
+      ticketCode: registration?.ticketCode || '',
+      ticketStatus: registration?.ticketCode ? 'Assigned' : 'Missing',
+      priceTier: finance.priceTier,
+      ticketPrice: finance.ticketPrice,
+      amountDue: finance.amountDue,
+      amountPaid: finance.amountPaid,
+      balanceDue: finance.balanceDue,
+      paymentMethod: finance.paymentMethod,
+      paymentReference: registration?.paymentReference || '',
+      paymentStatus: finance.paymentStatus,
+      statusGroup: finance.statusGroup,
+      displayStatus: finance.displayStatus,
+      warnings: finance.warnings,
+      needsFollowUp: finance.needsFollowUp,
+    }
+
+    summary.registrationCount += 1
+    summary.guestCount += finance.personsAttending
+    summary.expectedRegistrationIncome += finance.amountDue || 0
+    summary.recordedPayments += finance.amountPaid || 0
+    summary.outstandingBalance += finance.balanceDue || 0
+    if (finance.statusGroup === 'paid') summary.paidRegistrations += 1
+    if (finance.statusGroup === 'partial') summary.partialPaymentRegistrations += 1
+    if (finance.statusGroup === 'pending') summary.pendingRegistrations += 1
+    if (finance.statusGroup === 'door') summary.doorPaidRegistrations += 1
+    if (finance.statusGroup === 'door-list') summary.doorListRegistrations += 1
+    if (finance.statusGroup === 'complimentary') {
+      summary.complimentaryRegistrations += 1
+      summary.complimentaryGuests += finance.personsAttending
+    }
+    if (finance.statusGroup === 'unknown') summary.unknownPaymentStates += 1
+    if (finance.statusGroup === 'needs-review' || finance.warnings.length > 0) summary.financeReviewCount += 1
+    if (finance.needsFollowUp) summary.needsFollowUpCount += 1
+    return row
+  })
+
+  const filterCounts = {
+    all: paymentRows.length,
+    'needs-follow-up': paymentRows.filter((row) => row.needsFollowUp).length,
+    paid: paymentRows.filter((row) => row.statusGroup === 'paid').length,
+    partial: paymentRows.filter((row) => row.statusGroup === 'partial').length,
+    pending: paymentRows.filter((row) => row.statusGroup === 'pending').length,
+    door: paymentRows.filter((row) => row.statusGroup === 'door' || row.statusGroup === 'door-list').length,
+    complimentary: paymentRows.filter((row) => row.statusGroup === 'complimentary').length,
+    'finance-review': paymentRows.filter((row) => row.warnings.length > 0 || row.statusGroup === 'needs-review').length,
+  }
+
+  return {
+    rows: paymentRows,
+    followUpRows: paymentRows.filter((row) => row.needsFollowUp),
+    summary,
+    filterCounts,
+  }
+}
+
+export function paymentFilterMatches(row = {}, filter = 'all') {
+  if (!filter || filter === 'all') return true
+  if (filter === 'needs-follow-up') return Boolean(row.needsFollowUp)
+  if (filter === 'door') return row.statusGroup === 'door' || row.statusGroup === 'door-list'
+  if (filter === 'finance-review') return row.statusGroup === 'needs-review' || (row.warnings || []).length > 0
+  return row.statusGroup === filter
+}
+
+export function paymentSearchMatches(row = {}, query = '') {
+  const q = String(query || '').trim().toLowerCase()
+  if (!q) return true
+  return [
+    row.name,
+    row.email,
+    row.phone,
+    row.ticketCode,
+    row.paymentReference,
+    row.priceTier,
+    row.displayStatus,
+  ].some((value) => String(value || '').toLowerCase().includes(q))
 }
 
 export function buildFinanceSummary(registrations = [], event = {}) {
