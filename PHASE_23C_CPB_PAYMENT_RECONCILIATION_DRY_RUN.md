@@ -86,8 +86,9 @@ Only these registration payment fields may be proposed:
 - `balanceDue`
 - `paymentStatus`
 - `paymentMethod`
-- `paymentReference`
 - `priceTier`
+
+`paymentReference` is intentionally not proposed from workbook evidence-summary text. The workbook evidence summary can describe Gmail/payment proof, but it is not treated as a clean processor or bank reference for app writes.
 
 The preview never proposes changes to:
 
@@ -345,6 +346,208 @@ Required before Phase 23D:
 - Actual tablet and mobile viewport evidence.
 - Browser Network evidence showing no Firestore commit/write/audit-log requests during dry run.
 - Explicit approval of any future apply list after manual review rows, duplicate/non-unique rows, blocked rows, and app-only rows are excluded.
+
+## Phase 23C-R2 Approval Evidence Completion
+
+Phase 23C-R2 completed the remaining evidence gate without applying CPB changes. The private manifest was generated outside the repository and must be treated as the frozen input for any later Phase 23D review.
+
+- Evidence folder: `C:\Users\Jaylan\Desktop\GSV_Phase23C_Approval_Review`
+- Private manifest: `C:\Users\Jaylan\Desktop\GSV_Phase23C_Approval_Review\CPB_Proposal_Manifest_Private.json`
+- Masked manifest: `C:\Users\Jaylan\Desktop\GSV_Phase23C_Approval_Review\CPB_Proposal_Manifest_Masked.csv`
+- Canonical private manifest SHA-256: `4E62EDED15E4DB33B8BD0336C5C45C46B8EF7493948D41FC20F0068021212D8B`
+- Canonical order: registration document ID, then workbook row number, then field name.
+- Full private manifest is not committed.
+
+### R2 Classification Completion
+
+The previously missing 70th workbook row is the single `Possible Match - Manual Review` row. It is not a warning count.
+
+Workbook classifications now sum to exactly 70:
+
+| Classification | Count |
+| --- | ---: |
+| Exact Match - No Change | 0 |
+| Exact Match - Proposed Update | 65 |
+| Possible Match - Manual Review | 1 |
+| Workbook Only | 0 |
+| Duplicate/Non-Unique | 3 |
+| Conflict | 0 |
+| Blocked | 1 |
+
+App-registration classifications now sum to exactly 71:
+
+| Classification | Count |
+| --- | ---: |
+| Matched - No Change | 0 |
+| Matched - Proposed Update | 65 |
+| Matched - Manual Review | 0 |
+| App Only | 6 |
+| Duplicate/Non-Unique | 0 |
+| Conflict | 0 |
+| Blocked | 0 |
+
+### R2 Warning Instances
+
+Warnings remain separate from record classifications and may overlap:
+
+| Warning type | Count |
+| --- | ---: |
+| Workbook row warnings | 1 |
+| Duplicate workbook identifier keys | 22 |
+| Duplicate app identifier keys | 37 |
+| Duplicate blocking keys | 22 |
+| Duplicate contact keys | 37 |
+| Registrations missing ticket code | 0 |
+| Registrations missing payment reference | 71 |
+| Registrations missing email | 12 |
+| Registrations missing phone | 7 |
+
+### R2 Proposal Manifest Summary
+
+The frozen manifest contains 65 proposed registration updates and 373 supported field changes. `paymentReference` is excluded.
+
+| Field | Proposed changes |
+| --- | ---: |
+| `ticketPrice` | 65 |
+| `amountDue` | 65 |
+| `amountPaid` | 58 |
+| `balanceDue` | 58 |
+| `paymentStatus` | 65 |
+| `paymentMethod` | 7 |
+| `priceTier` | 55 |
+
+Proposal-size distribution:
+
+| Proposal size | Count |
+| --- | ---: |
+| One field | 0 |
+| Two fields | 0 |
+| Three or more fields | 65 |
+
+Blank-fill changes: 373. Existing nonblank app-value replacements: 0.
+
+Unsafe-overwrite result: no nonblank app value is replaced by the manifest. All proposals still require organizer approval before any later apply phase.
+
+Uniqueness result:
+
+- Unique proposal count: 65
+- Proposals downgraded to Manual Review: 1 workbook row
+- Proposals downgraded to Conflict: 0
+- Proposals downgraded to Blocked: 1 workbook row
+- Name-only matches used for proposals: 0
+- Amount-only matches used for proposals: 0
+- Shared email-only or phone-only matches used for proposals: 0
+
+### R2 Complete Finance Totals
+
+Rounding rule: all money values are rounded to two decimals using the existing app finance formatter. Differences are reconciliation differences, not missing-cash conclusions.
+
+| Source | Expected | Paid | Outstanding |
+| --- | ---: | ---: | ---: |
+| Workbook | BBD $6,740.00 | BBD $5,785.00 | BBD $100.00 |
+| Current app registrations | BBD $0.00 | BBD $0.00 | BBD $0.00 |
+| Hypothetical after approved proposals | BBD $6,290.00 | BBD $5,420.00 | BBD $870.00 |
+
+Differences:
+
+- Workbook minus current expected: BBD $6,740.00
+- Workbook minus current paid: BBD $5,785.00
+- Workbook minus current outstanding: BBD $100.00
+- Hypothetical minus current expected: BBD $6,290.00
+- Hypothetical minus current paid: BBD $5,420.00
+- Hypothetical minus current outstanding: BBD $870.00
+- Workbook minus hypothetical expected: BBD $450.00
+- Workbook minus hypothetical paid: BBD $365.00
+- Workbook minus hypothetical outstanding: BBD -$770.00
+
+Status counts:
+
+| Source | Status counts |
+| --- | --- |
+| Workbook | Paid - Confirmed: 52; Paid - Confirmed (Price Inferred): 4; Needs Review - No Gmail Proof Found: 1; Partial - Balance Due: 2; To Pay at Door: 7; Paid - Confirmed / Register Mismatch: 4 |
+| Current app | unknown: 69; complimentary: 2 |
+| Hypothetical | paid: 56; complimentary: 2; unknown: 4; door-list: 7; pending: 2 |
+
+Current app finance-review count: 71.
+
+### R2 Status Crosswalk
+
+| Workbook status | Current app status | Proposed app status | Count | Mapping result |
+| --- | --- | --- | ---: | --- |
+| Paid - Confirmed | unknown | paid | 52 | Numeric workbook amount fields only; no event-default or Operations amount used. |
+| Paid - Confirmed (Price Inferred) | unknown | paid | 4 | Numeric workbook amount fields only; no event-default or Operations amount used. |
+| Partial - Balance Due | unknown | pending | 2 | Numeric workbook amount fields only; no event-default or Operations amount used. |
+| To Pay at Door | unknown | door-list | 7 | Numeric workbook amount fields only; no event-default or Operations amount used. |
+
+The single `Needs Review - No Gmail Proof Found` row is excluded from proposals as manual review.
+
+### R2 Ticket And Operations Findings
+
+- Paid app registrations without tickets: 0
+- Workbook ticket identifiers without app registrations: 5
+- Duplicate workbook ticket identifiers: 0
+- Duplicate app ticket codes: 0
+- Conflicting ticket identifiers: 0
+- Payment-safe proposals requiring separate ticket review: 0
+- CPB Operations record count: 0
+- Possible Operations overlap count: 0
+- Possible Operations overlap total: BBD $0.00
+
+Zero CPB Operations records means no current overlap was found. It is not proof of complete historical accounting.
+
+### R2 Browser Evidence
+
+Screenshots were saved outside the repository:
+
+- Desktop: `01-desktop-target-lock.png` through `10-desktop-operations-overlap.png`
+- Tablet: `11-tablet-summary.png` through `15-tablet-finance-totals.png`
+- Mobile: `16-mobile-target-lock.png` through `23-mobile-bottom-spacing.png`
+- Console: `24-console-no-target.png` through `27-console-refresh-reset.png`
+- Network: `28-network-firestore-reads.png` through `31-network-refresh-reset.png`
+
+Responsive result:
+
+- Desktop review completed.
+- Tablet viewport `834 x 1112`: no horizontal overflow, readable money values, usable filters, no overlapping cards, no write control.
+- Mobile viewport `390 x 844`: no horizontal overflow, identifiers wrap, money values fit, filters remain usable, bottom navigation does not cover content, no apply/write action appears.
+
+Console result:
+
+- No React exception, duplicate-key warning, Firebase permission error, spreadsheet error, number-format error, null/undefined app error, or app-originated write warning was observed.
+- The only repeated red console message was browser-extension async listener noise, not an app-originated reconciliation error.
+
+Network result:
+
+- Sanitized summary: `C:\Users\Jaylan\Desktop\GSV_Phase23C_Approval_Review\network-no-write-summary.txt`
+- Total captured requests: 73
+- Firestore/auth-related requests: 18
+- Expected read activity: Firestore `Listen` channel requests, Identity Toolkit account lookup, Secure Token refresh, local workbook `GET`.
+- Firestore `Commit`: 0
+- Firestore `BatchWrite`: 0
+- Firestore write channel/RPC: 0
+- Write-like request count: 0
+- No document create/update/delete, audit-log creation, registration update, Operations update, or ticket update request was observed.
+
+Source cross-check: reconciliation route/read utilities do not import or call `setDoc`, `addDoc`, `updateDoc`, `deleteDoc`, `writeBatch`, `runTransaction`, registration update services, Operations update services, ticket update services, or audit-log append services.
+
+### R2 Refresh And Target Reset
+
+Refresh/reset evidence passed:
+
+- Initial route has no target selected.
+- Normal Working Event remains `CODEX_TEST Live Verification Event`.
+- CPB target selection is explicit inside the reconciliation route.
+- `CPB DRY RUN` is required.
+- Workbook must be explicitly loaded.
+- Refresh clears target, confirmation, workbook, result classifications, and proposal manifest.
+- No reconciliation target is stored in localStorage.
+- Revisiting the route starts locked.
+
+### R2 Gate Decision
+
+`PHASE 23D APPLY REVIEW READY`
+
+This means only that Phase 23D may begin as a separate approval-review phase. It does not authorize applying data changes. The frozen manifest hash above must be rechecked before any Phase 23D approval workflow, and any changed manifest requires organizer re-review.
 
 ## Guardrails Preserved
 

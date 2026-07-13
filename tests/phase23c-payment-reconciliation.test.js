@@ -180,6 +180,55 @@ test('Payment reconciliation exposes field-level proposal evidence and totals', 
   assert.equal(preview.totals.hypotheticalApp.totalCollected, 100)
 })
 
+test('Payment reconciliation supported proposal fields exclude paymentReference and count fields deterministically', () => {
+  const preview = buildPaymentReconciliationPreview({
+    workbookSheet: sheet([
+      ['CPB-040', 'Door Guest', 'Door Guest', 'door@example.com', 'Door/Late', '120', '0', '120', '120', 'To Pay at Door', 'Repeated workbook narrative, not a processor reference', 'High'],
+      ['CPB-041', 'Paid Guest', 'Paid Guest', 'paid@example.com', 'General', '100', '100', '100', '0', 'Paid confirmed', 'Repeated workbook narrative, not a processor reference', 'High'],
+    ]),
+    registrations: [
+      { registrationId: 'door', fullName: 'Door Guest', email: 'door@example.com', ticketCode: 'CPB-040' },
+      { registrationId: 'paid', fullName: 'Paid Guest', email: 'paid@example.com', ticketCode: 'CPB-041' },
+    ],
+    operationsEntries: [],
+    event: { currency: 'BBD' },
+  })
+  const proposals = preview.workbookClassifications.filter((row) => row.filterKey === 'proposed-update')
+  const changedFields = proposals.flatMap((row) => row.proposedChanges.map((change) => change.field))
+
+  assert.equal(preview.proposedFields.includes('paymentReference'), false)
+  assert.equal(changedFields.includes('paymentReference'), false)
+  assert.equal(changedFields.filter((field) => field === 'ticketPrice').length, 2)
+  assert.equal(changedFields.filter((field) => field === 'amountDue').length, 2)
+  assert.equal(changedFields.filter((field) => field === 'amountPaid').length, 1)
+  assert.equal(changedFields.filter((field) => field === 'balanceDue').length, 2)
+  assert.equal(changedFields.filter((field) => field === 'paymentStatus').length, 2)
+  assert.equal(changedFields.filter((field) => field === 'paymentMethod').length, 1)
+  assert.equal(changedFields.filter((field) => field === 'priceTier').length, 2)
+})
+
+test('Payment reconciliation keeps warnings separate from record classifications', () => {
+  const preview = buildPaymentReconciliationPreview({
+    workbookSheet: sheet([
+      ['CPB-050', 'Shared Guest', 'Shared Buyer', 'shared@example.com', 'General', '100', '100', '100', '0', 'Paid confirmed', 'Same evidence text', 'High'],
+      ['CPB-051', 'Shared Guest', 'Shared Buyer', 'shared@example.com', 'General', '100', '100', '100', '0', 'Paid confirmed', 'Same evidence text', 'High'],
+      ['', '', '', '', 'General', '100', '0', '100', '100', 'Pending', '', 'Low'],
+    ]),
+    registrations: [
+      { registrationId: 'one', fullName: 'Shared Guest', email: 'shared@example.com', ticketCode: 'CPB-050' },
+      { registrationId: 'two', fullName: 'Shared Guest', email: 'shared@example.com', ticketCode: 'CPB-051' },
+    ],
+    operationsEntries: [],
+    event: { currency: 'BBD' },
+  })
+
+  assert.equal(preview.classificationCounts.workbook.all, 3)
+  assert.equal(preview.classificationCounts.workbook['proposed-update'], 2)
+  assert.equal(preview.classificationCounts.workbook.blocked, 1)
+  assert.equal(preview.warningCounts.duplicateContactKeys > 0, true)
+  assert.equal(preview.warningCounts.duplicateContactKeys > preview.classificationCounts.workbook.duplicate, true)
+})
+
 test('Payment reconciliation UI includes refinement evidence tables and reset safety', async () => {
   const page = await readFile('src/pages/PaymentReconciliationPage.jsx', 'utf8')
   const utility = await readFile('src/utils/paymentReconciliation.js', 'utf8')

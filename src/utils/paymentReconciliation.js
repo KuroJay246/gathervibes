@@ -38,7 +38,6 @@ const PROPOSED_FIELDS = [
   'balanceDue',
   'paymentStatus',
   'paymentMethod',
-  'paymentReference',
   'priceTier',
 ]
 
