@@ -150,7 +150,8 @@ export function parsePaymentWorkbookSheet(sheet = {}) {
       const sourceRowNumber = Number(row?.sourceRowNumber) || index + 2
       const priceTier = cleanText(valueFrom(row, map.priceTier))
       const paymentStatusText = cleanText(valueFrom(row, map.paymentStatus))
-      const paymentReference = normalizeReference(valueFrom(row, map.paymentReference))
+      const rawPaymentReference = cleanText(valueFrom(row, map.paymentReference))
+      const paymentReference = normalizeReference(rawPaymentReference)
       const emailPhone = cleanText(valueFrom(row, map.emailPhone))
       const ticketCode = normalizeTicketCode(cleanText(valueFrom(row, map.ticketDoorId)))
       const amountDue = reconciliationMoney(valueFrom(row, map.amountDue))
@@ -174,7 +175,8 @@ export function parsePaymentWorkbookSheet(sheet = {}) {
         balanceDue,
         paymentStatus: mapWorkbookStatus(paymentStatusText, priceTier),
         paymentMethod: mapWorkbookMethod(valueFrom(row, map.paymentMethod), paymentStatusText, priceTier),
-        paymentReference: paymentReference || (ticketCode ? `PAYMENT-AUDIT:${ticketCode}` : ''),
+        paymentReference: paymentReference || '',
+        paymentReferenceSource: map.paymentReference >= 0 ? 'workbook' : 'missing',
         paymentStatusText,
         confidence: cleanText(valueFrom(row, map.confidence)),
         notes: cleanText(valueFrom(row, map.notes)),
@@ -206,7 +208,7 @@ function buildWorkbookProposedUpdates(record) {
     balanceDue: record.balanceDue,
     paymentStatus: record.paymentStatus,
     paymentMethod: record.paymentMethod,
-    paymentReference: record.paymentReference || null,
+    paymentReference: null,
     priceTier: record.priceTier || null,
   }
 }
@@ -262,6 +264,25 @@ function duplicateKeys(records = []) {
   return new Set([...index.entries()].filter(([, rows]) => rows.length > 1).map(([key]) => key))
 }
 
+function duplicateGroupsFor(records = [], source = 'unknown') {
+  const index = indexByKeys(records)
+  return [...index.entries()]
+    .filter(([, rows]) => rows.length > 1)
+    .map(([key, rows]) => ({
+      source,
+      key,
+      keyType: key.split(':')[0],
+      label: keyLabel(key),
+      count: rows.length,
+      recordIds: rows.map((row) => row.workbookRecordId || row.registrationId).filter(Boolean),
+      blocking: isBlockingDuplicateKey(key),
+    }))
+}
+
+function isBlockingDuplicateKey(key = '') {
+  return key.startsWith('ticket:') || key.startsWith('reference:')
+}
+
 function keyLabel(key = '') {
   if (key.startsWith('ticket:')) return 'ticket code'
   if (key.startsWith('reference:')) return 'payment reference'
@@ -280,10 +301,29 @@ function findExactMatch(workbookRecord, registrationIndex, workbookDuplicateKeys
     }
   })
 
-  const uniqueRegistrations = new Map(candidates.map((candidate) => [candidate.registrationRecord.registrationId, candidate]))
+  candidates.sort((a, b) => keyStrength(b.key) - keyStrength(a.key))
+  const uniqueRegistrations = new Map()
+  candidates.forEach((candidate) => {
+    if (!uniqueRegistrations.has(candidate.registrationRecord.registrationId)) {
+      uniqueRegistrations.set(candidate.registrationRecord.registrationId, candidate)
+    }
+  })
   if (uniqueRegistrations.size === 1) return uniqueRegistrations.values().next().value
   if (uniqueRegistrations.size > 1) return { conflict: true, candidates }
   return null
+}
+
+function keyStrength(key = '') {
+  if (key.startsWith('ticket:')) return 5
+  if (key.startsWith('reference:')) return 4
+  if (key.startsWith('email-phone:')) return 3
+  if (key.startsWith('email-name:')) return 2
+  if (key.startsWith('phone-name:')) return 2
+  return 1
+}
+
+function duplicateBlockingKeys(record = {}, workbookDuplicateKeys = new Set(), registrationDuplicateKeys = new Set()) {
+  return record.identifierKeys.filter((key) => isBlockingDuplicateKey(key) && (workbookDuplicateKeys.has(key) || registrationDuplicateKeys.has(key)))
 }
 
 function findPossibleMatches(workbookRecord, registrations = []) {
@@ -324,6 +364,18 @@ function proposedChanges(workbookRecord, registrationRecord) {
     .map((field) => ({ field, current: current[field], proposed: proposed[field] }))
 }
 
+function proposalWarnings(workbookRecord, registrationRecord, changes = []) {
+  const warnings = []
+  const changeFields = new Set(changes.map((change) => change.field))
+  if (!registrationRecord?.registrationId) warnings.push('No matched registration id.')
+  if (!workbookRecord?.matchKey && !workbookRecord?.ticketCode && !workbookRecord?.email) warnings.push('No strong match evidence.')
+  if (changeFields.has('paymentStatus') && workbookRecord.paymentStatus === 'unknown') warnings.push('Ambiguous workbook status.')
+  ;['ticketPrice', 'amountDue', 'amountPaid', 'balanceDue'].forEach((field) => {
+    if (changeFields.has(field) && workbookRecord.proposedUpdates[field] === null) warnings.push(`Workbook ${field} is not explicit.`)
+  })
+  return warnings
+}
+
 function applyProposed(registration = {}, changes = []) {
   const patch = Object.fromEntries(changes.map((change) => [change.field, change.proposed]))
   return { ...registration, ...patch }
@@ -344,40 +396,37 @@ export function buildPaymentReconciliationPreview({ workbookSheet, registrations
   const workbookDuplicateKeys = duplicateKeys(workbookRecords)
   const registrationDuplicateKeys = duplicateKeys(registrationRecords)
   const matchedRegistrationIds = new Set()
+  const possibleRegistrationIds = new Set()
   const rows = []
+  const workbookClassifications = []
 
   workbookRecords.forEach((workbookRecord) => {
-    const duplicateKey = workbookRecord.identifierKeys.find((key) => workbookDuplicateKeys.has(key) || registrationDuplicateKeys.has(key))
-    if (duplicateKey) {
-      rows.push(item(RECONCILIATION_CLASSIFICATIONS.duplicate, 'duplicate', {
-        workbookRecord,
-        reason: `Duplicate ${keyLabel(duplicateKey)} blocks automatic matching.`,
-      }))
-      return
-    }
-
     if (workbookRecord.warnings.length > 0) {
-      rows.push(item(RECONCILIATION_CLASSIFICATIONS.blocked, 'blocked', {
+      const blocked = item(RECONCILIATION_CLASSIFICATIONS.blocked, 'blocked', {
         workbookRecord,
         reason: workbookRecord.warnings.join(' '),
-      }))
+      })
+      rows.push(blocked)
+      workbookClassifications.push(blocked)
       return
     }
 
     const exact = findExactMatch(workbookRecord, registrationIndex, workbookDuplicateKeys, registrationDuplicateKeys)
     if (exact?.conflict) {
-      rows.push(item(RECONCILIATION_CLASSIFICATIONS.conflict, 'conflict', {
+      const conflict = item(RECONCILIATION_CLASSIFICATIONS.conflict, 'conflict', {
         workbookRecord,
         possibleMatches: exact.candidates.map((candidate) => candidate.registrationRecord),
         reason: 'Multiple registrations match strong identifiers.',
-      }))
+      })
+      rows.push(conflict)
+      workbookClassifications.push(conflict)
       return
     }
 
     if (exact?.registrationRecord) {
       matchedRegistrationIds.add(exact.registrationRecord.registrationId)
       const changes = proposedChanges(workbookRecord, exact.registrationRecord)
-      rows.push(item(
+      const exactItem = item(
         changes.length ? RECONCILIATION_CLASSIFICATIONS.proposedUpdate : RECONCILIATION_CLASSIFICATIONS.noChange,
         changes.length ? 'proposed-update' : 'no-change',
         {
@@ -386,26 +435,80 @@ export function buildPaymentReconciliationPreview({ workbookSheet, registrations
           matchKey: exact.key,
           matchBasis: keyLabel(exact.key),
           proposedChanges: changes,
+          proposalWarnings: proposalWarnings({ ...workbookRecord, matchKey: exact.key }, exact.registrationRecord, changes),
           reason: changes.length ? `${changes.length} supported registration payment field(s) differ.` : 'Supported payment fields already match.',
         },
-      ))
+      )
+      rows.push(exactItem)
+      workbookClassifications.push(exactItem)
+      return
+    }
+
+    const blockingKeys = duplicateBlockingKeys(workbookRecord, workbookDuplicateKeys, registrationDuplicateKeys)
+    if (blockingKeys.length > 0) {
+      const duplicate = item(RECONCILIATION_CLASSIFICATIONS.duplicate, 'duplicate', {
+        workbookRecord,
+        duplicateKeys: blockingKeys,
+        reason: `Non-unique ${blockingKeys.map(keyLabel).join(', ')} blocks automatic matching.`,
+      })
+      rows.push(duplicate)
+      workbookClassifications.push(duplicate)
       return
     }
 
     const possibleMatches = findPossibleMatches(workbookRecord, registrationRecords)
     if (possibleMatches.length) {
-      rows.push(item(RECONCILIATION_CLASSIFICATIONS.manualReview, 'manual-review', {
+      possibleMatches.forEach((match) => possibleRegistrationIds.add(match.registrationId))
+      const manual = item(RECONCILIATION_CLASSIFICATIONS.manualReview, 'manual-review', {
         workbookRecord,
         possibleMatches,
         reason: 'Name-only or fuzzy similarity is not safe enough for an automatic match.',
-      }))
+      })
+      rows.push(manual)
+      workbookClassifications.push(manual)
       return
     }
 
-    rows.push(item(RECONCILIATION_CLASSIFICATIONS.workbookOnly, 'workbook-only', {
+    const workbookOnly = item(RECONCILIATION_CLASSIFICATIONS.workbookOnly, 'workbook-only', {
       workbookRecord,
       reason: 'Workbook record has no exact app registration match.',
-    }))
+    })
+    rows.push(workbookOnly)
+    workbookClassifications.push(workbookOnly)
+  })
+
+  const exactRowsByRegistrationId = new Map(rows
+    .filter((row) => row.registrationRecord?.registrationId)
+    .map((row) => [row.registrationRecord.registrationId, row]))
+  const appClassifications = registrationRecords.map((registrationRecord) => {
+    const exact = exactRowsByRegistrationId.get(registrationRecord.registrationId)
+    if (exact) {
+      return item(exact.status, exact.filterKey, {
+        registrationRecord,
+        workbookRecord: exact.workbookRecord,
+        matchBasis: exact.matchBasis,
+        proposedChanges: exact.proposedChanges || [],
+        reason: exact.reason,
+      })
+    }
+    const blockingKeys = duplicateBlockingKeys(registrationRecord, workbookDuplicateKeys, registrationDuplicateKeys)
+    if (blockingKeys.length > 0) {
+      return item(RECONCILIATION_CLASSIFICATIONS.duplicate, 'duplicate', {
+        registrationRecord,
+        duplicateKeys: blockingKeys,
+        reason: `Non-unique ${blockingKeys.map(keyLabel).join(', ')} blocks automatic matching.`,
+      })
+    }
+    if (possibleRegistrationIds.has(registrationRecord.registrationId)) {
+      return item(RECONCILIATION_CLASSIFICATIONS.manualReview, 'manual-review', {
+        registrationRecord,
+        reason: 'Registration is a possible name-only/fuzzy match for a workbook row.',
+      })
+    }
+    return item(RECONCILIATION_CLASSIFICATIONS.appOnly, 'app-only', {
+      registrationRecord,
+      reason: 'App registration has no exact workbook match.',
+    })
   })
 
   registrationRecords.forEach((registrationRecord) => {
@@ -423,6 +526,10 @@ export function buildPaymentReconciliationPreview({ workbookSheet, registrations
     return updateRow ? applyProposed(registration, updateRow.proposedChanges) : registration
   })
   const operationOverlaps = findPossibleRegistrationPaymentOverlap(operationsEntries)
+  const duplicateGroups = [
+    ...duplicateGroupsFor(workbookRecords, 'workbook'),
+    ...duplicateGroupsFor(registrationRecords, 'registration'),
+  ]
 
   return {
     targetEvent: {
@@ -436,10 +543,15 @@ export function buildPaymentReconciliationPreview({ workbookSheet, registrations
       operationsRecords: operationsEntries,
     },
     rows,
-    counts: RECONCILIATION_FILTERS.reduce((counts, [key]) => {
-      counts[key] = key === 'all' ? rows.length : rows.filter((row) => row.filterKey === key).length
-      return counts
-    }, {}),
+    workbookClassifications,
+    appClassifications,
+    counts: countClassifications(rows),
+    classificationCounts: {
+      workbook: countClassifications(workbookClassifications),
+      app: countClassifications(appClassifications),
+    },
+    warningCounts: buildWarningCounts(workbookRecords, registrationRecords, duplicateGroups),
+    duplicateGroups,
     totals: {
       workbook: totalWorkbook(workbookRecords),
       currentApp: buildFinanceSummary(registrations, event),
@@ -452,6 +564,27 @@ export function buildPaymentReconciliationPreview({ workbookSheet, registrations
     },
     proposedFields: PROPOSED_FIELDS,
     writesPerformed: false,
+  }
+}
+
+function countClassifications(rows = []) {
+  return RECONCILIATION_FILTERS.reduce((counts, [key]) => {
+    counts[key] = key === 'all' ? rows.length : rows.filter((row) => row.filterKey === key).length
+    return counts
+  }, {})
+}
+
+function buildWarningCounts(workbookRecords = [], registrationRecords = [], duplicateGroups = []) {
+  return {
+    workbookWarnings: workbookRecords.reduce((sum, record) => sum + record.warnings.length, 0),
+    duplicateWorkbookKeys: duplicateGroups.filter((group) => group.source === 'workbook').length,
+    duplicateRegistrationKeys: duplicateGroups.filter((group) => group.source === 'registration').length,
+    duplicateBlockingKeys: duplicateGroups.filter((group) => group.blocking).length,
+    duplicateContactKeys: duplicateGroups.filter((group) => !group.blocking && ['email-name', 'phone-name', 'email-phone'].includes(group.keyType)).length,
+    registrationsMissingTicketCode: registrationRecords.filter((record) => !record.ticketCode).length,
+    registrationsMissingPaymentReference: registrationRecords.filter((record) => !record.paymentReference).length,
+    registrationsMissingEmail: registrationRecords.filter((record) => !record.email).length,
+    registrationsMissingPhone: registrationRecords.filter((record) => record.phoneKeys.length === 0).length,
   }
 }
 

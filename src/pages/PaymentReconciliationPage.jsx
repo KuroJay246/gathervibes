@@ -112,12 +112,123 @@ function SetupPanel({ targetEventId, setTargetEventId, confirmation, setConfirma
 
 function TotalsPanel({ preview }) {
   const currency = preview.targetEvent.currency
+  const appGuestCount = preview.recordSets.registrationRecords.reduce((sum, record) => sum + (record.finance?.personsAttending || 0), 0)
+  const proposedRows = preview.workbookClassifications.filter((row) => row.filterKey === 'proposed-update')
+  const changedFieldCount = proposedRows.reduce((sum, row) => sum + (row.proposedChanges?.length || 0), 0)
   return (
     <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <Metric label="Workbook records" value={preview.recordSets.workbookRecords.length} help={`${formatCurrency(preview.totals.workbook.amountPaid, currency)} recorded paid`} />
-      <Metric label="Registration records" value={preview.recordSets.registrationRecords.length} help={`${formatCurrency(preview.totals.currentApp.totalCollected, currency)} currently recorded`} />
-      <Metric label="Hypothetical after safe updates" value={formatCurrency(preview.totals.hypotheticalApp.totalCollected, currency)} help="Preview only; no updates applied." />
+      <Metric label="Registration records" value={preview.recordSets.registrationRecords.length} help={`${appGuestCount} guests from personsAttending`} />
+      <Metric label="Workbook expected" value={formatCurrency(preview.totals.workbook.amountDue, currency)} help={`${formatCurrency(preview.totals.workbook.balanceDue, currency)} outstanding`} />
+      <Metric label="Workbook paid" value={formatCurrency(preview.totals.workbook.amountPaid, currency)} />
+      <Metric label="Current app expected" value={formatCurrency(preview.totals.currentApp.totalExpected, currency)} help={`${formatCurrency(preview.totals.currentApp.totalOutstanding, currency)} outstanding`} />
+      <Metric label="Current app paid" value={formatCurrency(preview.totals.currentApp.totalCollected, currency)} />
+      <Metric label="Hypothetical expected" value={formatCurrency(preview.totals.hypotheticalApp.totalExpected, currency)} help="After proposed safe updates only." />
+      <Metric label="Hypothetical paid" value={formatCurrency(preview.totals.hypotheticalApp.totalCollected, currency)} help="Preview only; no updates applied." />
+      <Metric label="Hypothetical outstanding" value={formatCurrency(preview.totals.hypotheticalApp.totalOutstanding, currency)} help={`${proposedRows.length} registrations, ${changedFieldCount} fields`} />
       <Metric label="Operations excluded" value={preview.totals.operationsExcluded.count} help={`${preview.totals.operationsExcluded.possibleOverlapCount} possible overlaps flagged`} />
+    </section>
+  )
+}
+
+function EvidencePanel({ preview }) {
+  const countRows = [
+    ['No Change', 'no-change'],
+    ['Proposed Update', 'proposed-update'],
+    ['Manual Review', 'manual-review'],
+    ['Workbook Only', 'workbook-only'],
+    ['App Only', 'app-only'],
+    ['Duplicate/Non-Unique', 'duplicate'],
+    ['Conflict', 'conflict'],
+    ['Blocked', 'blocked'],
+  ]
+  const proposals = preview.workbookClassifications.filter((row) => row.filterKey === 'proposed-update')
+  return (
+    <section className="grid gap-4 xl:grid-cols-2">
+      <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
+        <h3 className="font-serif text-xl text-[#2B1723]">Workbook classifications</h3>
+        <p className="mt-1 text-xs leading-5 text-[#816D62]">Mutually exclusive workbook-row counts. Total must equal workbook records.</p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {countRows.filter(([, key]) => key !== 'app-only').map(([label, key]) => (
+            <div key={key} className="rounded-xl bg-[#FBF8F5] px-3 py-2 text-sm">
+              <strong>{preview.classificationCounts.workbook[key] || 0}</strong>
+              <span className="ml-2 text-xs text-[#816D62]">{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
+        <h3 className="font-serif text-xl text-[#2B1723]">App registration classifications</h3>
+        <p className="mt-1 text-xs leading-5 text-[#816D62]">Mutually exclusive app-registration counts. Total must equal registration documents.</p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {countRows.filter(([, key]) => key !== 'workbook-only').map(([label, key]) => (
+            <div key={key} className="rounded-xl bg-[#FBF8F5] px-3 py-2 text-sm">
+              <strong>{preview.classificationCounts.app[key] || 0}</strong>
+              <span className="ml-2 text-xs text-[#816D62]">{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
+        <h3 className="font-serif text-xl text-[#2B1723]">Warning instances</h3>
+        <p className="mt-1 text-xs leading-5 text-[#816D62]">Warnings may overlap and are separate from classification totals.</p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {Object.entries(preview.warningCounts).map(([key, value]) => (
+            <div key={key} className="rounded-xl bg-[#FBF8F5] px-3 py-2 text-sm">
+              <strong>{value}</strong>
+              <span className="ml-2 text-xs text-[#816D62]">{key.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
+        <h3 className="font-serif text-xl text-[#2B1723]">Duplicate groups</h3>
+        <p className="mt-1 text-xs leading-5 text-[#816D62]">Grouped by duplicated identifier key. Blocking groups are ticket/reference only.</p>
+        <div className="mt-4 space-y-2">
+          {preview.duplicateGroups.length === 0 ? (
+            <p className="text-sm text-[#816D62]">No duplicate identifier groups detected.</p>
+          ) : preview.duplicateGroups.slice(0, 8).map((group) => (
+            <div key={`${group.source}-${group.key}`} className="rounded-xl bg-[#FBF8F5] px-3 py-2 text-xs leading-5 text-[#6B564C]">
+              <strong>{group.source}</strong> · {group.label} · {group.count} records · {group.blocking ? 'blocking' : 'warning only'}
+            </div>
+          ))}
+          {preview.duplicateGroups.length > 8 && <p className="text-xs text-[#816D62]">Plus {preview.duplicateGroups.length - 8} additional duplicate groups.</p>}
+        </div>
+      </div>
+      <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4 xl:col-span-2">
+        <h3 className="font-serif text-xl text-[#2B1723]">Proposal field list</h3>
+        <p className="mt-1 text-xs leading-5 text-[#816D62]">Only changed supported payment fields are listed. Manual-review rows are excluded from proposals.</p>
+        {proposals.length === 0 ? (
+          <p className="mt-4 text-sm text-[#816D62]">No safe proposals are available.</p>
+        ) : (
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[720px] text-left text-xs">
+              <thead className="uppercase tracking-wider text-[#8C7567]">
+                <tr>
+                  <th className="px-2 py-2">#</th>
+                  <th className="px-2 py-2">Workbook row</th>
+                  <th className="px-2 py-2">Registration</th>
+                  <th className="px-2 py-2">Match</th>
+                  <th className="px-2 py-2">Changed fields</th>
+                  <th className="px-2 py-2">Warnings</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#F2E8E1]">
+                {proposals.map((row, index) => (
+                  <tr key={row.workbookRecord.workbookRecordId}>
+                    <td className="px-2 py-2 font-bold">{index + 1}</td>
+                    <td className="px-2 py-2">Row {row.workbookRecord.sourceRowNumber}</td>
+                    <td className="px-2 py-2">{row.registrationRecord.registrationId}</td>
+                    <td className="px-2 py-2">{row.matchBasis}</td>
+                    <td className="px-2 py-2">{row.proposedChanges.map((change) => change.field).join(', ')}</td>
+                    <td className="px-2 py-2">{row.proposalWarnings.length ? row.proposalWarnings.join('; ') : 'None'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </section>
   )
 }
@@ -321,6 +432,7 @@ export function PaymentReconciliationPage() {
             </section>
           )}
           <TotalsPanel preview={preview} />
+          <EvidencePanel preview={preview} />
           <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
             <div className="flex flex-wrap gap-2">
               {RECONCILIATION_FILTERS.map(([value, label]) => (

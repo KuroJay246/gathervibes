@@ -87,6 +87,55 @@ test('Payment reconciliation uses strong identifiers and never treats name-only 
   assert.equal(preview.writesPerformed, false)
 })
 
+test('Payment reconciliation keeps workbook and app classifications mutually exclusive', () => {
+  const preview = buildPaymentReconciliationPreview({
+    workbookSheet: sheet([
+      ['CPB-010', 'Matched No Change', 'Matched No Change', 'match@example.com', 'General', '100', '100', '100', '0', 'Paid confirmed', 'PAY-010', 'High'],
+      ['CPB-011', 'Matched Update', 'Matched Update', 'update@example.com', 'General', '100', '100', '100', '0', 'Paid confirmed', 'PAY-011', 'High'],
+      ['', 'Manual Name', 'Manual Name', '', 'General', '100', '50', '100', '50', 'Partial balance due', '', 'Medium'],
+      ['CPB-012', 'Workbook Only', 'Workbook Only', 'only@example.com', 'General', '100', '100', '100', '0', 'Paid confirmed', 'PAY-012', 'High'],
+    ]),
+    registrations: [
+      { registrationId: 'same', fullName: 'Matched No Change', email: 'match@example.com', ticketCode: 'CPB-010', ticketPrice: 100, amountDue: 100, amountPaid: 100, balanceDue: 0, paymentStatus: 'paid', paymentReference: 'PAY-010', priceTier: 'General' },
+      { registrationId: 'update', fullName: 'Matched Update', email: 'update@example.com', ticketCode: 'CPB-011', ticketPrice: 100, amountDue: 100, amountPaid: 0, balanceDue: 100, paymentStatus: 'pending', paymentReference: 'PAY-011', priceTier: 'General' },
+      { registrationId: 'manual', fullName: 'Manual Name', ticketPrice: 100, amountDue: 100, amountPaid: 0, balanceDue: 100, paymentStatus: 'pending' },
+      { registrationId: 'app-only', fullName: 'App Only', ticketCode: 'CPB-099', ticketPrice: 100, amountDue: 100, amountPaid: 0, balanceDue: 100, paymentStatus: 'pending' },
+    ],
+    operationsEntries: [],
+    event: { currency: 'BBD' },
+  })
+
+  assert.equal(preview.workbookClassifications.length, 4)
+  assert.equal(preview.appClassifications.length, 4)
+  assert.equal(preview.classificationCounts.workbook.all, 4)
+  assert.equal(preview.classificationCounts.app.all, 4)
+  assert.equal(preview.classificationCounts.workbook['no-change'], 1)
+  assert.equal(preview.classificationCounts.workbook['proposed-update'], 1)
+  assert.equal(preview.classificationCounts.workbook['manual-review'], 1)
+  assert.equal(preview.classificationCounts.workbook['workbook-only'], 1)
+  assert.equal(preview.classificationCounts.app['app-only'], 1)
+  assert.equal(preview.classificationCounts.app['manual-review'], 1)
+})
+
+test('Shared contact warnings do not override a unique ticket-code match', () => {
+  const preview = buildPaymentReconciliationPreview({
+    workbookSheet: sheet([
+      ['CPB-020', 'Household One', 'Buyer', 'shared@example.com', 'General', '100', '100', '100', '0', 'Paid confirmed', 'PAY-020', 'High'],
+      ['CPB-021', 'Household Two', 'Buyer', 'shared@example.com', 'General', '100', '100', '100', '0', 'Paid confirmed', 'PAY-021', 'High'],
+    ]),
+    registrations: [
+      { registrationId: 'one', fullName: 'Household One', email: 'shared@example.com', ticketCode: 'CPB-020', ticketPrice: 100, amountDue: 100, amountPaid: 0, balanceDue: 100, paymentStatus: 'pending', paymentReference: 'PAY-020' },
+      { registrationId: 'two', fullName: 'Household Two', email: 'shared@example.com', ticketCode: 'CPB-021', ticketPrice: 100, amountDue: 100, amountPaid: 0, balanceDue: 100, paymentStatus: 'pending', paymentReference: 'PAY-021' },
+    ],
+    operationsEntries: [],
+    event: { currency: 'BBD' },
+  })
+
+  assert.equal(preview.classificationCounts.workbook.duplicate, 0)
+  assert.equal(preview.classificationCounts.workbook['proposed-update'], 2)
+  assert.equal(preview.duplicateGroups.some((group) => group.keyType === 'email-name' && group.blocking), false)
+})
+
 test('Payment reconciliation blocks duplicate identifiers and keeps Operations separate', () => {
   const preview = buildPaymentReconciliationPreview({
     workbookSheet: sheet([
@@ -107,6 +156,45 @@ test('Payment reconciliation blocks duplicate identifiers and keeps Operations s
   assert.equal(preview.totals.operationsExcluded.count, 2)
   assert.equal(preview.totals.operationsExcluded.possibleOverlapCount, 1)
   assert.equal(preview.totals.operationsExcluded.possibleOverlapAmount, 100)
+})
+
+test('Payment reconciliation exposes field-level proposal evidence and totals', () => {
+  const preview = buildPaymentReconciliationPreview({
+    workbookSheet: sheet([
+      ['CPB-030', 'Proposal Guest', 'Proposal Guest', 'proposal@example.com', 'General', '100', '100', '100', '0', 'Paid confirmed', 'PAY-030', 'High'],
+    ]),
+    registrations: [
+      { registrationId: 'proposal', fullName: 'Proposal Guest', email: 'proposal@example.com', ticketCode: 'CPB-030', ticketPrice: 100, amountDue: 100, amountPaid: 25, balanceDue: 75, paymentStatus: 'pending', paymentReference: 'PAY-030', priceTier: 'General' },
+    ],
+    operationsEntries: [],
+    event: { currency: 'BBD' },
+  })
+  const row = preview.workbookClassifications[0]
+
+  assert.equal(row.status, 'Exact Match - Proposed Update')
+  assert.equal(row.matchBasis, 'ticket code')
+  assert.deepEqual(row.proposedChanges.map((change) => change.field).sort(), ['amountPaid', 'balanceDue', 'paymentStatus'].sort())
+  assert.equal(row.proposalWarnings.length, 0)
+  assert.equal(preview.totals.workbook.amountPaid, 100)
+  assert.equal(preview.totals.currentApp.totalCollected, 25)
+  assert.equal(preview.totals.hypotheticalApp.totalCollected, 100)
+})
+
+test('Payment reconciliation UI includes refinement evidence tables and reset safety', async () => {
+  const page = await readFile('src/pages/PaymentReconciliationPage.jsx', 'utf8')
+  const utility = await readFile('src/utils/paymentReconciliation.js', 'utf8')
+
+  assert.match(page, /classificationCounts/)
+  assert.match(page, /Workbook classifications/)
+  assert.match(page, /App registration classifications/)
+  assert.match(page, /Warning instances/)
+  assert.match(page, /Duplicate groups/)
+  assert.match(page, /Proposal field list/)
+  assert.match(page, /Refresh/)
+  assert.doesNotMatch(page, /localStorage|sessionStorage/)
+  assert.doesNotMatch(page, /setDoc|updateDoc|writeBatch|runTransaction/)
+  assert.match(utility, /workbookClassifications/)
+  assert.match(utility, /appClassifications/)
 })
 
 test('Phase 23C read-only architecture and guardrails remain intact', async () => {
