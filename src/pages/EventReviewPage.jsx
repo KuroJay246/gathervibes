@@ -189,10 +189,10 @@ export function EventReviewPage() {
             </p>
           </div>
           <Link
-            to="/dashboard"
+            to="/payments"
             className="inline-flex w-fit items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-3 text-xs font-bold text-white transition hover:bg-[#C57C88]"
           >
-            Back to Overview
+            Open Payments
           </Link>
         </div>
       </section>
@@ -209,9 +209,9 @@ export function EventReviewPage() {
         )}
       </Section>
 
-      <Section eyebrow="Registration Payments" title="Registration payments and Operations Summary">
+      <Section eyebrow="Financial Boundaries" title="Registration Payments and Operations Summary">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Registration payment records track what guests owe and have paid. The Operations Ledger tracks manually recorded event income, expenses, refunds, and adjustments. These are separate records and may not match automatically.
+          Registration payment records track guest charges, recorded payments, balances, methods, and follow-up. The Operations Ledger tracks manually recorded sponsor income, vendor or supplier payments, expenses, refunds, reimbursements, and adjustments. These are separate records and are not automatically reconciled.
         </div>
 
         <div className="mt-5 grid gap-6 xl:grid-cols-2">

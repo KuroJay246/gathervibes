@@ -171,8 +171,10 @@ export function SettingsPage() {
     finance: (
       <SettingsSection eyebrow="Finance & Operations" title="Financial boundaries">
         <div className="rounded-2xl border border-[#EFE2DA] p-4">
-          <InfoRow label="Registration payments" value="Guest-facing payment fields on registration records" />
+          <InfoRow label="Registration payments" value="Guest charges, recorded payments, balances, methods, references, and follow-up flags on registration records" />
+          <InfoRow label="Payments workspace" value="/payments reviews registration payment records only" />
           <InfoRow label="Operations Ledger" value="Sponsor income, vendor or supplier payments, expenses, refunds, reimbursements, and adjustments" />
+          <InfoRow label="Automatic reconciliation" value="Not enabled; registration payments and Operations remain separate record sets" />
           <InfoRow label="Payment processing" value="No payment gateway is connected" />
         </div>
       </SettingsSection>

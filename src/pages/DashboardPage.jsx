@@ -4,6 +4,7 @@ import {
   CalendarDays,
   ClipboardCheck,
   FileInput,
+  CreditCard,
   ReceiptText,
   TicketCheck,
   Users,
@@ -18,7 +19,6 @@ import { subscribeToOperationsLedger } from '../services/operationsLedgerService
 import { formatCountdown, formatEventDate, toDateInput, upcomingEvents } from '../utils/dateUtils'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
-import { buildOperationsTotals } from '../utils/operationsReport'
 import { getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
 import { isApprovedAdmin } from '../utils/accessRoles'
 import { buildEventReadiness } from '../utils/eventReadiness'
@@ -121,7 +121,6 @@ export function DashboardPage() {
   const upcoming = useMemo(() => upcomingEvents(visibleEvents), [visibleEvents])
   const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedEvent), [registrations, selectedEvent])
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedEvent), [registrations, selectedEvent])
-  const operationsTotals = useMemo(() => buildOperationsTotals(operationsEntries), [operationsEntries])
   const readiness = useMemo(
     () => buildEventReadiness(selectedEvent, registrations, operationsEntries),
     [operationsEntries, registrations, selectedEvent],
@@ -183,7 +182,7 @@ export function DashboardPage() {
           <section className="grid gap-3 md:grid-cols-4" aria-label="Key event numbers">
             <Metric label="Registration records" value={metrics.totalRegistrations} detail="Form entries" />
             <Metric label="Guests" value={metrics.totalPersons} detail="From persons attending" />
-            <Metric label="Registration money collected" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
+            <Metric label="Registration payments recorded" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
             <Metric label="Capacity used" value={selectedEvent?.capacity ? `${metrics.capacityPercent}%` : 'Not set'} detail={capacityLabel} />
           </section>
 
@@ -229,6 +228,7 @@ export function DashboardPage() {
                 {[
                   { to: '/registrations', label: 'Add registration', icon: Users },
                   { to: '/imports', label: 'Import registrations', icon: FileInput },
+                  { to: '/payments', label: 'Review payments', icon: CreditCard },
                   { to: '/tickets', label: 'Manage tickets', icon: TicketCheck },
                   { to: '/check-in', label: 'Open check-in', icon: ClipboardCheck },
                   { to: '/operations', label: 'Review Operations', icon: ReceiptText },
@@ -258,11 +258,11 @@ export function DashboardPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <Metric label="Tickets missing" value={metrics.missingTicketRegistrations} />
                   <Metric label="Open operations" value={openOperations} />
-                  <Metric label="Outstanding" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
-                  <Metric label="Other event income" value={formatCurrency(operationsTotals.income, financeSummary.currency)} />
+                  <Metric label="Registration balance outstanding" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
+                  <Metric label="Operations open items" value={openOperations} />
                 </div>
                 <p className="text-xs leading-5 text-[#816D62]">
-                  Registration payments and Operations Ledger entries are separate records. Use Reports for the read-only event review.
+                  Registration payment records and Operations Ledger entries are separate. Use Payments for registration balances and Reports for the read-only event review.
                 </p>
                 {adminUser && <Link to="/event-review" className="text-xs font-bold text-[#B76E79] hover:underline">Open Reports</Link>}
               </div>

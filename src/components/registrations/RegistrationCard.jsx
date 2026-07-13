@@ -8,13 +8,18 @@ function attendeesText(registration = {}) {
     : ''
 }
 
-export function RegistrationCard({ registration, onEdit, onDelete }) {
+export function RegistrationCard({ registration, onEdit, onDelete, highlighted = false }) {
   const attendees = attendeesText(registration)
   const paymentStatus = normalizePaymentStatus(registration.paymentStatus)
   const finance = calculateRegistrationFinance(registration)
   const persons = Number(registration.personsAttending) || 1
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
+    <div
+      id={`registration-${registration.registrationId}`}
+      className={`flex flex-col gap-3 rounded-2xl border p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)] ${
+        highlighted ? 'border-[#D8A739] bg-[#FFF8EA] ring-2 ring-[#D8A739]/30' : 'border-[#EEDFD6] bg-white'
+      }`}
+    >
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2">

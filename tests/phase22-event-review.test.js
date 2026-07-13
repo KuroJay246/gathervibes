@@ -143,7 +143,7 @@ test('Phase 22 payment review preserves registration finance distinctions', () =
   assert.equal(review.paymentReview.registrationRecords.doorListCount, 1)
   assert.equal(review.paymentReview.registrationRecords.unknownCount, 1)
   assert.ok(review.paymentReview.explanation.includes('separate'))
-  assert.ok(review.paymentReview.comparison.note.includes('not an accounting reconciliation'))
+  assert.ok(review.paymentReview.comparison.note.includes('separate record sets'))
 })
 
 test('Phase 22 payment review does not silently derive missing registration price from event default', () => {
