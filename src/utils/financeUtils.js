@@ -376,6 +376,7 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
     pending: paymentRows.filter((row) => row.statusGroup === 'pending').length,
     door: paymentRows.filter((row) => row.statusGroup === 'door' || row.statusGroup === 'door-list').length,
     complimentary: paymentRows.filter((row) => row.statusGroup === 'complimentary').length,
+    unknown: paymentRows.filter((row) => row.statusGroup === 'unknown').length,
     'finance-review': paymentRows.filter((row) => row.warnings.length > 0 || row.statusGroup === 'needs-review').length,
   }
 

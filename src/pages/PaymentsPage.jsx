@@ -21,6 +21,7 @@ const PAYMENT_FILTERS = [
   ['pending', 'Pending'],
   ['door', 'Door'],
   ['complimentary', 'Complimentary'],
+  ['unknown', 'Unknown'],
   ['finance-review', 'Finance Review'],
 ]
 
@@ -74,7 +75,7 @@ function FollowUpList({ rows, currency }) {
                   {row.warnings[0]?.message ? ` · ${row.warnings[0].message}` : ''}
                 </p>
               </div>
-              <Link to="/registrations" className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#B76E79]">
+              <Link to={`/registrations?reviewRegistration=${encodeURIComponent(row.registrationId)}`} className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#B76E79]">
                 Review Registration
               </Link>
             </div>
@@ -164,7 +165,8 @@ export function PaymentsPage() {
         <Metric label="Paid" value={workspace.summary.paidRegistrations} />
         <Metric label="Partial payments" value={workspace.summary.partialPaymentRegistrations} />
         <Metric label="Pending" value={workspace.summary.pendingRegistrations} />
-        <Metric label="Door follow-up" value={workspace.summary.doorPaidRegistrations + workspace.summary.doorListRegistrations} />
+        <Metric label="Door Paid" value={workspace.summary.doorPaidRegistrations} />
+        <Metric label="To Pay at Door" value={workspace.summary.doorListRegistrations} />
         <Metric label="Complimentary registrations" value={workspace.summary.complimentaryRegistrations} help={`${workspace.summary.complimentaryGuests} complimentary guests`} />
         <Metric label="Unknown payment state" value={workspace.summary.unknownPaymentStates} />
         <Metric label="Finance review" value={workspace.summary.financeReviewCount} />
@@ -206,12 +208,13 @@ export function PaymentsPage() {
             <p className="p-6 text-sm text-[#816D62]">No registration payment records match the current filters.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[980px] text-left text-sm">
+              <table className="w-full min-w-[1080px] text-left text-sm">
                 <thead className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
                   <tr>
                     <th className="px-3 py-2">Registration</th>
                     <th className="px-3 py-2">Status</th>
                     <th className="px-3 py-2">Ticket</th>
+                    <th className="px-3 py-2">Tier / Price</th>
                     <th className="px-3 py-2">Due</th>
                     <th className="px-3 py-2">Paid</th>
                     <th className="px-3 py-2">Balance</th>
@@ -230,10 +233,14 @@ export function PaymentsPage() {
                         <span className="rounded-full bg-[#F7F1ED] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{row.displayStatus}</span>
                       </td>
                       <td className="px-3 py-3 text-xs text-[#816D62]">{row.ticketCode || 'Missing ticket'}</td>
+                      <td className="px-3 py-3 text-xs text-[#816D62]">
+                        <p className="font-bold text-[#2B1723]">{row.priceTier || 'Needs review'}</p>
+                        <p>{row.ticketPrice === null ? 'Price needs review' : formatCurrency(row.ticketPrice, currency)}</p>
+                      </td>
                       <td className="px-3 py-3 font-bold">{row.amountDue === null ? 'Needs review' : formatCurrency(row.amountDue, currency)}</td>
                       <td className="px-3 py-3 font-bold">{formatCurrency(row.amountPaid, currency)}</td>
                       <td className="px-3 py-3 font-bold">{row.balanceDue === null ? 'Needs review' : formatCurrency(row.balanceDue, currency)}</td>
-                      <td className="px-3 py-3 text-xs text-[#816D62]">{formatPaymentMethod(row.paymentMethod)}{row.paymentReference ? ` · ${row.paymentReference}` : ''}</td>
+                      <td className="max-w-[220px] break-words px-3 py-3 text-xs text-[#816D62]">{formatPaymentMethod(row.paymentMethod)}{row.paymentReference ? ` · ${row.paymentReference}` : ''}</td>
                       <td className="px-3 py-3">
                         {row.warnings.length > 0 ? (
                           <div className="flex max-w-xs gap-2 text-xs leading-5 text-[#7A5818]">

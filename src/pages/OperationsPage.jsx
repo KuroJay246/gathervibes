@@ -300,8 +300,8 @@ export function OperationsPage() {
         <section className="flex gap-2 rounded-xl border border-[#F2D6A3] bg-[#FFF7E8] px-4 py-3 text-xs leading-5 text-[#7A5818]">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" />
           <p>
-            {possibleRegistrationPaymentOverlap.length} Operations income {possibleRegistrationPaymentOverlap.length === 1 ? 'entry looks' : 'entries look'} like registration or ticket revenue.
-            Review before adding Operations income to registration payment totals.
+            Possible overlap: {possibleRegistrationPaymentOverlap.length} Operations income {possibleRegistrationPaymentOverlap.length === 1 ? 'entry references' : 'entries reference'} registration or ticket revenue.
+            Confirm the income was not already recorded under Payments before adding Operations income to registration payment totals.
           </p>
         </section>
       )}
@@ -320,7 +320,7 @@ export function OperationsPage() {
           ['Expenses', formatCurrency(operationsTotals.expenses)],
           ['Refunds', formatCurrency(operationsTotals.refunds)],
           ['Adjustments', formatCurrency(operationsTotals.adjustments)],
-          ['Operations net', formatCurrency(operationsTotals.net)],
+          ['Operations Net Position', formatCurrency(operationsTotals.net)],
         ].map(([label, value]) => (
           <div key={label} className="rounded-xl border border-[#EEDFD6] bg-white p-4">
             <p className="text-lg font-bold text-[#2B1723]">{value}</p>
@@ -460,7 +460,7 @@ export function OperationsPage() {
               ['Visible income', formatCurrency(filteredTotals.income)],
               ['Visible expenses', formatCurrency(filteredTotals.expenses)],
               ['Visible refunds', formatCurrency(filteredTotals.refunds)],
-              ['Visible net', formatCurrency(filteredTotals.net)],
+              ['Visible Operations Net Position', formatCurrency(filteredTotals.net)],
             ].map(([label, value]) => (
               <div key={label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
                 <p className="text-sm font-bold text-[#2B1723]">{value}</p>
@@ -474,7 +474,7 @@ export function OperationsPage() {
           </div>
 
           <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-            <strong className="text-[#6B564C]">What this means:</strong> open ledger items are still expected or pending, while visible net reflects only the filtered Operations rows on screen. Do not add this automatically to registration payment totals.
+            <strong className="text-[#6B564C]">What this means:</strong> open ledger items are still expected or pending, while visible Operations Net Position reflects only the filtered Operations rows on screen. Do not add this automatically to registration payment totals.
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">

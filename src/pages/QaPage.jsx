@@ -156,6 +156,7 @@ export function QaPage() {
         { label: 'Total collected', status: 'pass', detail: formatCurrency(financeSummary.totalCollected) },
         { label: 'Total outstanding', status: financeSummary.totalOutstanding > 0 ? 'warning' : 'pass', detail: formatCurrency(financeSummary.totalOutstanding) },
         { label: 'Payments workspace boundary', status: 'pass', detail: `${paymentsWorkspace.summary.registrationCount} registration payment records reviewed; Operations Ledger records are not included.` },
+        { label: 'Overall event profit boundary', status: 'pass', detail: 'Overall event profit is not calculated automatically; review Payments and Operations as separate record sets.' },
         { label: 'Payment follow-up records', status: paymentsWorkspace.summary.needsFollowUpCount ? 'warning' : 'pass', detail: `${paymentsWorkspace.summary.needsFollowUpCount} registration records need follow-up` },
         { label: 'Missing ticket price', status: missingTicketPrice.length ? 'warning' : 'pass', detail: `${missingTicketPrice.length} rows` },
         { label: 'Missing amount paid on paid rows', status: missingPaidAmount.length ? 'warning' : 'pass', detail: `${missingPaidAmount.length} rows` },

@@ -20,7 +20,7 @@ import { DeleteRegistrationDialog } from '../components/registrations/DeleteRegi
 import { ExportModal } from '../components/registrations/ExportModal'
 import { RegistrationFilters } from '../components/registrations/RegistrationFilters'
 import { InfoHint } from '../components/ui/InfoHint'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { buildRegistrationMetrics, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
 import { formatPaymentLabel, paymentStatusMatches } from '../utils/paymentStatus'
 import {
@@ -88,6 +88,7 @@ function CountCard({ label, value, help, active, onClick }) {
 export function RegistrationsPage() {
   const { user } = useAuth()
   const { activeEvent } = useActiveEvent()
+  const [searchParams] = useSearchParams()
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -97,6 +98,7 @@ export function RegistrationsPage() {
   const [cardFilter, setCardFilter] = useState('')
   const [success, setSuccess] = useState('')
   const [selectedIds, setSelectedIds] = useState(new Set())
+  const reviewRegistrationId = searchParams.get('reviewRegistration') || ''
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
@@ -588,7 +590,11 @@ export function RegistrationsPage() {
                 </thead>
                 <tbody className="divide-y divide-[#F2E8E1]">
                   {filteredRegistrations.map((reg) => (
-                    <tr key={reg.registrationId}>
+                      <tr
+                        key={reg.registrationId}
+                        id={`registration-${reg.registrationId}`}
+                        className={reg.registrationId === reviewRegistrationId ? 'bg-[#FFF8EA] ring-2 ring-inset ring-[#D8A739]/40' : ''}
+                      >
                       <td className="px-4 py-3">
                         <input
                           type="checkbox"
@@ -658,6 +664,7 @@ export function RegistrationsPage() {
               <RegistrationCard
                 key={reg.registrationId}
                 registration={reg}
+                highlighted={reg.registrationId === reviewRegistrationId}
                 onEdit={(r) => { setEditingRegistration(r); setIsModalOpen(true) }}
                 onDelete={(r) => setDeletingRegistration(r)}
               />
