@@ -15,6 +15,7 @@ import { CheckInPage } from './pages/CheckInPage'
 import { CommunicationsPage } from './pages/CommunicationsPage'
 import { OperationsPage } from './pages/OperationsPage'
 import { PaymentsPage } from './pages/PaymentsPage'
+import { PaymentReconciliationPage } from './pages/PaymentReconciliationPage'
 import { ScannerPage } from './pages/ScannerPage'
 import { EventReviewPage } from './pages/EventReviewPage'
 import { AssignedEventGate } from './components/AssignedEventGate'
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/events" element={<EventsPage />} />
           <Route path="/registrations" element={<RegistrationsPage />} />
           <Route path="/payments" element={<AssignedEventGate purpose="Payments"><PaymentsPage /></AssignedEventGate>} />
+          <Route path="/payments/reconciliation" element={<PaymentReconciliationPage />} />
           <Route path="/imports" element={<ImportsPage />} />
           <Route path="/tickets" element={<TicketsPage />} />
           <Route path="/check-in" element={<AssignedEventGate purpose="Check-In"><CheckInPage /></AssignedEventGate>} />
