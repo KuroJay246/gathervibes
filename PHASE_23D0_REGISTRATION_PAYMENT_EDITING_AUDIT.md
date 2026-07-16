@@ -112,6 +112,59 @@ Chrome console checks reported no app-originated warnings or errors during final
 
 MANIFEST MUST BE REGENERATED before any CPB payment-update approval is applied. This phase changed canonical payment-status normalization and finance grouping rules for Paid Confirmed, derived Partial, Door Paid, and To Pay at Door states.
 
+## Release Gate Discrepancy Audit
+
+The release gate reviewed the reported CODEX_TEST baseline discrepancy before merge:
+
+- Earlier reported total: 5 registrations / 6 guests / BBD 270 expected and paid / BBD 0 outstanding.
+- Post-cleanup canonical total: 5 registrations / 6 guests / BBD 225 expected and paid / BBD 0 outstanding.
+- Difference reviewed: BBD 45.
+
+The current CODEX_TEST registration inventory contains five registration records and six guests. Four records are one-person paid registrations at BBD 45 each. One record is a two-person paid registration at BBD 90. One record has one person with explicit zero-price registration finance fields: `ticketPrice: 0`, `amountDue: 0`, `amountPaid: 0`, and `balanceDue: 0`.
+
+Record-level canonical finance summary:
+
+| Masked record | Ticket | Persons attending | Ticket price | Amount due | Amount paid | Balance due | Payment status | Canonical contribution |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: |
+| `imp_...3af1` | `GSV-6EA5DZ` | 2 | BBD 45 | BBD 90 | BBD 90 | BBD 0 | Paid | BBD 90 |
+| `imp_...9033` | `GSV-009` | 1 | BBD 0 | BBD 0 | BBD 0 | BBD 0 | Paid | BBD 0 |
+| `imp_...28bd` | `TST-003` | 1 | BBD 45 | BBD 45 | BBD 45 | BBD 0 | Paid | BBD 45 |
+| `imp_...3d0d` | `TST-001` | 1 | BBD 45 | BBD 45 | BBD 45 | BBD 0 | Paid | BBD 45 |
+| `imp_...0f89` | `TST-002` | 1 | BBD 45 | BBD 45 | BBD 45 | BBD 0 | Paid | BBD 45 |
+
+The BBD 270 figure equals `6 guests x BBD 45`, which applies the event default ticket price across every guest and incorrectly charges the explicit zero-price registration as BBD 45. The canonical total uses registration-level finance fields where they exist, so the zero-price record contributes BBD 0. That single record explains the full BBD 45 delta.
+
+The release-gate comparison also evaluated the same current Firestore registration snapshot through the pre-Phase-23D-0 `main` finance helpers and the Phase 23D-0 helpers. Both calculated BBD 225 expected, BBD 225 paid, and BBD 0 outstanding for the current five records. The discrepancy is therefore not caused by the Phase 23D-0 commit and is not evidence of a missing payment or data loss. It is a correction of an earlier aggregate/default-ticket-price interpretation.
+
+Final release-gate conclusion: **BBD 45 CHANGE LEGITIMATE**.
+
+## Release Gate Cleanup Evidence
+
+The synthetic browser-audit cleanup was verified from Firestore and audit logs:
+
+- Eight synthetic `QA_PAYMENT_STATUS_AUDIT_*` CODEX_TEST registrations were created during the audit.
+- The same eight synthetic registrations were deleted.
+- The synthetic create target set and delete target set matched exactly.
+- No synthetic CODEX_TEST registrations remained after cleanup.
+- Recent release-gate review found no Operations writes, ticket writes, or event writes associated with the cleanup.
+- Audit logs retained append-only evidence for the synthetic creates, updates, and deletes.
+
+Five real CODEX_TEST registration update audit entries existed before the synthetic browser-audit cleanup window. The audit-log details for those entries identify the registration update event but do not expose a field-level before/after diff, so the exact changed fields cannot be reconstructed from audit logs alone. Current registration records are internally consistent and produce the canonical BBD 225 / BBD 225 / BBD 0 totals.
+
+## Release Readiness and Manifest Invalidation
+
+The release gate treats the current CODEX_TEST totals as canonical:
+
+- Registrations: 5
+- Guests: 6
+- Expected registration income: BBD 225
+- Recorded registration payments: BBD 225
+- Outstanding registration balance: BBD 0
+- Payment follow-up count: 0
+- Remaining synthetic records: 0
+
+The previous CPB reconciliation manifest remains invalid and must not be used for approval or production writes. The invalid manifest hash is `2A98AB506F1846294944DA49A57CD2E898F6B5D97E4E03C412FD89683C92C409`. A new CPB manifest must be generated only in a later authorized phase after this release is complete.
+
 ## Recommended Next Phase
 
 Phase 23D should continue with a regenerated reconciliation manifest, then a fresh organizer approval review using the corrected payment-status and finance grouping contract.
