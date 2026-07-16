@@ -257,7 +257,11 @@ export function classifyRegistrationFinance(registration = {}, event = {}, conte
   }
 
   const hasBlockingWarning = warnings.some((item) => item.level === 'blocking')
-  const isPartial = computed.paymentStatus === 'partial' || (computed.amountPaid > 0 && (computed.balanceDue || 0) > 0)
+  const isPartial = (
+    !['door', 'door-list', 'complimentary'].includes(computed.paymentStatus)
+    && computed.amountPaid > 0
+    && (computed.balanceDue || 0) > 0
+  )
   const statusGroup = hasBlockingWarning
     ? 'needs-review'
     : isPartial
@@ -274,13 +278,19 @@ export function classifyRegistrationFinance(registration = {}, event = {}, conte
                 ? 'pending'
                 : 'unknown'
 
+  const isResolvedPaid = statusGroup === 'paid'
+    || (statusGroup === 'door' && computed.amountPaid > 0 && computed.balanceDue === 0)
+  const isPaymentResolved = isResolvedPaid || statusGroup === 'complimentary'
+
   return {
     ...computed,
     statusGroup,
     displayStatus: formatPaymentStatusGroup(statusGroup),
     warnings,
     blockingWarnings: warnings.filter((item) => item.level === 'blocking'),
-    needsFollowUp: statusGroup !== 'paid' || warnings.length > 0,
+    isResolvedPaid,
+    isPaymentResolved,
+    needsFollowUp: !isPaymentResolved || warnings.length > 0,
   }
 }
 
@@ -344,6 +354,8 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
       paymentStatus: finance.paymentStatus,
       statusGroup: finance.statusGroup,
       displayStatus: finance.displayStatus,
+      isResolvedPaid: finance.isResolvedPaid,
+      isPaymentResolved: finance.isPaymentResolved,
       warnings: finance.warnings,
       needsFollowUp: finance.needsFollowUp,
     }
@@ -353,7 +365,7 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
     summary.expectedRegistrationIncome += finance.amountDue || 0
     summary.recordedPayments += finance.amountPaid || 0
     summary.outstandingBalance += finance.balanceDue || 0
-    if (finance.statusGroup === 'paid') summary.paidRegistrations += 1
+    if (finance.isResolvedPaid) summary.paidRegistrations += 1
     if (finance.statusGroup === 'partial') summary.partialPaymentRegistrations += 1
     if (finance.statusGroup === 'pending') summary.pendingRegistrations += 1
     if (finance.statusGroup === 'door') summary.doorPaidRegistrations += 1
@@ -371,7 +383,7 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
   const filterCounts = {
     all: paymentRows.length,
     'needs-follow-up': paymentRows.filter((row) => row.needsFollowUp).length,
-    paid: paymentRows.filter((row) => row.statusGroup === 'paid').length,
+    paid: paymentRows.filter((row) => row.isResolvedPaid).length,
     partial: paymentRows.filter((row) => row.statusGroup === 'partial').length,
     pending: paymentRows.filter((row) => row.statusGroup === 'pending').length,
     door: paymentRows.filter((row) => row.statusGroup === 'door' || row.statusGroup === 'door-list').length,
@@ -391,6 +403,7 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
 export function paymentFilterMatches(row = {}, filter = 'all') {
   if (!filter || filter === 'all') return true
   if (filter === 'needs-follow-up') return Boolean(row.needsFollowUp)
+  if (filter === 'paid') return Boolean(row.isResolvedPaid)
   if (filter === 'door') return row.statusGroup === 'door' || row.statusGroup === 'door-list'
   if (filter === 'finance-review') return row.statusGroup === 'needs-review' || (row.warnings || []).length > 0
   return row.statusGroup === filter
@@ -425,10 +438,18 @@ export function buildFinanceSummary(registrations = [], event = {}) {
     summary.totalCollected += paid
     summary.totalOutstanding += balance
 
-    if (finance.paymentStatus === 'paid' || balance === 0) {
+    const isResolvedPaid = finance.paymentStatus === 'paid' || (finance.paymentStatus === 'door' && paid > 0 && balance === 0)
+    const isPartial = !['door', 'door-list', 'complimentary'].includes(finance.paymentStatus) && paid > 0 && balance > 0
+
+    if (isResolvedPaid) {
       summary.paidRegistrations += 1
       summary.paidPersons += persons
       summary.paidTotal += paid
+    }
+    if (isPartial) {
+      summary.partialPaymentRegistrations += 1
+      summary.partialPaymentPersons += persons
+      summary.partialPaymentTotal += paid
     }
     if (finance.paymentStatus === 'pending' || balance > 0) {
       summary.pendingRegistrations += 1
@@ -475,6 +496,9 @@ export function buildFinanceSummary(registrations = [], event = {}) {
     doorPersons: 0,
     doorListRegistrations: 0,
     doorListPersons: 0,
+    partialPaymentRegistrations: 0,
+    partialPaymentPersons: 0,
+    partialPaymentTotal: 0,
     complimentaryPersons: 0,
     missingFinanceInfo: 0,
     financeWarningCount: 0,
