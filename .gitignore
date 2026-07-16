@@ -22,3 +22,10 @@ test_output.txt
 Cake_Piknik_Payment_Audit.xlsx
 *_backup.csv
 *.xlsx
+
+# Repo-local cleanup guardrails: private evidence and copied worktrees belong outside
+# this active project so lint/test/build scope cannot be contaminated.
+GSV_Phase*/
+gathetr-*/
+**/dist/
+**/node_modules/
