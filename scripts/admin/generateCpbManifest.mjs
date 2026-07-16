@@ -74,6 +74,10 @@ function cellValue(cell, strings) {
   return Number.isFinite(number) && String(raw).trim() !== '' ? number : xmlDecode(raw)
 }
 
+function cellNodes(row = '') {
+  return [...row.matchAll(/<(?:[^:>]+:)?c\b[^>]*?(?:\/>|>[\s\S]*?<\/(?:[^:>]+:)?c>)/g)].map((match) => match[0])
+}
+
 function normalizeRows(rows = []) {
   const [headers = [], ...dataRows] = rows
   return {
@@ -108,11 +112,10 @@ function parseWorkbook(buffer) {
     const xml = entries[path] || ''
     const rows = elements(xml, 'row').map((row) => {
       const values = []
-      ;[...row.matchAll(/<(?:[^:>]+:)?c\b[^>]*>[\s\S]*?<\/(?:[^:>]+:)?c>/g)].forEach((cellMatch) => {
-        const cell = cellMatch[0]
+      cellNodes(row).forEach((cell) => {
         values[columnIndex(attr(cell, 'r'))] = cellValue(cell, strings)
       })
-      return values.map((value) => value ?? '')
+      return Array.from({ length: values.length }, (_, cellIndex) => values[cellIndex] ?? '')
     })
     return {
       id: `sheet-${index + 1}`,

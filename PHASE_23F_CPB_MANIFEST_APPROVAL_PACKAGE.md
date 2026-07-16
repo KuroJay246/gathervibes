@@ -6,7 +6,7 @@ Phase 23F turns the regenerated CPB payment manifest into an organizer-review pa
 
 The approval package is tied to new manifest SHA256:
 
-`FB3A216BB8F73B3113758AE1335A01CEAA6EAB079281E4DEE7142FBA4911FA80`
+`D690D6B84A272F5189098F57E4643FAF6F5E628F98519B74369593ED31DE0828`
 
 ## Inputs
 
@@ -43,26 +43,27 @@ The package is intentionally unresolved:
 
 Exact full-approval phrase:
 
-`I APPROVE CPB MANIFEST FB3A216BB8F73B3113758AE1335A01CEAA6EAB079281E4DEE7142FBA4911FA80 FOR PHASE 23G APPLY REHEARSAL AND PHASE 23H APPLY DESIGN ONLY`
+`I APPROVE CPB MANIFEST D690D6B84A272F5189098F57E4643FAF6F5E628F98519B74369593ED31DE0828 FOR PHASE 23G APPLY REHEARSAL AND PHASE 23H APPLY DESIGN ONLY`
 
 Exact partial-approval phrase:
 
-`I PARTIALLY APPROVE CPB MANIFEST FB3A216BB8F73B3113758AE1335A01CEAA6EAB079281E4DEE7142FBA4911FA80 USING THE SAVED APPROVAL DECISIONS FOR PHASE 23G APPLY REHEARSAL AND PHASE 23H APPLY DESIGN ONLY`
+`I PARTIALLY APPROVE CPB MANIFEST D690D6B84A272F5189098F57E4643FAF6F5E628F98519B74369593ED31DE0828 USING THE SAVED APPROVAL DECISIONS FOR PHASE 23G APPLY REHEARSAL AND PHASE 23H APPLY DESIGN ONLY`
 
 Exact rejection phrase:
 
-`I DO NOT APPROVE CPB MANIFEST FB3A216BB8F73B3113758AE1335A01CEAA6EAB079281E4DEE7142FBA4911FA80`
+`I DO NOT APPROVE CPB MANIFEST D690D6B84A272F5189098F57E4643FAF6F5E628F98519B74369593ED31DE0828`
 
 ## Counts
 
 - Proposals: `65`
-- Field changes: `373`
-- Blank fills: `243`
-- Existing-value replacements: `130`
+- Field changes: `385`
+- Blank fills: `253`
+- Existing-value replacements: `132`
 - Money-field changes: `246`
 - Payment-status changes: `65`
-- Price-tier changes: `55`
-- Payment-method changes: `7`
+- Price-tier changes: `65`
+- Payment-method changes: `9`
+- Door Paid proposals: `2`
 - To Pay at Door proposals: `7`
 - Partial-deposit proposals: `2`
 - Complimentary proposals: `0`
@@ -75,8 +76,8 @@ Field counts:
 - `amountPaid`: `58`
 - `balanceDue`: `58`
 - `paymentStatus`: `65`
-- `priceTier`: `55`
-- `paymentMethod`: `7`
+- `priceTier`: `65`
+- `paymentMethod`: `9`
 
 ## Risk Flags
 

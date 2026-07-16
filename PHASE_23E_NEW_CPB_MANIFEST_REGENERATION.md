@@ -15,11 +15,11 @@ Regenerate the Cake Piknik Barbados payment reconciliation manifest after the re
 
 ## Results
 
-- New manifest SHA256: `FB3A216BB8F73B3113758AE1335A01CEAA6EAB079281E4DEE7142FBA4911FA80`
+- New manifest SHA256: `D690D6B84A272F5189098F57E4643FAF6F5E628F98519B74369593ED31DE0828`
 - Normalized workbook rows: 70
 - CPB registration records read: 71
 - Proposal count: 65
-- Field-change count: 373
+- Field-change count: 385
 - Firestore writes performed: 0
 
 ## Classification Counts
@@ -67,7 +67,7 @@ Hypothetical after safe proposals:
 - Paid total: BBD 5420
 - Outstanding total: BBD 870
 - Affected registrations: 65
-- Changed fields: 373
+- Changed fields: 385
 
 Differences are reconciliation evidence only. They are not classified as missing cash.
 

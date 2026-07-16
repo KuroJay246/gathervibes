@@ -34,6 +34,8 @@ test('Phase 23E generator uses the released parser and finance contracts', async
   assert.match(script, /worksheet-xml-cached-values/)
   assert.match(script, /cpb-reconciliation-parser-v1/)
   assert.match(script, /phase-23d0-registration-finance-v1/)
+  assert.match(script, /function cellNodes/)
+  assert.match(script, /Array\.from\(\{ length: values\.length \}/)
   assert.match(script, /77AF3050F82D97D12067728FC1314E51CA734F73B798AAD8D63C263421029D96/)
   assert.match(script, /2A98AB506F1846294944DA49A57CD2E898F6B5D97E4E03C412FD89683C92C409/)
   assert.match(script, /C:\\\\Users\\\\Jaylan\\\\Desktop\\\\GSV_New_CPB_Manifest/)
