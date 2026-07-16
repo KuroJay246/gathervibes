@@ -227,6 +227,7 @@ export function EventReviewPage() {
               <SummaryCard label="Collected" value={formatEventReviewMoney(review.paymentReview.registrationRecords.collectedAmount, currency)} />
               <SummaryCard label="Outstanding" value={formatEventReviewMoney(review.paymentReview.registrationRecords.outstandingAmount, currency)} />
               <SummaryCard label="Pending count" value={review.paymentReview.registrationRecords.pendingCount} />
+              <SummaryCard label="Partial payment count" value={review.paymentReview.registrationRecords.partialPaymentCount} />
               <SummaryCard label="Paid count" value={review.paymentReview.registrationRecords.paidCount} />
               <SummaryCard label="Complimentary registrations" value={review.paymentReview.registrationRecords.complimentaryRegistrations} />
               <SummaryCard label="Complimentary guests" value={review.paymentReview.registrationRecords.complimentaryGuests} />
@@ -283,6 +284,7 @@ export function EventReviewPage() {
           <SummaryCard label="Capacity usage" value={review.summary.capacity > 0 ? `${review.summary.capacityUsagePercent}%` : 'Not available'} />
           <SummaryCard label="Paid count" value={review.summary.paidCount} />
           <SummaryCard label="Pending count" value={review.summary.pendingCount} />
+          <SummaryCard label="Partial payment count" value={review.summary.partialPaymentCount} />
           <SummaryCard label="Complimentary count" value={review.summary.complimentaryCount} />
           <SummaryCard label="To Pay at Door count" value={review.summary.doorListCount} />
           <SummaryCard label="Unknown count" value={review.summary.unknownCount} />

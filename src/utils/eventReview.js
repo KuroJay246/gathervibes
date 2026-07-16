@@ -93,6 +93,7 @@ function getEventTiming(event = {}, asOf = new Date()) {
 function buildRegistrationPaymentBreakdown(registrations = [], event = {}) {
   const summary = buildFinanceSummary(registrations, event)
   let doorListCount = 0
+  let partialPaymentCount = 0
   let unknownCount = 0
   let pricingReviewCount = 0
   let financeWarningCount = 0
@@ -103,6 +104,7 @@ function buildRegistrationPaymentBreakdown(registrations = [], event = {}) {
     const warnings = financeWarnings(registration, event)
 
     if (paymentStatus === 'door-list') doorListCount += 1
+    if (!['door', 'door-list', 'complimentary'].includes(paymentStatus) && finance.amountPaid > 0 && (finance.balanceDue || 0) > 0) partialPaymentCount += 1
     if (paymentStatus === 'unknown') unknownCount += 1
     if (finance.needsFinanceReview) pricingReviewCount += 1
     if (warnings.length > 0) financeWarningCount += 1
@@ -111,6 +113,7 @@ function buildRegistrationPaymentBreakdown(registrations = [], event = {}) {
   return {
     ...summary,
     doorListCount,
+    partialPaymentCount,
     unknownCount,
     pricingReviewCount,
     financeWarningCount,
@@ -383,7 +386,8 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
         complimentaryRegistrations: metrics.complimentaryRegistrations,
         complimentaryGuests: metrics.complimentaryPersons,
         pendingCount: metrics.pendingRegistrations,
-        paidCount: metrics.paidRegistrations,
+        partialPaymentCount: finance.partialPaymentCount,
+        paidCount: finance.paidRegistrations,
         doorPaidCount: metrics.doorRegistrations,
         doorListCount: finance.doorListCount,
         unknownCount: finance.unknownCount,
@@ -418,8 +422,9 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
       capacity: validCapacity,
       registrationCount: metrics.totalRegistrations,
       guestCount: totalGuests,
-      paidCount: metrics.paidRegistrations,
+      paidCount: finance.paidRegistrations,
       pendingCount: metrics.pendingRegistrations,
+      partialPaymentCount: finance.partialPaymentCount,
       complimentaryCount: metrics.complimentaryRegistrations,
       doorListCount: finance.doorListCount,
       unknownCount: finance.unknownCount,
