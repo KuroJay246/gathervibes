@@ -64,7 +64,7 @@ function sameActiveEventSnapshot(activeEvent, nextEvent) {
 
 function Metric({ label, value, detail }) {
   return (
-    <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3">
+    <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3" aria-label={`${label}: ${value}`}>
       <p className="text-xl font-bold text-[#2B1723]">{value}</p>
       <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8C7567]">{label}</p>
       {detail && <p className="mt-1 text-xs text-[#816D62]">{detail}</p>}
@@ -182,8 +182,40 @@ export function DashboardPage() {
           <section className="grid gap-3 md:grid-cols-4" aria-label="Key event numbers">
             <Metric label="Registration records" value={metrics.totalRegistrations} detail="Form entries" />
             <Metric label="Guests" value={metrics.totalPersons} detail="From persons attending" />
-            <Metric label="Registration payments recorded" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
+            <Metric label="Payments Received" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
             <Metric label="Capacity used" value={selectedEvent?.capacity ? `${metrics.capacityPercent}%` : 'Not set'} detail={capacityLabel} />
+          </section>
+
+          <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="overview-registration-finance-heading">
+            <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Registration Finance</p>
+                <h2 id="overview-registration-finance-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Expected, received, and outstanding</h2>
+              </div>
+              <Link to="/payments" className="inline-flex min-h-10 w-fit items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#B76E79]">
+                Open Payments
+              </Link>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <Metric
+                label="Expected Registration Income"
+                value={formatCurrency(financeSummary.totalExpected, financeSummary.currency)}
+                detail="Explicit registration charges only"
+              />
+              <Metric
+                label="Payments Received"
+                value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)}
+                detail="Confirmed registration payments"
+              />
+              <Metric
+                label="Outstanding Balance"
+                value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)}
+                detail="Balances still due"
+              />
+            </div>
+            <p className="mt-3 text-xs leading-5 text-[#816D62]">
+              These registration totals use explicit ticket price or amount due values only. Operations Ledger money remains separate.
+            </p>
           </section>
 
           <section className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
@@ -258,7 +290,7 @@ export function DashboardPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <Metric label="Tickets missing" value={metrics.missingTicketRegistrations} />
                   <Metric label="Open operations" value={openOperations} />
-                  <Metric label="Registration balance outstanding" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
+                  <Metric label="Outstanding Balance" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
                   <Metric label="Operations open items" value={openOperations} />
                 </div>
                 <p className="text-xs leading-5 text-[#816D62]">

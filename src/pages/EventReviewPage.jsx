@@ -20,7 +20,7 @@ import { formatEventDate } from '../utils/dateUtils'
 
 function SummaryCard({ label, value, help }) {
   return (
-    <article className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+    <article className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4" aria-label={`${label}: ${value}`}>
       <p className="text-lg font-bold text-[#2B1723]">{value}</p>
       <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
       {help && <p className="mt-2 text-[11px] leading-5 text-[#816D62]">{help}</p>}
@@ -211,7 +211,7 @@ export function EventReviewPage() {
 
       <Section eyebrow="Financial Boundaries" title="Registration Payments and Operations Summary">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Registration payment records track guest charges, recorded payments, balances, methods, and follow-up. The Operations Ledger tracks manually recorded sponsor income, vendor or supplier payments, expenses, refunds, reimbursements, and adjustments. These are separate records and are not automatically reconciled.
+          Registration payment records track guest charges, payments received, balances, methods, and follow-up. The Operations Ledger tracks manually recorded sponsor income, vendor or supplier payments, expenses, refunds, reimbursements, and adjustments. These are separate records and are not automatically reconciled.
         </div>
 
         <div className="mt-5 grid gap-6 xl:grid-cols-2">
@@ -223,9 +223,9 @@ export function EventReviewPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <SummaryCard label="Registration records" value={review.paymentReview.registrationRecords.registrationCount} />
               <SummaryCard label="Total guests" value={review.paymentReview.registrationRecords.guestCount} />
-              <SummaryCard label="Expected income" value={formatEventReviewMoney(review.paymentReview.registrationRecords.expectedIncome, currency)} />
-              <SummaryCard label="Collected" value={formatEventReviewMoney(review.paymentReview.registrationRecords.collectedAmount, currency)} />
-              <SummaryCard label="Outstanding" value={formatEventReviewMoney(review.paymentReview.registrationRecords.outstandingAmount, currency)} />
+              <SummaryCard label="Expected Registration Income" value={formatEventReviewMoney(review.paymentReview.registrationRecords.expectedIncome, currency)} />
+              <SummaryCard label="Payments Received" value={formatEventReviewMoney(review.paymentReview.registrationRecords.collectedAmount, currency)} />
+              <SummaryCard label="Outstanding Balance" value={formatEventReviewMoney(review.paymentReview.registrationRecords.outstandingAmount, currency)} />
               <SummaryCard label="Pending count" value={review.paymentReview.registrationRecords.pendingCount} />
               <SummaryCard label="Partial payment count" value={review.paymentReview.registrationRecords.partialPaymentCount} />
               <SummaryCard label="Paid count" value={review.paymentReview.registrationRecords.paidCount} />
@@ -265,7 +265,7 @@ export function EventReviewPage() {
             <div>
               <p className="text-sm font-bold text-[#2B1723]">{review.paymentReview.comparison.label}</p>
               <p className="mt-2 text-xs leading-5 text-[#816D62]">
-                Registration collected: <strong>{formatEventReviewMoney(review.paymentReview.comparison.registrationCollected, currency)}</strong>
+                Registration payments received: <strong>{formatEventReviewMoney(review.paymentReview.comparison.registrationCollected, currency)}</strong>
                 {' '}· Ledger received income: <strong>{formatEventReviewMoney(review.paymentReview.comparison.ledgerReceivedIncome, currency)}</strong>
                 {' '}· Difference: <strong>{formatEventReviewMoney(review.paymentReview.comparison.difference, currency)}</strong>
               </p>

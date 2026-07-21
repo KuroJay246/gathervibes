@@ -27,7 +27,7 @@ const PAYMENT_FILTERS = [
 
 function Metric({ label, value, help }) {
   return (
-    <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3">
+    <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3" aria-label={`${label}: ${value}`}>
       <p className="text-lg font-bold text-[#2B1723]">{value}</p>
       <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8C7567]">{label}</p>
       {help && <p className="mt-1 text-xs leading-5 text-[#816D62]">{help}</p>}
@@ -39,10 +39,58 @@ function BoundaryNotice() {
   return (
     <section className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
       <strong className="text-[#4E3928]">Registration payment records only.</strong> This page reviews registration charges,
-      recorded payments, balances, methods, and follow-up flags. It is not a payment gateway, processor report,
+      payments received, balances, methods, and follow-up flags. It is not a payment gateway, processor report,
       bank reconciliation, invoice system, or accounting ledger. Operations remains separate for sponsor income,
       vendor payments, expenses, refunds, reimbursements, and adjustments.
     </section>
+  )
+}
+
+function PaymentCard({ row, currency }) {
+  const details = [
+    ['Expected', row.amountDue === null ? 'Needs review' : formatCurrency(row.amountDue, currency)],
+    ['Received', formatCurrency(row.amountPaid, currency)],
+    ['Balance', row.balanceDue === null ? 'Needs review' : formatCurrency(row.balanceDue, currency)],
+    ['Price tier', row.priceTier || 'Needs review'],
+    ['Ticket price', row.ticketPrice === null ? 'Price needs review' : formatCurrency(row.ticketPrice, currency)],
+    ['Method', formatPaymentMethod(row.paymentMethod)],
+    ['Reference', row.paymentReference || 'Not recorded'],
+    ['Ticket', row.ticketCode || 'Missing ticket'],
+  ]
+  const warnings = row.warnings.map((item) => item.message).join(' ')
+
+  return (
+    <article className="rounded-2xl border border-[#F2E8E1] bg-white p-4" aria-label={`${row.name} payment record`}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h3 className="break-words text-sm font-bold text-[#2B1723]">{row.name}</h3>
+          <p className="mt-1 text-xs text-[#816D62]">
+            {row.personsAttending} guest{row.personsAttending === 1 ? '' : 's'}
+          </p>
+        </div>
+        <span className="inline-flex w-fit max-w-full items-center rounded-full bg-[#F7F1ED] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">
+          {row.displayStatus}
+        </span>
+      </div>
+
+      <dl className="mt-4 grid gap-2 sm:grid-cols-3" aria-label="Payment amounts">
+        {details.map(([label, value]) => (
+          <div key={label} className="min-w-0 rounded-xl bg-[#FBF8F5] px-3 py-2">
+            <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8C7567]">{label}</dt>
+            <dd className="mt-1 break-words text-sm font-bold text-[#2B1723]">{value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      {warnings ? (
+        <div className="mt-3 flex gap-2 rounded-xl border border-[#F1DBA9] bg-[#FFF8EA] p-3 text-xs leading-5 text-[#7A5818]" role="status">
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
+          <span className="min-w-0 break-words">{warnings}</span>
+        </div>
+      ) : (
+        <p className="mt-3 text-xs text-[#816D62]">No warning</p>
+      )}
+    </article>
   )
 }
 
@@ -159,9 +207,9 @@ export function PaymentsPage() {
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <Metric label="Registration records" value={workspace.summary.registrationCount} />
         <Metric label="Guests" value={workspace.summary.guestCount} />
-        <Metric label="Expected registration income" value={formatCurrency(workspace.summary.expectedRegistrationIncome, currency)} />
-        <Metric label="Recorded registration payments" value={formatCurrency(workspace.summary.recordedPayments, currency)} />
-        <Metric label="Outstanding registration balance" value={formatCurrency(workspace.summary.outstandingBalance, currency)} />
+        <Metric label="Expected Registration Income" value={formatCurrency(workspace.summary.expectedRegistrationIncome, currency)} />
+        <Metric label="Payments Received" value={formatCurrency(workspace.summary.recordedPayments, currency)} />
+        <Metric label="Outstanding Balance" value={formatCurrency(workspace.summary.outstandingBalance, currency)} />
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -182,7 +230,7 @@ export function PaymentsPage() {
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Payment Records</p>
-            <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Registration payment table</h2>
+            <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Registration payment records</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             <label className="relative">
@@ -206,7 +254,19 @@ export function PaymentsPage() {
           <strong className="text-[#6B564C]">How to use this:</strong> review flags here, then update the source registration record in Guests & Registrations. Do not add registration payments to Operations unless they are intentionally separate event-level ledger entries.
         </div>
 
-        <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">
+        <div className="mt-4 lg:hidden" aria-label="Responsive payment records">
+          {visibleRows.length === 0 ? (
+            <p className="rounded-xl border border-[#F2E8E1] p-6 text-sm text-[#816D62]">No registration payment records match the current filters.</p>
+          ) : (
+            <div className="grid gap-3">
+              {visibleRows.map((row) => (
+                <PaymentCard key={row.registrationId || `${row.name}-${row.ticketCode}`} row={row} currency={currency} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 hidden overflow-hidden rounded-xl border border-[#F2E8E1] lg:block">
           {visibleRows.length === 0 ? (
             <p className="p-6 text-sm text-[#816D62]">No registration payment records match the current filters.</p>
           ) : (

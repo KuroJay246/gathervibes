@@ -30,7 +30,7 @@ test('organizer navigation uses product labels while preserving route paths', as
 test('Overview removes phase clutter and keeps event-scoped decision sections', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
 
-  for (const text of ['Working Event', 'Registration records', 'Guests', 'Registration payments recorded', 'Capacity used', 'Needs Attention', 'Quick Actions', 'Event Progress', 'Upcoming Events']) {
+  for (const text of ['Working Event', 'Registration records', 'Guests', 'Payments Received', 'Capacity used', 'Needs Attention', 'Quick Actions', 'Event Progress', 'Upcoming Events']) {
     assert.match(dashboard, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
