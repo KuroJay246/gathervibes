@@ -1,6 +1,7 @@
 export const CODEX_TEST_EVENT_ID = 'xPfa0b3KZyLSDnAD2uGI'
 export const CPB_EVENT_ID = 'zhaPxi31cpqLAW0cuS20'
 export const PHASE_23G_MANIFEST_SHA256 = 'D690D6B84A272F5189098F57E4643FAF6F5E628F98519B74369593ED31DE0828'
+export const PHASE_23J_MANIFEST_SHA256 = PHASE_23G_MANIFEST_SHA256
 
 export const APPLY_SUPPORTED_FIELDS = [
   'ticketPrice',
@@ -16,6 +17,10 @@ export function expectedPhase23gApprovalPhrase(manifestSha256 = PHASE_23G_MANIFE
   return `I APPROVE CPB MANIFEST ${manifestSha256} FOR PHASE 23G APPLY REHEARSAL ONLY`
 }
 
+export function expectedPhase23jApprovalPhrase(manifestSha256 = PHASE_23J_MANIFEST_SHA256) {
+  return `I APPROVE CPB MANIFEST ${manifestSha256} FOR PHASE 23J FINAL APPLY PACKAGE AND SEPARATE CPB PRODUCTION APPLY AUTHORIZATION`
+}
+
 export function assertPhase23gApplyLock({
   targetEventId,
   manifestSha256,
@@ -28,6 +33,20 @@ export function assertPhase23gApplyLock({
   if (approvalPhrase !== expectedPhase23gApprovalPhrase(manifestSha256)) throw new Error('Exact Phase 23G rehearsal approval phrase is required.')
   if (rehearsalOnly !== true) throw new Error('Phase 23G supports rehearsal only; production apply is not enabled.')
   return true
+}
+
+export function assertPhase23jProductionApplyLock({
+  targetEventId,
+  manifestSha256,
+  approvalPhrase,
+  dryRun = true,
+  proposalCount,
+} = {}) {
+  if (targetEventId !== CPB_EVENT_ID) throw new Error('Phase 23J production apply is locked to CPB.')
+  if (manifestSha256 !== PHASE_23J_MANIFEST_SHA256) throw new Error('Manifest hash mismatch.')
+  if (approvalPhrase !== expectedPhase23jApprovalPhrase(manifestSha256)) throw new Error('Exact Phase 23J production approval phrase is required.')
+  if (proposalCount !== 65) throw new Error('Phase 23J expected exactly 65 CPB proposals.')
+  return { approved: true, dryRun }
 }
 
 export function buildRegistrationApplyPlan({ registration, proposal, targetEventId }) {

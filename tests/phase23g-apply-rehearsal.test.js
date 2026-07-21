@@ -7,9 +7,12 @@ import {
   CODEX_TEST_EVENT_ID,
   CPB_EVENT_ID,
   PHASE_23G_MANIFEST_SHA256,
+  PHASE_23J_MANIFEST_SHA256,
   assertPhase23gApplyLock,
+  assertPhase23jProductionApplyLock,
   buildRegistrationApplyPlan,
   expectedPhase23gApprovalPhrase,
+  expectedPhase23jApprovalPhrase,
 } from '../src/utils/manifestApplyEngine.js'
 
 test('Phase 23G apply lock allows CODEX_TEST rehearsal only with exact manifest approval phrase', () => {
@@ -75,6 +78,37 @@ test('Phase 23G apply plan rejects unsupported fields and scope drift', () => {
   assert.equal(APPLY_SUPPORTED_FIELDS.includes('checkedIn'), false)
 })
 
+test('Phase 23J production apply lock requires CPB, exact approval, and full proposal count', () => {
+  assert.deepEqual(assertPhase23jProductionApplyLock({
+    targetEventId: CPB_EVENT_ID,
+    manifestSha256: PHASE_23J_MANIFEST_SHA256,
+    approvalPhrase: expectedPhase23jApprovalPhrase(),
+    dryRun: false,
+    proposalCount: 65,
+  }), { approved: true, dryRun: false })
+
+  assert.throws(() => assertPhase23jProductionApplyLock({
+    targetEventId: CODEX_TEST_EVENT_ID,
+    manifestSha256: PHASE_23J_MANIFEST_SHA256,
+    approvalPhrase: expectedPhase23jApprovalPhrase(),
+    proposalCount: 65,
+  }), /locked to CPB/)
+
+  assert.throws(() => assertPhase23jProductionApplyLock({
+    targetEventId: CPB_EVENT_ID,
+    manifestSha256: PHASE_23J_MANIFEST_SHA256,
+    approvalPhrase: expectedPhase23gApprovalPhrase(),
+    proposalCount: 65,
+  }), /Exact Phase 23J production approval phrase/)
+
+  assert.throws(() => assertPhase23jProductionApplyLock({
+    targetEventId: CPB_EVENT_ID,
+    manifestSha256: PHASE_23J_MANIFEST_SHA256,
+    approvalPhrase: expectedPhase23jApprovalPhrase(),
+    proposalCount: 64,
+  }), /expected exactly 65/)
+})
+
 test('Phase 23G rehearsal script is CODEX_TEST-only and does not write Operations, tickets, or check-ins', () => {
   const script = readFileSync('scripts/admin/runCodexApplyRehearsal.mjs', 'utf8')
   assert.match(script, /CODEX_TEST_EVENT_ID/)
@@ -83,4 +117,19 @@ test('Phase 23G rehearsal script is CODEX_TEST-only and does not write Operation
   assert.doesNotMatch(script, /operationsLedger/)
   assert.doesNotMatch(script, /checkedIn:\s*true/)
   assert.doesNotMatch(script, /ticketCode:\s*'[^']+'/)
+})
+
+test('Phase 23J production script is locked to manifest approval, backups, audit logs, and registration finance only', () => {
+  const script = readFileSync('scripts/admin/runCpbProductionApply.mjs', 'utf8')
+
+  assert.match(script, /CPB_PRODUCTION_APPLY_APPROVAL/)
+  assert.match(script, /assertPhase23jProductionApplyLock/)
+  assert.match(script, /backup_private\.json/)
+  assert.match(script, /rawAuditValidated/)
+  assert.match(script, /registration\.finance-update/)
+  assert.match(script, /updateMask/)
+  assert.doesNotMatch(script, /operationsLedger/)
+  assert.doesNotMatch(script, /checkedIn:\s*true/)
+  assert.doesNotMatch(script, /ticketCode:\s*'[^']+'/)
+  assert.doesNotMatch(script, /\{\s*delete:/)
 })
