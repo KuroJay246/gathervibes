@@ -9,7 +9,7 @@ test('Phase 20 dashboard and events preserve approved layout while clarifying wo
   const events = await readFile('src/pages/EventsPage.jsx', 'utf8')
 
   assert.match(dashboard, /Working Event/)
-  assert.match(dashboard, /Registration payments recorded/)
+  assert.match(dashboard, /Payments Received/)
   assert.match(dashboard, /Capacity used/)
   assert.match(events, /function pricingModeLabel\(event = \{\}\)/)
   assert.match(events, /Default base ticket price only/)
