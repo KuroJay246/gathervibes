@@ -30,6 +30,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
         <div className="relative">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
           <input
+            aria-label="Search keyword"
             type="text"
             placeholder="Search keyword..."
             value={filters.keyword || ''}
@@ -38,6 +39,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
           />
         </div>
         <input
+          aria-label="Guest name"
           type="text"
           placeholder="Guest Name"
           value={filters.guestName || ''}
@@ -45,6 +47,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
           className={inputClasses}
         />
         <input
+          aria-label="Buyer or contact name"
           type="text"
           placeholder="Buyer / Contact"
           value={filters.buyerName || ''}
@@ -52,6 +55,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
           className={inputClasses}
         />
         <input
+          aria-label="Attendee name"
           type="text"
           placeholder="Attendee Name"
           value={filters.attendeeName || ''}
@@ -59,6 +63,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
           className={inputClasses}
         />
         <input
+          aria-label="Email or phone"
           type="text"
           placeholder="Email / Phone"
           value={filters.contact || ''}
@@ -66,6 +71,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
           className={inputClasses}
         />
         <input
+          aria-label="Group"
           type="text"
           placeholder="Group"
           value={filters.group || ''}
@@ -73,6 +79,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
           className={inputClasses}
         />
         <input
+          aria-label="Ticket code"
           type="text"
           placeholder="Ticket Code"
           value={filters.ticketCode || ''}
@@ -80,6 +87,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
           className={inputClasses}
         />
         <input
+          aria-label="Price tier"
           type="text"
           placeholder="Price Tier"
           value={filters.priceTier || ''}
@@ -90,6 +98,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <select
+          aria-label="Payment status filter"
           value={filters.paymentStatus || ''}
           onChange={(e) => handleChange('paymentStatus', e.target.value)}
           className={selectClasses}
@@ -104,6 +113,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
         </select>
 
         <select 
+          aria-label="Payment method filter"
           value={filters.paymentMethod || ''} 
           onChange={(e) => handleChange('paymentMethod', e.target.value)}
           className={selectClasses}

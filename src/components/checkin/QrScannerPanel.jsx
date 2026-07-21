@@ -183,10 +183,11 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
     if (!track) return
     
     try {
+      const nextTorchState = !torchOn
       await track.applyConstraints({
-        advanced: [{ torch: !torchOn }]
+        advanced: [{ torch: nextTorchState }]
       })
-      setTorchOn(!torchOn)
+      setTorchOn(() => nextTorchState)
     } catch (err) {
       if (import.meta.env.DEV) console.error('Torch toggle failed:', err)
     }

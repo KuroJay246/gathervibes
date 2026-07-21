@@ -554,10 +554,7 @@ service cloud.firestore {
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedInBy == null
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.updatedAt == data.timestamp
           ) || (
-            data.action in [
-              'registration.update', 'ticket.assign', 'ticket.unassign',
-              'ticket.regenerate', 'registration.finance-update'
-            ]
+            data.action in ['registration.update', 'registration.finance-update']
             && exists(/databases/$(database)/documents/registrations/$(data.targetId))
             && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
@@ -576,6 +573,36 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/registrations/$(data.targetId))
         && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
         && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedIn == true;
+    }
+
+    function matchesTicketMutation(data) {
+      return data.targetType == 'registration'
+        && exists(/databases/$(database)/documents/registrations/$(data.targetId))
+        && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
+        && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
+        && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
+        && data.details is map
+        && data.details.keys().hasOnly(['fullName', 'ticketCode', 'previousTicketCode'])
+        && data.details.fullName == getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.fullName
+        && (
+          (
+            data.action in ['ticket.assign', 'ticket.regenerate']
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.ticketStatus == 'assigned'
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.ticketCode == data.details.ticketCode
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.ticketAssignedAt == data.timestamp
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.ticketAssignedBy == data.performedBy
+            && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.ticketCode == data.details.previousTicketCode
+          ) || (
+            data.action == 'ticket.unassign'
+            && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.ticketStatus == 'assigned'
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.ticketStatus == 'no-ticket-assigned'
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.ticketCode == null
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.ticketAssignedAt == null
+            && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.ticketAssignedBy == null
+            && data.details.ticketCode == null
+            && get(/databases/$(database)/documents/registrations/$(data.targetId)).data.ticketCode == data.details.previousTicketCode
+          )
+        );
     }
 
     function matchesOperationMutation(data) {
@@ -806,13 +833,16 @@ service cloud.firestore {
             isCheckInCompletionUpdate(registrationId)
             || isCheckInUndoUpdate(registrationId)
             || (
-              isValidRegistration(request.resource.data, registrationId)
-              && request.resource.data.updatedAt == request.time
+              request.resource.data.updatedAt == request.time
               && (
-                isRegistrationDetailsUpdate()
-                || isTicketAssignmentUpdate()
+                isTicketAssignmentUpdate()
                 || isTicketUnassignmentUpdate()
               )
+            )
+            || (
+              isValidRegistration(request.resource.data, registrationId)
+              && request.resource.data.updatedAt == request.time
+              && isRegistrationDetailsUpdate()
             )
           )
         ) || (
@@ -834,6 +864,7 @@ service cloud.firestore {
               && matchesRegistrationMutation(request.resource.data)
             )
             || (isValidEventAuditLog(request.resource.data, logId) && matchesEventMutation(request.resource.data))
+            || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesTicketMutation(request.resource.data))
             || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesRegistrationMutation(request.resource.data))
             || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesDuplicateCheckInAttempt(request.resource.data))
             || (isValidOperationAuditLog(request.resource.data, logId) && matchesOperationMutation(request.resource.data))

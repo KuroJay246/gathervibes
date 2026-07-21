@@ -183,7 +183,7 @@ Data context for this segment:
 
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Payment</label>
-                <select value={filters.paymentStatus} onChange={(event) => setFilters((current) => ({ ...current, paymentStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
+                <select aria-label="Payment segment filter" value={filters.paymentStatus} onChange={(event) => setFilters((current) => ({ ...current, paymentStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
                   <option value="all">All payments</option>
                   <option value="paid">Paid</option>
                   <option value="pending">Pending</option>
@@ -195,21 +195,21 @@ Data context for this segment:
 
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Finance Segment</label>
-                <select value={filters.financeSegment} onChange={(event) => setFilters((current) => ({ ...current, financeSegment: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
+                <select aria-label="Finance segment filter" value={filters.financeSegment} onChange={(event) => setFilters((current) => ({ ...current, financeSegment: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
                   {COMMUNICATION_SEGMENTS.finance.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                 </select>
               </div>
 
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Ticket Segment</label>
-                <select value={filters.ticketStatus} onChange={(event) => setFilters((current) => ({ ...current, ticketStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
+                <select aria-label="Ticket segment filter" value={filters.ticketStatus} onChange={(event) => setFilters((current) => ({ ...current, ticketStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
                   {COMMUNICATION_SEGMENTS.ticket.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                 </select>
               </div>
 
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Attendance</label>
-                <select value={filters.checkInStatus} onChange={(event) => setFilters((current) => ({ ...current, checkInStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
+                <select aria-label="Attendance segment filter" value={filters.checkInStatus} onChange={(event) => setFilters((current) => ({ ...current, checkInStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
                   <option value="all">All guests</option>
                   <option value="checked-in">Checked in</option>
                   <option value="not-checked-in">Not checked in</option>
@@ -218,7 +218,7 @@ Data context for this segment:
 
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Guest / Contact</label>
-                <select value={filters.contactSegment} onChange={(event) => setFilters((current) => ({ ...current, contactSegment: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
+                <select aria-label="Guest or contact segment filter" value={filters.contactSegment} onChange={(event) => setFilters((current) => ({ ...current, contactSegment: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
                   {COMMUNICATION_SEGMENTS.contact.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                 </select>
               </div>

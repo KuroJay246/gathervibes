@@ -500,7 +500,7 @@ export function ImportsPage() {
                       <span className="mt-1 block text-xs leading-5 text-[#816D62]">{source.helperText}</span>
                       {source.special && (
                         <span className="mt-2 block rounded-lg bg-white/70 px-3 py-2 text-[11px] font-bold leading-5 text-[#A32626]">
-                          Dry-run first. No CPB writes until approval. Review unmatched rows before apply. Gmail links are not stored.
+                          CPB Payment Audit Backfill stays dry-run only here. No CPB writes run until a separate approval task. Gmail links are not stored.
                           <span className="mt-1 block font-semibold text-[#7A5818]">Cole also has the actual spreadsheet for independent verification. Use this dry-run as a helper, not as final proof.</span>
                         </span>
                       )}
@@ -522,6 +522,7 @@ export function ImportsPage() {
               <div className="mt-8 space-y-5">
                 <div className="relative flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#DFD0C8] bg-[#FBF8F5] transition hover:border-[#B76E79]">
                   <input
+                    aria-label="Upload XLSX workbook"
                     type="file"
                     accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     onChange={handleFileUpload}
@@ -553,6 +554,7 @@ export function ImportsPage() {
             ) : inputType === 'upload' ? (
               <div className="relative mt-8 flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#DFD0C8] bg-[#FBF8F5] transition hover:border-[#B76E79]">
                 <input
+                  aria-label="Upload CSV or text file"
                   type="file"
                   accept=".csv,.txt,text/csv,text/plain"
                   onChange={handleFileUpload}
@@ -565,6 +567,7 @@ export function ImportsPage() {
             ) : (
               <div className="mt-8 flex flex-col">
                 <textarea
+                  aria-label="Paste registration rows"
                   rows={8}
                   value={csvText}
                   onChange={(e) => setCsvText(e.target.value)}

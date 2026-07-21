@@ -116,6 +116,48 @@ function checkInAuditData(action = 'checkin.complete') {
   }
 }
 
+function unticketedRegistration(overrides = {}) {
+  return importedRegistration({
+    ticketStatus: 'no-ticket-assigned',
+    ticketCode: null,
+    ticketAssignedAt: null,
+    ticketAssignedBy: null,
+    ...overrides,
+  })
+}
+
+function ticketAssignmentUpdate(ticketCode = 'CT-001') {
+  return {
+    ticketStatus: 'assigned',
+    ticketCode,
+    ticketAssignedAt: serverTimestamp(),
+    ticketAssignedBy: adminEmail,
+    updatedAt: serverTimestamp(),
+  }
+}
+
+function ticketAuditData({
+  action = 'ticket.assign',
+  logId = 'audit-ticket-assign-1',
+  ticketCode = 'CT-001',
+  previousTicketCode = null,
+} = {}) {
+  return {
+    logId,
+    eventId,
+    action,
+    targetType: 'registration',
+    targetId: registrationId,
+    performedBy: adminEmail,
+    timestamp: serverTimestamp(),
+    details: {
+      fullName: 'CODEX_TEST Guest One',
+      ticketCode,
+      previousTicketCode,
+    },
+  }
+}
+
 function checkedInRegistration(overrides = {}) {
   return importedRegistration({
     checkedIn: true,
@@ -248,6 +290,55 @@ test('Firestore rules reject oversized single registration import batch due audi
     addImportRowsToBatch(db, batch, 7)
 
     await assertFails(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules allow approved admin ticket assignment batch', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, unticketedRegistration())
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+    const batch = writeBatch(db)
+
+    batch.update(doc(db, 'registrations', registrationId), ticketAssignmentUpdate('CT-001'))
+    batch.set(doc(db, 'auditLogs', 'audit-ticket-assign-1'), ticketAuditData({ ticketCode: 'CT-001' }))
+
+    await assertSucceeds(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules allow approved admin ticket regeneration batch', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+    const batch = writeBatch(db)
+
+    batch.update(doc(db, 'registrations', registrationId), ticketAssignmentUpdate('CT-010'))
+    batch.set(doc(db, 'auditLogs', 'audit-ticket-regenerate-1'), ticketAuditData({
+      action: 'ticket.regenerate',
+      logId: 'audit-ticket-regenerate-1',
+      ticketCode: 'CT-010',
+      previousTicketCode: 'GSV-009',
+    }))
+
+    await assertSucceeds(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject standalone ticket audit without registration transition', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, unticketedRegistration())
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+
+    await assertFails(setDoc(doc(db, 'auditLogs', 'audit-ticket-assign-1'), ticketAuditData()))
   } finally {
     await env.cleanup()
   }

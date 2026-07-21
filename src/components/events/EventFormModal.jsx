@@ -218,9 +218,9 @@ export function EventFormModal({ event, onClose, onSave }) {
               </div>
 
               <div>
-                <label htmlFor="ticketPrice" className="event-label">Legacy/default base ticket price (BBD) <span>*</span></label>
+                <label htmlFor="ticketPrice" className="event-label">Default base ticket price (BBD) <span>*</span></label>
                 <input id="ticketPrice" type="number" min="0" step="0.01" value={values.ticketPrice} onChange={(changeEvent) => updateField('ticketPrice', changeEvent.target.value)} className={inputClass('ticketPrice')} placeholder="75.00" disabled={saving} />
-                <p className="mt-1 text-[11px] leading-5 text-[#8C7567]">Used only as legacy event metadata. Registration price tiers and explicit ticket prices drive finance totals.</p>
+                <p className="mt-1 text-[11px] leading-5 text-[#8C7567]">Used as a fallback for older records. Registration price tiers and explicit ticket prices drive finance totals.</p>
                 <FieldError id="ticketPrice-error">{errors.ticketPrice}</FieldError>
               </div>
 

@@ -1,4 +1,5 @@
 import { ChevronRight } from 'lucide-react'
+import { useMemo } from 'react'
 import { buildHeaderMappingPreview } from '../../utils/importUtils'
 
 const REGISTRATION_FIELDS = [
@@ -36,6 +37,19 @@ export function FieldMappingForm({
   const hasAttendeeNames = Array.isArray(fieldMap.attendeeNames) && fieldMap.attendeeNames.length > 0
   const isReady = fieldMap.fullName !== undefined || fieldMap.buyerName !== undefined || hasAttendeeNames
   const mappingPreview = buildHeaderMappingPreview(headers, fieldMap)
+  const headerRows = useMemo(() => {
+    const seenHeaders = new Map()
+    return headers.map((header, index) => {
+      const label = header || 'Column'
+      const count = (seenHeaders.get(label) || 0) + 1
+      seenHeaders.set(label, count)
+      return {
+        id: `${label}-${count}`,
+        header,
+        index,
+      }
+    })
+  }, [headers])
   const fieldMapsIndex = (field, index) => (
     Array.isArray(fieldMap[field]) ? fieldMap[field].includes(index) : fieldMap[field] === index
   )
@@ -62,15 +76,16 @@ export function FieldMappingForm({
       </p>
 
       <div className="mt-6 space-y-4">
-        {headers.map((header, index) => {
+        {headerRows.map(({ id, header, index }) => {
           // Find if this field is currently mapped. attendeeNames can map to several columns.
           const mappedKey = Object.keys(fieldMap).find(key => fieldMapsIndex(key, index))
           const mappedField = REGISTRATION_FIELDS.find((field) => field.value === mappedKey)
+          const selectId = `import-column-map-${index}`
           
           return (
-            <div key={index} className="flex flex-col gap-3 rounded-xl border border-[#F2E8E1] p-4 sm:flex-row sm:items-center sm:gap-6">
+            <div key={id} className="flex flex-col gap-3 rounded-xl border border-[#F2E8E1] p-4 sm:flex-row sm:items-center sm:gap-6">
               <div className="flex-1 font-mono text-sm font-semibold text-[#5D4A52]">
-                {header || `Column ${index + 1}`}
+                <label htmlFor={selectId}>{header || `Column ${index + 1}`}</label>
                 <div className="mt-1 flex flex-wrap gap-2 font-sans text-[10px] font-bold uppercase tracking-wider">
                   <span className="rounded-full bg-[#F7F1ED] px-2 py-0.5 text-[#8C7567]">
                     Detected: {mappingPreview[index]?.detectedField || 'Unmapped'}
@@ -83,6 +98,7 @@ export function FieldMappingForm({
               <ChevronRight className="hidden size-4 text-[#C4B4AA] sm:block" />
               <div className="flex-1">
                 <select
+                  id={selectId}
                   value={mappedKey || ''}
                   onChange={(e) => {
                     const newMap = { ...fieldMap }

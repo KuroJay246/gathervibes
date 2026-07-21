@@ -64,7 +64,7 @@ function pricingModeLabel(event = {}) {
   const tiers = Array.isArray(event.priceTiers) ? event.priceTiers.filter(Boolean) : []
   if (tiers.length > 0) return `${tiers.length} price tier${tiers.length === 1 ? '' : 's'} active`
   const legacyPrice = Number(event.ticketPrice) || 0
-  if (legacyPrice > 0) return 'Legacy base ticket price only'
+  if (legacyPrice > 0) return 'Default base ticket price only'
   return 'No pricing configured'
 }
 
@@ -191,7 +191,7 @@ export function EventsPage() {
           </div>
           <h2 className="font-serif text-3xl text-[#2B1723]">Your gatherings</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-[#806C61]">Create each event once, keep its details current, and select the event your team is working on.</p>
-          <p className="mt-1 max-w-xl text-xs leading-5 text-[#8A7468]">Price tiers and explicit registration prices drive finance totals; the base ticket price column is legacy/default schema metadata.</p>
+          <p className="mt-1 max-w-xl text-xs leading-5 text-[#8A7468]">Price tiers and explicit registration prices drive finance totals; the base ticket price is a default fallback for older records.</p>
         </div>
         <button type="button" onClick={openCreate} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B]">
           <Plus className="size-4" strokeWidth={2.5} /> Create event
@@ -223,7 +223,7 @@ export function EventsPage() {
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full min-w-[900px] text-left">
               <thead className="bg-[#FFF9F5] text-[9px] font-bold uppercase tracking-[0.18em] text-[#927C70]">
-                <tr><th className="px-6 py-3.5">Event</th><th className="px-4 py-3.5">Date</th><th className="px-4 py-3.5">Status</th><th className="px-4 py-3.5">Capacity</th><th className="px-4 py-3.5">Legacy price</th><th className="px-6 py-3.5 text-right">Actions</th></tr>
+                <tr><th className="px-6 py-3.5">Event</th><th className="px-4 py-3.5">Date</th><th className="px-4 py-3.5">Status</th><th className="px-4 py-3.5">Capacity</th><th className="px-4 py-3.5">Base price</th><th className="px-6 py-3.5 text-right">Actions</th></tr>
               </thead>
               <tbody className="divide-y divide-[#F1E6DF]">
                 {events.map((event) => {
@@ -256,7 +256,7 @@ export function EventsPage() {
                     <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h4 className="font-serif text-lg text-[#35212B]">{event.eventName}</h4>{isActive && <span className="inline-flex items-center gap-1 rounded-full bg-[#E7F6ED] px-2 py-1 text-[8px] font-bold uppercase text-[#2F855A]"><CheckCircle2 className="size-3" /> Selected</span>}</div><p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#806C61]"><MapPin className="size-3.5" /> {event.location}</p></div>
                     <StatusBadge status={event.status} />
                   </div>
-                  <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-white p-3 text-center"><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Date</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{formatEventDate(event.eventDate, { year: undefined })}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Capacity</p><p className="mt-1 flex items-center justify-center gap-1 text-[10px] font-semibold text-[#59454E]"><UsersRound className="size-3" /> {event.capacity}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Legacy</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{currency.format(Number(event.ticketPrice) || 0)}</p></div></div>
+                  <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-white p-3 text-center"><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Date</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{formatEventDate(event.eventDate, { year: undefined })}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Capacity</p><p className="mt-1 flex items-center justify-center gap-1 text-[10px] font-semibold text-[#59454E]"><UsersRound className="size-3" /> {event.capacity}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Base</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{currency.format(Number(event.ticketPrice) || 0)}</p></div></div>
                   <p className="mt-3 text-[11px] font-semibold text-[#8A7468]">{pricingModeLabel(event)}</p>
                   <div className="mt-4 flex gap-2"><button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`min-h-11 flex-1 rounded-lg py-2.5 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#2F855A]' : 'border border-[#E1D1C8] text-[#806C61]'}`}>{isActive ? 'Selected event' : 'Select'}</button><button type="button" onClick={() => openEdit(event)} className="grid size-11 place-items-center rounded-lg border border-[#E1D1C8] text-[#806C61]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button><button type="button" onClick={() => requestDelete(event)} className="grid size-11 place-items-center rounded-lg border border-[#F0D3D3] text-[#C53030]" aria-label={`Delete ${event.eventName}`}><Trash2 className="size-4" /></button></div>
                 </article>

@@ -416,23 +416,25 @@ export function OperationsPage() {
             <h3 className="font-serif text-xl text-[#2B1723]">Ledger entries</h3>
             <div className="flex flex-wrap gap-2">
               <label className="relative">
+                <span className="sr-only">Search ledger entries</span>
                 <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[#B8A49A]" />
                 <input
+                  aria-label="Search ledger entries"
                   value={filters.search}
                   onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
                   placeholder="Search entry, category, note, reference"
                   className="rounded-xl border border-[#E5D7CF] py-2 pl-9 pr-3 text-xs font-bold"
                 />
               </label>
-              <select value={filters.type} onChange={(event) => setFilters((current) => ({ ...current, type: event.target.value }))} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
+              <select aria-label="Ledger entry type filter" value={filters.type} onChange={(event) => setFilters((current) => ({ ...current, type: event.target.value }))} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
                 <option value="all">All types</option>
                 {LEDGER_ENTRY_TYPES.map((type) => <option key={type} value={type}>{labelFor(type)}</option>)}
               </select>
-              <select value={filters.status} onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
+              <select aria-label="Ledger status filter" value={filters.status} onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
                 <option value="all">All statuses</option>
                 {LEDGER_STATUSES.map((status) => <option key={status} value={status}>{labelFor(status)}</option>)}
               </select>
-              <input value={filters.category} onChange={(event) => setFilters((current) => ({ ...current, category: event.target.value }))} placeholder="Category" className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold" />
+              <input aria-label="Ledger category filter" value={filters.category} onChange={(event) => setFilters((current) => ({ ...current, category: event.target.value }))} placeholder="Category" className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold" />
               <button type="button" onClick={clearFilters} className="rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]">
                 Clear filters
               </button>

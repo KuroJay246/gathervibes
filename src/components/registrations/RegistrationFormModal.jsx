@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useId, useRef } from 'react'
 import { X } from 'lucide-react'
 import { validPaymentStatuses, validateRegistration } from '../../utils/validators.js'
 import { formatPaymentLabel, normalizePaymentStatus } from '../../utils/paymentStatus.js'
 import { PAYMENT_METHODS, formatPaymentMethod, normalizePaymentMethod } from '../../utils/financeUtils.js'
 
 export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, saving }) {
+  const titleId = useId()
+  const firstInputRef = useRef(null)
   const [formData, setFormData] = useState({
     fullName: '',
     buyerName: '',
@@ -73,6 +75,12 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
   }, [isOpen, initialData])
 
   useEffect(() => {
+    if (!isOpen) return undefined
+    const timer = window.setTimeout(() => firstInputRef.current?.focus(), 0)
+    return () => window.clearTimeout(timer)
+  }, [isOpen])
+
+  useEffect(() => {
     function handleKeyDown(e) {
       if (e.key === 'Escape' && isOpen && !saving) onClose()
     }
@@ -103,14 +111,20 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
       <div className="absolute inset-0 bg-[#2B1723]/40 backdrop-blur-sm" onClick={!saving ? onClose : undefined} />
       
-      <div className="relative flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-[28px] bg-[#FFFdfb] shadow-[0_24px_80px_rgba(43,23,35,0.16)] sm:max-h-[85vh] sm:max-w-2xl sm:rounded-[28px]">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="relative flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-[28px] bg-[#FFFdfb] shadow-[0_24px_80px_rgba(43,23,35,0.16)] sm:max-h-[85vh] sm:max-w-2xl sm:rounded-[28px]"
+      >
         <div className="flex items-center justify-between border-b border-[#F2E8E1] px-5 py-4 sm:px-6">
-          <h2 className="font-serif text-xl text-[#2B1723]">{initialData ? 'Edit Registration' : 'New Registration'}</h2>
+          <h2 id={titleId} className="font-serif text-xl text-[#2B1723]">{initialData ? 'Edit Registration' : 'New Registration'}</h2>
           <button
             type="button"
             onClick={onClose}
             disabled={saving}
             className="rounded-full p-2 text-[#8C7567] transition hover:bg-[#FFF8F2] hover:text-[#2B1723] disabled:opacity-50"
+            aria-label="Close registration form"
           >
             <X className="size-5" />
           </button>
@@ -122,6 +136,8 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
               <div>
                 <label className="event-label">Full Name <span>*</span></label>
                 <input
+                  ref={firstInputRef}
+                  aria-label="Full name"
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => handleChange('fullName', e.target.value)}
@@ -135,6 +151,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
               <div>
                 <label className="event-label">Group Name (Optional)</label>
                 <input
+                  aria-label="Group name"
                   type="text"
                   value={formData.groupName}
                   onChange={(e) => handleChange('groupName', e.target.value)}
@@ -149,6 +166,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
               <div>
                 <label className="event-label">Buyer / Contact Name</label>
                 <input
+                  aria-label="Buyer or contact name"
                   type="text"
                   value={formData.buyerName}
                   onChange={(e) => handleChange('buyerName', e.target.value)}
@@ -161,6 +179,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
               <div>
                 <label className="event-label">Guest / Attendee Names</label>
                 <textarea
+                  aria-label="Guest or attendee names"
                   rows={3}
                   value={formData.attendeeNames}
                   onChange={(e) => handleChange('attendeeNames', e.target.value)}
@@ -175,6 +194,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
               <div>
                 <label className="event-label">Email Address</label>
                 <input
+                  aria-label="Email address"
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
@@ -187,6 +207,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
               <div>
                 <label className="event-label">Phone Number</label>
                 <input
+                  aria-label="Phone number"
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => handleChange('phone', e.target.value)}
@@ -201,6 +222,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
               <div>
                 <label className="event-label">Persons Attending <span>*</span></label>
                 <input
+                  aria-label="Persons attending"
                   type="number"
                   min="1"
                   max="100"
@@ -215,6 +237,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
               <div>
                 <label className="event-label">Payment Status <span>*</span></label>
                 <select
+                  aria-label="Payment status"
                   value={formData.paymentStatus}
                   onChange={(e) => handleChange('paymentStatus', e.target.value)}
                   className="event-input bg-white"
@@ -230,6 +253,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
             <div>
               <label className="event-label">Payment Reference (Optional)</label>
               <input
+                aria-label="Payment reference"
                 type="text"
                 value={formData.paymentReference}
                 onChange={(e) => handleChange('paymentReference', e.target.value)}
@@ -245,6 +269,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
                 <div>
                   <label className="event-label">Price Tier</label>
                   <input
+                    aria-label="Price tier"
                     type="text"
                     value={formData.priceTier}
                     onChange={(e) => handleChange('priceTier', e.target.value)}
@@ -256,6 +281,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
                 <div>
                   <label className="event-label">Payment Method</label>
                   <select
+                    aria-label="Payment method"
                     value={formData.paymentMethod}
                     onChange={(e) => handleChange('paymentMethod', e.target.value)}
                     className="event-input bg-white"
@@ -275,6 +301,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
                   <div key={field}>
                     <label className="event-label">{label}</label>
                     <input
+                      aria-label={label}
                       type="number"
                       min="0"
                       step="0.01"
@@ -292,6 +319,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
             <div>
               <label className="event-label">Dietary & Operational Notes</label>
               <textarea
+                aria-label="Dietary and operational notes"
                 rows={3}
                 value={formData.notes}
                 onChange={(e) => handleChange('notes', e.target.value)}

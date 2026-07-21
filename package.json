@@ -9,6 +9,9 @@
     "preview": "vite preview",
     "lint": "eslint src tests scripts eslint.config.js vite.config.js",
     "test": "node --test tests/*.test.js",
+    "doctor": "react-doctor . --project . --scope full --blocking none --no-telemetry",
+    "doctor:changed": "react-doctor . --project . --scope changed --base main --blocking error --no-telemetry",
+    "doctor:json": "react-doctor . --project . --scope full --blocking none --json --json-compact --no-telemetry",
     "admin:ensure-access": "node scripts/admin/ensureAccessControl.mjs",
     "admin:verify-firebase": "node scripts/admin/verifyFirebaseSetup.mjs",
     "admin:ensure-codex-test-event": "node scripts/admin/ensureCodexTestEvent.mjs",
@@ -40,6 +43,7 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "firebase-admin": "^14.0.0",
     "globals": "^16.5.0",
+    "react-doctor": "0.8.3",
     "tailwindcss": "^4.1.17",
     "vite": "^7.2.4"
   },

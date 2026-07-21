@@ -1,0 +1,21 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "rootDir": ".",
+  "projects": ["."],
+  "scope": "full",
+  "blocking": "none",
+  "ignore": {
+    "files": [
+      "dist/**",
+      "node_modules/**",
+      ".git/**",
+      ".firebase/**",
+      "coverage/**",
+      "**/*.zip",
+      "**/*.tar",
+      "**/*.tar.gz",
+      "**/*.tgz",
+      "**/*.xlsx"
+    ]
+  }
+}

@@ -12,7 +12,7 @@ test('Phase 20 dashboard and events preserve approved layout while clarifying wo
   assert.match(dashboard, /Registration payments recorded/)
   assert.match(dashboard, /Capacity used/)
   assert.match(events, /function pricingModeLabel\(event = \{\}\)/)
-  assert.match(events, /Legacy base ticket price only/)
+  assert.match(events, /Default base ticket price only/)
   assert.match(events, /No pricing configured/)
 })
 

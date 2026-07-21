@@ -396,8 +396,9 @@ export function AuthProvider({ children }) {
     setAuthError('')
     setLoading(true)
 
-    const result = await signInRequest()
+    let result = null
     try {
+      result = await signInRequest()
       const accessData = await verifyWorkspaceAccess(result.user)
       setUser(result.user)
       setAccessControl(accessData.accessControl)
@@ -407,7 +408,6 @@ export function AuthProvider({ children }) {
       setAccess(accessData.access)
       setIsAuthorized(true)
       setAuthInitialized(true)
-      setLoading(false)
       const roleDefaultRoute = defaultRouteForAccess(accessData.access)
       if (!redirectToWebAppHostIfNeeded()) {
         handOffAuthorizedLoginRoute(accessData.access)
@@ -420,7 +420,9 @@ export function AuthProvider({ children }) {
         }),
       }
     } catch (error) {
-      setUser(result.user)
+      if (result?.user) {
+        setUser(result.user)
+      }
       clearResolvedAccessState({
         setAccessControl,
         setStaffProfile,
@@ -431,8 +433,9 @@ export function AuthProvider({ children }) {
       setIsAuthorized(false)
       setAuthInitialized(true)
       setAuthError(error.code || 'auth/access-check-failed')
-      setLoading(false)
       throw error
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -468,8 +471,13 @@ export function AuthProvider({ children }) {
     }
 
     storeGoogleSignInState(safeReturnTo, { strategy: 'redirect' })
-    await signInWithRedirect(auth, googleProvider)
-    return null
+    try {
+      await signInWithRedirect(auth, googleProvider)
+      return null
+    } catch (error) {
+      setLoading(false)
+      throw error
+    }
   }, [completeSignIn])
 
   const value = useMemo(
