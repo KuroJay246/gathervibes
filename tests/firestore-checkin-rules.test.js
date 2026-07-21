@@ -10,7 +10,9 @@ import {
 } from '@firebase/rules-unit-testing'
 import {
   Timestamp,
+  deleteDoc,
   doc,
+  getDoc,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -21,6 +23,8 @@ const projectId = 'gathervibeshub-rules-test'
 const adminEmail = 'jaylanspencer99@gmail.com'
 const eventId = 'xPfa0b3KZyLSDnAD2uGI'
 const registrationId = 'imp_12593bf58f029033'
+const scannerUid = 'scanner-user'
+const scannerEmail = 'scanner@example.com'
 
 const emulatorHost = process.env.FIRESTORE_EMULATOR_HOST
 
@@ -89,6 +93,35 @@ async function seed(env, registration = importedRegistration()) {
   })
 }
 
+async function seedScanner(env) {
+  await env.withSecurityRulesDisabled(async (context) => {
+    const db = context.firestore()
+    await setDoc(doc(db, 'staffProfiles', scannerUid), {
+      uid: scannerUid,
+      email: scannerEmail,
+      displayName: 'CODEX_TEST Scanner',
+      status: 'active',
+      defaultRole: 'scanner',
+      createdAt: Timestamp.fromMillis(1710000000000),
+      updatedAt: Timestamp.fromMillis(1710000000000),
+      createdBy: adminEmail,
+      updatedBy: adminEmail,
+    })
+    await setDoc(doc(db, 'events', eventId, 'staffAssignments', scannerUid), {
+      uid: scannerUid,
+      eventId,
+      email: scannerEmail,
+      displayName: 'CODEX_TEST Scanner',
+      role: 'scanner',
+      status: 'active',
+      createdAt: Timestamp.fromMillis(1710000000000),
+      updatedAt: Timestamp.fromMillis(1710000000000),
+      createdBy: adminEmail,
+      updatedBy: adminEmail,
+    })
+  })
+}
+
 function checkInAfterState(registration = importedRegistration()) {
   return {
     ...registration,
@@ -116,6 +149,32 @@ function checkInAuditData(action = 'checkin.complete') {
   }
 }
 
+function existingAuditData(overrides = {}) {
+  return {
+    logId: 'audit-existing-1',
+    eventId,
+    action: 'registration.update',
+    targetType: 'registration',
+    targetId: registrationId,
+    performedBy: adminEmail,
+    timestamp: Timestamp.fromMillis(1710000300000),
+    details: {
+      fullName: 'CODEX_TEST Guest One',
+      registrationUpdated: true,
+    },
+    ...overrides,
+  }
+}
+
+async function seedAuditLog(env, overrides = {}) {
+  const audit = existingAuditData(overrides)
+  await env.withSecurityRulesDisabled(async (context) => {
+    const db = context.firestore()
+    await setDoc(doc(db, 'auditLogs', audit.logId), audit)
+  })
+  return audit
+}
+
 function unticketedRegistration(overrides = {}) {
   return importedRegistration({
     ticketStatus: 'no-ticket-assigned',
@@ -139,15 +198,17 @@ function ticketAssignmentUpdate(ticketCode = 'CT-001') {
 function ticketAuditData({
   action = 'ticket.assign',
   logId = 'audit-ticket-assign-1',
+  auditEventId = eventId,
+  auditTargetId = registrationId,
   ticketCode = 'CT-001',
   previousTicketCode = null,
 } = {}) {
   return {
     logId,
-    eventId,
+    eventId: auditEventId,
     action,
     targetType: 'registration',
-    targetId: registrationId,
+    targetId: auditTargetId,
     performedBy: adminEmail,
     timestamp: serverTimestamp(),
     details: {
@@ -344,6 +405,159 @@ test('Firestore rules reject standalone ticket audit without registration transi
   }
 })
 
+test('Firestore rules reject approved admin audit log update', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    const audit = await seedAuditLog(env)
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+
+    await assertFails(updateDoc(doc(db, 'auditLogs', audit.logId), {
+      details: {
+        ...audit.details,
+        tampered: true,
+      },
+    }))
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject approved admin audit log delete', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    const audit = await seedAuditLog(env)
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+
+    await assertFails(deleteDoc(doc(db, 'auditLogs', audit.logId)))
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject assigned scanner audit log update and delete', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    await seedScanner(env)
+    const updateAudit = await seedAuditLog(env, { logId: 'audit-scanner-update-1' })
+    const deleteAudit = await seedAuditLog(env, { logId: 'audit-scanner-delete-1' })
+    const db = env.authenticatedContext(scannerUid, { email: scannerEmail }).firestore()
+
+    await assertFails(updateDoc(doc(db, 'auditLogs', updateAudit.logId), {
+      details: {
+        ...updateAudit.details,
+        scannerTampered: true,
+      },
+    }))
+    await assertFails(deleteDoc(doc(db, 'auditLogs', deleteAudit.logId)))
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject unapproved audit log delete', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    const audit = await seedAuditLog(env)
+    const db = env.authenticatedContext('not-approved', { email: 'other@example.com' }).firestore()
+
+    await assertFails(deleteDoc(doc(db, 'auditLogs', audit.logId)))
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject ticket audit with mismatched target registration', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, unticketedRegistration())
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+    const batch = writeBatch(db)
+
+    batch.update(doc(db, 'registrations', registrationId), ticketAssignmentUpdate('CT-002'))
+    batch.set(doc(db, 'auditLogs', 'audit-ticket-mismatch-target-1'), ticketAuditData({
+      logId: 'audit-ticket-mismatch-target-1',
+      ticketCode: 'CT-002',
+      auditTargetId: 'other-registration-id',
+    }))
+
+    await assertFails(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject ticket audit with mismatched event', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, unticketedRegistration())
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+    const batch = writeBatch(db)
+
+    batch.update(doc(db, 'registrations', registrationId), ticketAssignmentUpdate('CT-003'))
+    batch.set(doc(db, 'auditLogs', 'audit-ticket-mismatch-event-1'), ticketAuditData({
+      logId: 'audit-ticket-mismatch-event-1',
+      ticketCode: 'CT-003',
+      auditEventId: 'other-event-id',
+    }))
+
+    await assertFails(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject audit log create with missing required fields', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, unticketedRegistration())
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+    const batch = writeBatch(db)
+    const incompleteAudit = ticketAuditData({
+      logId: 'audit-ticket-missing-fields-1',
+      ticketCode: 'CT-004',
+    })
+    delete incompleteAudit.performedBy
+
+    batch.update(doc(db, 'registrations', registrationId), ticketAssignmentUpdate('CT-004'))
+    batch.set(doc(db, 'auditLogs', 'audit-ticket-missing-fields-1'), incompleteAudit)
+
+    await assertFails(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject the whole ticket batch when audit validation fails', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, unticketedRegistration())
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+    const batch = writeBatch(db)
+    const incompleteAudit = ticketAuditData({
+      logId: 'audit-ticket-atomic-fail-1',
+      ticketCode: 'CT-005',
+    })
+    delete incompleteAudit.timestamp
+
+    batch.update(doc(db, 'registrations', registrationId), ticketAssignmentUpdate('CT-005'))
+    batch.set(doc(db, 'auditLogs', 'audit-ticket-atomic-fail-1'), incompleteAudit)
+
+    await assertFails(batch.commit())
+
+    await env.withSecurityRulesDisabled(async (context) => {
+      const snapshot = await getDoc(doc(context.firestore(), 'registrations', registrationId))
+      assert.equal(snapshot.data().ticketStatus, 'no-ticket-assigned')
+      assert.equal(snapshot.data().ticketCode, null)
+    })
+  } finally {
+    await env.cleanup()
+  }
+})
+
 test('Firestore rules reject unapproved check-in batch', { skip: !emulatorHost }, async () => {
   const env = await createTestEnv()
   try {
@@ -447,6 +661,22 @@ test('check-in rules allow only check-in field changes without broad schema loos
   assert.match(rules, /request\.resource\.data\.checkInTime == null/)
   assert.match(rules, /request\.resource\.data\.checkedInBy == null/)
   assert.doesNotMatch(rules, /allow update: if isApprovedAdmin\(\)\s+&& request\.resource\.data\.updatedAt == request\.time/)
+})
+
+test('audit log rules and services preserve append-only behavior', async () => {
+  const rules = await readFile('firestore.rules', 'utf8')
+  const auditService = await readFile('src/services/auditService.js', 'utf8')
+  const registrationService = await readFile('src/services/registrationService.js', 'utf8')
+  const ticketService = await readFile('src/services/ticketService.js', 'utf8')
+  const auditRulesStart = rules.indexOf('match /auditLogs/{logId}')
+  const auditRulesEnd = rules.indexOf('match /operationsLedger/{ledgerEntryId}')
+  const auditRules = rules.slice(auditRulesStart, auditRulesEnd)
+
+  assert.match(auditRules, /allow create:/)
+  assert.match(auditRules, /allow update,\s*delete:\s*if false;/)
+  assert.doesNotMatch(auditService, /deleteDoc|updateDoc|batch\.delete|batch\.update/)
+  assert.doesNotMatch(registrationService, /doc\(db,\s*'auditLogs'[\s\S]*batch\.delete/)
+  assert.doesNotMatch(ticketService, /doc\(db,\s*'auditLogs'[\s\S]*batch\.delete/)
 })
 
 test('check-in and undo services send minimal persistence payloads plus audit logs', async () => {
