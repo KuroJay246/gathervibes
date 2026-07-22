@@ -24,6 +24,7 @@ import {
 } from '../utils/operationsReport'
 import { InfoHint } from '../components/ui/InfoHint'
 import { canWriteOperations, isApprovedAdmin } from '../utils/accessRoles'
+import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 
 const EMPTY_FORM = {
   entryType: 'income',
@@ -154,6 +155,7 @@ export function OperationsPage() {
   const filteredControl = useMemo(() => buildOperationsControlSummary(filteredEntries), [filteredEntries])
   const possibleRegistrationPaymentOverlap = useMemo(() => findPossibleRegistrationPaymentOverlap(entries), [entries])
   const filterScopeLabel = useMemo(() => buildFilterScopeLabel(filters), [filters])
+  const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(activeEvent?.eventId), [activeEvent?.eventId])
 
   if (!activeEvent?.eventId) {
     return (
@@ -328,6 +330,49 @@ export function OperationsPage() {
           </div>
         ))}
       </section>
+
+      {evidenceAudit && (
+        <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="operations-closeout-heading">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Operations Closeout Proposal</p>
+              <h2 id="operations-closeout-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Documentary entries waiting for organizer approval</h2>
+              <p className="mt-2 max-w-3xl text-xs leading-5 text-[#715D46]">
+                These are proposed Operations and in-kind records only. They are not current ledger entries and they are not mixed into registration payment totals.
+              </p>
+            </div>
+            <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
+              CPB Operations entries now: {entries.length}
+            </span>
+          </div>
+          <div className="mt-4 grid gap-3 lg:grid-cols-3">
+            <article className="rounded-xl border border-[#EEDFD6] bg-white p-4">
+              <p className="text-sm font-bold text-[#2B1723]">LESC venue and 15 tables</p>
+              <p className="mt-1 text-lg font-bold text-[#2B1723]">{formatCurrency(evidenceAudit.operations.venuePaid)}</p>
+              <p className="mt-2 text-xs leading-5 text-[#715D46]">Directly Verified · Paid/Settled · Barbados Conference Services Limited / LESC.</p>
+            </article>
+            <article className="rounded-xl border border-[#EEDFD6] bg-white p-4">
+              <p className="text-sm font-bold text-[#2B1723]">Baker payment schedule</p>
+              <p className="mt-1 text-lg font-bold text-[#2B1723]">{formatCurrency(evidenceAudit.operations.bakerPaidOrganizerReported)} paid / {formatCurrency(evidenceAudit.operations.bakerOutstandingOrganizerReported)} outstanding</p>
+              <p className="mt-2 text-xs leading-5 text-[#715D46]">Organizer Reported. Candyrain subset is directly documented; do not count it twice.</p>
+            </article>
+            <article className="rounded-xl border border-[#EEDFD6] bg-white p-4">
+              <p className="text-sm font-bold text-[#2B1723]">Unresolved expenses</p>
+              <p className="mt-1 text-lg font-bold text-[#2B1723]">{formatCurrency(evidenceAudit.operations.cakeBoxesPrinting)}</p>
+              <p className="mt-2 text-xs leading-5 text-[#715D46]">Cake boxes / printing is Unverified / Outstanding. Supplier, invoice, quantity and proof are missing.</p>
+            </article>
+          </div>
+          <div className="mt-4 grid gap-3 lg:grid-cols-3">
+            {evidenceAudit.sponsorship.map((item) => (
+              <article key={item.sponsor} className="rounded-xl border border-[#EEDFD6] bg-white p-4" aria-label={`${item.sponsor}: ${item.evidenceClass}`}>
+                <p className="text-sm font-bold text-[#2B1723]">{item.sponsor}</p>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#8C7567]">{item.evidenceClass}</p>
+                <p className="mt-2 text-xs leading-5 text-[#715D46]">{item.quantity} · {item.item} · Cash received {formatCurrency(item.cashReceived)} · Estimated value unknown.</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         {canEditOperations && <form onSubmit={saveEntry} className="rounded-2xl border border-[#EEDFD6] bg-white p-5">

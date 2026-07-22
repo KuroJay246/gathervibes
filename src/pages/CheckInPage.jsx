@@ -26,6 +26,7 @@ import { normalizePaymentStatus } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
 import { buildRegistrationMetrics, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
 import { InfoHint } from '../components/ui/InfoHint'
+import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 
 const CHECK_IN_FILTER_GROUPS = [
   { label: 'Guest Lookup', values: ['search'] },
@@ -122,6 +123,7 @@ export function CheckInPage() {
     if (helperView === 'pending-payment') return getPendingPaymentRegistrations(registrations)
     return getDoorListRegistrations(registrations)
   }, [helperView, registrations])
+  const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(activeEvent?.eventId), [activeEvent?.eventId])
 
   const matches = useMemo(() => {
     const query = searchQuery.trim().toLowerCase()
@@ -386,6 +388,34 @@ export function CheckInPage() {
           </article>
         ))}
       </section>
+
+      {evidenceAudit && (
+        <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="checkin-evidence-heading">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-1 size-5 shrink-0 text-[#986F26]" />
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Attendance Evidence Reconciliation</p>
+              <h2 id="checkin-evidence-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Historical attendance is not system check-in</h2>
+              <p className="mt-2 text-xs leading-5 text-[#715D46]">
+                The audit reports approximately {evidenceAudit.attendance.approximateAttendance} patrons checked in, while the app currently records {summary.checkedInPersons} checked-in guests. Do not create check-ins from the approximate count.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              ['System checked-in guests', summary.checkedInPersons],
+              ['Approximate attendance', evidenceAudit.attendance.approximateAttendance],
+              ['Gmail-supported ticket spaces', evidenceAudit.attendance.gmailSupportedTicketSpaces],
+              ['Attendance-to-Gmail gap', evidenceAudit.attendance.attendanceToGmailGap],
+            ].map(([label, value]) => (
+              <article key={label} className="rounded-xl border border-[#EEDFD6] bg-white p-4" aria-label={`${label}: ${value}`}>
+                <p className="text-lg font-bold text-[#2B1723]">{value}</p>
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="flex items-center gap-2 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
         <p className="font-semibold text-[#6B564C]">Guest count may be higher than registration count.</p>

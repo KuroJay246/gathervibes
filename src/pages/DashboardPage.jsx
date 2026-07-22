@@ -22,6 +22,7 @@ import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
 import { getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
 import { isApprovedAdmin } from '../utils/accessRoles'
 import { buildEventReadiness } from '../utils/eventReadiness'
+import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 
 function useEventRegistrations(eventId) {
   const [rows, setRows] = useState([])
@@ -125,6 +126,7 @@ export function DashboardPage() {
     () => buildEventReadiness(selectedEvent, registrations, operationsEntries),
     [operationsEntries, registrations, selectedEvent],
   )
+  const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(selectedEvent?.eventId), [selectedEvent?.eventId])
 
   const needsAttention = readiness.actionItems.slice(0, 5)
   const openOperations = operationsEntries.filter((entry) => ['expected', 'pending'].includes(String(entry.status || '').toLowerCase())).length
@@ -217,6 +219,36 @@ export function DashboardPage() {
               These registration totals use explicit ticket price or amount due values only. Operations Ledger money remains separate.
             </p>
           </section>
+
+          {evidenceAudit && (
+            <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="overview-financial-evidence-heading">
+              <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Financial Evidence Audit</p>
+                  <h2 id="overview-financial-evidence-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">{evidenceAudit.auditStatus}</h2>
+                  <p className="mt-2 text-xs leading-5 text-[#715D46]">
+                    Documentary evidence is separate from the operational registration totals above.
+                  </p>
+                </div>
+                <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
+                  Profit {evidenceAudit.finalProfitStatus}
+                </span>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <Metric label="App Payments Received" value={formatCurrency(evidenceAudit.ticketIncome.appPaymentsReceived, financeSummary.currency)} />
+                <Metric label="Directly Verified Audit Receipts" value={formatCurrency(evidenceAudit.ticketIncome.directlyVerifiedAmount, financeSummary.currency)} />
+                <Metric label="Amount Inferred" value={formatCurrency(evidenceAudit.ticketIncome.inferredAmount, financeSummary.currency)} />
+                <Metric label="Unresolved Difference" value={formatCurrency(evidenceAudit.ticketIncome.documentaryToAppVariance, financeSummary.currency)} />
+                <Metric label="Document-Supported Ticket Spaces" value={evidenceAudit.ticketIncome.documentSupportedTickets} />
+                <Metric label="Approximate Attendance" value={evidenceAudit.attendance.approximateAttendance} />
+                <Metric label="Attendance Evidence Gap" value={evidenceAudit.attendance.attendanceEvidenceGap} />
+                <Metric label="Open Corrective Actions" value={evidenceAudit.correctiveActions.length} />
+              </div>
+              <p className="mt-3 text-xs leading-5 text-[#715D46]">
+                BBD $4,115 is verified documentary ticket income, not total event revenue. BBD $1,300 remains inferred until bank or 1stPay evidence is matched.
+              </p>
+            </section>
+          )}
 
           <section className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
             <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
