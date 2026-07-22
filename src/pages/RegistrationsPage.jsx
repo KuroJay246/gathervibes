@@ -55,6 +55,29 @@ function registrationNeedsReview(registration = {}, event = {}) {
   return Boolean(finance.needsFinanceReview || registration.financeReviewRequired || !registration.ticketCode)
 }
 
+function duplicateContactKeys(registrations = []) {
+  const emailCounts = new Map()
+  const phoneCounts = new Map()
+
+  registrations.forEach((registration) => {
+    const email = String(registration.email || '').trim().toLowerCase()
+    const phone = String(registration.phone || '').trim().toLowerCase()
+    if (email) emailCounts.set(email, (emailCounts.get(email) || 0) + 1)
+    if (phone) phoneCounts.set(phone, (phoneCounts.get(phone) || 0) + 1)
+  })
+
+  return { emailCounts, phoneCounts }
+}
+
+function hasDuplicateContact(registration = {}, contactKeys = duplicateContactKeys([])) {
+  const email = String(registration.email || '').trim().toLowerCase()
+  const phone = String(registration.phone || '').trim().toLowerCase()
+  return Boolean(
+    (email && (contactKeys.emailCounts.get(email) || 0) > 1)
+    || (phone && (contactKeys.phoneCounts.get(phone) || 0) > 1),
+  )
+}
+
 function matchesCardFilter(registration = {}, key, event = {}) {
   const finance = calculateRegistrationFinance(registration, event)
   if (!key) return true
@@ -100,6 +123,7 @@ export function RegistrationsPage() {
   const [success, setSuccess] = useState('')
   const [selectedIds, setSelectedIds] = useState(new Set())
   const reviewRegistrationId = searchParams.get('reviewRegistration') || ''
+  const reviewMode = searchParams.get('review') || ''
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
@@ -171,44 +195,52 @@ export function RegistrationsPage() {
   if (loading) return <LoadingState message="Loading registrations…" />
   if (loadError) return <ErrorState message={loadError} onRetry={retryRegistrationsLoad} />
 
+  const duplicateContactReview = reviewMode === 'duplicate-contacts'
+  const effectiveFilters = duplicateContactReview ? { ...filters, duplicateContacts: true } : filters
+  const effectiveActiveTab = duplicateContactReview ? 'All' : activeTab
+  const effectiveCardFilter = duplicateContactReview ? '' : cardFilter
+  const duplicateContactLookup = duplicateContactKeys(registrations)
   const filteredRegistrations = registrations.filter((reg) => {
     const finance = calculateRegistrationFinance(reg, activeEvent)
-    if (!matchesCardFilter(reg, cardFilter, activeEvent)) return false
+    if (!matchesCardFilter(reg, effectiveCardFilter, activeEvent)) return false
     // 1. Tab filtering
-    if (activeTab === 'Checked In' && !reg.checkedIn) return false
-    if (activeTab === 'Missing Ticket Code' && reg.ticketCode) return false
-    if (activeTab === 'Door Paid' && !paymentStatusMatches(reg.paymentStatus, 'door')) return false
-    if (activeTab === 'To Pay at Door' && !paymentStatusMatches(reg.paymentStatus, 'door-list')) return false
-    if (activeTab === 'Needs Review' && !registrationNeedsReview(reg, activeEvent)) return false
-    if (['Paid', 'Pending', 'Complimentary', 'Outstanding Balance'].includes(activeTab)) {
-      if (!financeFilterMatches(reg, activeTab, activeEvent)) return false
+    if (effectiveActiveTab === 'Checked In' && !reg.checkedIn) return false
+    if (effectiveActiveTab === 'Missing Ticket Code' && reg.ticketCode) return false
+    if (effectiveActiveTab === 'Door Paid' && !paymentStatusMatches(reg.paymentStatus, 'door')) return false
+    if (effectiveActiveTab === 'To Pay at Door' && !paymentStatusMatches(reg.paymentStatus, 'door-list')) return false
+    if (effectiveActiveTab === 'Needs Review' && !registrationNeedsReview(reg, activeEvent)) return false
+    if (['Paid', 'Pending', 'Complimentary', 'Outstanding Balance'].includes(effectiveActiveTab)) {
+      if (!financeFilterMatches(reg, effectiveActiveTab, activeEvent)) return false
     }
 
     // 2. Advanced Filters
-    if (filters.keyword) {
-      const q = filters.keyword.toLowerCase()
+    if (effectiveFilters.keyword) {
+      const q = effectiveFilters.keyword.toLowerCase()
       if (![reg.fullName, reg.buyerName, attendeeNamesText(reg), reg.email, reg.phone, reg.ticketCode].some(v => v?.toLowerCase().includes(q))) {
         return false
       }
     }
-    if (filters.guestName && !reg.fullName?.toLowerCase().includes(filters.guestName.toLowerCase())) return false
-    if (filters.buyerName && !reg.buyerName?.toLowerCase().includes(filters.buyerName.toLowerCase())) return false
-    if (filters.attendeeName && !attendeeNamesText(reg).toLowerCase().includes(filters.attendeeName.toLowerCase())) return false
-    if (filters.contact && !(reg.email?.toLowerCase().includes(filters.contact.toLowerCase()) || reg.phone?.toLowerCase().includes(filters.contact.toLowerCase()))) return false
-    if (filters.group && !reg.groupName?.toLowerCase().includes(filters.group.toLowerCase())) return false
-    if (filters.ticketCode && !reg.ticketCode?.toLowerCase().includes(filters.ticketCode.toLowerCase())) return false
-    if (filters.priceTier && !reg.priceTier?.toLowerCase().includes(filters.priceTier.toLowerCase())) return false
-    if (filters.paymentStatus && !paymentStatusMatches(reg.paymentStatus, filters.paymentStatus)) return false
-    if (filters.paymentMethod && reg.paymentMethod !== filters.paymentMethod) return false
-    if (filters.balanceDue) {
+    if (effectiveFilters.guestName && !reg.fullName?.toLowerCase().includes(effectiveFilters.guestName.toLowerCase())) return false
+    if (effectiveFilters.buyerName && !reg.buyerName?.toLowerCase().includes(effectiveFilters.buyerName.toLowerCase())) return false
+    if (effectiveFilters.attendeeName && !attendeeNamesText(reg).toLowerCase().includes(effectiveFilters.attendeeName.toLowerCase())) return false
+    if (effectiveFilters.contact && !(reg.email?.toLowerCase().includes(effectiveFilters.contact.toLowerCase()) || reg.phone?.toLowerCase().includes(effectiveFilters.contact.toLowerCase()))) return false
+    if (effectiveFilters.group && !reg.groupName?.toLowerCase().includes(effectiveFilters.group.toLowerCase())) return false
+    if (effectiveFilters.ticketCode && !reg.ticketCode?.toLowerCase().includes(effectiveFilters.ticketCode.toLowerCase())) return false
+    if (effectiveFilters.priceTier && !reg.priceTier?.toLowerCase().includes(effectiveFilters.priceTier.toLowerCase())) return false
+    if (effectiveFilters.paymentStatus && !paymentStatusMatches(reg.paymentStatus, effectiveFilters.paymentStatus)) return false
+    if (effectiveFilters.paymentMethod && reg.paymentMethod !== effectiveFilters.paymentMethod) return false
+    if (effectiveFilters.balanceDue) {
       if (!finance.balanceDue || finance.balanceDue <= 0) return false
     }
-    if (filters.missingTicket && reg.ticketCode) return false
-    if (filters.missingAmount) {
+    if (effectiveFilters.missingTicket && reg.ticketCode) return false
+    if (effectiveFilters.missingAmount) {
       if (finance.amountDue !== null && finance.amountPaid !== null) return false
     }
-    if (filters.reviewNeeded) {
+    if (effectiveFilters.reviewNeeded) {
       if (!registrationNeedsReview(reg, activeEvent)) return false
+    }
+    if (effectiveFilters.duplicateContacts) {
+      if (!hasDuplicateContact(reg, duplicateContactLookup)) return false
     }
     
     return true
@@ -217,7 +249,7 @@ export function RegistrationsPage() {
   const filteredMetrics = buildRegistrationMetrics(filteredRegistrations, activeEvent)
   const financeSummary = buildFinanceSummary(registrations, activeEvent)
   const evidenceAudit = getEventFinancialEvidenceAudit(activeEvent?.eventId)
-  const isFiltering = activeTab !== 'All' || Boolean(cardFilter) || Object.values(filters).some(Boolean)
+  const isFiltering = effectiveActiveTab !== 'All' || Boolean(effectiveCardFilter) || Object.values(effectiveFilters).some(Boolean)
   const showingText = isFiltering
     ? `Showing ${filteredMetrics.totalRegistrations} registration${filteredMetrics.totalRegistrations === 1 ? '' : 's'} covering ${filteredMetrics.totalPersons} guest${filteredMetrics.totalPersons === 1 ? '' : 's'}.`
     : 'Showing all registrations.'
@@ -452,7 +484,7 @@ export function RegistrationsPage() {
 
       <div className="flex flex-col gap-6">
         <RegistrationFilters 
-          filters={filters} 
+          filters={effectiveFilters}
           onFilterChange={setFilters} 
           onClearFilters={() => { setFilters({}); setActiveTab('All'); setCardFilter('') }} 
         />

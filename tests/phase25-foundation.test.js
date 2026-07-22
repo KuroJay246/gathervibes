@@ -106,3 +106,20 @@ test('Overview quick actions prioritize daily event work', async () => {
   assert.doesNotMatch(dashboard, /System QA/)
   assert.doesNotMatch(dashboard, /Message Builder', phase/)
 })
+
+test('duplicate-contact review actions open filtered registrations, not Import Center', async () => {
+  const readiness = await readFile('src/utils/eventReadiness.js', 'utf8')
+  const review = await readFile('src/utils/eventReview.js', 'utf8')
+  const registrations = await readFile('src/pages/RegistrationsPage.jsx', 'utf8')
+  const filters = await readFile('src/components/registrations/RegistrationFilters.jsx', 'utf8')
+
+  assert.match(readiness, /\/registrations\?review=duplicate-contacts/)
+  assert.match(readiness, /Review repeated contacts/)
+  assert.match(review, /Review repeated contact details/)
+  assert.match(review, /\/registrations\?review=duplicate-contacts/)
+  assert.match(registrations, /duplicateContactReview = reviewMode === 'duplicate-contacts'/)
+  assert.match(registrations, /duplicateContacts/)
+  assert.match(filters, /Repeated Contact Details/)
+  assert.doesNotMatch(review, /key: 'duplicate-contacts'[\s\S]{0,220}to: '\/imports'/)
+  assert.doesNotMatch(readiness, /duplicateContactRows > 0 \? '\/imports'/)
+})

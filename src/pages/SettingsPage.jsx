@@ -23,7 +23,7 @@ const SETTINGS_TABS = [
 function SettingsSection({ eyebrow, title, children }) {
   return (
     <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
-      <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">{eyebrow}</p>
+      <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#8A3F4B]">{eyebrow}</p>
       <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">{title}</h2>
       <div className="mt-6">{children}</div>
     </section>
@@ -45,7 +45,7 @@ function ProfileAvatar({ user }) {
 }
 
 function Pill({ children, tone = 'plain' }) {
-  const className = tone === 'warning' ? 'bg-[#FFF4DF] text-[#986F26]' : tone === 'success' ? 'bg-[#EAF6EF] text-[#2F855A]' : 'bg-[#F7F1ED] text-[#6B564C]'
+  const className = tone === 'warning' ? 'bg-[#FFF4DF] text-[#6F4A11]' : tone === 'success' ? 'bg-[#EAF6EF] text-[#17623A]' : 'bg-[#F7F1ED] text-[#6B564C]'
   return <span className={`inline-flex rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${className}`}>{children}</span>
 }
 
@@ -67,7 +67,7 @@ export function SettingsPage() {
             <div className="min-w-0">
               <p className="break-words text-lg font-bold text-[#2B1723]">{user?.displayName || 'Gather & Savor Admin'}</p>
               <p className="mt-1 break-words text-sm text-[#816D62]">{user?.email || 'No email available'}</p>
-              <p className="mt-2 inline-flex rounded-full bg-[#EAF6EF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#2F855A]">{currentRoleLabel}</p>
+              <p className="mt-2 inline-flex rounded-full bg-[#EAF6EF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#17623A]">{currentRoleLabel}</p>
             </div>
           </div>
           <div className="mt-6 rounded-2xl border border-[#EFE2DA] p-4">
@@ -131,9 +131,9 @@ export function SettingsPage() {
             <div key={entry.email} className="flex flex-col gap-1 border-b border-[#F2E8E1] p-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <p className="break-all text-sm font-bold text-[#2B1723]">{entry.email}</p>
-                {entry.protectedOwner && <p className="mt-1 text-xs font-semibold text-[#2F855A]">Protected Owner · cannot be removed or disabled here</p>}
+                {entry.protectedOwner && <p className="mt-1 text-xs font-semibold text-[#17623A]">Protected Owner · cannot be removed or disabled here</p>}
               </div>
-              <span className={`w-fit rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${entry.protectedOwner ? 'bg-[#EAF6EF] text-[#2F855A]' : 'bg-[#F7F1ED] text-[#6B564C]'}`}>
+              <span className={`w-fit rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${entry.protectedOwner ? 'bg-[#EAF6EF] text-[#17623A]' : 'bg-[#F7F1ED] text-[#6B564C]'}`}>
                 {entry.protectedOwner ? 'Protected Owner' : ACCESS_ROLES[entry.role]?.label || 'Admin'}
               </span>
             </div>

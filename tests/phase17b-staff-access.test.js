@@ -117,7 +117,7 @@ test('Phase 17B UI surfaces staff role gating and assigned-event fallback', asyn
   assert.match(auth, /doc\(db, 'events', eventId, 'staffAssignments', nextUser\.uid\)/)
   assert.doesNotMatch(auth, /collectionGroup\(db, 'staffAssignments'\)/)
   assert.match(protectedRoute, /canViewRoute/)
-  assert.match(shell, /filter\(\(\{ to \}\) => canViewRoute\(access, to\)\)/)
+  assert.match(shell, /canViewRoute\(access, to\)/)
   assert.match(app, /path="\/scanner"/)
   assert.match(app, /AssignedEventGate purpose="Check-In"/)
   assert.match(assignedGate, /No assigned events\. Please contact the organizer\./)

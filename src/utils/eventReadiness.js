@@ -184,8 +184,8 @@ export function buildEventReadiness(event = null, registrations = [], operations
       label: 'Data incomplete',
       statusLabel: missingContact > 0 ? 'Needs attention' : 'Review',
       summary: `${dataQualityWarnings} contact/duplicate warning${dataQualityWarnings === 1 ? '' : 's'} and ${reviewNeeded} finance review row${reviewNeeded === 1 ? '' : 's'}.`,
-      to: duplicateContactRows > 0 ? '/imports' : '/registrations',
-      linkLabel: duplicateContactRows > 0 ? 'Open Import Center' : 'Open Registrations',
+      to: duplicateContactRows > 0 ? '/registrations?review=duplicate-contacts' : '/registrations',
+      linkLabel: duplicateContactRows > 0 ? 'Review repeated contacts' : 'Open Registrations',
     })
   }
   if (metrics.capacityPercent >= 85) {

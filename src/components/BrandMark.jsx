@@ -16,7 +16,7 @@ export function BrandMark({ compact = false, light = false }) {
           <p className={`font-serif text-lg leading-none ${light ? 'text-white' : 'text-[#2B1723]'}`}>
             Gather & Savor
           </p>
-          <p className={`mt-1 text-[9px] font-semibold uppercase tracking-[0.28em] ${light ? 'text-white/45' : 'text-[#A48A7B]'}`}>
+          <p className={`mt-1 text-[9px] font-semibold uppercase tracking-[0.28em] ${light ? 'text-white/70' : 'text-[#A48A7B]'}`}>
             Event Hub
           </p>
         </div>

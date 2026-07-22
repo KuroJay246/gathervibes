@@ -159,13 +159,23 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
         </label>
         
         <label className="flex items-center gap-2 text-sm text-[#5D4A52]">
-          <input 
-            type="checkbox" 
+          <input
+            type="checkbox"
             checked={filters.reviewNeeded || false}
             onChange={(e) => handleChange('reviewNeeded', e.target.checked)}
             className="rounded border-[#C4B4AA] text-[#B76E79] focus:ring-[#B76E79]"
           />
           Needs Review
+        </label>
+
+        <label className="flex items-center gap-2 text-sm text-[#5D4A52]">
+          <input
+            type="checkbox"
+            checked={filters.duplicateContacts || false}
+            onChange={(e) => handleChange('duplicateContacts', e.target.checked)}
+            className="rounded border-[#C4B4AA] text-[#B76E79] focus:ring-[#B76E79]"
+          />
+          Repeated Contact Details
         </label>
       </div>
     </div>

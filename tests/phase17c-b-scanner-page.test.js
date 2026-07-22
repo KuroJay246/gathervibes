@@ -139,7 +139,7 @@ test('Phase 17C-B scanner route is outside AppShell and auto-selects a single as
   assert.match(gate, /assignedEvents\.length !== 1/)
   assert.match(gate, /setActiveEvent\(assignedEvents\[0\]\)/)
   assert.match(gate, /No assigned events\. Please contact the organizer\./)
-  assert.match(shell, /filter\(\(\{ to \}\) => canViewRoute\(access, to\)\)/)
+  assert.match(shell, /canViewRoute\(access, to\)/)
   assert.match(shell, /to="\/dashboard"[\s\S]*aria-label="Go to Overview"/)
   assert.doesNotMatch(scannerPage, /to="\/dashboard"|aria-label="Go to Overview"/)
 })

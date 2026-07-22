@@ -280,10 +280,10 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
   if (duplicateContactRows.length > 0) {
     followUpItems.push(buildFollowUpItem({
       key: 'duplicate-contacts',
-      label: 'Repeated contact details to review',
+      label: 'Review repeated contact details',
       count: duplicateContactRows.length,
-      explanation: 'These registrations reuse the same email or phone details and may need a duplicate or group review.',
-      to: '/imports',
+      explanation: 'These registrations reuse the same email or phone details. Review them in Registrations to decide whether they are group bookings or true duplicates.',
+      to: '/registrations?review=duplicate-contacts',
       preview: sampleNames(duplicateContactRows),
     }))
   }
