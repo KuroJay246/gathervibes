@@ -12,6 +12,11 @@
     "doctor": "react-doctor . --project . --scope full --blocking none --no-telemetry",
     "doctor:changed": "react-doctor . --project . --scope changed --base main --blocking error --no-telemetry",
     "doctor:json": "react-doctor . --project . --scope full --blocking none --json --json-compact --no-telemetry",
+    "product:copy-scan": "node scripts/product/copyScan.mjs",
+    "product:routes": "node scripts/product/routeInventory.mjs",
+    "product:bundle": "node scripts/product/bundleSummary.mjs",
+    "product:qa": "node scripts/product/runProductCommand.mjs qa",
+    "product:audit": "node scripts/product/runProductCommand.mjs audit",
     "admin:ensure-access": "node scripts/admin/ensureAccessControl.mjs",
     "admin:verify-firebase": "node scripts/admin/verifyFirebaseSetup.mjs",
     "admin:ensure-codex-test-event": "node scripts/admin/ensureCodexTestEvent.mjs",
@@ -23,6 +28,7 @@
     "firebase:deploy-all": "npx firebase-tools deploy --only firestore:rules,firestore:indexes,hosting --project gathervibeshub"
   },
   "dependencies": {
+    "@sentry/react": "^10.67.0",
     "firebase": "^12.6.0",
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.468.0",

@@ -1,4 +1,5 @@
 import { Component } from 'react'
+import { captureAppError } from '../lib/monitoring'
 
 export class AppErrorBoundary extends Component {
   constructor(props) {
@@ -23,6 +24,9 @@ export class AppErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
+    captureAppError(error, {
+      componentStack: errorInfo?.componentStack,
+    })
     console.error('Gather & Savor Hub render error', { error, errorInfo })
   }
 
