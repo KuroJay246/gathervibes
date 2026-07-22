@@ -1,8 +1,10 @@
+import { PROTECTED_OWNER_EMAIL, isProtectedOwnerUser } from '../config/protectedOwner.js'
+
 export const ACCESS_ROLES = {
   'owner-admin': {
     id: 'owner-admin',
     label: 'Owner/Admin',
-    summary: 'Full approved-admin access enforced by settings/accessControl.approvedEmails.',
+    summary: 'Full owner/admin access enforced by protected owner UID or approved organizer records.',
   },
   owner: {
     id: 'owner',
@@ -114,19 +116,33 @@ export function resolveAccessRole(accessControl = {}, email = '') {
 
 export function listApprovedAccessEntries(accessControl = {}) {
   const approvedEmails = Array.isArray(accessControl?.approvedEmails) ? accessControl.approvedEmails : []
-  return approvedEmails
+  const entries = approvedEmails
     .map(normalizeAccessEmail)
     .filter(Boolean)
     .sort()
     .map((email) => ({
       email,
       role: resolveAccessRole(accessControl, email) || 'admin',
+      protectedOwner: false,
     }))
+  if (!entries.some((entry) => entry.email === PROTECTED_OWNER_EMAIL)) {
+    entries.unshift({
+      email: PROTECTED_OWNER_EMAIL,
+      role: 'owner-admin',
+      protectedOwner: true,
+    })
+  }
+  return entries.map((entry) => (
+    entry.email === PROTECTED_OWNER_EMAIL
+      ? { ...entry, role: 'owner-admin', protectedOwner: true }
+      : entry
+  ))
 }
 
 export function roleCapabilitySummary(role) {
   const normalizedRole = normalizeAccessRole(role) || 'admin'
-  if (ADMIN_ROLES.has(normalizedRole)) return 'Full operations while approved by the private allowlist.'
+  if (normalizedRole === 'owner-admin') return 'Protected owner access is pinned to the Firebase UID and cannot be removed through the mutable allowlist.'
+  if (ADMIN_ROLES.has(normalizedRole)) return 'Full operations while approved by the private owner or organizer access contract.'
   if (normalizedRole === 'event-manager') return 'Assigned-event operational role. Rules-level writes remain narrow and explicit; live staff access does not enforce scoped rules yet until deployment approval.'
   if (normalizedRole === 'scanner' || normalizedRole === 'checkInStaff') return 'Assigned-event check-in lookup and check-in completion only. No ticket/payment/settings access; live staff access does not enforce scoped rules yet until deployment approval.'
   if (normalizedRole === 'viewer') return 'Assigned-event read-only role where read-only screens are implemented; live staff access does not enforce scoped rules yet until deployment approval.'
@@ -165,6 +181,18 @@ export function normalizeStaffAssignment(assignment = null) {
 }
 
 export function getUserAccessLevel(user, accessControl = {}, staffProfile = null, assignments = [], assignedEvents = []) {
+  if (isProtectedOwnerUser(user)) {
+    return {
+      level: 'admin',
+      role: 'owner-admin',
+      roleLabel: roleLabel('owner-admin'),
+      assignedEventIds: [],
+      assignmentsByEvent: {},
+      assignedEvents: [],
+      protectedOwner: true,
+    }
+  }
+
   const email = normalizeAccessEmail(user?.email)
   const adminRole = resolveAccessRole(accessControl || {}, email)
   if (adminRole) {

@@ -53,7 +53,7 @@ test('runtime health helpers hide allowlist contents while reporting approval', 
   })
 
   assert.equal(items.find((item) => item.label === 'Firebase project').status, 'ok')
-  assert.equal(items.find((item) => item.label === 'Current email approved').status, 'ok')
+  assert.equal(items.find((item) => item.label === 'Current owner or email approved').status, 'ok')
   assert.doesNotMatch(JSON.stringify(items), /approvedEmails/)
 })
 

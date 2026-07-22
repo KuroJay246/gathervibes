@@ -5,8 +5,14 @@ service cloud.firestore {
     // ===============================================================
     // Gather & Savor data model
     // ===============================================================
+    // Protected owner
+    //   UID: WcDU2jmbopdAgDlMMWvD3TkqqbC3
+    //   Email: jaylanspencer99@gmail.com
+    //   Non-secret permanent owner identity. This UID path is not editable
+    //   through normal organizer Settings and does not bypass validators.
+    //
     // settings/accessControl
-    //   approvedEmails: list<string> (created only in Firebase Console)
+    //   approvedEmails: list<string> (secondary organizers; created only in Firebase Console)
     //
     // events/{eventId}
     //   eventId: string (immutable, must equal document ID)
@@ -49,13 +55,24 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function protectedOwnerUid() {
+      return 'WcDU2jmbopdAgDlMMWvD3TkqqbC3';
+    }
+
+    function isProtectedOwner() {
+      return isSignedIn() && request.auth.uid == protectedOwnerUid();
+    }
+
     function isApprovedAdmin() {
-      return isSignedIn()
-        && request.auth.token.email is string
-        && exists(/databases/$(database)/documents/settings/accessControl)
-        && get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails is list
-        && request.auth.token.email.lower() in
-          get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails;
+      return isProtectedOwner()
+        || (
+          isSignedIn()
+          && request.auth.token.email is string
+          && exists(/databases/$(database)/documents/settings/accessControl)
+          && get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails is list
+          && request.auth.token.email.lower() in
+            get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails
+        );
     }
 
     function activeStaffProfile() {
