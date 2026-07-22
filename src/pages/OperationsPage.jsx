@@ -117,7 +117,9 @@ export function OperationsPage() {
       },
       (err) => {
         if (import.meta.env.DEV) console.error(err)
-        setError('Could not load operations ledger. Check permissions and Firestore rules.')
+        setError(
+          'Live Operations ledger rows could not be loaded for this session. The read-only Phase 23N closeout and audit summary remains separate from registration payments.',
+        )
         setLoading(false)
       },
     )
