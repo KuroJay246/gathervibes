@@ -15,9 +15,16 @@ test('Import Center source selector covers supported source types', () => {
       'pasted-table',
       'bank-payment-csv',
       'custom',
-      'cpb-payment-audit',
     ],
   )
+})
+
+test('Import Center excludes completed CPB recovery tools from organizer sources', async () => {
+  const page = await readFile('src/pages/ImportsPage.jsx', 'utf8')
+  const templates = await readFile('src/components/imports/ImportTemplatesPanel.jsx', 'utf8')
+
+  assert.doesNotMatch(page, /PaymentAuditBackfillPanel|cpb-audit-preview|CPB Payment Audit Backfill/)
+  assert.doesNotMatch(templates, /CPB Payment Audit Backfill|Christina Morris|Cole also has/)
 })
 
 test('Import Center keeps Google Sheets OAuth deferred and enables XLSX parsing', () => {

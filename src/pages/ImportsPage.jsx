@@ -10,7 +10,6 @@ import { FieldMappingForm } from '../components/imports/FieldMappingForm'
 import { ImportPreviewTable } from '../components/imports/ImportPreviewTable'
 import { ImportSummary } from '../components/imports/ImportSummary'
 import { ImportTemplatesPanel } from '../components/imports/ImportTemplatesPanel'
-import { PaymentAuditBackfillPanel } from '../components/imports/PaymentAuditBackfillPanel'
 import { EmptyState } from '../components/ui/EmptyState'
 import { InfoHint } from '../components/ui/InfoHint'
 import { IMPORT_SOURCES, getImportSource } from '../utils/importSources'
@@ -103,7 +102,7 @@ export function ImportsPage() {
         title="No selected event"
         description="Select an event before importing registrations."
         action={(
-          <Link to="/events" className="rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white">
+          <Link to="/events" className="rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white">
             Choose an event
           </Link>
         )}
@@ -189,11 +188,6 @@ export function ImportsPage() {
     }
     setConfirmedSheetId(sheet.id)
     
-    if (sourceType === 'cpb-payment-audit') {
-      setStep('cpb-audit-preview')
-      return
-    }
-
     loadParsedData(sheet.headers, sheet.rows, {
       sourceFileName: uploadedFileName,
       sourceSheetName: sheet.name,
@@ -428,7 +422,7 @@ export function ImportsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <Link to="/registrations" className="mb-4 inline-flex items-center gap-2 text-xs font-bold text-[#8C7567] hover:text-[#2B1723]">
+        <Link to="/registrations" className="mb-4 inline-flex items-center gap-2 text-xs font-bold text-[#6B564C] hover:text-[#2B1723]">
           <ArrowLeft className="size-4" /> Back to Registrations
         </Link>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -484,26 +478,16 @@ export function ImportsPage() {
                   type="button"
                   onClick={() => setSourceType(source.value)}
                   className={`rounded-xl border p-4 text-left transition ${
-                    source.special
-                      ? sourceType === source.value
-                        ? 'border-[#A32626] bg-[#FFF1F1]'
-                        : 'border-[#F2C3C3] bg-[#FFF8F8] hover:bg-[#FFF1F1]'
-                      : sourceType === source.value
-                        ? 'border-[#B76E79] bg-[#FFF8F2]'
-                        : 'border-[#F2E8E1] bg-white hover:bg-[#FBF8F5]'
+                    sourceType === source.value
+                      ? 'border-[#9A5260] bg-[#FFF8F2]'
+                      : 'border-[#F2E8E1] bg-white hover:bg-[#FBF8F5]'
                   }`}
                 >
                   <span className="flex items-start gap-3">
-                    <FileSpreadsheet className={`mt-0.5 size-5 shrink-0 ${source.special ? 'text-[#A32626]' : sourceType === source.value ? 'text-[#B76E79]' : 'text-[#C4B4AA]'}`} />
+                    <FileSpreadsheet className={`mt-0.5 size-5 shrink-0 ${sourceType === source.value ? 'text-[#9A5260]' : 'text-[#C4B4AA]'}`} />
                     <span>
                       <span className="block text-sm font-bold text-[#2B1723]">{source.label}</span>
                       <span className="mt-1 block text-xs leading-5 text-[#816D62]">{source.helperText}</span>
-                      {source.special && (
-                        <span className="mt-2 block rounded-lg bg-white/70 px-3 py-2 text-[11px] font-bold leading-5 text-[#A32626]">
-                          CPB Payment Audit Backfill stays dry-run only here. No CPB writes run until a separate approval task. Gmail links are not stored.
-                          <span className="mt-1 block font-semibold text-[#7A5818]">Cole also has the actual spreadsheet for independent verification. Use this dry-run as a helper, not as final proof.</span>
-                        </span>
-                      )}
                     </span>
                   </span>
                 </button>
@@ -513,14 +497,14 @@ export function ImportsPage() {
 
           <div className="rounded-2xl bg-white p-6 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-10">
             <div className="border-b border-[#F2E8E1] pb-6">
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">{selectedSource.label}</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8A3F4B]">{selectedSource.label}</p>
               <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Load registration rows</h3>
               <p className="mt-2 text-sm leading-6 text-[#816D62]">{selectedSource.helperText}</p>
             </div>
 
             {selectedSource.mode === 'xlsx' ? (
               <div className="mt-8 space-y-5">
-                <div className="relative flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#DFD0C8] bg-[#FBF8F5] transition hover:border-[#B76E79]">
+                <div className="relative flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#DFD0C8] bg-[#FBF8F5] transition hover:border-[#9A5260]">
                   <input
                     aria-label="Upload XLSX workbook"
                     type="file"
@@ -533,10 +517,10 @@ export function ImportsPage() {
                   <p className="mt-4 text-sm font-bold text-[#5D4A52]">
                     {parsingFile ? 'Reading workbook…' : 'Click or drag to upload XLSX'}
                   </p>
-                  <p className="mt-1 text-center text-xs leading-5 text-[#8C7567]">
+                  <p className="mt-1 text-center text-xs leading-5 text-[#6B564C]">
                     Formulas are not executed. Use saved/displayed values only, then preview before import.
                   </p>
-                  {uploadedFileName && <p className="mt-2 text-[11px] font-bold text-[#B76E79]">{uploadedFileName}</p>}
+                  {uploadedFileName && <p className="mt-2 text-[11px] font-bold text-[#9A5260]">{uploadedFileName}</p>}
                 </div>
 
                 <div className="rounded-2xl border border-[#F2D6A3] bg-[#FFF7E8] p-5 text-sm leading-6 text-[#7A5818]">
@@ -552,7 +536,7 @@ export function ImportsPage() {
                 </div>
               </div>
             ) : inputType === 'upload' ? (
-              <div className="relative mt-8 flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#DFD0C8] bg-[#FBF8F5] transition hover:border-[#B76E79]">
+              <div className="relative mt-8 flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#DFD0C8] bg-[#FBF8F5] transition hover:border-[#9A5260]">
                 <input
                   aria-label="Upload CSV or text file"
                   type="file"
@@ -562,7 +546,7 @@ export function ImportsPage() {
                 />
                 <UploadCloud className="size-10 text-[#C4B4AA]" />
                 <p className="mt-4 text-sm font-bold text-[#5D4A52]">Click or drag to upload CSV</p>
-                <p className="mt-1 text-xs text-[#8C7567]">Must include headers</p>
+                <p className="mt-1 text-xs text-[#6B564C]">Must include headers</p>
               </div>
             ) : (
               <div className="mt-8 flex flex-col">
@@ -572,13 +556,13 @@ export function ImportsPage() {
                   value={csvText}
                   onChange={(e) => setCsvText(e.target.value)}
                   placeholder={'Name, Email, Phone\nJohn Doe, john@example.com, 555-0100'}
-                  className="w-full rounded-xl border border-[#E5D7CF] p-4 font-mono text-sm focus:border-[#B76E79] focus:outline-none"
+                  className="w-full rounded-xl border border-[#E5D7CF] p-4 font-mono text-sm focus:border-[#9A5260] focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => parseAndMoveToMap(csvText, { sourceFileName: 'pasted-table', importBatchId: `pasted-${Date.now()}` })}
                   disabled={!csvText.trim()}
-                  className="mt-4 self-end rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B] disabled:opacity-50"
+                  className="mt-4 self-end rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B] disabled:opacity-50"
                 >
                   Parse rows
                 </button>
@@ -597,7 +581,7 @@ export function ImportsPage() {
       {step === 2 && (
         <div className="grid gap-6 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
           <section className="rounded-2xl bg-white p-5 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Select worksheet</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Select worksheet</p>
             <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Select the worksheet to import</h3>
             <p className="mt-2 text-sm leading-6 text-[#816D62]">
               Choose the sheet you want to import, review the sample rows, then confirm before continuing.
@@ -609,7 +593,7 @@ export function ImportsPage() {
                   key={sheet.id}
                   type="button"
                   onClick={() => handleSheetSelection(sheet.id)}
-                  className={`w-full rounded-xl border p-4 text-left transition ${selectedSheetId === sheet.id ? 'border-[#B76E79] bg-[#FFF8F2]' : 'border-[#F2E8E1] bg-white hover:bg-[#FBF8F5]'}`}
+                  className={`w-full rounded-xl border p-4 text-left transition ${selectedSheetId === sheet.id ? 'border-[#9A5260] bg-[#FFF8F2]' : 'border-[#F2E8E1] bg-white hover:bg-[#FBF8F5]'}`}
                 >
                   <span className="block text-sm font-bold text-[#2B1723]">{sheet.name}</span>
                   <span className="mt-1 block text-xs text-[#816D62]">
@@ -674,7 +658,7 @@ export function ImportsPage() {
               <button
                 type="button"
                 onClick={reset}
-                className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1]"
+                className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#6B564C] transition hover:bg-[#F2E8E1]"
               >
                 Clear File / Start Over
               </button>
@@ -687,23 +671,13 @@ export function ImportsPage() {
                 type="button"
                 onClick={confirmSheetSelection}
                 disabled={!canConfirmSheet}
-                className="rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B] disabled:opacity-50"
+                className="rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B] disabled:opacity-50"
               >
                 Confirm Sheet Selection
               </button>
             </div>
           </section>
         </div>
-      )}
-
-      {step === 'cpb-audit-preview' && (
-        <PaymentAuditBackfillPanel 
-          sheet={selectedSheet}
-          existingRegistrations={existingRegistrations}
-          event={activeEvent}
-          user={user}
-          onReset={resetImportState}
-        />
       )}
 
       {step === 3 && (
@@ -746,7 +720,7 @@ export function ImportsPage() {
       {step === 5 && (
         <div className="space-y-4">
           <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Ticket code handling</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#6B564C]">Ticket code handling</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {[
                 ['use-imported', 'Use imported ticket codes'],

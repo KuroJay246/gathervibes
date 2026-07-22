@@ -64,7 +64,7 @@ export class AppErrorBoundary extends Component {
       return (
         <main className="flex min-h-screen items-center justify-center bg-[#FFF8F2] px-4 py-10 text-[#2B1723]">
           <section className="w-full max-w-2xl rounded-2xl border border-[#EEDFD6] bg-white p-6 shadow-[0_18px_48px_rgba(43,23,35,0.08)]">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Gather & Savor Hub</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Gather & Savor Hub</p>
             <h1 className="mt-3 font-serif text-2xl">Something went wrong loading Gather & Savor Hub.</h1>
             <p className="mt-3 text-sm leading-6 text-[#7B665C]">
               Refresh the page first. If this account still gets stuck, try an Incognito or Private window, then clear

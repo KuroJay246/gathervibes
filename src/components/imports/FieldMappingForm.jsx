@@ -87,10 +87,10 @@ export function FieldMappingForm({
               <div className="flex-1 font-mono text-sm font-semibold text-[#5D4A52]">
                 <label htmlFor={selectId}>{header || `Column ${index + 1}`}</label>
                 <div className="mt-1 flex flex-wrap gap-2 font-sans text-[10px] font-bold uppercase tracking-wider">
-                  <span className="rounded-full bg-[#F7F1ED] px-2 py-0.5 text-[#8C7567]">
+                  <span className="rounded-full bg-[#F7F1ED] px-2 py-0.5 text-[#80685B]">
                     Detected: {mappingPreview[index]?.detectedField || 'Unmapped'}
                   </span>
-                  <span className="rounded-full bg-[#F7F1ED] px-2 py-0.5 text-[#8C7567]">
+                  <span className="rounded-full bg-[#F7F1ED] px-2 py-0.5 text-[#80685B]">
                     Confidence: {mappingPreview[index]?.confidence || 'none'}
                   </span>
                 </div>
@@ -115,7 +115,7 @@ export function FieldMappingForm({
                     }
                     onMapChange(newMap)
                   }}
-                  className="w-full rounded-lg border border-[#E5D7CF] bg-[#FBF8F5] px-3 py-2 text-sm text-[#2B1723] focus:border-[#B76E79] focus:outline-none"
+                  className="w-full rounded-lg border border-[#E5D7CF] bg-[#FBF8F5] px-3 py-2 text-sm text-[#2B1723] focus:border-[#9A5260] focus:outline-none"
                 >
                   <option value="">-- Skip this column --</option>
                   {REGISTRATION_FIELDS.map(field => (
@@ -129,7 +129,7 @@ export function FieldMappingForm({
                   ))}
                 </select>
                 {mappedField?.help && (
-                  <p className="mt-1 text-[11px] leading-4 text-[#8C7567]">{mappedField.help}</p>
+                  <p className="mt-1 text-[11px] leading-4 text-[#80685B]">{mappedField.help}</p>
                 )}
               </div>
             </div>
@@ -147,14 +147,14 @@ export function FieldMappingForm({
         <button
           type="button"
           onClick={onStartOver || onCancel}
-          className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1]"
+          className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#80685B] transition hover:bg-[#F2E8E1]"
         >
           Change File / Start Over
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1]"
+          className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#80685B] transition hover:bg-[#F2E8E1]"
         >
           Clear File
         </button>
@@ -167,7 +167,7 @@ export function FieldMappingForm({
           type="button"
           onClick={onProceed}
           disabled={!isReady}
-          className="rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#B76E79]/30 disabled:opacity-50"
+          className="rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#9A5260]/30 disabled:opacity-50"
         >
           Preview Import
         </button>

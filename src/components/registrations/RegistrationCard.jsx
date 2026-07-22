@@ -26,7 +26,7 @@ export function RegistrationCard({ registration, onEdit, onDelete, highlighted =
             <h3 className="font-bold text-[#2B1723]">{registration.fullName}</h3>
           </div>
           {registration.buyerName && (
-            <div className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer / Contact: {registration.buyerName}</div>
+            <div className="mt-1 text-xs font-semibold text-[#80685B]">Buyer / Contact: {registration.buyerName}</div>
           )}
           {attendees && (
             <div className="mt-1 text-xs text-[#5D4A52]">Guests: {attendees}</div>
@@ -36,7 +36,7 @@ export function RegistrationCard({ registration, onEdit, onDelete, highlighted =
             {registration.phone && <span>{registration.phone}</span>}
           </div>
         </div>
-        <div className="flex items-center gap-1 rounded-full bg-[#FFF8F2] px-2 py-1 text-xs font-bold text-[#B76E79]">
+        <div className="flex items-center gap-1 rounded-full bg-[#FFF8F2] px-2 py-1 text-xs font-bold text-[#9A5260]">
           <User className="size-3" />
           {persons > 1 ? `Group of ${persons}` : '1 guest'}
         </div>
@@ -45,7 +45,7 @@ export function RegistrationCard({ registration, onEdit, onDelete, highlighted =
       {(registration.groupName || registration.notes) && (
         <div className="rounded-xl bg-[#FBF8F5] p-3 text-xs text-[#5D4A52]">
           {registration.groupName && (
-            <div className="font-semibold text-[#8C7567]">Group: {registration.groupName}</div>
+            <div className="font-semibold text-[#80685B]">Group: {registration.groupName}</div>
           )}
           {registration.notes && (
             <div className={registration.groupName ? 'mt-1' : ''}>{registration.notes}</div>
@@ -68,22 +68,22 @@ export function RegistrationCard({ registration, onEdit, onDelete, highlighted =
       <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-[#F2E8E1] pt-3">
         <span className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
           paymentStatus === 'paid' ? 'bg-[#E5F3EC] text-[#1E7345]' :
-          paymentStatus === 'pending' ? 'bg-[#FFF4DF] text-[#986F26]' :
+          paymentStatus === 'pending' ? 'bg-[#FFF4DF] text-[#7A5818]' :
           paymentStatus === 'complimentary' ? 'bg-[#F2E8FA] text-[#6B3FA0]' :
           paymentStatus === 'door' ? 'bg-[#E6F0FA] text-[#285E9E]' :
-          'bg-[#F7F1ED] text-[#8C766A]'
+          'bg-[#F7F1ED] text-[#80685B]'
         }`}>
           {formatPaymentLabel(registration.paymentStatus)}
         </span>
         <span className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
           registration.ticketStatus === 'assigned' ? 'bg-[#E5F3EC] text-[#1E7345]' :
-          registration.ticketStatus === 'partially-assigned' ? 'bg-[#FFF4DF] text-[#986F26]' :
+          registration.ticketStatus === 'partially-assigned' ? 'bg-[#FFF4DF] text-[#7A5818]' :
           'bg-[#FCEEF1] text-[#A32626]'
         }`}>
           {registration.ticketStatus.replace(/-/g, ' ')}
         </span>
         <span className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
-          registration.checkedIn ? 'bg-[#E5F3EC] text-[#1E7345]' : 'bg-[#F7F1ED] text-[#8C766A]'
+          registration.checkedIn ? 'bg-[#E5F3EC] text-[#1E7345]' : 'bg-[#F7F1ED] text-[#80685B]'
         }`}>
           {registration.checkedIn ? 'Checked in' : 'Not checked in'}
         </span>
@@ -92,14 +92,14 @@ export function RegistrationCard({ registration, onEdit, onDelete, highlighted =
           <button
             type="button"
             onClick={() => onEdit(registration)}
-            className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#8C766A] hover:bg-[#FFF8F2]"
+            className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#80685B] hover:bg-[#FFF8F2]"
           >
             Edit
           </button>
           <button
             type="button"
             onClick={() => onDelete(registration)}
-            className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#A85F6B] hover:bg-[#FCEEF1]"
+            className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#8A3F4B] hover:bg-[#FCEEF1]"
           >
             Delete
           </button>

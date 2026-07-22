@@ -5,8 +5,8 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
     onFilterChange({ ...filters, [key]: value })
   }
 
-  const inputClasses = "rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-1 focus:ring-[#B76E79]"
-  const selectClasses = "rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-1 focus:ring-[#B76E79]"
+  const inputClasses = "rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-sm focus:border-[#9A5260] focus:outline-none focus:ring-1 focus:ring-[#9A5260]"
+  const selectClasses = "rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-sm focus:border-[#9A5260] focus:outline-none focus:ring-1 focus:ring-[#9A5260]"
 
   return (
     <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm space-y-4">
@@ -20,7 +20,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
         <button 
           type="button"
           onClick={onClearFilters}
-          className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold text-[#8C766A] hover:bg-[#F2E8E1] transition"
+          className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold text-[#80685B] hover:bg-[#F2E8E1] transition"
         >
           <X className="size-3" /> Clear filters
         </button>
@@ -133,7 +133,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
             type="checkbox" 
             checked={filters.balanceDue || false}
             onChange={(e) => handleChange('balanceDue', e.target.checked)}
-            className="rounded border-[#C4B4AA] text-[#B76E79] focus:ring-[#B76E79]"
+            className="rounded border-[#C4B4AA] text-[#9A5260] focus:ring-[#9A5260]"
           />
           Has Balance Due
         </label>
@@ -143,7 +143,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
             type="checkbox"
             checked={filters.missingTicket || false}
             onChange={(e) => handleChange('missingTicket', e.target.checked)}
-            className="rounded border-[#C4B4AA] text-[#B76E79] focus:ring-[#B76E79]"
+            className="rounded border-[#C4B4AA] text-[#9A5260] focus:ring-[#9A5260]"
           />
           Missing Ticket Code
         </label>
@@ -153,7 +153,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
             type="checkbox"
             checked={filters.missingAmount || false}
             onChange={(e) => handleChange('missingAmount', e.target.checked)}
-            className="rounded border-[#C4B4AA] text-[#B76E79] focus:ring-[#B76E79]"
+            className="rounded border-[#C4B4AA] text-[#9A5260] focus:ring-[#9A5260]"
           />
           Missing Amount
         </label>
@@ -163,7 +163,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
             type="checkbox"
             checked={filters.reviewNeeded || false}
             onChange={(e) => handleChange('reviewNeeded', e.target.checked)}
-            className="rounded border-[#C4B4AA] text-[#B76E79] focus:ring-[#B76E79]"
+            className="rounded border-[#C4B4AA] text-[#9A5260] focus:ring-[#9A5260]"
           />
           Needs Review
         </label>
@@ -173,7 +173,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
             type="checkbox"
             checked={filters.duplicateContacts || false}
             onChange={(e) => handleChange('duplicateContacts', e.target.checked)}
-            className="rounded border-[#C4B4AA] text-[#B76E79] focus:ring-[#B76E79]"
+            className="rounded border-[#C4B4AA] text-[#9A5260] focus:ring-[#9A5260]"
           />
           Repeated Contact Details
         </label>

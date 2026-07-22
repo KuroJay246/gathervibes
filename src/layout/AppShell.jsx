@@ -64,6 +64,7 @@ const mobileMoreGroups = [
   {
     label: 'Admin',
     items: [
+      { to: '/imports', label: 'Import Center', icon: FileInput },
       { to: '/settings', label: 'Settings', icon: Settings },
       { to: '/qa', label: 'System QA', icon: ShieldCheck },
     ],
@@ -81,7 +82,7 @@ const pageTitles = {
   '/operations': ['Operations', 'Track event-level money and obligations'],
   '/event-review': ['Reports', 'Read-only follow-up, payments, operations, and summary'],
   '/imports': ['Import Center', 'Bring in CSV exports and pasted table rows safely'],
-  '/qa': ['System QA', 'Production diagnostics and CODEX_TEST guardrails'],
+  '/qa': ['System QA', 'System health, data checks, and safe test guidance'],
   '/communications': ['Message Builder', 'Create, personalize, and copy event messages'],
   '/settings': ['Settings', 'Practical workspace and event defaults'],
 }

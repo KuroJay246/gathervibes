@@ -108,7 +108,7 @@ input:focus-visible {
   border: 0;
   border-radius: 0.95rem;
   background: transparent;
-  color: #8c766a;
+  color: #6b564c;
   font-size: 0.63rem;
   font-weight: 700;
   line-height: 1;
@@ -116,7 +116,7 @@ input:focus-visible {
 
 .mobile-tab-item-active {
   background: #fceef1;
-  color: #a85f6b;
+  color: #7f3e49;
 }
 
 .font-serif {

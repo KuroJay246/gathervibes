@@ -202,15 +202,15 @@ test('Phase 17C-B1 scanner shortcuts exist for approved admins without adding st
 test('Settings documents current access categories without rules rewriting UI', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
 
-  for (const category of ['Profile', 'Workspace', 'Events & Defaults', 'Access Summary', 'Scanner & Tickets', 'Imports', 'Finance & Operations', 'Message Builder', 'Security']) {
+  for (const category of ['Account', 'Workspace', 'Event Defaults', 'Organizer Access', 'Tickets & Check-In', 'Data & Messages', 'Advanced']) {
     assert.match(settings, new RegExp(category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
-  for (const item of ['Access request actions disabled', 'Role editing is not exposed', 'Assignment editing disabled', 'Lead scanner disabled', 'approvedEmails']) {
+  for (const item of ['Access is controlled outside this page', "cannot add, remove, disable, or change anyone's role", 'Assigned-event access only', 'No editable control here']) {
     assert.match(settings, new RegExp(item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
-  assert.match(settings, /Staff and scanner helpers are not added to that allowlist as a shortcut/)
+  assert.match(settings, /Helper access does not grant Settings or full organizer access/)
   assert.doesNotMatch(settings, /setDoc\(.*firestore\.rules|updateDoc\(.*firestore\.rules|rulesEditor|rulesTextarea/i)
 })
 
@@ -223,21 +223,24 @@ test('Phase 17C-B1b Settings uses accessible query-linked tabs', async () => {
   assert.match(settings, /role="tab"/)
   assert.match(settings, /aria-selected=\{activeTab === id\}/)
   assert.match(settings, /setSearchParams\(\{ tab: id \}\)/)
-  assert.match(settings, /const requestedTab = searchParams\.get\('tab'\) \|\| 'profile'/)
+  assert.match(settings, /const requestedTab = searchParams\.get\('tab'\) \|\| 'account'/)
+  assert.match(settings, /handleTabKeyDown/)
+  assert.match(settings, /tabIndex=\{activeTab === id \? 0 : -1\}/)
+  assert.match(settings, /aria-labelledby=/)
   assert.match(settings, /role="tabpanel"/)
 })
 
 test('Settings tabs preserve required guardrail content', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
 
-  assert.match(settings, /Approved admin allowlist active/)
-  assert.match(settings, /Staff and scanner helpers are not added to that allowlist/)
-  assert.match(settings, /Scanner route/)
-  assert.match(settings, /Admin-only audited Undo Check-In/)
-  assert.match(settings, /Scanner undo\/check-out/)
-  assert.match(settings, /Private approved-account workspace/)
+  assert.match(settings, /Protected Owner/)
+  assert.match(settings, /Helper access does not grant Settings or full organizer access/)
+  assert.match(settings, /Open Scanner Mode/)
+  assert.match(settings, /Organizer-only audited correction/)
+  assert.match(settings, /Normal scanner users cannot undo attendance/)
+  assert.match(settings, /private organizer workspace/i)
   assert.match(settings, /Search indexing/)
-  assert.match(settings, /No public attendee, vendor, or payment portal/)
+  assert.match(settings, /no public attendee, vendor, or payment portal/i)
 })
 
 test('Phase 17C-B3 AuthProvider checks staff path before not-approved error', async () => {

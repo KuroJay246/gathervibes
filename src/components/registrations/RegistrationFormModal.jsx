@@ -123,7 +123,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="rounded-full p-2 text-[#8C7567] transition hover:bg-[#FFF8F2] hover:text-[#2B1723] disabled:opacity-50"
+            className="rounded-full p-2 text-[#80685B] transition hover:bg-[#FFF8F2] hover:text-[#2B1723] disabled:opacity-50"
             aria-label="Close registration form"
           >
             <X className="size-5" />
@@ -264,7 +264,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
             </div>
 
             <div className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
-              <p className="mb-4 text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Finance / Money Tracker</p>
+              <p className="mb-4 text-xs font-bold uppercase tracking-wider text-[#80685B]">Finance / Money Tracker</p>
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label className="event-label">Price Tier</label>
@@ -337,7 +337,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1] disabled:opacity-50"
+              className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#80685B] transition hover:bg-[#F2E8E1] disabled:opacity-50"
             >
               Cancel
             </button>
@@ -345,7 +345,7 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
               type="submit"
               form="registration-form"
               disabled={saving}
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#B76E79]/30 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#9A5260]/30 disabled:opacity-50"
             >
               {saving ? (
                 <>

@@ -22,7 +22,7 @@ function statusLabel(value) {
 function ScannerField({ label, value }) {
   return (
     <div className="rounded-xl border border-[#EFE2DA] bg-[#FFFDFC] px-4 py-3">
-      <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">{label}</dt>
+      <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">{label}</dt>
       <dd className="mt-1 text-sm font-semibold text-[#2B1723]">{value}</dd>
     </div>
   )
@@ -277,7 +277,7 @@ export function ScannerPage() {
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
                   placeholder="Type a guest name or ticket code"
-                  className="min-h-12 w-full rounded-xl border border-[#E5D7CF] bg-white py-3 pl-9 pr-3 text-base font-semibold text-[#2B1723] focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
+                  className="min-h-12 w-full rounded-xl border border-[#E5D7CF] bg-white py-3 pl-9 pr-3 text-base font-semibold text-[#2B1723] focus:border-[#9A5260] focus:outline-none focus:ring-2 focus:ring-[#9A5260]/20"
                 />
               </div>
               {filteredRegistrations.length > 0 && (
@@ -293,7 +293,7 @@ export function ScannerPage() {
                         <span className="block text-sm font-bold text-[#2B1723]">{safeText(registration.fullName, 'Unnamed guest')}</span>
                         <span className="mt-1 block text-xs text-[#806C61]">{safeText(registration.ticketCode, 'No ticket code')}</span>
                       </span>
-                      <span className={registration.checkedIn ? 'text-xs font-bold text-[#1E7345]' : 'text-xs font-bold text-[#B76E79]'}>
+                      <span className={registration.checkedIn ? 'text-xs font-bold text-[#1E7345]' : 'text-xs font-bold text-[#9A5260]'}>
                         {registration.checkedIn ? 'Checked in' : 'Ready'}
                       </span>
                     </button>
@@ -303,7 +303,7 @@ export function ScannerPage() {
             </div>
 
             <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8C7567]">Event-day guidance</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#80685B]">Event-day guidance</p>
               <div className="mt-3 grid gap-2">
                 <p className="rounded-xl bg-[#FBF8F5] px-4 py-3 text-sm font-semibold text-[#2B1723]">Scan or search, review the guest card, then tap <span className="font-bold">Check In</span>.</p>
                 <p className="rounded-xl bg-[#FFF8EA] px-4 py-3 text-sm font-semibold text-[#715D46]">Scanner/check-in-only access cannot undo or check out a guest.</p>
@@ -329,9 +329,9 @@ export function ScannerPage() {
                     : 'border-[#E7D6CC] bg-[#FBF8F5]'
               }`}>
                 <div className="flex items-start gap-3">
-                  {lastResult.type === 'success' ? <Check className="mt-1 size-5 text-[#1E7345]" /> : lastResult.type === 'duplicate' ? <AlertTriangle className="mt-1 size-5 text-[#986F26]" /> : <CircleAlert className="mt-1 size-5 text-[#6B564C]" />}
+                  {lastResult.type === 'success' ? <Check className="mt-1 size-5 text-[#1E7345]" /> : lastResult.type === 'duplicate' ? <AlertTriangle className="mt-1 size-5 text-[#7A5818]" /> : <CircleAlert className="mt-1 size-5 text-[#6B564C]" />}
                   <div className="min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C7567]">{lastResult.title}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#80685B]">{lastResult.title}</p>
                     <h2 className="mt-1 break-words font-serif text-2xl text-[#2B1723]">{lastResult.fullName}</h2>
                     <p className="mt-1 text-sm font-semibold text-[#6B564C]">{lastResult.ticketCode}</p>
                     <p className="mt-2 text-sm font-semibold text-[#2B1723]">{lastResult.detail}</p>
@@ -348,14 +348,14 @@ export function ScannerPage() {
             )}
 
             <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
-              <div className="flex items-center gap-2 text-[#B76E79]">
+              <div className="flex items-center gap-2 text-[#9A5260]">
                 <Ticket className="size-5" />
                 <h1 className="font-serif text-2xl text-[#2B1723]">Guest ticket</h1>
               </div>
 
               {!selectedRegistration ? (
                 <div className="mt-5 rounded-xl border border-dashed border-[#E5D7CF] bg-[#FFF8F2] px-4 py-8 text-center">
-                  <UserRound className="mx-auto size-8 text-[#B76E79]" />
+                  <UserRound className="mx-auto size-8 text-[#9A5260]" />
                   <p className="mt-3 text-sm font-semibold text-[#2B1723]">
                     {loading ? 'Loading assigned event guests...' : 'Scan a QR code or find a ticket.'}
                   </p>
@@ -366,7 +366,7 @@ export function ScannerPage() {
               ) : (
                 <div className="mt-5 space-y-4">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C7567]">Guest</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#80685B]">Guest</p>
                     <h2 className="mt-1 font-serif text-3xl leading-tight text-[#2B1723]">{safeText(selectedRegistration.fullName, 'Unnamed guest')}</h2>
                     <p className="mt-1 text-sm text-[#806C61]">{safeText(selectedRegistration.eventName || activeEvent?.eventName, 'Assigned event')}</p>
                   </div>

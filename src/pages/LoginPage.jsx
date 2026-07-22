@@ -145,7 +145,7 @@ export function LoginPage() {
         <div className="mx-auto flex min-h-[calc(100dvh-1.5rem)] max-w-[760px] items-center justify-center sm:min-h-[calc(100dvh-2.5rem)]">
           <section className="w-full rounded-[24px] bg-white p-8 shadow-[0_24px_80px_rgba(69,35,50,0.13)]">
             <BrandMark />
-            <p className="mt-8 text-[10px] font-bold uppercase tracking-[0.24em] text-[#B76E79]">Authenticated account</p>
+            <p className="mt-8 text-[10px] font-bold uppercase tracking-[0.24em] text-[#9A5260]">Authenticated account</p>
             <h1 className="mt-3 font-serif text-3xl tracking-[-0.02em] text-[#2B1723]">Access still needs verification</h1>
             <p className="mt-4 text-sm leading-6 text-[#806C61]">
               Google sign-in succeeded, but this workspace could not complete admin or staff access verification for the current session.
@@ -199,7 +199,7 @@ export function LoginPage() {
           </div>
 
           <div className="relative z-10 flex items-center gap-3 text-xs text-white/40">
-            <span className="h-px w-10 bg-[#B76E79]" />
+            <span className="h-px w-10 bg-[#9A5260]" />
             Gather & Savor Vibes
           </div>
         </section>
@@ -211,7 +211,7 @@ export function LoginPage() {
             </div>
 
             <div className="mb-9">
-              <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.24em] text-[#B76E79]">Welcome back</p>
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.24em] text-[#9A5260]">Welcome back</p>
               <h2 className="font-serif text-4xl tracking-[-0.02em] text-[#2B1723]">Sign in to your hub</h2>
               <p className="mt-3 text-sm leading-6 text-[#806C61]">Use your approved admin account to continue.</p>
             </div>
@@ -234,7 +234,7 @@ export function LoginPage() {
             >
               {submitting === 'google-login' ? (
                 <>
-                  <span className="size-4 animate-spin rounded-full border-2 border-[#B76E79]/25 border-t-[#B76E79]" />
+                  <span className="size-4 animate-spin rounded-full border-2 border-[#9A5260]/25 border-t-[#9A5260]" />
                   Opening Google…
                 </>
               ) : (
@@ -247,7 +247,7 @@ export function LoginPage() {
 
             <div className="my-6 flex items-center gap-3" aria-hidden="true">
               <span className="h-px flex-1 bg-[#E9DDD6]" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#A48A7B]">Sign in with email</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Sign in with email</span>
               <span className="h-px flex-1 bg-[#E9DDD6]" />
             </div>
 
@@ -277,7 +277,7 @@ export function LoginPage() {
                   <label htmlFor="password" className="text-xs font-semibold text-[#4F3B43]">
                     Password
                   </label>
-                  <span className="text-[11px] text-[#A48A7B]">Admin access only</span>
+                  <span className="text-[11px] text-[#80685B]">Admin access only</span>
                 </div>
                 <div className="relative">
                   <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-[#B49B8D]" aria-hidden="true" />
@@ -296,7 +296,7 @@ export function LoginPage() {
                     type="button"
                     onClick={() => setShowPassword((visible) => !visible)}
                     disabled={!isConfigured}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-2 text-[#A48A7B] transition hover:bg-[#FFF8F2] hover:text-[#2B1723] disabled:opacity-40"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-2 text-[#80685B] transition hover:bg-[#FFF8F2] hover:text-[#2B1723] disabled:opacity-40"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="size-[18px]" /> : <Eye className="size-[18px]" />}

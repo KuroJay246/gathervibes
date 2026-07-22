@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
-import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
+import { connectAuthEmulator, getAuth } from 'firebase/auth'
+import { connectFirestoreEmulator, getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 
 function resolveAuthDomain() {
   const configuredDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN
@@ -42,3 +42,19 @@ export const db = app ? (
       })
     : getFirestore(app)
 ) : null
+
+const useFirebaseEmulators = import.meta.env.VITE_FIREBASE_USE_EMULATORS === 'true'
+
+if (useFirebaseEmulators && typeof window !== 'undefined') {
+  window.__GSV_FIREBASE_EMULATORS__ ||= {}
+
+  if (auth && !window.__GSV_FIREBASE_EMULATORS__.auth) {
+    connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true })
+    window.__GSV_FIREBASE_EMULATORS__.auth = true
+  }
+
+  if (db && !window.__GSV_FIREBASE_EMULATORS__.firestore) {
+    connectFirestoreEmulator(db, '127.0.0.1', 8080)
+    window.__GSV_FIREBASE_EMULATORS__.firestore = true
+  }
+}

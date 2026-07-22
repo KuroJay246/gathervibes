@@ -9,7 +9,7 @@ import { isProtectedOwnerUser } from '../config/protectedOwner'
 
 const toneClasses = {
   green: 'bg-[#E5F3EC] text-[#1E7345]',
-  gold: 'bg-[#FFF4DF] text-[#986F26]',
+  gold: 'bg-[#FFF4DF] text-[#7A5818]',
   red: 'bg-[#FFF1F1] text-[#A32626]',
 }
 
@@ -103,14 +103,14 @@ export function SystemHealthPanel({ compact = false }) {
     <section className={`rounded-[24px] border border-[#EEDFD6] bg-white shadow-[0_8px_24px_rgba(84,53,67,0.04)] ${compact ? 'p-5' : 'p-6 sm:p-8'}`}>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Runtime status</p>
+          <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Runtime status</p>
           <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">System Health</h2>
         </div>
         <span className="rounded-full bg-[#F7F1ED] px-3 py-1.5 text-[10px] font-bold text-[#6B564C]">
           Read-only checks
         </span>
       </div>
-      <p className="mt-3 text-xs leading-5 text-[#8A7468]">
+      <p className="mt-3 text-xs leading-5 text-[#80685B]">
         Shows app service status without exposing secrets, service account details, or the full admin allowlist.
       </p>
 
@@ -124,7 +124,7 @@ export function SystemHealthPanel({ compact = false }) {
               </span>
               <span className="min-w-0">
                 <span className="block text-sm font-bold text-[#2B1723]">{item.label}</span>
-                <span className="mt-0.5 block break-words text-xs leading-5 text-[#8A7468]">{item.detail}</span>
+                <span className="mt-0.5 block break-words text-xs leading-5 text-[#80685B]">{item.detail}</span>
               </span>
             </article>
           )

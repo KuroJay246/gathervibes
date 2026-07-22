@@ -22,14 +22,14 @@ export function ImportSummary({ result, onReset }) {
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
         <Link
           to="/registrations"
-          className="flex items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#B76E79]/30"
+          className="flex items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#9A5260]/30"
         >
           View Registrations
         </Link>
         <button
           type="button"
           onClick={onReset}
-          className="flex items-center justify-center gap-2 rounded-xl bg-[#FFF8F2] px-6 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1]"
+          className="flex items-center justify-center gap-2 rounded-xl bg-[#FFF8F2] px-6 py-2.5 text-sm font-bold text-[#80685B] transition hover:bg-[#F2E8E1]"
         >
           <RotateCcw className="size-4" />
           Import Another File

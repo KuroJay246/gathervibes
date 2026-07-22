@@ -8,7 +8,7 @@ import { ActiveEventProvider } from './events/ActiveEventProvider'
 import { initializeMonitoring } from './lib/monitoring'
 import './styles.css'
 
-initializeMonitoring()
+void initializeMonitoring()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

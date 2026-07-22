@@ -1,4 +1,9 @@
-import * as Sentry from '@sentry/react'
+let sentryModulePromise
+
+function loadSentry() {
+  sentryModulePromise ||= import('@sentry/react')
+  return sentryModulePromise
+}
 
 function numberFromEnv(value, fallback) {
   const number = Number(value)
@@ -15,9 +20,11 @@ function stripPrivateContext(event) {
   return event
 }
 
-export function initializeMonitoring() {
+export async function initializeMonitoring() {
   const dsn = import.meta.env.VITE_SENTRY_DSN
   if (!dsn) return false
+
+  const Sentry = await loadSentry()
 
   Sentry.init({
     dsn,
@@ -48,8 +55,9 @@ export function initializeMonitoring() {
   return true
 }
 
-export function captureAppError(error, context = {}) {
+export async function captureAppError(error, context = {}) {
   if (!import.meta.env.VITE_SENTRY_DSN) return
+  const Sentry = await loadSentry()
   Sentry.captureException(error, {
     contexts: {
       react: {

@@ -38,10 +38,10 @@ const CHECK_IN_FILTER_GROUPS = [
 function StatusBadge({ children, tone = 'neutral' }) {
   const tones = {
     green: 'bg-[#E5F3EC] text-[#1E7345]',
-    gold: 'bg-[#FFF4DF] text-[#986F26]',
+    gold: 'bg-[#FFF4DF] text-[#7A5818]',
     blush: 'bg-[#FCEEF1] text-[#A32626]',
     plum: 'bg-[#F2E8FA] text-[#6B3FA0]',
-    neutral: 'bg-[#F7F1ED] text-[#8C766A]',
+    neutral: 'bg-[#F7F1ED] text-[#80685B]',
   }
   return <span className={`rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${tones[tone]}`}>{children}</span>
 }
@@ -145,7 +145,7 @@ export function CheckInPage() {
         icon={ClipboardCheck}
         title="No selected event"
         description="Select a Working Event before opening the door check-in screen."
-        action={<Link to="/events" className="mt-6 inline-block rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white">Choose an event</Link>}
+        action={<Link to="/events" className="mt-6 inline-block rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white">Choose an event</Link>}
       />
     )
   }
@@ -383,7 +383,7 @@ export function CheckInPage() {
           ['Tickets assigned / missing', `${summary.ticketAssignedRegistrations}/${summary.missingTicketRegistrations}`],
         ].map(([label, value]) => (
           <article key={label} className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
-            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">{label}</p>
+            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#80685B]">{label}</p>
             <p className="mt-2 text-2xl font-bold text-[#2B1723]">{value}</p>
           </article>
         ))}
@@ -392,9 +392,9 @@ export function CheckInPage() {
       {evidenceAudit && (
         <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="checkin-evidence-heading">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-1 size-5 shrink-0 text-[#986F26]" />
+            <AlertTriangle className="mt-1 size-5 shrink-0 text-[#7A5818]" />
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Attendance Evidence Reconciliation</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Attendance Evidence Reconciliation</p>
               <h2 id="checkin-evidence-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Historical attendance is not system check-in</h2>
               <p className="mt-2 text-xs leading-5 text-[#715D46]">
                 The audit reports approximately {evidenceAudit.attendance.approximateAttendance} patrons checked in, while the app currently records {summary.checkedInPersons} checked-in guests. Do not create check-ins from the approximate count.
@@ -410,7 +410,7 @@ export function CheckInPage() {
             ].map(([label, value]) => (
               <article key={label} className="rounded-xl border border-[#EEDFD6] bg-white p-4" aria-label={`${label}: ${value}`}>
                 <p className="text-lg font-bold text-[#2B1723]">{value}</p>
-                <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{label}</p>
               </article>
             ))}
           </div>
@@ -478,10 +478,10 @@ export function CheckInPage() {
         {helperMessage && <div className="mt-3 rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{helperMessage}</div>}
 
         <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">
-          <div className="max-h-72 overflow-auto">
+          <div className="max-h-72 overflow-auto" role="region" aria-label="Check-in helper registrations" tabIndex={0}>
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] font-bold uppercase tracking-wider text-[#8C7567]">
+                <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] font-bold uppercase tracking-wider text-[#80685B]">
                   <th className="px-3 py-2">Guest</th>
                   <th className="px-3 py-2">Guests</th>
                   <th className="px-3 py-2">Payment</th>
@@ -499,8 +499,8 @@ export function CheckInPage() {
                     <td className="px-3 py-2 font-medium text-[#2B1723]">
                       <div>{registration.fullName}</div>
                       {attendeeNamesText(registration) && <div className="mt-0.5 text-[11px] text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}
-                      {registration.buyerName && <div className="mt-0.5 text-[11px] text-[#8C7567]">Buyer: {registration.buyerName}</div>}
-                      {registration.groupName && <div className="mt-0.5 text-[11px] text-[#8C7567]">{registration.groupName}</div>}
+                      {registration.buyerName && <div className="mt-0.5 text-[11px] text-[#80685B]">Buyer: {registration.buyerName}</div>}
+                      {registration.groupName && <div className="mt-0.5 text-[11px] text-[#80685B]">{registration.groupName}</div>}
                     </td>
                     <td className="px-3 py-2 text-[#5D4A52]">{registration.personsAttending || 1}</td>
                     <td className="px-3 py-2 text-[#5D4A52]">{formatPaymentLabel(registration.paymentStatus)}</td>
@@ -522,7 +522,7 @@ export function CheckInPage() {
         <div className="mt-4 grid gap-3 lg:grid-cols-4">
           {CHECK_IN_FILTER_GROUPS.map((group) => (
             <div key={group.label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">{group.label}</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">{group.label}</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {group.values.map((value) => {
                   const view = CHECK_IN_VIEWS.find((item) => item.value === value)
@@ -536,7 +536,7 @@ export function CheckInPage() {
                         setActionError('')
                         clearListSelection()
                       }}
-                      className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${activeView === value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1]'}`}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${activeView === value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#80685B] hover:bg-[#F2E8E1]'}`}
                     >
                       {view?.label || value}
                     </button>
@@ -573,7 +573,7 @@ export function CheckInPage() {
                   setActionError('')
                 }}
                 placeholder="Guest, buyer, attendee, email, phone, or GSV ticket code"
-                className="min-h-16 w-full rounded-2xl border border-[#E5D7CF] bg-white py-4 pl-12 pr-4 text-lg font-semibold text-[#2B1723] focus:border-[#B76E79] focus:outline-none focus:ring-4 focus:ring-[#B76E79]/15"
+                className="min-h-16 w-full rounded-2xl border border-[#E5D7CF] bg-white py-4 pl-12 pr-4 text-lg font-semibold text-[#2B1723] focus:border-[#9A5260] focus:outline-none focus:ring-4 focus:ring-[#9A5260]/15"
                 autoComplete="off"
               />
             </div>
@@ -590,13 +590,13 @@ export function CheckInPage() {
                 key={registration.registrationId}
                 type="button"
                 onClick={() => setSelectedId(registration.registrationId)}
-                className={`min-h-[72px] rounded-xl border p-4 text-left transition ${selectedRegistration?.registrationId === registration.registrationId ? 'border-[#B76E79] bg-[#FFF8F2] ring-2 ring-[#B76E79]/30 shadow-md' : 'border-[#EEDFD6] bg-white hover:bg-[#FBF8F5]'}`}
+                className={`min-h-[72px] rounded-xl border p-4 text-left transition ${selectedRegistration?.registrationId === registration.registrationId ? 'border-[#9A5260] bg-[#FFF8F2] ring-2 ring-[#9A5260]/30 shadow-md' : 'border-[#EEDFD6] bg-white hover:bg-[#FBF8F5]'}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-bold text-[#2B1723]">{registration.fullName}</p>
                     {attendeeNamesText(registration) && <p className="mt-1 text-xs text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</p>}
-                    {registration.buyerName && <p className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer: {registration.buyerName}</p>}
+                    {registration.buyerName && <p className="mt-1 text-xs font-semibold text-[#80685B]">Buyer: {registration.buyerName}</p>}
                     <p className="mt-1 text-xs text-[#816D62]">{registration.email || registration.phone || registration.ticketCode || 'No contact'}</p>
                   </div>
                   <StatusBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Waiting'}</StatusBadge>
@@ -619,13 +619,13 @@ export function CheckInPage() {
             <div className="space-y-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8C7567]">Guest</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#80685B]">Guest</p>
                   <h3 className="mt-1 font-serif text-3xl text-[#2B1723]">{selectedRegistration.fullName}</h3>
                   {attendeeNamesText(selectedRegistration) && (
                     <p className="mt-2 text-sm font-semibold text-[#5D4A52]">Guests attending: {attendeeNamesText(selectedRegistration)}</p>
                   )}
                   {selectedRegistration.buyerName && (
-                    <p className="mt-1 text-sm font-semibold text-[#8C7567]">Buyer / Contact: {selectedRegistration.buyerName}</p>
+                    <p className="mt-1 text-sm font-semibold text-[#80685B]">Buyer / Contact: {selectedRegistration.buyerName}</p>
                   )}
                   <p className="mt-2 text-sm text-[#816D62]">
                     {selectedRegistration.email || 'No email'} {selectedRegistration.phone ? `· ${selectedRegistration.phone}` : ''}
@@ -634,13 +634,13 @@ export function CheckInPage() {
                 {selectedRegistration.checkedIn ? (
                   <CheckCircle2 className="size-12 shrink-0 text-[#1E7345]" />
                 ) : (
-                  <ClipboardCheck className="size-12 shrink-0 text-[#B76E79]" />
+                  <ClipboardCheck className="size-12 shrink-0 text-[#9A5260]" />
                 )}
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="rounded-xl bg-[#FBF8F5] p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Door payment</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Door payment</p>
                   <div className="mt-2"><StatusBadge tone={paymentTone(selectedRegistration.paymentStatus)}>{formatPaymentLabel(selectedRegistration.paymentStatus)}</StatusBadge></div>
                   {selectedFinance && (
                     <div className="mt-2 text-xs leading-5 text-[#6B564C]">
@@ -651,11 +651,11 @@ export function CheckInPage() {
                   )}
                 </div>
                 <div className="rounded-xl bg-[#FBF8F5] p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Ticket</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Ticket</p>
                   <p className="mt-2 font-mono text-sm font-bold text-[#2B1723]">{selectedRegistration.ticketCode || formatTicketStatus(selectedRegistration)}</p>
                 </div>
                 <div className="rounded-xl bg-[#FBF8F5] p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Door status</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Door status</p>
                   <div className="mt-2"><StatusBadge tone={selectedRegistration.checkedIn ? 'green' : 'neutral'}>{formatDoorStatus(selectedRegistration)}</StatusBadge></div>
                 </div>
               </div>
@@ -691,7 +691,7 @@ export function CheckInPage() {
                   type="button"
                   onClick={handleCheckIn}
                   disabled={saving || !checkInState.allowed}
-                  className="flex min-h-16 flex-1 items-center justify-center gap-3 rounded-2xl bg-[#B76E79] px-6 text-base font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] disabled:cursor-not-allowed disabled:bg-[#D9C8C0] disabled:shadow-none"
+                  className="flex min-h-16 flex-1 items-center justify-center gap-3 rounded-2xl bg-[#9A5260] px-6 text-base font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B] disabled:cursor-not-allowed disabled:bg-[#D9C8C0] disabled:shadow-none"
                 >
                   {checkInState.allowed ? <CheckCircle2 className="size-5" /> : <XCircle className="size-5" />}
                   {saving ? 'Saving…' : checkInState.allowed ? 'Check in guest' : 'Check-in blocked'}
@@ -749,7 +749,7 @@ export function CheckInPage() {
               <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Guest list mode</h3>
               <p className="mt-1 text-xs leading-5 text-[#816D62]">Browse manually by payment, ticket, group, review, or check-in state. Bulk actions require confirmation and never delete records.</p>
             </div>
-            <p className="text-xs font-semibold text-[#8C7567]">Showing {visibleMetrics.totalRegistrations} registration{visibleMetrics.totalRegistrations === 1 ? '' : 's'} covering {visibleMetrics.totalPersons} guest{visibleMetrics.totalPersons === 1 ? '' : 's'}.</p>
+            <p className="text-xs font-semibold text-[#80685B]">Showing {visibleMetrics.totalRegistrations} registration{visibleMetrics.totalRegistrations === 1 ? '' : 's'} covering {visibleMetrics.totalPersons} guest{visibleMetrics.totalPersons === 1 ? '' : 's'}.</p>
           </div>
 
           <div className="mt-4 flex flex-col gap-3 rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3 lg:flex-row lg:items-center lg:justify-between">
@@ -758,7 +758,7 @@ export function CheckInPage() {
                 {allVisibleListRowsSelected ? 'Clear visible selection' : 'Select visible registrations'}
               </button>
               {selectedListIds.size > 0 && (
-                <button type="button" onClick={clearListSelection} className="rounded-xl px-4 py-2 text-xs font-bold text-[#8C7567] hover:bg-[#F2E8E1]">
+                <button type="button" onClick={clearListSelection} className="rounded-xl px-4 py-2 text-xs font-bold text-[#80685B] hover:bg-[#F2E8E1]">
                   Clear selected
                 </button>
               )}
@@ -790,7 +790,7 @@ export function CheckInPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
+                    <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#80685B]">
                       <th className="px-4 py-3">Select</th>
                       <th className="px-4 py-3">Guest</th>
                       <th className="px-4 py-3">Contact</th>
@@ -815,9 +815,9 @@ export function CheckInPage() {
                         </td>
                         <td className="px-4 py-3 font-medium text-[#2B1723]">
                           <div>{registration.fullName}</div>
-                          {Number(registration.personsAttending) > 1 && <div className="mt-1 w-fit rounded-full bg-[#FFF8F2] px-2 py-0.5 text-[10px] font-bold text-[#B76E79]">Group of {registration.personsAttending}</div>}
+                          {Number(registration.personsAttending) > 1 && <div className="mt-1 w-fit rounded-full bg-[#FFF8F2] px-2 py-0.5 text-[10px] font-bold text-[#9A5260]">Group of {registration.personsAttending}</div>}
                           {attendeeNamesText(registration) && <div className="mt-1 text-xs font-normal text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}
-                          {registration.buyerName && <div className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer: {registration.buyerName}</div>}
+                          {registration.buyerName && <div className="mt-1 text-xs font-semibold text-[#80685B]">Buyer: {registration.buyerName}</div>}
                         </td>
                         <td className="px-4 py-3 text-[#5D4A52]">
                           {registration.email && <div>{registration.email}</div>}
@@ -830,7 +830,7 @@ export function CheckInPage() {
                         <td className="px-4 py-3">
                           <div className="space-y-1">
                             <StatusBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{formatDoorStatus(registration)}</StatusBadge>
-                            <p className="text-[11px] text-[#8C7567]">{formatCheckInTime(registration.checkInTime)}</p>
+                            <p className="text-[11px] text-[#80685B]">{formatCheckInTime(registration.checkInTime)}</p>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-xs text-[#5D4A52]">{registration.checkedInBy || '—'}</td>
@@ -852,7 +852,7 @@ export function CheckInPage() {
             <p className="mt-3 text-sm leading-6 text-[#6B564C]">
               Undo check-in for this guest? This should only be used if the check-in was accidental.
             </p>
-            <p className="mt-2 text-sm font-semibold text-[#8C7567]">
+            <p className="mt-2 text-sm font-semibold text-[#80685B]">
               Checked in at: {formatCheckInTime(selectedRegistration.checkInTime)}
             </p>
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

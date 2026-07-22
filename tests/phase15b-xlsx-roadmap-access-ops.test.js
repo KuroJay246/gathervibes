@@ -35,7 +35,7 @@ test('Settings removes the roadmap archive while documentation retains release h
   const readme = await readFile('README.md', 'utf8')
   const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
 
-  for (const text of ['Settings', 'Current defaults', 'Default currency', 'Default ticket prefix', 'Access Summary', 'Scanner & Tickets', 'Message Builder', 'Security']) {
+  for (const text of ['Settings', 'Event Defaults', 'Currency', 'Ticket prefix', 'Organizer Access', 'Tickets & Check-In', 'Message Builder', 'Advanced']) {
     assert.match(settings, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
@@ -74,13 +74,10 @@ test('private access status reflects disabled workflow boundaries without roadma
     buildCommit: 'abc123',
   })
 
-  assert.match(settings, /Approved admin allowlist active/)
-  assert.match(settings, /Access request actions disabled/)
-  assert.match(settings, /Staff profile editing disabled/)
-  assert.match(settings, /Assignment editing disabled/)
-  assert.match(settings, /Lead scanner disabled/)
-  assert.match(settings, /Role editing is not exposed/)
-  assert.match(settings, /Scanner undo\/check-out/)
+  assert.match(settings, /Access is controlled outside this page/)
+  assert.match(settings, /cannot add, remove, disable, or change anyone's role/)
+  assert.match(settings, /Helper access does not grant Settings or full organizer access/)
+  assert.match(settings, /Normal scanner users cannot undo attendance or check guests out/)
   assert.doesNotMatch(settings, /Submit request \(not live\)/)
   assert.doesNotMatch(settings, /Approve request: not live/)
   assert.doesNotMatch(settings, /Phase 17/)
@@ -129,9 +126,9 @@ test('Event Operations page documents active ledger and future modules only', as
   assert.match(operations, /separate from registration payment records/)
   assert.match(operations, /sponsor income/)
   assert.match(operations, /operations helpers can only view assigned-event entries/)
-  assert.match(settings, /Operations Ledger/)
+  assert.match(settings, /Managed in Operations/)
   assert.match(settings, /Registration payments/)
-  assert.match(settings, /Payment processing/)
+  assert.match(settings, /does not automatically send email/)
 })
 
 test('Phase 15B keeps QR privacy and Phase 15A private indexing protections', async () => {

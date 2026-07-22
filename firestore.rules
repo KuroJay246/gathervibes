@@ -734,6 +734,24 @@ service cloud.firestore {
         && request.resource.data.ticketAssignedBy == null;
     }
 
+    function isApprovedRegistrationUpdate(registrationId) {
+      let changedKeys = request.resource.data.diff(resource.data).affectedKeys();
+      return changedKeys.hasAny([
+          'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy'
+        ])
+        ? (
+          request.resource.data.updatedAt == request.time
+          && (isTicketAssignmentUpdate() || isTicketUnassignmentUpdate())
+        )
+        : changedKeys.hasAny(['checkedIn', 'checkInTime', 'checkedInBy'])
+          ? (isCheckInCompletionUpdate(registrationId) || isCheckInUndoUpdate(registrationId))
+          : (
+            isValidRegistration(request.resource.data, registrationId)
+            && request.resource.data.updatedAt == request.time
+            && isRegistrationDetailsUpdate()
+          );
+    }
+
     function checkInCompletionChangedKeysOnly() {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
         'checkedIn', 'checkInTime', 'checkedInBy', 'updatedAt'
@@ -846,22 +864,7 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time;
       allow update: if (
           isApprovedAdmin()
-          && (
-            isCheckInCompletionUpdate(registrationId)
-            || isCheckInUndoUpdate(registrationId)
-            || (
-              request.resource.data.updatedAt == request.time
-              && (
-                isTicketAssignmentUpdate()
-                || isTicketUnassignmentUpdate()
-              )
-            )
-            || (
-              isValidRegistration(request.resource.data, registrationId)
-              && request.resource.data.updatedAt == request.time
-              && isRegistrationDetailsUpdate()
-            )
-          )
+          && isApprovedRegistrationUpdate(registrationId)
         ) || (
           isAssignedScanner(resource.data.eventId)
           && isValidRegistration(request.resource.data, registrationId)
@@ -876,15 +879,34 @@ service cloud.firestore {
           isApprovedAdmin()
           && (
             (
-              request.resource.data.action in ['checkin.complete', 'checkin.undo']
+              request.resource.data.action in ['event.create', 'event.update', 'event.delete']
+              && isValidEventAuditLog(request.resource.data, logId)
+              && matchesEventMutation(request.resource.data)
+            )
+            || (
+              request.resource.data.action in ['ticket.assign', 'ticket.unassign', 'ticket.regenerate']
+              && isValidRegistrationAuditLog(request.resource.data, logId)
+              && matchesTicketMutation(request.resource.data)
+            )
+            || (
+              request.resource.data.action in [
+                'registration.create', 'registration.update', 'registration.delete',
+                'registration.import', 'registration.finance-update',
+                'checkin.complete', 'checkin.undo'
+              ]
               && isValidRegistrationAuditLog(request.resource.data, logId)
               && matchesRegistrationMutation(request.resource.data)
             )
-            || (isValidEventAuditLog(request.resource.data, logId) && matchesEventMutation(request.resource.data))
-            || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesTicketMutation(request.resource.data))
-            || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesRegistrationMutation(request.resource.data))
-            || (isValidRegistrationAuditLog(request.resource.data, logId) && matchesDuplicateCheckInAttempt(request.resource.data))
-            || (isValidOperationAuditLog(request.resource.data, logId) && matchesOperationMutation(request.resource.data))
+            || (
+              request.resource.data.action == 'checkin.duplicate-attempt'
+              && isValidRegistrationAuditLog(request.resource.data, logId)
+              && matchesDuplicateCheckInAttempt(request.resource.data)
+            )
+            || (
+              request.resource.data.action in ['operation.create', 'operation.update', 'operation.cancel']
+              && isValidOperationAuditLog(request.resource.data, logId)
+              && matchesOperationMutation(request.resource.data)
+            )
           )
         ) || (
           isAssignedScanner(request.resource.data.eventId)

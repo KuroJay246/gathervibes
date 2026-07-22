@@ -23,8 +23,8 @@ function SummaryCard({ label, value, detail }) {
   return (
     <div className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-3">
       <div className="text-2xl font-serif text-[#2B1723]">{value}</div>
-      <div className="text-[10px] font-bold uppercase tracking-wider text-[#8A7468]">{label}</div>
-      {detail && <div className="mt-1 text-[11px] text-[#8A7468]">{detail}</div>}
+      <div className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{label}</div>
+      {detail && <div className="mt-1 text-[11px] text-[#80685B]">{detail}</div>}
     </div>
   )
 }
@@ -32,7 +32,7 @@ function SummaryCard({ label, value, detail }) {
 function Section({ eyebrow, title, children }) {
   return (
     <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm">
-      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">{eyebrow}</p>
+      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">{eyebrow}</p>
       <h3 className="mt-1 font-bold text-[#2B1723]">{title}</h3>
       <div className="mt-4">{children}</div>
     </section>
@@ -105,7 +105,7 @@ export function CommunicationsPage() {
         title="No selected event"
         description="Select an event from Events or the dashboard before preparing communications."
         action={(
-          <Link to="/events" className="mt-6 inline-block rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B]">
+          <Link to="/events" className="mt-6 inline-block rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B]">
             Choose an event
           </Link>
         )}
@@ -149,7 +149,7 @@ Data context for this segment:
     <div className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#B76E79]">Message Builder</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#9A5260]">Message Builder</p>
           <h2 className="mt-1 font-serif text-3xl text-[#2B1723]">Create Message</h2>
           <p className="mt-2 text-sm text-[#816D62]">
             Create, personalize, and copy event messages for <strong>{activeEvent.eventName}</strong>. Messages are not sent automatically.
@@ -157,7 +157,7 @@ Data context for this segment:
         </div>
       </header>
 
-      <div className="rounded-xl border border-[#EFE2DA] bg-[#FFF8F2] px-4 py-3 text-sm text-[#8A7468]">
+      <div className="rounded-xl border border-[#EFE2DA] bg-[#FFF8F2] px-4 py-3 text-sm text-[#80685B]">
         <strong>Copy-only:</strong> This page prepares text for clipboard copy. It does not send email or WhatsApp messages, write delivery logs, or connect to an AI API.
         <span className="mt-1 block text-xs">Use segments to choose recipients; buyer/contact can be different from attendee names, and Door Paid is not the same as To Pay at Door.</span>
       </div>
@@ -167,7 +167,7 @@ Data context for this segment:
           <Section eyebrow="Recipients" title="Choose recipients">
             <div className="space-y-4">
               <div>
-                <label htmlFor="search" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Search Guest</label>
+                <label htmlFor="search" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#80685B]">Search Guest</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
                   <input
@@ -176,13 +176,13 @@ Data context for this segment:
                     placeholder="Guest, buyer, attendee, email, ticket..."
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
-                    className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
+                    className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#9A5260] focus:outline-none focus:ring-2 focus:ring-[#9A5260]/20"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Payment</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#80685B]">Payment</label>
                 <select aria-label="Payment segment filter" value={filters.paymentStatus} onChange={(event) => setFilters((current) => ({ ...current, paymentStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
                   <option value="all">All payments</option>
                   <option value="paid">Paid</option>
@@ -194,21 +194,21 @@ Data context for this segment:
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Finance Segment</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#80685B]">Finance Segment</label>
                 <select aria-label="Finance segment filter" value={filters.financeSegment} onChange={(event) => setFilters((current) => ({ ...current, financeSegment: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
                   {COMMUNICATION_SEGMENTS.finance.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Ticket Segment</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#80685B]">Ticket Segment</label>
                 <select aria-label="Ticket segment filter" value={filters.ticketStatus} onChange={(event) => setFilters((current) => ({ ...current, ticketStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
                   {COMMUNICATION_SEGMENTS.ticket.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Attendance</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#80685B]">Attendance</label>
                 <select aria-label="Attendance segment filter" value={filters.checkInStatus} onChange={(event) => setFilters((current) => ({ ...current, checkInStatus: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
                   <option value="all">All guests</option>
                   <option value="checked-in">Checked in</option>
@@ -217,14 +217,14 @@ Data context for this segment:
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Guest / Contact</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#80685B]">Guest / Contact</label>
                 <select aria-label="Guest or contact segment filter" value={filters.contactSegment} onChange={(event) => setFilters((current) => ({ ...current, contactSegment: event.target.value }))} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm">
                   {COMMUNICATION_SEGMENTS.contact.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Group Name</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#80685B]">Group Name</label>
                 <input
                   type="text"
                   placeholder="Search group..."
@@ -256,14 +256,14 @@ Data context for this segment:
               <button
                 type="button"
                 onClick={() => setLabMode('standard')}
-                className={`flex-1 rounded-lg py-2 text-sm font-bold transition ${labMode === 'standard' ? 'bg-white text-[#2B1723] shadow-sm' : 'text-[#8C766A] hover:bg-white/50'}`}
+                className={`flex-1 rounded-lg py-2 text-sm font-bold transition ${labMode === 'standard' ? 'bg-white text-[#2B1723] shadow-sm' : 'text-[#80685B] hover:bg-white/50'}`}
               >
                 Standard Templates
               </button>
               <button
                 type="button"
                 onClick={() => setLabMode('ai')}
-                className={`flex-1 rounded-lg py-2 text-sm font-bold transition ${labMode === 'ai' ? 'bg-white text-[#B76E79] shadow-sm' : 'text-[#8C766A] hover:bg-white/50'}`}
+                className={`flex-1 rounded-lg py-2 text-sm font-bold transition ${labMode === 'ai' ? 'bg-white text-[#9A5260] shadow-sm' : 'text-[#80685B] hover:bg-white/50'}`}
               >
                 Prompt Builder
               </button>
@@ -272,8 +272,8 @@ Data context for this segment:
             {labMode === 'ai' && (
               <div className="mb-6 grid gap-4 md:grid-cols-2 rounded-xl border border-[#E5D7CF] bg-white p-4">
                 <div>
-                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Select Tone</label>
-                  <select value={selectedTone} onChange={(event) => setSelectedTone(event.target.value)} className="w-full rounded-xl border border-[#E5D7CF] bg-[#FBF8F5] py-2 pl-3 pr-8 text-sm">
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#80685B]">Select Tone</label>
+                  <select aria-label="Drafting tone" value={selectedTone} onChange={(event) => setSelectedTone(event.target.value)} className="w-full rounded-xl border border-[#E5D7CF] bg-[#FBF8F5] py-2 pl-3 pr-8 text-sm">
                     {['Professional', 'Warm', 'Friendly', 'Urgent but polite', 'Short WhatsApp style', 'Formal email', 'Social media caption', 'Luxury/event brand tone'].map((tone) => (
                       <option key={tone} value={tone}>{tone}</option>
                     ))}
@@ -286,7 +286,7 @@ Data context for this segment:
                   </button>
                 </div>
                 <div className="col-span-full">
-                  <p className="text-xs text-[#8A7468]">
+                  <p className="text-xs text-[#80685B]">
                     This helper only builds a prompt you can copy into your own drafting tool. It does not generate text inside the app.
                   </p>
                   <p className="mt-2 text-xs font-bold text-amber-700">
@@ -298,19 +298,19 @@ Data context for this segment:
 
             <div className="grid gap-4 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">{labMode === 'ai' ? 'Prompt starter' : 'Starter Template'}</label>
-                <select value={selectedTemplate} onChange={(event) => handleTemplateChange(event.target.value)} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm font-medium">
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#80685B]">{labMode === 'ai' ? 'Prompt starter' : 'Starter Template'}</label>
+                <select aria-label={labMode === 'ai' ? 'Prompt starter' : 'Starter template'} value={selectedTemplate} onChange={(event) => handleTemplateChange(event.target.value)} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm font-medium">
                   {COMMUNICATION_TEMPLATES.map((template) => <option key={template.id} value={template.id}>{template.label}</option>)}
                 </select>
-                <p className="mt-3 text-xs leading-5 text-[#8A7468]">Available templates include payment reminder, balance due, door payment, payment received, ticket/QR reminder, check-in instructions, missing ticket follow-up, event reminder, group reminder, thank-you, post-event, and internal note.</p>
+                <p className="mt-3 text-xs leading-5 text-[#80685B]">Available templates include payment reminder, balance due, door payment, payment received, ticket/QR reminder, check-in instructions, missing ticket follow-up, event reminder, group reminder, thank-you, post-event, and internal note.</p>
               </div>
               <div>
                 <div className="flex justify-between items-end mb-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#A48A7B]">Editable Draft</label>
-                  <button type="button" onClick={() => setDraftContent('')} className="text-[10px] font-bold text-[#A85F6B] hover:underline">Clear Draft</button>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#80685B]">Editable Draft</label>
+                  <button type="button" onClick={() => setDraftContent('')} className="text-[10px] font-bold text-[#8A3F4B] hover:underline">Clear Draft</button>
                 </div>
-                <textarea value={draftContent} onChange={(event) => setDraftContent(event.target.value)} rows={6} className="w-full resize-y rounded-xl border border-[#E5D7CF] bg-white p-3 text-sm" />
-                <p className="mt-2 text-[10px] leading-4 text-[#8A7468]">
+                <textarea aria-label="Editable draft" value={draftContent} onChange={(event) => setDraftContent(event.target.value)} rows={6} className="w-full resize-y rounded-xl border border-[#E5D7CF] bg-white p-3 text-sm" />
+                <p className="mt-2 text-[10px] leading-4 text-[#80685B]">
                   Placeholders: {'{{eventName}}'}, {'{{eventDate}}'}, {'{{eventTime}}'}, {'{{venue}}'}, {'{{buyerName}}'}, {'{{guestName}}'}, {'{{attendeeNames}}'}, {'{{groupName}}'}, {'{{ticketCode}}'}, {'{{paymentStatus}}'}, {'{{amountDue}}'}, {'{{amountPaid}}'}, {'{{balanceDue}}'}, {'{{paymentMethod}}'}, {'{{paymentReference}}'}
                 </p>
               </div>
@@ -323,18 +323,18 @@ Data context for this segment:
                 <pre className="max-h-72 overflow-auto rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 text-[13px] leading-relaxed whitespace-pre-wrap text-[#2B1723]">{firstMessage.message}</pre>
                 <div className="rounded-xl border border-[#EFE2DA] p-4">
                   <p className="text-sm font-bold text-[#2B1723]">{firstMessage.name}</p>
-                  <p className="mt-1 break-all text-xs text-[#8A7468]">{firstMessage.email || 'No email'} / {firstMessage.phone || 'No phone'}</p>
+                  <p className="mt-1 break-all text-xs text-[#80685B]">{firstMessage.email || 'No email'} / {firstMessage.phone || 'No phone'}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {firstMessage.warnings.length === 0 ? (
                       <span className="rounded-full bg-[#EAF6EF] px-3 py-1 text-[10px] font-bold uppercase text-[#2F855A]">No missing data</span>
                     ) : firstMessage.warnings.map((warning) => (
-                      <span key={warning} className="rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase text-[#986F26]">{warning}</span>
+                      <span key={warning} className="rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase text-[#7A5818]">{warning}</span>
                     ))}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="rounded-xl border border-dashed border-[#E5D7CF] p-8 text-center text-sm text-[#8A7468]">No guests match your segment filters.</div>
+              <div className="rounded-xl border border-dashed border-[#E5D7CF] p-8 text-center text-sm text-[#80685B]">No guests match your segment filters.</div>
             )}
           </Section>
 

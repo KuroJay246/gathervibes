@@ -25,6 +25,8 @@ const blockedPhrases = [
   /Apply Phase 23N/i,
   /Reapply/i,
   /Break the world/i,
+  /CPB Payment Audit Backfill/i,
+  /Cole also has the actual spreadsheet/i,
 ]
 
 let failures = 0
