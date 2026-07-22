@@ -256,7 +256,7 @@ export function EventReviewPage() {
               <SummaryCard label="Adjustments" value={formatEventReviewMoney(review.paymentReview.operationsLedger.adjustments, currency)} />
               <SummaryCard label="Cancelled items" value={review.paymentReview.operationsLedger.cancelledItems} />
               <SummaryCard label="Open ledger items" value={review.paymentReview.operationsLedger.openItemCount} />
-              <SummaryCard label="Current operations net" value={formatEventReviewMoney(review.paymentReview.operationsLedger.netPosition, currency)} />
+              <SummaryCard label="Operations cash position" value={formatEventReviewMoney(review.paymentReview.operationsLedger.netPosition, currency)} help="This is not final event profit." />
             </div>
           </div>
         </div>
@@ -351,7 +351,7 @@ export function EventReviewPage() {
           <SummaryCard label="Operations expenses" value={formatEventReviewMoney(review.summary.operationsExpenses, currency)} />
           <SummaryCard label="Operations refunds" value={formatEventReviewMoney(review.summary.operationsRefunds, currency)} />
           <SummaryCard label="Open operations items" value={review.summary.openOperationsItems} />
-          <SummaryCard label="Operations adjustments / net" value={`${formatEventReviewMoney(review.summary.operationsAdjustments, currency)} / ${formatEventReviewMoney(review.summary.operationsNetPosition, currency)}`} />
+          <SummaryCard label="Operations adjustments / cash position" value={`${formatEventReviewMoney(review.summary.operationsAdjustments, currency)} / ${formatEventReviewMoney(review.summary.operationsNetPosition, currency)}`} help="Operations cash position excludes registration ticket receipts." />
         </div>
 
         <div className="mt-5 rounded-2xl border border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#715D46]">

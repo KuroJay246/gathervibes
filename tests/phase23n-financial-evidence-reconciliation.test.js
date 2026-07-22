@@ -10,7 +10,7 @@ import {
   getEventFinancialEvidenceAudit,
 } from '../src/utils/financialEvidenceAudit.js'
 import { buildFinanceSummary } from '../src/utils/financeUtils.js'
-import { buildOperationsTotals } from '../src/utils/operationsReport.js'
+import { buildOperationsSettlementSummary, buildOperationsTotals } from '../src/utils/operationsReport.js'
 import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
 
 test('Phase 23N preserves exact evidence classes and CPB-only audit lookup', () => {
@@ -90,9 +90,89 @@ test('Phase 23N UI surfaces documentary audit without replacing operational labe
   assert.match(payments, /Evidence classification is separate from payment status/)
   assert.match(registrations, /Registration Evidence Reconciliation/)
   assert.match(checkIn, /Historical attendance is not system check-in/)
-  assert.match(operations, /Operations Closeout Proposal/)
+  assert.match(operations, /Financial Audit and Closeout History/)
   assert.match(reports, /Documentary Financial Audit/)
   assert.match(reports, /Final profit cannot be confirmed until bank, 1stPay, baker and supplier evidence is complete/)
+})
+
+test('Phase 23N-B Operations cash position is not labelled final profit', async () => {
+  const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
+  const reports = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
+
+  assert.match(operations, /Operations Cash Position/)
+  assert.match(operations, /This is not final event profit/)
+  assert.match(reports, /Operations cash position/)
+  assert.doesNotMatch(operations, /final profit\/loss|final event loss|event loss|final balance/i)
+})
+
+test('Phase 23N-B registration payments remain separate from Operations', async () => {
+  const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
+  const reports = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
+
+  assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
+  assert.match(operations, /should not be added automatically to registration payment totals/)
+  assert.match(reports, /Registration payment records track guest charges/)
+  assert.match(reports, /Operations cash position excludes registration ticket receipts/)
+})
+
+test('Phase 23N-B paid expenses and commitments remain separate', () => {
+  const entries = [
+    { entryType: 'expense', status: 'paid', amount: 1227.88 },
+    { entryType: 'expense', status: 'paid', amount: 1225 },
+    { entryType: 'expense', status: 'pending', amount: 1050 },
+  ]
+  const summary = buildOperationsSettlementSummary(entries)
+  const legacyTotals = buildOperationsTotals(entries)
+
+  assert.equal(summary.paidExpenses, 2452.88)
+  assert.equal(summary.outstandingCommitments, 1050)
+  assert.equal(summary.operationsCashPosition, -2452.88)
+  assert.equal(legacyTotals.expenses, 3502.88)
+})
+
+test('Phase 23N-B completed closeout panel cannot reapply records', async () => {
+  const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
+
+  assert.match(operations, /Phase 23N Operations closeout applied/)
+  assert.match(operations, /Applied/)
+  assert.match(operations, /Subsets 5 and 6 locked/)
+  assert.doesNotMatch(operations, /waiting for organizer approval/)
+  assert.doesNotMatch(operations, /Apply Phase 23N|Apply approved|Reapply/)
+})
+
+test('Phase 23N-B corrective tasks do not alter totals', () => {
+  const entries = [
+    { entryType: 'expense', status: 'paid', amount: CPB_FINANCIAL_EVIDENCE_AUDIT.operations.venuePaid },
+    { entryType: 'expense', status: 'paid', amount: CPB_FINANCIAL_EVIDENCE_AUDIT.operations.bakerPaidOrganizerReported },
+    { entryType: 'expense', status: 'pending', amount: CPB_FINANCIAL_EVIDENCE_AUDIT.operations.bakerOutstandingOrganizerReported },
+  ]
+  const summary = buildOperationsSettlementSummary(entries)
+
+  assert.equal(CPB_FINANCIAL_EVIDENCE_AUDIT.correctiveActions.length, 13)
+  assert.equal(summary.paidExpenses, 2452.88)
+  assert.equal(summary.outstandingCommitments, 1050)
+  assert.equal(summary.outstandingCommitments + CPB_FINANCIAL_EVIDENCE_AUDIT.operations.cakeBoxesPrinting, 1225)
+})
+
+test('Phase 23N-B applied proposal-count reporting is internally consistent', async () => {
+  const report = await readFile('PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md', 'utf8')
+
+  assert.match(report, /Approved proposal count: 21/)
+  assert.match(report, /Applied proposal count: 21/)
+  assert.match(report, /Skipped approved-write proposal count: 0/)
+  assert.match(report, /Non-write considered item count: 1/)
+  assert.match(report, /22 CONSIDERED \/ 21 APPLIED \/ 1 NON-WRITE SKIPPED/)
+  assert.match(report, /P23N-OP-CAKE-BOXES-PRINTING/)
+  assert.match(report, /not one of the 21 approved production write proposals/)
+})
+
+test('Phase 23N-B Subsets 5 and 6 remain locked in UI and report', async () => {
+  const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
+  const report = await readFile('PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md', 'utf8')
+
+  assert.match(operations, /Subsets 5 and 6 locked/)
+  assert.match(report, /Subset 5: Registration Evidence Metadata/)
+  assert.match(report, /Subset 6: Registration\/Attendance Corrections/)
 })
 
 test('Phase 23N generator is dry-run only and blocks ambiguous automatic apply', async () => {

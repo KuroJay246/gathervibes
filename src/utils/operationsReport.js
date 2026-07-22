@@ -57,6 +57,35 @@ export function buildOperationsControlSummary(entries = []) {
   })
 }
 
+export function buildOperationsSettlementSummary(entries = []) {
+  return entries.reduce((summary, entry) => {
+    if (entry.status === 'cancelled') return summary
+    const amount = Number(entry.amount) || 0
+
+    if (entry.entryType === 'income' && entry.status === 'received') summary.incomeReceived += amount
+    if (entry.entryType === 'income' && (entry.status === 'pending' || entry.status === 'expected')) summary.incomePending += amount
+    if (entry.entryType === 'expense' && entry.status === 'paid') summary.paidExpenses += amount
+    if (entry.entryType === 'expense' && (entry.status === 'pending' || entry.status === 'expected')) summary.outstandingCommitments += amount
+    if (entry.entryType === 'refund' && entry.status === 'paid') summary.paidRefunds += amount
+    if (entry.entryType === 'refund' && (entry.status === 'pending' || entry.status === 'expected')) summary.pendingRefunds += amount
+    if (entry.entryType === 'adjustment') summary.adjustments += amount
+    if (entry.category === 'In-kind support' && amount === 0) summary.inKindContributions += 1
+
+    summary.operationsCashPosition = summary.incomeReceived + summary.adjustments - summary.paidExpenses - summary.paidRefunds
+    return summary
+  }, {
+    incomeReceived: 0,
+    incomePending: 0,
+    paidExpenses: 0,
+    outstandingCommitments: 0,
+    paidRefunds: 0,
+    pendingRefunds: 0,
+    adjustments: 0,
+    operationsCashPosition: 0,
+    inKindContributions: 0,
+  })
+}
+
 export function buildOperationsLedgerReport(entries = [], { eventName = 'Selected Working Event', currency = 'BBD', scopeLabel = 'Current filtered view' } = {}) {
   const totals = buildOperationsTotals(entries)
   const counts = buildOperationsEntryCounts(entries)

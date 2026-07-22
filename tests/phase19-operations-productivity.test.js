@@ -75,7 +75,7 @@ test('Phase 19 operations page keeps existing design while adding practical filt
   assert.match(operations, /Pending income/)
   assert.match(operations, /Pending expenses/)
   assert.match(operations, /Visible income/)
-  assert.match(operations, /Visible Operations Net Position/)
+  assert.match(operations, /Visible Operations Cash Position/)
   assert.match(operations, /What this means:/)
   assert.match(operations, /This tracker is separate from registration payment records/)
 })

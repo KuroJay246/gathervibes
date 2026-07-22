@@ -19,6 +19,7 @@ import {
   buildOperationsControlSummary,
   buildOperationsEntryCounts,
   buildOperationsLedgerReport,
+  buildOperationsSettlementSummary,
   buildOperationsTotals,
   findPossibleRegistrationPaymentOverlap,
 } from '../utils/operationsReport'
@@ -150,6 +151,7 @@ export function OperationsPage() {
 
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, activeEvent), [registrations, activeEvent])
   const operationsTotals = useMemo(() => buildOperationsTotals(entries), [entries])
+  const operationsSettlement = useMemo(() => buildOperationsSettlementSummary(entries), [entries])
   const filteredTotals = useMemo(() => buildOperationsTotals(filteredEntries), [filteredEntries])
   const filteredCounts = useMemo(() => buildOperationsEntryCounts(filteredEntries), [filteredEntries])
   const filteredControl = useMemo(() => buildOperationsControlSummary(filteredEntries), [filteredEntries])
@@ -298,6 +300,13 @@ export function OperationsPage() {
         </InfoHint>
       </section>
 
+      <section aria-labelledby="operations-finance-summary-heading" className="rounded-xl border border-[#E6D4B4] bg-[#FFF8EA] px-4 py-3 text-xs leading-5 text-[#715D46]">
+        <h3 id="operations-finance-summary-heading" className="text-sm font-bold text-[#4E3928]">Operations finance boundary</h3>
+        <p className="mt-1">
+          Operations tracks event expenses, commitments and non-registration income. Registration ticket payments are recorded separately under Payments, so the Operations cash position is not the event's final profit or loss.
+        </p>
+      </section>
+
       {possibleRegistrationPaymentOverlap.length > 0 && (
         <section className="flex gap-2 rounded-xl border border-[#F2D6A3] bg-[#FFF7E8] px-4 py-3 text-xs leading-5 text-[#7A5818]">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" />
@@ -318,15 +327,19 @@ export function OperationsPage() {
             ['Registration payments recorded', formatCurrency(financeSummary.totalCollected)],
             ['Registration balance outstanding', formatCurrency(financeSummary.totalOutstanding)],
           ] : []),
-          ['Operations income received', formatCurrency(operationsTotals.income)],
-          ['Expenses', formatCurrency(operationsTotals.expenses)],
-          ['Refunds', formatCurrency(operationsTotals.refunds)],
+          ['Operations Income', formatCurrency(operationsSettlement.incomeReceived)],
+          ['Paid Event Expenses', formatCurrency(operationsSettlement.paidExpenses)],
+          ['Outstanding Commitments', formatCurrency(operationsSettlement.outstandingCommitments)],
+          ['Refunds Paid', formatCurrency(operationsSettlement.paidRefunds)],
           ['Adjustments', formatCurrency(operationsTotals.adjustments)],
-          ['Operations Net Position', formatCurrency(operationsTotals.net)],
+          ['Operations Cash Position', formatCurrency(operationsSettlement.operationsCashPosition)],
         ].map(([label, value]) => (
           <div key={label} className="rounded-xl border border-[#EEDFD6] bg-white p-4">
             <p className="text-lg font-bold text-[#2B1723]">{value}</p>
             <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
+            {label === 'Operations Cash Position' && (
+              <p className="mt-2 text-[11px] leading-5 text-[#816D62]">This is not final event profit.</p>
+            )}
           </div>
         ))}
       </section>
@@ -335,42 +348,55 @@ export function OperationsPage() {
         <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="operations-closeout-heading">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Operations Closeout Proposal</p>
-              <h2 id="operations-closeout-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Documentary entries waiting for organizer approval</h2>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Financial Audit and Closeout History</p>
+              <h2 id="operations-closeout-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Phase 23N Operations closeout applied</h2>
               <p className="mt-2 max-w-3xl text-xs leading-5 text-[#715D46]">
-                These are proposed Operations and in-kind records only. They are not current ledger entries and they are not mixed into registration payment totals.
+                Applied batch PH23N_SUBSETS_1_4_PRODUCTION_APPLY_2026-07-22T043009926Z created the completed Operations and in-kind records below. Subsets 5 and 6 remain locked, and open corrective tasks are evidence review only.
               </p>
             </div>
-            <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
-              CPB Operations entries now: {entries.length}
-            </span>
+            <div className="flex flex-wrap gap-2">
+              <span className="w-fit rounded-full bg-[#E5F3EC] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">Applied</span>
+              <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">Subsets 5 and 6 locked</span>
+              <span className="w-fit rounded-full bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
+                CPB Operations entries now: {entries.length}
+              </span>
+            </div>
           </div>
           <div className="mt-4 grid gap-3 lg:grid-cols-3">
             <article className="rounded-xl border border-[#EEDFD6] bg-white p-4">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">Completed financial entry</p>
               <p className="text-sm font-bold text-[#2B1723]">LESC venue and 15 tables</p>
               <p className="mt-1 text-lg font-bold text-[#2B1723]">{formatCurrency(evidenceAudit.operations.venuePaid)}</p>
               <p className="mt-2 text-xs leading-5 text-[#715D46]">Directly Verified · Paid/Settled · Barbados Conference Services Limited / LESC.</p>
             </article>
             <article className="rounded-xl border border-[#EEDFD6] bg-white p-4">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">Completed and open ledger entries</p>
               <p className="text-sm font-bold text-[#2B1723]">Baker payment schedule</p>
               <p className="mt-1 text-lg font-bold text-[#2B1723]">{formatCurrency(evidenceAudit.operations.bakerPaidOrganizerReported)} paid / {formatCurrency(evidenceAudit.operations.bakerOutstandingOrganizerReported)} outstanding</p>
               <p className="mt-2 text-xs leading-5 text-[#715D46]">Organizer Reported. Candyrain subset is directly documented; do not count it twice.</p>
             </article>
             <article className="rounded-xl border border-[#EEDFD6] bg-white p-4">
-              <p className="text-sm font-bold text-[#2B1723]">Unresolved expenses</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">Evidence-review task</p>
+              <p className="text-sm font-bold text-[#2B1723]">Cake boxes / printing evidence gap</p>
               <p className="mt-1 text-lg font-bold text-[#2B1723]">{formatCurrency(evidenceAudit.operations.cakeBoxesPrinting)}</p>
-              <p className="mt-2 text-xs leading-5 text-[#715D46]">Cake boxes / printing is Unverified / Outstanding. Supplier, invoice, quantity and proof are missing.</p>
+              <p className="mt-2 text-xs leading-5 text-[#715D46]">Unverified / Outstanding. This is not a paid expense or an additional Operations commitment until supplier, invoice, quantity and proof are confirmed.</p>
             </article>
           </div>
           <div className="mt-4 grid gap-3 lg:grid-cols-3">
             {evidenceAudit.sponsorship.map((item) => (
               <article key={item.sponsor} className="rounded-xl border border-[#EEDFD6] bg-white p-4" aria-label={`${item.sponsor}: ${item.evidenceClass}`}>
                 <p className="text-sm font-bold text-[#2B1723]">{item.sponsor}</p>
-                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#8C7567]">{item.evidenceClass}</p>
-                <p className="mt-2 text-xs leading-5 text-[#715D46]">{item.quantity} · {item.item} · Cash received {formatCurrency(item.cashReceived)} · Estimated value unknown.</p>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#8C7567]">In-kind · {item.evidenceClass}</p>
+                <p className="mt-2 text-xs leading-5 text-[#715D46]">{item.quantity} · {item.item} · Cash impact {formatCurrency(item.cashReceived)} · Estimated value unknown.</p>
               </article>
             ))}
           </div>
+          <details className="mt-4 rounded-xl border border-[#EEDFD6] bg-white p-4">
+            <summary className="cursor-pointer text-sm font-bold text-[#2B1723]">Open corrective and evidence-review tasks ({evidenceAudit.correctiveActions.length})</summary>
+            <ol className="mt-3 grid list-decimal gap-2 pl-5 text-xs leading-5 text-[#715D46] md:grid-cols-2">
+              {evidenceAudit.correctiveActions.map((item) => <li key={item}>{item}</li>)}
+            </ol>
+          </details>
         </section>
       )}
 
@@ -507,7 +533,7 @@ export function OperationsPage() {
               ['Visible income', formatCurrency(filteredTotals.income)],
               ['Visible expenses', formatCurrency(filteredTotals.expenses)],
               ['Visible refunds', formatCurrency(filteredTotals.refunds)],
-              ['Visible Operations Net Position', formatCurrency(filteredTotals.net)],
+              ['Visible Operations Cash Position', formatCurrency(filteredTotals.net)],
             ].map(([label, value]) => (
               <div key={label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
                 <p className="text-sm font-bold text-[#2B1723]">{value}</p>
@@ -521,7 +547,7 @@ export function OperationsPage() {
           </div>
 
           <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-            <strong className="text-[#6B564C]">What this means:</strong> open ledger items are still expected or pending, while visible Operations Net Position reflects only the filtered Operations rows on screen. Do not add this automatically to registration payment totals.
+            <strong className="text-[#6B564C]">What this means:</strong> open ledger items are still expected or pending, while visible Operations Cash Position reflects only the filtered Operations rows on screen. This is not final event profit and should not be added automatically to registration payment totals.
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">
