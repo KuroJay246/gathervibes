@@ -54,13 +54,10 @@ test('Phase 23Q paid records with missing amounts stay paid, move to Data Review
     registrationId: 'paid-organizer-confirmed',
     fullName: 'QA_PHASE23Q_OrganizerConfirmed',
     personsAttending: 1,
-    ticketPrice: 50,
-    amountDue: 50,
     balanceDue: 0,
     paymentStatus: 'paid',
     paymentMethod: 'firstpay',
     paymentEvidenceClass: 'Payment Organizer Confirmed',
-    paymentReference: 'QA23Q-CONFIRMED',
   }
 
   const finance = classifyRegistrationFinance(ingridLike, event)
@@ -70,12 +67,14 @@ test('Phase 23Q paid records with missing amounts stay paid, move to Data Review
   assert.equal(finance.statusGroup, 'paid')
   assert.equal(finance.paymentFollowUpRequired, false)
   assert.equal(finance.dataReviewRequired, true)
-  assert.equal(finance.reviewCategoryLabel, 'Data Review')
+  assert.equal(finance.reviewCategoryLabel, 'Internal Cleanup')
   assert.equal(finance.reviewLabel, 'Paid — Amount Not Recorded')
   assert.equal(finance.reviewMessage, 'Payment is confirmed, but the exact ticket amount was not recorded.')
   assert.equal(finance.outstandingPayment, false)
   assert.equal(finance.displayBalanceDue, 0)
   assert.equal(finance.paymentReminderEligible, false)
+  assert.equal(finance.dataReviewInternalCleanup, true)
+  assert.equal(finance.dataReviewProminent, true)
 
   assert.equal(row.paymentEvidenceClass, 'Payment Organizer Confirmed')
   assert.equal(row.displayStatus, 'Paid')
@@ -88,6 +87,9 @@ test('Phase 23Q paid records with missing amounts stay paid, move to Data Review
   assert.equal(workspace.summary.outstandingBalance, 0)
   assert.equal(workspace.summary.paymentFollowUpCount, 0)
   assert.equal(workspace.summary.dataReviewCount, 1)
+  assert.equal(workspace.summary.internalCleanupCount, 1)
+  assert.equal(workspace.summary.actionRequiredCount, 0)
+  assert.equal(workspace.summary.historicalLimitationCount, 0)
 
   assert.equal(filterCommunicationsRegistrations([ingridLike], communicationsFilters('payment-follow-up')).length, 0)
   assert.equal(filterCommunicationsRegistrations([ingridLike], communicationsFilters('outstanding')).length, 0)
@@ -198,5 +200,6 @@ test('Phase 23Q workspace counts and filters keep collection work separate from 
   assert.equal(workspace.filterCounts['payment-follow-up'], 4)
   assert.equal(workspace.filterCounts['needs-follow-up'], 4)
   assert.equal(workspace.filterCounts['data-review'], 1)
+  assert.equal(workspace.filterCounts['internal-cleanup'], 1)
   assert.equal(workspace.filterCounts['finance-review'], 1)
 })

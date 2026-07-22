@@ -199,10 +199,10 @@ export function EventReviewPage() {
         </div>
       </section>
 
-      <Section eyebrow="Payment Follow-Up and Data Review" title="What needs attention now">
+      <Section eyebrow="Payment Follow-Up and Finance Review" title="What needs attention now">
         {review.followUp.items.length === 0 ? (
           <div className="rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
-            No patron payment follow-up or internal data-review items were detected for the selected Working Event from current registration and operations data.
+            No patron payment follow-up or active finance review items were detected for the selected Working Event from current registration and operations data.
           </div>
         ) : (
           <div className="grid gap-4 xl:grid-cols-2">
@@ -229,7 +229,11 @@ export function EventReviewPage() {
               <SummaryCard label="Payments Received" value={formatEventReviewMoney(review.paymentReview.registrationRecords.collectedAmount, currency)} />
               <SummaryCard label="Outstanding Balance" value={formatEventReviewMoney(review.paymentReview.registrationRecords.outstandingAmount, currency)} />
               <SummaryCard label="Payment Follow-Up" value={review.paymentReview.registrationRecords.paymentFollowUpCount} />
-              <SummaryCard label="Data Review" value={review.paymentReview.registrationRecords.dataReviewCount} />
+              <SummaryCard label="Action Required" value={review.paymentReview.registrationRecords.actionRequiredCount} />
+              <SummaryCard label="Internal Cleanup" value={review.paymentReview.registrationRecords.internalCleanupCount} />
+              <SummaryCard label="Historical Limitations" value={review.paymentReview.registrationRecords.historicalLimitationCount} />
+              <SummaryCard label="Informational Only" value={review.paymentReview.registrationRecords.informationalOnlyCount} />
+              <SummaryCard label="Paid — Amount Not Recorded" value={review.paymentReview.registrationRecords.paidAmountNotRecordedCount} />
               <SummaryCard label="Pending count" value={review.paymentReview.registrationRecords.pendingCount} />
               <SummaryCard label="Partial payment count" value={review.paymentReview.registrationRecords.partialPaymentCount} />
               <SummaryCard label="Paid count" value={review.paymentReview.registrationRecords.paidCount} />

@@ -17,7 +17,15 @@ import { countEvidenceClasses, getEventFinancialEvidenceAudit } from '../utils/f
 const PAYMENT_FILTERS = [
   ['all', 'All'],
   ['payment-follow-up', 'Payment Follow-Up'],
-  ['data-review', 'Data Review'],
+  ['data-review', 'All Data Review'],
+  ['action-required', 'Action Required'],
+  ['internal-cleanup', 'Internal Cleanup'],
+  ['historical-limitation', 'Historical Limitation'],
+  ['paid-amount-not-recorded', 'Paid — Amount Not Recorded'],
+  ['missing-method', 'Missing Method'],
+  ['missing-reference', 'Missing Reference'],
+  ['possible-duplicate', 'Possible Duplicate'],
+  ['amount-mismatch', 'Amount Mismatch'],
   ['paid', 'Paid'],
   ['partial', 'Partial'],
   ['pending', 'Pending'],
@@ -54,6 +62,18 @@ function receivedDisplay(row, currency) {
   return formatCurrency(row.amountPaid, currency)
 }
 
+function reviewSummaryText(row) {
+  if (!row.reviewLabel) return ''
+  const secondaryLabels = (row.dataReviewCategoryLabels || [])
+    .filter((label) => label !== row.reviewLabel)
+    .slice(0, 2)
+  const details = [
+    row.reviewMessage,
+    ...secondaryLabels,
+  ].filter(Boolean)
+  return `${row.reviewCategoryLabel}: ${row.reviewLabel}${details.length ? ` · ${details.join(' · ')}` : ''}`
+}
+
 function PaymentCard({ row, currency }) {
   const details = [
     ['Expected', row.amountDue === null ? 'Needs review' : formatCurrency(row.amountDue, currency)],
@@ -66,9 +86,7 @@ function PaymentCard({ row, currency }) {
     ['Reference', row.paymentReference || 'Not recorded'],
     ['Ticket', row.ticketCode || 'Missing ticket'],
   ]
-  const reviewText = row.reviewLabel
-    ? `${row.reviewCategoryLabel}: ${row.reviewLabel}${row.reviewMessage ? ` · ${row.reviewMessage}` : ''}`
-    : ''
+  const reviewText = row.reviewLabel ? reviewSummaryText(row) : ''
 
   return (
     <article className="rounded-2xl border border-[#F2E8E1] bg-white p-4" aria-label={`${row.name} payment record`}>
@@ -178,8 +196,13 @@ export function PaymentsPage() {
   const workspace = useMemo(() => buildPaymentsWorkspace(registrations, activeEvent), [activeEvent, registrations])
   const activeFilter = filter === 'payment-follow-up'
     && (workspace.filterCounts['payment-follow-up'] || 0) === 0
-    && (workspace.filterCounts['data-review'] || 0) > 0
-    ? 'data-review'
+    ? workspace.summary.actionRequiredCount > 0
+      ? 'action-required'
+      : workspace.summary.internalCleanupCount > 0
+        ? 'internal-cleanup'
+        : workspace.summary.historicalLimitationCount > 0
+          ? 'historical-limitation'
+          : filter
     : filter
   const visibleRows = workspace.rows.filter((row) => paymentFilterMatches(row, activeFilter) && paymentSearchMatches(row, search))
   const currency = workspace.summary.currency
@@ -240,8 +263,14 @@ export function PaymentsPage() {
         <Metric label="Complimentary registrations" value={workspace.summary.complimentaryRegistrations} help={`${workspace.summary.complimentaryGuests} complimentary guests`} />
         <Metric label="Unknown payment state" value={workspace.summary.unknownPaymentStates} />
         <Metric label="Outstanding payments" value={workspace.summary.outstandingRegistrations} help="Positive balances only" />
-        <Metric label="Payment Follow-Up" value={workspace.summary.paymentFollowUpCount} />
-        <Metric label="Data Review" value={workspace.summary.dataReviewCount} />
+      </section>
+
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <Metric label="Payment Follow-Up" value={workspace.summary.paymentFollowUpCount} help="May still require patron contact" />
+        <Metric label="Action Required" value={workspace.summary.actionRequiredCount} help="Could affect totals, duplicates, or reminder accuracy" />
+        <Metric label="Internal Cleanup" value={workspace.summary.internalCleanupCount} help="Resolved records that still need organizer review" />
+        <Metric label="Historical Limitations" value={workspace.summary.historicalLimitationCount} help="Historical gaps kept out of urgent attention" />
+        <Metric label="Paid — Amount Not Recorded" value={workspace.summary.paidAmountNotRecordedCount} help="Resolved payment without an exact captured amount" />
       </section>
 
       {evidenceAudit && (
@@ -279,19 +308,37 @@ export function PaymentsPage() {
         description="Use this list for registrations that still look unresolved for payment collection or balance follow-up."
         rows={workspace.paymentFollowUpRows}
         currency={currency}
-        emptyMessage={workspace.summary.dataReviewCount > 0
-          ? 'No patron payment follow-up is detected. Some records still need internal data review.'
+        emptyMessage={workspace.summary.prominentDataReviewCount > 0 || workspace.summary.historicalLimitationCount > 0
+          ? 'No patron payment follow-up is detected. Review counts below are internal finance review only.'
           : 'No patron payment follow-up is detected from the current records.'}
       />
 
       <ReviewList
-        eyebrow="Data Review"
-        title="Internal cleanup that does not imply customer debt"
-        description="Use this list for records that are operationally resolved but still missing or inconsistent finance details."
-        rows={workspace.dataReviewRows}
+        eyebrow="Action Required and Internal Cleanup"
+        title="Records that still need organizer review"
+        description="Use this list for active finance review items. Historical limitations remain visible in the table below without inflating the urgent count."
+        rows={workspace.prominentDataReviewRows}
         currency={currency}
-        emptyMessage="No internal finance data review is currently detected."
+        emptyMessage="No active finance review is currently detected."
       />
+
+      <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Historical and Informational Review</p>
+            <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Resolved records kept out of urgent attention</h2>
+            <p className="mt-2 max-w-3xl text-xs leading-5 text-[#816D62]">
+              These records stay searchable for audit context, but they do not imply patron debt or active organizer follow-up when the missing information is historical, optional, or no longer recoverable.
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <Metric label="Historical Limitations" value={workspace.summary.historicalLimitationCount} />
+          <Metric label="Informational Only" value={workspace.summary.informationalOnlyCount} />
+          <Metric label="Missing Method" value={workspace.filterCounts['missing-method'] || 0} />
+          <Metric label="Missing Reference" value={workspace.filterCounts['missing-reference'] || 0} />
+        </div>
+      </section>
 
       <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -318,7 +365,7 @@ export function PaymentsPage() {
         </div>
 
         <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] px-4 py-3 text-xs leading-5 text-[#816D62]">
-          <strong className="text-[#6B564C]">How to use this:</strong> payment follow-up is for money that may still be due. Data Review is internal cleanup only. Do not add registration payments to Operations unless they are intentionally separate event-level ledger entries.
+          <strong className="text-[#6B564C]">How to use this:</strong> payment follow-up is for money that may still be due. Action Required and Internal Cleanup are active organizer work. Historical Limitation and Informational Only rows stay available for audit context without inflating debt or reminder counts. Do not add registration payments to Operations unless they are intentionally separate event-level ledger entries.
         </div>
 
         <div className="mt-4 lg:hidden" aria-label="Responsive payment records">
@@ -382,10 +429,11 @@ export function PaymentsPage() {
                             <span>
                               <strong>{row.reviewCategoryLabel}: {row.reviewLabel}</strong>
                               {row.reviewMessage ? ` ${row.reviewMessage}` : ''}
+                              {row.dataReviewCategoryLabels?.length > 1 ? ` ${row.dataReviewCategoryLabels.filter((label) => label !== row.reviewLabel).slice(0, 2).join(' · ')}` : ''}
                             </span>
                           </div>
                         ) : (
-                          <span className="text-xs text-[#816D62]">No warning</span>
+                          <span className="text-xs text-[#816D62]">No review item</span>
                         )}
                       </td>
                     </tr>

@@ -18,7 +18,7 @@ import { subscribeToRegistrations } from '../services/registrationService'
 import { subscribeToOperationsLedger } from '../services/operationsLedgerService'
 import { formatCountdown, formatEventDate, toDateInput, upcomingEvents } from '../utils/dateUtils'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
-import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
+import { buildFinanceSummary, buildPaymentsWorkspace, formatCurrency } from '../utils/financeUtils'
 import { getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
 import { isApprovedAdmin } from '../utils/accessRoles'
 import { buildEventReadiness } from '../utils/eventReadiness'
@@ -122,6 +122,7 @@ export function DashboardPage() {
   const upcoming = useMemo(() => upcomingEvents(visibleEvents), [visibleEvents])
   const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedEvent), [registrations, selectedEvent])
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedEvent), [registrations, selectedEvent])
+  const paymentsWorkspace = useMemo(() => buildPaymentsWorkspace(registrations, selectedEvent), [registrations, selectedEvent])
   const readiness = useMemo(
     () => buildEventReadiness(selectedEvent, registrations, operationsEntries),
     [operationsEntries, registrations, selectedEvent],
@@ -218,6 +219,14 @@ export function DashboardPage() {
             <p className="mt-3 text-xs leading-5 text-[#816D62]">
               These registration totals use explicit ticket price or amount due values only. Operations Ledger money remains separate.
             </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+              <Metric label="Payment Follow-Up" value={paymentsWorkspace.summary.paymentFollowUpCount} detail="Still unresolved for patron collection" />
+              <Metric label="Action Required" value={paymentsWorkspace.summary.actionRequiredCount} detail="Could affect totals or duplicate handling" />
+              <Metric label="Internal Cleanup" value={paymentsWorkspace.summary.internalCleanupCount} detail="Resolved records that still need organizer review" />
+              <Metric label="Historical Limitations" value={paymentsWorkspace.summary.historicalLimitationCount} detail="Historical metadata gaps kept out of urgent counts" />
+              <Metric label="Informational Only" value={paymentsWorkspace.summary.informationalOnlyCount} detail="Visible for audit context only" />
+              <Metric label="Paid — Amount Not Recorded" value={paymentsWorkspace.summary.paidAmountNotRecordedCount} detail="Resolved payment without an exact captured amount" />
+            </div>
           </section>
 
           {evidenceAudit && (
@@ -323,7 +332,7 @@ export function DashboardPage() {
                   <Metric label="Tickets missing" value={metrics.missingTicketRegistrations} />
                   <Metric label="Open operations" value={openOperations} />
                   <Metric label="Outstanding Balance" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
-                  <Metric label="Operations open items" value={openOperations} />
+                  <Metric label="Active finance review" value={paymentsWorkspace.summary.prominentDataReviewCount} />
                 </div>
                 <p className="text-xs leading-5 text-[#816D62]">
                   Registration payment records and Operations Ledger entries are separate. Use Payments for registration balances and Reports for the read-only event review.

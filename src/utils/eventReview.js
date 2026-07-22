@@ -1,5 +1,6 @@
 import { buildEventReadiness } from './eventReadiness.js'
 import {
+  buildFinanceClassificationContext,
   buildFinanceSummary,
   classifyRegistrationFinance,
   financeWarnings,
@@ -92,16 +93,23 @@ function getEventTiming(event = {}, asOf = new Date()) {
 
 function buildRegistrationPaymentBreakdown(registrations = [], event = {}) {
   const summary = buildFinanceSummary(registrations, event)
+  const financeContext = buildFinanceClassificationContext(registrations, event)
   let doorListCount = 0
   let partialPaymentCount = 0
   let unknownCount = 0
   let paymentFollowUpCount = 0
   let dataReviewCount = 0
+  let prominentDataReviewCount = 0
+  let actionRequiredCount = 0
+  let internalCleanupCount = 0
+  let historicalLimitationCount = 0
+  let informationalOnlyCount = 0
+  let paidAmountNotRecordedCount = 0
   let financeWarningCount = 0
 
   registrations.forEach((registration) => {
     const paymentStatus = normalizePaymentStatus(registration?.paymentStatus)
-    const finance = classifyRegistrationFinance(registration, event)
+    const finance = classifyRegistrationFinance(registration, event, financeContext)
     const warnings = financeWarnings(registration, event)
 
     if (paymentStatus === 'door-list') doorListCount += 1
@@ -109,6 +117,12 @@ function buildRegistrationPaymentBreakdown(registrations = [], event = {}) {
     if (paymentStatus === 'unknown') unknownCount += 1
     if (finance.paymentFollowUpRequired) paymentFollowUpCount += 1
     if (finance.dataReviewRequired) dataReviewCount += 1
+    if (finance.dataReviewProminent) prominentDataReviewCount += 1
+    if (finance.dataReviewActionRequired) actionRequiredCount += 1
+    if (finance.dataReviewInternalCleanup) internalCleanupCount += 1
+    if (finance.dataReviewHistoricalLimitation) historicalLimitationCount += 1
+    if (finance.dataReviewInformationalOnly) informationalOnlyCount += 1
+    if (finance.dataReviewCategoryKeys.includes('paid-amount-not-recorded')) paidAmountNotRecordedCount += 1
     if (warnings.length > 0) financeWarningCount += 1
   })
 
@@ -119,6 +133,12 @@ function buildRegistrationPaymentBreakdown(registrations = [], event = {}) {
     unknownCount,
     paymentFollowUpCount,
     dataReviewCount,
+    prominentDataReviewCount,
+    actionRequiredCount,
+    internalCleanupCount,
+    historicalLimitationCount,
+    informationalOnlyCount,
+    paidAmountNotRecordedCount,
     pricingReviewCount: dataReviewCount,
     financeWarningCount,
   }
@@ -200,13 +220,14 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
   const readiness = buildEventReadiness(event, rows, ledgerRows)
   const metrics = buildRegistrationMetrics(rows, event)
   const finance = buildRegistrationPaymentBreakdown(rows, event)
+  const financeContext = buildFinanceClassificationContext(rows, event)
   const ledger = buildLedgerBreakdown(ledgerRows, finance.currency)
   const ticketCoverage = buildTicketCoverage(rows)
   const attendance = buildAttendanceSummary(rows)
   const missingContactRows = rows.filter((registration) => !String(registration?.email || '').trim() && !String(registration?.phone || '').trim())
   const duplicateContactRows = countDuplicateContactRows(rows)
-  const paymentReviewRows = rows.filter((registration) => classifyRegistrationFinance(registration, event).paymentFollowUpRequired)
-  const incompleteFinanceRows = rows.filter((registration) => classifyRegistrationFinance(registration, event).dataReviewRequired)
+  const paymentReviewRows = rows.filter((registration) => classifyRegistrationFinance(registration, event, financeContext).paymentFollowUpRequired)
+  const incompleteFinanceRows = rows.filter((registration) => classifyRegistrationFinance(registration, event, financeContext).dataReviewProminent)
   const paidMissingTicketRows = rows.filter((registration) => {
     const paymentStatus = normalizePaymentStatus(registration?.paymentStatus)
     return !normalizeTicketCode(registration?.ticketCode) && (paymentStatus === 'paid' || paymentStatus === 'door')
@@ -266,9 +287,9 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
   if (incompleteFinanceRows.length > 0) {
     followUpItems.push(buildFollowUpItem({
       key: 'data-review',
-      label: 'Data Review',
+      label: 'Active finance review',
       count: incompleteFinanceRows.length,
-      explanation: 'These registrations do not show money outstanding, but their finance records still need internal cleanup or documentation review.',
+      explanation: 'These registrations do not show money outstanding, but they still need active organizer review or internal cleanup.',
       to: '/registrations',
       preview: sampleNames(incompleteFinanceRows),
     }))
@@ -384,6 +405,12 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
         complimentaryGuests: metrics.complimentaryPersons,
         paymentFollowUpCount: finance.paymentFollowUpCount,
         dataReviewCount: finance.dataReviewCount,
+        prominentDataReviewCount: finance.prominentDataReviewCount,
+        actionRequiredCount: finance.actionRequiredCount,
+        internalCleanupCount: finance.internalCleanupCount,
+        historicalLimitationCount: finance.historicalLimitationCount,
+        informationalOnlyCount: finance.informationalOnlyCount,
+        paidAmountNotRecordedCount: finance.paidAmountNotRecordedCount,
         pendingCount: metrics.pendingRegistrations,
         partialPaymentCount: finance.partialPaymentCount,
         paidCount: finance.paidRegistrations,
@@ -438,7 +465,7 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
       operationsAdjustments: ledger.totals.adjustments,
       operationsNetPosition: ledger.totals.net,
       openOperationsItems: ledger.control.openEntries,
-      incompleteDataWarnings: missingContactRows.length + incompleteFinanceRows.length + duplicateContactRows.length,
+      incompleteDataWarnings: missingContactRows.length + finance.prominentDataReviewCount + duplicateContactRows.length,
       attendanceNote: 'Guest attendance is based on the full personsAttending value of each checked-in registration record. Group registrations are not scanned guest-by-guest.',
     },
   }
