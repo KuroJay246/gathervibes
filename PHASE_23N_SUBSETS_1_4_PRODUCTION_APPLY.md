@@ -34,7 +34,8 @@ No production write was made to registrations, guests, registration-finance fiel
 
 - Approved proposal count: 21
 - Applied proposal count: 21
-- Skipped proposal count: 1
+- Skipped approved-write proposal count: 0
+- Non-write considered item count: 1
 - Blocked proposal count: 3 identity records remain locked
 - Failed proposal count: 0
 - New Phase 23N apply audit logs expected: 21
@@ -53,9 +54,15 @@ Applied proposal IDs:
 - `P23N-ATTENDANCE-OBSERVATION`
 - `P23N-ACTION-01` through `P23N-ACTION-13`
 
-Skipped proposal:
+Apply-count conclusion:
+
+- `22 CONSIDERED / 21 APPLIED / 1 NON-WRITE SKIPPED`
+
+Non-write considered item:
 
 - `P23N-OP-CAKE-BOXES-PRINTING`: not written as an Operations ledger expense. The cake-box/printing issue remains represented as an open corrective evidence task so the approved BBD 1,050 outstanding-commitment total is preserved.
+
+This item was reviewed during the Phase 23N-B closeout because it appeared in the organizer-review package as an unverified cake-box/printing item. It was not one of the 21 approved production write proposals, was not already applied, was not a failed write, and was not one of the blocked identity records. It remains a no-write evidence-review task represented in the event audit and corrective actions.
 
 Blocked identity records:
 
