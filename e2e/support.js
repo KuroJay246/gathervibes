@@ -23,6 +23,7 @@ export async function signInAndSelectEvent(page) {
   await page.locator('#password').fill(E2E_PASSWORD)
   await page.getByRole('button', { name: 'Sign in securely' }).click()
   await expect(page).toHaveURL(/\/dashboard$/)
+  await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible()
 
   await page.goto('/events')
   const eventContainer = page.locator('tr:visible, article:visible').filter({ hasText: E2E_EVENT_NAME }).first()
