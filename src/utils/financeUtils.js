@@ -34,6 +34,27 @@ export const DEFAULT_FINANCE_SETTINGS = {
   showFinanceWarnings: true,
 }
 
+export const DATA_REVIEW_SEVERITY_LABELS = {
+  'action-required': 'Action Required',
+  'internal-cleanup': 'Internal Cleanup',
+  'historical-limitation': 'Historical Limitation',
+  'informational-only': 'Informational Only',
+}
+
+export const DATA_REVIEW_CATEGORY_LABELS = {
+  'paid-amount-not-recorded': 'Paid — Amount Not Recorded',
+  'missing-payment-reference': 'Missing Payment Reference',
+  'missing-payment-method': 'Missing Payment Method',
+  'legacy-import-data': 'Legacy Import Data',
+  'evidence-classification-missing': 'Evidence Classification Missing',
+  'ticket-data-incomplete': 'Ticket Data Incomplete',
+  'group-booking-metadata': 'Group Booking Metadata',
+  'possible-duplicate-payment': 'Possible Duplicate',
+  'amount-mismatch': 'Finance Amount Mismatch',
+  'organizer-decision-required': 'Organizer Decision Required',
+  'no-action-required': 'No Action Required',
+}
+
 export function normalizeCurrency(value) {
   const code = String(value || '').trim().toUpperCase()
   return /^[A-Z]{3}$/.test(code) ? code : DEFAULT_CURRENCY
@@ -178,8 +199,79 @@ function warning(level, code, message) {
   return { level, code, message }
 }
 
-function reviewReason(code, label, message, category) {
-  return { code, label, message, category }
+function reviewReason(code, label, message, category, metadata = {}) {
+  return { code, label, message, category, ...metadata }
+}
+
+function dataReviewReason(code, label, message, severity, categoryKeys = [], metadata = {}) {
+  return reviewReason(code, label, message, 'data-review', {
+    severity,
+    categoryKeys,
+    ...metadata,
+  })
+}
+
+function normalizeRelationshipKey(value) {
+  return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ')
+}
+
+function isHistoricalEvent(event = {}) {
+  const status = String(event?.status || '').trim().toLowerCase()
+  if (['completed', 'cancelled'].includes(status)) return true
+  const eventDate = event?.eventDate ? new Date(event.eventDate) : null
+  return Boolean(eventDate && !Number.isNaN(eventDate.getTime()) && eventDate.getTime() < Date.now())
+}
+
+function severityRank(severity = '') {
+  return {
+    'action-required': 0,
+    'internal-cleanup': 1,
+    'historical-limitation': 2,
+    'informational-only': 3,
+  }[severity] ?? 4
+}
+
+function primarySeverity(reasons = []) {
+  return reasons
+    .map((reason) => reason.severity)
+    .sort((left, right) => severityRank(left) - severityRank(right))[0] || null
+}
+
+function uniqueStrings(values = []) {
+  return [...new Set(values.filter(Boolean))]
+}
+
+function categoryLabels(categoryKeys = []) {
+  return categoryKeys.map((key) => DATA_REVIEW_CATEGORY_LABELS[key] || key)
+}
+
+export function buildFinanceClassificationContext(registrations = [], event = {}) {
+  const rows = Array.isArray(registrations) ? registrations : []
+  const resolvedPayerNameCounts = new Map()
+
+  rows.forEach((registration) => {
+    const computed = calculateRegistrationFinance(registration, event)
+    const hasPositiveBalance = (computed.balanceDue || 0) > 0
+    const coveredByPayer = (
+      computed.paymentStatus === 'paid'
+      || (computed.paymentStatus === 'door' && !hasPositiveBalance)
+      || (computed.paymentStatus === 'complimentary' && !hasPositiveBalance)
+      || computed.amountPaid > 0
+    )
+
+    if (!coveredByPayer) return
+
+    ;[registration?.fullName, registration?.buyerName].forEach((value) => {
+      const key = normalizeRelationshipKey(value)
+      if (key) resolvedPayerNameCounts.set(key, (resolvedPayerNameCounts.get(key) || 0) + 1)
+    })
+  })
+
+  return {
+    paymentReferenceCounts: buildPaymentReferenceCounts(rows),
+    resolvedPayerNameCounts,
+    isHistoricalEvent: isHistoricalEvent(event),
+  }
 }
 
 export function buildPaymentReferenceCounts(registrations = []) {
@@ -194,14 +286,20 @@ export function buildPaymentReferenceCounts(registrations = []) {
 export function classifyRegistrationFinance(registration = {}, event = {}, context = {}) {
   const computed = calculateRegistrationFinance(registration, event)
   const warnings = []
+  const classificationContext = {
+    ...buildFinanceClassificationContext([registration], event),
+    ...(context || {}),
+  }
   const personsRaw = hasRawValue(registration?.personsAttending) ? Number(registration.personsAttending) : 1
   const explicitBalance = parseMoney(registration?.balanceDue)
   const expectedBalance = computed.amountDue !== null ? Math.max(0, roundMoney(computed.amountDue - computed.amountPaid)) : null
   const reference = normalizePaymentReference(registration?.paymentReference)
-  const referenceCounts = context?.paymentReferenceCounts
+  const referenceCounts = classificationContext?.paymentReferenceCounts
   const duplicateReference = reference && referenceCounts?.get(reference) > 1
   const paymentStatusRaw = String(registration?.paymentStatus || '').trim()
   const paymentMethodRaw = String(registration?.paymentMethod || '').trim()
+  const historicalEvent = Boolean(classificationContext?.isHistoricalEvent ?? isHistoricalEvent(event))
+  const paymentEvidenceClass = String(registration?.paymentEvidenceClass || '').trim()
   const moneyFields = [
     ['ticketPrice', 'Ticket price'],
     ['amountDue', 'Amount due'],
@@ -264,7 +362,7 @@ export function classifyRegistrationFinance(registration = {}, event = {}, conte
   const hasPositiveBalance = (computed.balanceDue || 0) > 0
   const missingTicketPrice = computed.ticketPrice === null
   const missingAmountDue = computed.amountDue === null
-  const missingRecordedAmount = (computed.paymentStatus === 'paid' || computed.paymentStatus === 'door')
+  const missingRecordedAmountBase = (computed.paymentStatus === 'paid' || computed.paymentStatus === 'door')
     && !hasPositiveBalance
     && (!hasRawValue(registration?.amountPaid) || missingTicketPrice || missingAmountDue)
   const missingPaymentMethod = !paymentMethodRaw || computed.paymentMethod === 'unknown'
@@ -294,6 +392,19 @@ export function classifyRegistrationFinance(registration = {}, event = {}, conte
   const missingPaymentReference = isResolvedPaid
     && referenceExpected
     && !String(registration?.paymentReference || '').trim()
+  const fullNameKey = normalizeRelationshipKey(registration?.fullName)
+  const buyerNameKey = normalizeRelationshipKey(registration?.buyerName)
+  const hasDistinctBuyer = Boolean(fullNameKey && buyerNameKey && fullNameKey !== buyerNameKey)
+  const payerCoveredGroupGuest = hasDistinctBuyer
+    && !hasPositiveBalance
+    && (computed.amountDue || 0) === 0
+    && (computed.amountPaid || 0) === 0
+    && (classificationContext?.resolvedPayerNameCounts?.get(buyerNameKey) || 0) > 1
+  const missingRecordedAmount = missingRecordedAmountBase && !payerCoveredGroupGuest
+  const legacyImportMetadataGap = historicalEvent
+    && registration?.source === 'csv-import'
+    && isPaymentResolved
+    && !hasPositiveBalance
   const displayBalanceDue = hasPositiveBalance
     ? computed.balanceDue
     : isPaymentResolved
@@ -318,59 +429,111 @@ export function classifyRegistrationFinance(registration = {}, event = {}, conte
   }
 
   const dataReviewReasons = []
+  const baseHistoricalCategories = uniqueStrings([
+    legacyImportMetadataGap ? 'legacy-import-data' : null,
+    !paymentEvidenceClass ? 'evidence-classification-missing' : null,
+    legacyImportMetadataGap ? 'no-action-required' : null,
+  ])
   if ((statusGroup === 'paid' || statusGroup === 'door') && !hasPositiveBalance && missingRecordedAmount) {
-    dataReviewReasons.push(reviewReason(
+    dataReviewReasons.push(dataReviewReason(
       'paid-amount-not-recorded',
       statusGroup === 'door' ? 'Door Paid — Amount Not Recorded' : 'Paid — Amount Not Recorded',
       'Payment is confirmed, but the exact ticket amount was not recorded.',
-      'data-review',
+      'internal-cleanup',
+      uniqueStrings([
+        'paid-amount-not-recorded',
+        missingPaymentReference ? 'missing-payment-reference' : null,
+      ]),
+      {
+        activeReview: true,
+      },
     ))
   }
-  if (isPaymentResolved && missingPaymentMethod) {
-    dataReviewReasons.push(reviewReason(
+  if (isPaymentResolved && missingPaymentMethod && !payerCoveredGroupGuest) {
+    dataReviewReasons.push(dataReviewReason(
       'missing-payment-method',
       'Missing Payment Method',
-      'Payment is resolved, but the payment method is not recorded clearly.',
-      'data-review',
+      legacyImportMetadataGap
+        ? 'Payment is resolved, but the historical import did not preserve a reliable payment method.'
+        : 'Payment is resolved, but the payment method is not recorded clearly.',
+      legacyImportMetadataGap ? 'historical-limitation' : 'internal-cleanup',
+      uniqueStrings([
+        'missing-payment-method',
+        ...baseHistoricalCategories,
+      ]),
+      {
+        activeReview: !legacyImportMetadataGap,
+      },
     ))
   }
   if (isResolvedPaid && missingPaymentReference) {
-    dataReviewReasons.push(reviewReason(
+    dataReviewReasons.push(dataReviewReason(
       'missing-payment-reference',
       'Missing Payment Reference',
-      'Payment is resolved, but no payment reference was recorded.',
-      'data-review',
+      legacyImportMetadataGap
+        ? 'Payment is resolved, but the historical import did not preserve a recoverable payment reference.'
+        : 'Payment is resolved, but no payment reference was recorded.',
+      legacyImportMetadataGap && !missingRecordedAmount ? 'historical-limitation' : 'internal-cleanup',
+      uniqueStrings([
+        'missing-payment-reference',
+        ...baseHistoricalCategories,
+      ]),
+      {
+        activeReview: !(legacyImportMetadataGap && !missingRecordedAmount),
+      },
     ))
   }
   if (warnings.some((item) => ['amount-due-mismatch', 'balance-mismatch', 'overpaid'].includes(item.code))) {
-    dataReviewReasons.push(reviewReason(
+    dataReviewReasons.push(dataReviewReason(
       'amount-mismatch',
       'Amount Mismatch',
       'Recorded finance amounts do not align and should be reviewed internally.',
-      'data-review',
+      'action-required',
+      ['amount-mismatch'],
+      {
+        activeReview: true,
+      },
     ))
   }
   if (duplicateReference) {
-    dataReviewReasons.push(reviewReason(
+    dataReviewReasons.push(dataReviewReason(
       'possible-duplicate-payment',
       'Possible Duplicate Payment',
       'A payment reference appears on more than one registration and should be reviewed.',
-      'data-review',
+      'action-required',
+      ['possible-duplicate-payment'],
+      {
+        activeReview: true,
+      },
     ))
   }
   if (statusGroup === 'complimentary' && (hasPositiveBalance || computed.amountDue > 0)) {
-    dataReviewReasons.push(reviewReason(
+    dataReviewReasons.push(dataReviewReason(
       'complimentary-classification-review',
       'Complimentary Classification Review',
       'Complimentary status should be checked against the recorded finance details.',
-      'data-review',
+      'action-required',
+      ['organizer-decision-required'],
+      {
+        activeReview: true,
+      },
     ))
   }
 
   const reviewReasons = [...paymentFollowUpReasons, ...dataReviewReasons]
   const paymentFollowUpRequired = paymentFollowUpReasons.length > 0
   const dataReviewRequired = !paymentFollowUpRequired && dataReviewReasons.length > 0
-  const primaryReviewReason = reviewReasons[0] || null
+  const dataReviewSeverity = dataReviewRequired ? primarySeverity(dataReviewReasons) : null
+  const dataReviewSeverityLabel = dataReviewSeverity ? DATA_REVIEW_SEVERITY_LABELS[dataReviewSeverity] : null
+  const dataReviewProminent = dataReviewRequired && ['action-required', 'internal-cleanup'].includes(dataReviewSeverity)
+  const dataReviewCategoryKeys = uniqueStrings(dataReviewReasons.flatMap((reason) => reason.categoryKeys || []))
+  const dataReviewCategoryLabels = categoryLabels(dataReviewCategoryKeys)
+  const dataReviewPrimaryCategory = dataReviewCategoryKeys[0] || null
+  const dataReviewPrimaryCategoryLabel = dataReviewPrimaryCategory ? DATA_REVIEW_CATEGORY_LABELS[dataReviewPrimaryCategory] : null
+  const dataReviewPrimaryReason = dataReviewReasons
+    .slice()
+    .sort((left, right) => severityRank(left.severity) - severityRank(right.severity))[0] || null
+  const primaryReviewReason = paymentFollowUpReasons[0] || dataReviewPrimaryReason || null
 
   return {
     ...computed,
@@ -384,8 +547,19 @@ export function classifyRegistrationFinance(registration = {}, event = {}, conte
     outstandingPayment: paymentFollowUpReasons.some((reason) => reason.code === 'outstanding-payment'),
     paymentFollowUpRequired,
     dataReviewRequired,
+    dataReviewProminent,
+    dataReviewSeverity,
+    dataReviewSeverityLabel,
+    dataReviewPrimaryCategory,
+    dataReviewPrimaryCategoryLabel,
+    dataReviewCategoryKeys,
+    dataReviewCategoryLabels,
+    dataReviewActionRequired: dataReviewSeverity === 'action-required',
+    dataReviewInternalCleanup: dataReviewSeverity === 'internal-cleanup',
+    dataReviewHistoricalLimitation: dataReviewSeverity === 'historical-limitation',
+    dataReviewInformationalOnly: dataReviewSeverity === 'informational-only',
     reviewCategory: paymentFollowUpRequired ? 'payment-follow-up' : dataReviewRequired ? 'data-review' : null,
-    reviewCategoryLabel: paymentFollowUpRequired ? 'Payment Follow-Up' : dataReviewRequired ? 'Data Review' : null,
+    reviewCategoryLabel: paymentFollowUpRequired ? 'Payment Follow-Up' : dataReviewSeverityLabel,
     reviewLabel: primaryReviewReason?.label || null,
     reviewMessage: primaryReviewReason?.message || null,
     reviewMessages: reviewReasons.map((reason) => reason.message),
@@ -415,7 +589,7 @@ function registrationDisplayName(registration = {}) {
 
 export function buildPaymentsWorkspace(registrations = [], event = {}) {
   const rows = Array.isArray(registrations) ? registrations : []
-  const paymentReferenceCounts = buildPaymentReferenceCounts(rows)
+  const classificationContext = buildFinanceClassificationContext(rows, event)
   const summary = {
     currency: getCurrencyCode(event || {}),
     registrationCount: 0,
@@ -435,11 +609,18 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
     financeReviewCount: 0,
     paymentFollowUpCount: 0,
     dataReviewCount: 0,
+    actionRequiredCount: 0,
+    internalCleanupCount: 0,
+    historicalLimitationCount: 0,
+    informationalOnlyCount: 0,
+    prominentDataReviewCount: 0,
+    paidAmountNotRecordedCount: 0,
     needsFollowUpCount: 0,
+    dataReviewCategoryCounts: Object.fromEntries(Object.keys(DATA_REVIEW_CATEGORY_LABELS).map((key) => [key, 0])),
   }
 
   const paymentRows = rows.map((registration) => {
-    const finance = classifyRegistrationFinance(registration, event, { paymentReferenceCounts })
+    const finance = classifyRegistrationFinance(registration, event, classificationContext)
     const row = {
       registrationId: registration?.registrationId || registration?.id || '',
       name: registrationDisplayName(registration),
@@ -470,6 +651,17 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
       reviewMessages: finance.reviewMessages,
       paymentFollowUpRequired: finance.paymentFollowUpRequired,
       dataReviewRequired: finance.dataReviewRequired,
+      dataReviewProminent: finance.dataReviewProminent,
+      dataReviewSeverity: finance.dataReviewSeverity,
+      dataReviewSeverityLabel: finance.dataReviewSeverityLabel,
+      dataReviewPrimaryCategory: finance.dataReviewPrimaryCategory,
+      dataReviewPrimaryCategoryLabel: finance.dataReviewPrimaryCategoryLabel,
+      dataReviewCategoryKeys: finance.dataReviewCategoryKeys,
+      dataReviewCategoryLabels: finance.dataReviewCategoryLabels,
+      dataReviewActionRequired: finance.dataReviewActionRequired,
+      dataReviewInternalCleanup: finance.dataReviewInternalCleanup,
+      dataReviewHistoricalLimitation: finance.dataReviewHistoricalLimitation,
+      dataReviewInformationalOnly: finance.dataReviewInformationalOnly,
       outstandingPayment: finance.outstandingPayment,
       paymentReminderEligible: finance.paymentReminderEligible,
       needsFollowUp: finance.needsFollowUp,
@@ -494,6 +686,15 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
     if (finance.dataReviewRequired) summary.financeReviewCount += 1
     if (finance.paymentFollowUpRequired) summary.paymentFollowUpCount += 1
     if (finance.dataReviewRequired) summary.dataReviewCount += 1
+    if (finance.dataReviewProminent) summary.prominentDataReviewCount += 1
+    if (finance.dataReviewActionRequired) summary.actionRequiredCount += 1
+    if (finance.dataReviewInternalCleanup) summary.internalCleanupCount += 1
+    if (finance.dataReviewHistoricalLimitation) summary.historicalLimitationCount += 1
+    if (finance.dataReviewInformationalOnly) summary.informationalOnlyCount += 1
+    if (finance.dataReviewCategoryKeys.includes('paid-amount-not-recorded')) summary.paidAmountNotRecordedCount += 1
+    finance.dataReviewCategoryKeys.forEach((categoryKey) => {
+      summary.dataReviewCategoryCounts[categoryKey] = (summary.dataReviewCategoryCounts[categoryKey] || 0) + 1
+    })
     if (finance.needsFollowUp) summary.needsFollowUpCount += 1
     return row
   })
@@ -503,6 +704,16 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
     'needs-follow-up': paymentRows.filter((row) => row.paymentFollowUpRequired).length,
     'payment-follow-up': paymentRows.filter((row) => row.paymentFollowUpRequired).length,
     'data-review': paymentRows.filter((row) => row.dataReviewRequired).length,
+    'action-required': paymentRows.filter((row) => row.dataReviewActionRequired).length,
+    'internal-cleanup': paymentRows.filter((row) => row.dataReviewInternalCleanup).length,
+    'historical-limitation': paymentRows.filter((row) => row.dataReviewHistoricalLimitation).length,
+    'informational-only': paymentRows.filter((row) => row.dataReviewInformationalOnly).length,
+    'paid-amount-not-recorded': paymentRows.filter((row) => row.dataReviewCategoryKeys.includes('paid-amount-not-recorded')).length,
+    'missing-method': paymentRows.filter((row) => row.dataReviewCategoryKeys.includes('missing-payment-method')).length,
+    'missing-reference': paymentRows.filter((row) => row.dataReviewCategoryKeys.includes('missing-payment-reference')).length,
+    'group-booking-metadata': paymentRows.filter((row) => row.dataReviewCategoryKeys.includes('group-booking-metadata')).length,
+    'possible-duplicate': paymentRows.filter((row) => row.dataReviewCategoryKeys.includes('possible-duplicate-payment')).length,
+    'amount-mismatch': paymentRows.filter((row) => row.dataReviewCategoryKeys.includes('amount-mismatch')).length,
     paid: paymentRows.filter((row) => row.isResolvedPaid).length,
     partial: paymentRows.filter((row) => row.statusGroup === 'partial').length,
     pending: paymentRows.filter((row) => row.statusGroup === 'pending').length,
@@ -516,6 +727,8 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
     rows: paymentRows,
     paymentFollowUpRows: paymentRows.filter((row) => row.paymentFollowUpRequired),
     dataReviewRows: paymentRows.filter((row) => row.dataReviewRequired),
+    prominentDataReviewRows: paymentRows.filter((row) => row.dataReviewProminent),
+    historicalDataReviewRows: paymentRows.filter((row) => row.dataReviewHistoricalLimitation),
     followUpRows: paymentRows.filter((row) => row.paymentFollowUpRequired),
     summary,
     filterCounts,
@@ -526,6 +739,16 @@ export function paymentFilterMatches(row = {}, filter = 'all') {
   if (!filter || filter === 'all') return true
   if (filter === 'needs-follow-up' || filter === 'payment-follow-up') return Boolean(row.paymentFollowUpRequired)
   if (filter === 'data-review') return Boolean(row.dataReviewRequired)
+  if (filter === 'action-required') return Boolean(row.dataReviewActionRequired)
+  if (filter === 'internal-cleanup') return Boolean(row.dataReviewInternalCleanup)
+  if (filter === 'historical-limitation') return Boolean(row.dataReviewHistoricalLimitation)
+  if (filter === 'informational-only') return Boolean(row.dataReviewInformationalOnly)
+  if (filter === 'paid-amount-not-recorded') return row.dataReviewCategoryKeys?.includes('paid-amount-not-recorded')
+  if (filter === 'missing-method') return row.dataReviewCategoryKeys?.includes('missing-payment-method')
+  if (filter === 'missing-reference') return row.dataReviewCategoryKeys?.includes('missing-payment-reference')
+  if (filter === 'group-booking-metadata') return row.dataReviewCategoryKeys?.includes('group-booking-metadata')
+  if (filter === 'possible-duplicate') return row.dataReviewCategoryKeys?.includes('possible-duplicate-payment')
+  if (filter === 'amount-mismatch') return row.dataReviewCategoryKeys?.includes('amount-mismatch')
   if (filter === 'paid') return Boolean(row.isResolvedPaid)
   if (filter === 'door') return row.statusGroup === 'door' || row.statusGroup === 'door-list'
   if (filter === 'finance-review') return Boolean(row.dataReviewRequired)

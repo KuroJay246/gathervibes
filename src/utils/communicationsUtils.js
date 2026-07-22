@@ -1,7 +1,14 @@
 import { searchableRegistrationText } from './ticketUtils.js'
 import { formatEventDate } from './dateUtils.js'
 import { formatPaymentLabel, paymentStatusMatches } from './paymentStatus.js'
-import { buildFinanceSummary, calculateRegistrationFinance, classifyRegistrationFinance, formatCurrency, formatPaymentMethod } from './financeUtils.js'
+import {
+  buildFinanceClassificationContext,
+  buildFinanceSummary,
+  calculateRegistrationFinance,
+  classifyRegistrationFinance,
+  formatCurrency,
+  formatPaymentMethod,
+} from './financeUtils.js'
 
 export const COMMUNICATION_TEMPLATES = [
   {
@@ -81,12 +88,12 @@ export const COMMUNICATION_SEGMENTS = {
     ['all', 'All finance segments'],
     ['outstanding', 'Payment outstanding'],
     ['payment-follow-up', 'Payment follow-up'],
-    ['data-review', 'Data review only'],
+    ['data-review', 'Active data review'],
     ['pending-payment', 'Pending payment'],
     ['door-payment', 'Door expected'],
     ['paid-guests', 'Paid guests'],
     ['complimentary-guests', 'Complimentary guests'],
-    ['missing-payment-reference', 'Missing payment reference'],
+    ['missing-payment-reference', 'Active missing payment reference'],
     ['missing-ticket-code', 'Missing ticket code'],
     ['balance-due', 'Balance due greater than 0'],
     ['amount-paid-zero', 'Paid amount not recorded'],
@@ -166,25 +173,27 @@ export function buildMissingDataWarnings(registration = {}, event = {}) {
   return warnings
 }
 
-export function filterCommunicationsRegistrations(registrations, filters, searchQuery = '') {
+export function filterCommunicationsRegistrations(registrations, filters, searchQuery = '', event = {}) {
+  const financeContext = buildFinanceClassificationContext(registrations, event)
+
   return registrations.filter((reg) => {
     // Payment Status Filter
     if (!paymentStatusMatches(reg.paymentStatus, filters.paymentStatus)) {
       return false
     }
 
-    const finance = classifyRegistrationFinance(reg)
+    const finance = classifyRegistrationFinance(reg, event, financeContext)
     if (filters.financeSegment === 'outstanding' && !finance.outstandingPayment) return false
     if (filters.financeSegment === 'payment-follow-up' && !finance.paymentFollowUpRequired) return false
-    if (filters.financeSegment === 'data-review' && !finance.dataReviewRequired) return false
+    if (filters.financeSegment === 'data-review' && !finance.dataReviewProminent) return false
     if (filters.financeSegment === 'pending-payment' && !['pending', 'partial', 'unknown'].includes(finance.statusGroup)) return false
     if (filters.financeSegment === 'door-payment' && finance.statusGroup !== 'door-list') return false
     if (filters.financeSegment === 'paid-guests' && !finance.isResolvedPaid) return false
     if (filters.financeSegment === 'complimentary-guests' && finance.paymentStatus !== 'complimentary') return false
-    if (filters.financeSegment === 'missing-payment-reference' && !((finance.statusGroup === 'paid' || finance.statusGroup === 'door') && !reg.paymentReference)) return false
+    if (filters.financeSegment === 'missing-payment-reference' && !(finance.dataReviewProminent && finance.dataReviewCategoryKeys?.includes('missing-payment-reference'))) return false
     if (filters.financeSegment === 'missing-ticket-code' && reg.ticketCode) return false
     if (filters.financeSegment === 'balance-due' && !finance.outstandingPayment) return false
-    if (filters.financeSegment === 'amount-paid-zero' && finance.reviewLabel !== 'Paid — Amount Not Recorded' && finance.reviewLabel !== 'Door Paid — Amount Not Recorded') return false
+    if (filters.financeSegment === 'amount-paid-zero' && !finance.dataReviewCategoryKeys?.includes('paid-amount-not-recorded')) return false
 
     // Check-in Status Filter
     if (filters.checkInStatus === 'checked-in' && !reg.checkedIn) return false

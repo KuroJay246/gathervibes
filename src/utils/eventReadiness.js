@@ -1,4 +1,4 @@
-import { classifyRegistrationFinance } from './financeUtils.js'
+import { buildFinanceClassificationContext, classifyRegistrationFinance } from './financeUtils.js'
 import { buildRegistrationMetrics } from './registrationMetrics.js'
 import {
   buildOperationsControlSummary,
@@ -74,20 +74,23 @@ export function buildEventReadiness(event = null, registrations = [], operations
   const operationsTotals = buildOperationsTotals(operationsEntries)
   const operationsCounts = buildOperationsEntryCounts(operationsEntries)
   const operationsSummary = buildOperationsControlSummary(operationsEntries)
+  const financeContext = buildFinanceClassificationContext(rows, event)
 
   let pendingPayments = 0
   let paidMissingTicket = 0
   let missingTicket = 0
   let missingContact = 0
   let reviewNeeded = 0
+  let historicalReviewCount = 0
 
   rows.forEach((registration) => {
-    const finance = classifyRegistrationFinance(registration, event)
+    const finance = classifyRegistrationFinance(registration, event, financeContext)
     if (finance.paymentFollowUpRequired) pendingPayments += 1
     if (!registration.ticketCode) missingTicket += 1
     if ((finance.paymentStatus === 'paid' || finance.paymentStatus === 'door') && !registration.ticketCode) paidMissingTicket += 1
     if (!String(registration.email || '').trim() && !String(registration.phone || '').trim()) missingContact += 1
-    if (finance.dataReviewRequired || registration.financeReviewRequired) reviewNeeded += 1
+    if (finance.dataReviewProminent || registration.financeReviewRequired) reviewNeeded += 1
+    if (finance.dataReviewHistoricalLimitation) historicalReviewCount += 1
   })
 
   const duplicateContactRows = countDuplicateContactRows(rows)
@@ -113,7 +116,7 @@ export function buildEventReadiness(event = null, registrations = [], operations
       pendingPayments > 0
         ? `${pendingPayments} registration${pendingPayments === 1 ? '' : 's'} still need payment follow-up.`
         : reviewNeeded > 0
-          ? `${reviewNeeded} registration${reviewNeeded === 1 ? '' : 's'} still need internal finance data review.`
+          ? `${reviewNeeded} registration${reviewNeeded === 1 ? '' : 's'} still need active finance review or cleanup.`
           : 'Payments look settled or intentionally complimentary.',
     ),
     buildCategory(
@@ -183,7 +186,7 @@ export function buildEventReadiness(event = null, registrations = [], operations
       key: 'data-incomplete',
       label: 'Data Review',
       statusLabel: missingContact > 0 ? 'Needs attention' : 'Review',
-      summary: `${dataQualityWarnings} contact/duplicate warning${dataQualityWarnings === 1 ? '' : 's'} and ${reviewNeeded} finance data-review row${reviewNeeded === 1 ? '' : 's'}.`,
+      summary: `${dataQualityWarnings} contact/duplicate warning${dataQualityWarnings === 1 ? '' : 's'} and ${reviewNeeded} active finance review row${reviewNeeded === 1 ? '' : 's'}.`,
       to: duplicateContactRows > 0 ? '/registrations?review=duplicate-contacts' : '/registrations',
       linkLabel: duplicateContactRows > 0 ? 'Review repeated contacts' : 'Open Registrations',
     })
@@ -232,6 +235,7 @@ export function buildEventReadiness(event = null, registrations = [], operations
       missingTicket,
       missingContact,
       reviewNeeded,
+      historicalReviewCount,
       duplicateContactRows,
       dataQualityWarnings,
       checkInPercent,

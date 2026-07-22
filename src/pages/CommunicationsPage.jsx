@@ -88,8 +88,8 @@ export function CommunicationsPage() {
 
   const availableGroups = useMemo(() => extractAvailableGroups(registrations), [registrations])
   const filteredRegistrations = useMemo(
-    () => filterCommunicationsRegistrations(registrations, filters, searchQuery),
-    [filters, registrations, searchQuery],
+    () => filterCommunicationsRegistrations(registrations, filters, searchQuery, activeEvent),
+    [activeEvent, filters, registrations, searchQuery],
   )
   const summary = useMemo(() => buildCommunicationsSegmentSummary(filteredRegistrations, activeEvent), [activeEvent, filteredRegistrations])
   const messages = useMemo(() => buildCommunicationMessages(filteredRegistrations, draftContent, activeEvent), [activeEvent, draftContent, filteredRegistrations])
@@ -159,7 +159,7 @@ Data context for this segment:
 
       <div className="rounded-xl border border-[#EFE2DA] bg-[#FFF8F2] px-4 py-3 text-sm text-[#80685B]">
         <strong>Copy-only:</strong> This page prepares text for clipboard copy. It does not send email or WhatsApp messages, write delivery logs, or connect to an AI API.
-        <span className="mt-1 block text-xs">Use segments to choose recipients; buyer/contact can be different from attendee names, and Door Paid is not the same as To Pay at Door.</span>
+        <span className="mt-1 block text-xs">Use segments to choose recipients; buyer/contact can be different from attendee names, Door Paid is not the same as To Pay at Door, and historical finance limitations stay out of active reminder audiences.</span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
