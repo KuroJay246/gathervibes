@@ -43,7 +43,7 @@ const EMPTY_FORM = {
 const PAYMENT_METHOD_OPTIONS = [
   ['cash', 'Cash'],
   ['bank-transfer', 'Bank Transfer'],
-  ['firstpay', 'FirstPay'],
+  ['firstpay', 'CIBC 1stPay'],
   ['card', 'Card'],
   ['unknown', 'Unknown / Not Recorded'],
 ]

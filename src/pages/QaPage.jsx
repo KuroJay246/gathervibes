@@ -147,7 +147,7 @@ export function QaPage() {
       const qrPrivateData = qrPayloadForTicketCode(ticketCodes[0] || 'QA-001')
       const hasPrivateQrData = /@|buyer|guest|phone|note/i.test(qrPrivateData)
       const missingTicketPrice = rows.filter((row) => calculateRegistrationFinance(row, activeEvent).ticketPrice === null)
-      const missingPaidAmount = rows.filter((row) => calculateRegistrationFinance(row, activeEvent).paymentStatus === 'paid' && calculateRegistrationFinance(row, activeEvent).amountPaid === 0)
+      const paidAmountNotRecorded = paymentsWorkspace.rows.filter((row) => row.reviewLabel === 'Paid — Amount Not Recorded' || row.reviewLabel === 'Door Paid — Amount Not Recorded')
       const balanceMismatch = rows.filter((row) => financeWarnings(row, activeEvent).some((warning) => /Amount due does not match/.test(warning)))
       const paidOutstanding = rows.filter((row) => {
         const finance = calculateRegistrationFinance(row, activeEvent)
@@ -176,9 +176,10 @@ export function QaPage() {
         { label: 'Total outstanding', status: financeSummary.totalOutstanding > 0 ? 'warning' : 'pass', detail: formatCurrency(financeSummary.totalOutstanding) },
         { label: 'Payments workspace boundary', status: 'pass', detail: `${paymentsWorkspace.summary.registrationCount} registration payment records reviewed; Operations Ledger records are not included.` },
         { label: 'Overall event profit boundary', status: 'pass', detail: 'Overall event profit is not calculated automatically; review Payments and Operations as separate record sets.' },
-        { label: 'Payment follow-up records', status: paymentsWorkspace.summary.needsFollowUpCount ? 'warning' : 'pass', detail: `${paymentsWorkspace.summary.needsFollowUpCount} registration records need follow-up` },
+        { label: 'Payment follow-up records', status: paymentsWorkspace.summary.paymentFollowUpCount ? 'warning' : 'pass', detail: `${paymentsWorkspace.summary.paymentFollowUpCount} registration records may still require patron payment follow-up` },
+        { label: 'Finance data cleanup records', status: paymentsWorkspace.summary.dataReviewCount ? 'warning' : 'pass', detail: `${paymentsWorkspace.summary.dataReviewCount} resolved registration records still need internal data review` },
         { label: 'Missing ticket price', status: missingTicketPrice.length ? 'warning' : 'pass', detail: `${missingTicketPrice.length} rows` },
-        { label: 'Missing amount paid on paid rows', status: missingPaidAmount.length ? 'warning' : 'pass', detail: `${missingPaidAmount.length} rows` },
+        { label: 'Paid amount not recorded', status: paidAmountNotRecorded.length ? 'warning' : 'pass', detail: `${paidAmountNotRecorded.length} rows` },
         { label: 'Balance due mismatch', status: balanceMismatch.length ? 'warning' : 'pass', detail: `${balanceMismatch.length} rows` },
         { label: 'Paid status with outstanding balance', status: paidOutstanding.length ? 'fail' : 'pass', detail: `${paidOutstanding.length} rows` },
         { label: 'Complimentary with amount due', status: complimentaryDue.length ? 'warning' : 'pass', detail: `${complimentaryDue.length} rows` },

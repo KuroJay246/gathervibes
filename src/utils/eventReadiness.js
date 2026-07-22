@@ -1,4 +1,4 @@
-import { calculateRegistrationFinance } from './financeUtils.js'
+import { classifyRegistrationFinance } from './financeUtils.js'
 import { buildRegistrationMetrics } from './registrationMetrics.js'
 import {
   buildOperationsControlSummary,
@@ -82,12 +82,12 @@ export function buildEventReadiness(event = null, registrations = [], operations
   let reviewNeeded = 0
 
   rows.forEach((registration) => {
-    const finance = calculateRegistrationFinance(registration, event)
-    if (finance.paymentStatus === 'pending' || finance.paymentStatus === 'door-list' || (finance.balanceDue || 0) > 0) pendingPayments += 1
+    const finance = classifyRegistrationFinance(registration, event)
+    if (finance.paymentFollowUpRequired) pendingPayments += 1
     if (!registration.ticketCode) missingTicket += 1
     if ((finance.paymentStatus === 'paid' || finance.paymentStatus === 'door') && !registration.ticketCode) paidMissingTicket += 1
     if (!String(registration.email || '').trim() && !String(registration.phone || '').trim()) missingContact += 1
-    if (finance.needsFinanceReview || registration.financeReviewRequired) reviewNeeded += 1
+    if (finance.dataReviewRequired || registration.financeReviewRequired) reviewNeeded += 1
   })
 
   const duplicateContactRows = countDuplicateContactRows(rows)
@@ -113,7 +113,7 @@ export function buildEventReadiness(event = null, registrations = [], operations
       pendingPayments > 0
         ? `${pendingPayments} registration${pendingPayments === 1 ? '' : 's'} still need payment follow-up.`
         : reviewNeeded > 0
-          ? `${reviewNeeded} registration${reviewNeeded === 1 ? '' : 's'} still need finance review.`
+          ? `${reviewNeeded} registration${reviewNeeded === 1 ? '' : 's'} still need internal finance data review.`
           : 'Payments look settled or intentionally complimentary.',
     ),
     buildCategory(
@@ -161,9 +161,9 @@ export function buildEventReadiness(event = null, registrations = [], operations
   if (pendingPayments > 0) {
     actionItems.push({
       key: 'pending-payments',
-      label: 'Payment pending',
+      label: 'Payment Follow-Up',
       statusLabel: 'Needs attention',
-      summary: `${pendingPayments} registration${pendingPayments === 1 ? '' : 's'} still need payment follow-up or door review.`,
+      summary: `${pendingPayments} registration${pendingPayments === 1 ? '' : 's'} still need payment follow-up or balance resolution.`,
       to: '/registrations',
       linkLabel: 'Open Registrations',
     })
@@ -181,9 +181,9 @@ export function buildEventReadiness(event = null, registrations = [], operations
   if (dataQualityWarnings > 0 || reviewNeeded > 0) {
     actionItems.push({
       key: 'data-incomplete',
-      label: 'Data incomplete',
+      label: 'Data Review',
       statusLabel: missingContact > 0 ? 'Needs attention' : 'Review',
-      summary: `${dataQualityWarnings} contact/duplicate warning${dataQualityWarnings === 1 ? '' : 's'} and ${reviewNeeded} finance review row${reviewNeeded === 1 ? '' : 's'}.`,
+      summary: `${dataQualityWarnings} contact/duplicate warning${dataQualityWarnings === 1 ? '' : 's'} and ${reviewNeeded} finance data-review row${reviewNeeded === 1 ? '' : 's'}.`,
       to: duplicateContactRows > 0 ? '/registrations?review=duplicate-contacts' : '/registrations',
       linkLabel: duplicateContactRows > 0 ? 'Review repeated contacts' : 'Open Registrations',
     })

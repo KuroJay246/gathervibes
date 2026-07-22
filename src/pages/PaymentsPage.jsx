@@ -16,14 +16,14 @@ import { countEvidenceClasses, getEventFinancialEvidenceAudit } from '../utils/f
 
 const PAYMENT_FILTERS = [
   ['all', 'All'],
-  ['needs-follow-up', 'Needs Follow-Up'],
+  ['payment-follow-up', 'Payment Follow-Up'],
+  ['data-review', 'Data Review'],
   ['paid', 'Paid'],
   ['partial', 'Partial'],
   ['pending', 'Pending'],
   ['door', 'Door'],
   ['complimentary', 'Complimentary'],
   ['unknown', 'Unknown'],
-  ['finance-review', 'Finance Review'],
 ]
 
 function Metric({ label, value, help }) {
@@ -40,25 +40,35 @@ function BoundaryNotice() {
   return (
     <section className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
       <strong className="text-[#4E3928]">Registration payment records only.</strong> This page reviews registration charges,
-      payments received, balances, methods, and follow-up flags. It is not a payment gateway, processor report,
+      payments received, balances, methods, payment follow-up, and internal data review. It is not a payment gateway, processor report,
       bank reconciliation, invoice system, or accounting ledger. Operations remains separate for sponsor income,
       vendor payments, expenses, refunds, reimbursements, and adjustments.
     </section>
   )
 }
 
+function receivedDisplay(row, currency) {
+  if (['Paid — Amount Not Recorded', 'Door Paid — Amount Not Recorded'].includes(row.reviewLabel) && row.amountPaid === 0) {
+    return 'Amount not recorded'
+  }
+  return formatCurrency(row.amountPaid, currency)
+}
+
 function PaymentCard({ row, currency }) {
   const details = [
     ['Expected', row.amountDue === null ? 'Needs review' : formatCurrency(row.amountDue, currency)],
-    ['Received', formatCurrency(row.amountPaid, currency)],
-    ['Balance', row.balanceDue === null ? 'Needs review' : formatCurrency(row.balanceDue, currency)],
+    ['Received', receivedDisplay(row, currency)],
+    ['Outstanding', row.displayBalanceDue === null ? 'Needs review' : formatCurrency(row.displayBalanceDue, currency)],
     ['Price tier', row.priceTier || 'Needs review'],
     ['Ticket price', row.ticketPrice === null ? 'Price needs review' : formatCurrency(row.ticketPrice, currency)],
     ['Method', formatPaymentMethod(row.paymentMethod)],
+    ['Evidence', row.paymentEvidenceClass || 'Not recorded'],
     ['Reference', row.paymentReference || 'Not recorded'],
     ['Ticket', row.ticketCode || 'Missing ticket'],
   ]
-  const warnings = row.warnings.map((item) => item.message).join(' ')
+  const reviewText = row.reviewLabel
+    ? `${row.reviewCategoryLabel}: ${row.reviewLabel}${row.reviewMessage ? ` · ${row.reviewMessage}` : ''}`
+    : ''
 
   return (
     <article className="rounded-2xl border border-[#F2E8E1] bg-white p-4" aria-label={`${row.name} payment record`}>
@@ -83,10 +93,10 @@ function PaymentCard({ row, currency }) {
         ))}
       </dl>
 
-      {warnings ? (
+      {reviewText ? (
         <div className="mt-3 flex gap-2 rounded-xl border border-[#F1DBA9] bg-[#FFF8EA] p-3 text-xs leading-5 text-[#7A5818]" role="status">
           <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
-          <span className="min-w-0 break-words">{warnings}</span>
+          <span className="min-w-0 break-words">{reviewText}</span>
         </div>
       ) : (
         <p className="mt-3 text-xs text-[#816D62]">No warning</p>
@@ -95,14 +105,15 @@ function PaymentCard({ row, currency }) {
   )
 }
 
-function FollowUpList({ rows, currency }) {
+function ReviewList({ eyebrow, title, description, rows, currency, emptyMessage }) {
   const visibleRows = rows.slice(0, 8)
   return (
     <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Needs Follow-Up</p>
-          <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Registration payment records to review</h2>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">{eyebrow}</p>
+          <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">{title}</h2>
+          <p className="mt-2 max-w-3xl text-xs leading-5 text-[#816D62]">{description}</p>
         </div>
         <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
           {rows.length} flagged
@@ -111,7 +122,7 @@ function FollowUpList({ rows, currency }) {
 
       {rows.length === 0 ? (
         <p className="mt-5 rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
-          No registration payment follow-up is detected from the current records.
+          {emptyMessage}
         </p>
       ) : (
         <div className="mt-5 divide-y divide-[#F2E8E1]">
@@ -120,8 +131,9 @@ function FollowUpList({ rows, currency }) {
               <div>
                 <p className="text-sm font-bold text-[#2B1723]">{row.name}</p>
                 <p className="mt-1 text-xs leading-5 text-[#816D62]">
-                  {row.displayStatus} · Balance {formatCurrency(row.balanceDue, currency)}
-                  {row.warnings[0]?.message ? ` · ${row.warnings[0].message}` : ''}
+                  {row.displayStatus} · Outstanding {formatCurrency(row.displayBalanceDue ?? 0, currency)}
+                  {row.reviewLabel ? ` · ${row.reviewLabel}` : ''}
+                  {row.reviewMessage ? ` · ${row.reviewMessage}` : ''}
                 </p>
               </div>
               <Link to={`/registrations?reviewRegistration=${encodeURIComponent(row.registrationId)}`} className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#9A5260]">
@@ -142,13 +154,13 @@ export function PaymentsPage() {
   const { activeEvent } = useActiveEvent()
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('needs-follow-up')
+  const [filter, setFilter] = useState('payment-follow-up')
   const [search, setSearch] = useState('')
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     setRegistrations([])
-    setFilter('needs-follow-up')
+    setFilter('payment-follow-up')
     setSearch('')
     setLoading(Boolean(activeEvent?.eventId))
     if (!activeEvent?.eventId) return undefined
@@ -164,7 +176,12 @@ export function PaymentsPage() {
   }, [activeEvent?.eventId])
 
   const workspace = useMemo(() => buildPaymentsWorkspace(registrations, activeEvent), [activeEvent, registrations])
-  const visibleRows = workspace.rows.filter((row) => paymentFilterMatches(row, filter) && paymentSearchMatches(row, search))
+  const activeFilter = filter === 'payment-follow-up'
+    && (workspace.filterCounts['payment-follow-up'] || 0) === 0
+    && (workspace.filterCounts['data-review'] || 0) > 0
+    ? 'data-review'
+    : filter
+  const visibleRows = workspace.rows.filter((row) => paymentFilterMatches(row, activeFilter) && paymentSearchMatches(row, search))
   const currency = workspace.summary.currency
   const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(activeEvent?.eventId), [activeEvent?.eventId])
 
@@ -188,7 +205,7 @@ export function PaymentsPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Selected Working Event only</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Registration Payments</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
-            Review registration charges, payments, balances, and records that need follow-up for <strong>{activeEvent.eventName}</strong>.
+            Review registration charges, payments, balances, payment follow-up, and internal data cleanup for <strong>{activeEvent.eventName}</strong>.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -222,8 +239,9 @@ export function PaymentsPage() {
         <Metric label="To Pay at Door" value={workspace.summary.doorListRegistrations} />
         <Metric label="Complimentary registrations" value={workspace.summary.complimentaryRegistrations} help={`${workspace.summary.complimentaryGuests} complimentary guests`} />
         <Metric label="Unknown payment state" value={workspace.summary.unknownPaymentStates} />
-        <Metric label="Finance review" value={workspace.summary.financeReviewCount} />
-        <Metric label="Needs follow-up" value={workspace.summary.needsFollowUpCount} />
+        <Metric label="Outstanding payments" value={workspace.summary.outstandingRegistrations} help="Positive balances only" />
+        <Metric label="Payment Follow-Up" value={workspace.summary.paymentFollowUpCount} />
+        <Metric label="Data Review" value={workspace.summary.dataReviewCount} />
       </section>
 
       {evidenceAudit && (
@@ -255,7 +273,25 @@ export function PaymentsPage() {
         </section>
       )}
 
-      <FollowUpList rows={workspace.followUpRows} currency={currency} />
+      <ReviewList
+        eyebrow="Payment Follow-Up"
+        title="Records that may still need patron contact"
+        description="Use this list for registrations that still look unresolved for payment collection or balance follow-up."
+        rows={workspace.paymentFollowUpRows}
+        currency={currency}
+        emptyMessage={workspace.summary.dataReviewCount > 0
+          ? 'No patron payment follow-up is detected. Some records still need internal data review.'
+          : 'No patron payment follow-up is detected from the current records.'}
+      />
+
+      <ReviewList
+        eyebrow="Data Review"
+        title="Internal cleanup that does not imply customer debt"
+        description="Use this list for records that are operationally resolved but still missing or inconsistent finance details."
+        rows={workspace.dataReviewRows}
+        currency={currency}
+        emptyMessage="No internal finance data review is currently detected."
+      />
 
       <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -273,7 +309,7 @@ export function PaymentsPage() {
                 className="min-h-10 rounded-xl border border-[#E5D7CF] py-2 pl-9 pr-3 text-xs font-bold"
               />
             </label>
-            <select aria-label="Payment record filter" value={filter} onChange={(event) => setFilter(event.target.value)} className="min-h-10 rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
+            <select aria-label="Payment record filter" value={activeFilter} onChange={(event) => setFilter(event.target.value)} className="min-h-10 rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
               {PAYMENT_FILTERS.map(([value, label]) => (
                 <option key={value} value={value}>{label} ({workspace.filterCounts[value] ?? workspace.rows.length})</option>
               ))}
@@ -282,7 +318,7 @@ export function PaymentsPage() {
         </div>
 
         <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] px-4 py-3 text-xs leading-5 text-[#816D62]">
-          <strong className="text-[#6B564C]">How to use this:</strong> review flags here, then update the source registration record in Guests & Registrations. Do not add registration payments to Operations unless they are intentionally separate event-level ledger entries.
+          <strong className="text-[#6B564C]">How to use this:</strong> payment follow-up is for money that may still be due. Data Review is internal cleanup only. Do not add registration payments to Operations unless they are intentionally separate event-level ledger entries.
         </div>
 
         <div className="mt-4 lg:hidden" aria-label="Responsive payment records">
@@ -332,14 +368,21 @@ export function PaymentsPage() {
                         <p>{row.ticketPrice === null ? 'Price needs review' : formatCurrency(row.ticketPrice, currency)}</p>
                       </td>
                       <td className="px-3 py-3 font-bold">{row.amountDue === null ? 'Needs review' : formatCurrency(row.amountDue, currency)}</td>
-                      <td className="px-3 py-3 font-bold">{formatCurrency(row.amountPaid, currency)}</td>
-                      <td className="px-3 py-3 font-bold">{row.balanceDue === null ? 'Needs review' : formatCurrency(row.balanceDue, currency)}</td>
-                      <td className="max-w-[220px] break-words px-3 py-3 text-xs text-[#816D62]">{formatPaymentMethod(row.paymentMethod)}{row.paymentReference ? ` · ${row.paymentReference}` : ''}</td>
+                      <td className="px-3 py-3 font-bold">{receivedDisplay(row, currency)}</td>
+                      <td className="px-3 py-3 font-bold">{row.displayBalanceDue === null ? 'Needs review' : formatCurrency(row.displayBalanceDue, currency)}</td>
+                      <td className="max-w-[220px] break-words px-3 py-3 text-xs text-[#816D62]">
+                        {formatPaymentMethod(row.paymentMethod)}
+                        {row.paymentEvidenceClass ? ` · ${row.paymentEvidenceClass}` : ''}
+                        {row.paymentReference ? ` · ${row.paymentReference}` : ''}
+                      </td>
                       <td className="px-3 py-3">
-                        {row.warnings.length > 0 ? (
+                        {row.reviewLabel ? (
                           <div className="flex max-w-xs gap-2 text-xs leading-5 text-[#7A5818]">
                             <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
-                            <span>{row.warnings.map((item) => item.message).join(' ')}</span>
+                            <span>
+                              <strong>{row.reviewCategoryLabel}: {row.reviewLabel}</strong>
+                              {row.reviewMessage ? ` ${row.reviewMessage}` : ''}
+                            </span>
                           </div>
                         ) : (
                           <span className="text-xs text-[#816D62]">No warning</span>

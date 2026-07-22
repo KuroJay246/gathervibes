@@ -199,10 +199,10 @@ export function EventReviewPage() {
         </div>
       </section>
 
-      <Section eyebrow="Needs Follow-Up" title="What needs attention now">
+      <Section eyebrow="Payment Follow-Up and Data Review" title="What needs attention now">
         {review.followUp.items.length === 0 ? (
           <div className="rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
-            No immediate follow-up items were detected for the selected Working Event from current registration and operations data.
+            No patron payment follow-up or internal data-review items were detected for the selected Working Event from current registration and operations data.
           </div>
         ) : (
           <div className="grid gap-4 xl:grid-cols-2">
@@ -213,7 +213,7 @@ export function EventReviewPage() {
 
       <Section eyebrow="Financial Boundaries" title="Registration Payments and Operations Summary">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Registration payment records track guest charges, payments received, balances, methods, and follow-up. The Operations Ledger tracks manually recorded sponsor income, vendor or supplier payments, expenses, refunds, reimbursements, and adjustments. These are separate records and are not automatically reconciled.
+          Registration payment records track guest charges, payments received, balances, payment follow-up, and data review. The Operations Ledger tracks manually recorded sponsor income, vendor or supplier payments, expenses, refunds, reimbursements, and adjustments. These are separate records and are not automatically reconciled.
         </div>
 
         <div className="mt-5 grid gap-6 xl:grid-cols-2">
@@ -228,6 +228,8 @@ export function EventReviewPage() {
               <SummaryCard label="Expected Registration Income" value={formatEventReviewMoney(review.paymentReview.registrationRecords.expectedIncome, currency)} />
               <SummaryCard label="Payments Received" value={formatEventReviewMoney(review.paymentReview.registrationRecords.collectedAmount, currency)} />
               <SummaryCard label="Outstanding Balance" value={formatEventReviewMoney(review.paymentReview.registrationRecords.outstandingAmount, currency)} />
+              <SummaryCard label="Payment Follow-Up" value={review.paymentReview.registrationRecords.paymentFollowUpCount} />
+              <SummaryCard label="Data Review" value={review.paymentReview.registrationRecords.dataReviewCount} />
               <SummaryCard label="Pending count" value={review.paymentReview.registrationRecords.pendingCount} />
               <SummaryCard label="Partial payment count" value={review.paymentReview.registrationRecords.partialPaymentCount} />
               <SummaryCard label="Paid count" value={review.paymentReview.registrationRecords.paidCount} />
@@ -236,7 +238,6 @@ export function EventReviewPage() {
               <SummaryCard label="Door paid count" value={review.paymentReview.registrationRecords.doorPaidCount} />
               <SummaryCard label="To Pay at Door count" value={review.paymentReview.registrationRecords.doorListCount} />
               <SummaryCard label="Unknown payment-state count" value={review.paymentReview.registrationRecords.unknownCount} />
-              <SummaryCard label="Pricing review count" value={review.paymentReview.registrationRecords.pricingReviewCount} />
               <SummaryCard label="Finance warnings" value={review.paymentReview.registrationRecords.financeWarningCount} />
             </div>
           </div>

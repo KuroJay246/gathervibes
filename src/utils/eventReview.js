@@ -1,7 +1,7 @@
 import { buildEventReadiness } from './eventReadiness.js'
 import {
   buildFinanceSummary,
-  calculateRegistrationFinance,
+  classifyRegistrationFinance,
   financeWarnings,
   formatCurrency,
 } from './financeUtils.js'
@@ -95,18 +95,20 @@ function buildRegistrationPaymentBreakdown(registrations = [], event = {}) {
   let doorListCount = 0
   let partialPaymentCount = 0
   let unknownCount = 0
-  let pricingReviewCount = 0
+  let paymentFollowUpCount = 0
+  let dataReviewCount = 0
   let financeWarningCount = 0
 
   registrations.forEach((registration) => {
     const paymentStatus = normalizePaymentStatus(registration?.paymentStatus)
-    const finance = calculateRegistrationFinance(registration, event)
+    const finance = classifyRegistrationFinance(registration, event)
     const warnings = financeWarnings(registration, event)
 
     if (paymentStatus === 'door-list') doorListCount += 1
-    if (!['door', 'door-list', 'complimentary'].includes(paymentStatus) && finance.amountPaid > 0 && (finance.balanceDue || 0) > 0) partialPaymentCount += 1
+    if (finance.statusGroup === 'partial') partialPaymentCount += 1
     if (paymentStatus === 'unknown') unknownCount += 1
-    if (finance.needsFinanceReview) pricingReviewCount += 1
+    if (finance.paymentFollowUpRequired) paymentFollowUpCount += 1
+    if (finance.dataReviewRequired) dataReviewCount += 1
     if (warnings.length > 0) financeWarningCount += 1
   })
 
@@ -115,7 +117,9 @@ function buildRegistrationPaymentBreakdown(registrations = [], event = {}) {
     doorListCount,
     partialPaymentCount,
     unknownCount,
-    pricingReviewCount,
+    paymentFollowUpCount,
+    dataReviewCount,
+    pricingReviewCount: dataReviewCount,
     financeWarningCount,
   }
 }
@@ -201,15 +205,8 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
   const attendance = buildAttendanceSummary(rows)
   const missingContactRows = rows.filter((registration) => !String(registration?.email || '').trim() && !String(registration?.phone || '').trim())
   const duplicateContactRows = countDuplicateContactRows(rows)
-  const paymentReviewRows = rows.filter((registration) => {
-    const financeState = calculateRegistrationFinance(registration, event)
-    const paymentStatus = normalizePaymentStatus(registration?.paymentStatus)
-    return paymentStatus === 'pending' || paymentStatus === 'unknown' || paymentStatus === 'door-list' || (financeState.balanceDue || 0) > 0
-  })
-  const incompleteFinanceRows = rows.filter((registration) => {
-    const financeState = calculateRegistrationFinance(registration, event)
-    return financeState.needsFinanceReview || financeWarnings(registration, event).length > 0
-  })
+  const paymentReviewRows = rows.filter((registration) => classifyRegistrationFinance(registration, event).paymentFollowUpRequired)
+  const incompleteFinanceRows = rows.filter((registration) => classifyRegistrationFinance(registration, event).dataReviewRequired)
   const paidMissingTicketRows = rows.filter((registration) => {
     const paymentStatus = normalizePaymentStatus(registration?.paymentStatus)
     return !normalizeTicketCode(registration?.ticketCode) && (paymentStatus === 'paid' || paymentStatus === 'door')
@@ -236,9 +233,9 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
   if (paymentReviewRows.length > 0) {
     followUpItems.push(buildFollowUpItem({
       key: 'payment-review',
-      label: 'Payment follow-up needed',
+      label: 'Payment Follow-Up',
       count: paymentReviewRows.length,
-      explanation: 'These registrations still look pending, unknown, door-list, or otherwise unresolved for payment follow-up.',
+      explanation: 'These registrations still look unresolved for payment collection or balance follow-up.',
       to: '/registrations',
       preview: sampleNames(paymentReviewRows),
     }))
@@ -268,10 +265,10 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
 
   if (incompleteFinanceRows.length > 0) {
     followUpItems.push(buildFollowUpItem({
-      key: 'incomplete-finance',
-      label: 'Incomplete finance details',
+      key: 'data-review',
+      label: 'Data Review',
       count: incompleteFinanceRows.length,
-      explanation: 'These registrations are missing pricing details or show finance warnings that should be reviewed manually.',
+      explanation: 'These registrations do not show money outstanding, but their finance records still need internal cleanup or documentation review.',
       to: '/registrations',
       preview: sampleNames(incompleteFinanceRows),
     }))
@@ -385,6 +382,8 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
         outstandingAmount: finance.totalOutstanding,
         complimentaryRegistrations: metrics.complimentaryRegistrations,
         complimentaryGuests: metrics.complimentaryPersons,
+        paymentFollowUpCount: finance.paymentFollowUpCount,
+        dataReviewCount: finance.dataReviewCount,
         pendingCount: metrics.pendingRegistrations,
         partialPaymentCount: finance.partialPaymentCount,
         paidCount: finance.paidRegistrations,

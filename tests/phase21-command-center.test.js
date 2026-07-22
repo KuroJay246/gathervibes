@@ -18,9 +18,9 @@ test('Overview keeps event priorities and high-frequency action destinations', a
   assert.match(dashboard, /to="\/event-review"/)
   assert.doesNotMatch(dashboard, /Event command center/)
   assert.doesNotMatch(dashboard, /Quick navigation/)
-  assert.match(readiness, /Payment pending/)
+  assert.match(readiness, /Payment Follow-Up/)
   assert.match(readiness, /Missing ticket/)
-  assert.match(readiness, /Data incomplete/)
+  assert.match(readiness, /Data Review/)
 })
 
 test('Phase 21 improves operations control summaries using existing ledger data only', async () => {

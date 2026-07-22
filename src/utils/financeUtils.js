@@ -14,7 +14,7 @@ export const PAYMENT_METHODS = [
 ]
 
 export const PAYMENT_METHOD_LABELS = {
-  firstpay: 'FirstPay',
+  firstpay: 'CIBC 1stPay',
   'bank-transfer': 'Bank transfer',
   cash: 'Cash',
   door: 'Door',
@@ -178,6 +178,10 @@ function warning(level, code, message) {
   return { level, code, message }
 }
 
+function reviewReason(code, label, message, category) {
+  return { code, label, message, category }
+}
+
 export function buildPaymentReferenceCounts(registrations = []) {
   const counts = new Map()
   ;(Array.isArray(registrations) ? registrations : []).forEach((registration) => {
@@ -197,6 +201,7 @@ export function classifyRegistrationFinance(registration = {}, event = {}, conte
   const referenceCounts = context?.paymentReferenceCounts
   const duplicateReference = reference && referenceCounts?.get(reference) > 1
   const paymentStatusRaw = String(registration?.paymentStatus || '').trim()
+  const paymentMethodRaw = String(registration?.paymentMethod || '').trim()
   const moneyFields = [
     ['ticketPrice', 'Ticket price'],
     ['amountDue', 'Amount due'],
@@ -256,31 +261,116 @@ export function classifyRegistrationFinance(registration = {}, event = {}, conte
     warnings.push(warning('warning', 'duplicate-payment-reference', 'Payment reference appears on more than one registration for this event.'))
   }
 
-  const hasBlockingWarning = warnings.some((item) => item.level === 'blocking')
+  const hasPositiveBalance = (computed.balanceDue || 0) > 0
+  const missingTicketPrice = computed.ticketPrice === null
+  const missingAmountDue = computed.amountDue === null
+  const missingRecordedAmount = (computed.paymentStatus === 'paid' || computed.paymentStatus === 'door')
+    && !hasPositiveBalance
+    && (!hasRawValue(registration?.amountPaid) || missingTicketPrice || missingAmountDue)
+  const missingPaymentMethod = !paymentMethodRaw || computed.paymentMethod === 'unknown'
   const isPartial = (
     !['door', 'door-list', 'complimentary'].includes(computed.paymentStatus)
     && computed.amountPaid > 0
-    && (computed.balanceDue || 0) > 0
+    && hasPositiveBalance
   )
-  const statusGroup = hasBlockingWarning
-    ? 'needs-review'
-    : isPartial
-      ? 'partial'
-      : computed.paymentStatus === 'door'
-        ? 'door'
-        : computed.paymentStatus === 'door-list'
-          ? 'door-list'
-          : computed.paymentStatus === 'complimentary'
-            ? 'complimentary'
-            : computed.paymentStatus === 'paid' || (computed.balanceDue === 0 && computed.amountDue !== null)
-              ? 'paid'
-              : computed.paymentStatus === 'pending'
-                ? 'pending'
-                : 'unknown'
+  const statusGroup = isPartial
+    ? 'partial'
+    : computed.paymentStatus === 'door'
+      ? 'door'
+      : computed.paymentStatus === 'door-list'
+        ? 'door-list'
+        : computed.paymentStatus === 'complimentary'
+          ? 'complimentary'
+          : computed.paymentStatus === 'paid'
+            ? 'paid'
+            : computed.paymentStatus === 'pending'
+              ? 'pending'
+              : 'unknown'
 
   const isResolvedPaid = statusGroup === 'paid'
-    || (statusGroup === 'door' && computed.amountPaid > 0 && computed.balanceDue === 0)
-  const isPaymentResolved = isResolvedPaid || statusGroup === 'complimentary'
+    || (statusGroup === 'door' && !hasPositiveBalance)
+  const isPaymentResolved = isResolvedPaid || (statusGroup === 'complimentary' && !hasPositiveBalance)
+  const referenceExpected = ['firstpay', 'bank-transfer', 'card'].includes(computed.paymentMethod)
+  const missingPaymentReference = isResolvedPaid
+    && referenceExpected
+    && !String(registration?.paymentReference || '').trim()
+  const displayBalanceDue = hasPositiveBalance
+    ? computed.balanceDue
+    : isPaymentResolved
+      ? 0
+      : computed.balanceDue
+
+  const paymentFollowUpReasons = []
+  if (hasPositiveBalance && ['pending', 'partial', 'door-list', 'door', 'paid', 'unknown'].includes(statusGroup)) {
+    paymentFollowUpReasons.push(reviewReason(
+      'outstanding-payment',
+      'Outstanding Payment',
+      'A positive balance remains on this registration and may still require patron payment follow-up.',
+      'payment-follow-up',
+    ))
+  } else if (statusGroup === 'unknown' || statusGroup === 'pending' || statusGroup === 'door-list') {
+    paymentFollowUpReasons.push(reviewReason(
+      'payment-follow-up-required',
+      'Payment Follow-Up Required',
+      'Payment status is unresolved and may still require organizer follow-up with the patron.',
+      'payment-follow-up',
+    ))
+  }
+
+  const dataReviewReasons = []
+  if ((statusGroup === 'paid' || statusGroup === 'door') && !hasPositiveBalance && missingRecordedAmount) {
+    dataReviewReasons.push(reviewReason(
+      'paid-amount-not-recorded',
+      statusGroup === 'door' ? 'Door Paid — Amount Not Recorded' : 'Paid — Amount Not Recorded',
+      'Payment is confirmed, but the exact ticket amount was not recorded.',
+      'data-review',
+    ))
+  }
+  if (isPaymentResolved && missingPaymentMethod) {
+    dataReviewReasons.push(reviewReason(
+      'missing-payment-method',
+      'Missing Payment Method',
+      'Payment is resolved, but the payment method is not recorded clearly.',
+      'data-review',
+    ))
+  }
+  if (isResolvedPaid && missingPaymentReference) {
+    dataReviewReasons.push(reviewReason(
+      'missing-payment-reference',
+      'Missing Payment Reference',
+      'Payment is resolved, but no payment reference was recorded.',
+      'data-review',
+    ))
+  }
+  if (warnings.some((item) => ['amount-due-mismatch', 'balance-mismatch', 'overpaid'].includes(item.code))) {
+    dataReviewReasons.push(reviewReason(
+      'amount-mismatch',
+      'Amount Mismatch',
+      'Recorded finance amounts do not align and should be reviewed internally.',
+      'data-review',
+    ))
+  }
+  if (duplicateReference) {
+    dataReviewReasons.push(reviewReason(
+      'possible-duplicate-payment',
+      'Possible Duplicate Payment',
+      'A payment reference appears on more than one registration and should be reviewed.',
+      'data-review',
+    ))
+  }
+  if (statusGroup === 'complimentary' && (hasPositiveBalance || computed.amountDue > 0)) {
+    dataReviewReasons.push(reviewReason(
+      'complimentary-classification-review',
+      'Complimentary Classification Review',
+      'Complimentary status should be checked against the recorded finance details.',
+      'data-review',
+    ))
+  }
+
+  const reviewReasons = [...paymentFollowUpReasons, ...dataReviewReasons]
+  const paymentFollowUpRequired = paymentFollowUpReasons.length > 0
+  const dataReviewRequired = !paymentFollowUpRequired && dataReviewReasons.length > 0
+  const primaryReviewReason = reviewReasons[0] || null
 
   return {
     ...computed,
@@ -290,7 +380,18 @@ export function classifyRegistrationFinance(registration = {}, event = {}, conte
     blockingWarnings: warnings.filter((item) => item.level === 'blocking'),
     isResolvedPaid,
     isPaymentResolved,
-    needsFollowUp: !isPaymentResolved || warnings.length > 0,
+    displayBalanceDue,
+    outstandingPayment: paymentFollowUpReasons.some((reason) => reason.code === 'outstanding-payment'),
+    paymentFollowUpRequired,
+    dataReviewRequired,
+    reviewCategory: paymentFollowUpRequired ? 'payment-follow-up' : dataReviewRequired ? 'data-review' : null,
+    reviewCategoryLabel: paymentFollowUpRequired ? 'Payment Follow-Up' : dataReviewRequired ? 'Data Review' : null,
+    reviewLabel: primaryReviewReason?.label || null,
+    reviewMessage: primaryReviewReason?.message || null,
+    reviewMessages: reviewReasons.map((reason) => reason.message),
+    reviewReasons,
+    needsFollowUp: paymentFollowUpRequired,
+    paymentReminderEligible: paymentFollowUpRequired,
   }
 }
 
@@ -330,7 +431,10 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
     complimentaryRegistrations: 0,
     complimentaryGuests: 0,
     unknownPaymentStates: 0,
+    outstandingRegistrations: 0,
     financeReviewCount: 0,
+    paymentFollowUpCount: 0,
+    dataReviewCount: 0,
     needsFollowUpCount: 0,
   }
 
@@ -349,14 +453,25 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
       amountDue: finance.amountDue,
       amountPaid: finance.amountPaid,
       balanceDue: finance.balanceDue,
+      displayBalanceDue: finance.displayBalanceDue,
       paymentMethod: finance.paymentMethod,
       paymentReference: registration?.paymentReference || '',
+      paymentEvidenceClass: registration?.paymentEvidenceClass || '',
       paymentStatus: finance.paymentStatus,
       statusGroup: finance.statusGroup,
       displayStatus: finance.displayStatus,
       isResolvedPaid: finance.isResolvedPaid,
       isPaymentResolved: finance.isPaymentResolved,
       warnings: finance.warnings,
+      reviewCategory: finance.reviewCategory,
+      reviewCategoryLabel: finance.reviewCategoryLabel,
+      reviewLabel: finance.reviewLabel,
+      reviewMessage: finance.reviewMessage,
+      reviewMessages: finance.reviewMessages,
+      paymentFollowUpRequired: finance.paymentFollowUpRequired,
+      dataReviewRequired: finance.dataReviewRequired,
+      outstandingPayment: finance.outstandingPayment,
+      paymentReminderEligible: finance.paymentReminderEligible,
       needsFollowUp: finance.needsFollowUp,
     }
 
@@ -375,26 +490,33 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
       summary.complimentaryGuests += finance.personsAttending
     }
     if (finance.statusGroup === 'unknown') summary.unknownPaymentStates += 1
-    if (finance.statusGroup === 'needs-review' || finance.warnings.length > 0) summary.financeReviewCount += 1
+    if (finance.outstandingPayment) summary.outstandingRegistrations += 1
+    if (finance.dataReviewRequired) summary.financeReviewCount += 1
+    if (finance.paymentFollowUpRequired) summary.paymentFollowUpCount += 1
+    if (finance.dataReviewRequired) summary.dataReviewCount += 1
     if (finance.needsFollowUp) summary.needsFollowUpCount += 1
     return row
   })
 
   const filterCounts = {
     all: paymentRows.length,
-    'needs-follow-up': paymentRows.filter((row) => row.needsFollowUp).length,
+    'needs-follow-up': paymentRows.filter((row) => row.paymentFollowUpRequired).length,
+    'payment-follow-up': paymentRows.filter((row) => row.paymentFollowUpRequired).length,
+    'data-review': paymentRows.filter((row) => row.dataReviewRequired).length,
     paid: paymentRows.filter((row) => row.isResolvedPaid).length,
     partial: paymentRows.filter((row) => row.statusGroup === 'partial').length,
     pending: paymentRows.filter((row) => row.statusGroup === 'pending').length,
     door: paymentRows.filter((row) => row.statusGroup === 'door' || row.statusGroup === 'door-list').length,
     complimentary: paymentRows.filter((row) => row.statusGroup === 'complimentary').length,
     unknown: paymentRows.filter((row) => row.statusGroup === 'unknown').length,
-    'finance-review': paymentRows.filter((row) => row.warnings.length > 0 || row.statusGroup === 'needs-review').length,
+    'finance-review': paymentRows.filter((row) => row.dataReviewRequired).length,
   }
 
   return {
     rows: paymentRows,
-    followUpRows: paymentRows.filter((row) => row.needsFollowUp),
+    paymentFollowUpRows: paymentRows.filter((row) => row.paymentFollowUpRequired),
+    dataReviewRows: paymentRows.filter((row) => row.dataReviewRequired),
+    followUpRows: paymentRows.filter((row) => row.paymentFollowUpRequired),
     summary,
     filterCounts,
   }
@@ -402,10 +524,11 @@ export function buildPaymentsWorkspace(registrations = [], event = {}) {
 
 export function paymentFilterMatches(row = {}, filter = 'all') {
   if (!filter || filter === 'all') return true
-  if (filter === 'needs-follow-up') return Boolean(row.needsFollowUp)
+  if (filter === 'needs-follow-up' || filter === 'payment-follow-up') return Boolean(row.paymentFollowUpRequired)
+  if (filter === 'data-review') return Boolean(row.dataReviewRequired)
   if (filter === 'paid') return Boolean(row.isResolvedPaid)
   if (filter === 'door') return row.statusGroup === 'door' || row.statusGroup === 'door-list'
-  if (filter === 'finance-review') return row.statusGroup === 'needs-review' || (row.warnings || []).length > 0
+  if (filter === 'finance-review') return Boolean(row.dataReviewRequired)
   return row.statusGroup === filter
 }
 
