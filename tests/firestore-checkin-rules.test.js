@@ -21,6 +21,8 @@ import {
 
 const projectId = 'gathervibeshub-rules-test'
 const adminEmail = 'jaylanspencer99@gmail.com'
+const protectedOwnerUid = 'WcDU2jmbopdAgDlMMWvD3TkqqbC3'
+const protectedOwnerEmail = 'jaylanspencer99@gmail.com'
 const eventId = 'xPfa0b3KZyLSDnAD2uGI'
 const registrationId = 'imp_12593bf58f029033'
 const scannerUid = 'scanner-user'
@@ -73,6 +75,31 @@ async function seed(env, registration = importedRegistration()) {
     const db = context.firestore()
     await setDoc(doc(db, 'settings', 'accessControl'), {
       approvedEmails: [adminEmail],
+      updatedAt: Timestamp.fromMillis(1710000000000),
+    })
+    await setDoc(doc(db, 'events', eventId), {
+      eventId,
+      eventName: 'CODEX_TEST Live Verification Event',
+      eventDate: Timestamp.fromMillis(1893456000000),
+      location: 'QA',
+      eventType: 'other',
+      status: 'upcoming',
+      capacity: 10,
+      ticketPrice: 0,
+      priceTiers: [],
+      notes: 'Permanent QA fixture',
+      createdAt: Timestamp.fromMillis(1710000000000),
+      updatedAt: Timestamp.fromMillis(1710000000000),
+    })
+    await setDoc(doc(db, 'registrations', registration.registrationId), registration)
+  })
+}
+
+async function seedWithoutApprovedOwner(env, registration = importedRegistration()) {
+  await env.withSecurityRulesDisabled(async (context) => {
+    const db = context.firestore()
+    await setDoc(doc(db, 'settings', 'accessControl'), {
+      approvedEmails: ['secondary@example.com'],
       updatedAt: Timestamp.fromMillis(1710000000000),
     })
     await setDoc(doc(db, 'events', eventId), {
@@ -320,6 +347,25 @@ test('Firestore rules allow approved admin check-in batch for imported ticketed 
     batch.update(doc(db, 'registrations', registrationId), checkInAfterState())
     batch.set(doc(db, 'auditLogs', 'audit-checkin-1'), checkInAuditData())
 
+    await assertSucceeds(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules allow protected owner UID when email is absent from mutable allowlist', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seedWithoutApprovedOwner(env)
+    const db = env.authenticatedContext(protectedOwnerUid, { email: protectedOwnerEmail }).firestore()
+    const batch = writeBatch(db)
+    batch.update(doc(db, 'registrations', registrationId), checkInAfterState())
+    batch.set(doc(db, 'auditLogs', 'audit-owner-checkin-1'), {
+      ...checkInAuditData(),
+      logId: 'audit-owner-checkin-1',
+    })
+
+    await assertSucceeds(getDoc(doc(db, 'settings', 'accessControl')))
     await assertSucceeds(batch.commit())
   } finally {
     await env.cleanup()

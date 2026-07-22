@@ -6,6 +6,7 @@ import { useActiveEvent } from '../events/useActiveEvent'
 import { firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
 import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeUtils'
 import { ACCESS_ROLES, ROLE_ORDER, listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
+import { PROTECTED_OWNER_EMAIL } from '../config/protectedOwner'
 
 const SETTINGS_TABS = [
   ['profile', 'Profile'],
@@ -112,9 +113,10 @@ export function SettingsPage() {
     access: (
       <SettingsSection eyebrow="Access Summary" title="Approved accounts and staff boundaries">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-          Approved admin access is controlled by <code>settings/accessControl.approvedEmails</code>. Staff and scanner helpers are not added to that allowlist as a shortcut.
+          Protected owner access is pinned to the Firebase UID for <code>{PROTECTED_OWNER_EMAIL}</code>. Secondary organizer access remains controlled by <code>settings/accessControl.approvedEmails</code>. Staff and scanner helpers are not added to that allowlist as a shortcut.
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
+          <Pill tone="success">Protected Owner</Pill>
           <Pill tone="success">Approved admin allowlist active</Pill>
           <Pill>Access request actions disabled</Pill>
           <Pill>Role editing is not exposed</Pill>
@@ -127,8 +129,13 @@ export function SettingsPage() {
             <p className="p-4 text-sm text-[#816D62]">No approved emails were loaded.</p>
           ) : approvedEntries.map((entry) => (
             <div key={entry.email} className="flex flex-col gap-1 border-b border-[#F2E8E1] p-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
-              <p className="break-all text-sm font-bold text-[#2B1723]">{entry.email}</p>
-              <span className="w-fit rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{ACCESS_ROLES[entry.role]?.label || 'Admin'}</span>
+              <div className="min-w-0">
+                <p className="break-all text-sm font-bold text-[#2B1723]">{entry.email}</p>
+                {entry.protectedOwner && <p className="mt-1 text-xs font-semibold text-[#2F855A]">Protected Owner · cannot be removed or disabled here</p>}
+              </div>
+              <span className={`w-fit rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${entry.protectedOwner ? 'bg-[#EAF6EF] text-[#2F855A]' : 'bg-[#F7F1ED] text-[#6B564C]'}`}>
+                {entry.protectedOwner ? 'Protected Owner' : ACCESS_ROLES[entry.role]?.label || 'Admin'}
+              </span>
             </div>
           ))}
         </div>

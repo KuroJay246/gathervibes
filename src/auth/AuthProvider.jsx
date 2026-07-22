@@ -13,6 +13,7 @@ import {
 import { doc, getDoc } from 'firebase/firestore'
 import { auth, db, isFirebaseConfigured } from '../lib/firebase'
 import { AuthContext } from './AuthContext'
+import { PROTECTED_OWNER_EMAIL, isProtectedOwnerUser } from '../config/protectedOwner'
 import {
   clearGoogleSignInState,
   readGoogleSignInState,
@@ -127,15 +128,18 @@ async function waitForFirebaseUser(nextUser, { attempts = 2 } = {}) {
 }
 
 async function readAdminAccessControl(nextUser) {
+  const protectedOwner = isProtectedOwnerUser(nextUser)
   const accessDocument = await getDoc(doc(db, 'settings', 'accessControl'))
-  if (!accessDocument.exists()) return null
+  if (!accessDocument.exists()) {
+    return protectedOwner ? { approvedEmails: [PROTECTED_OWNER_EMAIL], protectedOwner: true } : null
+  }
 
   const data = accessDocument.data()
   const approvedEmails = Array.isArray(data?.approvedEmails) ? data.approvedEmails : []
   const userEmail = normalizeAccessEmail(nextUser.email)
 
-  if (!approvedEmails.map(normalizeAccessEmail).includes(userEmail)) return null
-  return data
+  if (!protectedOwner && !approvedEmails.map(normalizeAccessEmail).includes(userEmail)) return null
+  return protectedOwner ? { ...data, approvedEmails, protectedOwner: true } : data
 }
 
 async function readStaffAccess(nextUser) {

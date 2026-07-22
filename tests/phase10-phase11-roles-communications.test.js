@@ -88,7 +88,7 @@ test('Phase 10 role detection keeps approvedEmails backward compatible', () => {
   assert.equal(resolveAccessRole(accessControl, 'viewer@example.com'), 'viewer')
   assert.equal(resolveAccessRole(accessControl, 'random@example.com'), null)
   assert.equal(resolveAccessRole({ approvedEmails: ['legacy@example.com'] }, 'legacy@example.com'), 'admin')
-  assert.equal(listApprovedAccessEntries(accessControl).length, 4)
+  assert.equal(listApprovedAccessEntries(accessControl).length, 5)
   assert.match(roleCapabilitySummary('viewer'), /does not enforce scoped rules yet/)
 })
 
