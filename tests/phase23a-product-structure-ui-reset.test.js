@@ -69,7 +69,7 @@ test('Reports remains read-only and separates registration payments from Operati
 
   assert.match(page, /Event Report & Review/)
   assert.match(page, /read-only report/i)
-  assert.match(page, /Needs Follow-Up/)
+  assert.match(page, /Payment Follow-Up and Data Review/)
   assert.match(page, /Registration Payments and Operations Summary/)
   assert.match(page, /Registration Payments/)
   assert.match(page, /Operations Ledger/)

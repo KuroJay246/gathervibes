@@ -1,7 +1,7 @@
 import { searchableRegistrationText } from './ticketUtils.js'
 import { formatEventDate } from './dateUtils.js'
 import { formatPaymentLabel, paymentStatusMatches } from './paymentStatus.js'
-import { buildFinanceSummary, calculateRegistrationFinance, formatCurrency, formatPaymentMethod } from './financeUtils.js'
+import { buildFinanceSummary, calculateRegistrationFinance, classifyRegistrationFinance, formatCurrency, formatPaymentMethod } from './financeUtils.js'
 
 export const COMMUNICATION_TEMPLATES = [
   {
@@ -80,6 +80,8 @@ export const COMMUNICATION_SEGMENTS = {
   finance: [
     ['all', 'All finance segments'],
     ['outstanding', 'Payment outstanding'],
+    ['payment-follow-up', 'Payment follow-up'],
+    ['data-review', 'Data review only'],
     ['pending-payment', 'Pending payment'],
     ['door-payment', 'Door expected'],
     ['paid-guests', 'Paid guests'],
@@ -87,7 +89,7 @@ export const COMMUNICATION_SEGMENTS = {
     ['missing-payment-reference', 'Missing payment reference'],
     ['missing-ticket-code', 'Missing ticket code'],
     ['balance-due', 'Balance due greater than 0'],
-    ['amount-paid-zero', 'Amount paid equals 0'],
+    ['amount-paid-zero', 'Paid amount not recorded'],
   ],
   ticket: [
     ['all', 'All ticket statuses'],
@@ -171,16 +173,18 @@ export function filterCommunicationsRegistrations(registrations, filters, search
       return false
     }
 
-    const finance = calculateRegistrationFinance(reg)
-    if (filters.financeSegment === 'outstanding' && !(finance.balanceDue > 0)) return false
-    if (filters.financeSegment === 'pending-payment' && finance.paymentStatus !== 'pending') return false
-    if (filters.financeSegment === 'door-payment' && finance.paymentStatus !== 'door') return false
-    if (filters.financeSegment === 'paid-guests' && finance.paymentStatus !== 'paid') return false
+    const finance = classifyRegistrationFinance(reg)
+    if (filters.financeSegment === 'outstanding' && !finance.outstandingPayment) return false
+    if (filters.financeSegment === 'payment-follow-up' && !finance.paymentFollowUpRequired) return false
+    if (filters.financeSegment === 'data-review' && !finance.dataReviewRequired) return false
+    if (filters.financeSegment === 'pending-payment' && !['pending', 'partial', 'unknown'].includes(finance.statusGroup)) return false
+    if (filters.financeSegment === 'door-payment' && finance.statusGroup !== 'door-list') return false
+    if (filters.financeSegment === 'paid-guests' && !finance.isResolvedPaid) return false
     if (filters.financeSegment === 'complimentary-guests' && finance.paymentStatus !== 'complimentary') return false
-    if (filters.financeSegment === 'missing-payment-reference' && !(finance.paymentStatus === 'paid' && !reg.paymentReference)) return false
+    if (filters.financeSegment === 'missing-payment-reference' && !((finance.statusGroup === 'paid' || finance.statusGroup === 'door') && !reg.paymentReference)) return false
     if (filters.financeSegment === 'missing-ticket-code' && reg.ticketCode) return false
-    if (filters.financeSegment === 'balance-due' && !(finance.balanceDue > 0)) return false
-    if (filters.financeSegment === 'amount-paid-zero' && finance.amountPaid !== 0) return false
+    if (filters.financeSegment === 'balance-due' && !finance.outstandingPayment) return false
+    if (filters.financeSegment === 'amount-paid-zero' && finance.reviewLabel !== 'Paid — Amount Not Recorded' && finance.reviewLabel !== 'Door Paid — Amount Not Recorded') return false
 
     // Check-in Status Filter
     if (filters.checkInStatus === 'checked-in' && !reg.checkedIn) return false

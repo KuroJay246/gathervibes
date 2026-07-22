@@ -119,7 +119,7 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
           className={selectClasses}
         >
           <option value="">Any Payment Method</option>
-          <option value="firstpay">FirstPay</option>
+          <option value="firstpay">CIBC 1stPay</option>
           <option value="bank-transfer">Bank Transfer</option>
           <option value="cash">Cash</option>
           <option value="door">Door</option>

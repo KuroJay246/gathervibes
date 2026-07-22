@@ -75,7 +75,7 @@ test('Phase 23M Payments keeps desktop table and adds responsive cards with full
   assert.match(payments, /lg:hidden[\s\S]*Responsive payment records/)
   assert.match(payments, /hidden overflow-hidden rounded-xl border border-\[#F2E8E1\] lg:block/)
   assert.match(payments, /<table className="w-full min-w-\[1080px\]/)
-  for (const label of ['Expected', 'Received', 'Balance', 'Price tier', 'Method', 'Reference', 'Ticket']) {
+  for (const label of ['Expected', 'Received', 'Outstanding', 'Price tier', 'Method', 'Reference', 'Ticket']) {
     assert.match(payments, new RegExp(`'${label}'`))
   }
   assert.match(payments, /break-words text-sm font-bold text-\[#2B1723\]/)
@@ -92,7 +92,8 @@ test('Phase 23M Payments filters and search results remain unchanged', () => {
   assert.equal(workspace.filterCounts.pending, 0)
   assert.equal(workspace.filterCounts.door, 2)
   assert.equal(workspace.filterCounts['needs-follow-up'], 3)
-  assert.equal(workspace.filterCounts['finance-review'], 1)
+  assert.equal(workspace.filterCounts['finance-review'], 0)
+  assert.equal(workspace.filterCounts['data-review'], 0)
   assert.equal(paymentFilterMatches(byId['door-paid'], 'paid'), true)
   assert.equal(paymentFilterMatches(byId['door-paid'], 'door'), true)
   assert.equal(paymentFilterMatches(byId['door-list'], 'paid'), false)

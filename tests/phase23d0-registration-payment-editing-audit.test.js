@@ -71,9 +71,10 @@ test('Phase 23D-0 Payments filters and follow-up handle Door Paid versus To Pay 
 
   assert.equal(byId['door-paid'].displayStatus, 'Door Paid')
   assert.equal(byId['door-paid'].needsFollowUp, false)
+  assert.equal(byId['door-paid'].dataReviewRequired, false)
   assert.equal(paymentFilterMatches(byId['door-paid'], 'door'), true)
   assert.equal(paymentFilterMatches(byId['door-paid'], 'paid'), true)
-  assert.equal(paymentFilterMatches(byId['door-paid'], 'needs-follow-up'), false)
+  assert.equal(paymentFilterMatches(byId['door-paid'], 'payment-follow-up'), false)
 
   assert.equal(byId['door-list'].displayStatus, 'To Pay at Door')
   assert.equal(byId['door-list'].needsFollowUp, true)
@@ -86,7 +87,7 @@ test('Phase 23D-0 Payments filters and follow-up handle Door Paid versus To Pay 
   assert.equal(paymentFilterMatches(byId.partial, 'partial'), true)
   assert.equal(byId.complimentary.displayStatus, 'Complimentary')
   assert.equal(byId.complimentary.needsFollowUp, false)
-  assert.equal(paymentFilterMatches(byId.complimentary, 'needs-follow-up'), false)
+  assert.equal(paymentFilterMatches(byId.complimentary, 'payment-follow-up'), false)
 
   assert.equal(workspace.summary.registrationCount, 8)
   assert.equal(workspace.summary.recordedPayments, 280)
@@ -97,6 +98,7 @@ test('Phase 23D-0 Payments filters and follow-up handle Door Paid versus To Pay 
   assert.equal(workspace.summary.doorListRegistrations, 2)
   assert.equal(workspace.filterCounts.paid, 2)
   assert.equal(workspace.filterCounts.door, 3)
+  assert.equal(workspace.filterCounts['data-review'], 0)
   assert.equal(workspace.filterCounts['needs-follow-up'], 5)
 })
 
@@ -143,7 +145,8 @@ test('Phase 23D-0 registration update writes remain registration plus audit only
   assert.match(service, /batch\.set\(audit\.ref, audit\.data\)/)
   assert.doesNotMatch(service, /operationsLedger|createLedgerEntry|collection\(firestore, 'operations'/)
   assert.match(form, /validPaymentStatuses\.map/)
-  assert.match(paymentsPage, /Needs Follow-Up/)
+  assert.match(paymentsPage, /Payment Follow-Up/)
+  assert.match(paymentsPage, /Data Review/)
   assert.equal(qrPayloadForTicketCode('PH23D0-001'), 'GSV:TICKET:PH23D0-001')
 })
 
