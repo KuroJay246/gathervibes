@@ -86,7 +86,7 @@ test('private access status reflects disabled workflow boundaries without roadma
   assert.doesNotMatch(settings, /Phase 17/)
   assert.match(qa, /Staff role boundary/)
   assert.equal(healthItems.find((item) => item.label === 'Staff role boundary').status, 'ok')
-  assert.match(healthItems.find((item) => item.label === 'Approved-admin allowlist').detail, /Active server-side security boundary/)
+  assert.match(healthItems.find((item) => item.label === 'Protected owner and approved organizers').detail, /Protected owner UID plus secondary approved organizers/)
   assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /Rules enforce private admin access/)
   assert.match(healthItems.find((item) => item.label === 'Daily QA workflow').detail, /CODEX_TEST checks/)
 })

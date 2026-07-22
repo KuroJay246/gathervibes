@@ -34,8 +34,8 @@ function getAuthErrorMessage(code) {
     'auth/popup-blocked': 'Your browser blocked the Google sign-in window. Continue in this window instead.',
     'auth/unauthorized-domain': 'Google sign-in is blocked because this website domain is not authorized in Firebase Authentication. Add this domain under Firebase Console → Authentication → Settings → Authorized domains.',
     'auth/operation-not-allowed': 'Google sign-in is not enabled for this Firebase project.',
-    'auth/unapproved-account': 'This account signed in successfully but is not approved in settings/accessControl.',
-    'auth/access-check-failed': 'Your admin access could not be verified. Check your connection and try again.',
+    'auth/unapproved-account': 'Your administrator access could not be confirmed. Refresh the page or sign in again. No changes were saved.',
+    'auth/access-check-failed': 'Your administrator access could not be confirmed. Refresh the page or sign in again. No changes were saved.',
     'auth/redirect-failed': 'Google sign-in could not be completed. Please try again.',
     'auth/persistence-failed': 'This browser could not persist Firebase sign-in state. Check browser storage settings and try again.',
   }

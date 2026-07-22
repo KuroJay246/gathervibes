@@ -43,7 +43,7 @@ function StatusBadge({ ok, children }) {
 }
 
 export function QaPage() {
-  const { accessControl, currentRoleLabel } = useAuth()
+  const { accessControl, access, currentRoleLabel } = useAuth()
   const { activeEvent } = useActiveEvent()
   const [events, setEvents] = useState([])
   const [auditStatus, setAuditStatus] = useState('checking')
@@ -168,11 +168,11 @@ export function QaPage() {
         { label: 'auditLogs reachable', status: auditStatus === 'ok' ? 'pass' : 'warning', detail: auditStatus },
         { label: 'QR payload privacy', status: hasPrivateQrData ? 'fail' : 'pass', detail: qrPrivateData },
         { label: 'Current user role detected', status: currentRoleLabel ? 'pass' : 'warning', detail: currentRoleLabel || 'Role pending accessControl load' },
-        { label: 'Approved admin detected', status: db && Array.isArray(accessControl?.approvedEmails) ? 'pass' : 'fail', detail: 'Protected page loaded with settings/accessControl allowlist access' },
-        { label: 'Empty allowlist check', status: accessControl?.approvedEmails?.length > 0 ? 'pass' : 'fail', detail: accessControl?.approvedEmails?.length > 0 ? `${accessControl.approvedEmails.length} emails approved` : 'approvedEmails is missing or empty' },
+        { label: 'Approved admin detected', status: access?.level === 'admin' ? 'pass' : 'fail', detail: access?.protectedOwner ? 'Protected owner UID access active' : 'Protected page loaded with approved organizer access' },
+        { label: 'Protected owner or allowlist check', status: access?.protectedOwner || accessControl?.approvedEmails?.length > 0 ? 'pass' : 'fail', detail: access?.protectedOwner ? 'Protected owner does not depend on mutable approvedEmails' : `${accessControl?.approvedEmails?.length || 0} emails approved` },
         { label: 'No public access warning', status: 'pass', detail: 'App remains private and allowlist-only.' },
         { label: 'Staff role boundary', status: 'pass', detail: 'Scanner/check-in-only access remains assigned-event-only. Admin routes and settings stay unavailable to scanner roles.' },
-        { label: 'Approved-admin allowlist active', status: 'pass', detail: 'settings/accessControl.approvedEmails remains owner/admin enforcement.' },
+        { label: 'Protected-owner admin contract active', status: 'pass', detail: 'Protected owner UID plus secondary approvedEmails enforce owner/admin access.' },
         { label: 'Firestore role enforcement', status: 'pass', detail: 'Rules enforce private admin access, assigned scanner access, and append-only audit-log behavior. Firestore indexes were not changed in this release.' },
         { label: 'Daily QA workflow status', status: 'warning', detail: 'Use the current production smoke result as the source of truth when older GitHub badges are stale.' },
         { label: 'Communications templates available', status: COMMUNICATION_TEMPLATES.length >= 12 ? 'pass' : 'warning', detail: `${COMMUNICATION_TEMPLATES.length} copy-only templates` },

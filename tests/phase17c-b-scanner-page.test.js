@@ -254,7 +254,7 @@ test('Phase 17C-B3 AuthProvider checks staff path before not-approved error', as
   assert.match(authProvider, /workspaceDefaultRoute: sanitizeReturnPath\(requestedReturnPath/)
   assert.match(protectedRoute, /canViewRoute\(access, location\.pathname\)/)
   assert.match(loginPage, /navigate\(result\?\.workspaceDefaultRoute \|\| from/)
-  assert.match(loginPage, /not approved in settings\/accessControl/)
+  assert.match(loginPage, /administrator access could not be confirmed/)
   assert.match(rules, /match \/staffProfiles\/\{uid\} \{[\s\S]*allow get: if isApprovedAdmin\(\)[\s\S]*request\.auth\.uid == uid[\s\S]*resource\.data\.status == 'active'/)
   assert.match(rules, /match \/events\/\{eventId\}\/staffAssignments\/\{uid\} \{[\s\S]*allow get: if isApprovedAdmin\(\)[\s\S]*request\.auth\.uid == uid[\s\S]*resource\.data\.eventId == eventId[\s\S]*resource\.data\.status == 'active'/)
 })

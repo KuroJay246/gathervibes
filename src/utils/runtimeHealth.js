@@ -34,9 +34,9 @@ export function buildRuntimeHealthItems({
       detail: user?.email || 'No signed-in user.',
     },
     {
-      label: 'Current email approved',
+      label: 'Current owner or email approved',
       status: allowlistApproved === true ? 'ok' : allowlistApproved === false ? 'fail' : 'warn',
-      detail: allowlistApproved === true ? 'Approved by settings/accessControl.' : allowlistApproved === false ? 'Not approved by allowlist.' : 'Checking allowlist.',
+      detail: allowlistApproved === true ? 'Approved by protected owner UID or settings/accessControl.' : allowlistApproved === false ? 'Not approved by protected owner or allowlist.' : 'Checking access contract.',
     },
     {
       label: 'Current role detected',
@@ -49,9 +49,9 @@ export function buildRuntimeHealthItems({
       detail: 'Scanner and staff access remain assigned-event scoped. Approval, revocation, assignment editing, and lead-scanner management are disabled in the organizer UI.',
     },
     {
-      label: 'Approved-admin allowlist',
+      label: 'Protected owner and approved organizers',
       status: allowlistApproved === true ? 'ok' : allowlistApproved === false ? 'fail' : 'warn',
-      detail: 'Active server-side security boundary for private admin access.',
+      detail: 'Protected owner UID plus secondary approved organizers are the server-side admin boundary.',
     },
     {
       label: 'Firestore role enforcement',

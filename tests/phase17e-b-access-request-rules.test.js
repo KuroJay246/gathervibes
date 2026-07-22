@@ -37,7 +37,7 @@ test('Phase 17E-B docs and current UI keep accessRequests non-live', async () =>
   assert.doesNotMatch(settings, /accessRequests\/\{requestId\}/)
   assert.match(qa, /Staff role boundary/)
   assert.match(qa, /Firestore role enforcement/)
-  assert.match(health, /Active server-side security boundary/)
+  assert.match(health, /Protected owner UID plus secondary approved organizers/)
   assert.match(health, /Rules enforce private admin access/)
   assert.match(readme, /Phase 17F-B is now closed, merged-ready, and organizer accepted on branch `codex\/phase-17e-cde-access-requests-ui-readiness-ci` as the disabled Access Request service contract only\./)
   assert.match(handoff, /Phase 17F-C is now closed, merged-ready, and organizer accepted on branch `codex\/phase-17e-cde-access-requests-ui-readiness-ci` as the Access Workflow manual smoke checklist only\./)

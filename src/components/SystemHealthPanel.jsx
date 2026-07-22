@@ -5,6 +5,7 @@ import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { db, firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
 import { buildRuntimeHealthItems, healthTone } from '../utils/runtimeHealth'
+import { isProtectedOwnerUser } from '../config/protectedOwner'
 
 const toneClasses = {
   green: 'bg-[#E5F3EC] text-[#1E7345]',
@@ -38,7 +39,9 @@ export function SystemHealthPanel({ compact = false }) {
         return
       }
 
-      try {
+      if (isProtectedOwnerUser(user)) {
+        if (active) setAllowlistApproved(true)
+      } else try {
         const accessDoc = await getDoc(doc(db, 'settings', 'accessControl'))
         const emails = Array.isArray(accessDoc.data()?.approvedEmails) ? accessDoc.data().approvedEmails : []
         const approvedEmails = emails.map((email) => String(email || '').trim().toLowerCase())
@@ -77,7 +80,7 @@ export function SystemHealthPanel({ compact = false }) {
     return () => {
       active = false
     }
-  }, [activeEvent?.eventId, user?.email])
+  }, [activeEvent?.eventId, user])
 
   const items = useMemo(
     () => buildRuntimeHealthItems({
