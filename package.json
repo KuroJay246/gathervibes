@@ -40,7 +40,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6",
-    "read-excel-file": "^9.2.0"
+    "read-excel-file": "^9.3.4"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
