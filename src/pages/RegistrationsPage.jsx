@@ -30,6 +30,7 @@ import {
   formatCurrency,
   formatPaymentMethod,
 } from '../utils/financeUtils'
+import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 
 const TABS = ['All', 'Paid', 'Pending', 'Door Paid', 'To Pay at Door', 'Complimentary', 'Outstanding Balance', 'Missing Ticket Code', 'Needs Review', 'Checked In']
 
@@ -215,6 +216,7 @@ export function RegistrationsPage() {
   const allMetrics = buildRegistrationMetrics(registrations, activeEvent)
   const filteredMetrics = buildRegistrationMetrics(filteredRegistrations, activeEvent)
   const financeSummary = buildFinanceSummary(registrations, activeEvent)
+  const evidenceAudit = getEventFinancialEvidenceAudit(activeEvent?.eventId)
   const isFiltering = activeTab !== 'All' || Boolean(cardFilter) || Object.values(filters).some(Boolean)
   const showingText = isFiltering
     ? `Showing ${filteredMetrics.totalRegistrations} registration${filteredMetrics.totalRegistrations === 1 ? '' : 's'} covering ${filteredMetrics.totalPersons} guest${filteredMetrics.totalPersons === 1 ? '' : 's'}.`
@@ -424,6 +426,29 @@ export function RegistrationsPage() {
           />
         ))}
       </section>
+
+      {evidenceAudit && (
+        <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="registration-audit-heading">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Registration Evidence Reconciliation</p>
+              <h2 id="registration-audit-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">CPB booking crosswalk in organizer review</h2>
+              <p className="mt-2 max-w-3xl text-xs leading-5 text-[#715D46]">
+                The private manifest maps audit booking IDs to current registration records. Exact and high-confidence matches can be proposed; candidate, conflict and unmatched records stay in organizer review.
+              </p>
+            </div>
+            <Link to="/event-review" className="inline-flex min-h-10 w-fit items-center justify-center rounded-xl border border-[#D8C5A8] bg-white px-4 text-xs font-bold text-[#7A5818]">
+              Open Reports
+            </Link>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <CountCard label="App registrations" value={evidenceAudit.attendance.appRegistrations} help="Current Firestore registration records." />
+            <CountCard label="App guests" value={evidenceAudit.attendance.appGuests} help="Current persons attending total." />
+            <CountCard label="Gmail-supported ticket spaces" value={evidenceAudit.ticketIncome.gmailSupportedTickets} help="Documentary ticket spaces, including inferred amounts." />
+            <CountCard label="Christina Morris exception" value="Still present" help="No current CPB app row safely contains Christina Morris or her two guest spaces." />
+          </div>
+        </section>
+      )}
 
       <div className="flex flex-col gap-6">
         <RegistrationFilters 

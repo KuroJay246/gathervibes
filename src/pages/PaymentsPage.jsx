@@ -12,6 +12,7 @@ import {
   paymentFilterMatches,
   paymentSearchMatches,
 } from '../utils/financeUtils'
+import { countEvidenceClasses, getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 
 const PAYMENT_FILTERS = [
   ['all', 'All'],
@@ -165,6 +166,7 @@ export function PaymentsPage() {
   const workspace = useMemo(() => buildPaymentsWorkspace(registrations, activeEvent), [activeEvent, registrations])
   const visibleRows = workspace.rows.filter((row) => paymentFilterMatches(row, filter) && paymentSearchMatches(row, search))
   const currency = workspace.summary.currency
+  const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(activeEvent?.eventId), [activeEvent?.eventId])
 
   if (!activeEvent?.eventId) {
     return (
@@ -223,6 +225,35 @@ export function PaymentsPage() {
         <Metric label="Finance review" value={workspace.summary.financeReviewCount} />
         <Metric label="Needs follow-up" value={workspace.summary.needsFollowUpCount} />
       </section>
+
+      {evidenceAudit && (
+        <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="payments-evidence-heading">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Payment Evidence</p>
+              <h2 id="payments-evidence-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Documentary support for CPB ticket income</h2>
+              <p className="mt-2 max-w-3xl text-xs leading-5 text-[#715D46]">
+                Evidence classification is separate from payment status. The row-level matching package remains private until organizer review.
+              </p>
+            </div>
+            <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
+              BBD {evidenceAudit.ticketIncome.documentaryToAppVariance.toFixed(2)} variance unresolved
+            </span>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {countEvidenceClasses(evidenceAudit).map(([label, value]) => (
+              <Metric
+                key={label}
+                label={label}
+                value={typeof value === 'number' && value > 100 ? formatCurrency(value, currency) : value}
+              />
+            ))}
+          </div>
+          <p className="mt-3 text-xs leading-5 text-[#715D46]">
+            BBD $5,420 remains the app payment record. BBD $5,415 is the maximum Gmail-supported ticket value and must not replace app totals without row-level bank or 1stPay evidence.
+          </p>
+        </section>
+      )}
 
       <FollowUpList rows={workspace.followUpRows} currency={currency} />
 

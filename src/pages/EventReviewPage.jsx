@@ -17,6 +17,7 @@ import { subscribeToOperationsLedger } from '../services/operationsLedgerService
 import { subscribeToEvents } from '../services/eventService'
 import { buildEventReview, formatEventReviewMoney } from '../utils/eventReview'
 import { formatEventDate } from '../utils/dateUtils'
+import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 
 function SummaryCard({ label, value, help }) {
   return (
@@ -146,6 +147,7 @@ export function EventReviewPage() {
     () => buildEventReview(resolvedActiveEvent, registrations, operationsEntries),
     [resolvedActiveEvent, operationsEntries, registrations],
   )
+  const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(resolvedActiveEvent?.eventId), [resolvedActiveEvent?.eventId])
 
   if (!resolvedActiveEvent?.eventId) {
     return (
@@ -274,6 +276,57 @@ export function EventReviewPage() {
           </div>
         </div>
       </Section>
+
+      {evidenceAudit && (
+        <Section eyebrow="Documentary Financial Audit" title={evidenceAudit.auditStatus}>
+          <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
+            Final profit cannot be confirmed until bank, 1stPay, baker and supplier evidence is complete.
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <SummaryCard label="Audit date" value={evidenceAudit.auditDate} />
+            <SummaryCard label="App registrations" value={review.paymentReview.registrationRecords.registrationCount} />
+            <SummaryCard label="App guests" value={review.paymentReview.registrationRecords.guestCount} />
+            <SummaryCard label="App Payments Received" value={formatEventReviewMoney(evidenceAudit.ticketIncome.appPaymentsReceived, currency)} />
+            <SummaryCard label="Verified ticket income" value={formatEventReviewMoney(evidenceAudit.ticketIncome.directlyVerifiedAmount, currency)} help="Directly Verified Gmail-supported receipts." />
+            <SummaryCard label="Inferred ticket value" value={formatEventReviewMoney(evidenceAudit.ticketIncome.inferredAmount, currency)} help="Amount Inferred. Not verified until matched to CIBC or 1stPay." />
+            <SummaryCard label="Maximum Gmail-supported value" value={formatEventReviewMoney(evidenceAudit.ticketIncome.maximumGmailSupportedValue, currency)} />
+            <SummaryCard label="Documentary-to-app variance" value={formatEventReviewMoney(evidenceAudit.ticketIncome.documentaryToAppVariance, currency)} />
+            <SummaryCard label="Gmail-supported ticket spaces" value={evidenceAudit.ticketIncome.gmailSupportedTickets} />
+            <SummaryCard label="Approximate attendance" value={evidenceAudit.attendance.approximateAttendance} help={evidenceAudit.attendance.systemCheckInNote} />
+            <SummaryCard label="Attendance evidence gap" value={evidenceAudit.attendance.attendanceToGmailGap} />
+            <SummaryCard label="Final profit status" value={evidenceAudit.finalProfitStatus} />
+            <SummaryCard label="Cash sponsorship verified" value={formatEventReviewMoney(evidenceAudit.operations.cashSponsorshipVerified, currency)} />
+            <SummaryCard label="Venue paid" value={formatEventReviewMoney(evidenceAudit.operations.venuePaid, currency)} help={evidenceAudit.operations.venueEvidenceClass} />
+            <SummaryCard label="Baker paid organizer-reported" value={formatEventReviewMoney(evidenceAudit.operations.bakerPaidOrganizerReported, currency)} />
+            <SummaryCard label="Baker outstanding organizer-reported" value={formatEventReviewMoney(evidenceAudit.operations.bakerOutstandingOrganizerReported, currency)} />
+            <SummaryCard label="Baker variance" value={formatEventReviewMoney(evidenceAudit.operations.bakerVariance, currency)} help="Needs External Evidence. Not added as an expense or liability." />
+            <SummaryCard label="Cake boxes / printing" value={formatEventReviewMoney(evidenceAudit.operations.cakeBoxesPrinting, currency)} help="Unverified / Outstanding." />
+            <SummaryCard label="Open corrective actions" value={evidenceAudit.correctiveActions.length} />
+          </div>
+
+          <div className="mt-5 grid gap-4 xl:grid-cols-2">
+            <article className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+              <p className="text-sm font-bold text-[#2B1723]">In-kind sponsorship</p>
+              <div className="mt-3 space-y-3">
+                {evidenceAudit.sponsorship.map((item) => (
+                  <div key={item.sponsor} className="rounded-xl border border-[#E7D6CC] bg-white p-3">
+                    <p className="text-xs font-bold text-[#2B1723]">{item.sponsor}</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{item.evidenceClass}</p>
+                    <p className="mt-2 text-xs leading-5 text-[#816D62]">{item.quantity} · {item.item} · cash received {formatEventReviewMoney(item.cashReceived, currency)} · estimated value unknown.</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+            <article className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+              <p className="text-sm font-bold text-[#2B1723]">Outstanding corrective actions</p>
+              <ol className="mt-3 list-decimal space-y-2 pl-5 text-xs leading-5 text-[#816D62]">
+                {evidenceAudit.correctiveActions.map((item) => <li key={item}>{item}</li>)}
+              </ol>
+            </article>
+          </div>
+        </Section>
+      )}
 
       <Section eyebrow={review.summary.eyebrow} title={review.summary.title}>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
