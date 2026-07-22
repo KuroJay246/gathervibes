@@ -38,7 +38,7 @@ export function ExportModal({ isOpen, onClose, registrations, event }) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-2 text-[#8C766A] hover:bg-[#F2E8E1] hover:text-[#2B1723]"
+            className="rounded-full p-2 text-[#80685B] hover:bg-[#F2E8E1] hover:text-[#2B1723]"
           >
             <X className="size-5" />
           </button>
@@ -47,15 +47,15 @@ export function ExportModal({ isOpen, onClose, registrations, event }) {
         <div className="p-6">
           <div className="mb-6 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 text-sm">
             <p className="font-bold text-[#2B1723]">Scope: {event?.eventName || 'Unknown Event'}</p>
-            <p className="mt-1 text-[#8C766A]">
+            <p className="mt-1 text-[#80685B]">
               Exporting {rowCount} row{rowCount === 1 ? '' : 's'} ({personsCount} person{personsCount === 1 ? '' : 's'})
             </p>
-            <p className="mt-3 text-xs italic text-[#A85F6B]">
+            <p className="mt-3 text-xs italic text-[#8A3F4B]">
               Only the selected Working Event will be exported. Audit logs and system settings are never included.
             </p>
           </div>
 
-          <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#8C766A]">
+          <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#80685B]">
             Export Preset
           </label>
           <div className="grid gap-2">
@@ -66,14 +66,14 @@ export function ExportModal({ isOpen, onClose, registrations, event }) {
                 onClick={() => setSelectedPreset(preset.id)}
                 className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition ${
                   selectedPreset === preset.id
-                    ? 'border-[#B76E79] bg-[#FFF8F9]'
+                    ? 'border-[#9A5260] bg-[#FFF8F9]'
                     : 'border-[#EFE2DA] bg-white hover:border-[#D6C1B5]'
                 }`}
               >
-                <span className={`text-sm font-bold ${selectedPreset === preset.id ? 'text-[#B76E79]' : 'text-[#2B1723]'}`}>
+                <span className={`text-sm font-bold ${selectedPreset === preset.id ? 'text-[#9A5260]' : 'text-[#2B1723]'}`}>
                   {preset.label}
                 </span>
-                {selectedPreset === preset.id && <CheckCircle2 className="size-5 text-[#B76E79]" />}
+                {selectedPreset === preset.id && <CheckCircle2 className="size-5 text-[#9A5260]" />}
               </button>
             ))}
           </div>
@@ -83,7 +83,7 @@ export function ExportModal({ isOpen, onClose, registrations, event }) {
           <button
             type="button"
             onClick={handleCopy}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#8C766A] transition hover:bg-[#F2E8E1] sm:flex-none"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#80685B] transition hover:bg-[#F2E8E1] sm:flex-none"
           >
             {copied ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
             {copied ? 'Copied' : 'Copy CSV'}

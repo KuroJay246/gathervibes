@@ -72,6 +72,7 @@ test('Phase 22 follow-up flags missing contact, duplicate contacts, missing tick
   assert.ok(keys.includes('duplicate-contacts'))
   assert.ok(keys.includes('open-operations'))
   assert.ok(keys.includes('checkin-not-started'))
+  assert.equal(review.followUp.items.find((item) => item.key === 'duplicate-contacts').to, '/registrations?review=duplicate-contacts')
 })
 
 test('Phase 22 follow-up identifies check-in in progress and complete states', () => {

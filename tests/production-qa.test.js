@@ -40,9 +40,9 @@ test('System QA route and text keep production QA scoped to CODEX_TEST', async (
 
   assert.match(app, /path="\/qa"/)
   assert.match(shell, /System QA/)
-  assert.match(page, /CODEX_TEST smoke testing/)
-  assert.match(page, /Do not use CPB for QA/)
-  assert.match(page, /does not create registrations/)
+  assert.match(page, /System status and event checks/)
+  assert.match(page, /CPB is production data and remains read-only during normal QA/)
+  assert.match(page, /do not create or change event records/)
   assert.match(page, /Copy/)
   assert.ok(qaChecklist.length >= 7)
 })

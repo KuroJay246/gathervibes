@@ -30,7 +30,7 @@ function Metric({ label, value, help }) {
   return (
     <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3" aria-label={`${label}: ${value}`}>
       <p className="text-lg font-bold text-[#2B1723]">{value}</p>
-      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8C7567]">{label}</p>
+      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#80685B]">{label}</p>
       {help && <p className="mt-1 text-xs leading-5 text-[#816D62]">{help}</p>}
     </div>
   )
@@ -77,7 +77,7 @@ function PaymentCard({ row, currency }) {
       <dl className="mt-4 grid gap-2 sm:grid-cols-3" aria-label="Payment amounts">
         {details.map(([label, value]) => (
           <div key={label} className="min-w-0 rounded-xl bg-[#FBF8F5] px-3 py-2">
-            <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8C7567]">{label}</dt>
+            <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#80685B]">{label}</dt>
             <dd className="mt-1 break-words text-sm font-bold text-[#2B1723]">{value}</dd>
           </div>
         ))}
@@ -101,10 +101,10 @@ function FollowUpList({ rows, currency }) {
     <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Needs Follow-Up</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Needs Follow-Up</p>
           <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Registration payment records to review</h2>
         </div>
-        <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#986F26]">
+        <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
           {rows.length} flagged
         </span>
       </div>
@@ -124,7 +124,7 @@ function FollowUpList({ rows, currency }) {
                   {row.warnings[0]?.message ? ` · ${row.warnings[0].message}` : ''}
                 </p>
               </div>
-              <Link to={`/registrations?reviewRegistration=${encodeURIComponent(row.registrationId)}`} className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#B76E79]">
+              <Link to={`/registrations?reviewRegistration=${encodeURIComponent(row.registrationId)}`} className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#9A5260]">
                 Review Registration
               </Link>
             </div>
@@ -174,7 +174,7 @@ export function PaymentsPage() {
         icon={CreditCard}
         title="No selected event"
         description="Select a Working Event before reviewing registration payment records."
-        action={<Link to="/events" className="mt-6 inline-block rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white">Choose an event</Link>}
+        action={<Link to="/events" className="mt-6 inline-block rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white">Choose an event</Link>}
       />
     )
   }
@@ -185,7 +185,7 @@ export function PaymentsPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Selected Working Event only</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Selected Working Event only</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Registration Payments</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
             Review registration charges, payments, balances, and records that need follow-up for <strong>{activeEvent.eventName}</strong>.
@@ -230,7 +230,7 @@ export function PaymentsPage() {
         <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="payments-evidence-heading">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Payment Evidence</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Payment Evidence</p>
               <h2 id="payments-evidence-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Documentary support for CPB ticket income</h2>
               <p className="mt-2 max-w-3xl text-xs leading-5 text-[#715D46]">
                 Evidence classification is separate from payment status. The row-level matching package remains private until organizer review.
@@ -260,7 +260,7 @@ export function PaymentsPage() {
       <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Payment Records</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Payment Records</p>
             <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Registration payment records</h2>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -273,7 +273,7 @@ export function PaymentsPage() {
                 className="min-h-10 rounded-xl border border-[#E5D7CF] py-2 pl-9 pr-3 text-xs font-bold"
               />
             </label>
-            <select value={filter} onChange={(event) => setFilter(event.target.value)} className="min-h-10 rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
+            <select aria-label="Payment record filter" value={filter} onChange={(event) => setFilter(event.target.value)} className="min-h-10 rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
               {PAYMENT_FILTERS.map(([value, label]) => (
                 <option key={value} value={value}>{label} ({workspace.filterCounts[value] ?? workspace.rows.length})</option>
               ))}
@@ -303,7 +303,7 @@ export function PaymentsPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1080px] text-left text-sm">
-                <thead className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
+                <thead className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#80685B]">
                   <tr>
                     <th className="px-3 py-2">Registration</th>
                     <th className="px-3 py-2">Status</th>

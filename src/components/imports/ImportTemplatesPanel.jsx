@@ -108,21 +108,6 @@ const TEMPLATES = [
     headers: ['Full Name', 'Buyer Name', 'Guest Names', 'Group Name', 'Email Address', 'Phone Number', 'Persons Attending', 'Payment Status', 'Payment Method', 'Payment Reference', 'Price Tier', 'Ticket Price', 'Amount Due', 'Amount Paid', 'Balance Due', 'Ticket Code', 'Notes'],
     sampleRow: ['Jamie Forms', 'Jamie Buyer', 'Jamie Forms', '', 'jamie@example.com', '555-0104', 1, 'pending', 'unknown', '', 'General', '', '', '', '', '', 'Cleaned re-import row'],
   },
-  {
-    id: 'cpb-payment-audit',
-    label: '8. CPB Payment Audit Backfill',
-    description: 'Special dry-run workflow for the Cake Piknik Barbados payment audit workbook.',
-    when: 'Use only with the organizer-reviewed CPB payment audit workbook.',
-    required: ['Payment Audit sheet', 'Ticket/Door ID', 'Guest Name', 'Buyer/Contact', 'Payment Status', 'Confidence'],
-    optional: ['Evidence Summary', 'Evidence Date', 'Email/Phone', 'Notes'],
-    exampleUse: 'Previewing proposed CPB finance backfill updates without writing to Firestore.',
-    leaveBlank: 'Leave transaction numbers and payment methods blank when not proven.',
-    doNotPut: 'Do not store Gmail links, CPB exports, backups, or private proof in registration fields.',
-    duplicates: 'Review unmatched rows, review-needed rows, Christina Morris, Gabriela missing guest, and Roger Walcott before approval.',
-    effect: 'Dry-run preview only by default; it does not apply CPB writes or create missing registrations. Cole also has the spreadsheet for independent verification.',
-    headers: ['Source Register', 'Ticket/Door ID', 'Guest Name', 'Buyer/Contact', 'Email/Phone', 'Price Tier', 'Unit Price', 'Amount Paid Confirmed', 'Expected Total', 'Balance/Due', 'Payment Status', 'Evidence Summary', 'Evidence Date', 'Confidence', 'Notes'],
-    sampleRow: ['CPB audit', 'CPB-001', 'Example Guest', 'Example Buyer', '', 'General', 100, 100, 100, 0, 'Paid - Confirmed', 'Safe summary only', '', 'High', 'No Gmail link'],
-  },
 ]
 
 export function ImportTemplatesPanel() {
@@ -157,7 +142,7 @@ export function ImportTemplatesPanel() {
     <div className="space-y-6">
       <div className="rounded-2xl border border-[#EFE2DA] bg-white p-6 shadow-sm">
         <div className="flex items-center gap-3 border-b border-[#F2E8E1] pb-4">
-          <FileSpreadsheet className="size-6 text-[#B76E79]" />
+          <FileSpreadsheet className="size-6 text-[#9A5260]" />
           <div>
             <h2 className="font-serif text-xl text-[#2B1723]">Import Templates</h2>
             <p className="text-sm text-[#816D62]">Download sample CSV files to format your data before importing.</p>
@@ -169,8 +154,8 @@ export function ImportTemplatesPanel() {
             <div key={template.id} className="flex flex-col justify-between rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
               <div>
                 <p className="font-bold text-[#2B1723]">{template.label}</p>
-                <p className="mt-1 text-xs text-[#8A7468]">{template.description}</p>
-                <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-[#A85F6B]">Includes columns:</p>
+                <p className="mt-1 text-xs text-[#6B564C]">{template.description}</p>
+                <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-[#8A3F4B]">Includes columns:</p>
                 <p className="mt-1 text-xs text-[#6B564C]">{template.headers.join(', ')}</p>
                 <dl className="mt-3 space-y-2 text-xs leading-5 text-[#6B564C]">
                   <div><dt className="font-bold text-[#2B1723]">When to use it</dt><dd>{template.when}</dd></div>
@@ -195,9 +180,9 @@ export function ImportTemplatesPanel() {
                 <button
                   type="button"
                   onClick={() => handleCopyHeaders(template)}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#8C766A] transition hover:bg-[#F2E8E1]"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#6B564C] transition hover:bg-[#F2E8E1]"
                 >
-                  {copiedId === `${template.id}-headers` ? <CheckCircle2 className="size-3.5 text-[#B76E79]" /> : <Copy className="size-3.5" />}
+                  {copiedId === `${template.id}-headers` ? <CheckCircle2 className="size-3.5 text-[#9A5260]" /> : <Copy className="size-3.5" />}
                   {copiedId === `${template.id}-headers` ? 'Copied' : 'Copy Headers'}
                 </button>
               </div>
@@ -211,10 +196,10 @@ export function ImportTemplatesPanel() {
           <Info className="mt-0.5 size-5 shrink-0 text-[#2C7B8B]" />
           <div>
             <h3 className="font-bold text-[#1F5763]">Google Sheets Workflow</h3>
-            <p className="mt-1 text-sm text-[#3E7C8B]">
+            <p className="mt-1 text-sm text-[#245F6B]">
               Because direct Google Sheets integration is deferred, follow these manual steps to sync data:
             </p>
-            <ol className="ml-4 mt-3 list-decimal space-y-2 text-sm text-[#3E7C8B]">
+            <ol className="ml-4 mt-3 list-decimal space-y-2 text-sm text-[#245F6B]">
               <li>Go to the <strong>Registrations</strong> page and click <strong>Export CSV</strong> (use "Google Forms re-import template").</li>
               <li>Open Google Sheets and click <strong>File &rarr; Import</strong>.</li>
               <li>Upload the CSV and choose "Replace current sheet" or "Create new spreadsheet".</li>

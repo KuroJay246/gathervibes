@@ -55,6 +55,29 @@ function registrationNeedsReview(registration = {}, event = {}) {
   return Boolean(finance.needsFinanceReview || registration.financeReviewRequired || !registration.ticketCode)
 }
 
+function duplicateContactKeys(registrations = []) {
+  const emailCounts = new Map()
+  const phoneCounts = new Map()
+
+  registrations.forEach((registration) => {
+    const email = String(registration.email || '').trim().toLowerCase()
+    const phone = String(registration.phone || '').trim().toLowerCase()
+    if (email) emailCounts.set(email, (emailCounts.get(email) || 0) + 1)
+    if (phone) phoneCounts.set(phone, (phoneCounts.get(phone) || 0) + 1)
+  })
+
+  return { emailCounts, phoneCounts }
+}
+
+function hasDuplicateContact(registration = {}, contactKeys = duplicateContactKeys([])) {
+  const email = String(registration.email || '').trim().toLowerCase()
+  const phone = String(registration.phone || '').trim().toLowerCase()
+  return Boolean(
+    (email && (contactKeys.emailCounts.get(email) || 0) > 1)
+    || (phone && (contactKeys.phoneCounts.get(phone) || 0) > 1),
+  )
+}
+
 function matchesCardFilter(registration = {}, key, event = {}) {
   const finance = calculateRegistrationFinance(registration, event)
   if (!key) return true
@@ -73,13 +96,13 @@ function CountCard({ label, value, help, active, onClick }) {
   return (
     <div
       className={`rounded-xl border px-4 py-3 text-left transition ${
-        active ? 'border-[#B76E79] bg-[#FFF8F2] ring-2 ring-[#B76E79]/20' : 'border-[#EEDFD6] bg-white hover:bg-[#FBF8F5]'
+        active ? 'border-[#9A5260] bg-[#FFF8F2] ring-2 ring-[#9A5260]/20' : 'border-[#EEDFD6] bg-white hover:bg-[#FBF8F5]'
       }`}
       title={help}
     >
       <button type="button" onClick={onClick} className="block w-full text-left">
         <p className="text-lg font-bold text-[#2B1723]">{value}</p>
-        <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
+        <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{label}</p>
       </button>
       {help && <InfoHint className="mt-1" label={`${label} help`}>{help}</InfoHint>}
     </div>
@@ -100,6 +123,7 @@ export function RegistrationsPage() {
   const [success, setSuccess] = useState('')
   const [selectedIds, setSelectedIds] = useState(new Set())
   const reviewRegistrationId = searchParams.get('reviewRegistration') || ''
+  const reviewMode = searchParams.get('review') || ''
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
@@ -154,7 +178,7 @@ export function RegistrationsPage() {
         title="No selected event"
         description="Select an event from Events or the dashboard before managing registrations."
         action={(
-          <Link to="/events" className="mt-6 inline-block rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B]">
+          <Link to="/events" className="mt-6 inline-block rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B]">
             Choose an event
           </Link>
         )}
@@ -171,44 +195,52 @@ export function RegistrationsPage() {
   if (loading) return <LoadingState message="Loading registrations…" />
   if (loadError) return <ErrorState message={loadError} onRetry={retryRegistrationsLoad} />
 
+  const duplicateContactReview = reviewMode === 'duplicate-contacts'
+  const effectiveFilters = duplicateContactReview ? { ...filters, duplicateContacts: true } : filters
+  const effectiveActiveTab = duplicateContactReview ? 'All' : activeTab
+  const effectiveCardFilter = duplicateContactReview ? '' : cardFilter
+  const duplicateContactLookup = duplicateContactKeys(registrations)
   const filteredRegistrations = registrations.filter((reg) => {
     const finance = calculateRegistrationFinance(reg, activeEvent)
-    if (!matchesCardFilter(reg, cardFilter, activeEvent)) return false
+    if (!matchesCardFilter(reg, effectiveCardFilter, activeEvent)) return false
     // 1. Tab filtering
-    if (activeTab === 'Checked In' && !reg.checkedIn) return false
-    if (activeTab === 'Missing Ticket Code' && reg.ticketCode) return false
-    if (activeTab === 'Door Paid' && !paymentStatusMatches(reg.paymentStatus, 'door')) return false
-    if (activeTab === 'To Pay at Door' && !paymentStatusMatches(reg.paymentStatus, 'door-list')) return false
-    if (activeTab === 'Needs Review' && !registrationNeedsReview(reg, activeEvent)) return false
-    if (['Paid', 'Pending', 'Complimentary', 'Outstanding Balance'].includes(activeTab)) {
-      if (!financeFilterMatches(reg, activeTab, activeEvent)) return false
+    if (effectiveActiveTab === 'Checked In' && !reg.checkedIn) return false
+    if (effectiveActiveTab === 'Missing Ticket Code' && reg.ticketCode) return false
+    if (effectiveActiveTab === 'Door Paid' && !paymentStatusMatches(reg.paymentStatus, 'door')) return false
+    if (effectiveActiveTab === 'To Pay at Door' && !paymentStatusMatches(reg.paymentStatus, 'door-list')) return false
+    if (effectiveActiveTab === 'Needs Review' && !registrationNeedsReview(reg, activeEvent)) return false
+    if (['Paid', 'Pending', 'Complimentary', 'Outstanding Balance'].includes(effectiveActiveTab)) {
+      if (!financeFilterMatches(reg, effectiveActiveTab, activeEvent)) return false
     }
 
     // 2. Advanced Filters
-    if (filters.keyword) {
-      const q = filters.keyword.toLowerCase()
+    if (effectiveFilters.keyword) {
+      const q = effectiveFilters.keyword.toLowerCase()
       if (![reg.fullName, reg.buyerName, attendeeNamesText(reg), reg.email, reg.phone, reg.ticketCode].some(v => v?.toLowerCase().includes(q))) {
         return false
       }
     }
-    if (filters.guestName && !reg.fullName?.toLowerCase().includes(filters.guestName.toLowerCase())) return false
-    if (filters.buyerName && !reg.buyerName?.toLowerCase().includes(filters.buyerName.toLowerCase())) return false
-    if (filters.attendeeName && !attendeeNamesText(reg).toLowerCase().includes(filters.attendeeName.toLowerCase())) return false
-    if (filters.contact && !(reg.email?.toLowerCase().includes(filters.contact.toLowerCase()) || reg.phone?.toLowerCase().includes(filters.contact.toLowerCase()))) return false
-    if (filters.group && !reg.groupName?.toLowerCase().includes(filters.group.toLowerCase())) return false
-    if (filters.ticketCode && !reg.ticketCode?.toLowerCase().includes(filters.ticketCode.toLowerCase())) return false
-    if (filters.priceTier && !reg.priceTier?.toLowerCase().includes(filters.priceTier.toLowerCase())) return false
-    if (filters.paymentStatus && !paymentStatusMatches(reg.paymentStatus, filters.paymentStatus)) return false
-    if (filters.paymentMethod && reg.paymentMethod !== filters.paymentMethod) return false
-    if (filters.balanceDue) {
+    if (effectiveFilters.guestName && !reg.fullName?.toLowerCase().includes(effectiveFilters.guestName.toLowerCase())) return false
+    if (effectiveFilters.buyerName && !reg.buyerName?.toLowerCase().includes(effectiveFilters.buyerName.toLowerCase())) return false
+    if (effectiveFilters.attendeeName && !attendeeNamesText(reg).toLowerCase().includes(effectiveFilters.attendeeName.toLowerCase())) return false
+    if (effectiveFilters.contact && !(reg.email?.toLowerCase().includes(effectiveFilters.contact.toLowerCase()) || reg.phone?.toLowerCase().includes(effectiveFilters.contact.toLowerCase()))) return false
+    if (effectiveFilters.group && !reg.groupName?.toLowerCase().includes(effectiveFilters.group.toLowerCase())) return false
+    if (effectiveFilters.ticketCode && !reg.ticketCode?.toLowerCase().includes(effectiveFilters.ticketCode.toLowerCase())) return false
+    if (effectiveFilters.priceTier && !reg.priceTier?.toLowerCase().includes(effectiveFilters.priceTier.toLowerCase())) return false
+    if (effectiveFilters.paymentStatus && !paymentStatusMatches(reg.paymentStatus, effectiveFilters.paymentStatus)) return false
+    if (effectiveFilters.paymentMethod && reg.paymentMethod !== effectiveFilters.paymentMethod) return false
+    if (effectiveFilters.balanceDue) {
       if (!finance.balanceDue || finance.balanceDue <= 0) return false
     }
-    if (filters.missingTicket && reg.ticketCode) return false
-    if (filters.missingAmount) {
+    if (effectiveFilters.missingTicket && reg.ticketCode) return false
+    if (effectiveFilters.missingAmount) {
       if (finance.amountDue !== null && finance.amountPaid !== null) return false
     }
-    if (filters.reviewNeeded) {
+    if (effectiveFilters.reviewNeeded) {
       if (!registrationNeedsReview(reg, activeEvent)) return false
+    }
+    if (effectiveFilters.duplicateContacts) {
+      if (!hasDuplicateContact(reg, duplicateContactLookup)) return false
     }
     
     return true
@@ -217,7 +249,7 @@ export function RegistrationsPage() {
   const filteredMetrics = buildRegistrationMetrics(filteredRegistrations, activeEvent)
   const financeSummary = buildFinanceSummary(registrations, activeEvent)
   const evidenceAudit = getEventFinancialEvidenceAudit(activeEvent?.eventId)
-  const isFiltering = activeTab !== 'All' || Boolean(cardFilter) || Object.values(filters).some(Boolean)
+  const isFiltering = effectiveActiveTab !== 'All' || Boolean(effectiveCardFilter) || Object.values(effectiveFilters).some(Boolean)
   const showingText = isFiltering
     ? `Showing ${filteredMetrics.totalRegistrations} registration${filteredMetrics.totalRegistrations === 1 ? '' : 's'} covering ${filteredMetrics.totalPersons} guest${filteredMetrics.totalPersons === 1 ? '' : 's'}.`
     : 'Showing all registrations.'
@@ -350,7 +382,7 @@ export function RegistrationsPage() {
           <button
             type="button"
             onClick={() => setIsExportModalOpen(true)}
-            className="flex items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#8C766A] shadow-sm transition hover:bg-[#FBF8F5]"
+            className="flex items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#80685B] shadow-sm transition hover:bg-[#FBF8F5]"
           >
             <Download className="size-4" />
             <span className="hidden sm:inline">Export CSV</span>
@@ -358,20 +390,20 @@ export function RegistrationsPage() {
           </button>
           <Link
             to="/imports"
-            className="flex items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#8C766A] shadow-sm transition hover:bg-[#FBF8F5]"
+            className="flex items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#80685B] shadow-sm transition hover:bg-[#FBF8F5]"
           >
             Import Center
           </Link>
           <Link
             to="/payments"
-            className="flex items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#8C766A] shadow-sm transition hover:bg-[#FBF8F5]"
+            className="flex items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-5 py-2.5 text-sm font-bold text-[#80685B] shadow-sm transition hover:bg-[#FBF8F5]"
           >
             Payments
           </Link>
           <button
             type="button"
             onClick={() => { setEditingRegistration(null); setIsModalOpen(true) }}
-            className="flex items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B]"
+            className="flex items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B]"
           >
             <Plus className="size-4" />
             <span className="hidden sm:inline">Add registration</span>
@@ -431,7 +463,7 @@ export function RegistrationsPage() {
         <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="registration-audit-heading">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Registration Evidence Reconciliation</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Registration Evidence Reconciliation</p>
               <h2 id="registration-audit-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">CPB booking crosswalk in organizer review</h2>
               <p className="mt-2 max-w-3xl text-xs leading-5 text-[#715D46]">
                 The private manifest maps audit booking IDs to current registration records. Exact and high-confidence matches can be proposed; candidate, conflict and unmatched records stay in organizer review.
@@ -452,7 +484,7 @@ export function RegistrationsPage() {
 
       <div className="flex flex-col gap-6">
         <RegistrationFilters 
-          filters={filters} 
+          filters={effectiveFilters}
           onFilterChange={setFilters} 
           onClearFilters={() => { setFilters({}); setActiveTab('All'); setCardFilter('') }} 
         />
@@ -467,7 +499,7 @@ export function RegistrationsPage() {
                 className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition ${
                   activeTab === tab
                     ? 'bg-[#2B1723] text-white'
-                    : 'bg-white text-[#8C766A] border border-[#E5D7CF] hover:bg-[#F2E8E1]'
+                    : 'bg-white text-[#80685B] border border-[#E5D7CF] hover:bg-[#F2E8E1]'
                 }`}
               >
                 {tab}
@@ -497,7 +529,7 @@ export function RegistrationsPage() {
             <button
               type="button"
               onClick={clearSelection}
-              className="rounded-xl px-4 py-2 text-xs font-bold text-[#8C7567] hover:bg-[#F2E8E1]"
+              className="rounded-xl px-4 py-2 text-xs font-bold text-[#80685B] hover:bg-[#F2E8E1]"
             >
               Clear selected
             </button>
@@ -594,7 +626,7 @@ export function RegistrationsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
+                  <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#80685B]">
                     <th className="px-4 py-3">
                       <input
                         type="checkbox"
@@ -631,10 +663,10 @@ export function RegistrationsPage() {
                       <td className="px-4 py-3">
                         <div className="font-medium text-[#2B1723]">{reg.fullName}</div>
                         <div className="mt-1 flex flex-wrap gap-2">
-                          <span className="rounded-full bg-[#FFF8F2] px-2 py-0.5 text-[10px] font-bold text-[#B76E79]">{personsLabel(reg)}</span>
-                          {registrationNeedsReview(reg, activeEvent) && <span className="rounded-full bg-[#FFF7E8] px-2 py-0.5 text-[10px] font-bold text-[#986F26]">Needs review</span>}
+                          <span className="rounded-full bg-[#FFF8F2] px-2 py-0.5 text-[10px] font-bold text-[#9A5260]">{personsLabel(reg)}</span>
+                          {registrationNeedsReview(reg, activeEvent) && <span className="rounded-full bg-[#FFF7E8] px-2 py-0.5 text-[10px] font-bold text-[#7A5818]">Needs review</span>}
                         </div>
-                        {reg.buyerName && <div className="text-xs font-semibold text-[#8C7567]">Buyer: {reg.buyerName}</div>}
+                        {reg.buyerName && <div className="text-xs font-semibold text-[#80685B]">Buyer: {reg.buyerName}</div>}
                         {attendeeNamesText(reg) && <div className="max-w-xs text-xs text-[#5D4A52]">Guests: {attendeeNamesText(reg)}</div>}
                         {reg.groupName && <div className="text-xs text-[#816D62]">{reg.groupName}</div>}
                       </td>
@@ -665,14 +697,14 @@ export function RegistrationsPage() {
                         <button
                           type="button"
                           onClick={() => { setEditingRegistration(reg); setIsModalOpen(true) }}
-                          className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#8C766A] hover:bg-[#FFF8F2]"
+                          className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#80685B] hover:bg-[#FFF8F2]"
                         >
                           Edit
                         </button>
                         <button
                           type="button"
                           onClick={() => setDeletingRegistration(reg)}
-                          className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#A85F6B] hover:bg-[#FCEEF1]"
+                          className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#8A3F4B] hover:bg-[#FCEEF1]"
                         >
                           Delete
                         </button>

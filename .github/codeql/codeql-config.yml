@@ -1,0 +1,16 @@
+name: Gather and Savor CodeQL config
+
+paths:
+  - src
+  - scripts
+  - tests
+
+paths-ignore:
+  - dist
+  - node_modules
+
+query-filters:
+  - include:
+      tags contain: security
+  - include:
+      tags contain: correctness

@@ -30,10 +30,9 @@ test('Phase 17E-B docs and current UI keep accessRequests non-live', async () =>
   const readiness = await readFile('PHASE_17E_E_ACCESS_WORKFLOW_DEPLOYMENT_READINESS.md', 'utf8')
   const phase17gB = await readFile('PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md', 'utf8')
 
-  assert.match(settings, /Access request actions disabled/)
-  assert.match(settings, /Staff profile editing disabled/)
-  assert.match(settings, /Assignment editing disabled/)
-  assert.match(settings, /Role editing is not exposed/)
+  assert.match(settings, /Access is controlled outside this page/)
+  assert.match(settings, /cannot add, remove, disable, or change anyone's role/)
+  assert.match(settings, /Helper access does not grant Settings or full organizer access/)
   assert.doesNotMatch(settings, /accessRequests\/\{requestId\}/)
   assert.match(qa, /Staff role boundary/)
   assert.match(qa, /Firestore role enforcement/)

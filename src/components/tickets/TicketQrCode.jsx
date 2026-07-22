@@ -61,8 +61,8 @@ export function TicketQrCode({ ticketCode, compact = false }) {
   return (
     <div className={`rounded-xl border border-[#EEDFD6] bg-[#FBF8F5] p-3 ${compact ? 'max-w-[9rem]' : 'max-w-[12rem]'}`}>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Ticket QR</p>
-        <QrCode className="size-4 text-[#B76E79]" />
+        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Ticket QR</p>
+        <QrCode className="size-4 text-[#9A5260]" />
       </div>
       {dataUrl ? (
         <img
@@ -71,7 +71,7 @@ export function TicketQrCode({ ticketCode, compact = false }) {
           className="mt-2 aspect-square w-full rounded-lg border border-[#E5D7CF] bg-white p-1"
         />
       ) : (
-        <div className="mt-2 grid aspect-square w-full place-items-center rounded-lg border border-[#E5D7CF] bg-white text-[10px] text-[#8C7567]">
+        <div className="mt-2 grid aspect-square w-full place-items-center rounded-lg border border-[#E5D7CF] bg-white text-[10px] text-[#80685B]">
           Loading QR
         </div>
       )}

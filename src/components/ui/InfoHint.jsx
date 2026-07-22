@@ -15,7 +15,7 @@ export function InfoHint({ label = 'More information', children, className = '' 
           setOpen((current) => !current)
         }}
         onBlur={() => setOpen(false)}
-        className="inline-flex size-5 items-center justify-center rounded-full text-[#A48A7B] transition hover:bg-[#F7F1ED] hover:text-[#2B1723] focus:bg-[#F7F1ED] focus:text-[#2B1723] focus:outline-none"
+        className="inline-flex size-5 items-center justify-center rounded-full text-[#80685B] transition hover:bg-[#F7F1ED] hover:text-[#2B1723] focus:bg-[#F7F1ED] focus:text-[#2B1723] focus:outline-none"
       >
         <Info className="size-3.5" aria-hidden="true" />
       </button>

@@ -150,11 +150,11 @@ export function EventFormModal({ event, onClose, onSave }) {
       >
         <div className="flex items-center justify-between border-b border-[#EEDFD6] px-5 py-4 sm:px-7 sm:py-5">
           <div className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-xl bg-[#FCEEF1] text-[#B76E79]">
+            <span className="grid size-10 place-items-center rounded-xl bg-[#FCEEF1] text-[#9A5260]">
               <CalendarDays className="size-[18px]" />
             </span>
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">{isEditing ? 'Update details' : 'New gathering'}</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">{isEditing ? 'Update details' : 'New gathering'}</p>
               <h2 id="event-form-title" className="mt-1 font-serif text-xl text-[#2B1723]">
                 {isEditing ? 'Edit event' : 'Create an event'}
               </h2>
@@ -220,7 +220,7 @@ export function EventFormModal({ event, onClose, onSave }) {
               <div>
                 <label htmlFor="ticketPrice" className="event-label">Default base ticket price (BBD) <span>*</span></label>
                 <input id="ticketPrice" type="number" min="0" step="0.01" value={values.ticketPrice} onChange={(changeEvent) => updateField('ticketPrice', changeEvent.target.value)} className={inputClass('ticketPrice')} placeholder="75.00" disabled={saving} />
-                <p className="mt-1 text-[11px] leading-5 text-[#8C7567]">Used as a fallback for older records. Registration price tiers and explicit ticket prices drive finance totals.</p>
+                <p className="mt-1 text-[11px] leading-5 text-[#80685B]">Used as a fallback for older records. Registration price tiers and explicit ticket prices drive finance totals.</p>
                 <FieldError id="ticketPrice-error">{errors.ticketPrice}</FieldError>
               </div>
 
@@ -234,7 +234,7 @@ export function EventFormModal({ event, onClose, onSave }) {
             <div className="mt-7">
               <div className="mb-3 flex items-center justify-between">
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">Optional</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Optional</p>
                   <h3 className="font-serif text-base text-[#2B1723]">Price tiers</h3>
                 </div>
                 {values.priceTiers.length < MAX_PRICE_TIERS && (
@@ -321,7 +321,7 @@ export function EventFormModal({ event, onClose, onSave }) {
                             onClick={() => removeTier(index)}
                             disabled={saving}
                             aria-label={`Remove tier ${index + 1}`}
-                            className="rounded-lg p-2 text-[#9B867A] hover:bg-[#FCEEF1] hover:text-[#B76E79] disabled:opacity-40"
+                            className="rounded-lg p-2 text-[#9B867A] hover:bg-[#FCEEF1] hover:text-[#9A5260] disabled:opacity-40"
                           >
                             <Trash2 className="size-4" />
                           </button>
@@ -336,7 +336,7 @@ export function EventFormModal({ event, onClose, onSave }) {
 
           <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-[#EEDFD6] bg-white px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
             <button type="button" onClick={onClose} disabled={saving} className="rounded-xl border border-[#E1D1C8] px-5 py-3 text-xs font-bold text-[#6B564C] hover:bg-[#FFF8F2] disabled:opacity-50">Cancel</button>
-            <button type="submit" disabled={saving} className="inline-flex min-w-32 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#B76E79]/20 hover:bg-[#A9606B] disabled:opacity-60">
+            <button type="submit" disabled={saving} className="inline-flex min-w-32 items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#9A5260]/20 hover:bg-[#A9606B] disabled:opacity-60">
               {saving && <span className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />}
               {saving ? 'Saving…' : isEditing ? 'Save changes' : 'Create event'}
             </button>

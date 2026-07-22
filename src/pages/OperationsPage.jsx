@@ -63,7 +63,7 @@ function labelFor(value) {
 }
 
 function FieldHelp({ children }) {
-  return <p className="mt-1 text-[11px] leading-4 text-[#8C7567]">{children}</p>
+  return <p className="mt-1 text-[11px] leading-4 text-[#80685B]">{children}</p>
 }
 
 function buildFilterScopeLabel(filters = DEFAULT_FILTERS) {
@@ -167,7 +167,7 @@ export function OperationsPage() {
         icon={ReceiptText}
         title="No selected event"
         description="Select a Working Event before tracking event operations money."
-        action={<Link to="/events" className="mt-6 inline-block rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white">Choose an event</Link>}
+        action={<Link to="/events" className="mt-6 inline-block rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white">Choose an event</Link>}
       />
     )
   }
@@ -271,7 +271,7 @@ export function OperationsPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Selected Working Event only</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Selected Working Event only</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Event Operations / Money Tracker</h2>
           <p className="mt-2 text-sm text-[#816D62]">
             Track event-level obligations for <strong>{activeEvent.eventName}</strong>. Registration payments are reviewed separately in Payments.
@@ -338,7 +338,7 @@ export function OperationsPage() {
         ].map(([label, value]) => (
           <div key={label} className="rounded-xl border border-[#EEDFD6] bg-white p-4">
             <p className="text-lg font-bold text-[#2B1723]">{value}</p>
-            <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
+            <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{label}</p>
             {label === 'Operations Cash Position' && (
               <p className="mt-2 text-[11px] leading-5 text-[#816D62]">This is not final event profit.</p>
             )}
@@ -350,7 +350,7 @@ export function OperationsPage() {
         <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="operations-closeout-heading">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Financial Audit and Closeout History</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Financial Audit and Closeout History</p>
               <h2 id="operations-closeout-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Phase 23N Operations closeout applied</h2>
               <p className="mt-2 max-w-3xl text-xs leading-5 text-[#715D46]">
                 Applied batch PH23N_SUBSETS_1_4_PRODUCTION_APPLY_2026-07-22T043009926Z created the completed Operations and in-kind records below. Subsets 5 and 6 remain locked, and open corrective tasks are evidence review only.
@@ -388,7 +388,7 @@ export function OperationsPage() {
             {evidenceAudit.sponsorship.map((item) => (
               <article key={item.sponsor} className="rounded-xl border border-[#EEDFD6] bg-white p-4" aria-label={`${item.sponsor}: ${item.evidenceClass}`}>
                 <p className="text-sm font-bold text-[#2B1723]">{item.sponsor}</p>
-                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#8C7567]">In-kind · {item.evidenceClass}</p>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#80685B]">In-kind · {item.evidenceClass}</p>
                 <p className="mt-2 text-xs leading-5 text-[#715D46]">{item.quantity} · {item.item} · Cash impact {formatCurrency(item.cashReceived)} · Estimated value unknown.</p>
               </article>
             ))}
@@ -406,76 +406,76 @@ export function OperationsPage() {
         {canEditOperations && <form onSubmit={saveEntry} className="rounded-2xl border border-[#EEDFD6] bg-white p-5">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="font-serif text-xl text-[#2B1723]">{editing ? 'Edit entry' : 'Add entry'}</h3>
-            {editing && <button type="button" onClick={resetForm} className="rounded-lg p-2 text-[#8C7567] hover:bg-[#F2E8E1]" aria-label="Cancel edit"><X className="size-4" /></button>}
+            {editing && <button type="button" onClick={resetForm} className="rounded-lg p-2 text-[#80685B] hover:bg-[#F2E8E1]" aria-label="Cancel edit"><X className="size-4" /></button>}
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Entry Type</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Entry Type</span>
               <select value={form.entryType} onChange={(event) => setForm((current) => ({ ...current, entryType: event.target.value }))} className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm">
                 {LEDGER_ENTRY_TYPES.map((type) => <option key={type} value={type}>{labelFor(type)}</option>)}
               </select>
               <FieldHelp>Choose whether this entry is money coming in, money going out, or an internal correction.</FieldHelp>
             </label>
             <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Status</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Status</span>
               <select value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm">
                 {LEDGER_STATUSES.map((status) => <option key={status} value={status}>{labelFor(status)}</option>)}
               </select>
               <FieldHelp>Track whether this entry is planned, pending, paid, cancelled, or already received. {STATUS_HELP[form.status]}</FieldHelp>
             </label>
             <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Category</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Category</span>
               <input value={form.category} onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))} placeholder="Sponsor, Baker payment, Venue, Decor" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
               <FieldHelp>Group this entry so event costs and income are easier to review later.</FieldHelp>
             </label>
             <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Amount</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Amount</span>
               <input value={form.amount} onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))} placeholder="100.00" type="number" min="0" step="0.01" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
               <FieldHelp>Enter the amount for this operation. Leave blank only when no amount is known yet.</FieldHelp>
             </label>
             <label className="block sm:col-span-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Short description / title</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Short description / title</span>
               <input value={form.label} onChange={(event) => setForm((current) => ({ ...current, label: event.target.value }))} placeholder="Sponsor payment from Cake Co." className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
               <FieldHelp>Use a short name that makes this entry easy to recognize.</FieldHelp>
             </label>
             <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Payment Method</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Payment Method</span>
               <select value={form.paymentMethod} onChange={(event) => setForm((current) => ({ ...current, paymentMethod: event.target.value }))} className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm">
                 {PAYMENT_METHOD_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
               </select>
               <FieldHelp>Choose how the payment was made or recorded. Use Unknown / Not Recorded only when the detail is genuinely not available yet.</FieldHelp>
             </label>
             <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Payment Reference</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Payment Reference</span>
               <input value={form.paymentReference} onChange={(event) => setForm((current) => ({ ...current, paymentReference: event.target.value }))} placeholder="Receipt or transaction reference" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
               <FieldHelp>Add a receipt number, transfer note, invoice number, or other proof reference. Registration payment references belong on registration records unless this is intentionally separate Operations income.</FieldHelp>
             </label>
             <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Paid By / Paid To</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Paid By / Paid To</span>
               <input value={form.paidByOrPaidTo} onChange={(event) => setForm((current) => ({ ...current, paidByOrPaidTo: event.target.value }))} placeholder="Who paid you, or who you paid" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
               <FieldHelp>Record who paid or who received the payment.</FieldHelp>
             </label>
             <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Date</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Date</span>
               <input value={form.date} onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))} type="date" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
               <FieldHelp>Use the date the payment, expense, or note relates to.</FieldHelp>
             </label>
             <label className="block sm:col-span-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#8C7567]">Notes</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Notes</span>
               <textarea value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} placeholder="Short internal note" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" rows={3} />
               <FieldHelp>Add any extra context needed for later review. Do not store credentials, private exports, or payment proof links here.</FieldHelp>
             </label>
           </div>
 
-          <button type="submit" disabled={saving} className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 text-sm font-bold text-white disabled:opacity-50">
+          <button type="submit" disabled={saving} className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 text-sm font-bold text-white disabled:opacity-50">
             {editing ? <Save className="size-4" /> : <Plus className="size-4" />}
             {saving ? 'Saving...' : editing ? 'Save entry' : 'Add entry'}
           </button>
         </form>}
         {!canEditOperations && (
           <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Read-only operations role</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Read-only operations role</p>
             <h3 className="mt-2 font-serif text-xl text-[#2B1723]">Assigned event ledger view</h3>
             <p className="mt-3 text-sm leading-6 text-[#816D62]">
               Operations helpers can review assigned-event ledger entries here. Creating, editing, cancelling, registration deletes,
@@ -539,7 +539,7 @@ export function OperationsPage() {
             ].map(([label, value]) => (
               <div key={label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
                 <p className="text-sm font-bold text-[#2B1723]">{value}</p>
-                <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{label}</p>
               </div>
             ))}
           </div>
@@ -560,7 +560,7 @@ export function OperationsPage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-left text-sm">
-                  <thead className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
+                  <thead className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#80685B]">
                     <tr>
                       <th className="px-3 py-2">Entry</th>
                       <th className="px-3 py-2">Type</th>
@@ -584,7 +584,7 @@ export function OperationsPage() {
                         <td className="px-3 py-3 text-right">
                           {canEditOperations ? (
                             <>
-                              <button type="button" onClick={() => editEntry(entry)} disabled={saving || entry.status === 'cancelled'} className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#8C766A] hover:bg-[#FFF8F2] disabled:opacity-40">
+                              <button type="button" onClick={() => editEntry(entry)} disabled={saving || entry.status === 'cancelled'} className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#80685B] hover:bg-[#FFF8F2] disabled:opacity-40">
                                 <Edit3 className="inline size-3.5" /> Edit
                               </button>
                               <button type="button" onClick={() => cancelEntry(entry)} disabled={saving || entry.status === 'cancelled'} className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#A32626] hover:bg-[#FFF1F1] disabled:opacity-40">
@@ -592,7 +592,7 @@ export function OperationsPage() {
                               </button>
                             </>
                           ) : (
-                            <span className="text-xs font-semibold text-[#8C7567]">Read-only</span>
+                            <span className="text-xs font-semibold text-[#80685B]">Read-only</span>
                           )}
                         </td>
                       </tr>

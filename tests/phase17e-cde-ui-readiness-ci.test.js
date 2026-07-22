@@ -20,10 +20,9 @@ test('Daily QA workflow stays read-only and matches the current login surface', 
 test('access workflow remains disabled in organizer Settings', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
 
-  assert.match(settings, /Access request actions disabled/)
-  assert.match(settings, /Staff profile editing disabled/)
-  assert.match(settings, /Assignment editing disabled/)
-  assert.match(settings, /Role editing is not exposed/)
+  assert.match(settings, /Access is controlled outside this page/)
+  assert.match(settings, /cannot add, remove, disable, or change anyone's role/)
+  assert.match(settings, /No editable control here/)
   assert.doesNotMatch(settings, /Approve request: not live/)
   assert.doesNotMatch(settings, /Submit request \(not live\)/)
   assert.doesNotMatch(settings, /Requester form prototype/)

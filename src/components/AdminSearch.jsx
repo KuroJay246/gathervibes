@@ -9,7 +9,7 @@ import { buildAdminSearchResults } from '../utils/adminSearch'
 const badgeTone = {
   Event: 'bg-[#F3EEFF] text-[#6B3FA0]',
   Registration: 'bg-[#E5F3EC] text-[#1E7345]',
-  Ticket: 'bg-[#FFF4DF] text-[#986F26]',
+  Ticket: 'bg-[#FFF4DF] text-[#7A5818]',
   'Check-In': 'bg-[#FCEEF1] text-[#A32626]',
 }
 
@@ -77,7 +77,7 @@ export function AdminSearch() {
         onFocus={() => setFocused(true)}
         onBlur={() => window.setTimeout(() => setFocused(false), 140)}
         placeholder={activeEvent?.eventId ? 'Search events, guests, tickets…' : 'Search events…'}
-        className="min-h-11 w-full rounded-xl border border-[#E7D6CC] bg-white py-2.5 pl-10 pr-9 text-sm text-[#2B1723] shadow-sm focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/15"
+        className="min-h-11 w-full rounded-xl border border-[#E7D6CC] bg-white py-2.5 pl-10 pr-9 text-sm text-[#2B1723] shadow-sm focus:border-[#9A5260] focus:outline-none focus:ring-2 focus:ring-[#9A5260]/15"
       />
       {query && (
         <button
@@ -93,18 +93,18 @@ export function AdminSearch() {
       {showPanel && (
         <div className="absolute right-0 top-[calc(100%+0.5rem)] z-40 w-[min(34rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#E7D6CC] bg-white shadow-[0_18px_60px_rgba(43,23,35,0.16)]">
           <div className="border-b border-[#F2E8E1] px-4 py-3">
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#B76E79]">Workspace search</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9A5260]">Workspace search</p>
             {!activeEvent?.eventId && (
-              <p className="mt-1 text-xs text-[#8C7567]">Select a Working Event to search registrations, tickets, and check-in records.</p>
+              <p className="mt-1 text-xs text-[#80685B]">Select a Working Event to search registrations, tickets, and check-in records.</p>
             )}
           </div>
 
           {loading ? (
-            <p className="px-4 py-5 text-sm text-[#8C7567]">Searching…</p>
+            <p className="px-4 py-5 text-sm text-[#80685B]">Searching…</p>
           ) : error ? (
             <p className="px-4 py-5 text-sm text-[#A32626]">{error}</p>
           ) : results.length === 0 ? (
-            <p className="px-4 py-5 text-sm text-[#8C7567]">No results found.</p>
+            <p className="px-4 py-5 text-sm text-[#80685B]">No results found.</p>
           ) : (
             <ul className="max-h-[22rem] overflow-y-auto py-2">
               {results.map((result) => (
@@ -120,7 +120,7 @@ export function AdminSearch() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-bold text-[#2B1723]">{result.title}</span>
-                      <span className="mt-0.5 block truncate text-xs text-[#8C7567]">{result.detail}</span>
+                      <span className="mt-0.5 block truncate text-xs text-[#80685B]">{result.detail}</span>
                     </span>
                   </button>
                 </li>

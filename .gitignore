@@ -16,6 +16,8 @@ secrets/
 *.key
 *.local
 test_output.txt
+test-results/
+playwright-report/
 
 test_output.txt
 

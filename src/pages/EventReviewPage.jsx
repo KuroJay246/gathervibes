@@ -23,7 +23,7 @@ function SummaryCard({ label, value, help }) {
   return (
     <article className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4" aria-label={`${label}: ${value}`}>
       <p className="text-lg font-bold text-[#2B1723]">{value}</p>
-      <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{label}</p>
+      <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{label}</p>
       {help && <p className="mt-2 text-[11px] leading-5 text-[#816D62]">{help}</p>}
     </article>
   )
@@ -32,7 +32,7 @@ function SummaryCard({ label, value, help }) {
 function Section({ eyebrow, title, children }) {
   return (
     <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
-      <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">{eyebrow}</p>
+      <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">{eyebrow}</p>
       <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">{title}</h2>
       <div className="mt-5">{children}</div>
     </section>
@@ -45,16 +45,16 @@ function FollowUpItem({ item }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-bold text-[#2B1723]">{item.label}</p>
-          <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{item.count}</p>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{item.count}</p>
         </div>
-        <Link to={item.to} className="shrink-0 text-xs font-bold text-[#B76E79] hover:underline">
+        <Link to={item.to} className="shrink-0 text-xs font-bold text-[#9A5260] hover:underline">
           Open page
         </Link>
       </div>
       <p className="mt-2 text-xs leading-5 text-[#816D62]">{item.explanation}</p>
       {item.preview.length > 0 && (
         <div className="mt-3 rounded-xl border border-[#E7D6CC] bg-white p-3">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">Examples</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">Examples</p>
           <ul className="mt-2 space-y-1 text-xs text-[#5D4A52]">
             {item.preview.map((name, index) => <li key={`${item.key}-${name}-${index}`}>{name}</li>)}
           </ul>
@@ -156,7 +156,7 @@ export function EventReviewPage() {
         title="No selected event"
         description="Select a Working Event before reviewing follow-up, payment records, and event summary details."
         action={(
-          <Link to="/events" className="mt-6 inline-block rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B]">
+          <Link to="/events" className="mt-6 inline-block rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#A9606B]">
             Choose an event
           </Link>
         )}
@@ -192,7 +192,7 @@ export function EventReviewPage() {
           </div>
           <Link
             to="/payments"
-            className="inline-flex w-fit items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-3 text-xs font-bold text-white transition hover:bg-[#C57C88]"
+            className="inline-flex w-fit items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-3 text-xs font-bold text-white transition hover:bg-[#C57C88]"
           >
             Open Payments
           </Link>
@@ -219,7 +219,7 @@ export function EventReviewPage() {
         <div className="mt-5 grid gap-6 xl:grid-cols-2">
           <div className="space-y-4">
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Registration payment records</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Registration payment records</p>
               <h3 className="mt-1 text-sm font-bold text-[#2B1723]">Guest-facing payment data</h3>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -243,7 +243,7 @@ export function EventReviewPage() {
 
           <div className="space-y-4">
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Operations Ledger</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Operations Ledger</p>
               <h3 className="mt-1 text-sm font-bold text-[#2B1723]">Manually recorded event money</h3>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -263,7 +263,7 @@ export function EventReviewPage() {
 
         <div className="mt-5 rounded-2xl border border-[#EEDFD6] bg-[#FBF8F5] p-4">
           <div className="flex items-start gap-3">
-            <ReceiptText className="mt-0.5 size-5 shrink-0 text-[#B76E79]" />
+            <ReceiptText className="mt-0.5 size-5 shrink-0 text-[#9A5260]" />
             <div>
               <p className="text-sm font-bold text-[#2B1723]">{review.paymentReview.comparison.label}</p>
               <p className="mt-2 text-xs leading-5 text-[#816D62]">
@@ -312,7 +312,7 @@ export function EventReviewPage() {
                 {evidenceAudit.sponsorship.map((item) => (
                   <div key={item.sponsor} className="rounded-xl border border-[#E7D6CC] bg-white p-3">
                     <p className="text-xs font-bold text-[#2B1723]">{item.sponsor}</p>
-                    <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{item.evidenceClass}</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{item.evidenceClass}</p>
                     <p className="mt-2 text-xs leading-5 text-[#816D62]">{item.quantity} · {item.item} · cash received {formatEventReviewMoney(item.cashReceived, currency)} · estimated value unknown.</p>
                   </div>
                 ))}

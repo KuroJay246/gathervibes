@@ -236,7 +236,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
         </div>
         <div className="flex items-center gap-2">
           {scanning && <span className="rounded-full bg-[#E5F3EC] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">Scanning...</span>}
-          <ScanLine className="size-8 text-[#B76E79]" />
+          <ScanLine className="size-8 text-[#9A5260]" />
         </div>
       </div>
 
@@ -248,7 +248,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
               type="button"
               onClick={startScanner}
               disabled={scanning}
-              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-4 text-xs font-bold text-white hover:bg-[#A9606B] disabled:opacity-50"
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-4 text-xs font-bold text-white hover:bg-[#A9606B] disabled:opacity-50"
             >
               <Camera className="size-4" />
               Start camera
@@ -263,9 +263,9 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
               Stop
             </button>
           </div>
-          <div className="flex items-center justify-between text-xs font-semibold text-[#8C7567]">
+          <div className="flex items-center justify-between text-xs font-semibold text-[#80685B]">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={continuousScan} onChange={(e) => setContinuousScan(e.target.checked)} className="rounded text-[#B76E79] focus:ring-[#B76E79]" />
+              <input type="checkbox" checked={continuousScan} onChange={(e) => setContinuousScan(e.target.checked)} className="rounded text-[#9A5260] focus:ring-[#9A5260]" />
               Continuous Scan Mode
             </label>
             {torchSupported && (
@@ -277,11 +277,11 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
           <div className="grid gap-2 sm:grid-cols-2">
             <label className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-[#E7D6CC] bg-[#FFFDFC] px-3 text-xs font-semibold text-[#6B564C]">
               Sound feedback
-              <input type="checkbox" checked={soundEnabled} onChange={handleSoundToggle} className="rounded text-[#B76E79] focus:ring-[#B76E79]" />
+              <input type="checkbox" checked={soundEnabled} onChange={handleSoundToggle} className="rounded text-[#9A5260] focus:ring-[#9A5260]" />
             </label>
             <label className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-[#E7D6CC] bg-[#FFFDFC] px-3 text-xs font-semibold text-[#6B564C]">
               Vibration / haptic
-              <input type="checkbox" checked={hapticEnabled} onChange={handleHapticToggle} className="rounded text-[#B76E79] focus:ring-[#B76E79]" />
+              <input type="checkbox" checked={hapticEnabled} onChange={handleHapticToggle} className="rounded text-[#9A5260] focus:ring-[#9A5260]" />
             </label>
           </div>
         </div>
@@ -297,7 +297,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
                 value={manualValue}
                 onChange={(event) => setManualValue(event.target.value.toUpperCase())}
                 placeholder="CPB-001 or GSV:TICKET:CPB-001"
-                className="min-h-11 w-full rounded-xl border border-[#E5D7CF] bg-white py-3 pl-9 pr-3 text-sm font-semibold text-[#2B1723] focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20"
+                className="min-h-11 w-full rounded-xl border border-[#E5D7CF] bg-white py-3 pl-9 pr-3 text-sm font-semibold text-[#2B1723] focus:border-[#9A5260] focus:outline-none focus:ring-2 focus:ring-[#9A5260]/20"
               />
             </div>
             <button

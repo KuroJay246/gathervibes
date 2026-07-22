@@ -5,8 +5,8 @@ import { PAYMENT_METHODS, formatCurrency, formatPaymentMethod, normalizePaymentM
 
 function statusTone(status) {
   if (status === 'valid') return 'text-[#1E7345]'
-  if (status === 'warning' || status === 'needs-review') return 'text-[#986F26]'
-  if (status === 'skipped') return 'text-[#8C7567]'
+  if (status === 'warning' || status === 'needs-review') return 'text-[#7A5818]'
+  if (status === 'skipped') return 'text-[#80685B]'
   return 'text-[#A32626]'
 }
 
@@ -20,7 +20,7 @@ function statusLabel(status) {
 
 function StatusIcon({ status }) {
   if (status === 'valid') return <CheckCircle2 className="size-5 text-[#1E7345]" />
-  if (status === 'warning' || status === 'needs-review') return <AlertCircle className="size-5 text-[#986F26]" />
+  if (status === 'warning' || status === 'needs-review') return <AlertCircle className="size-5 text-[#7A5818]" />
   return <XCircle className="size-5 text-[#A32626]" />
 }
 
@@ -163,7 +163,7 @@ export function ImportPreviewTable({
               ? 'Review hard errors, shared-contact warnings, and possible true duplicates before the final preview.'
               : 'Preview the exact rows that will be written after confirmation. No Firestore write happens before this step.'}
           </p>
-          <p className="mt-1 text-xs leading-5 text-[#8C7567]">
+          <p className="mt-1 text-xs leading-5 text-[#80685B]">
             Payment and finance columns use imported values only. Missing ticket price or amount due stays Needs Review instead of using the event base ticket price.
           </p>
         </div>
@@ -172,11 +172,11 @@ export function ImportPreviewTable({
             <CheckCircle2 className="size-4" />
             {validRows.length} Valid
           </div>
-          <div className="flex items-center gap-1.5 text-[#986F26]">
+          <div className="flex items-center gap-1.5 text-[#7A5818]">
             <AlertCircle className="size-4" />
             {warningRows.length} Warning
           </div>
-          <div className="flex items-center gap-1.5 text-[#986F26]">
+          <div className="flex items-center gap-1.5 text-[#7A5818]">
             <AlertCircle className="size-4" />
             {reviewRows.length} Review
           </div>
@@ -185,7 +185,7 @@ export function ImportPreviewTable({
             {blockedRows.length} Blocked
           </div>
           {skippedRows.length > 0 && (
-            <div className="flex items-center gap-1.5 text-[#8C7567]">
+            <div className="flex items-center gap-1.5 text-[#80685B]">
               <XCircle className="size-4" />
               {skippedRows.length} Skipped
             </div>
@@ -197,15 +197,15 @@ export function ImportPreviewTable({
           <div className="flex flex-wrap gap-2 text-xs font-bold">
             <span>Total {processedRows.length}</span>
             <span className="text-[#1E7345]">Ready {validRows.length}</span>
-            <span className="text-[#986F26]">Warnings {warningRows.length}</span>
-            <span className="text-[#986F26]">Review {reviewRows.length}</span>
+            <span className="text-[#7A5818]">Warnings {warningRows.length}</span>
+            <span className="text-[#7A5818]">Review {reviewRows.length}</span>
             <span className="text-[#A32626]">Blocked {blockedRows.length}</span>
-            <span className="text-[#8C7567]">Selected {selectedCount}</span>
+            <span className="text-[#80685B]">Selected {selectedCount}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => selectByStatus('warning')} className="rounded-lg border border-[#E7D6CC] px-3 py-1.5 text-xs font-bold text-[#6B564C]">Select warnings</button>
             <button type="button" onClick={() => selectByStatus('blocked')} className="rounded-lg border border-[#E7D6CC] px-3 py-1.5 text-xs font-bold text-[#6B564C]">Select blocked</button>
-            <button type="button" onClick={() => setSelectedRows(new Set())} className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#8C7567]">Clear selected</button>
+            <button type="button" onClick={() => setSelectedRows(new Set())} className="rounded-lg px-3 py-1.5 text-xs font-bold text-[#80685B]">Clear selected</button>
             <button type="button" onClick={skipSelected} disabled={selectedCount === 0} className="rounded-lg bg-[#F7F1ED] px-3 py-1.5 text-xs font-bold text-[#6B564C] disabled:opacity-50">Skip selected</button>
             <button type="button" onClick={clearSelectedActions} disabled={selectedCount === 0} className="rounded-lg bg-[#F7F1ED] px-3 py-1.5 text-xs font-bold text-[#6B564C] disabled:opacity-50">Clear actions</button>
             <select
@@ -230,7 +230,7 @@ export function ImportPreviewTable({
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
+              <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#80685B]">
                 {isReviewMode && <th className="px-4 py-3">Select</th>}
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Row</th>
@@ -260,7 +260,7 @@ export function ImportPreviewTable({
                       {pr.row.edited && <span className="rounded-full bg-[#E6F0FA] px-2 py-0.5 text-[10px] font-bold text-[#285E9E]">Edited</span>}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-xs font-bold text-[#8C7567]">{pr.row.sourceRowIndex || idx + 1}</td>
+                  <td className="px-4 py-3 text-xs font-bold text-[#80685B]">{pr.row.sourceRowIndex || idx + 1}</td>
                   <td className="px-4 py-3 text-[#5D4A52]">
                     <div className="max-w-[16rem] whitespace-normal font-medium text-[#2B1723]">{formatAttendees(pr.row)}</div>
                   </td>
@@ -270,8 +270,8 @@ export function ImportPreviewTable({
                   <td className="px-4 py-3 text-[#5D4A52]">{pr.row.personsAttending || 1}</td>
                   <td className="px-4 py-3 text-[#5D4A52]">
                     <div>{formatPaymentLabel(pr.row.paymentStatus)}</div>
-                    <div className="mt-0.5 text-xs text-[#8C7567]">{formatPaymentMethod(pr.row.paymentMethod)}</div>
-                    {pr.row.paymentReference && <div className="mt-0.5 text-xs text-[#8C7567]">{pr.row.paymentReference}</div>}
+                    <div className="mt-0.5 text-xs text-[#80685B]">{formatPaymentMethod(pr.row.paymentMethod)}</div>
+                    {pr.row.paymentReference && <div className="mt-0.5 text-xs text-[#80685B]">{pr.row.paymentReference}</div>}
                   </td>
                   <td className="px-4 py-3 text-xs text-[#5D4A52]">
                     <div>Tier: {pr.row.priceTier || 'Needs review'}</div>
@@ -281,7 +281,7 @@ export function ImportPreviewTable({
                     <div>Balance: {pr.row.balanceDue === null || pr.row.balanceDue === undefined ? 'Needs review' : formatCurrency(pr.row.balanceDue)}</div>
                   </td>
                   <td className="px-4 py-3 font-mono text-xs font-bold text-[#2B1723]">
-                    {pr.row.ticketCode || <span className="font-sans font-normal italic text-[#A48A7B]">No ticket code assigned</span>}
+                    {pr.row.ticketCode || <span className="font-sans font-normal italic text-[#80685B]">No ticket code assigned</span>}
                   </td>
                   <td className="px-4 py-3 text-xs text-[#5D4A52]">
                     <div className="space-y-0.5">
@@ -370,7 +370,7 @@ export function ImportPreviewTable({
               ))}
               {processedRows.length > 100 && (
                 <tr>
-                  <td colSpan={isReviewMode ? 12 : 10} className="px-4 py-3 text-center text-xs italic text-[#8C7567]">
+                  <td colSpan={isReviewMode ? 12 : 10} className="px-4 py-3 text-center text-xs italic text-[#80685B]">
                     ...and {processedRows.length - 100} more rows not shown.
                   </td>
                 </tr>
@@ -398,7 +398,7 @@ export function ImportPreviewTable({
           type="button"
           onClick={onStartOver || onCancel}
           disabled={importing}
-          className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#8C7567] transition hover:bg-[#F2E8E1] disabled:opacity-50"
+          className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#80685B] transition hover:bg-[#F2E8E1] disabled:opacity-50"
         >
           Change File / Start Over
         </button>
@@ -407,7 +407,7 @@ export function ImportPreviewTable({
             type="button"
             onClick={onContinue}
             disabled={!canContinue}
-            className="flex items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#B76E79]/30 disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#9A5260]/30 disabled:opacity-50"
           >
             Continue to Final Import Preview
           </button>
@@ -416,7 +416,7 @@ export function ImportPreviewTable({
             type="button"
             onClick={() => onImport(processedRows.filter((row) => row.status !== 'blocked' && row.status !== 'skipped'))}
             disabled={!canImport || importing}
-            className="flex items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#B76E79]/30 disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#9A5260]/30 disabled:opacity-50"
           >
             {importing ? (
               <>

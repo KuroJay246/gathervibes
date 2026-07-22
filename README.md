@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub
 
-For the complete implementation, Firebase, security, testing, and deployment handoff, see [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md).
+The current product, workflow, authorization, QA, monitoring, and release reference is [`docs/PRODUCT_GUIDE.md`](./docs/PRODUCT_GUIDE.md). Historical phase records are preserved in [`docs/HISTORICAL_ARCHIVE_INDEX.md`](./docs/HISTORICAL_ARCHIVE_INDEX.md); the older cumulative engineering handoff remains in [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md).
 
 Private event-operations dashboard for **Gather & Savor Vibes**. This is an admin-only workspace—not a public attendee app. Guests continue using Instagram, Linktree, Google Forms, and Google Sheets.
 

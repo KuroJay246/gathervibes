@@ -64,6 +64,7 @@ const mobileMoreGroups = [
   {
     label: 'Admin',
     items: [
+      { to: '/imports', label: 'Import Center', icon: FileInput },
       { to: '/settings', label: 'Settings', icon: Settings },
       { to: '/qa', label: 'System QA', icon: ShieldCheck },
     ],
@@ -81,7 +82,7 @@ const pageTitles = {
   '/operations': ['Operations', 'Track event-level money and obligations'],
   '/event-review': ['Reports', 'Read-only follow-up, payments, operations, and summary'],
   '/imports': ['Import Center', 'Bring in CSV exports and pasted table rows safely'],
-  '/qa': ['System QA', 'Production diagnostics and CODEX_TEST guardrails'],
+  '/qa': ['System QA', 'System health, data checks, and safe test guidance'],
   '/communications': ['Message Builder', 'Create, personalize, and copy event messages'],
   '/settings': ['Settings', 'Practical workspace and event defaults'],
 }
@@ -103,55 +104,59 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups }) {
         <Link to={adminUser ? '/events' : '/check-in'} onClick={onNavigate} className="flex w-full min-w-0 items-center justify-between gap-3 text-left">
           <span className="min-w-0 flex-1 overflow-hidden">
             <span className="block max-w-full truncate text-sm font-medium text-white">{activeEvent?.eventName || 'No event selected'}</span>
-            <span className="mt-0.5 block max-w-full truncate text-[11px] text-white/45">
+            <span className="mt-0.5 block max-w-full truncate text-[11px] text-white/70">
               {activeEvent ? `${formatEventDate(activeEvent.eventDate)} · ${activeEvent.status || 'status not set'}` : adminUser ? 'Choose one from Events' : 'Assigned event required'}
             </span>
           </span>
-          <ChevronDown className="size-4 shrink-0 text-white/30" aria-hidden="true" />
+          <ChevronDown className="size-4 shrink-0 text-white/65" aria-hidden="true" />
         </Link>
       </div>
 
       <nav className="mt-5 min-h-0 flex-1 overflow-y-auto px-3 pb-4" aria-label="Main navigation">
         {groups.map((group) => (
           <div className="mb-5" key={group.label}>
-            <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/30">{group.label}</p>
+            <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/65">{group.label}</p>
             <div className="space-y-1">
-              {group.items.filter(({ to }) => canViewRoute(access, to)).map(({ to, label, icon: Icon }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  onClick={onNavigate}
-                  className={({ isActive }) =>
-                    `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition ${
-                      isActive
-                        ? 'bg-[#B76E79] text-white shadow-[0_8px_24px_rgba(183,110,121,0.2)]'
-                        : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
-                    }`
-                  }
-                >
-                  <Icon className="size-[17px] shrink-0" strokeWidth={1.8} aria-hidden="true" />
-                  <span className="flex-1">{label}</span>
-                </NavLink>
-              ))}
+              {group.items.reduce((links, { to, label, icon: Icon }) => {
+                if (!canViewRoute(access, to)) return links
+                links.push(
+                  <NavLink
+                    key={to}
+                    to={to}
+                    onClick={onNavigate}
+                    className={({ isActive }) =>
+                      `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition ${
+                        isActive
+                          ? 'bg-[#7F3E49] text-white shadow-[0_8px_24px_rgba(127,62,73,0.24)]'
+                          : 'text-white/70 hover:bg-white/[0.06] hover:text-white'
+                      }`
+                    }
+                  >
+                    <Icon className="size-[17px] shrink-0" strokeWidth={1.8} aria-hidden="true" />
+                    <span className="flex-1">{label}</span>
+                  </NavLink>,
+                )
+                return links
+              }, [])}
             </div>
           </div>
         ))}
       </nav>
 
       <div className={`shrink-0 border-t border-white/10 p-3 ${mobile ? 'pb-[max(1rem,env(safe-area-inset-bottom))]' : ''}`}>
-        {settingsAllowed && <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/30">Account</p>}
+        {settingsAllowed && <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/65">Account</p>}
         <div className="flex items-center gap-3 rounded-xl bg-black/10 p-2.5">
           <div className="grid size-8 shrink-0 place-items-center rounded-full bg-[#F7DDE6] text-xs font-bold uppercase text-[#2B1723]">
             {user?.email?.slice(0, 1) || 'A'}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-medium text-white">{currentRoleLabel || 'Admin'}</p>
-            <p className="truncate text-[10px] text-white/40">{user?.email}</p>
+            <p className="truncate text-[10px] text-white/70">{user?.email}</p>
           </div>
           <button
             type="button"
             onClick={signOut}
-            className="rounded-lg p-2 text-white/40 transition hover:bg-white/10 hover:text-white"
+            className="rounded-lg p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
             aria-label="Sign out"
           >
             <LogOut className="size-4" aria-hidden="true" />
@@ -186,7 +191,7 @@ export function AppShell() {
           />
           <aside className="relative h-[100dvh] w-[min(20rem,calc(100vw-2rem))] overflow-hidden bg-[#2B1723] shadow-2xl">
             <button
-              className="absolute right-3 top-3 rounded-lg p-2 text-white/50 hover:bg-white/10 hover:text-white"
+              className="absolute right-3 top-3 rounded-lg p-2 text-white/70 hover:bg-white/10 hover:text-white"
               onClick={() => setMenuOpen(false)}
               aria-label="Close menu"
               type="button"
@@ -212,12 +217,12 @@ export function AppShell() {
             </button>
             <div className="min-w-0 flex-1">
               <h1 className="truncate font-serif text-xl sm:text-2xl">{title}</h1>
-              <p className="mt-0.5 hidden text-xs text-[#8C766A] sm:block">{subtitle}</p>
+              <p className="mt-0.5 hidden text-xs text-[#5F493F] sm:block">{subtitle}</p>
             </div>
             {adminUser && <AdminSearch />}
             <div className="hidden items-center gap-2 rounded-full border border-[#E7D6CC] bg-white py-1.5 pl-2 pr-3 sm:flex">
               <span className="grid size-7 place-items-center rounded-full bg-[#F7DDE6]">
-                <Sparkles className="size-3.5 text-[#B76E79]" aria-hidden="true" />
+                <Sparkles className="size-3.5 text-[#8A3F4B]" aria-hidden="true" />
               </span>
               <span className="text-[11px] font-semibold text-[#6B564C]">{currentRoleLabel || 'Private admin'}</span>
             </div>
@@ -229,9 +234,9 @@ export function AppShell() {
             <div className="mb-5 rounded-2xl border border-[#EEDDD3] bg-white px-4 py-3 shadow-[0_6px_18px_rgba(84,53,67,0.04)]">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Everything here is scoped to</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#8A3F4B]">Everything here is scoped to</p>
                   <p className="mt-1 truncate text-sm font-bold text-[#2B1723]">{activeEvent?.eventName || 'No selected Working Event'}</p>
-                  <p className="mt-0.5 text-xs text-[#8C766A]">
+                  <p className="mt-0.5 text-xs text-[#5F493F]">
                     {activeEvent ? `${formatEventDate(activeEvent.eventDate)} · ${activeEvent.status || 'status not set'}` : 'Choose an event before using event-scoped pages.'}
                   </p>
                 </div>

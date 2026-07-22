@@ -99,8 +99,8 @@ test('Phase 10 UI displays roles without weakening Firestore rules', async () =>
   const rules = await readFile('firestore.rules', 'utf8')
 
   assert.match(auth, /rolesByEmail|resolveAccessRole/)
-  assert.match(settings, /Approved accounts and staff boundaries/)
-  assert.match(settings, /Role editing is not exposed/)
+  assert.match(settings, /Protected owner and approved organizers/)
+  assert.match(settings, /cannot add, remove, disable, or change anyone's role/)
   assert.match(shell, /currentRoleLabel/)
   assert.match(rules, /isApprovedAdmin/)
   assert.doesNotMatch(rules, /allow read, write: if true/)

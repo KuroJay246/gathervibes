@@ -18,8 +18,8 @@ test('organizer navigation uses product labels while preserving route paths', as
   assert.match(shell, /to: '\/qa', label: 'System QA'/)
   assert.match(shell, /Overview[\s\S]*Guests[\s\S]*Tickets[\s\S]*Check-In[\s\S]*More/)
   const mobileMoreGroups = shell.slice(shell.indexOf('const mobileMoreGroups'), shell.indexOf('const pageTitles'))
-  assert.match(mobileMoreGroups, /More workspace[\s\S]*\/events[\s\S]*\/operations[\s\S]*\/communications[\s\S]*\/event-review[\s\S]*Admin[\s\S]*\/settings[\s\S]*\/qa/)
-  assert.doesNotMatch(mobileMoreGroups, /\/dashboard|\/registrations|\/tickets|\/check-in|\/imports/)
+  assert.match(mobileMoreGroups, /More workspace[\s\S]*\/events[\s\S]*\/operations[\s\S]*\/communications[\s\S]*\/event-review[\s\S]*Admin[\s\S]*\/imports[\s\S]*\/settings[\s\S]*\/qa/)
+  assert.doesNotMatch(mobileMoreGroups, /\/dashboard|\/registrations|\/tickets|\/check-in/)
   assert.match(app, /path="\/communications"/)
   assert.match(app, /path="\/event-review"/)
   assert.match(app, /path="\/qa"/)
@@ -55,12 +55,12 @@ test('Message Builder is copy-only and does not claim automatic sending or real 
 test('Settings contains practical settings and not a roadmap archive', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
 
-  for (const text of ['Current defaults', 'Default currency', 'Default ticket prefix', 'Price tiers fallback', 'Access Summary', 'Scanner & Tickets', 'Finance & Operations', 'Security']) {
+  for (const text of ['Event Defaults', 'Currency', 'Ticket prefix', 'Price tiers', 'Organizer Access', 'Tickets & Check-In', 'Data & Messages', 'Advanced']) {
     assert.match(settings, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
-  assert.match(settings, /Access request actions disabled/)
-  assert.match(settings, /Role editing is not exposed/)
+  assert.match(settings, /Access is controlled outside this page/)
+  assert.match(settings, /cannot add, remove, disable, or change anyone's role/)
   assert.doesNotMatch(settings, /Phase \d+|roadmap|backlog|closed \/ shipped|Current active phase|Submit request \(not live\)/i)
 })
 

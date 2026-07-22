@@ -35,13 +35,6 @@ export const IMPORT_SOURCES = [
     helperText: 'Use this for files with unusual headers. The system will help detect headers and fields.',
     mode: 'csv',
   },
-  {
-    value: 'cpb-payment-audit',
-    label: 'CPB Payment Audit Backfill',
-    helperText: 'Special separated workflow. Dry-run first; no CPB writes until approval; review unmatched rows before apply; Gmail links are not stored.',
-    mode: 'xlsx',
-    special: true,
-  },
 ]
 
 export function getImportSource(value) {

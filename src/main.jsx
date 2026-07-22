@@ -5,7 +5,10 @@ import App from './App'
 import { AuthProvider } from './auth/AuthProvider'
 import { AppErrorBoundary } from './components/AppErrorBoundary'
 import { ActiveEventProvider } from './events/ActiveEventProvider'
+import { initializeMonitoring } from './lib/monitoring'
 import './styles.css'
+
+void initializeMonitoring()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

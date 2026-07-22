@@ -186,23 +186,23 @@ export function EventsPage() {
 
       <section className="flex flex-col gap-5 rounded-[26px] border border-[#EEDFD6] bg-white p-6 shadow-[0_10px_32px_rgba(84,53,67,0.05)] sm:flex-row sm:items-center sm:justify-between sm:p-7">
         <div>
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#FCEEF1] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#A85F6B]">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#FCEEF1] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A3F4B]">
             <Sparkles className="size-3.5" /> Live events
           </div>
           <h2 className="font-serif text-3xl text-[#2B1723]">Your gatherings</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-[#806C61]">Create each event once, keep its details current, and select the event your team is working on.</p>
-          <p className="mt-1 max-w-xl text-xs leading-5 text-[#8A7468]">Price tiers and explicit registration prices drive finance totals; the base ticket price is a default fallback for older records.</p>
+          <p className="mt-1 max-w-xl text-xs leading-5 text-[#80685B]">Price tiers and explicit registration prices drive finance totals; the base ticket price is a default fallback for older records.</p>
         </div>
-        <button type="button" onClick={openCreate} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#B76E79]/20 transition hover:bg-[#A9606B]">
+        <button type="button" onClick={openCreate} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B]">
           <Plus className="size-4" strokeWidth={2.5} /> Create event
         </button>
       </section>
 
       {!loading && !loadError && events.length > 0 && (
         <section className="grid gap-3 sm:grid-cols-3" aria-label="Event totals">
-          <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A48A7B]">All events</p><p className="mt-2 font-serif text-3xl">{totals.events}</p></div>
-          <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A48A7B]">Upcoming / active</p><p className="mt-2 font-serif text-3xl">{totals.upcoming}</p></div>
-          <div className="rounded-2xl border border-[#E6D4B4] bg-[#F8E9CB] p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#86662C]">Planned capacity</p><p className="mt-2 font-serif text-3xl text-[#4E3928]">{totals.capacity.toLocaleString('en-BB')}</p></div>
+          <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#80685B]">All events</p><p className="mt-2 font-serif text-3xl">{totals.events}</p></div>
+          <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#80685B]">Upcoming / active</p><p className="mt-2 font-serif text-3xl">{totals.upcoming}</p></div>
+          <div className="rounded-2xl border border-[#E6D4B4] bg-[#F8E9CB] p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#7A5818]">Planned capacity</p><p className="mt-2 font-serif text-3xl text-[#4E3928]">{totals.capacity.toLocaleString('en-BB')}</p></div>
         </section>
       )}
 
@@ -215,14 +215,14 @@ export function EventsPage() {
           <div className="flex items-center justify-between border-b border-[#EFE2DA] px-5 py-4 sm:px-6">
             <div>
               <h3 className="text-sm font-bold text-[#3A2630]">Event calendar</h3>
-              <p className="mt-1 text-[11px] text-[#8A7468]">{events.length} {events.length === 1 ? 'event' : 'events'} in Firestore</p>
+              <p className="mt-1 text-[11px] text-[#80685B]">{events.length} {events.length === 1 ? 'event' : 'events'} in Firestore</p>
             </div>
             <MoreHorizontal className="size-5 text-[#B49B8D]" />
           </div>
 
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full min-w-[900px] text-left">
-              <thead className="bg-[#FFF9F5] text-[9px] font-bold uppercase tracking-[0.18em] text-[#927C70]">
+              <thead className="bg-[#FFF9F5] text-[9px] font-bold uppercase tracking-[0.18em] text-[#80685B]">
                 <tr><th className="px-6 py-3.5">Event</th><th className="px-4 py-3.5">Date</th><th className="px-4 py-3.5">Status</th><th className="px-4 py-3.5">Capacity</th><th className="px-4 py-3.5">Base price</th><th className="px-6 py-3.5 text-right">Actions</th></tr>
               </thead>
               <tbody className="divide-y divide-[#F1E6DF]">
@@ -230,14 +230,14 @@ export function EventsPage() {
                   const isActive = activeEvent?.eventId === event.eventId
                   return (
                     <tr key={event.eventId} className={isActive ? 'bg-[#FFF8F2]' : 'hover:bg-[#FFFCFA]'}>
-                      <td className="px-6 py-4"><div className="flex items-center gap-3"><span className={`grid size-10 shrink-0 place-items-center rounded-xl ${isActive ? 'bg-[#B76E79] text-white' : 'bg-[#FCEEF1] text-[#B76E79]'}`}><CalendarDays className="size-[17px]" /></span><div><p className="text-sm font-bold text-[#3A2630]">{event.eventName}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-[#8A7468]"><MapPin className="size-3" />{event.location}</p><p className="mt-1 text-[10px] font-semibold text-[#8A7468]">{pricingModeLabel(event)}</p></div></div></td>
+                      <td className="px-6 py-4"><div className="flex items-center gap-3"><span className={`grid size-10 shrink-0 place-items-center rounded-xl ${isActive ? 'bg-[#9A5260] text-white' : 'bg-[#FCEEF1] text-[#9A5260]'}`}><CalendarDays className="size-[17px]" /></span><div><p className="text-sm font-bold text-[#3A2630]">{event.eventName}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-[#80685B]"><MapPin className="size-3" />{event.location}</p><p className="mt-1 text-[10px] font-semibold text-[#80685B]">{pricingModeLabel(event)}</p></div></div></td>
                       <td className="px-4 py-4 text-xs text-[#6D594F]">{formatEventDate(event.eventDate)}</td>
                       <td className="px-4 py-4"><StatusBadge status={event.status} /></td>
                       <td className="px-4 py-4 text-xs font-semibold text-[#6D594F]">{Number(event.capacity).toLocaleString('en-BB')}</td>
                       <td className="px-4 py-4 text-xs font-semibold text-[#6D594F]">{currency.format(Number(event.ticketPrice) || 0)}</td>
                       <td className="px-6 py-4"><div className="flex items-center justify-end gap-1.5">
                         <button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`rounded-lg px-3 py-2 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#2F855A]' : 'border border-[#E1D1C8] text-[#806C61] hover:bg-[#FFF8F2]'}`}>{isActive ? 'Selected event' : 'Select'}</button>
-                        <button type="button" onClick={() => openEdit(event)} className="rounded-lg p-2 text-[#8C766A] hover:bg-[#FCEEF1] hover:text-[#A85F6B]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button>
+                        <button type="button" onClick={() => openEdit(event)} className="rounded-lg p-2 text-[#80685B] hover:bg-[#FCEEF1] hover:text-[#8A3F4B]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button>
                         <button type="button" onClick={() => requestDelete(event)} className="rounded-lg p-2 text-[#9A7777] hover:bg-[#FFF0F0] hover:text-[#C53030]" aria-label={`Delete ${event.eventName}`}><Trash2 className="size-4" /></button>
                       </div></td>
                     </tr>
@@ -253,12 +253,12 @@ export function EventsPage() {
               return (
                 <article key={event.eventId} className={`p-4 sm:p-5 ${isActive ? 'bg-[#FFF8F2]' : ''}`}>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h4 className="font-serif text-lg text-[#35212B]">{event.eventName}</h4>{isActive && <span className="inline-flex items-center gap-1 rounded-full bg-[#E7F6ED] px-2 py-1 text-[8px] font-bold uppercase text-[#2F855A]"><CheckCircle2 className="size-3" /> Selected</span>}</div><p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#806C61]"><MapPin className="size-3.5" /> {event.location}</p></div>
+                    <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h4 className="font-serif text-lg text-[#35212B]">{event.eventName}</h4>{isActive && <span className="inline-flex items-center gap-1 rounded-full bg-[#E7F6ED] px-2 py-1 text-[8px] font-bold uppercase text-[#1E7345]"><CheckCircle2 className="size-3" /> Selected</span>}</div><p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#806C61]"><MapPin className="size-3.5" /> {event.location}</p></div>
                     <StatusBadge status={event.status} />
                   </div>
-                  <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-white p-3 text-center"><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Date</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{formatEventDate(event.eventDate, { year: undefined })}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Capacity</p><p className="mt-1 flex items-center justify-center gap-1 text-[10px] font-semibold text-[#59454E]"><UsersRound className="size-3" /> {event.capacity}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#A48A7B]">Base</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{currency.format(Number(event.ticketPrice) || 0)}</p></div></div>
-                  <p className="mt-3 text-[11px] font-semibold text-[#8A7468]">{pricingModeLabel(event)}</p>
-                  <div className="mt-4 flex gap-2"><button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`min-h-11 flex-1 rounded-lg py-2.5 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#2F855A]' : 'border border-[#E1D1C8] text-[#806C61]'}`}>{isActive ? 'Selected event' : 'Select'}</button><button type="button" onClick={() => openEdit(event)} className="grid size-11 place-items-center rounded-lg border border-[#E1D1C8] text-[#806C61]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button><button type="button" onClick={() => requestDelete(event)} className="grid size-11 place-items-center rounded-lg border border-[#F0D3D3] text-[#C53030]" aria-label={`Delete ${event.eventName}`}><Trash2 className="size-4" /></button></div>
+                  <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-white p-3 text-center"><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#80685B]">Date</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{formatEventDate(event.eventDate, { year: undefined })}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#80685B]">Capacity</p><p className="mt-1 flex items-center justify-center gap-1 text-[10px] font-semibold text-[#59454E]"><UsersRound className="size-3" /> {event.capacity}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#80685B]">Base</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{currency.format(Number(event.ticketPrice) || 0)}</p></div></div>
+                  <p className="mt-3 text-[11px] font-semibold text-[#80685B]">{pricingModeLabel(event)}</p>
+                  <div className="mt-4 flex gap-2"><button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`min-h-11 flex-1 rounded-lg py-2.5 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#1E7345]' : 'border border-[#E1D1C8] text-[#806C61]'}`}>{isActive ? 'Selected event' : 'Select'}</button><button type="button" onClick={() => openEdit(event)} className="grid size-11 place-items-center rounded-lg border border-[#E1D1C8] text-[#806C61]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button><button type="button" onClick={() => requestDelete(event)} className="grid size-11 place-items-center rounded-lg border border-[#F0D3D3] text-[#C53030]" aria-label={`Delete ${event.eventName}`}><Trash2 className="size-4" /></button></div>
                 </article>
               )
             })}

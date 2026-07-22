@@ -84,7 +84,7 @@ test('System QA includes browser and CODEX_TEST retest guidance', async () => {
     'Website does not load?',
     'Ctrl+Shift+R hard refresh',
     'clear site data for gathervibeshub.web.app',
-    'CODEX_TEST smoke testing',
+    'System status and event checks',
     'login works with the approved second Google account',
     'QR camera lookup works',
     'manual ticket-code fallback works',

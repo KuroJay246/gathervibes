@@ -22,7 +22,7 @@ function Metric({ label, value, help }) {
   return (
     <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
       <p className="text-xl font-bold text-[#2B1723]">{value}</p>
-      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8C7567]">{label}</p>
+      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#80685B]">{label}</p>
       {help && <p className="mt-1 text-xs leading-5 text-[#816D62]">{help}</p>}
     </div>
   )
@@ -32,7 +32,7 @@ function GuardrailNotice() {
   return (
     <section className="rounded-2xl border border-[#F2D6A3] bg-[#FFF8EA] p-5 text-sm leading-6 text-[#715D46]">
       <div className="flex gap-3">
-        <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[#986F26]" />
+        <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[#7A5818]" />
         <div>
           <h3 className="font-bold text-[#4E3928]">Read-only reconciliation preview</h3>
           <p className="mt-1">
@@ -51,7 +51,7 @@ function SetupPanel({ targetEventId, setTargetEventId, confirmation, setConfirma
     <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
       <div className="grid gap-4 lg:grid-cols-3">
         <label className="space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Target event</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Target event</span>
           <select
             value={targetEventId}
             onChange={(event) => setTargetEventId(event.target.value)}
@@ -65,7 +65,7 @@ function SetupPanel({ targetEventId, setTargetEventId, confirmation, setConfirma
         </label>
 
         <label className="space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Workbook</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Workbook</span>
           <input
             type="file"
             accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -81,7 +81,7 @@ function SetupPanel({ targetEventId, setTargetEventId, confirmation, setConfirma
         </label>
 
         <label className="space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Confirmation</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Confirmation</span>
           <input
             value={confirmation}
             onChange={(event) => setConfirmation(event.target.value)}
@@ -203,7 +203,7 @@ function EvidencePanel({ preview }) {
         ) : (
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-xs">
-              <thead className="uppercase tracking-wider text-[#8C7567]">
+              <thead className="uppercase tracking-wider text-[#80685B]">
                 <tr>
                   <th className="px-2 py-2">#</th>
                   <th className="px-2 py-2">Workbook row</th>
@@ -265,7 +265,7 @@ function ReconciliationTable({ preview, filter }) {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1080px] text-left text-sm">
-            <thead className="border-b border-[#F2E8E1] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
+            <thead className="border-b border-[#F2E8E1] text-xs font-bold uppercase tracking-wider text-[#80685B]">
               <tr>
                 <th className="px-3 py-2">Record</th>
                 <th className="px-3 py-2">Classification</th>
@@ -373,7 +373,7 @@ export function PaymentReconciliationPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Payments · dry-run only</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Payments · dry-run only</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Payment Reconciliation Preview</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
             Compare the CPB payment workbook to existing app registration payment records without changing data.

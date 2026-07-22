@@ -78,10 +78,9 @@ test('17F status stays in docs while UI keeps access workflows disabled', async 
   const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
   const phase17gB = await readFile('PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md', 'utf8')
 
-  assert.match(settings, /Access request actions disabled/)
-  assert.match(settings, /Staff profile editing disabled/)
-  assert.match(settings, /Assignment editing disabled/)
-  assert.match(settings, /Lead scanner disabled/)
+  assert.match(settings, /Access is controlled outside this page/)
+  assert.match(settings, /cannot add, remove, disable, or change anyone's role/)
+  assert.match(settings, /Assigned-event access only/)
   assert.match(qa, /Daily QA workflow/)
   assert.match(health, /CODEX_TEST checks/)
   assert.match(health, /Rules enforce private admin access/)

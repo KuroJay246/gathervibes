@@ -56,9 +56,9 @@ function titleCase(value = '') {
 function TicketBadge({ children, tone = 'neutral' }) {
   const tones = {
     green: 'bg-[#E5F3EC] text-[#1E7345]',
-    gold: 'bg-[#FFF4DF] text-[#986F26]',
+    gold: 'bg-[#FFF4DF] text-[#7A5818]',
     blush: 'bg-[#FCEEF1] text-[#A32626]',
-    neutral: 'bg-[#F7F1ED] text-[#8C766A]',
+    neutral: 'bg-[#F7F1ED] text-[#80685B]',
   }
   return <span className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${tones[tone]}`}>{children}</span>
 }
@@ -186,7 +186,7 @@ export function TicketsPage() {
         icon={TicketCheck}
         title="No selected event"
         description="Select a Working Event before assigning ticket codes."
-        action={<Link to="/events" className="mt-6 inline-block rounded-xl bg-[#B76E79] px-6 py-2.5 text-sm font-bold text-white">Choose an event</Link>}
+        action={<Link to="/events" className="mt-6 inline-block rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white">Choose an event</Link>}
       />
     )
   }
@@ -237,7 +237,7 @@ export function TicketsPage() {
               value={draftCode}
               onChange={(event) => setDraftCodes((prev) => ({ ...prev, [registration.registrationId]: event.target.value.toUpperCase() }))}
               placeholder={registration.ticketCode || `${ticketPrefix}-001`}
-              className="min-h-10 rounded-lg border border-[#E5D7CF] bg-white px-3 text-xs font-bold text-[#2B1723] focus:border-[#B76E79] focus:outline-none"
+              className="min-h-10 rounded-lg border border-[#E5D7CF] bg-white px-3 text-xs font-bold text-[#2B1723] focus:border-[#9A5260] focus:outline-none"
             />
             <button
               type="button"
@@ -282,7 +282,7 @@ export function TicketsPage() {
           value={draftCode}
           onChange={(event) => setDraftCodes((prev) => ({ ...prev, [registration.registrationId]: event.target.value.toUpperCase() }))}
           placeholder={`${ticketPrefix}-001`}
-          className="min-h-10 rounded-lg border border-[#E5D7CF] bg-white px-3 text-xs font-bold text-[#2B1723] focus:border-[#B76E79] focus:outline-none"
+          className="min-h-10 rounded-lg border border-[#E5D7CF] bg-white px-3 text-xs font-bold text-[#2B1723] focus:border-[#9A5260] focus:outline-none"
         />
         <button
           type="button"
@@ -296,7 +296,7 @@ export function TicketsPage() {
           type="button"
           onClick={() => assignCode(registration, generateSequentialTicketCode(existingCodes, activeEvent))}
           disabled={savingId === registration.registrationId}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#B76E79] px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#9A5260] px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
         >
           <Wand2 className="size-3.5" />
           Generate next {ticketPrefix} code
@@ -357,7 +357,7 @@ export function TicketsPage() {
           <button 
             type="button"
             onClick={() => { setFilter('all'); setSearchQuery(''); }}
-            className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold text-[#8C766A] hover:bg-[#F2E8E1] transition"
+            className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold text-[#80685B] hover:bg-[#F2E8E1] transition"
           >
             <X className="size-3" /> Clear filters
           </button>
@@ -369,20 +369,20 @@ export function TicketsPage() {
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Search keyword..."
-              className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#B76E79] focus:outline-none focus:ring-1 focus:ring-[#B76E79]"
+              className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-9 pr-4 text-sm focus:border-[#9A5260] focus:outline-none focus:ring-1 focus:ring-[#9A5260]"
             />
           </div>
           <div className="grid gap-3 lg:grid-cols-4">
             {FILTER_GROUPS.map((group) => (
               <div key={group.label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">{group.label}</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">{group.label}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {group.items.map((item) => (
                     <button
                       key={item.value}
                       type="button"
                       onClick={() => setFilter(item.value)}
-                      className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${filter === item.value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#8C766A] hover:bg-[#F2E8E1] border border-[#E5D7CF]'}`}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${filter === item.value ? 'bg-[#2B1723] text-white' : 'bg-white text-[#80685B] hover:bg-[#F2E8E1] border border-[#E5D7CF]'}`}
                     >
                       {item.label}
                     </button>
@@ -448,7 +448,7 @@ export function TicketsPage() {
           <div className="hidden overflow-hidden rounded-2xl border border-[#EEDFD6] bg-white shadow-[0_4px_16px_rgba(43,23,35,0.03)] xl:block">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#8C7567]">
+                <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#80685B]">
                   <th className="px-4 py-3">Guest / Registration</th>
                   <th className="px-4 py-3">Buyer / Contact</th>
                   <th className="px-4 py-3">Payment</th>
@@ -463,7 +463,7 @@ export function TicketsPage() {
                     <td className="px-4 py-3">
                       <div className="font-medium text-[#2B1723]">{registration.fullName}</div>
                       {Number(registration.personsAttending) > 1 && <div className="mt-1"><TicketBadge tone="neutral">Group of {registration.personsAttending}</TicketBadge></div>}
-                      {registration.buyerName && <div className="text-xs font-semibold text-[#8C7567]">Buyer / Contact: {registration.buyerName}</div>}
+                      {registration.buyerName && <div className="text-xs font-semibold text-[#80685B]">Buyer / Contact: {registration.buyerName}</div>}
                       {attendeeNamesText(registration) && <div className="max-w-xs text-xs text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}
                       {registration.groupName && <div className="text-xs text-[#816D62]">{registration.groupName}</div>}
                     </td>
@@ -506,15 +506,15 @@ export function TicketsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="font-bold text-[#2B1723]">{registration.fullName}</h3>
-                    {Number(registration.personsAttending) > 1 && <p className="mt-1 text-xs font-bold text-[#B76E79]">Group of {registration.personsAttending}</p>}
-                    {registration.buyerName && <p className="mt-1 text-xs font-semibold text-[#8C7567]">Buyer / Contact: {registration.buyerName}</p>}
+                    {Number(registration.personsAttending) > 1 && <p className="mt-1 text-xs font-bold text-[#9A5260]">Group of {registration.personsAttending}</p>}
+                    {registration.buyerName && <p className="mt-1 text-xs font-semibold text-[#80685B]">Buyer / Contact: {registration.buyerName}</p>}
                     {attendeeNamesText(registration) && <p className="mt-1 text-xs text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</p>}
                     <p className="mt-1 text-xs text-[#816D62]">{registration.email || registration.phone || 'No contact'}</p>
                   </div>
                   <TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{registration.ticketStatus === 'assigned' ? 'Assigned' : 'No ticket'}</TicketBadge>
                 </div>
                 <div className="mt-4 rounded-xl bg-[#FBF8F5] p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8C7567]">Ticket code</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Ticket code</p>
                   <p className="mt-1 font-mono text-lg font-bold text-[#2B1723]">{registration.ticketCode || 'Not assigned'}</p>
                 </div>
                 {registration.ticketStatus === 'assigned' && registration.ticketCode && (

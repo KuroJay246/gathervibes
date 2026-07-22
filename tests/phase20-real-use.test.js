@@ -37,9 +37,8 @@ test('Phase 20 keeps import preview-first, xlsx absent, read-excel-file active, 
   assert.equal(packageJson.dependencies['read-excel-file'], '^9.2.0')
   assert.doesNotMatch(packageLock, /node_modules\/xlsx/)
   assert.match(xlsxImport, /read-excel-file\/browser/)
-  assert.match(settings, /Access request actions disabled/)
-  assert.match(settings, /Staff profile editing disabled/)
-  assert.match(settings, /Assignment editing disabled/)
+  assert.match(settings, /Access is controlled outside this page/)
+  assert.match(settings, /cannot add, remove, disable, or change anyone's role/)
 })
 
 test('Phase 20 operational handoff guide stays practical and preserves CPB and CODEX_TEST guardrails', async () => {

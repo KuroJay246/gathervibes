@@ -67,7 +67,7 @@ function Metric({ label, value, detail }) {
   return (
     <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3" aria-label={`${label}: ${value}`}>
       <p className="text-xl font-bold text-[#2B1723]">{value}</p>
-      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8C7567]">{label}</p>
+      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#80685B]">{label}</p>
       {detail && <p className="mt-1 text-xs text-[#816D62]">{detail}</p>}
     </div>
   )
@@ -78,7 +78,7 @@ function ProgressBar({ value }) {
   return (
     <div className="h-2.5 overflow-hidden rounded-full bg-[#F2E8E1]">
       <div
-        className={`h-full rounded-full ${safeValue >= 90 ? 'bg-[#C53030]' : safeValue >= 70 ? 'bg-[#D4890A]' : 'bg-[#B76E79]'}`}
+        className={`h-full rounded-full ${safeValue >= 90 ? 'bg-[#C53030]' : safeValue >= 70 ? 'bg-[#D4890A]' : 'bg-[#9A5260]'}`}
         style={{ width: `${safeValue}%` }}
       />
     </div>
@@ -139,7 +139,7 @@ export function DashboardPage() {
       <section className="rounded-[28px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Overview</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Overview</p>
             <h2 className="mt-2 break-words font-serif text-3xl text-[#2B1723]">
               {getWorkingEventDisplayName(activeEvent)}
             </h2>
@@ -175,7 +175,7 @@ export function DashboardPage() {
           <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#816D62]">
             Registrations, tickets, check-in, operations, messages, and reports are scoped to one selected event at a time.
           </p>
-          <Link to="/events" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#B76E79] px-5 text-xs font-bold text-white">
+          <Link to="/events" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#9A5260] px-5 text-xs font-bold text-white">
             Go to Events
           </Link>
         </section>
@@ -191,10 +191,10 @@ export function DashboardPage() {
           <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="overview-registration-finance-heading">
             <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Registration Finance</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Registration Finance</p>
                 <h2 id="overview-registration-finance-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Expected, received, and outstanding</h2>
               </div>
-              <Link to="/payments" className="inline-flex min-h-10 w-fit items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#B76E79]">
+              <Link to="/payments" className="inline-flex min-h-10 w-fit items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#9A5260]">
                 Open Payments
               </Link>
             </div>
@@ -224,7 +224,7 @@ export function DashboardPage() {
             <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="overview-financial-evidence-heading">
               <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#986F26]">Financial Evidence Audit</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Financial Evidence Audit</p>
                   <h2 id="overview-financial-evidence-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">{evidenceAudit.auditStatus}</h2>
                   <p className="mt-2 text-xs leading-5 text-[#715D46]">
                     Documentary evidence is separate from the operational registration totals above.
@@ -254,7 +254,7 @@ export function DashboardPage() {
             <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Needs Attention</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Needs Attention</p>
                   <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Priorities for this event</h2>
                 </div>
                 <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
@@ -276,7 +276,7 @@ export function DashboardPage() {
                         <p className="text-sm font-bold text-[#2B1723]">{item.label}</p>
                         <p className="mt-1 text-xs leading-5 text-[#816D62]">{item.summary}</p>
                       </div>
-                      <Link to={item.to} className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#B76E79]">
+                      <Link to={item.to} className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#9A5260]">
                         {item.linkLabel}
                       </Link>
                     </div>
@@ -286,7 +286,7 @@ export function DashboardPage() {
             </article>
 
             <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Quick Actions</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Quick Actions</p>
               <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Do next</h2>
               <div className="mt-5 grid gap-2">
                 {[
@@ -298,7 +298,7 @@ export function DashboardPage() {
                   { to: '/operations', label: 'Review Operations', icon: ReceiptText },
                 ].map(({ to, label, icon: Icon }) => (
                   <Link key={to} to={to} className="flex min-h-12 items-center gap-3 rounded-xl border border-[#EFE2DA] px-4 text-sm font-bold text-[#2B1723] hover:bg-[#FFF8F2]">
-                    <Icon className="size-4 text-[#B76E79]" />
+                    <Icon className="size-4 text-[#9A5260]" />
                     {label}
                     <ArrowRight className="ml-auto size-4 text-[#B8A49A]" />
                   </Link>
@@ -309,7 +309,7 @@ export function DashboardPage() {
 
           <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
             <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Event Progress</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Event Progress</p>
               <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Snapshot</h2>
               <div className="mt-5 space-y-4">
                 <div>
@@ -328,17 +328,17 @@ export function DashboardPage() {
                 <p className="text-xs leading-5 text-[#816D62]">
                   Registration payment records and Operations Ledger entries are separate. Use Payments for registration balances and Reports for the read-only event review.
                 </p>
-                {adminUser && <Link to="/event-review" className="text-xs font-bold text-[#B76E79] hover:underline">Open Reports</Link>}
+                {adminUser && <Link to="/event-review" className="text-xs font-bold text-[#9A5260] hover:underline">Open Reports</Link>}
               </div>
             </article>
 
             <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#B76E79]">Upcoming Events</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Upcoming Events</p>
                   <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Calendar</h2>
                 </div>
-                {adminUser && <Link to="/events" className="text-xs font-bold text-[#B76E79] hover:underline">View all</Link>}
+                {adminUser && <Link to="/events" className="text-xs font-bold text-[#9A5260] hover:underline">View all</Link>}
               </div>
               <div className="mt-5 divide-y divide-[#F2E8E1]">
                 {!visibleEventsLoaded ? (
@@ -349,17 +349,17 @@ export function DashboardPage() {
                   const selected = event.eventId === activeEvent.eventId
                   return (
                     <div key={event.eventId} className="flex items-center gap-4 py-3">
-                      <CalendarDays className="size-5 shrink-0 text-[#B76E79]" />
+                      <CalendarDays className="size-5 shrink-0 text-[#9A5260]" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-bold text-[#2B1723]">{event.eventName}</p>
                         <p className="mt-0.5 text-xs text-[#816D62]">{formatEventDate(event.eventDate)} · {event.location || 'Location not set'}</p>
                       </div>
                       <div className="shrink-0 text-right">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#8C7567]">{formatCountdown(event.eventDate)}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{formatCountdown(event.eventDate)}</p>
                         {selected ? (
                           <span className="text-[10px] font-bold text-[#2F855A]">Selected</span>
                         ) : (
-                          <button type="button" onClick={() => setActiveEvent(event)} className="text-[10px] font-bold text-[#B76E79] hover:underline">
+                          <button type="button" onClick={() => setActiveEvent(event)} className="text-[10px] font-bold text-[#9A5260] hover:underline">
                             Select
                           </button>
                         )}
