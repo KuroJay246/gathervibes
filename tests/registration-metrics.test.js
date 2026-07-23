@@ -87,7 +87,7 @@ test('Check-In page waits for Firestore success and avoids false success on perm
 
   assert.ok(completeIndex > -1)
   assert.ok(successIndex > completeIndex)
-  assert.match(checkIn, /Check-in was not saved because Firestore denied the write/)
+  assert.match(checkIn, /Check-in was not saved because your account could not confirm the update/)
   assert.doesNotMatch(checkIn.slice(completeIndex, successIndex), /set[A-Z][A-Za-z]*\([^)]*checkedIn/)
 })
 
@@ -100,7 +100,7 @@ test('Check-In page labels undo and clear actions truthfully', async () => {
   assert.match(checkIn, /Clear Selected Guest/)
   assert.doesNotMatch(checkIn, />\\s*Reset\\s*</)
   assert.match(checkIn, /Undo check-in for this guest\? This should only be used if the check-in was accidental\./)
-  assert.match(checkIn, /Undo check-in was not saved because Firestore denied the write/)
+  assert.match(checkIn, /Undo check-in was not saved because your account could not confirm the update/)
   assert.ok(undoIndex > -1)
   assert.ok(undoSuccessIndex > undoIndex)
 })

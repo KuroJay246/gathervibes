@@ -118,7 +118,7 @@ export function OperationsPage() {
       (err) => {
         if (import.meta.env.DEV) console.error(err)
         setError(
-          'Live Operations ledger rows could not be loaded for this session. The read-only Phase 23N closeout and audit summary remains separate from registration payments.',
+          'Live Operations ledger rows could not be loaded for this session. The read-only audit summary remains separate from registration payments.',
         )
         setLoading(false)
       },
@@ -351,14 +351,14 @@ export function OperationsPage() {
           <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Financial Audit and Closeout History</p>
-              <h2 id="operations-closeout-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Phase 23N Operations closeout applied</h2>
+              <h2 id="operations-closeout-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Operations closeout records applied</h2>
               <p className="mt-2 max-w-3xl text-xs leading-5 text-[#715D46]">
-                Applied batch PH23N_SUBSETS_1_4_PRODUCTION_APPLY_2026-07-22T043009926Z created the completed Operations and in-kind records below. Subsets 5 and 6 remain locked, and open corrective tasks are evidence review only.
+                The approved CPB audit package applied on July 22, 2026 created the completed Operations and in-kind records below. Registration evidence and attendance corrections remain locked for separate review, and open corrective tasks remain evidence review only.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <span className="w-fit rounded-full bg-[#E5F3EC] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">Applied</span>
-              <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">Subsets 5 and 6 locked</span>
+              <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">Registration and attendance corrections locked</span>
               <span className="w-fit rounded-full bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
                 CPB Operations entries now: {entries.length}
               </span>

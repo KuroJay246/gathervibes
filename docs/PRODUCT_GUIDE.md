@@ -6,6 +6,16 @@ Gather & Savor Event Hub is a private React and Firebase workspace for event org
 
 All daily work is scoped to the selected Working Event. `CODEX_TEST` is the permanent synthetic QA event. Cake Piknik Barbados (CPB) contains production data and is read-only during normal QA.
 
+## Current companion docs
+
+- [ROUTE_MAP.md](./ROUTE_MAP.md): current route labels, purposes, and Working Event rules
+- [PROTOTYPE_DEMO_GUIDE.md](./PROTOTYPE_DEMO_GUIDE.md): safe demo path using CODEX_TEST
+- [OPERATIONS_GUIDE.md](./OPERATIONS_GUIDE.md): event-level money boundaries
+- [FINANCE_EVIDENCE_GUIDE.md](./FINANCE_EVIDENCE_GUIDE.md): evidence handling and CPB safety rules
+- [QA_GUIDE.md](./QA_GUIDE.md): local, browser, and cleanup QA workflow
+- [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md): merge, deploy, and smoke sequence
+- [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md): current product limits
+
 ## Route map
 
 | Route | Organizer purpose |

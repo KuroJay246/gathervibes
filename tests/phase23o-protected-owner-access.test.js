@@ -105,7 +105,7 @@ test('Phase 23O guardrails preserve QR privacy, CODEX_TEST isolation, CPB locks,
   assert.match(qaHelper, new RegExp(CPB_EVENT_ID))
   assert.match(qaPage, /CPB is production data and remains read-only during normal QA/)
   assert.match(qaPage, /Legacy CPB write controls remain unavailable/)
-  assert.match(operations, /Subsets 5 and 6 locked/)
+  assert.match(operations, /Registration and attendance corrections locked/)
   assert.match(phase23n, /Subset 5: Registration Evidence Metadata/)
   assert.match(phase23n, /Subset 6: Registration\/Attendance Corrections/)
   assert.match(paymentAuditEngine, /CPB_AUDIT_APPROVAL_TEXT/)

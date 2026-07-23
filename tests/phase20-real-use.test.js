@@ -32,7 +32,7 @@ test('Phase 20 keeps import preview-first, xlsx absent, read-excel-file active, 
   const xlsxImport = await readFile('src/utils/xlsxImport.js', 'utf8')
 
   assert.match(imports, /preview before saving/i)
-  assert.match(imports, /No Firestore write happens until you confirm valid rows on the preview screen\./)
+  assert.match(imports, /No event records are saved until you confirm valid rows on the preview screen\./)
   assert.equal(packageJson.dependencies.xlsx, undefined)
   assert.equal(packageJson.dependencies['read-excel-file'], '^9.2.0')
   assert.doesNotMatch(packageLock, /node_modules\/xlsx/)

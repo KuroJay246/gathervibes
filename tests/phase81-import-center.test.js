@@ -346,7 +346,7 @@ test('confirmed import write strips UI-only review fields', async () => {
 test('Import Center shows clear Firestore permission-denied diagnostics without guest rows', async () => {
   const page = await readFile('src/pages/ImportsPage.jsx', 'utf8')
 
-  assert.match(page, /Import failed because Firestore denied the write/)
+  assert.match(page, /Import failed because your account could not save the confirmed rows/)
   assert.match(page, /No rows were imported/)
   assert.match(page, /confirmed-import-batch/)
   assert.match(page, /Copy Error Details/)

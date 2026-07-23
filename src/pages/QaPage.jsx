@@ -14,9 +14,12 @@ import {
   CODEX_TEST_EVENT_NAME,
   CPB_EVENT_ID,
   CPB_EVENT_NAME,
+  QA_PHASE23S_PREFIX,
   buildQaSampleCsv,
   buildQaTestPrefix,
+  findCodexTestEvent,
   isCodexTestWorkingEvent,
+  prototypeReadinessChecklist,
   qaChecklist,
 } from '../utils/qaHelper'
 
@@ -63,7 +66,7 @@ function SummaryCard({ label, status, value, detail }) {
 
 export function QaPage() {
   const { accessControl, access, currentRoleLabel } = useAuth()
-  const { activeEvent } = useActiveEvent()
+  const { activeEvent, setActiveEvent } = useActiveEvent()
   const [events, setEvents] = useState([])
   const [auditStatus, setAuditStatus] = useState('checking')
   const [loading, setLoading] = useState(true)
@@ -74,6 +77,7 @@ export function QaPage() {
   const prefix = useMemo(() => buildQaTestPrefix(), [])
   const sampleCsv = useMemo(() => buildQaSampleCsv(prefix), [prefix])
   const codexEvents = events.filter((event) => event.eventId === CODEX_TEST_EVENT_ID || event.eventName === CODEX_TEST_EVENT_NAME)
+  const codexTestEvent = useMemo(() => findCodexTestEvent(events), [events])
   const cpbEvent = events.find((event) => event.eventId === CPB_EVENT_ID || event.eventName === CPB_EVENT_NAME)
   const workingEventIsCodex = isCodexTestWorkingEvent(activeEvent)
 
@@ -263,9 +267,85 @@ export function QaPage() {
     return 'bg-[#FFF4DF] text-[#6F4A11]'
   }
 
+  function readinessTone(status) {
+    if (status === 'ready') return 'bg-[#EAF6EF] text-[#17623A]'
+    if (status === 'not-ready') return 'bg-[#FFF1F1] text-[#A32626]'
+    if (status === 'not-applicable') return 'bg-[#F3EFEA] text-[#6B564C]'
+    return 'bg-[#FFF4DF] text-[#6F4A11]'
+  }
+
+  function readinessLabel(status) {
+    if (status === 'ready') return 'Ready'
+    if (status === 'not-ready') return 'Not Ready'
+    if (status === 'not-applicable') return 'Not Applicable'
+    return 'Ready with Limitation'
+  }
+
   const failedChecks = qaChecks.filter((check) => check.status === 'fail').length
   const warningChecks = qaChecks.filter((check) => check.status === 'warning').length
   const overallStatus = loading || qaChecks.length === 0 ? 'warn' : failedChecks > 0 ? 'fail' : 'ok'
+  const prototypeChecklist = useMemo(() => prototypeReadinessChecklist.map((item) => {
+    const defaultStatus = qaChecks.length === 0 ? 'ready-with-limitation' : failedChecks > 0 ? 'not-ready' : 'ready'
+
+    switch (item.key) {
+      case 'authentication':
+        return {
+          ...item,
+          status: access?.level === 'admin' ? 'ready' : 'not-ready',
+          detail: access?.protectedOwner
+            ? 'Protected-owner access is active.'
+            : access?.level === 'admin'
+              ? 'Approved organizer access is active.'
+              : item.detail,
+        }
+      case 'eventCreation':
+        return { ...item, status: access?.level === 'admin' ? 'ready' : 'not-ready' }
+      case 'registrationWorkflow':
+      case 'paymentWorkflow':
+      case 'ticketWorkflow':
+      case 'checkInWorkflow':
+      case 'operationsWorkflow':
+      case 'reports':
+      case 'communications':
+        return { ...item, status: defaultStatus }
+      case 'imports':
+        return {
+          ...item,
+          status: workingEventIsCodex ? 'ready' : 'ready-with-limitation',
+          detail: workingEventIsCodex
+            ? 'CODEX_TEST is selected for preview-first demo imports.'
+            : 'Select CODEX_TEST before importing any demo data.',
+        }
+      case 'responsiveDesign':
+        return {
+          ...item,
+          status: 'ready-with-limitation',
+          detail: 'Use the responsive browser matrix before a release sign-off.',
+        }
+      case 'accessibility':
+        return {
+          ...item,
+          status: 'ready-with-limitation',
+          detail: 'Run the automated and manual accessibility review before sign-off.',
+        }
+      case 'dataSafety':
+        return {
+          ...item,
+          status: codexEvents.length === 1 ? 'ready' : 'not-ready',
+          detail: codexEvents.length === 1
+            ? 'CODEX_TEST is available for demos and CPB remains protected.'
+            : 'The demo fixture must exist exactly once before destructive QA.',
+        }
+      case 'productionDeployment':
+        return {
+          ...item,
+          status: 'ready-with-limitation',
+          detail: 'Hosting deployment, rules review, and production smoke still happen outside this page.',
+        }
+      default:
+        return { ...item, status: 'ready-with-limitation' }
+    }
+  }), [access?.level, access?.protectedOwner, codexEvents.length, failedChecks, qaChecks.length, workingEventIsCodex])
   const organizerSummary = [
     {
       label: 'Overall Status',
@@ -352,7 +432,61 @@ export function QaPage() {
         <div className="mt-6 rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#5F4A2A]">
           Use <strong>{CODEX_TEST_EVENT_NAME}</strong> for test registrations, imports, tickets, or check-ins. CPB is production data and remains read-only during normal QA.
         </div>
+
+        <div className="mt-4 rounded-2xl border border-[#D8C5A8] bg-[#FFFCF6] p-5">
+          <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Prototype Demo Mode</p>
+          <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">{workingEventIsCodex ? 'Demo event selected' : 'Open the safe demo event'}</h3>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#715D46]">
+            Use CODEX_TEST for walkthroughs, prefix temporary demo business records with <strong>{QA_PHASE23S_PREFIX}_</strong>, delete those temporary business records after the demo, and keep audit logs untouched.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {codexTestEvent && !workingEventIsCodex && (
+              <button
+                type="button"
+                onClick={() => setActiveEvent(codexTestEvent)}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#7A5818] px-4 text-xs font-bold text-white"
+              >
+                Open Demo Event
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={runQaChecks}
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#D8C5A8] bg-white px-4 text-xs font-bold text-[#7A5818]"
+            >
+              Run Demo Checks
+            </button>
+          </div>
+        </div>
       </section>
+
+      <details className="group min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white shadow-[0_8px_24px_rgba(84,53,67,0.04)]">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-6 font-bold text-[#2B1723] sm:p-8">
+          <span>
+            <span className="block text-[9px] font-bold uppercase tracking-[0.22em] text-[#8A3F4B]">Prototype Status</span>
+            <span className="mt-2 block font-serif text-2xl">Readiness checklist</span>
+          </span>
+          <ChevronDown className="size-5 shrink-0 transition group-open:rotate-180" aria-hidden="true" />
+        </summary>
+        <div className="border-t border-[#EFE2DA] p-6 sm:p-8">
+          <p className="max-w-3xl text-sm leading-6 text-[#6B564C]">
+            Use this list to confirm the organizer demo path is coherent, safe, and ready for a walkthrough. Release validation and production smoke still happen outside this page.
+          </p>
+          <div className="mt-5 grid gap-3 xl:grid-cols-2">
+            {prototypeChecklist.map((item) => (
+              <article key={item.key} className="rounded-2xl border border-[#EFE2DA] p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <p className="text-sm font-bold text-[#2B1723]">{item.label}</p>
+                  <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase ${readinessTone(item.status)}`}>
+                    {readinessLabel(item.status)}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-6 text-[#6B564C]">{item.detail}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </details>
 
       <details className="group min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white shadow-[0_8px_24px_rgba(84,53,67,0.04)]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-6 font-bold text-[#2B1723] sm:p-8">
@@ -389,7 +523,7 @@ export function QaPage() {
           <div className="rounded-2xl border border-[#EFE2DA] p-4">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6B564C]">Current Working Event</p>
             <p className="mt-2 truncate text-sm font-bold text-[#2B1723]">{activeEvent?.eventName || 'None selected'}</p>
-            <p className="mt-1 break-all text-xs text-[#6B564C]">{activeEvent?.eventId || 'Select CODEX_TEST before QA writes'}</p>
+            <p className="mt-1 text-xs text-[#6B564C]">{activeEvent ? 'Selected in this browser session.' : 'Select CODEX_TEST before QA writes'}</p>
             <div className="mt-3">
               <StatusBadge ok={workingEventIsCodex}>{workingEventIsCodex ? 'Using CODEX_TEST' : 'Not CODEX_TEST'}</StatusBadge>
             </div>
@@ -494,7 +628,7 @@ export function QaPage() {
         <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Manual smoke checklist</p>
         <h3 className="mt-2 font-serif text-2xl">Staff access readiness</h3>
         <p className="mt-3 text-sm leading-6 text-[#7B665C]">
-          Use CODEX_TEST only. This checklist is manual guidance and does not write to Firestore.
+          Use CODEX_TEST only. This checklist is manual guidance and does not change event records by itself.
         </p>
         <div className="mt-5 grid gap-3">
           {qaChecklist.map((item) => (

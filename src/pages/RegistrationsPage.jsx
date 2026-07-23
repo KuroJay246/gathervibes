@@ -466,7 +466,7 @@ export function RegistrationsPage() {
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Registration Evidence Reconciliation</p>
               <h2 id="registration-audit-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">CPB booking crosswalk in organizer review</h2>
               <p className="mt-2 max-w-3xl text-xs leading-5 text-[#715D46]">
-                The private manifest maps audit booking IDs to current registration records. Exact and high-confidence matches can be proposed; candidate, conflict and unmatched records stay in organizer review.
+                Historical workbook booking records are being matched to current registration records for organizer review. Exact and high-confidence matches can be proposed; candidate, conflict, and unmatched rows stay in manual review.
               </p>
             </div>
             <Link to="/event-review" className="inline-flex min-h-10 w-fit items-center justify-center rounded-xl border border-[#D8C5A8] bg-white px-4 text-xs font-bold text-[#7A5818]">
@@ -474,7 +474,7 @@ export function RegistrationsPage() {
             </Link>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <CountCard label="App registrations" value={evidenceAudit.attendance.appRegistrations} help="Current Firestore registration records." />
+            <CountCard label="App registrations" value={evidenceAudit.attendance.appRegistrations} help="Current registration records for this event." />
             <CountCard label="App guests" value={evidenceAudit.attendance.appGuests} help="Current persons attending total." />
             <CountCard label="Gmail-supported ticket spaces" value={evidenceAudit.ticketIncome.gmailSupportedTickets} help="Documentary ticket spaces, including inferred amounts." />
             <CountCard label="Christina Morris exception" value="Still present" help="No current CPB app row safely contains Christina Morris or her two guest spaces." />

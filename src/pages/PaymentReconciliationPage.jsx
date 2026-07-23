@@ -37,7 +37,7 @@ function GuardrailNotice() {
           <h3 className="font-bold text-[#4E3928]">Read-only reconciliation preview</h3>
           <p className="mt-1">
             This tool loads workbook records, CPB registration records, and CPB Operations records for comparison only.
-            It does not use the selected Working Event, does not write Firestore data, does not import registrations, and does not apply payment updates.
+            It does not use the selected Working Event, does not save changes, does not import registrations, and does not apply payment updates.
           </p>
         </div>
       </div>
@@ -449,7 +449,7 @@ export function PaymentReconciliationPage() {
           </section>
           <ReconciliationTable preview={preview} filter={filter} />
           <section className="rounded-2xl border border-[#F2C3C3] bg-[#FFF8F8] p-5 text-sm leading-6 text-[#7E1E1E]">
-            <h3 className="font-bold">No apply action exists in Phase 23C</h3>
+            <h3 className="font-bold">No apply action is available here</h3>
             <p className="mt-1">Supported updates are previewed only for organizer review. Identity fields, event ID, guest count, ticket codes, check-in fields, and audit history are never proposed here.</p>
           </section>
         </>

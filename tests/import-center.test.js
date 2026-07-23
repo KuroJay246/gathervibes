@@ -42,7 +42,7 @@ test('Import Center page labels source selector and XLSX upload as preview-first
   assert.match(page, /Import Center/)
   assert.match(page, /Choose source/)
   assert.match(page, /Click or drag to upload XLSX/)
-  assert.match(page, /No Firestore write happens until you confirm valid rows/)
+  assert.match(page, /No event records are saved until you confirm valid rows/)
   assert.doesNotMatch(page, /Google Sheets API/)
 })
 

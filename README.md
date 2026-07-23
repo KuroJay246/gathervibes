@@ -6,6 +6,23 @@ Private event-operations dashboard for **Gather & Savor Vibes**. This is an admi
 
 This private admin app intentionally uses `noindex` and does not publish `sitemap.xml` or JSON-LD structured data. Public SEO should be handled by a separate public marketing landing page later.
 
+## Current product docs
+
+- [`docs/PRODUCT_GUIDE.md`](./docs/PRODUCT_GUIDE.md)
+- [`docs/ROUTE_MAP.md`](./docs/ROUTE_MAP.md)
+- [`docs/PROTOTYPE_DEMO_GUIDE.md`](./docs/PROTOTYPE_DEMO_GUIDE.md)
+- [`docs/OPERATIONS_GUIDE.md`](./docs/OPERATIONS_GUIDE.md)
+- [`docs/FINANCE_EVIDENCE_GUIDE.md`](./docs/FINANCE_EVIDENCE_GUIDE.md)
+- [`docs/QA_GUIDE.md`](./docs/QA_GUIDE.md)
+- [`docs/DEPLOYMENT_GUIDE.md`](./docs/DEPLOYMENT_GUIDE.md)
+- [`docs/KNOWN_LIMITATIONS.md`](./docs/KNOWN_LIMITATIONS.md)
+
+## Current workspace summary
+
+- Use `Overview`, `Events`, `Guests & Registrations`, `Payments`, `Tickets`, `Check-In`, `Operations`, `Message Builder`, `Reports`, `Settings`, and `System QA` as the current organizer-facing structure.
+- Use `CODEX_TEST Live Verification Event` for walkthroughs, QA, and destructive demos.
+- Keep CPB production data read-only during routine QA and demos.
+
 ## Implementation status
 
 - [x] **Phase 1**: Auth and base app shell

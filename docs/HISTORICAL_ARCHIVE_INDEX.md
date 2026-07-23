@@ -1,6 +1,6 @@
 # Historical Archive Index
 
-This index preserves implementation history without making phase reports the primary product documentation. Current behavior is documented in [PRODUCT_GUIDE.md](./PRODUCT_GUIDE.md).
+This index preserves implementation history without making phase reports the primary product documentation. Current behavior is documented in [PRODUCT_GUIDE.md](./PRODUCT_GUIDE.md), [ROUTE_MAP.md](./ROUTE_MAP.md), and [PROTOTYPE_DEMO_GUIDE.md](./PROTOTYPE_DEMO_GUIDE.md).
 
 ## Product and release history
 
