@@ -321,12 +321,15 @@ export function OperationsPage() {
         </InfoHint>
       </section>
 
-      <section aria-labelledby="operations-finance-summary-heading" className="rounded-xl border border-[#E6D4B4] bg-[#FFF8EA] px-4 py-3 text-xs leading-5 text-[#715D46]">
-        <h3 id="operations-finance-summary-heading" className="text-sm font-bold text-[#4E3928]">Operations finance boundary</h3>
-        <p className="mt-1">
-          Operations tracks event expenses, commitments and non-registration income. Registration ticket payments are recorded separately under Payments, so the Operations cash position is not the event's final profit or loss.
-        </p>
-      </section>
+      <details className="phase23v-panel border-[#E6D4B4] bg-[#FFF8EA]">
+        <summary className="phase23v-summary text-[#4E3928]">Operations finance boundary</summary>
+        <div className="phase23v-body text-xs leading-5 text-[#715D46]">
+          <h3 id="operations-finance-summary-heading" className="text-sm font-bold text-[#4E3928]">Operations finance boundary</h3>
+          <p className="mt-1">
+            Operations tracks event expenses, commitments and non-registration income. Registration ticket payments are recorded separately under Payments, so the Operations cash position is not the event's final profit or loss.
+          </p>
+        </div>
+      </details>
 
       {completedEvent && (
         <section className="rounded-xl border border-[#D9E3F8] bg-[#F6F9FF] px-4 py-3 text-sm leading-6 text-[#415F91]">
@@ -347,7 +350,7 @@ export function OperationsPage() {
       {error && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{error}</div>}
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="phase23v-metric-grid">
         {[
           ...(adminUser ? [
             ['Registration expected income', formatCurrency(financeSummary.totalExpected)],
@@ -371,14 +374,21 @@ export function OperationsPage() {
         ))}
       </section>
 
-      <PartnerCommitmentsPanel
-        event={currentEvent}
-        onSaveRecord={(record) => savePartnerRecord(currentEvent, record, user)}
-        onDeleteRecord={(partnerId) => deletePartnerRecord(currentEvent, partnerId, user)}
-      />
+      <details className="phase23v-panel">
+        <summary className="phase23v-summary">Partner commitments, sponsors, and supplier contacts</summary>
+        <div className="phase23v-body">
+          <PartnerCommitmentsPanel
+            event={currentEvent}
+            onSaveRecord={(record) => savePartnerRecord(currentEvent, record, user)}
+            onDeleteRecord={(partnerId) => deletePartnerRecord(currentEvent, partnerId, user)}
+          />
+        </div>
+      </details>
 
       {evidenceAudit && (
-        <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="operations-closeout-heading">
+        <details className="phase23v-panel border-[#D8C5A8] bg-[#FFFCF6]" aria-labelledby="operations-closeout-heading">
+          <summary className="phase23v-summary text-[#4E3928]">Financial audit and closeout history</summary>
+          <div className="phase23v-body">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Financial Audit and Closeout History</p>
@@ -430,7 +440,8 @@ export function OperationsPage() {
               {evidenceAudit.correctiveActions.map((item) => <li key={item}>{item}</li>)}
             </ol>
           </details>
-        </section>
+          </div>
+        </details>
       )}
 
       <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">

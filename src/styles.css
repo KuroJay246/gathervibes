@@ -241,6 +241,59 @@ input:focus-visible {
   overflow-wrap: anywhere;
 }
 
+.phase23v-panel {
+  min-width: 0;
+  border: 1px solid #eedfd6;
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(84, 53, 67, 0.04);
+}
+
+.phase23v-summary {
+  display: flex;
+  min-height: 3.75rem;
+  cursor: pointer;
+  list-style: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  color: #2b1723;
+  font-weight: 800;
+}
+
+.phase23v-summary::-webkit-details-marker {
+  display: none;
+}
+
+.phase23v-summary::after {
+  content: "Open";
+  flex: none;
+  border-radius: 999px;
+  border: 1px solid #e7d6cc;
+  padding: 0.35rem 0.65rem;
+  color: #80685b;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.phase23v-panel[open] > .phase23v-summary::after {
+  content: "Close";
+}
+
+.phase23v-body {
+  border-top: 1px solid #efe2da;
+  padding: 1rem;
+}
+
+.phase23v-metric-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+}
+
 @media (max-width: 1023px) {
   html {
     scroll-padding-bottom: calc(7.5rem + env(safe-area-inset-bottom));

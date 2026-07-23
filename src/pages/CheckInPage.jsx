@@ -371,12 +371,24 @@ export function CheckInPage() {
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
       {actionError && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{actionError}</div>}
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="phase23v-metric-grid">
         {[
           ['Total Registrations', summary.totalRegistrations],
           ['Total Guests', summary.totalPersons],
           ['Checked-In Registrations', summary.checkedInRegistrations],
           ['Checked-In Guests', summary.checkedInPersons],
+        ].map(([label, value]) => (
+          <article key={label} className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
+            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#80685B]">{label}</p>
+            <p className="mt-2 text-2xl font-bold text-[#2B1723]">{value}</p>
+          </article>
+        ))}
+      </section>
+
+      <details className="phase23v-panel">
+        <summary className="phase23v-summary">More attendance and readiness counts</summary>
+        <div className="phase23v-body phase23v-metric-grid">
+        {[
           ['Remaining Registrations', summary.remainingRegistrations],
           ['Remaining Guests', summary.remainingPersons],
           ['Paid / pending / comp', `${summary.paidRegistrations}/${summary.pendingRegistrations}/${summary.complimentaryRegistrations}`],
@@ -387,10 +399,13 @@ export function CheckInPage() {
             <p className="mt-2 text-2xl font-bold text-[#2B1723]">{value}</p>
           </article>
         ))}
-      </section>
+        </div>
+      </details>
 
       {evidenceAudit && (
-        <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="checkin-evidence-heading">
+        <details className="phase23v-panel border-[#D8C5A8] bg-[#FFFCF6]" aria-labelledby="checkin-evidence-heading">
+          <summary className="phase23v-summary text-[#4E3928]">Attendance evidence context</summary>
+          <div className="phase23v-body">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-1 size-5 shrink-0 text-[#7A5818]" />
             <div>
@@ -414,7 +429,8 @@ export function CheckInPage() {
               </article>
             ))}
           </div>
-        </section>
+          </div>
+        </details>
       )}
 
       <section className="flex items-center gap-2 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
@@ -424,7 +440,9 @@ export function CheckInPage() {
         </InfoHint>
       </section>
 
-      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)] sm:p-5">
+      <details className="phase23v-panel">
+        <summary className="phase23v-summary">Event-day helper lists and exports</summary>
+        <div className="phase23v-body">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Event-day helpers</p>
@@ -512,9 +530,12 @@ export function CheckInPage() {
             </table>
           </div>
         </div>
-      </section>
+        </div>
+      </details>
 
-      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
+      <details className="phase23v-panel">
+        <summary className="phase23v-summary">Advanced check-in filters</summary>
+        <div className="phase23v-body">
         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Advanced Filters</p>
         <p className="mt-1 text-xs leading-5 text-[#816D62]">
           Switch between QR lookup and manual guest lists. Bulk check-in and undo still require confirmation and never delete records.
@@ -546,7 +567,8 @@ export function CheckInPage() {
             </div>
           ))}
         </div>
-      </section>
+        </div>
+      </details>
 
       {activeView === 'search' ? (
         <section className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
