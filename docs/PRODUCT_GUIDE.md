@@ -4,17 +4,24 @@
 
 Gather & Savor Event Hub is a private React and Firebase workspace for event organizers. It manages events, registrations, registration finance, tickets, check-in, event-level Operations, communications drafts, imports, reports, settings, and system checks. It is not a public attendee site, payment processor, accounting ledger, or automatic messaging service.
 
+The organizer-ready MVP goal is simple: the organizer should be able to sign in, create the next real event, and manage it through the normal interface without developer tools, Firebase knowledge, or phase-history context.
+
 All daily work is scoped to the selected Working Event. `CODEX_TEST` is the permanent synthetic QA event. Cake Piknik Barbados (CPB) contains production data and is read-only during normal QA.
 
 ## Current companion docs
 
-- [ROUTE_MAP.md](./ROUTE_MAP.md): current route labels, purposes, and Working Event rules
-- [PROTOTYPE_DEMO_GUIDE.md](./PROTOTYPE_DEMO_GUIDE.md): safe demo path using CODEX_TEST
-- [OPERATIONS_GUIDE.md](./OPERATIONS_GUIDE.md): event-level money boundaries
-- [FINANCE_EVIDENCE_GUIDE.md](./FINANCE_EVIDENCE_GUIDE.md): evidence handling and CPB safety rules
-- [QA_GUIDE.md](./QA_GUIDE.md): local, browser, and cleanup QA workflow
-- [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md): merge, deploy, and smoke sequence
-- [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md): current product limits
+- [Route Map](./ROUTE_MAP.md): current route labels, purposes, and Working Event rules
+- [Organizer Quick Start](./ORGANIZER_QUICK_START.md): fastest organizer path through the core product
+- [New Event Setup Guide](./NEW_EVENT_SETUP_GUIDE.md): the five-step event planner workflow
+- [Event Lifecycle Guide](./EVENT_LIFECYCLE_GUIDE.md): event statuses, what they mean, and what to do next
+- [Event Day Guide](./EVENT_DAY_GUIDE.md): the day-of-event workflow
+- [Organizer Rehearsal Guide](./PROTOTYPE_DEMO_GUIDE.md): organizer rehearsal path using CODEX_TEST
+- [Operations Guide](./OPERATIONS_GUIDE.md): event-level money boundaries
+- [Baker Payment Guide](./BAKER_PAYMENT_GUIDE.md): baker commitments and payment-closeout boundaries
+- [Finance Evidence Guide](./FINANCE_EVIDENCE_GUIDE.md): evidence handling and CPB safety rules
+- [QA Guide](./QA_GUIDE.md): local, browser, and cleanup QA workflow
+- [Deployment Guide](./DEPLOYMENT_GUIDE.md): merge, deploy, and smoke sequence
+- [Known Limitations](./KNOWN_LIMITATIONS.md): current product limits
 
 ## Route map
 
@@ -72,6 +79,10 @@ Completed CPB backfills, consumed manifests, and old recovery Apply controls are
 
 Message Builder filters a selected-event audience, previews a draft, and copies text or a review packet. It does not send email, WhatsApp, SMS, or social posts and does not call a live AI service.
 
+### Event planning and lifecycle
+
+The normal organizer path starts in `Events` with `Plan a New Event`. The event planner captures basics, capacity, pricing, financial plan, operations notes, and readiness, then opens the selected event into `Overview`. Status labels use plain organizer language such as `Draft`, `Planning`, `Registration Open`, `Ready for Event`, `In Progress`, and `Completed`.
+
 ### Settings and System QA
 
 Settings separates Account, Workspace, Event Defaults, Organizer Access, Tickets & Check-In, Data & Messages, and Advanced information. Controls state their scope and timing; unavailable functionality is not presented as editable.
@@ -119,5 +130,6 @@ The repository includes Dependabot configuration and CodeQL analysis configurati
 - The prompt builder does not call a live AI API.
 - No public attendee portal, payment gateway, native app, or broad staff-management workflow is active.
 - Historical CPB identity and attendance questions remain evidence-gated.
+- Final event profit is not calculated automatically.
 
 Historical implementation records are indexed in [HISTORICAL_ARCHIVE_INDEX.md](./HISTORICAL_ARCHIVE_INDEX.md).

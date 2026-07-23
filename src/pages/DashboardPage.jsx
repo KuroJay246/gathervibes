@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  ArrowRight,
   CalendarDays,
+  CheckCircle2,
   ClipboardCheck,
-  FileInput,
+  Clock3,
   CreditCard,
+  MessageSquareText,
   ReceiptText,
   TicketCheck,
   Users,
@@ -16,14 +17,20 @@ import { useAuth } from '../auth/useAuth'
 import { subscribeToEvents } from '../services/eventService'
 import { subscribeToRegistrations } from '../services/registrationService'
 import { subscribeToOperationsLedger } from '../services/operationsLedgerService'
-import { formatCountdown, formatEventDate, toDateInput, upcomingEvents } from '../utils/dateUtils'
+import { formatEventDate, toDateInput, upcomingEvents } from '../utils/dateUtils'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
-import { buildFinanceSummary, buildPaymentsWorkspace, formatCurrency } from '../utils/financeUtils'
+import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
 import { getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
 import { isApprovedAdmin } from '../utils/accessRoles'
 import { buildEventReadiness } from '../utils/eventReadiness'
+import {
+  eventStatusLabel,
+  formatDaysUntilEvent,
+  hydrateEventForPlanning,
+  isCompletedEvent,
+  isEventDayStatus,
+} from '../utils/eventPlanning'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
-import { findCodexTestEvent, isCodexTestWorkingEvent } from '../utils/qaHelper'
 
 function useEventRegistrations(eventId) {
   const [rows, setRows] = useState([])
@@ -66,24 +73,100 @@ function sameActiveEventSnapshot(activeEvent, nextEvent) {
 
 function Metric({ label, value, detail }) {
   return (
-    <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3" aria-label={`${label}: ${value}`}>
+    <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3">
       <p className="text-xl font-bold text-[#2B1723]">{value}</p>
       <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#80685B]">{label}</p>
-      {detail && <p className="mt-1 text-xs text-[#816D62]">{detail}</p>}
+      {detail && <p className="mt-2 text-xs leading-5 text-[#816D62]">{detail}</p>}
     </div>
   )
 }
 
-function ProgressBar({ value }) {
-  const safeValue = Math.max(0, Math.min(100, Number(value) || 0))
+function Section({ eyebrow, title, children }) {
   return (
-    <div className="h-2.5 overflow-hidden rounded-full bg-[#F2E8E1]">
-      <div
-        className={`h-full rounded-full ${safeValue >= 90 ? 'bg-[#C53030]' : safeValue >= 70 ? 'bg-[#D4890A]' : 'bg-[#9A5260]'}`}
-        style={{ width: `${safeValue}%` }}
-      />
+    <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">{eyebrow}</p>
+      <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">{title}</h2>
+      <div className="mt-5">{children}</div>
+    </section>
+  )
+}
+
+function PriorityItem({ item }) {
+  return (
+    <Link to={item.to} className="block rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 hover:bg-white">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-bold text-[#2B1723]">{item.label}</p>
+          <p className="mt-2 text-xs leading-5 text-[#816D62]">{item.summary}</p>
+        </div>
+        <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+          item.statusLabel === 'Needs attention' ? 'bg-[#FFF1F1] text-[#A32626]' : 'bg-[#FFF4DF] text-[#7A5818]'
+        }`}>
+          {item.statusLabel}
+        </span>
+      </div>
+      <p className="mt-3 text-xs font-bold text-[#9A5260]">{item.linkLabel}</p>
+    </Link>
+  )
+}
+
+function ActionLink({ to, icon: Icon, label }) {
+  return (
+    <Link to={to} className="flex min-h-12 items-center gap-3 rounded-xl border border-[#EFE2DA] px-4 text-sm font-bold text-[#2B1723] hover:bg-[#FFF8F2]">
+      <Icon className="size-4 text-[#9A5260]" />
+      {label}
+    </Link>
+  )
+}
+
+function TimelineList({ timeline = [] }) {
+  const items = Array.isArray(timeline) ? timeline.filter((item) => item?.time || item?.label) : []
+  if (items.length === 0) {
+    return <p className="rounded-2xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm text-[#816D62]">No event-day timeline has been added yet.</p>
+  }
+
+  return (
+    <div className="space-y-3">
+      {items.map((item) => (
+        <div key={item.timelineId || `${item.time}-${item.label}`} className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+          <p className="text-sm font-bold text-[#2B1723]">{item.time || 'Time not set'}</p>
+          <p className="mt-2 text-sm leading-6 text-[#6B564C]">{item.label || 'No description'}</p>
+        </div>
+      ))}
     </div>
   )
+}
+
+const CLOCK_FORMATTER = new Intl.DateTimeFormat('en-BB', {
+  hour: 'numeric',
+  minute: '2-digit',
+})
+
+const PLANNING_ACTIONS = [
+  { to: '/registrations', label: 'Add Registration', icon: Users },
+  { to: '/payments', label: 'Record Payment', icon: CreditCard },
+  { to: '/operations', label: 'Add Expense or Commitment', icon: ReceiptText },
+  { to: '/operations', label: 'Add Supplier or Sponsor', icon: ReceiptText },
+  { to: '/events', label: 'Add Task', icon: CalendarDays },
+  { to: '/communications', label: 'Build Message', icon: MessageSquareText },
+  { to: '/event-review', label: 'Review Event Readiness', icon: ClipboardCheck },
+]
+
+const EVENT_DAY_ACTIONS = [
+  { to: '/tickets', label: 'Ticket Lookup', icon: TicketCheck },
+  { to: '/check-in', label: 'Open Check-In', icon: ClipboardCheck },
+  { to: '/operations', label: 'Urgent Contacts and Commitments', icon: ReceiptText },
+  { to: '/event-review', label: 'Open Reports', icon: CreditCard },
+]
+
+const COMPLETED_ACTIONS = [
+  { to: '/event-review', label: 'Open Final Report', icon: CheckCircle2 },
+  { to: '/operations', label: 'Review Baker Payments', icon: ReceiptText },
+  { to: '/events', label: 'Open Event Plan', icon: CalendarDays },
+]
+
+function formatClock(value) {
+  return CLOCK_FORMATTER.format(value)
 }
 
 export function DashboardPage() {
@@ -91,11 +174,12 @@ export function DashboardPage() {
   const { access, assignedEvents = [] } = useAuth()
   const [allEvents, setAllEvents] = useState([])
   const [eventsLoaded, setEventsLoaded] = useState(false)
+  const [currentTime, setCurrentTime] = useState(() => new Date())
 
   const adminUser = isApprovedAdmin(access)
   const visibleEvents = adminUser ? allEvents : assignedEvents
   const visibleEventsLoaded = adminUser ? eventsLoaded : true
-  const selectedEvent = activeEvent ? visibleEvents.find((event) => event.eventId === activeEvent.eventId) : null
+  const selectedEvent = activeEvent ? visibleEvents.find((event) => event.eventId === activeEvent.eventId) || activeEvent : null
   const registrations = useEventRegistrations(activeEvent?.eventId)
   const operationsEntries = useEventOperations(activeEvent?.eventId)
 
@@ -120,23 +204,28 @@ export function DashboardPage() {
     if (!sameActiveEventSnapshot(activeEvent, matchedEvent)) setActiveEvent(matchedEvent)
   }, [activeEvent, clearActiveEvent, setActiveEvent, visibleEvents, visibleEventsLoaded])
 
+  useEffect(() => {
+    const intervalId = window.setInterval(() => setCurrentTime(new Date()), 60000)
+    return () => window.clearInterval(intervalId)
+  }, [])
+
   const upcoming = useMemo(() => upcomingEvents(visibleEvents), [visibleEvents])
-  const codexTestEvent = useMemo(() => findCodexTestEvent(visibleEvents), [visibleEvents])
+  const hydratedEvent = useMemo(() => hydrateEventForPlanning(selectedEvent || {}), [selectedEvent])
   const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedEvent), [registrations, selectedEvent])
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedEvent), [registrations, selectedEvent])
-  const paymentsWorkspace = useMemo(() => buildPaymentsWorkspace(registrations, selectedEvent), [registrations, selectedEvent])
   const readiness = useMemo(
     () => buildEventReadiness(selectedEvent, registrations, operationsEntries),
     [operationsEntries, registrations, selectedEvent],
   )
   const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(selectedEvent?.eventId), [selectedEvent?.eventId])
-
-  const needsAttention = readiness.actionItems.slice(0, 5)
-  const openOperations = operationsEntries.filter((entry) => ['expected', 'pending'].includes(String(entry.status || '').toLowerCase())).length
-  const capacityLabel = selectedEvent?.capacity
-    ? `${metrics.capacityUsed} / ${selectedEvent.capacity} guests`
+  const completedEvent = isCompletedEvent(hydratedEvent)
+  const eventDayMode = isEventDayStatus(hydratedEvent)
+  const capacityLabel = hydratedEvent?.capacity
+    ? `${metrics.capacityUsed} of ${hydratedEvent.capacity} guests`
     : 'Capacity not set'
-  const demoEventSelected = isCodexTestWorkingEvent(activeEvent)
+  const urgentContacts = hydratedEvent.partnerRecords
+    .filter((record) => record.phone || record.email)
+    .slice(0, 4)
 
   return (
     <div className="space-y-6">
@@ -144,28 +233,17 @@ export function DashboardPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Overview</p>
-            <h2 className="mt-2 break-words font-serif text-3xl text-[#2B1723]">
-              {getWorkingEventDisplayName(activeEvent)}
-            </h2>
+            <h2 className="mt-2 break-words font-serif text-3xl text-[#2B1723]">{getWorkingEventDisplayName(activeEvent)}</h2>
             <p className="mt-2 text-sm leading-6 text-[#816D62]">
               {activeEvent
-                ? `${formatEventDate(activeEvent.eventDate)} · ${activeEvent.location || 'Location not set'} · ${activeEvent.status || 'status not set'}`
-                : 'Select a Working Event to see event-scoped numbers and next actions.'}
+                ? `${formatEventDate(activeEvent.eventDate)} · ${hydratedEvent.venueName || hydratedEvent.location || 'Venue not set'} · ${eventStatusLabel(activeEvent.status)}`
+                : 'Select a Working Event to see planning progress, event-day actions, and final reporting for that event.'}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link to="/events" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-4 text-xs font-bold text-white">
               Change event
             </Link>
-            {codexTestEvent && !demoEventSelected && (
-              <button
-                type="button"
-                onClick={() => setActiveEvent(codexTestEvent)}
-                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E6D4B4] bg-[#FFF8EA] px-4 text-xs font-bold text-[#7A5818]"
-              >
-                Use CODEX_TEST
-              </button>
-            )}
             {activeEvent && (
               <button
                 type="button"
@@ -181,217 +259,161 @@ export function DashboardPage() {
         </div>
       </section>
 
-      {codexTestEvent && (
-        <section className="rounded-[24px] border border-[#E6D4B4] bg-[#FFF8EA] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Prototype Demo</p>
-              <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">{demoEventSelected ? 'CODEX_TEST is ready for the walkthrough' : 'Open the safe demo event'}</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-[#715D46]">
-                {demoEventSelected
-                  ? 'Use the QA_PHASE23S_ prefix for temporary demo registrations, imports, payments, tickets, and Operations entries. Clean up those temporary records after the walkthrough and leave audit logs in place.'
-                  : 'Use CODEX_TEST to demonstrate the full organizer workflow without touching CPB production data.'}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {!demoEventSelected && (
-                <button
-                  type="button"
-                  onClick={() => setActiveEvent(codexTestEvent)}
-                  className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#7A5818] px-4 text-xs font-bold text-white"
-                >
-                  Open Demo Event
-                </button>
-              )}
-              <Link to="/qa" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#D8C5A8] bg-white px-4 text-xs font-bold text-[#7A5818]">
-                Open Demo Checklist
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
-
       {!activeEvent?.eventId ? (
         <section className="rounded-[24px] border border-dashed border-[#EEDFD6] bg-white p-8 text-center">
           <CalendarDays className="mx-auto mb-3 size-9 text-[#DFC9BC]" />
-          <h2 className="font-serif text-2xl text-[#2B1723]">Choose a Working Event</h2>
-          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#816D62]">
-            Registrations, tickets, check-in, operations, messages, and reports are scoped to one selected event at a time.
+          <h2 className="font-serif text-2xl text-[#2B1723]">Choose or create an event</h2>
+          <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-[#816D62]">
+            Start from Events to create the next gathering, set the Working Event, and open the organizer planning workflow. Every route after that will stay scoped to the selected event.
           </p>
-          <Link to="/events" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#9A5260] px-5 text-xs font-bold text-white">
-            Go to Events
-          </Link>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <Link to="/events" className="inline-flex min-h-11 items-center rounded-xl bg-[#9A5260] px-5 text-xs font-bold text-white">
+              Plan a New Event
+            </Link>
+            <Link to="/events" className="inline-flex min-h-11 items-center rounded-xl border border-[#E7D6CC] bg-white px-5 text-xs font-bold text-[#5A443B]">
+              Open Events
+            </Link>
+          </div>
         </section>
-      ) : (
+      ) : completedEvent ? (
         <>
-          <section className="grid gap-3 md:grid-cols-4" aria-label="Key event numbers">
-            <Metric label="Registration records" value={metrics.totalRegistrations} detail="Form entries" />
-            <Metric label="Guests" value={metrics.totalPersons} detail="From persons attending" />
-            <Metric label="Payments Received" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
-            <Metric label="Capacity used" value={selectedEvent?.capacity ? `${metrics.capacityPercent}%` : 'Not set'} detail={capacityLabel} />
-          </section>
-
-          <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="overview-registration-finance-heading">
-            <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Registration Finance</p>
-                <h2 id="overview-registration-finance-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Expected, received, and outstanding</h2>
-              </div>
-              <Link to="/payments" className="inline-flex min-h-10 w-fit items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#9A5260]">
-                Open Payments
-              </Link>
+          <Section eyebrow="Completed Event" title="Historical event overview">
+            <div className="rounded-2xl border border-[#E9EFFB] bg-[#F6F9FF] p-4 text-sm leading-6 text-[#415F91]">
+              This event is completed. Upcoming-event reminders, ticket prompts, and patron payment follow-up are no longer treated as active organizer work.
+              {selectedEvent?.eventId === 'zhaPxi31cpqLAW0cuS20' && ' CPB remains a completed historical event. Patron totals stay locked while baker payments can still be managed from Operations.'}
             </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <Metric
-                label="Expected Registration Income"
-                value={formatCurrency(financeSummary.totalExpected, financeSummary.currency)}
-                detail="Explicit registration charges only"
-              />
-              <Metric
-                label="Payments Received"
-                value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)}
-                detail="Confirmed registration payments"
-              />
-              <Metric
-                label="Outstanding Balance"
-                value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)}
-                detail="Balances still due"
-              />
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+              <Metric label="Status" value={eventStatusLabel(selectedEvent.status)} />
+              <Metric label="Registration records" value={metrics.totalRegistrations} />
+              <Metric label="Guests" value={metrics.totalPersons} />
+              <Metric label="Payments received" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
+              <Metric label="Paid event expenses" value={formatCurrency(readiness.planningOverview.operationsSettlement.paidExpenses, financeSummary.currency)} />
+              <Metric label="Outstanding commitments" value={formatCurrency(readiness.planningOverview.totalOutstandingCommitments, financeSummary.currency)} />
             </div>
-            <p className="mt-3 text-xs leading-5 text-[#816D62]">
-              These registration totals use explicit ticket price or amount due values only. Operations Ledger money remains separate.
-            </p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
-              <Metric label="Payment Follow-Up" value={paymentsWorkspace.summary.paymentFollowUpCount} detail="Still unresolved for patron collection" />
-              <Metric label="Action Required" value={paymentsWorkspace.summary.actionRequiredCount} detail="Could affect totals or duplicate handling" />
-              <Metric label="Internal Cleanup" value={paymentsWorkspace.summary.internalCleanupCount} detail="Resolved records that still need organizer review" />
-              <Metric label="Historical Limitations" value={paymentsWorkspace.summary.historicalLimitationCount} detail="Historical metadata gaps kept out of urgent counts" />
-              <Metric label="Informational Only" value={paymentsWorkspace.summary.informationalOnlyCount} detail="Visible for audit context only" />
-              <Metric label="Paid — Amount Not Recorded" value={paymentsWorkspace.summary.paidAmountNotRecordedCount} detail="Resolved payment without an exact captured amount" />
-            </div>
-          </section>
+          </Section>
 
           {evidenceAudit && (
-            <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="overview-financial-evidence-heading">
-              <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Financial Evidence Audit</p>
-                  <h2 id="overview-financial-evidence-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">{evidenceAudit.auditStatus}</h2>
-                  <p className="mt-2 text-xs leading-5 text-[#715D46]">
-                    Documentary evidence is separate from the operational registration totals above.
-                  </p>
-                </div>
-                <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
-                  Profit {evidenceAudit.finalProfitStatus}
-                </span>
+            <Section eyebrow="Historical Reference" title="Financial audit history">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <Metric label="App payments received" value={formatCurrency(evidenceAudit.ticketIncome.appPaymentsReceived, financeSummary.currency)} />
+                <Metric label="Verified ticket income" value={formatCurrency(evidenceAudit.ticketIncome.directlyVerifiedAmount, financeSummary.currency)} />
+                <Metric label="Baker paid" value={formatCurrency(evidenceAudit.operations.bakerPaidOrganizerReported, financeSummary.currency)} />
+                <Metric label="Baker outstanding" value={formatCurrency(evidenceAudit.operations.bakerOutstandingOrganizerReported, financeSummary.currency)} />
               </div>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <Metric label="App Payments Received" value={formatCurrency(evidenceAudit.ticketIncome.appPaymentsReceived, financeSummary.currency)} />
-                <Metric label="Directly Verified Audit Receipts" value={formatCurrency(evidenceAudit.ticketIncome.directlyVerifiedAmount, financeSummary.currency)} />
-                <Metric label="Amount Inferred" value={formatCurrency(evidenceAudit.ticketIncome.inferredAmount, financeSummary.currency)} />
-                <Metric label="Unresolved Difference" value={formatCurrency(evidenceAudit.ticketIncome.documentaryToAppVariance, financeSummary.currency)} />
-                <Metric label="Document-Supported Ticket Spaces" value={evidenceAudit.ticketIncome.documentSupportedTickets} />
-                <Metric label="Approximate Attendance" value={evidenceAudit.attendance.approximateAttendance} />
-                <Metric label="Attendance Evidence Gap" value={evidenceAudit.attendance.attendanceEvidenceGap} />
-                <Metric label="Open Corrective Actions" value={evidenceAudit.correctiveActions.length} />
-              </div>
-              <p className="mt-3 text-xs leading-5 text-[#715D46]">
-                BBD $4,115 is verified documentary ticket income, not total event revenue. BBD $1,300 remains inferred until bank or 1stPay evidence is matched.
-              </p>
-            </section>
+            </Section>
           )}
 
-          <section className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
-            <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Needs Attention</p>
-                  <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Priorities for this event</h2>
-                </div>
-                <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                  readiness.readinessLabel === 'Ready' ? 'bg-[#EAF6EF] text-[#1E7345]' : readiness.readinessLabel === 'Needs attention' ? 'bg-[#FFF1F1] text-[#A32626]' : 'bg-[#FFF7E8] text-[#7A5818]'
-                }`}>
-                  {readiness.readinessLabel}
-                </span>
-              </div>
+          <Section eyebrow="Closeout" title="Next actions for a completed event">
+            <div className="grid gap-3 md:grid-cols-3">
+              {COMPLETED_ACTIONS.map((action) => <ActionLink key={action.label} {...action} />)}
+            </div>
+          </Section>
+        </>
+      ) : eventDayMode ? (
+        <>
+          <Section eyebrow="Event Day Mode" title="Run the event from one place">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+              <Metric label="Current time" value={formatClock(currentTime)} detail="Local device time" />
+              <Metric label="Registrations" value={metrics.totalRegistrations} />
+              <Metric label="Guests" value={metrics.totalPersons} />
+              <Metric label="Checked-in registrations" value={metrics.checkedInRegistrations} />
+              <Metric label="Checked-in guests" value={metrics.checkedInPersons} />
+              <Metric label="Open event-day tasks" value={readiness.planningOverview.tasks.open} detail={`${readiness.planningOverview.tasks.overdue} overdue`} />
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-4">
+              {EVENT_DAY_ACTIONS.map((action) => <ActionLink key={action.label} {...action} />)}
+            </div>
+          </Section>
 
-              {needsAttention.length === 0 ? (
-                <p className="mt-5 rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
-                  No urgent follow-up is detected from the current registration and operations data.
+          <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+            <Section eyebrow="Urgent Contacts" title="Who to call quickly">
+              {urgentContacts.length === 0 ? (
+                <p className="rounded-2xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm text-[#816D62]">
+                  No supplier, sponsor, venue, or helper contacts with phone or email are recorded yet.
                 </p>
               ) : (
-                <div className="mt-5 divide-y divide-[#F2E8E1]">
-                  {needsAttention.map((item) => (
-                    <div key={item.key} className="grid gap-3 py-4 sm:grid-cols-[1fr_auto] sm:items-center">
-                      <div>
-                        <p className="text-sm font-bold text-[#2B1723]">{item.label}</p>
-                        <p className="mt-1 text-xs leading-5 text-[#816D62]">{item.summary}</p>
-                      </div>
-                      <Link to={item.to} className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#9A5260]">
-                        {item.linkLabel}
-                      </Link>
+                <div className="space-y-3">
+                  {urgentContacts.map((contact) => (
+                    <div key={contact.partnerId} className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+                      <p className="text-sm font-bold text-[#2B1723]">{contact.name}</p>
+                      <p className="mt-1 text-xs text-[#816D62]">{contact.company || contact.role || contact.recordType}</p>
+                      <p className="mt-2 text-sm text-[#6B564C]">{contact.phone || contact.email}</p>
                     </div>
                   ))}
                 </div>
               )}
-            </article>
+            </Section>
 
-            <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Quick Actions</p>
-              <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Do next</h2>
-              <div className="mt-5 grid gap-2">
-                {[
-                  { to: '/registrations', label: 'Add registration', icon: Users },
-                  { to: '/imports', label: 'Import registrations', icon: FileInput },
-                  { to: '/payments', label: 'Review payments', icon: CreditCard },
-                  { to: '/tickets', label: 'Manage tickets', icon: TicketCheck },
-                  { to: '/check-in', label: 'Open check-in', icon: ClipboardCheck },
-                  { to: '/operations', label: 'Review Operations', icon: ReceiptText },
-                ].map(({ to, label, icon: Icon }) => (
-                  <Link key={to} to={to} className="flex min-h-12 items-center gap-3 rounded-xl border border-[#EFE2DA] px-4 text-sm font-bold text-[#2B1723] hover:bg-[#FFF8F2]">
-                    <Icon className="size-4 text-[#9A5260]" />
-                    {label}
-                    <ArrowRight className="ml-auto size-4 text-[#B8A49A]" />
-                  </Link>
-                ))}
-              </div>
-            </article>
+            <Section eyebrow="Timeline" title="What happens next">
+              <TimelineList timeline={hydratedEvent.operationsPlan.timeline} />
+            </Section>
+          </section>
+        </>
+      ) : (
+        <>
+          <Section eyebrow="Event Summary" title="What event am I working on?">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+              <Metric label="Days remaining" value={formatDaysUntilEvent(selectedEvent.eventDate)} />
+              <Metric label="Status" value={eventStatusLabel(selectedEvent.status)} detail={hydratedEvent.registrationRequired ? 'Registration required' : 'Registration optional'} />
+              <Metric label="Venue" value={hydratedEvent.venueName || 'Not set'} detail={hydratedEvent.location || 'Location not set'} />
+              <Metric label="Capacity" value={hydratedEvent.capacity || 'Not set'} detail={capacityLabel} />
+              <Metric label="Tasks completed" value={`${readiness.planningOverview.tasks.completed} / ${readiness.planningOverview.tasks.total || 0}`} detail={`${readiness.planningOverview.tasks.overdue} overdue`} />
+              <Metric label="Readiness" value={readiness.planningOverview.readiness.readinessLabel} detail={`${readiness.planningOverview.readiness.needsAttentionCount} item${readiness.planningOverview.readiness.needsAttentionCount === 1 ? '' : 's'} need attention`} />
+            </div>
+          </Section>
+
+          <section className="grid gap-3 md:grid-cols-4" aria-label="Key event numbers">
+            <Metric label="Registration records" value={metrics.totalRegistrations} detail="Form entries" />
+            <Metric label="Guests" value={metrics.totalPersons} detail="From persons attending" />
+            <Metric label="Payments received" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
+            <Metric label="Capacity used" value={hydratedEvent?.capacity ? `${metrics.capacityPercent}%` : 'Not set'} detail={capacityLabel} />
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
-            <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Event Progress</p>
-              <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Snapshot</h2>
-              <div className="mt-5 space-y-4">
-                <div>
-                  <div className="mb-2 flex justify-between gap-3 text-xs font-bold text-[#6B564C]">
-                    <span>Capacity</span>
-                    <span>{capacityLabel}</span>
-                  </div>
-                  <ProgressBar value={metrics.capacityPercent} />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <Metric label="Tickets missing" value={metrics.missingTicketRegistrations} />
-                  <Metric label="Open operations" value={openOperations} />
-                  <Metric label="Outstanding Balance" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
-                  <Metric label="Active finance review" value={paymentsWorkspace.summary.prominentDataReviewCount} />
-                </div>
-                <p className="text-xs leading-5 text-[#816D62]">
-                  Registration payment records and Operations Ledger entries are separate. Use Payments for registration balances and Reports for the read-only event review.
-                </p>
-                {adminUser && <Link to="/event-review" className="text-xs font-bold text-[#9A5260] hover:underline">Open Reports</Link>}
-              </div>
-            </article>
+          <Section eyebrow="Financial Snapshot" title="Money received, planned, and still owed">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+              <Metric label="Projected registration income" value={formatCurrency(readiness.planningOverview.budgets.projectedRegistrationIncome, financeSummary.currency)} />
+              <Metric label="Payments received" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
+              <Metric label="Outstanding registration balance" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
+              <Metric label="Paid event expenses" value={formatCurrency(readiness.planningOverview.operationsSettlement.paidExpenses, financeSummary.currency)} />
+              <Metric label="Outstanding commitments" value={formatCurrency(readiness.planningOverview.totalOutstandingCommitments, financeSummary.currency)} />
+              <Metric label="Projected cash position" value={formatCurrency(readiness.planningOverview.projectedCashPosition, financeSummary.currency)} detail="Planning view, not final profit" />
+            </div>
+          </Section>
 
-            <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Upcoming Events</p>
-                  <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Calendar</h2>
+          <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+            <Section eyebrow="Needs Attention" title="What should I do next?">
+              {readiness.actionItems.length === 0 ? (
+                <p className="rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
+                  No urgent planning blockers are currently visible for this event.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {readiness.actionItems.slice(0, 6).map((item) => <PriorityItem key={item.key} item={item} />)}
                 </div>
-                {adminUser && <Link to="/events" className="text-xs font-bold text-[#9A5260] hover:underline">View all</Link>}
+              )}
+            </Section>
+
+            <Section eyebrow="Quick Actions" title="Common organizer actions">
+              <div className="grid gap-2">
+              {PLANNING_ACTIONS.map((action) => <ActionLink key={action.label} {...action} />)}
               </div>
-              <div className="mt-5 divide-y divide-[#F2E8E1]">
+            </Section>
+          </section>
+
+          <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+            <Section eyebrow="Planning Progress" title="How prepared is this event?">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Metric label="Completed tasks" value={readiness.planningOverview.tasks.completed} />
+                <Metric label="Overdue tasks" value={readiness.planningOverview.tasks.overdue} />
+                <Metric label="Upcoming deadlines" value={readiness.planningOverview.tasks.upcoming} />
+                <Metric label="Readiness items left" value={readiness.planningOverview.readiness.needsAttentionCount} />
+                <Metric label="Supplier and sponsor records" value={readiness.planningOverview.partners.totalRecords} />
+                <Metric label="Confirmed sponsor cash" value={formatCurrency(readiness.planningOverview.partners.confirmedCashSponsors, financeSummary.currency)} />
+              </div>
+            </Section>
+
+            <Section eyebrow="Upcoming Events" title="What else is coming up?">
+              <div className="space-y-3">
                 {!visibleEventsLoaded ? (
                   <p className="py-4 text-sm text-[#816D62]">Loading events...</p>
                 ) : upcoming.length === 0 ? (
@@ -399,16 +421,16 @@ export function DashboardPage() {
                 ) : upcoming.slice(0, 4).map((event) => {
                   const selected = event.eventId === activeEvent.eventId
                   return (
-                    <div key={event.eventId} className="flex items-center gap-4 py-3">
+                    <div key={event.eventId} className="flex items-center gap-4 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] px-4 py-3">
                       <CalendarDays className="size-5 shrink-0 text-[#9A5260]" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-bold text-[#2B1723]">{event.eventName}</p>
-                        <p className="mt-0.5 text-xs text-[#816D62]">{formatEventDate(event.eventDate)} · {event.location || 'Location not set'}</p>
+                        <p className="mt-0.5 text-xs text-[#816D62]">{formatEventDate(event.eventDate)} · {event.venueName || event.location || 'Location not set'}</p>
                       </div>
                       <div className="shrink-0 text-right">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{formatCountdown(event.eventDate)}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{formatDaysUntilEvent(event.eventDate)}</p>
                         {selected ? (
-                          <span className="text-[10px] font-bold text-[#2F855A]">Selected</span>
+                          <span className="text-[10px] font-bold text-[#17623A]">Selected</span>
                         ) : (
                           <button type="button" onClick={() => setActiveEvent(event)} className="text-[10px] font-bold text-[#9A5260] hover:underline">
                             Select
@@ -419,7 +441,7 @@ export function DashboardPage() {
                   )
                 })}
               </div>
-            </article>
+            </Section>
           </section>
         </>
       )}

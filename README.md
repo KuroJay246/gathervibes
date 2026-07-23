@@ -10,8 +10,13 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 
 - [`docs/PRODUCT_GUIDE.md`](./docs/PRODUCT_GUIDE.md)
 - [`docs/ROUTE_MAP.md`](./docs/ROUTE_MAP.md)
+- [`docs/ORGANIZER_QUICK_START.md`](./docs/ORGANIZER_QUICK_START.md)
+- [`docs/NEW_EVENT_SETUP_GUIDE.md`](./docs/NEW_EVENT_SETUP_GUIDE.md)
+- [`docs/EVENT_LIFECYCLE_GUIDE.md`](./docs/EVENT_LIFECYCLE_GUIDE.md)
+- [`docs/EVENT_DAY_GUIDE.md`](./docs/EVENT_DAY_GUIDE.md)
 - [`docs/PROTOTYPE_DEMO_GUIDE.md`](./docs/PROTOTYPE_DEMO_GUIDE.md)
 - [`docs/OPERATIONS_GUIDE.md`](./docs/OPERATIONS_GUIDE.md)
+- [`docs/BAKER_PAYMENT_GUIDE.md`](./docs/BAKER_PAYMENT_GUIDE.md)
 - [`docs/FINANCE_EVIDENCE_GUIDE.md`](./docs/FINANCE_EVIDENCE_GUIDE.md)
 - [`docs/QA_GUIDE.md`](./docs/QA_GUIDE.md)
 - [`docs/DEPLOYMENT_GUIDE.md`](./docs/DEPLOYMENT_GUIDE.md)
@@ -20,8 +25,9 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 ## Current workspace summary
 
 - Use `Overview`, `Events`, `Guests & Registrations`, `Payments`, `Tickets`, `Check-In`, `Operations`, `Message Builder`, `Reports`, `Settings`, and `System QA` as the current organizer-facing structure.
+- Start a new real event from `Events` with `Plan a New Event`, then keep that event selected as the Working Event.
 - Use `CODEX_TEST Live Verification Event` for walkthroughs, QA, and destructive demos.
-- Keep CPB production data read-only during routine QA and demos.
+- Keep CPB production data read-only during routine QA and rehearsal.
 
 ## Implementation status
 

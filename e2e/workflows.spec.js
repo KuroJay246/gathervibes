@@ -10,6 +10,78 @@ async function openRegistrationEditor(page, name) {
   return dialog
 }
 
+test('organizer can create a full planner event through the normal event wizard', async ({ page }) => {
+  const name = 'QA_PHASE23T Organizer Ready Event'
+  await signInAndSelectEvent(page)
+  await page.goto('/events')
+
+  await page.getByRole('button', { name: 'Plan a New Event' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Create an organizer-ready event' })
+  await expect(dialog).toBeVisible()
+
+  await dialog.getByLabel('Event name').fill(name)
+  await dialog.getByLabel('Event type').selectOption('hospitality-event')
+  await dialog.getByLabel('Lifecycle status').selectOption('planning')
+  await dialog.getByLabel('Event date').fill('2026-11-14')
+  await dialog.getByLabel('Venue').fill('Organizer QA Pavilion')
+  await dialog.getByLabel('Start time').fill('16:00')
+  await dialog.getByLabel('End time').fill('21:00')
+  await dialog.getByLabel('Location').fill('Bridgetown Organizer Rehearsal Site')
+  await dialog.getByLabel('Event description').fill('Synthetic Phase 23T rehearsal event used to verify organizer planning, finance, ticketing, and closeout workflows.')
+  await dialog.getByRole('button', { name: 'Next' }).click()
+
+  await dialog.getByLabel('Expected capacity').fill('60')
+  await dialog.getByLabel('Number of ticket types').fill('1')
+  await dialog.getByLabel('Default ticket price (BBD)').fill('75')
+  await dialog.getByLabel('Registration opening date').fill('2026-08-15')
+  await dialog.getByLabel('Registration closing date').fill('2026-11-10')
+  await dialog.getByRole('button', { name: 'Next' }).click()
+
+  await dialog.getByLabel('Projected registration income').fill('4500')
+  await dialog.getByLabel('Venue budget').fill('1200')
+  await dialog.getByLabel('Supplier budget').fill('800')
+  await dialog.getByLabel('Entertainment budget').fill('500')
+  await dialog.getByLabel('Marketing budget').fill('300')
+  await dialog.getByLabel('Staffing budget').fill('400')
+  await dialog.getByLabel('Contingency').fill('250')
+  await dialog.getByLabel('Other budget').fill('150')
+  await dialog.getByRole('button', { name: 'Next' }).click()
+
+  await dialog.getByLabel('Venue access time').fill('13:00')
+  await dialog.getByLabel('Setup time').fill('14:30')
+  await dialog.getByLabel('Emergency contact').fill('Organizer QA Lead - 246-555-0140')
+  await dialog.getByLabel('Suppliers').fill('Synthetic supplier note')
+  await dialog.getByLabel('Bakers and vendors').fill('Synthetic baker and vendor note')
+  await dialog.getByLabel('Sponsors').fill('Synthetic sponsor note')
+  await dialog.getByLabel('Staff and helpers').fill('Synthetic staff note')
+  await dialog.getByLabel('Equipment').fill('Synthetic equipment note')
+  await dialog.getByLabel('Licences').fill('Synthetic licence note')
+  await dialog.getByLabel('Insurance').fill('Synthetic insurance note')
+  await dialog.locator('#timeline-time-0').fill('15:00')
+  await dialog.locator('#timeline-label-0').fill('Setup review')
+  await dialog.getByRole('button', { name: 'Add row' }).click()
+  await dialog.locator('#timeline-time-1').fill('16:00')
+  await dialog.locator('#timeline-label-1').fill('Doors open')
+  await dialog.getByRole('button', { name: 'Next' }).click()
+
+  await expect(dialog.getByText('Checklist snapshot')).toBeVisible()
+  const createButton = dialog.getByRole('button', { name: 'Create and open Overview' })
+  await expect(createButton).toBeVisible()
+  await Promise.all([
+    page.waitForURL(/\/dashboard$/),
+    createButton.evaluate((button) => button.click()),
+  ])
+
+  await expect(page.getByText(name).first()).toBeVisible()
+
+  await page.goto('/events')
+  const row = page.locator('tr:visible, article:visible').filter({ hasText: name }).first()
+  await expect(row).toBeVisible()
+  await row.getByRole('button', { name: `Delete ${name}` }).click()
+  await page.getByRole('alertdialog', { name: 'Delete this event?' }).getByRole('button', { name: 'Delete permanently' }).click()
+  await expect(page.getByText(`${name} was deleted.`)).toBeVisible()
+})
+
 test('registration, ticket, and check-in journey preserves finance distinctions', async ({ page }) => {
   const name = 'QA_PHASE23P_REG_Workflow Guest'
   await signInAndSelectEvent(page)
@@ -61,7 +133,7 @@ test('registration, ticket, and check-in journey preserves finance distinctions'
   await expect(page.getByText('Already checked in')).toBeVisible()
 
   for (const [path, text] of [
-    ['/dashboard', 'Expected Registration Income'],
+    ['/dashboard', 'Projected registration income'],
     ['/event-review', 'Registration Payments'],
   ]) {
     await page.goto(path)

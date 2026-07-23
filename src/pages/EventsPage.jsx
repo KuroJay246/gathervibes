@@ -12,22 +12,39 @@ import {
   UsersRound,
   X,
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
 import { DeleteEventDialog } from '../components/events/DeleteEventDialog'
+import { EventPlanningWorkspace } from '../components/events/EventPlanningWorkspace'
 import { EventFormModal } from '../components/events/EventFormModal'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { useActiveEvent } from '../events/useActiveEvent'
-import { createEvent, deleteEvent, subscribeToEvents, updateEvent } from '../services/eventService'
+import {
+  createEvent,
+  deleteEvent,
+  deletePlanningTask,
+  savePlanningTask,
+  subscribeToEvents,
+  updateEvent,
+  updateEventPlanningFields,
+} from '../services/eventService'
 import { formatEventDate } from '../utils/dateUtils'
+import { eventStatusLabel, hydrateEventForPlanning } from '../utils/eventPlanning'
 import { findCodexTestEvent, isCodexTestWorkingEvent } from '../utils/qaHelper'
 
 const statusStyles = {
   draft: 'bg-[#F1ECE8] text-[#725F55]',
+  planning: 'bg-[#FFF2D8] text-[#8A641E]',
+  'registration-open': 'bg-[#EAF6EF] text-[#17623A]',
+  'registration-closed': 'bg-[#FFF4DF] text-[#7A5818]',
+  'ready-for-event': 'bg-[#FCEEF1] text-[#8A3F4B]',
+  'in-progress': 'bg-[#E7F6ED] text-[#17623A]',
   upcoming: 'bg-[#FFF2D8] text-[#8A641E]',
-  active: 'bg-[#E7F6ED] text-[#2F855A]',
+  active: 'bg-[#E7F6ED] text-[#17623A]',
   completed: 'bg-[#E9EFFB] text-[#415F91]',
+  archived: 'bg-[#EEF2F9] text-[#415F91]',
   cancelled: 'bg-[#FFF0F0] text-[#B53D3D]',
 }
 
@@ -56,7 +73,7 @@ function friendlyFirebaseError(error) {
 function StatusBadge({ status }) {
   return (
     <span className={`inline-flex rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider ${statusStyles[status] || statusStyles.draft}`}>
-      {titleCase(status)}
+      {eventStatusLabel(status) || titleCase(status)}
     </span>
   )
 }
@@ -70,6 +87,7 @@ function pricingModeLabel(event = {}) {
 }
 
 export function EventsPage() {
+  const navigate = useNavigate()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -82,6 +100,10 @@ export function EventsPage() {
   const [success, setSuccess] = useState('')
   const { user } = useAuth()
   const { activeEvent, setActiveEvent, clearActiveEvent } = useActiveEvent()
+  const selectedEvent = useMemo(
+    () => (activeEvent ? events.find((event) => event.eventId === activeEvent.eventId) || activeEvent : null),
+    [activeEvent, events],
+  )
 
   useEffect(() => {
     return subscribeToEvents(
@@ -110,11 +132,11 @@ export function EventsPage() {
 
   const totals = useMemo(() => ({
     events: events.length,
-    upcoming: events.filter((event) => ['upcoming', 'active'].includes(event.status)).length,
+    upcoming: events.filter((event) => ['planning', 'registration-open', 'registration-closed', 'ready-for-event', 'in-progress', 'upcoming', 'active'].includes(event.status)).length,
     capacity: events.reduce((total, event) => total + (Number(event.capacity) || 0), 0),
   }), [events])
   const codexTestEvent = useMemo(() => findCodexTestEvent(events), [events])
-  const demoEventSelected = isCodexTestWorkingEvent(activeEvent)
+  const qaEventSelected = isCodexTestWorkingEvent(activeEvent)
 
   function openCreate() {
     setFormEvent(undefined)
@@ -128,15 +150,35 @@ export function EventsPage() {
 
   async function handleSave(values) {
     try {
+      const hydratedValues = hydrateEventForPlanning(values)
       if (formEvent) {
         await updateEvent(formEvent.eventId, values, user)
         if (activeEvent?.eventId === formEvent.eventId) {
-          setActiveEvent({ ...formEvent, ...values, eventId: formEvent.eventId })
+          setActiveEvent({
+            ...formEvent,
+            ...hydratedValues,
+            eventId: formEvent.eventId,
+            eventDate: values.eventDate,
+            capacity: Number(values.capacity),
+            ticketPrice: Number(values.ticketPrice),
+          })
         }
         setSuccess(`${values.eventName.trim()} was updated.`)
       } else {
-        await createEvent(values, user)
-        setSuccess(`${values.eventName.trim()} was created.`)
+        const eventId = await createEvent(values, user)
+        setActiveEvent({
+          ...hydratedValues,
+          eventId,
+          eventName: values.eventName.trim(),
+          eventDate: values.eventDate,
+          location: values.location.trim(),
+          venueName: values.venueName.trim(),
+          status: values.status,
+          capacity: Number(values.capacity),
+          ticketPrice: Number(values.ticketPrice),
+        })
+        setSuccess(`${values.eventName.trim()} was created and selected.`)
+        navigate('/dashboard')
       }
       setFormOpen(false)
       setFormEvent(undefined)
@@ -171,6 +213,27 @@ export function EventsPage() {
     setSuccess(`${event.eventName} is now the selected event.`)
   }
 
+  async function handleSaveTask(task) {
+    if (!selectedEvent) return
+    await savePlanningTask(selectedEvent, task, user)
+  }
+
+  async function handleDeleteTask(taskId) {
+    if (!selectedEvent) return
+    await deletePlanningTask(selectedEvent, taskId, user)
+  }
+
+  async function handleToggleReadiness(key, nextValue) {
+    if (!selectedEvent) return
+    const hydratedSelectedEvent = hydrateEventForPlanning(selectedEvent)
+    await updateEventPlanningFields(selectedEvent, {
+      readinessChecklist: {
+        ...hydratedSelectedEvent.readinessChecklist,
+        [key]: nextValue,
+      },
+    }, user)
+  }
+
   function retryEvents() {
     setLoading(true)
     setLoadError('')
@@ -181,7 +244,7 @@ export function EventsPage() {
     <div className="space-y-6">
       {success && (
         <div className="fixed right-4 top-4 z-[90] flex max-w-sm items-center gap-3 rounded-2xl border border-[#BEE0CB] bg-white px-4 py-3.5 shadow-[0_18px_50px_rgba(43,23,35,0.16)] sm:right-6" role="status">
-          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#E7F6ED] text-[#2F855A]"><Check className="size-4" strokeWidth={2.5} /></span>
+          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#E7F6ED] text-[#17623A]"><Check className="size-4" strokeWidth={2.5} /></span>
           <p className="flex-1 text-xs font-semibold leading-5 text-[#365C45]">{success}</p>
           <button type="button" onClick={() => setSuccess('')} className="rounded-lg p-1 text-[#7A9884] hover:bg-[#E7F6ED]" aria-label="Dismiss success message"><X className="size-4" /></button>
         </div>
@@ -193,18 +256,18 @@ export function EventsPage() {
             <Sparkles className="size-3.5" /> Live events
           </div>
           <h2 className="font-serif text-3xl text-[#2B1723]">Your gatherings</h2>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-[#806C61]">Create each event once, keep its details current, and select the event your team is working on.</p>
-          <p className="mt-1 max-w-xl text-xs leading-5 text-[#80685B]">Price tiers and explicit registration prices drive finance totals; the base ticket price is a default fallback for older records.</p>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-[#806C61]">Create each event once, plan it progressively, and keep one Working Event selected for the organizer team.</p>
+          <p className="mt-1 max-w-xl text-xs leading-5 text-[#80685B]">The event planner now includes event setup, budget planning, readiness, and task tracking without leaving the normal organizer workflow.</p>
           {codexTestEvent && (
             <p className="mt-3 max-w-xl text-xs leading-5 text-[#7A5818]">
-              {demoEventSelected
-                ? 'CODEX_TEST is selected. Use it for demos and clean up QA_PHASE23S_ records after the walkthrough.'
-                : 'Use CODEX_TEST for demos so CPB stays untouched.'}
+              {qaEventSelected
+                ? 'CODEX_TEST is selected. Use it for organizer rehearsal and clean up QA_PHASE23T_ records after the review.'
+                : 'Use CODEX_TEST for organizer rehearsal so CPB stays untouched.'}
             </p>
           )}
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
-          {codexTestEvent && !demoEventSelected && (
+          {codexTestEvent && !qaEventSelected && (
             <button
               type="button"
               onClick={() => chooseActiveEvent(codexTestEvent)}
@@ -214,7 +277,7 @@ export function EventsPage() {
             </button>
           )}
           <button type="button" onClick={openCreate} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B]">
-            <Plus className="size-4" strokeWidth={2.5} /> Create event
+            <Plus className="size-4" strokeWidth={2.5} /> Plan a New Event
           </button>
         </div>
       </section>
@@ -257,7 +320,7 @@ export function EventsPage() {
                       <td className="px-4 py-4 text-xs font-semibold text-[#6D594F]">{Number(event.capacity).toLocaleString('en-BB')}</td>
                       <td className="px-4 py-4 text-xs font-semibold text-[#6D594F]">{currency.format(Number(event.ticketPrice) || 0)}</td>
                       <td className="px-6 py-4"><div className="flex items-center justify-end gap-1.5">
-                        <button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`rounded-lg px-3 py-2 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#2F855A]' : 'border border-[#E1D1C8] text-[#806C61] hover:bg-[#FFF8F2]'}`}>{isActive ? 'Selected event' : 'Select'}</button>
+                        <button type="button" onClick={() => chooseActiveEvent(event)} disabled={isActive} className={`rounded-lg px-3 py-2 text-[10px] font-bold ${isActive ? 'bg-[#E7F6ED] text-[#17623A]' : 'border border-[#E1D1C8] text-[#806C61] hover:bg-[#FFF8F2]'}`}>{isActive ? 'Selected event' : 'Select'}</button>
                         <button type="button" onClick={() => openEdit(event)} className="rounded-lg p-2 text-[#80685B] hover:bg-[#FCEEF1] hover:text-[#8A3F4B]" aria-label={`Edit ${event.eventName}`}><Edit3 className="size-4" /></button>
                         <button type="button" onClick={() => requestDelete(event)} className="rounded-lg p-2 text-[#9A7777] hover:bg-[#FFF0F0] hover:text-[#C53030]" aria-label={`Delete ${event.eventName}`}><Trash2 className="size-4" /></button>
                       </div></td>
@@ -285,6 +348,16 @@ export function EventsPage() {
             })}
           </div>
         </section>
+      )}
+
+      {!loading && !loadError && selectedEvent && (
+        <EventPlanningWorkspace
+          event={selectedEvent}
+          onEditEvent={() => openEdit(selectedEvent)}
+          onSaveTask={handleSaveTask}
+          onDeleteTask={handleDeleteTask}
+          onToggleReadiness={handleToggleReadiness}
+        />
       )}
 
       {formOpen && <EventFormModal event={formEvent} onClose={() => setFormOpen(false)} onSave={handleSave} />}

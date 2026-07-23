@@ -77,7 +77,7 @@ test('Phase 23N approximate attendance does not create system check-ins', () => 
   assert.equal(review.summary.checkedInGuests, 0)
 })
 
-test('Phase 23N UI surfaces documentary audit without replacing operational labels', async () => {
+test('Phase 23N UI surfaces documentary audit without reopening completed-event planning work', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
   const payments = await readFile('src/pages/PaymentsPage.jsx', 'utf8')
   const registrations = await readFile('src/pages/RegistrationsPage.jsx', 'utf8')
@@ -85,8 +85,9 @@ test('Phase 23N UI surfaces documentary audit without replacing operational labe
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
   const reports = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
 
-  assert.match(dashboard, /Financial Evidence Audit/)
-  assert.match(dashboard, /Expected Registration Income/)
+  assert.match(dashboard, /Historical Reference/)
+  assert.match(dashboard, /Financial audit history/)
+  assert.match(dashboard, /completed historical event/i)
   assert.match(payments, /Evidence classification is separate from payment status/)
   assert.match(registrations, /Registration Evidence Reconciliation/)
   assert.match(checkIn, /Historical attendance is not system check-in/)

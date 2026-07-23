@@ -7,7 +7,7 @@ const baseEvent = {
   eventId: 'event-21',
   eventName: 'CODEX_TEST Live Verification Event',
   capacity: 10,
-  status: 'active',
+  status: 'planning',
   currency: 'BBD',
 }
 
@@ -27,7 +27,8 @@ test('event readiness helper keeps an empty event review-only without inventing 
   assert.equal(readiness.categories.length, 6)
   assert.equal(readiness.counts.pendingPayments, 0)
   assert.equal(readiness.counts.missingTicket, 0)
-  assert.match(readiness.categories.find((category) => category.key === 'operations').summary, /No operations ledger entries yet/)
+  assert.match(readiness.categories.find((category) => category.key === 'registration').summary, /Registration and ticket setup look usable/i)
+  assert.equal(readiness.operationsSummary.openEntries, 0)
 })
 
 test('event readiness helper flags pending payments as needs attention', () => {
@@ -47,7 +48,7 @@ test('event readiness helper flags pending payments as needs attention', () => {
   ], [])
 
   assert.equal(readiness.counts.pendingPayments, 1)
-  assert.equal(readiness.categories.find((category) => category.key === 'payment').status, 'needs-attention')
+  assert.equal(readiness.categories.find((category) => category.key === 'registration').status, 'needs-attention')
   assert.match(readiness.actionItems.find((item) => item.key === 'pending-payments').summary, /still need payment follow-up/i)
 })
 
@@ -69,7 +70,7 @@ test('event readiness helper flags paid registrations missing ticket codes', () 
   ], [])
 
   assert.equal(readiness.counts.paidMissingTicket, 1)
-  assert.equal(readiness.categories.find((category) => category.key === 'tickets').status, 'needs-attention')
+  assert.equal(readiness.categories.find((category) => category.key === 'registration').status, 'needs-attention')
   assert.equal(readiness.actionItems.find((item) => item.key === 'missing-tickets').to, '/tickets')
 })
 
@@ -80,6 +81,9 @@ test('event readiness helper marks complete ticket assignment as ready', () => {
       fullName: 'Ready Guest',
       personsAttending: 2,
       paymentStatus: 'paid',
+      paymentMethod: 'firstpay',
+      paymentEvidenceClass: 'Payment Organizer Confirmed',
+      paymentReference: '1stPay-123',
       ticketPrice: 100,
       amountDue: 200,
       amountPaid: 200,
@@ -91,7 +95,7 @@ test('event readiness helper marks complete ticket assignment as ready', () => {
   ], [])
 
   assert.equal(readiness.counts.missingTicket, 0)
-  assert.equal(readiness.categories.find((category) => category.key === 'tickets').status, 'ready')
+  assert.equal(readiness.categories.find((category) => category.key === 'registration').status, 'ready')
 })
 
 test('event readiness helper surfaces operations warnings from existing ledger entries only', () => {
@@ -101,6 +105,6 @@ test('event readiness helper surfaces operations warnings from existing ledger e
   ])
 
   assert.equal(readiness.operationsSummary.openEntries, 2)
-  assert.equal(readiness.categories.find((category) => category.key === 'operations').status, 'review')
+  assert.equal(readiness.categories.find((category) => category.key === 'money').status, 'review')
   assert.equal(readiness.actionItems.find((item) => item.key === 'operations-summary').to, '/operations')
 })
