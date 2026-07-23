@@ -168,7 +168,7 @@ export function CheckInPage() {
       if (import.meta.env.DEV) console.error(err)
       const permissionDenied = err?.code === 'permission-denied' || /permission|insufficient/i.test(err?.message || '')
       setActionError(permissionDenied
-        ? 'Check-in was not saved because Firestore denied the write. No local success state was applied.'
+        ? 'Check-in was not saved because your account could not confirm the update. No local success state was applied.'
         : err.message || 'Check-in failed. No local success state was applied.')
     } finally {
       setSaving(false)
@@ -205,7 +205,7 @@ export function CheckInPage() {
       if (import.meta.env.DEV) console.error(err)
       const permissionDenied = err?.code === 'permission-denied' || /permission|insufficient/i.test(err?.message || '')
       setActionError(permissionDenied
-        ? 'Undo check-in was not saved because Firestore denied the write. The guest remains checked in.'
+        ? 'Undo check-in was not saved because your account could not confirm the update. The guest remains checked in.'
         : err.message || 'Undo check-in failed. The guest remains checked in.')
     } finally {
       setSaving(false)
@@ -430,7 +430,7 @@ export function CheckInPage() {
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Event-day helpers</p>
             <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Print and export event-day lists</h3>
             <p className="mt-1 text-xs leading-5 text-[#816D62]">
-              Client-side only. Nothing is uploaded and no new Firestore data is created.
+              Browser-only export. Nothing is uploaded and no new event record is created.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">

@@ -377,7 +377,7 @@ export function ImportsPage() {
       setImportErrorDetails(buildSafeImportErrorDetails(err, validRows.length))
       setError(
         isPermissionDeniedImportError(err)
-          ? 'Import failed because Firestore denied the write. No rows were imported. This usually means the confirmed import payload does not match the current Firestore rules/schema.'
+          ? 'Import failed because your account could not save the confirmed rows. No rows were imported. This usually means the confirmed import payload no longer matches the current workspace rules or required fields.'
           : 'Import failed before any rows were imported. Check the diagnostic details below and try again.',
       )
     } finally {
@@ -529,7 +529,7 @@ export function ImportsPage() {
                     <div>
                       <p className="font-bold">XLSX import is enabled with preview-first safety.</p>
                       <p className="mt-1">
-                        No Firestore write happens until you confirm valid rows on the preview screen.
+                        No event records are saved until you confirm valid rows on the preview screen.
                       </p>
                     </div>
                   </div>

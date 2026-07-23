@@ -23,6 +23,7 @@ import { getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/ev
 import { isApprovedAdmin } from '../utils/accessRoles'
 import { buildEventReadiness } from '../utils/eventReadiness'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
+import { findCodexTestEvent, isCodexTestWorkingEvent } from '../utils/qaHelper'
 
 function useEventRegistrations(eventId) {
   const [rows, setRows] = useState([])
@@ -120,6 +121,7 @@ export function DashboardPage() {
   }, [activeEvent, clearActiveEvent, setActiveEvent, visibleEvents, visibleEventsLoaded])
 
   const upcoming = useMemo(() => upcomingEvents(visibleEvents), [visibleEvents])
+  const codexTestEvent = useMemo(() => findCodexTestEvent(visibleEvents), [visibleEvents])
   const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedEvent), [registrations, selectedEvent])
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedEvent), [registrations, selectedEvent])
   const paymentsWorkspace = useMemo(() => buildPaymentsWorkspace(registrations, selectedEvent), [registrations, selectedEvent])
@@ -134,6 +136,7 @@ export function DashboardPage() {
   const capacityLabel = selectedEvent?.capacity
     ? `${metrics.capacityUsed} / ${selectedEvent.capacity} guests`
     : 'Capacity not set'
+  const demoEventSelected = isCodexTestWorkingEvent(activeEvent)
 
   return (
     <div className="space-y-6">
@@ -154,6 +157,15 @@ export function DashboardPage() {
             <Link to="/events" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-4 text-xs font-bold text-white">
               Change event
             </Link>
+            {codexTestEvent && !demoEventSelected && (
+              <button
+                type="button"
+                onClick={() => setActiveEvent(codexTestEvent)}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E6D4B4] bg-[#FFF8EA] px-4 text-xs font-bold text-[#7A5818]"
+              >
+                Use CODEX_TEST
+              </button>
+            )}
             {activeEvent && (
               <button
                 type="button"
@@ -168,6 +180,36 @@ export function DashboardPage() {
           </div>
         </div>
       </section>
+
+      {codexTestEvent && (
+        <section className="rounded-[24px] border border-[#E6D4B4] bg-[#FFF8EA] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Prototype Demo</p>
+              <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">{demoEventSelected ? 'CODEX_TEST is ready for the walkthrough' : 'Open the safe demo event'}</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-[#715D46]">
+                {demoEventSelected
+                  ? 'Use the QA_PHASE23S_ prefix for temporary demo registrations, imports, payments, tickets, and Operations entries. Clean up those temporary records after the walkthrough and leave audit logs in place.'
+                  : 'Use CODEX_TEST to demonstrate the full organizer workflow without touching CPB production data.'}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {!demoEventSelected && (
+                <button
+                  type="button"
+                  onClick={() => setActiveEvent(codexTestEvent)}
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#7A5818] px-4 text-xs font-bold text-white"
+                >
+                  Open Demo Event
+                </button>
+              )}
+              <Link to="/qa" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#D8C5A8] bg-white px-4 text-xs font-bold text-[#7A5818]">
+                Open Demo Checklist
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {!activeEvent?.eventId ? (
         <section className="rounded-[24px] border border-dashed border-[#EEDFD6] bg-white p-8 text-center">

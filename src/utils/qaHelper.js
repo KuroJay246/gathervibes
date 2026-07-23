@@ -3,6 +3,24 @@ export const CODEX_TEST_EVENT_NAME = 'CODEX_TEST Live Verification Event'
 export const CPB_EVENT_ID = 'zhaPxi31cpqLAW0cuS20'
 export const CPB_EVENT_NAME = 'CPB'
 export const CODEX_TEST_NOTES = 'Permanent QA fixture. Do not use for real guests. Do not delete unless the organizer explicitly approves.'
+export const QA_PHASE23S_PREFIX = 'QA_PHASE23S'
+
+export const prototypeReadinessChecklist = [
+  { key: 'authentication', label: 'Authentication', detail: 'Approved organizer access and protected-owner boundaries remain required.' },
+  { key: 'eventCreation', label: 'Event Creation', detail: 'Create and select a new event without touching CPB.' },
+  { key: 'registrationWorkflow', label: 'Registration Workflow', detail: 'Add registrations, group bookings, guest counts, and finance fields clearly.' },
+  { key: 'paymentWorkflow', label: 'Payment Workflow', detail: 'Review charges, recorded payments, outstanding balances, and finance follow-up.' },
+  { key: 'ticketWorkflow', label: 'Ticket Workflow', detail: 'Assign ticket codes and preserve the QR payload contract.' },
+  { key: 'checkInWorkflow', label: 'Check-In Workflow', detail: 'Check in attendees safely with event-scoped search and scanner boundaries.' },
+  { key: 'operationsWorkflow', label: 'Operations Workflow', detail: 'Record event-level income, expenses, commitments, and in-kind support separately from registration payments.' },
+  { key: 'reports', label: 'Reports', detail: 'Review read-only follow-up, registration payments, Operations, and summary sections.' },
+  { key: 'communications', label: 'Communications', detail: 'Create and copy messages without implying automatic sending.' },
+  { key: 'imports', label: 'Import', detail: 'Use preview-first CSV, pasted table, and XLSX imports.' },
+  { key: 'responsiveDesign', label: 'Responsive Design', detail: 'Primary organizer workflows remain usable on desktop, tablet, and mobile.' },
+  { key: 'accessibility', label: 'Accessibility', detail: 'Keyboard, labels, focus treatment, and readable layout need a release check before sign-off.' },
+  { key: 'dataSafety', label: 'Data Safety', detail: 'CPB remains protected, audit logs remain append-only, and demo work stays in CODEX_TEST.' },
+  { key: 'productionDeployment', label: 'Production Deployment', detail: 'Release status stays separate from local prototype work until validation and smoke pass.' },
+]
 
 export const qaChecklist = [
   'Confirm the live site loads on the primary browser',
@@ -72,7 +90,7 @@ export function buildQaTestPrefix(date = new Date()) {
   const hour = pad(date.getHours())
   const minute = pad(date.getMinutes())
 
-  return `CODEX_TEST_${year}${month}${day}_${hour}${minute}`
+  return `${QA_PHASE23S_PREFIX}_${year}${month}${day}_${hour}${minute}`
 }
 
 export function buildQaSampleCsv(prefix = buildQaTestPrefix()) {
@@ -87,4 +105,8 @@ export function buildQaSampleCsv(prefix = buildQaTestPrefix()) {
 
 export function isCodexTestWorkingEvent(activeEvent) {
   return activeEvent?.eventId === CODEX_TEST_EVENT_ID || activeEvent?.eventName === CODEX_TEST_EVENT_NAME
+}
+
+export function findCodexTestEvent(events = []) {
+  return events.find((event) => event?.eventId === CODEX_TEST_EVENT_ID || event?.eventName === CODEX_TEST_EVENT_NAME) || null
 }

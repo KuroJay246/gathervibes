@@ -27,7 +27,7 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
   assert.match(xlsxImport, /sampleRows/)
   assert.match(xlsxImport, /importable: parsed\.headers\.length > 0 && parsed\.rows\.length > 0/)
   assert.match(importsPage, /Select the worksheet to import/)
-  assert.match(importsPage, /No Firestore write happens until you confirm valid rows/)
+  assert.match(importsPage, /No event records are saved until you confirm valid rows/)
 })
 
 test('Settings removes the roadmap archive while documentation retains release history', async () => {

@@ -133,9 +133,9 @@ test('Phase 23N-B paid expenses and commitments remain separate', () => {
 test('Phase 23N-B completed closeout panel cannot reapply records', async () => {
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
 
-  assert.match(operations, /Phase 23N Operations closeout applied/)
+  assert.match(operations, /Operations closeout records applied/)
   assert.match(operations, /Applied/)
-  assert.match(operations, /Subsets 5 and 6 locked/)
+  assert.match(operations, /Registration and attendance corrections locked/)
   assert.doesNotMatch(operations, /waiting for organizer approval/)
   assert.doesNotMatch(operations, /Apply Phase 23N|Apply approved|Reapply/)
 })
@@ -170,7 +170,7 @@ test('Phase 23N-B Subsets 5 and 6 remain locked in UI and report', async () => {
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
   const report = await readFile('PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md', 'utf8')
 
-  assert.match(operations, /Subsets 5 and 6 locked/)
+  assert.match(operations, /Registration and attendance corrections locked/)
   assert.match(report, /Subset 5: Registration Evidence Metadata/)
   assert.match(report, /Subset 6: Registration\/Attendance Corrections/)
 })

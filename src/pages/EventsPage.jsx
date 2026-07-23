@@ -21,6 +21,7 @@ import { LoadingState } from '../components/ui/LoadingState'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { createEvent, deleteEvent, subscribeToEvents, updateEvent } from '../services/eventService'
 import { formatEventDate } from '../utils/dateUtils'
+import { findCodexTestEvent, isCodexTestWorkingEvent } from '../utils/qaHelper'
 
 const statusStyles = {
   draft: 'bg-[#F1ECE8] text-[#725F55]',
@@ -45,9 +46,9 @@ function titleCase(value = '') {
 
 function friendlyFirebaseError(error) {
   if (error?.code === 'permission-denied') {
-    return 'Your account is signed in but is not approved by the Firestore admin allowlist.'
+    return 'Your account is signed in, but organizer access has not been approved for this workspace.'
   }
-  if (error?.code === 'unavailable') return 'Firestore is temporarily unavailable. Check your connection and try again.'
+  if (error?.code === 'unavailable') return 'The event workspace is temporarily unavailable. Check your connection and try again.'
   if (error?.code === 'unauthenticated') return 'Your session has expired. Sign in again to continue.'
   return error?.message || 'Something went wrong. Please try again.'
 }
@@ -112,6 +113,8 @@ export function EventsPage() {
     upcoming: events.filter((event) => ['upcoming', 'active'].includes(event.status)).length,
     capacity: events.reduce((total, event) => total + (Number(event.capacity) || 0), 0),
   }), [events])
+  const codexTestEvent = useMemo(() => findCodexTestEvent(events), [events])
+  const demoEventSelected = isCodexTestWorkingEvent(activeEvent)
 
   function openCreate() {
     setFormEvent(undefined)
@@ -192,10 +195,28 @@ export function EventsPage() {
           <h2 className="font-serif text-3xl text-[#2B1723]">Your gatherings</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-[#806C61]">Create each event once, keep its details current, and select the event your team is working on.</p>
           <p className="mt-1 max-w-xl text-xs leading-5 text-[#80685B]">Price tiers and explicit registration prices drive finance totals; the base ticket price is a default fallback for older records.</p>
+          {codexTestEvent && (
+            <p className="mt-3 max-w-xl text-xs leading-5 text-[#7A5818]">
+              {demoEventSelected
+                ? 'CODEX_TEST is selected. Use it for demos and clean up QA_PHASE23S_ records after the walkthrough.'
+                : 'Use CODEX_TEST for demos so CPB stays untouched.'}
+            </p>
+          )}
         </div>
-        <button type="button" onClick={openCreate} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B]">
-          <Plus className="size-4" strokeWidth={2.5} /> Create event
-        </button>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          {codexTestEvent && !demoEventSelected && (
+            <button
+              type="button"
+              onClick={() => chooseActiveEvent(codexTestEvent)}
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E6D4B4] bg-[#FFF8EA] px-4 py-3 text-xs font-bold text-[#7A5818]"
+            >
+              Use CODEX_TEST
+            </button>
+          )}
+          <button type="button" onClick={openCreate} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B]">
+            <Plus className="size-4" strokeWidth={2.5} /> Create event
+          </button>
+        </div>
       </section>
 
       {!loading && !loadError && events.length > 0 && (
@@ -215,7 +236,7 @@ export function EventsPage() {
           <div className="flex items-center justify-between border-b border-[#EFE2DA] px-5 py-4 sm:px-6">
             <div>
               <h3 className="text-sm font-bold text-[#3A2630]">Event calendar</h3>
-              <p className="mt-1 text-[11px] text-[#80685B]">{events.length} {events.length === 1 ? 'event' : 'events'} in Firestore</p>
+              <p className="mt-1 text-[11px] text-[#80685B]">{events.length} {events.length === 1 ? 'event' : 'events'} in this workspace</p>
             </div>
             <MoreHorizontal className="size-5 text-[#B49B8D]" />
           </div>
