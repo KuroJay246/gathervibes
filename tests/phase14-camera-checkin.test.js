@@ -159,9 +159,16 @@ test('firebase.js guards persistence against test environment', async () => {
   assert.match(src, /__FIRESTORE_TEST_ENV__|MODE.*test/)
 })
 
+test('firebase.js disables persistent cache for emulator browser tests', async () => {
+  const src = await readFile('src/lib/firebase.js', 'utf8')
+  assert.match(src, /VITE_FIREBASE_USE_EMULATORS/)
+  assert.match(src, /experimentalForceLongPolling/)
+})
+
 test('runtimeHealth includes offline persistence status item', async () => {
   const src = await readFile('src/utils/runtimeHealth.js', 'utf8')
   assert.match(src, /Offline persistence/)
+  assert.match(src, /test or emulator environment/)
 })
 
 // ─── 6. Safety & Deferred Reminders ──────────────────────────────────────────
