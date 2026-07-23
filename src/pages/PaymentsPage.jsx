@@ -246,7 +246,7 @@ export function PaymentsPage() {
 
       <BoundaryNotice />
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <section className="phase23v-metric-grid">
         <Metric label="Registration records" value={workspace.summary.registrationCount} />
         <Metric label="Guests" value={workspace.summary.guestCount} />
         <Metric label="Expected Registration Income" value={formatCurrency(workspace.summary.expectedRegistrationIncome, currency)} />
@@ -254,27 +254,34 @@ export function PaymentsPage() {
         <Metric label="Outstanding Balance" value={formatCurrency(workspace.summary.outstandingBalance, currency)} />
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Metric label="Paid" value={workspace.summary.paidRegistrations} />
-        <Metric label="Partial payments" value={workspace.summary.partialPaymentRegistrations} />
-        <Metric label="Pending" value={workspace.summary.pendingRegistrations} />
-        <Metric label="Door Paid" value={workspace.summary.doorPaidRegistrations} />
-        <Metric label="To Pay at Door" value={workspace.summary.doorListRegistrations} />
-        <Metric label="Complimentary registrations" value={workspace.summary.complimentaryRegistrations} help={`${workspace.summary.complimentaryGuests} complimentary guests`} />
-        <Metric label="Unknown payment state" value={workspace.summary.unknownPaymentStates} />
-        <Metric label="Outstanding payments" value={workspace.summary.outstandingRegistrations} help="Positive balances only" />
-      </section>
+      <details className="phase23v-panel">
+        <summary className="phase23v-summary">Payment status and review detail</summary>
+        <div className="phase23v-body space-y-4">
+          <section className="phase23v-metric-grid">
+            <Metric label="Paid" value={workspace.summary.paidRegistrations} />
+            <Metric label="Partial payments" value={workspace.summary.partialPaymentRegistrations} />
+            <Metric label="Pending" value={workspace.summary.pendingRegistrations} />
+            <Metric label="Door Paid" value={workspace.summary.doorPaidRegistrations} />
+            <Metric label="To Pay at Door" value={workspace.summary.doorListRegistrations} />
+            <Metric label="Complimentary registrations" value={workspace.summary.complimentaryRegistrations} help={`${workspace.summary.complimentaryGuests} complimentary guests`} />
+            <Metric label="Unknown payment state" value={workspace.summary.unknownPaymentStates} />
+            <Metric label="Outstanding payments" value={workspace.summary.outstandingRegistrations} help="Positive balances only" />
+          </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <Metric label="Payment Follow-Up" value={workspace.summary.paymentFollowUpCount} help="May still require patron contact" />
-        <Metric label="Action Required" value={workspace.summary.actionRequiredCount} help="Could affect totals, duplicates, or reminder accuracy" />
-        <Metric label="Internal Cleanup" value={workspace.summary.internalCleanupCount} help="Resolved records that still need organizer review" />
-        <Metric label="Historical Limitations" value={workspace.summary.historicalLimitationCount} help="Historical gaps kept out of urgent attention" />
-        <Metric label="Paid — Amount Not Recorded" value={workspace.summary.paidAmountNotRecordedCount} help="Resolved payment without an exact captured amount" />
-      </section>
+          <section className="phase23v-metric-grid">
+            <Metric label="Payment Follow-Up" value={workspace.summary.paymentFollowUpCount} help="May still require patron contact" />
+            <Metric label="Action Required" value={workspace.summary.actionRequiredCount} help="Could affect totals, duplicates, or reminder accuracy" />
+            <Metric label="Internal Cleanup" value={workspace.summary.internalCleanupCount} help="Resolved records that still need organizer review" />
+            <Metric label="Historical Limitations" value={workspace.summary.historicalLimitationCount} help="Historical gaps kept out of urgent attention" />
+            <Metric label="Paid — Amount Not Recorded" value={workspace.summary.paidAmountNotRecordedCount} help="Resolved payment without an exact captured amount" />
+          </section>
+        </div>
+      </details>
 
       {evidenceAudit && (
-        <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="payments-evidence-heading">
+        <details className="phase23v-panel border-[#D8C5A8] bg-[#FFFCF6]" aria-labelledby="payments-evidence-heading">
+          <summary className="phase23v-summary text-[#4E3928]">Payment evidence detail</summary>
+          <div className="phase23v-body">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Payment Evidence</p>
@@ -299,7 +306,8 @@ export function PaymentsPage() {
           <p className="mt-3 text-xs leading-5 text-[#715D46]">
             BBD $5,420 remains the app payment record. BBD $5,415 is the maximum Gmail-supported ticket value and must not replace app totals without row-level bank or 1stPay evidence.
           </p>
-        </section>
+          </div>
+        </details>
       )}
 
       <ReviewList
@@ -322,7 +330,9 @@ export function PaymentsPage() {
         emptyMessage="No active finance review is currently detected."
       />
 
-      <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+      <details className="phase23v-panel">
+        <summary className="phase23v-summary">Historical and informational review</summary>
+        <div className="phase23v-body">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Historical and Informational Review</p>
@@ -338,7 +348,8 @@ export function PaymentsPage() {
           <Metric label="Missing Method" value={workspace.filterCounts['missing-method'] || 0} />
           <Metric label="Missing Reference" value={workspace.filterCounts['missing-reference'] || 0} />
         </div>
-      </section>
+        </div>
+      </details>
 
       <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">

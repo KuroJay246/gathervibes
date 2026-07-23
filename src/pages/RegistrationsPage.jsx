@@ -255,6 +255,25 @@ export function RegistrationsPage() {
     : 'Showing all registrations.'
   const selectedRegistrations = filteredRegistrations.filter((registration) => selectedIds.has(registration.registrationId))
   const allVisibleSelected = filteredRegistrations.length > 0 && filteredRegistrations.every((registration) => selectedIds.has(registration.registrationId))
+  const registrationMetricCards = [
+    { label: 'Total Registrations', value: allMetrics.totalRegistrations, help: 'Registration records for this Working Event.', key: '' },
+    { label: 'Total Guests', value: allMetrics.totalPersons, help: 'Guests represented by those registrations, including groups.', key: '' },
+    { label: 'Expected Registration Income', value: formatCurrency(financeSummary.totalExpected), help: 'Registration totals from explicit ticket price or amount due only.' },
+    { label: 'Recorded Registration Payments', value: formatCurrency(financeSummary.totalCollected), help: 'Confirmed amountPaid across registrations.' },
+    { label: 'Outstanding Balance', value: formatCurrency(financeSummary.totalOutstanding), help: 'Click to see rows with balance due.', tab: 'Outstanding Balance', card: 'outstanding' },
+    { label: 'Needs Review', value: registrations.filter((reg) => registrationNeedsReview(reg, activeEvent)).length, help: 'Registrations with finance review, ticket review, or missing ticket information.', tab: 'Needs Review', card: 'review-needed' },
+    { label: 'Paid', value: formatRegistrationGuestSummary(allMetrics.paidRegistrations, allMetrics.paidPersons), help: 'Registrations marked paid.', tab: 'Paid' },
+    { label: 'Pending', value: formatRegistrationGuestSummary(allMetrics.pendingRegistrations, allMetrics.pendingPersons), help: 'Registrations still pending payment review or collection.', tab: 'Pending' },
+    { label: 'Complimentary', value: formatRegistrationGuestSummary(allMetrics.complimentaryRegistrations, allMetrics.complimentaryPersons), help: 'Registrations marked complimentary.', tab: 'Complimentary' },
+    { label: 'Door Paid', value: formatRegistrationGuestSummary(allMetrics.doorRegistrations, allMetrics.doorPersons), help: 'Paid at door or late payment confirmed.', tab: 'Door Paid', card: 'door' },
+    { label: 'To Pay at Door', value: formatCurrency(financeSummary.doorTotal), help: 'Expected door balances, not confirmed paid.', tab: 'To Pay at Door', card: 'door-list' },
+    { label: 'Complimentary Value', value: formatCurrency(financeSummary.complimentaryValue), help: 'Value of complimentary tickets when prices are explicit.' },
+    { label: 'Finance Review', value: financeSummary.financeWarningCount, help: 'Click to see registrations needing finance review.', card: 'finance-warning' },
+    { label: 'Checked In', value: formatRegistrationGuestSummary(allMetrics.checkedInRegistrations, allMetrics.checkedInPersons), help: 'Checked-in registrations and guests represented.', card: 'checked-in' },
+    { label: 'Not Checked In', value: formatRegistrationGuestSummary(allMetrics.remainingRegistrations, allMetrics.remainingPersons), help: 'Registrations and guests not checked in yet.', card: 'not-checked-in' },
+    { label: 'Missing Ticket Code', value: allMetrics.missingTicketRegistrations, help: 'Registrations with no ticket code assigned.', tab: 'Missing Ticket Code', card: 'missing-ticket' },
+    { label: 'Selected Registrations', value: selectedIds.size, help: 'Registrations currently selected for bulk actions.' },
+  ]
 
   function toggleSelected(registrationId) {
     setSelectedIds((current) => {
@@ -425,26 +444,8 @@ export function RegistrationsPage() {
         </InfoHint>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
-        {[
-          { label: 'Total Registrations', value: allMetrics.totalRegistrations, help: 'Registration records for this Working Event.', key: '' },
-          { label: 'Total Guests', value: allMetrics.totalPersons, help: 'Guests represented by those registrations, including groups.', key: '' },
-          { label: 'Paid', value: formatRegistrationGuestSummary(allMetrics.paidRegistrations, allMetrics.paidPersons), help: 'Registrations marked paid.', tab: 'Paid' },
-          { label: 'Pending', value: formatRegistrationGuestSummary(allMetrics.pendingRegistrations, allMetrics.pendingPersons), help: 'Registrations still pending payment review or collection.', tab: 'Pending' },
-          { label: 'Complimentary', value: formatRegistrationGuestSummary(allMetrics.complimentaryRegistrations, allMetrics.complimentaryPersons), help: 'Registrations marked complimentary.', tab: 'Complimentary' },
-          { label: 'Door Paid', value: formatRegistrationGuestSummary(allMetrics.doorRegistrations, allMetrics.doorPersons), help: 'Paid at door or late payment confirmed.', tab: 'Door Paid', card: 'door' },
-          { label: 'Expected Registration Income', value: formatCurrency(financeSummary.totalExpected), help: 'Registration totals from explicit ticket price or amount due only.' },
-          { label: 'Recorded Registration Payments', value: formatCurrency(financeSummary.totalCollected), help: 'Confirmed amountPaid across registrations.' },
-          { label: 'Outstanding Balance', value: formatCurrency(financeSummary.totalOutstanding), help: 'Click to see rows with balance due.', tab: 'Outstanding Balance', card: 'outstanding' },
-          { label: 'To Pay at Door', value: formatCurrency(financeSummary.doorTotal), help: 'Expected door balances, not confirmed paid.', tab: 'To Pay at Door', card: 'door-list' },
-          { label: 'Complimentary Value', value: formatCurrency(financeSummary.complimentaryValue), help: 'Value of complimentary tickets when prices are explicit.' },
-          { label: 'Finance Review', value: financeSummary.financeWarningCount, help: 'Click to see registrations needing finance review.', card: 'finance-warning' },
-          { label: 'Checked In', value: formatRegistrationGuestSummary(allMetrics.checkedInRegistrations, allMetrics.checkedInPersons), help: 'Checked-in registrations and guests represented.', card: 'checked-in' },
-          { label: 'Not Checked In', value: formatRegistrationGuestSummary(allMetrics.remainingRegistrations, allMetrics.remainingPersons), help: 'Registrations and guests not checked in yet.', card: 'not-checked-in' },
-          { label: 'Missing Ticket Code', value: allMetrics.missingTicketRegistrations, help: 'Registrations with no ticket code assigned.', tab: 'Missing Ticket Code', card: 'missing-ticket' },
-          { label: 'Needs Review', value: registrations.filter((reg) => registrationNeedsReview(reg, activeEvent)).length, help: 'Registrations with finance review, ticket review, or missing ticket information.', tab: 'Needs Review', card: 'review-needed' },
-          { label: 'Selected Registrations', value: selectedIds.size, help: 'Registrations currently selected for bulk actions.' },
-        ].map((item) => (
+      <section className="phase23v-metric-grid">
+        {registrationMetricCards.slice(0, 6).map((item) => (
           <CountCard
             key={item.label}
             label={item.label}
@@ -459,8 +460,29 @@ export function RegistrationsPage() {
         ))}
       </section>
 
+      <details className="phase23v-panel">
+        <summary className="phase23v-summary">More registration metrics and review filters</summary>
+        <div className="phase23v-body phase23v-metric-grid">
+          {registrationMetricCards.slice(6).map((item) => (
+            <CountCard
+              key={item.label}
+              label={item.label}
+              value={item.value}
+              help={item.help}
+              active={(item.card && cardFilter === item.card) || (item.tab && activeTab === item.tab)}
+              onClick={() => {
+                if (item.tab) setActiveTab(item.tab)
+                setCardFilter((current) => (item.card && current !== item.card ? item.card : ''))
+              }}
+            />
+          ))}
+        </div>
+      </details>
+
       {evidenceAudit && (
-        <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="registration-audit-heading">
+        <details className="phase23v-panel border-[#D8C5A8] bg-[#FFFCF6]" aria-labelledby="registration-audit-heading">
+          <summary className="phase23v-summary text-[#4E3928]">Registration evidence reconciliation</summary>
+          <div className="phase23v-body">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Registration Evidence Reconciliation</p>
@@ -479,7 +501,8 @@ export function RegistrationsPage() {
             <CountCard label="Gmail-supported ticket spaces" value={evidenceAudit.ticketIncome.gmailSupportedTickets} help="Documentary ticket spaces, including inferred amounts." />
             <CountCard label="Christina Morris exception" value="Still present" help="No current CPB app row safely contains Christina Morris or her two guest spaces." />
           </div>
-        </section>
+          </div>
+        </details>
       )}
 
       <div className="flex flex-col gap-6">

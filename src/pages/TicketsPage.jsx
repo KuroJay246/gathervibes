@@ -346,7 +346,9 @@ export function TicketsPage() {
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
       {actionError && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{actionError}</div>}
 
-      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm space-y-4">
+      <details className="phase23v-panel">
+        <summary className="phase23v-summary">Advanced ticket filters</summary>
+        <div className="phase23v-body space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="font-bold text-[#2B1723]">Advanced Filters</h3>
@@ -392,7 +394,8 @@ export function TicketsPage() {
             ))}
           </div>
         </div>
-      </section>
+        </div>
+      </details>
 
       {assignedRegistrations.length > 0 && (
         <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
@@ -486,11 +489,6 @@ export function TicketsPage() {
                     <td className="px-4 py-3">
                       <div className="font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'Missing ticket code'}</div>
                       <div className="mt-1"><TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{titleCase(registration.ticketStatus || 'no-ticket-assigned')}</TicketBadge></div>
-                      {registration.ticketStatus === 'assigned' && registration.ticketCode && (
-                        <div className="mt-3">
-                          <TicketQrCode ticketCode={registration.ticketCode} compact />
-                        </div>
-                      )}
                     </td>
                     <td className="px-4 py-3"><TicketBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Not checked in'}</TicketBadge></td>
                     <td className="px-4 py-3 text-right">{renderActions(registration)}</td>
@@ -518,9 +516,12 @@ export function TicketsPage() {
                   <p className="mt-1 font-mono text-lg font-bold text-[#2B1723]">{registration.ticketCode || 'Not assigned'}</p>
                 </div>
                 {registration.ticketStatus === 'assigned' && registration.ticketCode && (
-                  <div className="mt-3">
+                  <details className="mt-3 rounded-xl border border-[#F2E8E1] bg-white">
+                    <summary className="cursor-pointer px-3 py-2 text-xs font-bold text-[#80685B]">Show QR code</summary>
+                    <div className="border-t border-[#F2E8E1] p-3">
                     <TicketQrCode ticketCode={registration.ticketCode} />
-                  </div>
+                    </div>
+                  </details>
                 )}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <TicketBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Not checked in'}</TicketBadge>

@@ -286,7 +286,14 @@ export function DashboardPage() {
               <Metric label="Status" value={eventStatusLabel(selectedEvent.status)} />
               <Metric label="Registration records" value={metrics.totalRegistrations} />
               <Metric label="Guests" value={metrics.totalPersons} />
-              <Metric label="Payments received" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
+              <Metric
+                label="Payments received"
+                value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)}
+                detail={`Projected registration income ${formatCurrency(
+                  readiness.planningOverview.budgets.projectedRegistrationIncome,
+                  financeSummary.currency,
+                )} · Outstanding registration balance ${formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)}`}
+              />
               <Metric label="Paid event expenses" value={formatCurrency(readiness.planningOverview.operationsSettlement.paidExpenses, financeSummary.currency)} />
               <Metric label="Outstanding commitments" value={formatCurrency(readiness.planningOverview.totalOutstandingCommitments, financeSummary.currency)} />
             </div>
@@ -351,34 +358,19 @@ export function DashboardPage() {
         </>
       ) : (
         <>
-          <Section eyebrow="Event Summary" title="What event am I working on?">
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
-              <Metric label="Days remaining" value={formatDaysUntilEvent(selectedEvent.eventDate)} />
-              <Metric label="Status" value={eventStatusLabel(selectedEvent.status)} detail={hydratedEvent.registrationRequired ? 'Registration required' : 'Registration optional'} />
-              <Metric label="Venue" value={hydratedEvent.venueName || 'Not set'} detail={hydratedEvent.location || 'Location not set'} />
-              <Metric label="Capacity" value={hydratedEvent.capacity || 'Not set'} detail={capacityLabel} />
-              <Metric label="Tasks completed" value={`${readiness.planningOverview.tasks.completed} / ${readiness.planningOverview.tasks.total || 0}`} detail={`${readiness.planningOverview.tasks.overdue} overdue`} />
-              <Metric label="Readiness" value={readiness.planningOverview.readiness.readinessLabel} detail={`${readiness.planningOverview.readiness.needsAttentionCount} item${readiness.planningOverview.readiness.needsAttentionCount === 1 ? '' : 's'} need attention`} />
-            </div>
-          </Section>
-
-          <section className="grid gap-3 md:grid-cols-4" aria-label="Key event numbers">
+          <section className="phase23v-metric-grid" aria-label="Key event numbers">
             <Metric label="Registration records" value={metrics.totalRegistrations} detail="Form entries" />
             <Metric label="Guests" value={metrics.totalPersons} detail="From persons attending" />
-            <Metric label="Payments received" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
+            <Metric
+              label="Payments received"
+              value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)}
+              detail={`Projected registration income ${formatCurrency(
+                readiness.planningOverview.budgets.projectedRegistrationIncome,
+                financeSummary.currency,
+              )} · Outstanding registration balance ${formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)}`}
+            />
             <Metric label="Capacity used" value={hydratedEvent?.capacity ? `${metrics.capacityPercent}%` : 'Not set'} detail={capacityLabel} />
           </section>
-
-          <Section eyebrow="Financial Snapshot" title="Money received, planned, and still owed">
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
-              <Metric label="Projected registration income" value={formatCurrency(readiness.planningOverview.budgets.projectedRegistrationIncome, financeSummary.currency)} />
-              <Metric label="Payments received" value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)} />
-              <Metric label="Outstanding registration balance" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
-              <Metric label="Paid event expenses" value={formatCurrency(readiness.planningOverview.operationsSettlement.paidExpenses, financeSummary.currency)} />
-              <Metric label="Outstanding commitments" value={formatCurrency(readiness.planningOverview.totalOutstandingCommitments, financeSummary.currency)} />
-              <Metric label="Projected cash position" value={formatCurrency(readiness.planningOverview.projectedCashPosition, financeSummary.currency)} detail="Planning view, not final profit" />
-            </div>
-          </Section>
 
           <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
             <Section eyebrow="Needs Attention" title="What should I do next?">
@@ -400,49 +392,79 @@ export function DashboardPage() {
             </Section>
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-            <Section eyebrow="Planning Progress" title="How prepared is this event?">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Metric label="Completed tasks" value={readiness.planningOverview.tasks.completed} />
-                <Metric label="Overdue tasks" value={readiness.planningOverview.tasks.overdue} />
-                <Metric label="Upcoming deadlines" value={readiness.planningOverview.tasks.upcoming} />
-                <Metric label="Readiness items left" value={readiness.planningOverview.readiness.needsAttentionCount} />
-                <Metric label="Supplier and sponsor records" value={readiness.planningOverview.partners.totalRecords} />
-                <Metric label="Confirmed sponsor cash" value={formatCurrency(readiness.planningOverview.partners.confirmedCashSponsors, financeSummary.currency)} />
-              </div>
-            </Section>
+          <details className="phase23v-panel">
+            <summary className="phase23v-summary">
+              Event details, money snapshot, and readiness progress
+            </summary>
+            <div className="phase23v-body space-y-5">
+              <section aria-label="Event Summary details">
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Event Summary</p>
+                <div className="mt-3 phase23v-metric-grid">
+                  <Metric label="Days remaining" value={formatDaysUntilEvent(selectedEvent.eventDate)} />
+                  <Metric label="Status" value={eventStatusLabel(selectedEvent.status)} detail={hydratedEvent.registrationRequired ? 'Registration required' : 'Registration optional'} />
+                  <Metric label="Venue" value={hydratedEvent.venueName || 'Not set'} detail={hydratedEvent.location || 'Location not set'} />
+                  <Metric label="Capacity" value={hydratedEvent.capacity || 'Not set'} detail={capacityLabel} />
+                </div>
+              </section>
 
-            <Section eyebrow="Upcoming Events" title="What else is coming up?">
-              <div className="space-y-3">
-                {!visibleEventsLoaded ? (
-                  <p className="py-4 text-sm text-[#816D62]">Loading events...</p>
-                ) : upcoming.length === 0 ? (
-                  <p className="py-4 text-sm text-[#816D62]">No upcoming events.</p>
-                ) : upcoming.slice(0, 4).map((event) => {
-                  const selected = event.eventId === activeEvent.eventId
-                  return (
-                    <div key={event.eventId} className="flex items-center gap-4 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] px-4 py-3">
-                      <CalendarDays className="size-5 shrink-0 text-[#9A5260]" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold text-[#2B1723]">{event.eventName}</p>
-                        <p className="mt-0.5 text-xs text-[#816D62]">{formatEventDate(event.eventDate)} · {event.venueName || event.location || 'Location not set'}</p>
+              <section aria-label="Financial snapshot">
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Financial Snapshot</p>
+                <div className="mt-3 phase23v-metric-grid">
+                  <Metric label="Projected registration income" value={formatCurrency(readiness.planningOverview.budgets.projectedRegistrationIncome, financeSummary.currency)} />
+                  <Metric label="Outstanding registration balance" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
+                  <Metric label="Paid event expenses" value={formatCurrency(readiness.planningOverview.operationsSettlement.paidExpenses, financeSummary.currency)} />
+                  <Metric label="Projected cash position" value={formatCurrency(readiness.planningOverview.projectedCashPosition, financeSummary.currency)} detail="Planning view, not final profit" />
+                </div>
+              </section>
+            </div>
+          </details>
+
+          <details className="phase23v-panel">
+            <summary className="phase23v-summary">Planning progress and upcoming events</summary>
+            <div className="phase23v-body grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+              <Section eyebrow="Planning Progress" title="How prepared is this event?">
+                <div className="phase23v-metric-grid">
+                  <Metric label="Completed tasks" value={readiness.planningOverview.tasks.completed} />
+                  <Metric label="Overdue tasks" value={readiness.planningOverview.tasks.overdue} />
+                  <Metric label="Upcoming deadlines" value={readiness.planningOverview.tasks.upcoming} />
+                  <Metric label="Readiness items left" value={readiness.planningOverview.readiness.needsAttentionCount} />
+                  <Metric label="Supplier and sponsor records" value={readiness.planningOverview.partners.totalRecords} />
+                  <Metric label="Confirmed sponsor cash" value={formatCurrency(readiness.planningOverview.partners.confirmedCashSponsors, financeSummary.currency)} />
+                </div>
+              </Section>
+
+              <Section eyebrow="Upcoming Events" title="What else is coming up?">
+                <div className="space-y-3">
+                  {!visibleEventsLoaded ? (
+                    <p className="py-4 text-sm text-[#816D62]">Loading events...</p>
+                  ) : upcoming.length === 0 ? (
+                    <p className="py-4 text-sm text-[#816D62]">No upcoming events.</p>
+                  ) : upcoming.slice(0, 4).map((event) => {
+                    const selected = event.eventId === activeEvent.eventId
+                    return (
+                      <div key={event.eventId} className="flex items-center gap-4 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] px-4 py-3">
+                        <CalendarDays className="size-5 shrink-0 text-[#9A5260]" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-bold text-[#2B1723]">{event.eventName}</p>
+                          <p className="mt-0.5 text-xs text-[#816D62]">{formatEventDate(event.eventDate)} · {event.venueName || event.location || 'Location not set'}</p>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{formatDaysUntilEvent(event.eventDate)}</p>
+                          {selected ? (
+                            <span className="text-[10px] font-bold text-[#17623A]">Selected</span>
+                          ) : (
+                            <button type="button" onClick={() => setActiveEvent(event)} className="text-[10px] font-bold text-[#9A5260] hover:underline">
+                              Select
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <div className="shrink-0 text-right">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{formatDaysUntilEvent(event.eventDate)}</p>
-                        {selected ? (
-                          <span className="text-[10px] font-bold text-[#17623A]">Selected</span>
-                        ) : (
-                          <button type="button" onClick={() => setActiveEvent(event)} className="text-[10px] font-bold text-[#9A5260] hover:underline">
-                            Select
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </Section>
-          </section>
+                    )
+                  })}
+                </div>
+              </Section>
+            </div>
+          </details>
         </>
       )}
     </div>

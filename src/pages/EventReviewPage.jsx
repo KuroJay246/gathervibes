@@ -334,30 +334,35 @@ export function EventReviewPage() {
       )}
 
       <Section eyebrow={review.summary.eyebrow} title={review.summary.title}>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="phase23v-metric-grid">
           <SummaryCard label="Event status" value={review.summary.eventStatus} />
-          <SummaryCard label="Capacity" value={review.summary.capacity > 0 ? review.summary.capacity : 'Not set'} />
           <SummaryCard label="Registration records" value={review.summary.registrationCount} />
           <SummaryCard label="Total guests" value={review.summary.guestCount} />
           <SummaryCard label="Capacity usage" value={review.summary.capacity > 0 ? `${review.summary.capacityUsagePercent}%` : 'Not available'} />
-          <SummaryCard label="Paid count" value={review.summary.paidCount} />
-          <SummaryCard label="Pending count" value={review.summary.pendingCount} />
-          <SummaryCard label="Partial payment count" value={review.summary.partialPaymentCount} />
-          <SummaryCard label="Complimentary count" value={review.summary.complimentaryCount} />
-          <SummaryCard label="To Pay at Door count" value={review.summary.doorListCount} />
-          <SummaryCard label="Unknown count" value={review.summary.unknownCount} />
-          <SummaryCard label="Tickets assigned" value={`${review.summary.ticketCoverage.assignedCount} (${review.summary.ticketCoverage.assignedPercent}%)`} />
-          <SummaryCard label="Tickets missing" value={review.summary.ticketCoverage.missingCount} help={`Paid missing tickets: ${review.summary.ticketCoverage.paidMissingCount}`} />
-          <SummaryCard label="Checked-in registrations" value={review.summary.checkedInRegistrations} />
-          <SummaryCard label="Checked-in guests" value={review.summary.checkedInGuests} />
-          <SummaryCard label="Attendance rate" value={review.summary.guestCount > 0 ? `${review.summary.attendanceRate}%` : 'Not available'} />
-          <SummaryCard label="Incomplete-data warnings" value={review.summary.incompleteDataWarnings} />
-          <SummaryCard label="Operations income" value={formatEventReviewMoney(review.summary.operationsIncome, currency)} />
-          <SummaryCard label="Operations expenses" value={formatEventReviewMoney(review.summary.operationsExpenses, currency)} />
-          <SummaryCard label="Operations refunds" value={formatEventReviewMoney(review.summary.operationsRefunds, currency)} />
-          <SummaryCard label="Open operations items" value={review.summary.openOperationsItems} />
-          <SummaryCard label="Operations adjustments / cash position" value={`${formatEventReviewMoney(review.summary.operationsAdjustments, currency)} / ${formatEventReviewMoney(review.summary.operationsNetPosition, currency)}`} help="Operations cash position excludes registration ticket receipts." />
         </div>
+        <details className="mt-5 rounded-2xl border border-[#EEDFD6] bg-[#FFFDFC]">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-[#6B564C]">Show full report metrics</summary>
+          <div className="border-t border-[#EFE2DA] p-4 phase23v-metric-grid">
+            <SummaryCard label="Capacity" value={review.summary.capacity > 0 ? review.summary.capacity : 'Not set'} />
+            <SummaryCard label="Paid count" value={review.summary.paidCount} />
+            <SummaryCard label="Pending count" value={review.summary.pendingCount} />
+            <SummaryCard label="Partial payment count" value={review.summary.partialPaymentCount} />
+            <SummaryCard label="Complimentary count" value={review.summary.complimentaryCount} />
+            <SummaryCard label="To Pay at Door count" value={review.summary.doorListCount} />
+            <SummaryCard label="Unknown count" value={review.summary.unknownCount} />
+            <SummaryCard label="Tickets assigned" value={`${review.summary.ticketCoverage.assignedCount} (${review.summary.ticketCoverage.assignedPercent}%)`} />
+            <SummaryCard label="Tickets missing" value={review.summary.ticketCoverage.missingCount} help={`Paid missing tickets: ${review.summary.ticketCoverage.paidMissingCount}`} />
+            <SummaryCard label="Checked-in registrations" value={review.summary.checkedInRegistrations} />
+            <SummaryCard label="Checked-in guests" value={review.summary.checkedInGuests} />
+            <SummaryCard label="Attendance rate" value={review.summary.guestCount > 0 ? `${review.summary.attendanceRate}%` : 'Not available'} />
+            <SummaryCard label="Incomplete-data warnings" value={review.summary.incompleteDataWarnings} />
+            <SummaryCard label="Operations income" value={formatEventReviewMoney(review.summary.operationsIncome, currency)} />
+            <SummaryCard label="Operations expenses" value={formatEventReviewMoney(review.summary.operationsExpenses, currency)} />
+            <SummaryCard label="Operations refunds" value={formatEventReviewMoney(review.summary.operationsRefunds, currency)} />
+            <SummaryCard label="Open operations items" value={review.summary.openOperationsItems} />
+            <SummaryCard label="Operations adjustments / cash position" value={`${formatEventReviewMoney(review.summary.operationsAdjustments, currency)} / ${formatEventReviewMoney(review.summary.operationsNetPosition, currency)}`} help="Operations cash position excludes registration ticket receipts." />
+          </div>
+        </details>
 
         <div className="mt-5 rounded-2xl border border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#715D46]">
           <div className="flex items-start gap-3">
