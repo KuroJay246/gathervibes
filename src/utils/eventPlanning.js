@@ -421,7 +421,11 @@ export function hydrateEventForPlanning(event = {}) {
 
 export function financialPlanTotals(financialPlan = {}) {
   const normalized = normalizeFinancialPlan(financialPlan)
-  const totalBudget = Object.values(normalized).reduce((sum, value) => sum + (Number(value) || 0), 0)
+  const {
+    projectedRegistrationIncome: _projectedRegistrationIncome,
+    ...budgetFields
+  } = normalized
+  const totalBudget = Object.values(budgetFields).reduce((sum, value) => sum + (Number(value) || 0), 0)
   return {
     ...normalized,
     totalBudget,
