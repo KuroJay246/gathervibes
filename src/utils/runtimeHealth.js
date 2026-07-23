@@ -86,7 +86,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Offline persistence',
       status: 'ok',
-      detail: (typeof window !== 'undefined' && import.meta.env.MODE !== 'test' && !window.__FIRESTORE_TEST_ENV__) ? 'Enabled via IndexedDbPersistence (multi-tab).' : 'Disabled in test environment.',
+      detail: (typeof window !== 'undefined' && import.meta.env.VITE_FIREBASE_USE_EMULATORS !== 'true' && import.meta.env.MODE !== 'test' && !window.__FIRESTORE_TEST_ENV__) ? 'Enabled via IndexedDbPersistence (multi-tab).' : 'Disabled in test or emulator environment.',
     },
     {
       label: 'Build metadata',

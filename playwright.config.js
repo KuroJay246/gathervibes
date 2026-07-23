@@ -7,14 +7,30 @@ export default defineConfig({
   workers: 1,
   retries: 0,
   timeout: 90_000,
+  expect: {
+    timeout: 20_000,
+  },
   reporter: [['list']],
   use: {
     baseURL: 'http://127.0.0.1:4175',
-    browserName: 'chromium',
     headless: true,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
+  projects: [
+    {
+      name: 'chromium',
+      use: { browserName: 'chromium' },
+    },
+    {
+      name: 'firefox',
+      use: { browserName: 'firefox' },
+    },
+    {
+      name: 'webkit',
+      use: { browserName: 'webkit' },
+    },
+  ],
   globalSetup: './scripts/e2e/globalSetup.mjs',
   webServer: {
     command: 'npm run dev -- --host 127.0.0.1 --port 4175 --strictPort',

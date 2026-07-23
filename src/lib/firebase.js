@@ -35,15 +35,17 @@ const app = isFirebaseConfigured ? (getApps().length ? getApp() : initializeApp(
 
 export const auth = app ? getAuth(app) : null
 
+const useFirebaseEmulators = import.meta.env.VITE_FIREBASE_USE_EMULATORS === 'true'
+
 export const db = app ? (
-  typeof window !== 'undefined' && import.meta.env.MODE !== 'test' && !window.__FIRESTORE_TEST_ENV__
+  useFirebaseEmulators
+    ? initializeFirestore(app, { experimentalForceLongPolling: true })
+    : typeof window !== 'undefined' && import.meta.env.MODE !== 'test' && !window.__FIRESTORE_TEST_ENV__
     ? initializeFirestore(app, {
         localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
       })
     : getFirestore(app)
 ) : null
-
-const useFirebaseEmulators = import.meta.env.VITE_FIREBASE_USE_EMULATORS === 'true'
 
 if (useFirebaseEmulators && typeof window !== 'undefined') {
   window.__GSV_FIREBASE_EMULATORS__ ||= {}
