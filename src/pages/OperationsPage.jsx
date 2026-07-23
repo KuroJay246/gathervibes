@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AlertTriangle, Copy, Edit3, Plus, Printer, ReceiptText, Save, Search, X } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
+import { PartnerCommitmentsPanel } from '../components/operations/PartnerCommitmentsPanel'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { EmptyState } from '../components/ui/EmptyState'
 import { LoadingState } from '../components/ui/LoadingState'
@@ -15,6 +16,7 @@ import {
   subscribeToOperationsLedger,
   updateLedgerEntry,
 } from '../services/operationsLedgerService'
+import { deletePartnerRecord, savePartnerRecord, subscribeToEvents } from '../services/eventService'
 import {
   buildOperationsControlSummary,
   buildOperationsEntryCounts,
@@ -25,6 +27,7 @@ import {
 } from '../utils/operationsReport'
 import { InfoHint } from '../components/ui/InfoHint'
 import { canWriteOperations, isApprovedAdmin } from '../utils/accessRoles'
+import { isCompletedEvent } from '../utils/eventPlanning'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 
 const EMPTY_FORM = {
@@ -78,6 +81,7 @@ function buildFilterScopeLabel(filters = DEFAULT_FILTERS) {
 export function OperationsPage() {
   const { user, access } = useAuth()
   const { activeEvent } = useActiveEvent()
+  const [resolvedActiveEvent, setResolvedActiveEvent] = useState(activeEvent)
   const [registrations, setRegistrations] = useState([])
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
@@ -88,12 +92,15 @@ export function OperationsPage() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const adminUser = isApprovedAdmin(access)
-  const canEditOperations = canWriteOperations(access, activeEvent?.eventId)
+  const currentEvent = resolvedActiveEvent || activeEvent
+  const canEditOperations = canWriteOperations(access, currentEvent?.eventId)
+  const completedEvent = isCompletedEvent(currentEvent)
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     setEntries([])
     setRegistrations([])
+    setResolvedActiveEvent(activeEvent)
     setFilters(DEFAULT_FILTERS)
     setForm(EMPTY_FORM)
     setEditing(null)
@@ -101,16 +108,28 @@ export function OperationsPage() {
     setError('')
     setLoading(Boolean(activeEvent?.eventId))
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, [activeEvent?.eventId])
+  }, [activeEvent])
 
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
 
+    return subscribeToEvents(
+      (events) => {
+        const matchedEvent = events.find((event) => event?.eventId === activeEvent.eventId)
+        if (matchedEvent) setResolvedActiveEvent(matchedEvent)
+      },
+      () => {},
+    )
+  }, [activeEvent])
+
+  useEffect(() => {
+    if (!currentEvent?.eventId) return undefined
+
     const unsubscribeRegs = adminUser
-      ? subscribeToRegistrations(activeEvent.eventId, setRegistrations, () => {})
+      ? subscribeToRegistrations(currentEvent.eventId, setRegistrations, () => {})
       : () => setRegistrations([])
     const unsubscribeLedger = subscribeToOperationsLedger(
-      activeEvent.eventId,
+      currentEvent.eventId,
       (rows) => {
         setEntries(rows)
         setLoading(false)
@@ -128,7 +147,7 @@ export function OperationsPage() {
       unsubscribeRegs()
       unsubscribeLedger()
     }
-  }, [activeEvent?.eventId, adminUser])
+  }, [adminUser, currentEvent?.eventId])
 
   const filteredEntries = entries.filter((entry) => {
     if (filters.type !== 'all' && entry.entryType !== filters.type) return false
@@ -151,7 +170,7 @@ export function OperationsPage() {
     return true
   })
 
-  const financeSummary = useMemo(() => buildFinanceSummary(registrations, activeEvent), [registrations, activeEvent])
+  const financeSummary = useMemo(() => buildFinanceSummary(registrations, currentEvent), [currentEvent, registrations])
   const operationsTotals = useMemo(() => buildOperationsTotals(entries), [entries])
   const operationsSettlement = useMemo(() => buildOperationsSettlementSummary(entries), [entries])
   const filteredTotals = useMemo(() => buildOperationsTotals(filteredEntries), [filteredEntries])
@@ -159,9 +178,9 @@ export function OperationsPage() {
   const filteredControl = useMemo(() => buildOperationsControlSummary(filteredEntries), [filteredEntries])
   const possibleRegistrationPaymentOverlap = useMemo(() => findPossibleRegistrationPaymentOverlap(entries), [entries])
   const filterScopeLabel = useMemo(() => buildFilterScopeLabel(filters), [filters])
-  const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(activeEvent?.eventId), [activeEvent?.eventId])
+  const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(currentEvent?.eventId), [currentEvent?.eventId])
 
-  if (!activeEvent?.eventId) {
+  if (!currentEvent?.eventId) {
     return (
       <EmptyState
         icon={ReceiptText}
@@ -215,7 +234,7 @@ export function OperationsPage() {
         await updateLedgerEntry(editing, form, user)
         setMessage('Operations ledger entry updated.')
       } else {
-        await createLedgerEntry(form, activeEvent.eventId, user)
+        await createLedgerEntry(form, currentEvent.eventId, user)
         setMessage('Operations ledger entry added.')
       }
       resetForm()
@@ -232,7 +251,7 @@ export function OperationsPage() {
       setError('This role can view assigned operations entries but cannot cancel them.')
       return
     }
-    if (!window.confirm(`Cancel ledger entry "${entry.label}" for ${activeEvent.eventName}?`)) return
+    if (!window.confirm(`Cancel ledger entry "${entry.label}" for ${currentEvent.eventName}?`)) return
     setSaving(true)
     setError('')
     setMessage('')
@@ -249,7 +268,7 @@ export function OperationsPage() {
 
   async function copyCurrentViewReport() {
     const report = buildOperationsLedgerReport(filteredEntries, {
-      eventName: activeEvent?.eventName,
+      eventName: currentEvent?.eventName,
       currency: financeSummary.currency,
       scopeLabel: filterScopeLabel,
     })
@@ -272,9 +291,9 @@ export function OperationsPage() {
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Selected Working Event only</p>
-          <h2 className="font-serif text-3xl text-[#2B1723]">Event Operations / Money Tracker</h2>
+          <h2 className="font-serif text-3xl text-[#2B1723]">Operations and Commitments</h2>
           <p className="mt-2 text-sm text-[#816D62]">
-            Track event-level obligations for <strong>{activeEvent.eventName}</strong>. Registration payments are reviewed separately in Payments.
+            Track partner commitments and event-level money for <strong>{currentEvent.eventName}</strong>. Registration payments are reviewed separately in Payments.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -294,11 +313,11 @@ export function OperationsPage() {
 
       <section className="flex items-center gap-2 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
         <p className="font-semibold text-[#6B564C]">
-          Operations Ledger is active for sponsor income, vendor payments, expenses, reimbursements, and refunds.
+          Operations now covers both planning commitments and the event-level ledger.
           {!canEditOperations && ' Your role is read-only for this assigned event.'}
         </p>
         <InfoHint label="Operations Ledger Info">
-          This tracker is separate from registration payment records. Use Payments for guest charges, recorded payments, balances, and payment follow-up. Use Operations for sponsor income, vendor or supplier payments, expenses, refunds, reimbursements, and adjustments.
+          Use the contact and commitment workspace for bakers, vendors, suppliers, sponsors, venue contacts, and helpers. Use the ledger for event-level income, expenses, refunds, reimbursements, and adjustments. Registration payments stay in Payments.
         </InfoHint>
       </section>
 
@@ -308,6 +327,12 @@ export function OperationsPage() {
           Operations tracks event expenses, commitments and non-registration income. Registration ticket payments are recorded separately under Payments, so the Operations cash position is not the event's final profit or loss.
         </p>
       </section>
+
+      {completedEvent && (
+        <section className="rounded-xl border border-[#D9E3F8] bg-[#F6F9FF] px-4 py-3 text-sm leading-6 text-[#415F91]">
+          This event is completed. Use this page mainly for historical reference, outstanding supplier or baker commitments, and closeout checks instead of normal upcoming-event setup.
+        </section>
+      )}
 
       {possibleRegistrationPaymentOverlap.length > 0 && (
         <section className="flex gap-2 rounded-xl border border-[#F2D6A3] bg-[#FFF7E8] px-4 py-3 text-xs leading-5 text-[#7A5818]">
@@ -345,6 +370,12 @@ export function OperationsPage() {
           </div>
         ))}
       </section>
+
+      <PartnerCommitmentsPanel
+        event={currentEvent}
+        onSaveRecord={(record) => savePartnerRecord(currentEvent, record, user)}
+        onDeleteRecord={(partnerId) => deletePartnerRecord(currentEvent, partnerId, user)}
+      />
 
       {evidenceAudit && (
         <section className="rounded-[24px] border border-[#D8C5A8] bg-[#FFFCF6] p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" aria-labelledby="operations-closeout-heading">

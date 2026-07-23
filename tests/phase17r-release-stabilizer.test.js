@@ -12,8 +12,8 @@ test('Phase 17R core routes keep clean no-selected-event boundaries and explicit
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
   const checkIn = await readFile('src/pages/CheckInPage.jsx', 'utf8')
 
-  assert.match(dashboard, /Working Event/)
-  assert.match(dashboard, /Choose a Working Event/)
+  assert.match(dashboard, /Select a Working Event/)
+  assert.match(dashboard, /Choose or create an event/)
   assert.match(registrations, /Select an event from Events or the dashboard before managing registrations/)
   assert.match(imports, /Select an event before importing registrations/)
   assert.match(tickets, /Select a Working Event before assigning ticket codes/)

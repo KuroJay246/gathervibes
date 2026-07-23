@@ -236,7 +236,7 @@ test('Phase 22 route, guardrails, and read-only page structure are present witho
   const packageLock = await readFile('package-lock.json', 'utf8')
 
   assert.match(app, /path="\/event-review"/)
-  assert.match(dashboard, /to="\/event-review"/)
+  assert.match(dashboard, /to: '\/event-review'/)
   assert.match(operations, /to="\/event-review"/)
   assert.match(page, /subscribeToEvents/)
   assert.match(page, /buildEventReview\(resolvedActiveEvent, registrations, operationsEntries\)/)
@@ -248,6 +248,8 @@ test('Phase 22 route, guardrails, and read-only page structure are present witho
   assert.equal(packageJson.dependencies['read-excel-file'], '^9.2.0')
   assert.doesNotMatch(packageLock, /node_modules\/xlsx/)
   assert.match(rules, /match \/accessRequests\/\{requestId\}/)
+  assert.match(rules, /planningTasks/)
+  assert.match(rules, /partnerRecords/)
   assert.match(indexes, /registrations/)
 })
 

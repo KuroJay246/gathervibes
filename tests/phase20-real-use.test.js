@@ -8,12 +8,14 @@ test('Phase 20 dashboard and events preserve approved layout while clarifying wo
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
   const events = await readFile('src/pages/EventsPage.jsx', 'utf8')
 
-  assert.match(dashboard, /Working Event/)
-  assert.match(dashboard, /Payments Received/)
+  assert.match(dashboard, /Event Summary/)
+  assert.match(dashboard, /Payments received/)
   assert.match(dashboard, /Capacity used/)
+  assert.match(dashboard, /Projected cash position/)
   assert.match(events, /function pricingModeLabel\(event = \{\}\)/)
   assert.match(events, /Default base ticket price only/)
   assert.match(events, /No pricing configured/)
+  assert.match(events, /Plan a New Event/)
 })
 
 test('Phase 20 keeps registration audit wording and ticket QR guardrails intact', async () => {

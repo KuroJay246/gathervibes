@@ -52,6 +52,18 @@ Status should reflect the real state of the record, such as:
 4. Keep registration payments in `Payments`.
 5. Use `Reports` for the read-only cross-check.
 
-## Prototype demo rule
+## Baker payments
 
-Use CODEX_TEST for destructive demos. Do not create demo Operations entries in CPB.
+Use baker, vendor, and supplier commitment records to track what is still owed outside registration payments.
+
+For baker payments:
+
+1. Confirm the agreed amount and current balance.
+2. Update amount paid only after the real payment is made.
+3. Record payment method, payment date, evidence, and notes where available.
+4. Use the remaining balance to track what is still outstanding.
+5. Keep patron payment totals unchanged.
+
+## QA rehearsal rule
+
+Use CODEX_TEST for destructive QA and organizer rehearsal. Do not create temporary Operations entries in CPB.

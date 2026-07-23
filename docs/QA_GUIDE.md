@@ -2,9 +2,9 @@
 
 ## Safe QA event
 
-- Use `CODEX_TEST Live Verification Event` for destructive QA and demos.
+- Use `CODEX_TEST Live Verification Event` for destructive QA and organizer rehearsal.
 - Keep CPB read-only unless a separate production-safe approval exists.
-- Prefix temporary QA business records with `QA_PHASE23S_`.
+- Prefix temporary QA business records with `QA_PHASE23T_`.
 
 ## Local validation
 
@@ -61,4 +61,4 @@ Review across desktop, tablet, and mobile widths. Confirm:
 
 ## Cleanup
 
-Delete temporary demo business records after testing. Preserve audit logs.
+Delete temporary QA business records after testing. Preserve audit logs.

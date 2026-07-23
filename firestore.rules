@@ -19,12 +19,22 @@ service cloud.firestore {
     //   eventName: string (1..150)
     //   eventDate: timestamp
     //   location: string (1..250)
+    //   venueName: string (0..250)
     //   eventType: supported enum
     //   status: supported enum
+    //   eventStartTime / eventEndTime: string (0..32)
+    //   eventDescription: string (0..5000)
     //   capacity: int (1..100000)
     //   ticketPrice: number (0..1000000)  — backward-compat scalar
     //   priceTiers: list<map> or null
     //     { name: string, price: number>=0, status: enum }
+    //   registrationRequired / complimentaryAllowed / doorPaymentAllowed: bool
+    //   ticketTypeCount: int (1..12)
+    //   registrationOpenDate / registrationCloseDate: timestamp|null
+    //   financialPlan: organizer-entered budget map
+    //   operationsPlan: organizer-entered planning map
+    //   readinessChecklist: organizer-entered readiness map
+    //   planningTasks / partnerRecords: organizer planning lists
     //   notes: string (0..10000)
     //   createdAt: timestamp (immutable)
     //   updatedAt: timestamp
@@ -311,7 +321,76 @@ service cloud.firestore {
         );
     }
 
-    // ── Event allowed keys with optional priceTiers ────────────────────────
+    function validEventType(value) {
+      return value in [
+        'cake-picnic', 'cake-tasting', 'brunch', 'tasting',
+        'cultural-experience', 'hospitality-event', 'workshop', 'party',
+        'food-event', 'vendor-pop-up', 'private-food-experience',
+        'private-event', 'other'
+      ];
+    }
+
+    function validEventStatus(value) {
+      return value in [
+        'draft', 'planning', 'registration-open', 'registration-closed',
+        'ready-for-event', 'in-progress', 'completed', 'archived',
+        'cancelled', 'upcoming', 'active'
+      ];
+    }
+
+    function validFinancialPlan(plan) {
+      return plan is map
+        && plan.keys().hasOnly([
+          'projectedRegistrationIncome', 'venueBudget', 'supplierBudget',
+          'entertainmentBudget', 'marketingBudget', 'staffingBudget',
+          'contingencyBudget', 'otherBudget'
+        ])
+        && (!('projectedRegistrationIncome' in plan) || validOptionalMoney(plan.projectedRegistrationIncome))
+        && (!('venueBudget' in plan) || validOptionalMoney(plan.venueBudget))
+        && (!('supplierBudget' in plan) || validOptionalMoney(plan.supplierBudget))
+        && (!('entertainmentBudget' in plan) || validOptionalMoney(plan.entertainmentBudget))
+        && (!('marketingBudget' in plan) || validOptionalMoney(plan.marketingBudget))
+        && (!('staffingBudget' in plan) || validOptionalMoney(plan.staffingBudget))
+        && (!('contingencyBudget' in plan) || validOptionalMoney(plan.contingencyBudget))
+        && (!('otherBudget' in plan) || validOptionalMoney(plan.otherBudget));
+    }
+
+    function validPlanningTimeline(timeline) {
+      return timeline is list && timeline.size() <= 24;
+    }
+
+    function validOperationsPlan(plan) {
+      return plan is map
+        && plan.keys().hasOnly([
+          'venueAccessTime', 'emergencyContact', 'suppliersNote',
+          'bakerVendorNote', 'sponsorNote', 'staffNote', 'equipmentNote',
+          'licencesNote', 'insuranceNote', 'setupTime', 'timeline'
+        ])
+        && (!('venueAccessTime' in plan) || validOptionalString(plan.venueAccessTime, 32))
+        && (!('emergencyContact' in plan) || validOptionalString(plan.emergencyContact, 250))
+        && (!('setupTime' in plan) || validOptionalString(plan.setupTime, 64))
+        && (!('timeline' in plan) || validPlanningTimeline(plan.timeline));
+    }
+
+    function validReadinessChecklist(checklist) {
+      return checklist is map
+        && checklist.keys().hasOnly([
+          'venueConfirmed', 'venueAccessConfirmed', 'paymentMethodsConfigured',
+          'suppliersConfirmed', 'staffAssigned', 'eventDayTimelineReady',
+          'ticketProcessReady', 'checkInProcessReady',
+          'communicationsPrepared', 'licencesReviewed', 'insuranceReviewed'
+        ]);
+    }
+
+    function validPlanningTasks(tasks) {
+      return tasks is list && tasks.size() <= 250;
+    }
+
+    function validPartnerRecords(records) {
+      return records is list && records.size() <= 250;
+    }
+
+    // ── Event allowed keys with optional planner fields ────────────────────
     function isValidEvent(data, eventId) {
       return (
           // Must have all required keys
@@ -319,11 +398,16 @@ service cloud.firestore {
             'eventId', 'eventName', 'eventDate', 'location', 'eventType',
             'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt'
           ])
-          // May optionally include priceTiers
+          // May optionally include planner and ticket configuration fields
           && data.keys().hasOnly([
             'eventId', 'eventName', 'eventDate', 'location', 'eventType',
             'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt',
-            'priceTiers'
+            'priceTiers', 'venueName', 'eventStartTime', 'eventEndTime',
+            'eventDescription', 'registrationRequired', 'ticketTypeCount',
+            'complimentaryAllowed', 'doorPaymentAllowed',
+            'registrationOpenDate', 'registrationCloseDate', 'financialPlan',
+            'operationsPlan', 'readinessChecklist', 'planningTasks',
+            'partnerRecords'
           ])
           && data.eventId == eventId
           && validShortId(data.eventId)
@@ -334,11 +418,8 @@ service cloud.firestore {
           && data.location is string
           && data.location.size() > 0
           && data.location.size() <= 250
-          && data.eventType in [
-            'cake-picnic', 'brunch', 'tasting', 'vendor-pop-up',
-            'private-food-experience', 'other'
-          ]
-          && data.status in ['draft', 'upcoming', 'active', 'completed', 'cancelled']
+          && validEventType(data.eventType)
+          && validEventStatus(data.status)
           && data.capacity is int
           && data.capacity > 0
           && data.capacity <= 100000
@@ -351,6 +432,21 @@ service cloud.firestore {
           && data.updatedAt is timestamp
           // Optional price tiers
           && (!('priceTiers' in data) || validPriceTiers(data.priceTiers))
+          && (!('venueName' in data) || validOptionalString(data.venueName, 250))
+          && (!('eventStartTime' in data) || validOptionalString(data.eventStartTime, 32))
+          && (!('eventEndTime' in data) || validOptionalString(data.eventEndTime, 32))
+          && (!('eventDescription' in data) || validOptionalString(data.eventDescription, 5000))
+          && (!('registrationRequired' in data) || data.registrationRequired is bool)
+          && (!('ticketTypeCount' in data) || (data.ticketTypeCount is int && data.ticketTypeCount >= 1 && data.ticketTypeCount <= 12))
+          && (!('complimentaryAllowed' in data) || data.complimentaryAllowed is bool)
+          && (!('doorPaymentAllowed' in data) || data.doorPaymentAllowed is bool)
+          && (!('registrationOpenDate' in data) || data.registrationOpenDate == null || data.registrationOpenDate is timestamp)
+          && (!('registrationCloseDate' in data) || data.registrationCloseDate == null || data.registrationCloseDate is timestamp)
+          && (!('financialPlan' in data) || validFinancialPlan(data.financialPlan))
+          && (!('operationsPlan' in data) || validOperationsPlan(data.operationsPlan))
+          && (!('readinessChecklist' in data) || validReadinessChecklist(data.readinessChecklist))
+          && (!('planningTasks' in data) || validPlanningTasks(data.planningTasks))
+          && (!('partnerRecords' in data) || validPartnerRecords(data.partnerRecords))
         );
     }
 

@@ -51,20 +51,24 @@ test('Phase 23M Overview, Payments, and Reports finance totals align', () => {
   assert.equal(report.paymentReview.operationsLedger.incomeReceived, 999)
 })
 
-test('Phase 23M source uses aligned labels across Overview, Payments, and Reports', async () => {
+test('Phase 23M source uses aligned finance concepts across Overview, Payments, and Reports', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
   const payments = await readFile('src/pages/PaymentsPage.jsx', 'utf8')
   const reports = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
 
-  for (const source of [dashboard, payments, reports]) {
+  assert.match(dashboard, /Projected registration income/)
+  assert.match(dashboard, /Payments received/)
+  assert.match(dashboard, /Outstanding registration balance/)
+  assert.match(dashboard, /Planning view, not final profit/)
+  assert.match(dashboard, /buildFinanceSummary\(registrations, selectedEvent\)/)
+  assert.match(dashboard, /formatCurrency\(financeSummary\.totalCollected, financeSummary\.currency\)/)
+  assert.doesNotMatch(dashboard, /defaultTicketPriceForEvent|ticketPrice \* metrics|metrics\.totalPersons \*/)
+
+  for (const source of [payments, reports]) {
     assert.match(source, /Expected Registration Income/)
     assert.match(source, /Payments Received/)
     assert.match(source, /Outstanding Balance/)
   }
-  assert.match(dashboard, /buildFinanceSummary\(registrations, selectedEvent\)/)
-  assert.match(dashboard, /formatCurrency\(financeSummary\.totalExpected, financeSummary\.currency\)/)
-  assert.match(dashboard, /Operations Ledger money remains separate/)
-  assert.doesNotMatch(dashboard, /defaultTicketPriceForEvent|ticketPrice \* metrics|metrics\.totalPersons \*/)
   assert.doesNotMatch(payments, /Operations Ledger tracks[\s\S]*workspace\.summary\.expectedRegistrationIncome/)
 })
 

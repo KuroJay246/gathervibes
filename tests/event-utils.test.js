@@ -7,10 +7,13 @@ const validEvent = {
   eventName: 'Cake Picnic Barbados',
   eventDate: '2026-09-12',
   location: 'Bridgetown, Barbados',
+  venueName: 'LESC',
   eventType: 'cake-picnic',
-  status: 'upcoming',
+  status: 'planning',
+  eventStartTime: '14:00',
   capacity: '150',
   ticketPrice: '75',
+  ticketTypeCount: '1',
   notes: '',
 }
 
