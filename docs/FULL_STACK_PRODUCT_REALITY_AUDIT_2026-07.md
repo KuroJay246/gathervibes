@@ -7,9 +7,11 @@ Firebase project: `gathervibeshub`
 
 ## Result
 
-**FULL-STACK PRODUCT HOLD**
+**FULL-STACK PRODUCT PASS WITH NON-BLOCKING LIMITATIONS**
 
-The established production-readiness gates pass for Chromium and Firefox after a Phase 23U test-environment repair. The release is held because authenticated production Chrome smoke, Hosting deployment, and final production acceptance were not completed in this pass. WebKit remains an emulator-lab limitation: Playwright WebKit on Windows still reports Firestore emulator transport/access-check instability on mobile and during route churn. This was not reproduced in Chromium or Firefox and was not treated as evidence of a production Safari regression without a real Safari device check.
+The established production-readiness gates pass for Chromium and Firefox after a Phase 23U test-environment repair. Authenticated production Chrome acceptance against `CODEX_TEST Live Verification Event` passed after the audit branch was created: route loading, owner session restoration, responsive viewport checks, production console/network checks, and one create/pay/ticket/check-in/delete workflow completed through the organizer UI.
+
+WebKit remains a non-blocking emulator-lab limitation: Playwright WebKit on Windows still reports Firestore emulator transport/access-check instability on mobile and during route churn. This was not reproduced in Chromium, Firefox, or authenticated production Chrome and was not treated as evidence of a production Safari regression without a real Safari device check.
 
 No CPB production data was read for modification or changed. No Firestore rules, indexes, Functions, Storage, Auth configuration, scanner permissions, QR payload, access workflow, or CPB finance totals were changed.
 
@@ -50,6 +52,9 @@ No CPB production data was read for modification or changed. No Firestore rules,
 | `npm run product:routes` | Passed: 15 routes, 12 navigation labels |
 | `npm run product:copy-scan` | Passed: 15 primary UI files |
 | `git diff --check` | Passed before report creation; rerun required before final merge |
+| Authenticated production Chrome route matrix | Passed: 52 route/breakpoint combinations loaded without login failure, CPB bleed, or AppErrorBoundary |
+| Production console/network review | Passed for `/dashboard`, `/payments`, `/operations`, `/event-review`, `/communications`, `/settings`, `/qa` |
+| CODEX_TEST production workflow | Passed: synthetic registration create, payment fields, ticket assignment, QR payload, check-in, and delete cleanup |
 
 ## Route And UX Coverage
 
@@ -83,7 +88,72 @@ The Chromium and Firefox suites cover:
 
 The automated responsive matrix found no page-level horizontal overflow in Chromium and Firefox. Tickets and Check-In remain first-class event-day routes. Message Builder, Reports, Payments, Settings, and System QA labels remain route-stable.
 
-Authenticated Chrome Default-profile manual production review was not completed in this pass; the current acceptance status is based on automated local emulator browser coverage and source inspection. A production browser smoke should be run before any Hosting deployment decision.
+Authenticated Chrome Default-profile production review was completed against `CODEX_TEST Live Verification Event` on `https://gathervibeshub.web.app`.
+
+Production route matrix covered desktop `1440 x 900`, tablet `834 x 1112`, mobile `390 x 844`, and narrow mobile `320 x 568`.
+
+Routes opened:
+
+- `/dashboard`
+- `/events`
+- `/registrations`
+- `/payments`
+- `/tickets`
+- `/check-in`
+- `/scanner`
+- `/operations`
+- `/event-review`
+- `/communications`
+- `/imports`
+- `/settings`
+- `/qa`
+
+All route headings loaded. No production login loop, not-approved state, AppErrorBoundary, or CPB event bleed was observed. Tables and horizontal tab strips remain intentionally scrollable inside their containers on narrow screens; the document-level page did not horizontally overflow.
+
+Representative visual evidence was saved under `output/phase23u-production-acceptance/`:
+
+- `desktop-dashboard.png`
+- `desktop-tickets.png`
+- `desktop-reports.png`
+- `tablet-settings.png`
+- `mobile-overview.png`
+- `mobile-tickets.png`
+- `mobile-checkin.png`
+- `mobile-reports.png`
+- `mobile-more-open.png`
+
+Mobile navigation preserved event-day priority: Overview, Guests, Tickets, and Check-In remain primary bottom actions, while the More menu exposes Events, Payments, Operations, Message Builder, Reports, Import Center, Settings, and System QA.
+
+The Chrome viewport override displays the emulated viewport inside the larger browser canvas; blank space outside the emulated viewport in screenshots is a tool artifact, not app content overflow.
+
+## Production Workflow Acceptance
+
+One synthetic CODEX_TEST row was created and cleaned up through the production organizer UI:
+
+- Registration: `QA_PHASE23U_PROD_SMOKE_1784829716505 Registration`
+- Event scope: `CODEX_TEST Live Verification Event`
+- Payment status: Paid
+- Payment method: Cash
+- Amount due: BBD $1.00
+- Amount paid: BBD $1.00
+- Balance: BBD $0.00
+- Ticket assigned by app sequencing: `CTLVE-001`
+- Rendered QR payload: `GSV:TICKET:CTLVE-001`
+- Check-In result: checked in successfully
+- Cleanup result: synthetic registration deleted
+
+The create and check-in actions visibly entered `Saving...` state and disabled their primary submit buttons immediately after click, which confirms a visible duplicate-submit guard in the exercised production paths.
+
+After cleanup, CODEX_TEST returned to:
+
+- 5 registrations
+- 6 guests
+- BBD $225.00 expected registration income
+- BBD $225.00 recorded registration payments
+- BBD $0.00 outstanding registration balance
+- 5 checked-in registrations / 6 checked-in guests
+
+Append-only audit logs were not deleted.
 
 ## Data And Financial Boundaries
 
@@ -117,10 +187,10 @@ Authenticated Chrome Default-profile manual production review was not completed 
 
 ## Deployment Position
 
-Do not deploy from this branch yet.
+The audit branch is eligible for merge and Hosting-only deployment after normal release-manager review.
 
-Reason: WebKit emulator limitation and authenticated production Chrome smoke remain unresolved observations. The changes are safe local/tooling/runtime-test improvements, but Phase 23U should either accept WebKit-on-Windows emulator instability as non-blocking or schedule a focused Safari/WebKit validation pass before merge/deploy.
+Reason: production Chrome acceptance passed, Chromium and Firefox automated browser gates passed, and WebKit-on-Windows emulator instability is classified as a non-blocking laboratory limitation. A real Safari/WebKit device check remains useful but is not required to merge these Phase 23U tooling/runtime-test improvements.
 
 ## Recommended Next Action
 
-Run authenticated production Chrome smoke on `https://gathervibeshub.web.app` against `CODEX_TEST Live Verification Event`, then decide whether to classify WebKit emulator instability as non-blocking or create a focused Phase 23U-B browser-transport follow-up.
+Merge the Phase 23U audit branch into `main`, push normally, deploy Firebase Hosting only, then run a final production smoke against `CODEX_TEST Live Verification Event`.
