@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { Sparkles, X, ArrowRight } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { Sparkles, X } from 'lucide-react'
 import { BrandMark } from '../BrandMark'
 import { useAuth } from '../../auth/useAuth'
 
@@ -45,10 +46,19 @@ function Confetti() {
 }
 
 export function WelcomeCelebration({ onStart, onSkip, onClose }) {
-  const { staffProfile } = useAuth()
+  const { user, staffProfile } = useAuth()
   const modalRef = useRef(null)
   
-  const displayName = staffProfile?.displayName?.split(' ')?.[0] || ''
+  const getGreeting = () => {
+    if (user?.uid === 'WM2UOQtSeuOglCI5uMZQKrYYqP53') {
+      return 'Welcome, Anica'
+    }
+    const displayName = staffProfile?.displayName?.split(' ')?.[0] || user?.displayName?.split(' ')?.[0] || ''
+    if (user?.uid === 'WcDU2jmbopdAgDlMMWvD3TkqqbC3') {
+      return displayName ? `Welcome, ${displayName}` : 'Welcome, Jaylan'
+    }
+    return displayName ? `Welcome, ${displayName}` : 'Welcome to Your Gather & Savor Event Hub'
+  }
   
   useEffect(() => {
     // Focus trap setup
@@ -82,7 +92,7 @@ export function WelcomeCelebration({ onStart, onSkip, onClose }) {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
   
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#160B12]/80 px-4 py-6 backdrop-blur-md sm:px-6">
       <div
         ref={modalRef}
@@ -103,17 +113,19 @@ export function WelcomeCelebration({ onStart, onSkip, onClose }) {
         </button>
         
         <div className="relative z-10 flex flex-col items-center px-6 pb-8 pt-10 text-center sm:px-10">
-          <div className="mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-[#2B1723] shadow-lg">
-            <BrandMark light className="scale-125" />
+          <div className="mb-6 flex justify-center" aria-label="Gather & Savor Logo" role="img">
+            <div aria-hidden="true">
+              <BrandMark light={false} compact={false} />
+            </div>
           </div>
           
-          <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-[#F7DDE6] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#8A3F4B]">
+          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-[#F7DDE6] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#8A3F4B]">
             <Sparkles className="size-3.5" aria-hidden="true" />
             <span>App Officially Open</span>
           </div>
           
           <h1 id="welcome-title" className="mb-2 font-serif text-2xl font-bold text-[#2B1723] sm:text-3xl">
-            {displayName ? `Welcome, ${displayName}` : 'Welcome to Your Gather & Savor Event Hub'}
+            {getGreeting()}
           </h1>
           
           <p className="mb-6 text-[15px] leading-relaxed text-[#5F493F]">
@@ -158,6 +170,7 @@ export function WelcomeCelebration({ onStart, onSkip, onClose }) {
           }
         }
       `}</style>
-    </div>
+    </div>,
+    document.body
   )
 }

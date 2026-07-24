@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { doc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import { useAuth } from '../../auth/useAuth'
 
@@ -27,20 +27,33 @@ export function useOnboarding() {
     
     async function loadState() {
       try {
-        const docRef = doc(db, 'staffProfiles', user.uid)
+        const docRef = doc(db, 'staffProfiles', user.uid, 'preferences', 'onboarding')
         const docSnap = await getDoc(docRef)
         
-        if (docSnap.exists() && isMounted) {
+        let currentOnboarding = {
+          version: null,
+          startedAt: null,
+          completed: false,
+          completedAt: null,
+          skippedAt: null,
+          lastStep: 0,
+          replayRequestedAt: null
+        }
+
+        if (docSnap.exists()) {
           const data = docSnap.data()
-          const currentOnboarding = {
-            version: data.onboardingVersion,
-            startedAt: data.onboardingStartedAt,
-            completed: data.onboardingCompleted,
-            completedAt: data.onboardingCompletedAt,
-            skippedAt: data.onboardingSkippedAt,
-            lastStep: data.onboardingLastStep,
-            replayRequestedAt: data.onboardingReplayRequestedAt
+          currentOnboarding = {
+            version: data.version || null,
+            startedAt: data.startedAt || null,
+            completed: data.completed || false,
+            completedAt: data.completedAt || null,
+            skippedAt: data.skippedAt || null,
+            lastStep: data.lastStep || 0,
+            replayRequestedAt: data.replayRequestedAt || null
           }
+        }
+        
+        if (isMounted) {
           setState(currentOnboarding)
           
           const isCurrentVersion = currentOnboarding.version === ONBOARDING_VERSION
@@ -77,15 +90,14 @@ export function useOnboarding() {
     setShowWalkthrough(true)
     
     try {
-      const docRef = doc(db, 'staffProfiles', user.uid)
-      await updateDoc(docRef, {
-        onboardingVersion: ONBOARDING_VERSION,
-        onboardingStartedAt: serverTimestamp(),
+      const docRef = doc(db, 'staffProfiles', user.uid, 'preferences', 'onboarding')
+      await setDoc(docRef, {
+        version: ONBOARDING_VERSION,
+        startedAt: serverTimestamp(),
         updatedAt: serverTimestamp()
-      })
+      }, { merge: true })
     } catch (err) {
       console.error('[Onboarding] Error starting tour:', err)
-      // Allow them to continue despite failure
     }
   }, [user])
 
@@ -95,12 +107,12 @@ export function useOnboarding() {
     sessionStorage.setItem(`onboarding_skipped_${ONBOARDING_VERSION}`, 'true')
     
     try {
-      const docRef = doc(db, 'staffProfiles', user.uid)
-      await updateDoc(docRef, {
-        onboardingVersion: ONBOARDING_VERSION,
-        onboardingSkippedAt: serverTimestamp(),
+      const docRef = doc(db, 'staffProfiles', user.uid, 'preferences', 'onboarding')
+      await setDoc(docRef, {
+        version: ONBOARDING_VERSION,
+        skippedAt: serverTimestamp(),
         updatedAt: serverTimestamp()
-      })
+      }, { merge: true })
     } catch (err) {
       console.error('[Onboarding] Error skipping tour:', err)
     }
@@ -108,34 +120,46 @@ export function useOnboarding() {
 
   const completeTour = useCallback(async (lastStep = 13) => {
     try {
-      const docRef = doc(db, 'staffProfiles', user.uid)
-      await updateDoc(docRef, {
-        onboardingVersion: ONBOARDING_VERSION,
-        onboardingCompleted: true,
-        onboardingCompletedAt: serverTimestamp(),
-        onboardingLastStep: lastStep,
-        updatedAt: serverTimestamp()
-      })
+      const docRef = doc(db, 'staffProfiles', user.uid, 'preferences', 'onboarding')
       
-      setState(prev => ({ ...prev, completed: true, version: ONBOARDING_VERSION }))
+      const payload = {
+        version: ONBOARDING_VERSION,
+        completed: true,
+        lastStep,
+        updatedAt: serverTimestamp()
+      }
+
+      // Preserve the original completedAt value if it already exists in the state
+      if (!state?.completedAt) {
+        payload.completedAt = serverTimestamp()
+      }
+
+      await setDoc(docRef, payload, { merge: true })
+      
+      setState(prev => ({ 
+        ...prev, 
+        completed: true, 
+        version: ONBOARDING_VERSION,
+        completedAt: prev?.completedAt || new Date() // Fallback mock value for state updating
+      }))
       setShowWalkthrough(false)
       return { success: true }
     } catch (err) {
       console.error('[Onboarding] Error completing tour:', err)
       return { success: false, error: err }
     }
-  }, [user])
+  }, [user, state])
 
   const replayTour = useCallback(async () => {
     setShowWelcome(true)
     setShowWalkthrough(false)
     
     try {
-      const docRef = doc(db, 'staffProfiles', user.uid)
-      await updateDoc(docRef, {
-        onboardingReplayRequestedAt: serverTimestamp(),
+      const docRef = doc(db, 'staffProfiles', user.uid, 'preferences', 'onboarding')
+      await setDoc(docRef, {
+        replayRequestedAt: serverTimestamp(),
         updatedAt: serverTimestamp()
-      })
+      }, { merge: true })
     } catch (err) {
       console.error('[Onboarding] Error replaying tour:', err)
     }

@@ -164,10 +164,7 @@ service cloud.firestore {
         ])
         && data.keys().hasOnly([
           'uid', 'email', 'displayName', 'status', 'defaultRole',
-          'createdAt', 'updatedAt', 'createdBy', 'updatedBy',
-          'onboardingVersion', 'onboardingStartedAt', 'onboardingCompleted',
-          'onboardingCompletedAt', 'onboardingSkippedAt', 'onboardingLastStep',
-          'onboardingReplayRequestedAt'
+          'createdAt', 'updatedAt', 'createdBy', 'updatedBy'
         ])
         && data.uid == uid
         && data.uid is string
@@ -187,24 +184,22 @@ service cloud.firestore {
         && data.createdBy.size() <= 256
         && data.updatedBy is string
         && data.updatedBy.size() > 0
-        && data.updatedBy.size() <= 256
-        && (!('onboardingVersion' in data) || (data.onboardingVersion is string && data.onboardingVersion.size() <= 64))
-        && (!('onboardingStartedAt' in data) || data.onboardingStartedAt is timestamp)
-        && (!('onboardingCompleted' in data) || data.onboardingCompleted is bool)
-        && (!('onboardingCompletedAt' in data) || data.onboardingCompletedAt is timestamp)
-        && (!('onboardingSkippedAt' in data) || data.onboardingSkippedAt is timestamp)
-        && (!('onboardingLastStep' in data) || (data.onboardingLastStep is int && data.onboardingLastStep >= 0 && data.onboardingLastStep <= 100))
-        && (!('onboardingReplayRequestedAt' in data) || data.onboardingReplayRequestedAt is timestamp);
+        && data.updatedBy.size() <= 256;
     }
 
-    function onboardingFieldsUnchanged(newData, oldData) {
-      return newData.get('onboardingVersion', null) == oldData.get('onboardingVersion', null)
-        && newData.get('onboardingStartedAt', null) == oldData.get('onboardingStartedAt', null)
-        && newData.get('onboardingCompleted', null) == oldData.get('onboardingCompleted', null)
-        && newData.get('onboardingCompletedAt', null) == oldData.get('onboardingCompletedAt', null)
-        && newData.get('onboardingSkippedAt', null) == oldData.get('onboardingSkippedAt', null)
-        && newData.get('onboardingLastStep', null) == oldData.get('onboardingLastStep', null)
-        && newData.get('onboardingReplayRequestedAt', null) == oldData.get('onboardingReplayRequestedAt', null);
+    function validOnboardingData(data) {
+      return data.keys().hasOnly([
+          'version', 'startedAt', 'completed', 'completedAt', 'skippedAt',
+          'lastStep', 'replayRequestedAt', 'updatedAt'
+        ])
+        && (!('version' in data) || (data.version is string && data.version.size() <= 64))
+        && (!('startedAt' in data) || data.startedAt is timestamp)
+        && (!('completed' in data) || data.completed is bool)
+        && (!('completedAt' in data) || data.completedAt is timestamp)
+        && (!('skippedAt' in data) || data.skippedAt is timestamp)
+        && (!('lastStep' in data) || (data.lastStep is int && data.lastStep >= 1 && data.lastStep <= 13))
+        && (!('replayRequestedAt' in data) || data.replayRequestedAt is timestamp)
+        && (!('updatedAt' in data) || data.updatedAt is timestamp);
     }
 
     function validStaffAssignment(data, eventId, uid) {
@@ -1098,9 +1093,14 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.updatedAt == request.time
         && (isProtectedOwner() || request.resource.data.defaultRole == resource.data.defaultRole)
-        && (isProtectedOwner() || request.resource.data.status == resource.data.status)
-        && (request.auth.uid == uid || onboardingFieldsUnchanged(request.resource.data, resource.data));
+        && (isProtectedOwner() || request.resource.data.status == resource.data.status);
       allow delete: if isApprovedAdmin();
+    }
+
+    match /staffProfiles/{uid}/preferences/onboarding {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if isSignedIn() && request.auth.uid == uid
+        && validOnboardingData(request.resource.data);
     }
 
     // Reserved collections remain unavailable until their schemas and rules
