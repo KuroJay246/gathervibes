@@ -24,6 +24,9 @@ import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { formatEventDate } from '../utils/dateUtils'
 import { canUseSettings, canViewRoute, isApprovedAdmin } from '../utils/accessRoles'
+import { useOnboarding } from '../components/onboarding/useOnboarding'
+import { WelcomeCelebration } from '../components/onboarding/WelcomeCelebration'
+import { AppWalkthrough } from '../components/onboarding/AppWalkthrough'
 
 const navGroups = [
   {
@@ -175,8 +178,16 @@ export function AppShell() {
   const [title, subtitle] = pageTitles[location.pathname] || ['Event Hub', 'Gather & Savor Vibes']
   const adminUser = isApprovedAdmin(access)
 
+  const { showWelcome, showWalkthrough, startTour, skipTour, completeTour, closeTour } = useOnboarding()
+
   return (
     <div className="min-h-screen bg-[#FFF8F2] text-[#2B1723]">
+      {showWelcome && (
+        <WelcomeCelebration onStart={startTour} onSkip={skipTour} onClose={closeTour} />
+      )}
+      {showWalkthrough && (
+        <AppWalkthrough onComplete={completeTour} onSkip={skipTour} onClose={closeTour} />
+      )}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[258px] bg-[#2B1723] lg:block">
         <SidebarContent />
       </aside>

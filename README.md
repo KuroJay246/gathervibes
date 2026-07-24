@@ -524,3 +524,24 @@ npm run build
 ```
 
 Tests cover event validation, PWA/service worker safety, registration validation, payment status normalization, ticket status validation, ticket code generation and validation, ticket transitions, check-in duplicate blocking, check-in warnings, Import Center source definitions, CSV parsing (quoted commas, newlines, escaped quotes), XLSX row normalization, field mapping, duplicate detection helpers, stable registration ID generation, runtime health helpers, admin search helpers, and missing email/phone blocking for import.
+
+## Welcome Celebration and Walkthrough
+
+A personalized first-time welcome celebration and 13-step guided app walkthrough are implemented for the target organizer.
+
+### Experience
+- **First-time Celebration**: A modal with a celebratory confetti animation, personalized greeting, and a "Created by Jaylan Maynard" badge.
+- **Walkthrough**: A 13-step guided tour covering all major features (Overview, Events, Guests, Payments, Tickets, Check-In, Operations, Tasks, Communications, Reports, Import Center, Settings/Help).
+- **Skip for Now**: Closes the experience without marking it complete. It won't reopen in the same browser session but will reappear on the next login until finished.
+- **Completion**: Writes `onboardingCompleted: true` and the date to the user's staff profile. A final success screen provides "Plan a New Event" or "Go to Overview" links.
+- **Replay**: A "Show Welcome Tour Again" button in Settings -> Account allows target organizers to view the experience again without resetting their original completion timestamp.
+
+### State and Persistence
+- **Location**: Onboarding state is saved in `staffProfiles/{uid}`.
+- **Versioning**: Controlled by `onboardingVersion` (currently `mother-launch-v1`).
+- **Target Configuration**: Hardcoded by Firebase UIDs in `src/components/onboarding/useOnboarding.js` to ensure only the specified target organizer and the test account receive the tour. No other accounts will see it.
+- **Firestore Rules**: Organizers can update their *own* onboarding fields (`onboardingVersion`, `onboardingStartedAt`, `onboardingCompleted`, `onboardingCompletedAt`, `onboardingSkippedAt`, `onboardingLastStep`, `onboardingReplayRequestedAt`) but cannot modify their `defaultRole`, `status`, or `email`. Cross-user edits remain blocked.
+
+### Testing and Troubleshooting
+- **Safe Testing**: Test the tour with the approved developer account. Completing it on the test account does not affect the actual target organizer's profile.
+- **Troubleshooting**: If state fails to save (e.g., due to permissions), the app logs the error but does not lock the organizer out of the hub. Use the Replay button in Settings to verify rendering.

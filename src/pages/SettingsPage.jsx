@@ -7,6 +7,7 @@ import { firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
 import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeUtils'
 import { listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
 import { PROTECTED_OWNER_EMAIL } from '../config/protectedOwner'
+import { TARGET_UIDS } from '../components/onboarding/useOnboarding'
 
 const SETTINGS_TABS = [
   ['account', 'Account'],
@@ -105,6 +106,18 @@ export function SettingsPage() {
           <LogOut className="size-4" aria-hidden="true" />
           Log out
         </button>
+        {user && TARGET_UIDS.includes(user.uid) && (
+          <div className="mt-8 border-t border-[#F2E8E1] pt-6">
+            <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#8A3F4B] mb-3">Welcome Experience</p>
+            <button 
+              type="button" 
+              onClick={() => window.dispatchEvent(new CustomEvent('replay-onboarding'))} 
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] bg-white px-5 text-sm font-bold text-[#5A443B] transition hover:bg-[#FBF8F5]"
+            >
+              Show Welcome Tour Again
+            </button>
+          </div>
+        )}
       </SettingsSection>
     ),
     workspace: (

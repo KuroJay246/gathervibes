@@ -164,7 +164,10 @@ service cloud.firestore {
         ])
         && data.keys().hasOnly([
           'uid', 'email', 'displayName', 'status', 'defaultRole',
-          'createdAt', 'updatedAt', 'createdBy', 'updatedBy'
+          'createdAt', 'updatedAt', 'createdBy', 'updatedBy',
+          'onboardingVersion', 'onboardingStartedAt', 'onboardingCompleted',
+          'onboardingCompletedAt', 'onboardingSkippedAt', 'onboardingLastStep',
+          'onboardingReplayRequestedAt'
         ])
         && data.uid == uid
         && data.uid is string
@@ -184,7 +187,24 @@ service cloud.firestore {
         && data.createdBy.size() <= 256
         && data.updatedBy is string
         && data.updatedBy.size() > 0
-        && data.updatedBy.size() <= 256;
+        && data.updatedBy.size() <= 256
+        && (!('onboardingVersion' in data) || (data.onboardingVersion is string && data.onboardingVersion.size() <= 64))
+        && (!('onboardingStartedAt' in data) || data.onboardingStartedAt is timestamp)
+        && (!('onboardingCompleted' in data) || data.onboardingCompleted is bool)
+        && (!('onboardingCompletedAt' in data) || data.onboardingCompletedAt is timestamp)
+        && (!('onboardingSkippedAt' in data) || data.onboardingSkippedAt is timestamp)
+        && (!('onboardingLastStep' in data) || (data.onboardingLastStep is int && data.onboardingLastStep >= 0 && data.onboardingLastStep <= 100))
+        && (!('onboardingReplayRequestedAt' in data) || data.onboardingReplayRequestedAt is timestamp);
+    }
+
+    function onboardingFieldsUnchanged(newData, oldData) {
+      return newData.get('onboardingVersion', null) == oldData.get('onboardingVersion', null)
+        && newData.get('onboardingStartedAt', null) == oldData.get('onboardingStartedAt', null)
+        && newData.get('onboardingCompleted', null) == oldData.get('onboardingCompleted', null)
+        && newData.get('onboardingCompletedAt', null) == oldData.get('onboardingCompletedAt', null)
+        && newData.get('onboardingSkippedAt', null) == oldData.get('onboardingSkippedAt', null)
+        && newData.get('onboardingLastStep', null) == oldData.get('onboardingLastStep', null)
+        && newData.get('onboardingReplayRequestedAt', null) == oldData.get('onboardingReplayRequestedAt', null);
     }
 
     function validStaffAssignment(data, eventId, uid) {
@@ -1076,7 +1096,10 @@ service cloud.firestore {
         && validStaffProfile(request.resource.data, uid)
         && request.resource.data.uid == resource.data.uid
         && request.resource.data.createdAt == resource.data.createdAt
-        && request.resource.data.updatedAt == request.time;
+        && request.resource.data.updatedAt == request.time
+        && (isProtectedOwner() || request.resource.data.defaultRole == resource.data.defaultRole)
+        && (isProtectedOwner() || request.resource.data.status == resource.data.status)
+        && (request.auth.uid == uid || onboardingFieldsUnchanged(request.resource.data, resource.data));
       allow delete: if isApprovedAdmin();
     }
 
