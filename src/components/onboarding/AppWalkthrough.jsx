@@ -41,8 +41,8 @@ const ROUTE_HEADER_TITLES = {
 
 const NAV_TIMEOUT_MS = 5000
 
-export function AppWalkthrough({ onComplete, onSkip, onClose }) {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0)
+export function AppWalkthrough({ initialStep = 0, onComplete, onSkip, onClose }) {
+  const [currentStepIndex, setCurrentStepIndex] = useState(initialStep)
   const [errorMsg, setErrorMsg] = useState('')
   const [navPending, setNavPending] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -76,7 +76,7 @@ export function AppWalkthrough({ onComplete, onSkip, onClose }) {
     if (!navPending) firstElement?.focus()
 
     function handleKeyDown(e) {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') onClose(currentStepIndex)
       if (e.key === 'Tab') {
         if (e.shiftKey) {
           if (document.activeElement === firstElement) {
@@ -242,8 +242,11 @@ export function AppWalkthrough({ onComplete, onSkip, onClose }) {
             Your Gather &amp; Savor Event Hub is ready. Select an action below to get started.
           </p>
 
-          <p className="mb-6 text-xs font-medium text-[#8A3F4B] uppercase tracking-wider">
+          <p className="mb-2 text-xs font-medium text-[#8A3F4B] uppercase tracking-wider">
             Created by Jaylan Maynard
+          </p>
+          <p className="mb-6 text-xs text-[#5F493F]">
+            Need help using the app? Contact Jaylan Maynard.
           </p>
 
           {errorMsg && (
@@ -294,7 +297,7 @@ export function AppWalkthrough({ onComplete, onSkip, onClose }) {
         type="button"
         aria-label="Close tour"
         className="absolute inset-0 cursor-default"
-        onClick={onClose}
+        onClick={() => onClose(currentStepIndex)}
         tabIndex={-1}
       />
 
@@ -330,7 +333,7 @@ export function AppWalkthrough({ onComplete, onSkip, onClose }) {
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => onClose(currentStepIndex)}
             className="rounded-full p-2 text-[#5F493F] transition hover:bg-[#FFF8F2] hover:text-[#2B1723] focus:outline-none focus:ring-2 focus:ring-[#8A3F4B]"
             aria-label="Close tour"
           >
@@ -372,7 +375,7 @@ export function AppWalkthrough({ onComplete, onSkip, onClose }) {
         <div className="flex items-center justify-between border-t border-[#EEDDD3] bg-[#FFF8F2] px-5 py-4 rounded-b-2xl">
           <button
             type="button"
-            onClick={onSkip}
+            onClick={() => onSkip(currentStepIndex)}
             className="text-sm font-semibold text-[#5F493F] hover:text-[#2B1723] focus:outline-none focus:ring-2 focus:ring-[#8A3F4B] rounded-lg px-2 py-1"
           >
             Skip Tour

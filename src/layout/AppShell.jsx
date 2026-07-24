@@ -178,7 +178,7 @@ export function AppShell() {
   const [title, subtitle] = pageTitles[location.pathname] || ['Event Hub', 'Gather & Savor Vibes']
   const adminUser = isApprovedAdmin(access)
 
-  const { showWelcome, showWalkthrough, startTour, skipTour, completeTour, closeTour } = useOnboarding()
+  const { showWelcome, showWalkthrough, showSuccess, state, startTour, skipTour, completeTour, closeTour } = useOnboarding()
 
   return (
     <div className="min-h-screen bg-[#FFF8F2] text-[#2B1723]">
@@ -186,7 +186,18 @@ export function AppShell() {
         <WelcomeCelebration onStart={startTour} onSkip={skipTour} onClose={closeTour} />
       )}
       {showWalkthrough && (
-        <AppWalkthrough onComplete={completeTour} onSkip={skipTour} onClose={closeTour} />
+        <AppWalkthrough initialStep={state?.lastStep || 0} onComplete={completeTour} onSkip={skipTour} onClose={closeTour} />
+      )}
+      {showSuccess && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#160B12]/80 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-2xl p-6 text-center shadow-2xl max-w-sm w-full animate-in fade-in zoom-in duration-300">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#F7DDE6] mb-4">
+              <span className="text-xl">✨</span>
+            </div>
+            <h2 className="text-xl font-serif font-bold text-[#2B1723] mb-2">Welcome aboard, Anica.</h2>
+            <p className="text-[#5F493F]">Your Event Hub is ready.</p>
+          </div>
+        </div>
       )}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[258px] bg-[#2B1723] lg:block">
         <SidebarContent />

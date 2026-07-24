@@ -12,6 +12,7 @@ export function useOnboarding() {
   const [error, setError] = useState(null)
   const [showWelcome, setShowWelcome] = useState(false)
   const [showWalkthrough, setShowWalkthrough] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
   const [state, setState] = useState(null)
   
   const isTargetUser = user && TARGET_UIDS.includes(user.uid)
@@ -60,7 +61,7 @@ export function useOnboarding() {
           const isCompleted = currentOnboarding.completed === true
           
           const sessionSkipped = sessionStorage.getItem(`onboarding_skipped_${ONBOARDING_VERSION}`)
-          const needsWelcome = !isCurrentVersion || (!isCompleted && !sessionSkipped)
+          const needsWelcome = !isCompleted && (!isCurrentVersion || !sessionSkipped)
           
           if (needsWelcome) {
             setShowWelcome(true)
@@ -101,7 +102,7 @@ export function useOnboarding() {
     }
   }, [user])
 
-  const skipTour = useCallback(async () => {
+  const skipTour = useCallback(async (lastStep = 0) => {
     setShowWelcome(false)
     setShowWalkthrough(false)
     sessionStorage.setItem(`onboarding_skipped_${ONBOARDING_VERSION}`, 'true')
@@ -111,6 +112,7 @@ export function useOnboarding() {
       await setDoc(docRef, {
         version: ONBOARDING_VERSION,
         skippedAt: serverTimestamp(),
+        lastStep,
         updatedAt: serverTimestamp()
       }, { merge: true })
     } catch (err) {
@@ -143,6 +145,8 @@ export function useOnboarding() {
         completedAt: prev?.completedAt || new Date() // Fallback mock value for state updating
       }))
       setShowWalkthrough(false)
+      setShowSuccess(true)
+      setTimeout(() => setShowSuccess(false), 5000)
       return { success: true }
     } catch (err) {
       console.error('[Onboarding] Error completing tour:', err)
@@ -184,6 +188,8 @@ export function useOnboarding() {
     replayTour,
     closeTour: skipTour,
     setShowWelcome,
-    setShowWalkthrough
+    setShowWalkthrough,
+    showSuccess,
+    setShowSuccess
   }
 }
