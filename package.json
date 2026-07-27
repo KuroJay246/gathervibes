@@ -34,14 +34,14 @@
     "firebase:deploy-all": "npx firebase-tools deploy --only firestore:rules,firestore:indexes,hosting --project gathervibeshub"
   },
   "dependencies": {
-    "@sentry/react": "^10.67.0",
+    "@sentry/react": "^10.68.0",
     "firebase": "^12.6.0",
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.468.0",
     "qrcode": "^1.5.4",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.6",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.1",
     "read-excel-file": "^9.2.0"
   },
   "devDependencies": {
