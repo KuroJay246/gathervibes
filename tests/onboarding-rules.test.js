@@ -14,7 +14,7 @@
  *   - correct type validation
  *   - read isolation
  */
-import test from 'node:test'
+import { before, test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import {
@@ -33,6 +33,37 @@ const JAYLAN_UID = 'WcDU2jmbopdAgDlMMWvD3TkqqbC3'
 const ANICA_UID = 'WM2UOQtSeuOglCI5uMZQKrYYqP53'
 const OTHER_UID = 'some-other-user-uid-123'
 const emulatorHost = process.env.FIRESTORE_EMULATOR_HOST
+let emulatorAvailable = false
+
+async function isFirestoreEmulatorAvailable() {
+  const [host, port] = (emulatorHost || '127.0.0.1:8080').split(':')
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 750)
+
+  try {
+    const response = await fetch(`http://${host}:${port}`, { signal: controller.signal })
+    return response.status < 500
+  } catch {
+    return false
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+before(async () => {
+  emulatorAvailable = await isFirestoreEmulatorAvailable()
+})
+
+function rulesTest(name, fn) {
+  test(name, async (t) => {
+    if (!emulatorAvailable) {
+      t.skip('Firestore emulator is not running')
+      return
+    }
+
+    await fn(t)
+  })
+}
 
 async function createTestEnv() {
   return initializeTestEnvironment({
@@ -61,7 +92,7 @@ function validOnboarding(overrides = {}) {
 
 // ── Create (document does not exist) ────────────────────────────────────────
 
-test('[onboarding-rules] Jaylan can create their own onboarding document (new user)', async () => {
+rulesTest('[onboarding-rules] Jaylan can create their own onboarding document (new user)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -71,7 +102,7 @@ test('[onboarding-rules] Jaylan can create their own onboarding document (new us
   }
 })
 
-test('[onboarding-rules] Jaylan can create with all optional onboarding fields', async () => {
+rulesTest('[onboarding-rules] Jaylan can create with all optional onboarding fields', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -95,7 +126,7 @@ test('[onboarding-rules] Jaylan can create with all optional onboarding fields',
 
 // ── Update / merge (document already exists) ────────────────────────────────
 
-test('[onboarding-rules] Jaylan can merge-update their existing onboarding document', async () => {
+rulesTest('[onboarding-rules] Jaylan can merge-update their existing onboarding document', async () => {
   const testEnv = await createTestEnv()
   try {
     await testEnv.withSecurityRulesDisabled(async (env) => {
@@ -116,7 +147,7 @@ test('[onboarding-rules] Jaylan can merge-update their existing onboarding docum
 
 // ── Anica create ─────────────────────────────────────────────────────────────
 
-test('[onboarding-rules] Anica can create her own onboarding document', async () => {
+rulesTest('[onboarding-rules] Anica can create her own onboarding document', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(ANICA_UID)
@@ -128,7 +159,7 @@ test('[onboarding-rules] Anica can create her own onboarding document', async ()
 
 // ── Cross-user write denial ───────────────────────────────────────────────────
 
-test('[onboarding-rules] Jaylan cannot write to Anica onboarding document', async () => {
+rulesTest('[onboarding-rules] Jaylan cannot write to Anica onboarding document', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -138,7 +169,7 @@ test('[onboarding-rules] Jaylan cannot write to Anica onboarding document', asyn
   }
 })
 
-test('[onboarding-rules] Anica cannot write to Jaylan onboarding document', async () => {
+rulesTest('[onboarding-rules] Anica cannot write to Jaylan onboarding document', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(ANICA_UID)
@@ -148,7 +179,7 @@ test('[onboarding-rules] Anica cannot write to Jaylan onboarding document', asyn
   }
 })
 
-test('[onboarding-rules] Third-party user cannot write to Jaylan onboarding document', async () => {
+rulesTest('[onboarding-rules] Third-party user cannot write to Jaylan onboarding document', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(OTHER_UID)
@@ -160,7 +191,7 @@ test('[onboarding-rules] Third-party user cannot write to Jaylan onboarding docu
 
 // ── Extra field denial ────────────────────────────────────────────────────────
 
-test('[onboarding-rules] Rejects write with unauthorized field "role"', async () => {
+rulesTest('[onboarding-rules] Rejects write with unauthorized field "role"', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -170,7 +201,7 @@ test('[onboarding-rules] Rejects write with unauthorized field "role"', async ()
   }
 })
 
-test('[onboarding-rules] Rejects write with unauthorized field "status"', async () => {
+rulesTest('[onboarding-rules] Rejects write with unauthorized field "status"', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -180,7 +211,7 @@ test('[onboarding-rules] Rejects write with unauthorized field "status"', async 
   }
 })
 
-test('[onboarding-rules] Rejects write with unauthorized field "email"', async () => {
+rulesTest('[onboarding-rules] Rejects write with unauthorized field "email"', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -190,7 +221,7 @@ test('[onboarding-rules] Rejects write with unauthorized field "email"', async (
   }
 })
 
-test('[onboarding-rules] Rejects write with arbitrary extra field "adminOverride"', async () => {
+rulesTest('[onboarding-rules] Rejects write with arbitrary extra field "adminOverride"', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -202,7 +233,7 @@ test('[onboarding-rules] Rejects write with arbitrary extra field "adminOverride
 
 // ── Field type validation ─────────────────────────────────────────────────────
 
-test('[onboarding-rules] Rejects lastStep below minimum (0)', async () => {
+rulesTest('[onboarding-rules] Rejects lastStep below minimum (0)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -212,7 +243,7 @@ test('[onboarding-rules] Rejects lastStep below minimum (0)', async () => {
   }
 })
 
-test('[onboarding-rules] Rejects lastStep above maximum (14)', async () => {
+rulesTest('[onboarding-rules] Rejects lastStep above maximum (14)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -222,7 +253,7 @@ test('[onboarding-rules] Rejects lastStep above maximum (14)', async () => {
   }
 })
 
-test('[onboarding-rules] Accepts lastStep at minimum boundary (1)', async () => {
+rulesTest('[onboarding-rules] Accepts lastStep at minimum boundary (1)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -232,7 +263,7 @@ test('[onboarding-rules] Accepts lastStep at minimum boundary (1)', async () => 
   }
 })
 
-test('[onboarding-rules] Accepts lastStep at maximum boundary (13)', async () => {
+rulesTest('[onboarding-rules] Accepts lastStep at maximum boundary (13)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -242,7 +273,7 @@ test('[onboarding-rules] Accepts lastStep at maximum boundary (13)', async () =>
   }
 })
 
-test('[onboarding-rules] Rejects non-boolean "completed" value', async () => {
+rulesTest('[onboarding-rules] Rejects non-boolean "completed" value', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -252,7 +283,7 @@ test('[onboarding-rules] Rejects non-boolean "completed" value', async () => {
   }
 })
 
-test('[onboarding-rules] Rejects version string longer than 64 characters', async () => {
+rulesTest('[onboarding-rules] Rejects version string longer than 64 characters', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -264,7 +295,7 @@ test('[onboarding-rules] Rejects version string longer than 64 characters', asyn
 
 // ── Read isolation ────────────────────────────────────────────────────────────
 
-test('[onboarding-rules] Jaylan can read their own onboarding document', async () => {
+rulesTest('[onboarding-rules] Jaylan can read their own onboarding document', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -274,7 +305,7 @@ test('[onboarding-rules] Jaylan can read their own onboarding document', async (
   }
 })
 
-test('[onboarding-rules] Jaylan cannot read Anica onboarding document', async () => {
+rulesTest('[onboarding-rules] Jaylan cannot read Anica onboarding document', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
@@ -284,7 +315,7 @@ test('[onboarding-rules] Jaylan cannot read Anica onboarding document', async ()
   }
 })
 
-test('[onboarding-rules] Unauthenticated user cannot read onboarding document', async () => {
+rulesTest('[onboarding-rules] Unauthenticated user cannot read onboarding document', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.unauthenticatedContext()
