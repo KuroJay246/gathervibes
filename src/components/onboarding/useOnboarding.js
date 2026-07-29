@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import { useAuth } from '../../auth/useAuth'
@@ -14,16 +14,27 @@ export function useOnboarding() {
   const [showWalkthrough, setShowWalkthrough] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [state, setState] = useState(null)
+  const successTimerRef = useRef(null)
   
   const isTargetUser = user && TARGET_UIDS.includes(user.uid)
 
   useEffect(() => {
+    return () => {
+      if (successTimerRef.current) window.clearTimeout(successTimerRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
     let isMounted = true
+    let loadingTimerId = null
     if (!isTargetUser || !user) {
-      setTimeout(() => {
+      loadingTimerId = window.setTimeout(() => {
         if (isMounted) setLoading(false)
       }, 0)
-      return
+      return () => {
+        isMounted = false
+        window.clearTimeout(loadingTimerId)
+      }
     }
     
     async function loadState() {
@@ -146,7 +157,11 @@ export function useOnboarding() {
       }))
       setShowWalkthrough(false)
       setShowSuccess(true)
-      setTimeout(() => setShowSuccess(false), 5000)
+      if (successTimerRef.current) window.clearTimeout(successTimerRef.current)
+      successTimerRef.current = window.setTimeout(() => {
+        setShowSuccess(false)
+        successTimerRef.current = null
+      }, 5000)
       return { success: true }
     } catch (err) {
       console.error('[Onboarding] Error completing tour:', err)
