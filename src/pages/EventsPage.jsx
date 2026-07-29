@@ -12,7 +12,7 @@ import {
   UsersRound,
   X,
 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { useAuth } from '../auth/useAuth'
 import { DeleteEventDialog } from '../components/events/DeleteEventDialog'
 import { EventPlanningWorkspace } from '../components/events/EventPlanningWorkspace'

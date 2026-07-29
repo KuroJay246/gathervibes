@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router'
 import { X, ChevronRight, ChevronLeft, Map, RefreshCw } from 'lucide-react'
 import { walkthroughSteps } from './onboardingSteps'
 import { useActiveEvent } from '../../events/useActiveEvent'
