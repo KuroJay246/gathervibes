@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, Sparkles } from 'lucide-react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router'
 import { BrandMark } from '../components/BrandMark'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { useAuth } from '../auth/useAuth'

@@ -11,7 +11,7 @@ import {
   Users,
   X,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { useAuth } from '../auth/useAuth'
 import { subscribeToEvents } from '../services/eventService'

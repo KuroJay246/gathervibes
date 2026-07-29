@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { LoadingScreen } from './components/LoadingScreen'
 import { AssignedEventGate } from './components/AssignedEventGate'

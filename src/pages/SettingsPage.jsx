@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { Check, Copy, LogOut } from 'lucide-react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { AlertTriangle, Copy, Edit3, Plus, Printer, ReceiptText, Save, Search, X } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { PartnerCommitmentsPanel } from '../components/operations/PartnerCommitmentsPanel'

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { CheckCircle2, RotateCcw } from 'lucide-react'
 
 export function ImportSummary({ result, onReset }) {

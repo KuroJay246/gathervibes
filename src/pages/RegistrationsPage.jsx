@@ -20,7 +20,7 @@ import { DeleteRegistrationDialog } from '../components/registrations/DeleteRegi
 import { ExportModal } from '../components/registrations/ExportModal'
 import { RegistrationFilters } from '../components/registrations/RegistrationFilters'
 import { InfoHint } from '../components/ui/InfoHint'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router'
 import { buildRegistrationMetrics, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
 import { formatPaymentLabel, paymentStatusMatches } from '../utils/paymentStatus'
 import {
