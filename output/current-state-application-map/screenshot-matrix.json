@@ -1,0 +1,1677 @@
+{
+  "generatedAt": "2026-07-29T21:19:57.879Z",
+  "captureMode": "stable visible viewport",
+  "selectedEvent": "CODEX_TEST Live Verification Event",
+  "records": [
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/dashboard",
+      "file": "screenshots/desktop-1440x900__dashboard.png",
+      "title": "Overview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 1423
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/events",
+      "file": "screenshots/desktop-1440x900__events.png",
+      "title": "Events",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 4151
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/registrations",
+      "file": "screenshots/desktop-1440x900__registrations.png",
+      "title": "Guests & Registrations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 2116
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/payments",
+      "file": "screenshots/desktop-1440x900__payments.png",
+      "title": "Payments",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 1532
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/payments/reconciliation",
+      "file": "screenshots/desktop-1440x900__payments-reconciliation.png",
+      "title": "Reconciliation Preview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "scrollHeight": 900
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/imports",
+      "file": "screenshots/desktop-1440x900__imports.png",
+      "title": "Import Center",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 4062
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/tickets",
+      "file": "screenshots/desktop-1440x900__tickets.png",
+      "title": "Tickets",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 1634
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/check-in",
+      "file": "screenshots/desktop-1440x900__check-in.png",
+      "title": "Check-In",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 1463
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/scanner",
+      "file": "screenshots/desktop-1440x900__scanner.png",
+      "title": "Guest ticket",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 1103
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/operations",
+      "file": "screenshots/desktop-1440x900__operations.png",
+      "title": "Operations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 1963
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/communications",
+      "file": "screenshots/desktop-1440x900__message-builder.png",
+      "title": "Message Builder",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 1705
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/event-review",
+      "file": "screenshots/desktop-1440x900__reports.png",
+      "title": "Reports",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 2946
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/settings",
+      "file": "screenshots/desktop-1440x900__settings.png",
+      "title": "Settings",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "scrollHeight": 900
+      }
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/qa",
+      "file": "screenshots/desktop-1440x900__system-qa.png",
+      "title": "System QA",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "scrollHeight": 2138
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/dashboard",
+      "file": "screenshots/desktop-1280x720__dashboard.png",
+      "title": "Overview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 1411
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/events",
+      "file": "screenshots/desktop-1280x720__events.png",
+      "title": "Events",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 4241
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/registrations",
+      "file": "screenshots/desktop-1280x720__registrations.png",
+      "title": "Guests & Registrations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 2116
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/payments",
+      "file": "screenshots/desktop-1280x720__payments.png",
+      "title": "Payments",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 1636
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/payments/reconciliation",
+      "file": "screenshots/desktop-1280x720__payments-reconciliation.png",
+      "title": "Reconciliation Preview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 863
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/imports",
+      "file": "screenshots/desktop-1280x720__imports.png",
+      "title": "Import Center",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 4310
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/tickets",
+      "file": "screenshots/desktop-1280x720__tickets.png",
+      "title": "Tickets",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 1654
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/check-in",
+      "file": "screenshots/desktop-1280x720__check-in.png",
+      "title": "Check-In",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 1483
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/scanner",
+      "file": "screenshots/desktop-1280x720__scanner.png",
+      "title": "Guest ticket",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 1103
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/operations",
+      "file": "screenshots/desktop-1280x720__operations.png",
+      "title": "Operations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 2112
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/communications",
+      "file": "screenshots/desktop-1280x720__message-builder.png",
+      "title": "Message Builder",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 1797
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/event-review",
+      "file": "screenshots/desktop-1280x720__reports.png",
+      "title": "Reports",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 3050
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/settings",
+      "file": "screenshots/desktop-1280x720__settings.png",
+      "title": "Settings",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 852
+      }
+    },
+    {
+      "viewport": "desktop-1280x720",
+      "route": "/qa",
+      "file": "screenshots/desktop-1280x720__system-qa.png",
+      "title": "System QA",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 1265,
+        "clientWidth": 1265,
+        "scrollHeight": 2202
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/dashboard",
+      "file": "screenshots/tablet-834x1112__dashboard.png",
+      "title": "Overview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 2032
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/events",
+      "file": "screenshots/tablet-834x1112__events.png",
+      "title": "Events",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 5771
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/registrations",
+      "file": "screenshots/tablet-834x1112__registrations.png",
+      "title": "Guests & Registrations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 3318
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/payments",
+      "file": "screenshots/tablet-834x1112__payments.png",
+      "title": "Payments",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 1851
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/payments/reconciliation",
+      "file": "screenshots/tablet-834x1112__payments-reconciliation.png",
+      "title": "Reconciliation Preview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 1155
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/imports",
+      "file": "screenshots/tablet-834x1112__imports.png",
+      "title": "Import Center",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 6125
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/tickets",
+      "file": "screenshots/tablet-834x1112__tickets.png",
+      "title": "Tickets",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 2706
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/check-in",
+      "file": "screenshots/tablet-834x1112__check-in.png",
+      "title": "Check-In",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 2170
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/scanner",
+      "file": "screenshots/tablet-834x1112__scanner.png",
+      "title": "Guest ticket",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 1438
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/operations",
+      "file": "screenshots/tablet-834x1112__operations.png",
+      "title": "Operations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 3159
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/communications",
+      "file": "screenshots/tablet-834x1112__message-builder.png",
+      "title": "Message Builder",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 2910
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/event-review",
+      "file": "screenshots/tablet-834x1112__reports.png",
+      "title": "Reports",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 3965
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/settings",
+      "file": "screenshots/tablet-834x1112__settings.png",
+      "title": "Settings",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 834,
+        "clientWidth": 834,
+        "scrollHeight": 1112
+      }
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/qa",
+      "file": "screenshots/tablet-834x1112__system-qa.png",
+      "title": "System QA",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 819,
+        "clientWidth": 819,
+        "scrollHeight": 2358
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/dashboard",
+      "file": "screenshots/tablet-768x1024__dashboard.png",
+      "title": "Overview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 2153
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/events",
+      "file": "screenshots/tablet-768x1024__events.png",
+      "title": "Events",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 5811
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/registrations",
+      "file": "screenshots/tablet-768x1024__registrations.png",
+      "title": "Guests & Registrations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 3338
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/payments",
+      "file": "screenshots/tablet-768x1024__payments.png",
+      "title": "Payments",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 1858
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/payments/reconciliation",
+      "file": "screenshots/tablet-768x1024__payments-reconciliation.png",
+      "title": "Reconciliation Preview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 1187
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/imports",
+      "file": "screenshots/tablet-768x1024__imports.png",
+      "title": "Import Center",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 6157
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/tickets",
+      "file": "screenshots/tablet-768x1024__tickets.png",
+      "title": "Tickets",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 2726
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/check-in",
+      "file": "screenshots/tablet-768x1024__check-in.png",
+      "title": "Check-In",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 2255
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/scanner",
+      "file": "screenshots/tablet-768x1024__scanner.png",
+      "title": "Guest ticket",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 1438
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/operations",
+      "file": "screenshots/tablet-768x1024__operations.png",
+      "title": "Operations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 3165
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/communications",
+      "file": "screenshots/tablet-768x1024__message-builder.png",
+      "title": "Message Builder",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 2968
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/event-review",
+      "file": "screenshots/tablet-768x1024__reports.png",
+      "title": "Reports",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 4009
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/settings",
+      "file": "screenshots/tablet-768x1024__settings.png",
+      "title": "Settings",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 768,
+        "clientWidth": 768,
+        "scrollHeight": 1024
+      }
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "route": "/qa",
+      "file": "screenshots/tablet-768x1024__system-qa.png",
+      "title": "System QA",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "scrollHeight": 2418
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/dashboard",
+      "file": "screenshots/mobile-430x932__dashboard.png",
+      "title": "Overview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 2356
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/events",
+      "file": "screenshots/mobile-430x932__events.png",
+      "title": "Events",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 8185
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/registrations",
+      "file": "screenshots/mobile-430x932__registrations.png",
+      "title": "Guests & Registrations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 4317
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/payments",
+      "file": "screenshots/mobile-430x932__payments.png",
+      "title": "Payments",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 2466
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/payments/reconciliation",
+      "file": "screenshots/mobile-430x932__payments-reconciliation.png",
+      "title": "Reconciliation Preview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 1442
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/imports",
+      "file": "screenshots/mobile-430x932__imports.png",
+      "title": "Import Center",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 7566
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/tickets",
+      "file": "screenshots/mobile-430x932__tickets.png",
+      "title": "Tickets",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 3282
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/check-in",
+      "file": "screenshots/mobile-430x932__check-in.png",
+      "title": "Check-In",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 2598
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/scanner",
+      "file": "screenshots/mobile-430x932__scanner.png",
+      "title": "Guest ticket",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 1866
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/operations",
+      "file": "screenshots/mobile-430x932__operations.png",
+      "title": "Operations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 4658
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/communications",
+      "file": "screenshots/mobile-430x932__message-builder.png",
+      "title": "Message Builder",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 3321
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/event-review",
+      "file": "screenshots/mobile-430x932__reports.png",
+      "title": "Reports",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 6005
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/settings",
+      "file": "screenshots/mobile-430x932__settings.png",
+      "title": "Settings",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 1021
+      }
+    },
+    {
+      "viewport": "mobile-430x932",
+      "route": "/qa",
+      "file": "screenshots/mobile-430x932__system-qa.png",
+      "title": "System QA",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "scrollHeight": 3078
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/dashboard",
+      "file": "screenshots/mobile-390x844__dashboard.png",
+      "title": "Overview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 2606
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/events",
+      "file": "screenshots/mobile-390x844__events.png",
+      "title": "Events",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 8285
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/registrations",
+      "file": "screenshots/mobile-390x844__registrations.png",
+      "title": "Guests & Registrations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 4828
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/payments",
+      "file": "screenshots/mobile-390x844__payments.png",
+      "title": "Payments",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 2735
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/payments/reconciliation",
+      "file": "screenshots/mobile-390x844__payments-reconciliation.png",
+      "title": "Reconciliation Preview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 1510
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/imports",
+      "file": "screenshots/mobile-390x844__imports.png",
+      "title": "Import Center",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 7970
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/tickets",
+      "file": "screenshots/mobile-390x844__tickets.png",
+      "title": "Tickets",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 3282
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/check-in",
+      "file": "screenshots/mobile-390x844__check-in.png",
+      "title": "Check-In",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 2801
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/scanner",
+      "file": "screenshots/mobile-390x844__scanner.png",
+      "title": "Guest ticket",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 1930
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/operations",
+      "file": "screenshots/mobile-390x844__operations.png",
+      "title": "Operations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 5117
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/communications",
+      "file": "screenshots/mobile-390x844__message-builder.png",
+      "title": "Message Builder",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 3494
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/event-review",
+      "file": "screenshots/mobile-390x844__reports.png",
+      "title": "Reports",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 6190
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/settings",
+      "file": "screenshots/mobile-390x844__settings.png",
+      "title": "Settings",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 1021
+      }
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/qa",
+      "file": "screenshots/mobile-390x844__system-qa.png",
+      "title": "System QA",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "scrollHeight": 3298
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/dashboard",
+      "file": "screenshots/mobile-360x800__dashboard.png",
+      "title": "Overview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 2698
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/events",
+      "file": "screenshots/mobile-360x800__events.png",
+      "title": "Events",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 8369
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/registrations",
+      "file": "screenshots/mobile-360x800__registrations.png",
+      "title": "Guests & Registrations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 4904
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/payments",
+      "file": "screenshots/mobile-360x800__payments.png",
+      "title": "Payments",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 2810
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/payments/reconciliation",
+      "file": "screenshots/mobile-360x800__payments-reconciliation.png",
+      "title": "Reconciliation Preview",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 1558
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/imports",
+      "file": "screenshots/mobile-360x800__imports.png",
+      "title": "Import Center",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 8446
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/tickets",
+      "file": "screenshots/mobile-360x800__tickets.png",
+      "title": "Tickets",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 3282
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/check-in",
+      "file": "screenshots/mobile-360x800__check-in.png",
+      "title": "Check-In",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 2877
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/scanner",
+      "file": "screenshots/mobile-360x800__scanner.png",
+      "title": "Guest ticket",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 1950
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/operations",
+      "file": "screenshots/mobile-360x800__operations.png",
+      "title": "Operations",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 5290
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/communications",
+      "file": "screenshots/mobile-360x800__message-builder.png",
+      "title": "Message Builder",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 3548
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/event-review",
+      "file": "screenshots/mobile-360x800__reports.png",
+      "title": "Reports",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 6376
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/settings",
+      "file": "screenshots/mobile-360x800__settings.png",
+      "title": "Settings",
+      "selectedEventVisible": true,
+      "cpbTextVisible": false,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 1045
+      }
+    },
+    {
+      "viewport": "mobile-360x800",
+      "route": "/qa",
+      "file": "screenshots/mobile-360x800__system-qa.png",
+      "title": "System QA",
+      "selectedEventVisible": true,
+      "cpbTextVisible": true,
+      "loginVisible": false,
+      "appError": false,
+      "loadingCaptured": false,
+      "horizontalOverflow": false,
+      "dimensions": {
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "scrollHeight": 3478
+      }
+    }
+  ],
+  "consoleSummary": {
+    "classification": "Chrome extension/browser messaging noise observed; no app error boundary or route-blocking console error found in visual matrix",
+    "knownNoise": "A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received"
+  }
+}

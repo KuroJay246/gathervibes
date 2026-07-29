@@ -2,7 +2,7 @@
 
 Date: 2026-07-29
 Branch: `codex/full-current-state-application-map`
-Base commit inspected: `a89e60b88068c350ebbf63735754e24577a40b58`
+Base commit inspected: `f61cb96d466975ca902e417025a1deff0445393c`
 
 ## Purpose
 
@@ -12,7 +12,7 @@ This register captures known product, data, wording, and workflow discrepancies 
 
 | ID | Area | Current state | Risk | Recommended next action |
 | --- | --- | --- | --- | --- |
-| D-001 | Git alignment | Local `main` is `a89e60b`; `origin/main` is `545e10f`. | Remote GitHub does not contain the local manual Daily QA workflow change. | Resolve push permission or decide whether to re-create the workflow change in a PR using a token with workflow scope. |
+| D-001 | Git alignment | Local `main` and `origin/main` both point to `f61cb96`. | No current release-alignment blocker. The older Daily QA workflow-only local commit is preserved only on a backup branch, not on this documentation branch. | Keep future release and documentation branches based on updated `main`. |
 | D-002 | Onboarding | Current `main` uses welcome modal plus route walkthrough. It is not the full interactive spotlight tutorial. | Organizer may still feel guided by a development tour rather than a polished training layer. | Continue the tutorial phase separately after this docs-only map. |
 | D-003 | Onboarding copy | `AppShell` success modal hardcodes `Welcome aboard, Anica.` | Wrong or awkward for other approved organizers. | Replace with user-aware display name in the tutorial/code-fix branch, not this audit branch. |
 | D-004 | Mobile navigation | Check-In can be rendered twice for roles that can view `/check-in` but cannot view `/dashboard`. | Scanner-like or narrow-role mobile users may see duplicate primary actions. | Add a focused navigation test and dedupe logic in a code-fix branch. |

@@ -3,7 +3,7 @@
 Date: 2026-07-29
 Repository: `C:\Users\Jaylan\Documents\gathetr`
 Branch: `codex/full-current-state-application-map`
-Base commit inspected: `a89e60b88068c350ebbf63735754e24577a40b58`
+Base commit inspected: `f61cb96d466975ca902e417025a1deff0445393c`
 Firebase project: `gathervibeshub`
 Production URL: `https://gathervibeshub.web.app`
 Canonical local URL: `http://localhost:4173`
@@ -16,13 +16,13 @@ No app behavior files were changed for this artifact. No Firestore rules, indexe
 
 ## Git Position
 
-Current local `main` is not identical to `origin/main`.
+Current local `main` is aligned with `origin/main`.
 
-- Local `main`: `a89e60b88068c350ebbf63735754e24577a40b58`
-- `origin/main`: `545e10f9497dbd0abb0866be9db763ce0eca56c0`
-- Local-only commit on `main`: `a89e60b Run Daily QA locally instead of scheduled GitHub Actions`
+- Local `main`: `f61cb96d466975ca902e417025a1deff0445393c`
+- `origin/main`: `f61cb96d466975ca902e417025a1deff0445393c`
+- Release merge: `f61cb96 Release dependency security and stability fixes`
 
-This branch was created from local `main`, so it includes that local-only workflow-history commit. The workflow change is not pushed to GitHub because previous push authority did not include workflow scope. This audit does not rewrite or force-push history.
+This documentation branch was rebuilt from the updated `main` release line and contains documentation/evidence only. It does not include the older local-only Daily QA workflow-history commit.
 
 ## Product Summary
 
@@ -108,7 +108,6 @@ There is no active cron schedule in `.github/workflows/daily-qa.yml`. The matchi
 
 ## Current Product Risks And Friction
 
-- Local `main` and `origin/main` are not aligned, so release planning should not assume the remote contains the local Daily QA workflow update.
 - Current onboarding on `main` remains modal-route-walkthrough based and includes hardcoded Anica success copy. The richer tutorial branch exists separately but is not merged here.
 - Mobile bottom navigation can duplicate Check-In for a role that can view `/check-in` but cannot view `/dashboard`, because Check-In is conditionally added once for scanner-like access and again unconditionally when `/check-in` is viewable.
 - Several current product areas still contain CPB-specific explanatory panels or historical audit context. These are useful for safety, but they can make the product feel less event-agnostic.
@@ -119,7 +118,9 @@ There is no active cron schedule in `.github/workflows/daily-qa.yml`. The matchi
 
 Private evidence for this audit is tracked in `output/current-state-application-map/`.
 
-This run is primarily source-and-validation grounded. Prior authenticated production evidence exists in `docs/FULL_STACK_PRODUCT_REALITY_AUDIT_2026-07.md`, including a route matrix and responsive acceptance against `CODEX_TEST Live Verification Event`. This audit did not perform new production writes and did not select or modify CPB.
+This run includes source inspection, validation, and authenticated production visual evidence against `CODEX_TEST Live Verification Event`. The screenshot matrix contains 98 visible-viewport screenshots across 14 protected routes and 7 viewport sizes. The visual pass found no login fallback, no AppErrorBoundary fallback, no route-level loading capture, and no document-level horizontal overflow in the recorded matrix.
+
+The screenshots are private evidence and are not reproduced in the public Markdown maps because route captures may contain organizer workspace details. This audit did not perform production writes and did not select or modify CPB.
 
 ## Related Detailed Maps
 

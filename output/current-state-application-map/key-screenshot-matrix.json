@@ -1,0 +1,337 @@
+{
+  "generatedAt": "2026-07-29T21:13:52.142Z",
+  "captureMode": "stable visible viewport",
+  "selectedEvent": "CODEX_TEST Live Verification Event",
+  "records": [
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/dashboard",
+      "file": "screenshots/desktop-1440x900__dashboard.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Overview"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/events",
+      "file": "screenshots/desktop-1440x900__events.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Events"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/registrations",
+      "file": "screenshots/desktop-1440x900__registrations.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Guests & Registrations"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/payments",
+      "file": "screenshots/desktop-1440x900__payments.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Payments"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/tickets",
+      "file": "screenshots/desktop-1440x900__tickets.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Tickets"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/check-in",
+      "file": "screenshots/desktop-1440x900__check-in.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Check-In"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/operations",
+      "file": "screenshots/desktop-1440x900__operations.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Operations"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/communications",
+      "file": "screenshots/desktop-1440x900__message-builder.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Message Builder"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/event-review",
+      "file": "screenshots/desktop-1440x900__reports.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Reports"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/settings",
+      "file": "screenshots/desktop-1440x900__settings.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Settings"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "route": "/qa",
+      "file": "screenshots/desktop-1440x900__system-qa.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "System QA"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/dashboard",
+      "file": "screenshots/tablet-834x1112__dashboard.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Overview"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/events",
+      "file": "screenshots/tablet-834x1112__events.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Events"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/registrations",
+      "file": "screenshots/tablet-834x1112__registrations.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Guests & Registrations"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/payments",
+      "file": "screenshots/tablet-834x1112__payments.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Payments"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/tickets",
+      "file": "screenshots/tablet-834x1112__tickets.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Tickets"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/check-in",
+      "file": "screenshots/tablet-834x1112__check-in.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Check-In"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/operations",
+      "file": "screenshots/tablet-834x1112__operations.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Operations"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/communications",
+      "file": "screenshots/tablet-834x1112__message-builder.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Message Builder"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/event-review",
+      "file": "screenshots/tablet-834x1112__reports.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Reports"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/settings",
+      "file": "screenshots/tablet-834x1112__settings.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Settings"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "route": "/qa",
+      "file": "screenshots/tablet-834x1112__system-qa.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "System QA"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/dashboard",
+      "file": "screenshots/mobile-390x844__dashboard.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Overview"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/events",
+      "file": "screenshots/mobile-390x844__events.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Events"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/registrations",
+      "file": "screenshots/mobile-390x844__registrations.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Guests & Registrations"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/payments",
+      "file": "screenshots/mobile-390x844__payments.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Payments"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/tickets",
+      "file": "screenshots/mobile-390x844__tickets.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Tickets"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/check-in",
+      "file": "screenshots/mobile-390x844__check-in.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Check-In"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/operations",
+      "file": "screenshots/mobile-390x844__operations.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Operations"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/communications",
+      "file": "screenshots/mobile-390x844__message-builder.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Message Builder"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/event-review",
+      "file": "screenshots/mobile-390x844__reports.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Reports"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/settings",
+      "file": "screenshots/mobile-390x844__settings.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "Settings"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "route": "/qa",
+      "file": "screenshots/mobile-390x844__system-qa.png",
+      "appError": false,
+      "hasCode": true,
+      "loading": false,
+      "overflow": false,
+      "title": "System QA"
+    }
+  ]
+}

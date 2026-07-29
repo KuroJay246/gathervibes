@@ -2,7 +2,7 @@
 
 Date: 2026-07-29
 Branch: `codex/full-current-state-application-map`
-Base commit inspected: `a89e60b88068c350ebbf63735754e24577a40b58`
+Base commit inspected: `f61cb96d466975ca902e417025a1deff0445393c`
 
 ## Evidence Created In This Branch
 
@@ -11,29 +11,72 @@ Base commit inspected: `a89e60b88068c350ebbf63735754e24577a40b58`
 - `docs/DATA_MODEL_SECURITY_AND_INTEGRATION_MAP_2026-07.md`
 - `docs/EVENT_AGNOSTIC_ARCHITECTURE_ASSESSMENT_2026-07.md`
 - `docs/KNOWN_PRODUCT_AND_DATA_DISCREPANCIES_2026-07.md`
+- `output/current-state-application-map/screenshot-matrix.json`
+- `output/current-state-application-map/key-screenshot-matrix.json`
+- `output/current-state-application-map/screenshots/`
 
 ## Validation Results
 
-- `npm run product:routes`: passed, 15 routes and 12 navigation labels.
 - `npm run lint`: passed.
 - `npm test`: passed, 477 total, 434 passed, 43 skipped, 0 failed.
 - `npm run build`: passed.
+- `npm audit --omit=dev`: passed with 0 vulnerabilities.
+- `npm run product:routes`: passed, 15 routes and 12 navigation labels.
+- `npm run doctor:json`: exited successfully after the React Doctor error fix on `main`.
+- `npm run product:qa`: passed.
 - `npm ls xlsx`: absent.
 - `npm ls read-excel-file`: `read-excel-file@9.2.0`.
-- `git diff --check`: passed before validation.
-- `npm run doctor:json`: exited successfully; React Doctor reported `ok: true`, 161 diagnostics, 1 error-class diagnostic, and 160 warnings.
-- `npm run product:qa`: failed at final `npm audit --omit=dev` step after lint/test/build/e2e smoke passed.
-- `npm audit --omit=dev`: failed with 2 high-severity vulnerabilities from `react-router@7.18.2` via `react-router-dom@7.18.2`; advisory range reported by npm audit is `react-router 7.12.0 - 8.2.0`.
-
-The audit failure was not fixed in this branch because the branch scope is documentation and evidence only. A separate dependency/security branch should resolve it with a targeted package update and full validation.
+- `git diff --check`: passed.
 
 ## Screenshot Status
 
-No new screenshots were captured in this documentation-only pass.
+Fresh authenticated production screenshot evidence was captured using the existing Chrome profile.
 
-Reason: this pass is constrained to repository/source inspection and validation artifacts. It does not perform production writes or modify app behavior. Prior authenticated production and responsive screenshot evidence is documented in `docs/FULL_STACK_PRODUCT_REALITY_AUDIT_2026-07.md` under `output/phase23u-production-acceptance/`.
+Capture target:
 
-If a fresh screenshot matrix is required, run it as a separate authenticated-browser QA task against `CODEX_TEST Live Verification Event` and keep CPB unselected.
+- Production URL: `https://gathervibeshub.web.app`
+- Selected event: `CODEX_TEST Live Verification Event`
+- Capture mode: stable visible viewport
+- Routes captured: 14
+- Viewports captured: 7
+- Total screenshots: 98
+- Additional key-route verification matrix: 33 records across desktop, tablet, and mobile.
+
+Routes:
+
+- `/dashboard`
+- `/events`
+- `/registrations`
+- `/payments`
+- `/payments/reconciliation`
+- `/imports`
+- `/tickets`
+- `/check-in`
+- `/scanner`
+- `/operations`
+- `/communications`
+- `/event-review`
+- `/settings`
+- `/qa`
+
+Viewports:
+
+- `1440 x 900`
+- `1280 x 720`
+- `834 x 1112`
+- `768 x 1024`
+- `430 x 932`
+- `390 x 844`
+- `360 x 800`
+
+Matrix result:
+
+- 0 loading-shell captures after final recapture.
+- 0 missing `CODEX_TEST Live Verification Event` scope checks.
+- 0 login fallbacks.
+- 0 AppErrorBoundary fallbacks.
+- 0 document-level horizontal overflow flags.
+- Chrome/browser messaging noise was observed: `A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received`. This was classified as extension/browser noise, not a route-blocking app-originated failure.
 
 ## Production Data Status
 
