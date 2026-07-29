@@ -21,6 +21,12 @@ For each route/viewport record, the browser captured:
 
 Private text was scrubbed in JSON where email-like strings appeared.
 
+Additional interactive-state measurements are stored in:
+
+- `output/fresh-visual-application-audit/interactive-states/interactive-state-metadata.json`
+
+Those records add route/state-specific measurements for modals, expanded disclosures, mobile navigation, and zoom/page-scale checks.
+
 ## Coverage Summary
 
 - Records: 140.
@@ -31,6 +37,11 @@ Private text was scrubbed in JSON where email-like strings appeared.
 - AppErrorBoundary records: 0.
 - Missing selected event records: 0.
 - Horizontal overflow records: 14.
+- Interactive-state records: 20.
+- Interactive loading records: 0.
+- Interactive AppErrorBoundary records: 0.
+- Interactive signed-out login record: 1.
+- Interactive zoom records: 3.
 
 ## App-Level Width Finding
 
@@ -177,3 +188,5 @@ Interpretation:
 - `output/fresh-visual-application-audit/measurements-mobile-390x844.json`
 - `output/fresh-visual-application-audit/measurements-mobile-360x800.json`
 - `output/fresh-visual-application-audit/measurements-mobile-320x568.json`
+- `output/fresh-visual-application-audit/interactive-states/interactive-state-metadata.json`
+- `output/fresh-visual-application-audit/interactive-states/*.png`

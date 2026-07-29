@@ -1,0 +1,6 @@
+Lighthouse attempted twice against https://gathervibeshub.web.app/login on 2026-07-29.
+Both attempts generated a report but exited nonzero during chrome-launcher temporary profile cleanup.
+Error class: EPERM, Permission denied while removing a browser temporary profile directory.
+Second attempt used an explicit disposable profile under the evidence area, but chrome-launcher still used its own temporary profile path for cleanup.
+Classification: secondary-tool environment cleanup limitation, not an application runtime failure.
+Raw Lighthouse JSON was not retained because it included Firebase auth iframe URLs with API-key query parameters. A sanitized score summary was retained instead.

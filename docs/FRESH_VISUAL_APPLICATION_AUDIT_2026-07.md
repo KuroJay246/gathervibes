@@ -22,18 +22,28 @@ Primary evidence files:
 - `layout-measurements.json`
 - `measurements-*.json`
 - `redacted-screenshots/`
+- `interactive-states/interactive-state-metadata.json`
+- `interactive-states/*.png`
+- `secondary-tools/axe-login-playwright.json`
+- `secondary-tools/lighthouse-login-summary.json`
+- `secondary-tools/browser-console-dashboard.json`
 
 Coverage currently captured:
 
-- 14 authenticated production routes.
+- 14 authenticated production routes plus signed-out `/login`.
 - 10 viewport sizes.
 - 140 rendered layout measurement records.
 - 140 redacted first-viewport screenshots.
+- 20 additional interactive-state screenshots.
+- 20 interactive-state metadata records.
+- 3 zoom inspections on Overview at `125%`, `150%`, and `200%` equivalent page-scale factors.
 
 The screenshot set is redacted before commit:
 
 - Desktop account area is blurred.
 - Visible private record regions on data-heavy pages are blurred.
+- Mobile drawer account details are covered.
+- Owner-name references in welcome/walkthrough metadata and screenshots are redacted.
 - Measurement JSON replaces email-like text with `[email]`.
 
 Raw screenshots were captured only to a temp directory outside the repository and are not staged as repository evidence.
@@ -105,6 +115,28 @@ Interpretation:
 
 - This is a narrow-viewport compatibility issue at the minimum supported width. It is not caused by a single page table because it appears on every route at the same viewport.
 - The likely root is the app-level `min-width: 320px` plus scrollbar/client-width behavior in Chrome at `320px` viewport.
+
+Interactive-state result from `interactive-state-metadata.json`:
+
+- Records: 20.
+- Loading records: 0.
+- AppErrorBoundary records: 0.
+- Signed-out login route: captured in a clean browser context.
+- Event creation modal: captured.
+- Event editing modal: captured.
+- Registration form modal: captured.
+- Registration record edit/detail modal: captured.
+- Registration filters and disclosures expanded: captured.
+- Payment filters/disclosures and records: captured.
+- Ticket QR display: captured.
+- Check-In disclosures: captured.
+- Operations commitments/disclosures: captured.
+- Reports disclosures: captured.
+- Import field mapping/preview state: captured with a synthetic pasted row and no save/commit action.
+- Settings Organizer Access tab: captured.
+- Welcome celebration and existing walkthrough: captured.
+- Mobile navigation and mobile More drawer: captured.
+- Zoom/page-scale factors `1.25`, `1.5`, and `2`: applied and captured.
 
 ## Primary Visual Findings
 
@@ -217,14 +249,45 @@ Finding:
 - Organizer-confirmed historical attendance is a different evidence class and should not be fabricated as QR scan history.
 - Future UX should separate "system check-in" from "historical attendance confirmation."
 
+## Secondary Tooling Results
+
+Lighthouse:
+
+- Route: `/login`.
+- Raw Lighthouse JSON was not committed because it included Firebase auth iframe URLs with API-key query parameters.
+- Sanitized summary retained in `secondary-tools/lighthouse-login-summary.json`.
+- Performance score: `0.70`.
+- Accessibility score: `0.95`.
+- Best Practices score: `1.00`.
+- SEO score: `0.63`.
+- Lighthouse command exited nonzero during temporary browser-profile cleanup after report generation. This is documented in `secondary-tools/lighthouse-login-failure.txt`.
+
+Axe:
+
+- Axe CLI failed because the temporary ChromeDriver version did not match the installed Chrome.
+- Playwright plus injected `axe-core@4.12.1` completed on `/login`.
+- Result: 1 serious color-contrast violation and 1 serious incomplete color-contrast check.
+- Evidence: `secondary-tools/axe-login-playwright.json`.
+
+Browser console:
+
+- Evidence: `secondary-tools/browser-console-dashboard.json`.
+- Extension-originated message-channel errors were present.
+- Two app-originated onboarding skip/close permission errors appeared while testing the welcome/walkthrough replay path.
+- No AppErrorBoundary rendered during the interactive captures.
+
+React Developer Tools:
+
+- A separate React DevTools component-tree export was not available from the automated browser surface.
+- React Doctor full JSON remained the repeatable React diagnostic signal for this pass.
+
 ## Current Limitations Of This Pass
 
-Not yet complete against the full Phase 4 target:
+This pass now captures the requested primary routes, responsive matrix, modal/dialog states, disclosures, mobile navigation, and zoom checks. Remaining limitations are secondary-tool and product-defect observations rather than missing route evidence:
 
-- Modal states are not fully captured yet.
-- Expanded disclosures are measured but not all expanded visual states are captured.
-- Browser zoom `125%`, `150%`, and `200%` are not yet captured.
-- Lighthouse, axe DevTools, and React Developer Tools evidence are not yet recorded.
-- Login route visual evidence is not captured in signed-out state because this pass preserved the authenticated organizer session.
+- Lighthouse raw output is intentionally excluded because it contains Firebase auth iframe API-key URLs; only the sanitized score summary is retained.
+- Axe DevTools UI itself was not available, but equivalent axe-core analysis was run through Playwright on the login route.
+- React DevTools component screenshots are not included; source-to-rendered mapping and React Doctor diagnostics are used instead.
+- Browser console includes a non-blocking app-originated onboarding permission error when closing/skipping the replayed tour.
 
-These are remaining Phase 4 tasks, not product regressions.
+CPB remained untouched.

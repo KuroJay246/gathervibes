@@ -1,0 +1,37 @@
+{
+  "url": "https://gathervibeshub.web.app/login",
+  "timestamp": "2026-07-29T22:18:37.904Z",
+  "testEngine": {
+    "name": "axe-core",
+    "version": "4.12.1"
+  },
+  "testRunner": "playwright-injected-axe-core",
+  "violationCount": 1,
+  "incompleteCount": 1,
+  "passCount": 28,
+  "violations": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodeCount": 2,
+      "targets": [
+        [
+          ".primary-button"
+        ],
+        [
+          ".mt-8"
+        ]
+      ]
+    }
+  ],
+  "incomplete": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodeCount": 2
+    }
+  ]
+}

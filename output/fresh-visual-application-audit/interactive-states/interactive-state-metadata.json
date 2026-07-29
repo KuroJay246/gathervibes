@@ -1,0 +1,1093 @@
+{
+  "capturedAt": "2026-07-29T22:19:30.090Z",
+  "productionUrl": "https://gathervibeshub.web.app",
+  "selectedEvent": "CODEX_TEST Live Verification Event",
+  "rawScreenshots": "captured outside repository and intentionally not committed",
+  "records": [
+    {
+      "label": "00-login-route-unauthenticated",
+      "route": "/login",
+      "state": "Signed-out login route captured in a clean browser context; authenticated Chrome session not disturbed",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/00-login-route-unauthenticated.png",
+      "metrics": {
+        "title": "Gather & Savor Event Hub",
+        "pathname": "/login",
+        "h1": "Every detail,\nbeautifully gathered.",
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nPRIVATE EVENT OPERATIONS\nEvery detail,\nbeautifully gathered.\n\nA calm, private workspace for planning memorable food experiences—from the first guest name to the final check-in.\n\nGather & Savor Vibes\n\nWELCOME BACK\n\nSign in to your hub\n\nUse your approved admin account to continue.\n\nContinue with Google\nSIGN IN WITH EMAIL\nEmail address\nPassword\nAdmin access only\nSign in securely\nAccess is restricted to approved staff. Activity inside the hub will be recorded for operational security.",
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "devicePixelRatio": 1
+        },
+        "document": {
+          "clientWidth": 1440,
+          "scrollWidth": 1440,
+          "scrollHeight": 900
+        },
+        "main": {
+          "width": 1440,
+          "height": 900,
+          "left": 0,
+          "top": 0
+        },
+        "loading": false,
+        "loginControlsVisible": true,
+        "appError": false
+      }
+    },
+    {
+      "label": "01-event-creation-modal-desktop",
+      "route": "/events",
+      "state": "Event creation modal open",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/01-event-creation-modal-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nEvents\n\nPlan and organize every gathering\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\nLIVE EVENTS\nYour gatherings\n\nCreate each event once, plan it progressively, and keep one Working Event selected for the organizer team.\n\nThe event planner now includes event setup, budget planning, readiness, and task tracking without leaving the normal organizer workflow.\n\nCODEX_TEST is selected. Use it for organizer rehearsal and clean up QA_PHASE23T_ records after the review.\n\nPlan a New Event\n\nALL EVENTS\n\n2\n\nUPCOMING / ACTIVE\n\n0\n\nPLANNED CAPACITY\n\n90\n\nEvent calendar\n\n2 events in this workspace\n\nEVENT\tDATE\tSTATUS\tCAPACITY\tBASE PRICE\tACTIONS\n\n\nCPB\n\nLESC\n\n3 price tiers active\n\n\t20 Jun 2026\tCOMPLETED\t80\t$85.00\t\nSelect\n\n\n\nCODEX_TEST Live Verification Event\n\nQA / Smoke Test\n\nDefault base ticket price only\n\n\t15 Jan 2027\t",
+        "details": [],
+        "dialog": {
+          "height": 852,
+          "left": 200,
+          "text": "PLAN A NEW EVENT\n\nCreate an organizer-ready event\n\nEvent Basics: Set the event name, type, date, time, venue, and overall status.\n\n1\nEvent Basics\n2\nCapacity and Registration\n3\nFinancial Plan\n4\nOperations\n5\nReadiness\n\nSTEP 1\n\nEvent Basics\n\nThis is the organizer-friendly event profile guests and staff will work from later.\n\nEvent name *\nEvent type *\nCake Picnic\nCake Tasting\nBrunch\nTasting\nCultural Experience\nHospitality Event\nWorkshop\nParty\nFood Event\nVendor Pop-Up\nPrivate Food Experience\nPrivate Event\nOther\nLifecycle status *\nDraft\nPlanning\nRegistration Open\nRegistration Closed\nReady for Event\nIn Progress\nCompleted\nArchived\nCancelled\n\nBuild the guest plan, budget, partners, tasks, and readiness details.\n\nEvent date *\nVenue *\nStart time *\nEnd time\nLocation *\nEvent description\nCancel\nNext",
+          "top": 24,
+          "width": 1024
+        },
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 4151,
+          "scrollWidth": 1425
+        },
+        "h1": "Events",
+        "loading": false,
+        "main": {
+          "height": 4070,
+          "left": 258,
+          "top": 81,
+          "width": 1167
+        },
+        "openDetails": [],
+        "pathname": "/events",
+        "selectedEventVisible": true,
+        "tables": [
+          {
+            "columns": 6,
+            "height": 222,
+            "index": 0,
+            "width": 1085
+          }
+        ],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      }
+    },
+    {
+      "label": "02-event-editing-modal-desktop",
+      "route": "/events",
+      "state": "Event editing modal open for selected CODEX_TEST event",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/02-event-editing-modal-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nEvents\n\nPlan and organize every gathering\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\nLIVE EVENTS\nYour gatherings\n\nCreate each event once, plan it progressively, and keep one Working Event selected for the organizer team.\n\nThe event planner now includes event setup, budget planning, readiness, and task tracking without leaving the normal organizer workflow.\n\nCODEX_TEST is selected. Use it for organizer rehearsal and clean up QA_PHASE23T_ records after the review.\n\nPlan a New Event\n\nALL EVENTS\n\n2\n\nUPCOMING / ACTIVE\n\n0\n\nPLANNED CAPACITY\n\n90\n\nEvent calendar\n\n2 events in this workspace\n\nEVENT\tDATE\tSTATUS\tCAPACITY\tBASE PRICE\tACTIONS\n\n\nCPB\n\nLESC\n\n3 price tiers active\n\n\t20 Jun 2026\tCOMPLETED\t80\t$85.00\t\nSelect\n\n\n\nCODEX_TEST Live Verification Event\n\nQA / Smoke Test\n\nDefault base ticket price only\n\n\t15 Jan 2027\t",
+        "details": [],
+        "dialog": {
+          "height": 852,
+          "left": 200,
+          "text": "UPDATE EVENT PLAN\n\nEdit event setup\n\nEvent Basics: Set the event name, type, date, time, venue, and overall status.\n\n1\nEvent Basics\n2\nCapacity and Registration\n3\nFinancial Plan\n4\nOperations\n5\nReadiness\n\nSTEP 1\n\nEvent Basics\n\nThis is the organizer-friendly event profile guests and staff will work from later.\n\nEvent name *\nEvent type *\nCake Picnic\nCake Tasting\nBrunch\nTasting\nCultural Experience\nHospitality Event\nWorkshop\nParty\nFood Event\nVendor Pop-Up\nPrivate Food Experience\nPrivate Event\nOther\nLifecycle status *\nDraft\nPlanning\nRegistration Open\nRegistration Closed\nReady for Event\nIn Progress\nCompleted\nArchived\nCancelled\n\nCapture the event idea and basic details before planning starts.\n\nEvent date *\nVenue *\nStart time *\nEnd time\nLocation *\nEvent description\nCancel\nNext",
+          "top": 24,
+          "width": 1024
+        },
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 4151,
+          "scrollWidth": 1425
+        },
+        "h1": "Events",
+        "loading": false,
+        "main": {
+          "height": 4070,
+          "left": 258,
+          "top": -470,
+          "width": 1167
+        },
+        "openDetails": [],
+        "pathname": "/events",
+        "selectedEventVisible": true,
+        "tables": [
+          {
+            "columns": 6,
+            "height": 222,
+            "index": 0,
+            "width": 1085
+          }
+        ],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      }
+    },
+    {
+      "label": "03-registration-form-modal-desktop",
+      "route": "/registrations",
+      "state": "Registration form modal open",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/03-registration-form-modal-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nGuests & Registrations\n\nManage registration records and guest counts\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\nGuests & Registrations\n\nManage registration records and the guests represented inside them for CODEX_TEST Live Verification Event.\n\nExport CSV\nImport Center\nPayments\nAdd registration\n\nShowing all registrations.\n\n5\n\nTOTAL REGISTRATIONS\n\n6\n\nTOTAL GUESTS\n\nBBD $225.00\n\nEXPECTED REGISTRATION INCOME\n\nBBD $225.00\n\nRECORDED REGISTRATION PAYMENTS\n\nBBD $0.00\n\nOUTSTANDING BALANCE\n\n0\n\nNEEDS REVIEW\n\nMore registration metrics and review filters\nAdvanced Filters\n\nSearch buyer, guest, contact, group, ticket, payment, and review fields without covering the category tabs below.\n\nClear filters\nAny Payment Status\nPaid\nPending\nDoor Paid\nTo Pay at Door\nComplimentary\nUnknown\nAny Payment Method\nCIBC 1stPay\nBank Tra",
+        "details": [
+          {
+            "height": 63,
+            "index": 0,
+            "open": false,
+            "summary": "More registration metrics and review filters",
+            "top": 662,
+            "width": 1087
+          }
+        ],
+        "dialog": {
+          "height": 765,
+          "left": 376,
+          "text": "New Registration\nFull Name *\nGroup Name (Optional)\nBuyer / Contact Name\nGuest / Attendee Names\nEmail Address\nPhone Number\nPersons Attending *\nPayment Status *\nPaid\nPending\nComplimentary\nDoor Paid\nTo Pay at Door\nUnknown\nPayment Reference (Optional)\n\nFINANCE / MONEY TRACKER\n\nPrice Tier\nPayment Method\nCIBC 1stPay\nBank transfer\nCash\nDoor\nCard\nComplimentary\nUnknown\nTicket Price\nAmount Due\nAmount Paid\nBalance Due\nDietary & Operational Notes\nCancel\nSave registration",
+          "top": 68,
+          "width": 672
+        },
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 2116,
+          "scrollWidth": 1425
+        },
+        "h1": "Guests & Registrations",
+        "loading": false,
+        "main": {
+          "height": 2036,
+          "left": 258,
+          "top": 81,
+          "width": 1167
+        },
+        "openDetails": [],
+        "pathname": "/registrations",
+        "selectedEventVisible": true,
+        "tables": [
+          {
+            "columns": 9,
+            "height": 790,
+            "index": 0,
+            "width": 1216
+          }
+        ],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      }
+    },
+    {
+      "label": "04-registration-record-edit-detail-desktop",
+      "route": "/registrations",
+      "state": "Registration record edit/detail modal open",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/04-registration-record-edit-detail-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nGuests & Registrations\n\nManage registration records and guest counts\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\nGuests & Registrations\n\nManage registration records and the guests represented inside them for CODEX_TEST Live Verification Event.\n\nExport CSV\nImport Center\nPayments\nAdd registration\n\nShowing all registrations.\n\n5\n\nTOTAL REGISTRATIONS\n\n6\n\nTOTAL GUESTS\n\nBBD $225.00\n\nEXPECTED REGISTRATION INCOME\n\nBBD $225.00\n\nRECORDED REGISTRATION PAYMENTS\n\nBBD $0.00\n\nOUTSTANDING BALANCE\n\n0\n\nNEEDS REVIEW\n\nMore registration metrics and review filters\nAdvanced Filters\n\nSearch buyer, guest, contact, group, ticket, payment, and review fields without covering the category tabs below.\n\nClear filters\nAny Payment Status\nPaid\nPending\nDoor Paid\nTo Pay at Door\nComplimentary\nUnknown\nAny Payment Method\nCIBC 1stPay\nBank Tra",
+        "details": [
+          {
+            "height": 63,
+            "index": 0,
+            "open": false,
+            "summary": "More registration metrics and review filters",
+            "top": -262,
+            "width": 1087
+          }
+        ],
+        "dialog": {
+          "height": 765,
+          "left": 376,
+          "text": "Edit Registration\nFull Name *\nGroup Name (Optional)\nBuyer / Contact Name\nGuest / Attendee Names\nEmail Address\nPhone Number\nPersons Attending *\nPayment Status *\nPaid\nPending\nComplimentary\nDoor Paid\nTo Pay at Door\nUnknown\nPayment Reference (Optional)\n\nFINANCE / MONEY TRACKER\n\nPrice Tier\nPayment Method\nCIBC 1stPay\nBank transfer\nCash\nDoor\nCard\nComplimentary\nUnknown\nTicket Price\nAmount Due\nAmount Paid\nBalance Due\nDietary & Operational Notes\nCancel\nSave registration",
+          "top": 68,
+          "width": 672
+        },
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 2116,
+          "scrollWidth": 1425
+        },
+        "h1": "Guests & Registrations",
+        "loading": false,
+        "main": {
+          "height": 2036,
+          "left": 258,
+          "top": -844,
+          "width": 1167
+        },
+        "openDetails": [],
+        "pathname": "/registrations",
+        "selectedEventVisible": true,
+        "tables": [
+          {
+            "columns": 9,
+            "height": 790,
+            "index": 0,
+            "width": 1216
+          }
+        ],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "editButtonCount": 5
+    },
+    {
+      "label": "05-registration-filters-disclosures-expanded-desktop",
+      "route": "/registrations",
+      "state": "Registration metrics, filters, and evidence disclosures expanded where available",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/05-registration-filters-disclosures-expanded-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nGuests & Registrations\n\nManage registration records and guest counts\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\nGuests & Registrations\n\nManage registration records and the guests represented inside them for CODEX_TEST Live Verification Event.\n\nExport CSV\nImport Center\nPayments\nAdd registration\n\nShowing all registrations.\n\n5\n\nTOTAL REGISTRATIONS\n\n6\n\nTOTAL GUESTS\n\nBBD $225.00\n\nEXPECTED REGISTRATION INCOME\n\nBBD $225.00\n\nRECORDED REGISTRATION PAYMENTS\n\nBBD $0.00\n\nOUTSTANDING BALANCE\n\n0\n\nNEEDS REVIEW\n\nMore registration metrics and review filters\n\n5 registrations / 6 guests\n\nPAID\n\n0 registrations / 0 guests\n\nPENDING\n\n0 registrations / 0 guests\n\nCOMPLIMENTARY\n\n0 registrations / 0 guests\n\nDOOR PAID\n\nBBD $0.00\n\nTO PAY AT DOOR\n\nBBD $0.00\n\nCOMPLIMENTARY VALUE\n\n0\n\nFINANCE REVIEW\n\n5 registrations / 6 guests\n\nCHECK",
+        "details": [
+          {
+            "height": 473,
+            "index": 0,
+            "open": true,
+            "summary": "More registration metrics and review filters",
+            "top": 418,
+            "width": 1087
+          }
+        ],
+        "dialog": null,
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 2526,
+          "scrollWidth": 1425
+        },
+        "h1": "Guests & Registrations",
+        "loading": false,
+        "main": {
+          "height": 2446,
+          "left": 258,
+          "top": -163,
+          "width": 1167
+        },
+        "openDetails": [
+          "[Circular]"
+        ],
+        "pathname": "/registrations",
+        "selectedEventVisible": true,
+        "tables": [
+          {
+            "columns": 9,
+            "height": 790,
+            "index": 0,
+            "width": 1216
+          }
+        ],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "detailsCount": 1
+    },
+    {
+      "label": "06-payments-filters-records-expanded-desktop",
+      "route": "/payments",
+      "state": "Payment filters/evidence disclosures and records visible",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/06-payments-filters-records-expanded-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nPayments\n\nReview registration charges, payments, balances, and follow-up\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\n\nSELECTED WORKING EVENT ONLY\n\nRegistration Payments\n\nReview registration charges, payments, balances, payment follow-up, and internal data cleanup for CODEX_TEST Live Verification Event.\n\nOpen Registrations\nOpen Reports\nReconciliation Preview\nRegistration payment records only. This page reviews registration charges, payments received, balances, methods, payment follow-up, and internal data review. It is not a payment gateway, processor report, bank reconciliation, invoice system, or accounting ledger. Operations remains separate for sponsor income, vendor payments, expenses, refunds, reimbursements, and adjustments.\n\n5\n\nREGISTRATION RECORDS\n\n6\n\nGUESTS\n\nBBD $225.00\n\nEXPECTED REGISTRATION ",
+        "details": [
+          {
+            "height": 439,
+            "index": 0,
+            "open": true,
+            "summary": "Payment status and review detail",
+            "top": -418,
+            "width": 1087
+          },
+          {
+            "height": 287,
+            "index": 1,
+            "open": true,
+            "summary": "Historical and informational review",
+            "top": 506,
+            "width": 1087
+          }
+        ],
+        "dialog": null,
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 2133,
+          "scrollWidth": 1425
+        },
+        "h1": "Payments",
+        "loading": false,
+        "main": {
+          "height": 2052,
+          "left": 258,
+          "top": -927,
+          "width": 1167
+        },
+        "openDetails": [
+          "[Circular]",
+          "[Circular]"
+        ],
+        "pathname": "/payments",
+        "selectedEventVisible": true,
+        "tables": [],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "detailsCount": 2
+    },
+    {
+      "label": "07-ticket-qr-display-desktop",
+      "route": "/tickets",
+      "state": "Printable QR list and ticket details visible",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/07-ticket-qr-display-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nTickets\n\nAssign ticket codes and prepare QR access\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\nTickets\n\nAssigning ticket codes for CODEX_TEST Live Verification Event.\n\nQR codes store ticket codes only. Use Generate next CTLVE code for event-style sequencing.\n\nAdvanced ticket filters: use these to find assigned tickets, missing codes, payment states, check-in state, and review-needed rows.\n\nShowing 5 registrations for CODEX_TEST Live Verification Event.\n\nAssigned tickets in this view: 5.\n\nAdvanced ticket filters\nAdvanced Filters\n\nSearch ticket code, guest, buyer, attendees, email, phone, group, payment status, or price tier.\n\nClear filters\n\nTICKET STATUS\n\nAll Tickets\nAssigned\nMissing Ticket Code\n\nPAYMENT STATUS\n\nPaid\nPending\nOutstanding Balance\nDoor Paid\nTo Pay at Door\nComplimentary\n\nCHECK-IN STATUS\n\nCh",
+        "details": [
+          {
+            "height": 404,
+            "index": 0,
+            "open": true,
+            "summary": "Advanced ticket filters",
+            "top": 419,
+            "width": 1087
+          },
+          {
+            "height": 0,
+            "index": 1,
+            "open": false,
+            "summary": "Show QR code",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "height": 0,
+            "index": 2,
+            "open": false,
+            "summary": "Show QR code",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "height": 0,
+            "index": 3,
+            "open": false,
+            "summary": "Show QR code",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "height": 0,
+            "index": 4,
+            "open": false,
+            "summary": "Show QR code",
+            "top": 0,
+            "width": 0
+          },
+          {
+            "height": 0,
+            "index": 5,
+            "open": false,
+            "summary": "Show QR code",
+            "top": 0,
+            "width": 0
+          }
+        ],
+        "dialog": null,
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 2652,
+          "scrollWidth": 1425
+        },
+        "h1": "Tickets",
+        "loading": false,
+        "main": {
+          "height": 2571,
+          "left": 258,
+          "top": 54,
+          "width": 1167
+        },
+        "openDetails": [
+          "[Circular]"
+        ],
+        "pathname": "/tickets",
+        "selectedEventVisible": true,
+        "tables": [
+          {
+            "columns": 6,
+            "height": 908,
+            "index": 0,
+            "width": 1129
+          }
+        ],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "qrButtonCount": 1,
+      "detailsCount": 6
+    },
+    {
+      "label": "08-check-in-disclosures-expanded-desktop",
+      "route": "/check-in",
+      "state": "Check-In attendance/readiness and evidence disclosures expanded",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/08-check-in-disclosures-expanded-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nCheck-In\n\nTrack event-day attendance\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\n\nEVENT-DAY MODE\n\nDoor Check-In / QR Scan\n\nChecking in guests for CODEX_TEST Live Verification Event. Checked In: 5 registrations / 6 guests\n\nQR scan, manual ticket lookup, and name search all use this Working Event only.\nOpen Scanner Mode\n\nTOTAL REGISTRATIONS\n\n5\n\nTOTAL GUESTS\n\n6\n\nCHECKED-IN REGISTRATIONS\n\n5\n\nCHECKED-IN GUESTS\n\n6\n\nMore attendance and readiness counts\n\nREMAINING REGISTRATIONS\n\n0\n\nREMAINING GUESTS\n\n0\n\nPAID / PENDING / COMP\n\n5/0/0\n\nTICKETS ASSIGNED / MISSING\n\n5/0\n\nGuest count may be higher than registration count.\n\nEvent-day helper lists and exports\n\nEVENT-DAY HELPERS\n\nPrint and export event-day lists\n\nBrowser-only export. Nothing is uploaded and no new event record is created.\n\nGuest list\nMissing ticket codes",
+        "details": [
+          {
+            "height": 183,
+            "index": 0,
+            "open": true,
+            "summary": "More attendance and readiness counts",
+            "top": -417,
+            "width": 1087
+          },
+          {
+            "height": 536,
+            "index": 1,
+            "open": true,
+            "summary": "Event-day helper lists and exports",
+            "top": -141,
+            "width": 1087
+          },
+          {
+            "height": 299,
+            "index": 2,
+            "open": true,
+            "summary": "Advanced check-in filters",
+            "top": 419,
+            "width": 1087
+          }
+        ],
+        "dialog": null,
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 2293,
+          "scrollWidth": 1425
+        },
+        "h1": "Check-In",
+        "loading": false,
+        "main": {
+          "height": 2212,
+          "left": 258,
+          "top": -790,
+          "width": 1167
+        },
+        "openDetails": [
+          "[Circular]",
+          "[Circular]",
+          "[Circular]"
+        ],
+        "pathname": "/check-in",
+        "selectedEventVisible": true,
+        "tables": [
+          {
+            "columns": 5,
+            "height": 379,
+            "index": 0,
+            "width": 1036
+          }
+        ],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "detailsCount": 3
+    },
+    {
+      "label": "09-operations-partner-commitments-expanded-desktop",
+      "route": "/operations",
+      "state": "Operations ledger and partner/commitment disclosures expanded",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/09-operations-partner-commitments-expanded-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nOperations\n\nTrack event-level money and obligations\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\n\nSELECTED WORKING EVENT ONLY\n\nOperations and Commitments\n\nTrack partner commitments and event-level money for CODEX_TEST Live Verification Event. Registration payments are reviewed separately in Payments.\n\nOpen Payments\nOpen Event Review\nBack to Overview\n\nOperations now covers both planning commitments and the event-level ledger.\n\nOperations finance boundary\nOperations finance boundary\n\nOperations tracks event expenses, commitments and non-registration income. Registration ticket payments are recorded separately under Payments, so the Operations cash position is not the event's final profit or loss.\n\nBBD $225.00\n\nREGISTRATION EXPECTED INCOME\n\nBBD $225.00\n\nREGISTRATION PAYMENTS RECORDED\n\nBBD $0.00\n\nREGISTRATI",
+        "details": [
+          {
+            "height": 160,
+            "index": 0,
+            "open": true,
+            "summary": "Operations finance boundary",
+            "top": -5,
+            "width": 1087
+          },
+          {
+            "height": 1547,
+            "index": 1,
+            "open": true,
+            "summary": "Partner commitments, sponsors, and supplier contacts",
+            "top": 419,
+            "width": 1087
+          }
+        ],
+        "dialog": null,
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 3544,
+          "scrollWidth": 1425
+        },
+        "h1": "Operations",
+        "loading": false,
+        "main": {
+          "height": 3463,
+          "left": 258,
+          "top": -334,
+          "width": 1167
+        },
+        "openDetails": [
+          "[Circular]",
+          "[Circular]"
+        ],
+        "pathname": "/operations",
+        "selectedEventVisible": true,
+        "tables": [
+          {
+            "columns": 6,
+            "height": 358,
+            "index": 0,
+            "width": 760
+          }
+        ],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "detailsCount": 2
+    },
+    {
+      "label": "10-reports-disclosures-expanded-desktop",
+      "route": "/event-review",
+      "state": "Reports/Event Review disclosure sections expanded",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/10-reports-disclosures-expanded-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nReports\n\nRead-only follow-up, payments, operations, and summary\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\n\nReports\n\nEvent Report & Review\n\n15 Jan 2027\n·\nStatus: draft\n\nThis read-only report combines follow-up items, registration payment records, Operations Ledger figures, and a current or post-event summary for the selected Working Event only.\n\nOpen Payments\n\nPAYMENT FOLLOW-UP AND FINANCE REVIEW\n\nWhat needs attention now\n\nReview repeated contact details\n\n3\n\nOpen page\n\nThese registrations reuse the same email or phone details. Review them in Registrations to decide whether they are group bookings or true duplicates.\n\nEXAMPLES\n\nTest Guest Beta\nTest Guest Alpha\nTest Guest Alpha\n\nOpen operations items\n\n2\n\nOpen page\n\nThese ledger entries are still expected or pending and should be reviewed before the even",
+        "details": [
+          {
+            "height": 591,
+            "index": 0,
+            "open": true,
+            "summary": "Show full report metrics",
+            "top": 571,
+            "width": 1029
+          }
+        ],
+        "dialog": null,
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 3492,
+          "scrollWidth": 1425
+        },
+        "h1": "Reports",
+        "loading": false,
+        "main": {
+          "height": 3411,
+          "left": 258,
+          "top": -1966,
+          "width": 1167
+        },
+        "openDetails": [
+          "[Circular]"
+        ],
+        "pathname": "/event-review",
+        "selectedEventVisible": true,
+        "tables": [],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "detailsCount": 1
+    },
+    {
+      "label": "11-import-field-mapping-preview-desktop",
+      "route": "/imports",
+      "state": "Import field mapping/preview attempted with synthetic pasted row; no save/commit action used",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/11-import-field-mapping-preview-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nImport Center\n\nBring in CSV exports and pasted table rows safely\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\nBack to Registrations\nImport Center\n\nFor event: CODEX_TEST Live Verification Event. CSV, pasted table rows, and Excel/XLSX workbooks all use preview before saving.\n\nChoose source\n\nPick the closest source so the mapping step starts with the right expectations.\n\nGoogle Forms CSV\nExport responses from Google Forms/Sheets as CSV, then upload here.\nGoogle Sheets CSV\nDownload your sheet as CSV, then upload here.\nExcel/XLSX\nUpload an Excel workbook. Choose the sheet and map columns before saving.\nPasted table\nPaste rows copied from a spreadsheet or CSV file.\nBank/payment CSV\nImport payment/reference lists and map names, emails, references, and payment status.\nCustom\nUse this for files with unusual head",
+        "details": [],
+        "dialog": null,
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 4062,
+          "scrollWidth": 1425
+        },
+        "h1": "Import Center",
+        "loading": false,
+        "main": {
+          "height": 3982,
+          "left": 258,
+          "top": 81,
+          "width": 1167
+        },
+        "openDetails": [],
+        "pathname": "/imports",
+        "selectedEventVisible": true,
+        "tables": [],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "pastedCount": 1,
+      "textareaCount": 1,
+      "previewCount": 4
+    },
+    {
+      "label": "12-settings-organizer-access-tab-desktop",
+      "route": "/settings",
+      "state": "Organizer Access settings tab visible",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/12-settings-organizer-access-tab-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nSettings\n\nPractical workspace and event defaults\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\nAccount\nWorkspace\nEvent Defaults\nOrganizer Access\nTickets & Check-In\nData & Messages\nAdvanced\n\nORGANIZER ACCESS\n\nProtected owner and approved organizers\n\nAccess is controlled outside this page. This summary cannot add, remove, disable, or change anyone's role.\n\nProtected Owner\n\n[email]\n\nPermanent owner access is pinned to the verified Firebase account and cannot be removed or disabled in organizer settings.\n\nSecondary organizers\n\nApp-wide\n\n1 approved\n\nApproved organizers receive only the role and event access configured for their account.\n\nACTIVE NOW\n\nStaff and scanner helpers\n\nEvent-specific\n\nAssigned-event access only\n\nHelper access does not grant Settings or full organizer access.\n\nACTIVE NOW\n\nAccess changes",
+        "details": [],
+        "dialog": null,
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 954,
+          "scrollWidth": 1425
+        },
+        "h1": "Settings",
+        "loading": false,
+        "main": {
+          "height": 874,
+          "left": 258,
+          "top": 81,
+          "width": 1167
+        },
+        "openDetails": [],
+        "pathname": "/settings",
+        "selectedEventVisible": true,
+        "tables": [],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      }
+    },
+    {
+      "label": "13-welcome-celebration-modal-desktop",
+      "route": "/settings",
+      "state": "Welcome celebration modal opened from replay control",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/13-welcome-celebration-modal-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nSettings\n\nPractical workspace and event defaults\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\nAccount\nWorkspace\nEvent Defaults\nOrganizer Access\nTickets & Check-In\nData & Messages\nAdvanced\n\nACCOUNT\n\nYour organizer account\n\nReview the account and access level currently signed in to this private workspace.\n\n[owner]\n\n[email]\n\nOWNER/ADMIN\n\nProtected owner access is pinned to the Firebase UID and cannot be removed through the mutable allowlist.\n\nLog out\n\nWELCOME EXPERIENCE\n\nShow Welcome Tour Again\n&\n\nGather & Savor\n\nEVENT HUB\n\nAPP OFFICIALLY OPEN\nWelcome, [owner]\n\nThis space was created to help you plan events, organize guests, track payments, manage tickets, coordinate suppliers and sponsors, prepare for event day, and review everything in one place.\n\nCreated for you by [owner].\n\nSelect Start Your Tour ",
+        "details": [],
+        "dialog": {
+          "height": 521,
+          "left": 480,
+          "text": "&\n\nGather & Savor\n\nEVENT HUB\n\nAPP OFFICIALLY OPEN\nWelcome, [owner]\n\nThis space was created to help you plan events, organize guests, track payments, manage tickets, coordinate suppliers and sponsors, prepare for event day, and review everything in one place.\n\nCreated for you by [owner].\n\nSelect Start Your Tour for a short walkthrough of the app.\n\nSkip for Now\nStart Your Tour",
+          "top": 190,
+          "width": 480
+        },
+        "document": {
+          "clientWidth": 1440,
+          "scrollHeight": 900,
+          "scrollWidth": 1440
+        },
+        "h1": "Settings",
+        "loading": false,
+        "main": {
+          "height": 771,
+          "left": 258,
+          "top": 81,
+          "width": 1182
+        },
+        "openDetails": [],
+        "pathname": "/settings",
+        "selectedEventVisible": true,
+        "tables": [],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "tourCount": 1
+    },
+    {
+      "label": "14-existing-walkthrough-dialog-desktop",
+      "route": "/settings",
+      "state": "Existing walkthrough dialog first step visible after Start Your Tour",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/14-existing-walkthrough-dialog-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nSettings\n\nPractical workspace and event defaults\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\nAccount\nWorkspace\nEvent Defaults\nOrganizer Access\nTickets & Check-In\nData & Messages\nAdvanced\n\nACCOUNT\n\nYour organizer account\n\nReview the account and access level currently signed in to this private workspace.\n\n[owner]\n\n[email]\n\nOWNER/ADMIN\n\nProtected owner access is pinned to the Firebase UID and cannot be removed through the mutable allowlist.\n\nLog out\n\nWELCOME EXPERIENCE\n\nShow Welcome Tour Again\nYou’re Ready to Begin\n\nYour Gather & Savor Event Hub is ready. Select an action below to get started.\n\nCREATED BY [owner]\n\nNeed help using the app? Contact [owner].\n\nFinish and Go to Overview\nPlan a New Event",
+        "details": [],
+        "dialog": {
+          "height": 408,
+          "left": 500,
+          "text": "You’re Ready to Begin\n\nYour Gather & Savor Event Hub is ready. Select an action below to get started.\n\nCREATED BY [owner]\n\nNeed help using the app? Contact [owner].\n\nFinish and Go to Overview\nPlan a New Event",
+          "top": 246,
+          "width": 440
+        },
+        "document": {
+          "clientWidth": 1440,
+          "scrollHeight": 900,
+          "scrollWidth": 1440
+        },
+        "h1": "Settings",
+        "loading": false,
+        "main": {
+          "height": 771,
+          "left": 258,
+          "top": 81,
+          "width": 1182
+        },
+        "openDetails": [],
+        "pathname": "/settings",
+        "selectedEventVisible": true,
+        "tables": [],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "startTourCount": 1
+    },
+    {
+      "label": "15-mobile-navigation-overview-390x844",
+      "route": "/dashboard",
+      "state": "Mobile primary navigation visible",
+      "viewport": "mobile-390x844",
+      "file": "interactive-states/15-mobile-navigation-overview-390x844.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "Overview\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\n\nOVERVIEW\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · QA / Smoke Test · Draft\n\nChange event\nClear selection\n\n5\n\nREGISTRATION RECORDS\n\nForm entries\n\n6\n\nGUESTS\n\nFrom persons attending\n\nBBD $225.00\n\nPAYMENTS RECEIVED\n\nProjected registration income BBD $0.00 · Outstanding registration balance BBD $0.00\n\n60%\n\nCAPACITY USED\n\n6 of 10 guests\n\nNEEDS ATTENTION\n\nWhat should I do next?\n\nConfirm venue details\n\nAdd or confirm the venue, location, and access timing so the event plan is actionable.\n\nNEEDS ATTENTION\n\nOpen Events\n\nAdd partners and commitments\n\nSuppliers, sponsors, bakers, vendors, venue contacts, and helpers are not recorded yet.\n\nNEEDS ATTENTION\n\nOpen Operations\n\nData Review\n\n3 contact/duplicate warnings and 0 active finance review rows.\n\nREVIEW\n\nReview repeated contacts\n\nReview\n\nBBD $500.00 is still outstanding across partner commitments and open operations.\n\nREVIEW\n\nOpen Operations\n\nQUICK ACTIONS\n\nCommon organizer actions\nAdd Registration\nRecord Payment\nAdd Expense or Commitment\nAdd Supplier or Sponsor\nAdd Task\nBuild Message\nReview Event Readiness\nEvent details, mo",
+        "details": [
+          {
+            "height": 106,
+            "index": 0,
+            "open": false,
+            "summary": "Event details, money snapshot, and readiness progress",
+            "top": 2282,
+            "width": 343
+          },
+          {
+            "height": 82,
+            "index": 1,
+            "open": false,
+            "summary": "Planning progress and upcoming events",
+            "top": 2412,
+            "width": 343
+          }
+        ],
+        "dialog": null,
+        "document": {
+          "clientWidth": 375,
+          "scrollHeight": 2606,
+          "scrollWidth": 375
+        },
+        "h1": "Overview",
+        "loading": false,
+        "main": {
+          "height": 2535,
+          "left": 0,
+          "top": 70,
+          "width": 375
+        },
+        "openDetails": [],
+        "pathname": "/dashboard",
+        "selectedEventVisible": true,
+        "tables": [],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 844,
+          "width": 390
+        }
+      }
+    },
+    {
+      "label": "16-mobile-more-drawer-open-390x844",
+      "route": "/dashboard",
+      "state": "Mobile More drawer open via DOM node 9 Open all navigation; drawer links visible",
+      "viewport": "mobile-390x844",
+      "file": "interactive-states/16-mobile-more-drawer-open-390x844.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nMORE WORKSPACE\n\nEvents\nPayments\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nOverview\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\n\nOVERVIEW\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · QA / Smoke Test · Draft\n\nChange event\nClear selection\n\n5\n\nREGISTRATION RECORDS\n\nForm entries\n\n6\n\nGUESTS\n\nFrom persons attending\n\nBBD $225.00\n\nPAYMENTS RECEIVED\n\nProjected registration income BBD $0.00 · Outstanding registration balance BBD $0.00\n\n60%\n\nCAPACITY USED\n\n6 of 10 guests\n\nNEEDS ATTENTION\n\nWhat should I do next?\n\nConfirm venue details\n\nAdd or confirm the venue, location, and access timing so the event plan is actionable.\n\nNEEDS ATTENTION\n\nOpen Events\n\nAdd partners and commitments\n\nSuppliers, sponsors, bakers, vendors, venue contacts, and helpers are not recorded yet.\n\nNEEDS ATTENTION\n\nOpen Operations\n\nData Review\n\n3 contact/duplicate warnings and 0 active finance review rows.\n\nREVIEW\n\nReview repeated contacts\n\nReview\n\nBBD $500.00 is still outstanding across partner ",
+        "details": [
+          {
+            "height": 106,
+            "index": 0,
+            "open": false,
+            "summary": "Event details, money snapshot, and readiness progress",
+            "top": 2282,
+            "width": 343
+          },
+          {
+            "height": 82,
+            "index": 1,
+            "open": false,
+            "summary": "Planning progress and upcoming events",
+            "top": 2412,
+            "width": 343
+          }
+        ],
+        "dialog": null,
+        "document": {
+          "clientWidth": 375,
+          "scrollHeight": 2606,
+          "scrollWidth": 375
+        },
+        "h1": "Overview",
+        "loading": false,
+        "main": {
+          "height": 2535,
+          "left": 0,
+          "top": 70,
+          "width": 375
+        },
+        "openDetails": [],
+        "pathname": "/dashboard",
+        "selectedEventVisible": true,
+        "tables": [],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 844,
+          "width": 390
+        }
+      },
+      "domNodeClicked": "9",
+      "visibleDomAfter": "<button node_id=10 aria-label=\"Close navigation\" type=\"button\" />\n<button node_id=11 aria-label=\"Close menu\" type=\"button\" />\n<a node_id=12 aria-label=\"Go to Overview\" href=\"/dashboard\">&amp; Gather &amp; Savor Event Hub</a>\n<a node_id=13 href=\"/events\">CODEX_TEST Live Verification Event 15 Jan 2027 · draft</a>\n<a node_id=14 href=\"/events\">Events</a>\n<a node_id=15 href=\"/payments\">Payments</a>\n<a node_id=16 href=\"/operations\">Operations</a>\n<a node_id=17 href=\"/communications\">Message Builder</a>\n<a node_id=18 href=\"/event-review\">Reports</a>\n<a node_id=19 href=\"/imports\">Import Center</a>\n<a node_id=20 href=\"/settings\">Settings</a>\n<a node_id=21 href=\"/qa\">System QA</a>\n<button node_id=22 aria-label=\"Sign out\" type=\"button\" />\n<button node_id=1 aria-label=\"Open navigation\" type=\"button\" />\n<a node_id=2 href=\"/events\">Change event</a>\n<a node_id=3 href=\"/events\">Change event</a>\n<button node_id=4 type=\"button\">Clear selection</button>\n<a node_id=5 href=\"/dashboard\">Overview</a>\n<a node_id=6 href=\"/registrations\">Guests</a>\n<a node_id=7 href=\"/tickets\">Tickets</a>\n<a node_id=8 href=\"/check-in\">Check-In</a>\n<button node_id=9 aria-label=\"Open all navigation\" type=\"button\">More</button",
+      "containsMoreWorkspace": false,
+      "drawerLinksVisible": [
+        "Events",
+        "Payments",
+        "Operations",
+        "Message Builder",
+        "Reports",
+        "Import Center",
+        "Settings",
+        "System QA"
+      ]
+    },
+    {
+      "label": "17-zoom-125-overview-desktop",
+      "route": "/dashboard",
+      "state": "Overview inspected with CDP page scale factor 1.25",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/17-zoom-125-overview-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nOverview\n\nCurrent event status, priorities, and next actions\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\n\nOVERVIEW\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · QA / Smoke Test · Draft\n\nChange event\nClear selection\n\n5\n\nREGISTRATION RECORDS\n\nForm entries\n\n6\n\nGUESTS\n\nFrom persons attending\n\nBBD $225.00\n\nPAYMENTS RECEIVED\n\nProjected registration income BBD $0.00 · Outstanding registration balance BBD $0.00\n\n60%\n\nCAPACITY USED\n\n6 of 10 guests\n\nNEEDS ATTENTION\n\nWhat should I do next?\n\nConfirm venue details\n\nAdd or confirm the venue, location, and access timing so the event plan is actionable.\n\nNEEDS ATTENTION\n\nOpen Events\n\nAdd partners and commitments\n\nSuppliers, sponsors, bakers, vendors, venue contacts, and helpers are not recorded yet.\n\nNEEDS ATTENTION\n\nOpen Operations\n\nData Review\n\n3 contact/duplic",
+        "details": [
+          {
+            "height": 63,
+            "index": 0,
+            "open": false,
+            "summary": "Event details, money snapshot, and readiness progress",
+            "top": 1226,
+            "width": 1087
+          },
+          {
+            "height": 63,
+            "index": 1,
+            "open": false,
+            "summary": "Planning progress and upcoming events",
+            "top": 1313,
+            "width": 1087
+          }
+        ],
+        "dialog": null,
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 1411,
+          "scrollWidth": 1425
+        },
+        "h1": "Overview",
+        "loading": false,
+        "main": {
+          "height": 1331,
+          "left": 258,
+          "top": 81,
+          "width": 1167
+        },
+        "openDetails": [],
+        "pathname": "/dashboard",
+        "selectedEventVisible": true,
+        "tables": [],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "zoomFactor": 1.25,
+      "zoomStatus": "applied"
+    },
+    {
+      "label": "17-zoom-150-overview-desktop",
+      "route": "/dashboard",
+      "state": "Overview inspected with CDP page scale factor 1.5",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/17-zoom-150-overview-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nOverview\n\nCurrent event status, priorities, and next actions\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\n\nOVERVIEW\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · QA / Smoke Test · Draft\n\nChange event\nClear selection\n\n5\n\nREGISTRATION RECORDS\n\nForm entries\n\n6\n\nGUESTS\n\nFrom persons attending\n\nBBD $225.00\n\nPAYMENTS RECEIVED\n\nProjected registration income BBD $0.00 · Outstanding registration balance BBD $0.00\n\n60%\n\nCAPACITY USED\n\n6 of 10 guests\n\nNEEDS ATTENTION\n\nWhat should I do next?\n\nConfirm venue details\n\nAdd or confirm the venue, location, and access timing so the event plan is actionable.\n\nNEEDS ATTENTION\n\nOpen Events\n\nAdd partners and commitments\n\nSuppliers, sponsors, bakers, vendors, venue contacts, and helpers are not recorded yet.\n\nNEEDS ATTENTION\n\nOpen Operations\n\nData Review\n\n3 contact/duplic",
+        "details": [
+          {
+            "height": 63,
+            "index": 0,
+            "open": false,
+            "summary": "Event details, money snapshot, and readiness progress",
+            "top": 1238,
+            "width": 1087
+          },
+          {
+            "height": 63,
+            "index": 1,
+            "open": false,
+            "summary": "Planning progress and upcoming events",
+            "top": 1325,
+            "width": 1087
+          }
+        ],
+        "dialog": null,
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 1423,
+          "scrollWidth": 1425
+        },
+        "h1": "Overview",
+        "loading": false,
+        "main": {
+          "height": 1343,
+          "left": 258,
+          "top": 81,
+          "width": 1167
+        },
+        "openDetails": [],
+        "pathname": "/dashboard",
+        "selectedEventVisible": true,
+        "tables": [],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "zoomFactor": 1.5,
+      "zoomStatus": "applied"
+    },
+    {
+      "label": "17-zoom-200-overview-desktop",
+      "route": "/dashboard",
+      "state": "Overview inspected with CDP page scale factor 2",
+      "viewport": "desktop-1440x900",
+      "file": "interactive-states/17-zoom-200-overview-desktop.png",
+      "metrics": {
+        "appError": false,
+        "bodyExcerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\n[email]\n\nOverview\n\nCurrent event status, priorities, and next actions\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\n\nOVERVIEW\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · QA / Smoke Test · Draft\n\nChange event\nClear selection\n\n5\n\nREGISTRATION RECORDS\n\nForm entries\n\n6\n\nGUESTS\n\nFrom persons attending\n\nBBD $225.00\n\nPAYMENTS RECEIVED\n\nProjected registration income BBD $0.00 · Outstanding registration balance BBD $0.00\n\n60%\n\nCAPACITY USED\n\n6 of 10 guests\n\nNEEDS ATTENTION\n\nWhat should I do next?\n\nConfirm venue details\n\nAdd or confirm the venue, location, and access timing so the event plan is actionable.\n\nNEEDS ATTENTION\n\nOpen Events\n\nAdd partners and commitments\n\nSuppliers, sponsors, bakers, vendors, venue contacts, and helpers are not recorded yet.\n\nNEEDS ATTENTION\n\nOpen Operations\n\nData Review\n\n3 contact/duplic",
+        "details": [
+          {
+            "height": 63,
+            "index": 0,
+            "open": false,
+            "summary": "Event details, money snapshot, and readiness progress",
+            "top": 1238,
+            "width": 1087
+          },
+          {
+            "height": 63,
+            "index": 1,
+            "open": false,
+            "summary": "Planning progress and upcoming events",
+            "top": 1325,
+            "width": 1087
+          }
+        ],
+        "dialog": null,
+        "document": {
+          "clientWidth": 1425,
+          "scrollHeight": 1423,
+          "scrollWidth": 1425
+        },
+        "h1": "Overview",
+        "loading": false,
+        "main": {
+          "height": 1343,
+          "left": 258,
+          "top": 81,
+          "width": 1167
+        },
+        "openDetails": [],
+        "pathname": "/dashboard",
+        "selectedEventVisible": true,
+        "tables": [],
+        "title": "Gather & Savor Event Hub",
+        "viewport": {
+          "devicePixelRatio": 1.0000000149011612,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "zoomFactor": 2,
+      "zoomStatus": "applied"
+    }
+  ]
+}

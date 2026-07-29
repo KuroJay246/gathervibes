@@ -218,3 +218,27 @@ Finding:
 Finding:
 
 - System QA is intentionally technical and should remain separated from daily event work.
+
+## Interactive Components Captured
+
+| State | Component / source | Evidence |
+| --- | --- | --- |
+| Event creation modal | `src/components/events/EventFormModal.jsx` | `interactive-states/01-event-creation-modal-desktop.png` |
+| Event editing modal | `src/components/events/EventFormModal.jsx` | `interactive-states/02-event-editing-modal-desktop.png` |
+| Registration form modal | `src/components/registrations/RegistrationFormModal.jsx` | `interactive-states/03-registration-form-modal-desktop.png` |
+| Registration record edit/detail | `src/components/registrations/RegistrationFormModal.jsx`, `src/pages/RegistrationsPage.jsx` | `interactive-states/04-registration-record-edit-detail-desktop.png` |
+| Registration expanded disclosures | `src/pages/RegistrationsPage.jsx`, `.phase23v-panel` | `interactive-states/05-registration-filters-disclosures-expanded-desktop.png` |
+| Payments expanded disclosures | `src/pages/PaymentsPage.jsx`, `.phase23v-panel` | `interactive-states/06-payments-filters-records-expanded-desktop.png` |
+| Ticket QR list | `src/pages/TicketsPage.jsx`, `src/utils/qrTicketUtils.js` | `interactive-states/07-ticket-qr-display-desktop.png` |
+| Check-In expanded disclosures | `src/pages/CheckInPage.jsx`, `.phase23v-panel` | `interactive-states/08-check-in-disclosures-expanded-desktop.png` |
+| Operations commitments/disclosures | `src/pages/OperationsPage.jsx`, `src/components/operations/PartnerCommitmentsPanel.jsx` | `interactive-states/09-operations-partner-commitments-expanded-desktop.png` |
+| Reports disclosures | `src/pages/EventReviewPage.jsx`, `src/utils/eventReview.js` | `interactive-states/10-reports-disclosures-expanded-desktop.png` |
+| Import field mapping/preview | `src/pages/ImportsPage.jsx`, import preview components | `interactive-states/11-import-field-mapping-preview-desktop.png` |
+| Organizer Access settings tab | `src/pages/SettingsPage.jsx`, `src/utils/accessRoles.js` | `interactive-states/12-settings-organizer-access-tab-desktop.png` |
+| Welcome celebration | `src/components/onboarding/WelcomeCelebration.jsx` | `interactive-states/13-welcome-celebration-modal-desktop.png` |
+| Existing walkthrough | `src/components/onboarding/AppWalkthrough.jsx` | `interactive-states/14-existing-walkthrough-dialog-desktop.png` |
+| Mobile More drawer | `src/layout/AppShell.jsx` | `interactive-states/16-mobile-more-drawer-open-390x844.png` |
+
+Interactive finding:
+
+- The welcome/walkthrough replay surface renders, but closing/skipping it during production browser review emitted app-originated Firestore permission errors. This is a real follow-up item for the onboarding write path or close/skip behavior, not a rendered layout blocker.

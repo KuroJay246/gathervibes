@@ -1,0 +1,53 @@
+{
+  "url": "https://gathervibeshub.web.app/login",
+  "fetchTime": "2026-07-29T22:17:55.866Z",
+  "lighthouseVersion": "13.4.1",
+  "commandExit": "nonzero because chrome-launcher temporary-profile cleanup failed after report generation",
+  "categories": {
+    "performance": {
+      "title": "Performance",
+      "score": 0.7
+    },
+    "accessibility": {
+      "title": "Accessibility",
+      "score": 0.95
+    },
+    "best-practices": {
+      "title": "Best Practices",
+      "score": 1
+    },
+    "seo": {
+      "title": "SEO",
+      "score": 0.63
+    },
+    "agentic-browsing": {
+      "title": "Agentic Browsing",
+      "score": 0.67
+    }
+  },
+  "notableAudits": {
+    "firstContentfulPaint": {
+      "score": 0.2,
+      "displayValue": "4.1 s"
+    },
+    "largestContentfulPaint": {
+      "score": 0.26,
+      "displayValue": "5.0 s"
+    },
+    "cumulativeLayoutShift": {
+      "score": 1,
+      "displayValue": "0"
+    },
+    "colorContrast": {
+      "score": 0,
+      "title": "Background and foreground colors do not have a sufficient contrast ratio."
+    },
+    "htmlHasLang": {
+      "score": 1,
+      "title": "`<html>` element has a `[lang]` attribute"
+    },
+    "metaViewport": null
+  },
+  "rawReportCommitted": false,
+  "rawReportReason": "Raw Lighthouse JSON contains Firebase auth iframe URLs with API-key query parameters; only sanitized summary is retained."
+}

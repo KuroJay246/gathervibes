@@ -1,0 +1,118 @@
+{
+  "capturedAt": "2026-07-29T22:18:48.947Z",
+  "route": "/dashboard",
+  "levels": [
+    "error",
+    "warn"
+  ],
+  "entries": [
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:03:38.604Z",
+      "url": "https://gathervibeshub.web.app/dashboard"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:03:38.605Z",
+      "url": "https://gathervibeshub.web.app/dashboard"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:03:38.605Z",
+      "url": "https://gathervibeshub.web.app/dashboard"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:03:51.117Z",
+      "url": "https://gathervibeshub.web.app/dashboard"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:03:51.117Z",
+      "url": "https://gathervibeshub.web.app/dashboard"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:03:51.117Z",
+      "url": "https://gathervibeshub.web.app/dashboard"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:05:38.123Z",
+      "url": "https://gathervibeshub.web.app/qa"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:05:38.123Z",
+      "url": "https://gathervibeshub.web.app/qa"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:05:38.123Z",
+      "url": "https://gathervibeshub.web.app/qa"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:05:38.131Z",
+      "url": "https://gathervibeshub.web.app/qa"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:05:38.132Z",
+      "url": "https://gathervibeshub.web.app/qa"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:07:51.131Z",
+      "url": "https://gathervibeshub.web.app/payments"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:07:51.132Z",
+      "url": "https://gathervibeshub.web.app/payments"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:07:51.735Z",
+      "url": "https://gathervibeshub.web.app/tickets"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:07:51.735Z",
+      "url": "https://gathervibeshub.web.app/tickets"
+    },
+    {
+      "level": "error",
+      "message": "[Onboarding] Error skipping tour: FirebaseError: Missing or insufficient permissions.",
+      "timestamp": "2026-07-29T22:08:20.898Z",
+      "url": "https://gathervibeshub.web.app/assets/index-g5CYzZdt.js"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-29T22:11:57.648Z",
+      "url": "https://gathervibeshub.web.app/event-review"
+    },
+    {
+      "level": "error",
+      "message": "[Onboarding] Error skipping tour: FirebaseError: Missing or insufficient permissions.",
+      "timestamp": "2026-07-29T22:12:25.505Z",
+      "url": "https://gathervibeshub.web.app/assets/index-g5CYzZdt.js"
+    }
+  ]
+}

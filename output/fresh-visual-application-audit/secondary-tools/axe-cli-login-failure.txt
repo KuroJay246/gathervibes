@@ -1,0 +1,4 @@
+axe CLI attempted against https://gathervibeshub.web.app/login on 2026-07-29.
+The CLI failed before scanning because the downloaded ChromeDriver supports Chrome 151 while installed Chrome is 149.0.7827.156.
+Classification: secondary-tool environment limitation, not an application accessibility result.
+A Playwright plus injected axe-core fallback was attempted separately.
