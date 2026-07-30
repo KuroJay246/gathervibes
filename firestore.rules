@@ -83,8 +83,6 @@ service cloud.firestore {
         || (
           isSignedIn()
           && request.auth.token.email is string
-          && exists(/databases/$(database)/documents/settings/accessControl)
-          && get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails is list
           && request.auth.token.email.lower() in
             get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails
         );
@@ -360,23 +358,7 @@ service cloud.firestore {
           'allergens', 'schoolsYouth', 'speakers', 'sessions',
           'certificates', 'bridalParty', 'accommodation', 'transport'
         ])
-        && (!('publicRegistration' in capabilities) || capabilities.publicRegistration is bool)
-        && (!('ticketing' in capabilities) || capabilities.ticketing is bool)
-        && (!('checkIn' in capabilities) || capabilities.checkIn is bool)
-        && (!('seating' in capabilities) || capabilities.seating is bool)
-        && (!('suppliers' in capabilities) || capabilities.suppliers is bool)
-        && (!('vendors' in capabilities) || capabilities.vendors is bool)
-        && (!('sponsors' in capabilities) || capabilities.sponsors is bool)
-        && (!('bakers' in capabilities) || capabilities.bakers is bool)
-        && (!('tastingZones' in capabilities) || capabilities.tastingZones is bool)
-        && (!('allergens' in capabilities) || capabilities.allergens is bool)
-        && (!('schoolsYouth' in capabilities) || capabilities.schoolsYouth is bool)
-        && (!('speakers' in capabilities) || capabilities.speakers is bool)
-        && (!('sessions' in capabilities) || capabilities.sessions is bool)
-        && (!('certificates' in capabilities) || capabilities.certificates is bool)
-        && (!('bridalParty' in capabilities) || capabilities.bridalParty is bool)
-        && (!('accommodation' in capabilities) || capabilities.accommodation is bool)
-        && (!('transport' in capabilities) || capabilities.transport is bool);
+        && capabilities.values().hasOnly([true, false]);
     }
 
     function validEventStatus(value) {
@@ -393,15 +375,7 @@ service cloud.firestore {
           'projectedRegistrationIncome', 'venueBudget', 'supplierBudget',
           'entertainmentBudget', 'marketingBudget', 'staffingBudget',
           'contingencyBudget', 'otherBudget'
-        ])
-        && (!('projectedRegistrationIncome' in plan) || validOptionalMoney(plan.projectedRegistrationIncome))
-        && (!('venueBudget' in plan) || validOptionalMoney(plan.venueBudget))
-        && (!('supplierBudget' in plan) || validOptionalMoney(plan.supplierBudget))
-        && (!('entertainmentBudget' in plan) || validOptionalMoney(plan.entertainmentBudget))
-        && (!('marketingBudget' in plan) || validOptionalMoney(plan.marketingBudget))
-        && (!('staffingBudget' in plan) || validOptionalMoney(plan.staffingBudget))
-        && (!('contingencyBudget' in plan) || validOptionalMoney(plan.contingencyBudget))
-        && (!('otherBudget' in plan) || validOptionalMoney(plan.otherBudget));
+        ]);
     }
 
     function validPlanningTimeline(timeline) {
@@ -415,9 +389,6 @@ service cloud.firestore {
           'bakerVendorNote', 'sponsorNote', 'staffNote', 'equipmentNote',
           'licencesNote', 'insuranceNote', 'setupTime', 'timeline'
         ])
-        && (!('venueAccessTime' in plan) || validOptionalString(plan.venueAccessTime, 32))
-        && (!('emergencyContact' in plan) || validOptionalString(plan.emergencyContact, 250))
-        && (!('setupTime' in plan) || validOptionalString(plan.setupTime, 64))
         && (!('timeline' in plan) || validPlanningTimeline(plan.timeline));
     }
 
@@ -428,7 +399,8 @@ service cloud.firestore {
           'suppliersConfirmed', 'staffAssigned', 'eventDayTimelineReady',
           'ticketProcessReady', 'checkInProcessReady',
           'communicationsPrepared', 'licencesReviewed', 'insuranceReviewed'
-        ]);
+        ])
+        && checklist.values().hasOnly([true, false]);
     }
 
     function validPlanningTasks(tasks) {
@@ -442,13 +414,8 @@ service cloud.firestore {
     // ── Event allowed keys with optional planner fields ────────────────────
     function isValidEvent(data, eventId) {
       return (
-          // Must have all required keys
-          data.keys().hasAll([
-            'eventId', 'eventName', 'eventDate', 'location', 'eventType',
-            'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt'
-          ])
           // May optionally include planner and ticket configuration fields
-          && data.keys().hasOnly([
+          data.keys().hasOnly([
             'eventId', 'eventName', 'eventDate', 'location', 'eventType',
             'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt',
             'priceTiers', 'venueName', 'eventStartTime', 'eventEndTime',
