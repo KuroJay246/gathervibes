@@ -1,165 +1,209 @@
-/**
- * Onboarding Flow Tests
- *
- * Verifies the onboarding hook reads and writes to the dedicated
- * subcollection path: staffProfiles/{uid}/preferences/onboarding
- *
- * Uses node:test + node:assert (project standard).
- */
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
-import { walkthroughSteps } from '../src/components/onboarding/onboardingSteps.js'
+import { guidedTutorialSteps, TARGET_UIDS, TUTORIAL_VERSION, practiceMissions } from '../src/tutorial/tutorialSteps.js'
+import { TUTORIAL_STATES, initialTutorialMachine, tutorialReducer } from '../src/tutorial/TutorialStateMachine.js'
+import { TUTORIAL_ROUTE_TARGETS, TUTORIAL_TARGETS, isTargetAllowedForRoute } from '../src/tutorial/tutorialRegistry.js'
 
 const JAYLAN_UID = 'WcDU2jmbopdAgDlMMWvD3TkqqbC3'
 const ANICA_UID = 'WM2UOQtSeuOglCI5uMZQKrYYqP53'
-const OTHER_UID = 'non-target-uid-xyzabc'
 
-// ── TARGET_UIDS ───────────────────────────────────────────────────────────────
-
-test('[onboarding-flow] TARGET_UIDS includes Jaylan UID', async () => {
-  const src = await readFile('src/components/onboarding/useOnboarding.js', 'utf8')
-  assert.match(src, new RegExp(JAYLAN_UID), 'Jaylan UID should be in TARGET_UIDS')
+test('[tutorial-v3] eligible users are Jaylan and Anica without hardcoded organizer copy', async () => {
+  assert.ok(TARGET_UIDS.includes(JAYLAN_UID))
+  assert.ok(TARGET_UIDS.includes(ANICA_UID))
+  const provider = await readFile('src/tutorial/TutorialProvider.jsx', 'utf8')
+  const welcome = await readFile('src/tutorial/WelcomeCelebration.jsx', 'utf8')
+  assert.doesNotMatch(provider + welcome, /Welcome aboard, Anica|Welcome, Anica|WM2UOQtSeuOglCI5uMZQKrYYqP53/)
 })
 
-test('[onboarding-flow] TARGET_UIDS includes Anica UID', async () => {
-  const src = await readFile('src/components/onboarding/useOnboarding.js', 'utf8')
-  assert.match(src, new RegExp(ANICA_UID), 'Anica UID should be in TARGET_UIDS')
+test('[tutorial-v3] version is new and does not reuse v2 completion', () => {
+  assert.equal(TUTORIAL_VERSION, 'tutorial-v3-ground-up')
+  assert.notEqual(TUTORIAL_VERSION, 'interactive-product-tour-v2')
 })
 
-// ── ONBOARDING_VERSION ────────────────────────────────────────────────────────
-
-test('[onboarding-flow] ONBOARDING_VERSION is exported and valid length', async () => {
-  const src = await readFile('src/components/onboarding/useOnboarding.js', 'utf8')
-  assert.match(src, /export const ONBOARDING_VERSION = '[^']+'/)
+test('[tutorial-v3] guided orientation covers the required 19-step sequence', () => {
+  assert.equal(guidedTutorialSteps.length, 19)
+  assert.deepEqual(guidedTutorialSteps.map((step) => step.id), [
+    'working-event',
+    'overview',
+    'create-event',
+    'event-category',
+    'event-capabilities',
+    'event-planning',
+    'registrations',
+    'add-registration',
+    'registration-filters',
+    'payments',
+    'tickets',
+    'check-in',
+    'operations',
+    'partners',
+    'communications',
+    'reports',
+    'imports',
+    'settings',
+    'system-qa',
+  ])
 })
 
-// ── walkthroughSteps ──────────────────────────────────────────────────────────
-
-test('[onboarding-flow] walkthroughSteps contains exactly 16 steps', () => {
-  assert.equal(walkthroughSteps.length, 16)
-})
-
-test('[onboarding-flow] every step has a non-empty id, title, content, route, target, and practical example', () => {
-  const VALID_ROUTES = [
-    '/dashboard', '/events', '/registrations', '/payments',
-    '/tickets', '/check-in', '/operations', '/event-review',
-    '/communications', '/imports', '/settings', '/qa',
-  ]
-  for (const [i, step] of walkthroughSteps.entries()) {
-    assert.ok(step.id, `step ${i} must have id`)
-    assert.ok(step.title, `step ${i} must have title`)
-    assert.ok(step.content, `step ${i} must have content`)
-    assert.ok(step.when, `step ${i} must explain when to use it`)
-    assert.ok(step.example, `step ${i} must include an example`)
-    assert.ok(step.route, `step ${i} must have route`)
-    assert.ok(step.targetId, `step ${i} must have targetId`)
-    assert.ok(step.route.startsWith('/'), `step ${i} route must start with /`)
-    assert.ok(VALID_ROUTES.includes(step.route), `step ${i} route "${step.route}" must be a valid app path`)
+test('[tutorial-v3] every guided step has rich practical content and a registered target', () => {
+  for (const step of guidedTutorialSteps) {
+    assert.ok(step.id)
+    assert.ok(step.title)
+    assert.ok(step.pathname.startsWith('/'))
+    assert.ok(step.routeId)
+    assert.ok(step.targetId)
+    assert.ok(step.content.length > 40)
+    assert.ok(step.when.length > 30)
+    assert.ok(step.action.length > 30)
+    assert.ok(step.example.length > 30)
+    assert.ok(step.affects.length > 30)
+    assert.ok(isTargetAllowedForRoute(step.routeId, step.targetId), `${step.id} target must be registered for route`)
   }
 })
 
-test('[onboarding-flow] step sequence matches required order', () => {
-  const expectedIds = [
-    'working-event', 'overview', 'create-event', 'event-capabilities', 'event-planning',
-    'guests', 'payments', 'tickets', 'check-in', 'operations', 'partners',
-    'communications', 'reports', 'imports', 'settings', 'system-qa',
+test('[tutorial-v3] state machine exposes explicit legal states', () => {
+  const expected = [
+    'idle',
+    'opening',
+    'preparing-route',
+    'navigating',
+    'waiting-for-route',
+    'waiting-for-data',
+    'waiting-for-target',
+    'positioning',
+    'presenting',
+    'advancing',
+    'reversing',
+    'paused',
+    'retryable-error',
+    'completing',
+    'completed',
+    'closing',
   ]
-  assert.deepEqual(walkthroughSteps.map((s) => s.id), expectedIds)
+  for (const state of expected) {
+    assert.ok(Object.values(TUTORIAL_STATES).includes(state), state)
+  }
 })
 
-// ── useOnboarding.js path and merge contract ──────────────────────────────────
-
-test('[onboarding-flow] useOnboarding reads and writes to the preferences subcollection, not the root profile doc', async () => {
-  const src = await readFile('src/components/onboarding/useOnboarding.js', 'utf8')
-  assert.match(src, /'staffProfiles', user\.uid, 'preferences', 'onboarding'/)
-  // Must NOT reference the root staffProfiles/{uid} document for onboarding writes
-  assert.doesNotMatch(src, /doc\(db, 'staffProfiles', user\.uid\)\s*\n\s*await (setDoc|updateDoc)/)
+test('[tutorial-v3] stale transition events cannot overwrite current presentation', () => {
+  let state = tutorialReducer(initialTutorialMachine, { type: 'START_GUIDED', stepIndex: 0, transitionId: 'current' })
+  state = tutorialReducer(state, { type: 'TRANSITION', direction: 'next', transitionId: 'newer' })
+  const stale = tutorialReducer(state, { type: 'PRESENT', transitionId: 'older', stepIndex: 5 })
+  assert.equal(stale.stepIndex, 0)
+  assert.equal(stale.transitionId, 'newer')
+  const current = tutorialReducer(state, { type: 'PRESENT', transitionId: 'newer', stepIndex: 1 })
+  assert.equal(current.stepIndex, 1)
+  assert.equal(current.status, TUTORIAL_STATES.presenting)
 })
 
-test('[onboarding-flow] useOnboarding uses setDoc with merge: true, not updateDoc', async () => {
-  const src = await readFile('src/components/onboarding/useOnboarding.js', 'utf8')
-  assert.match(src, /setDoc\(/)
-  assert.match(src, /\{ merge: true \}/)
-  assert.doesNotMatch(src, /updateDoc\(/)
+test('[tutorial-v3] Back and Next transitions are first-class reducer operations', () => {
+  let state = tutorialReducer(initialTutorialMachine, { type: 'START_GUIDED', stepIndex: 3, transitionId: 'start' })
+  state = tutorialReducer(state, { type: 'TRANSITION', direction: 'back', transitionId: 'back-1' })
+  assert.equal(state.status, TUTORIAL_STATES.reversing)
+  state = tutorialReducer(state, { type: 'PRESENT', transitionId: 'back-1', stepIndex: 2 })
+  assert.equal(state.stepIndex, 2)
+  state = tutorialReducer(state, { type: 'TRANSITION', direction: 'next', transitionId: 'next-1' })
+  assert.equal(state.status, TUTORIAL_STATES.advancing)
 })
 
-test('[onboarding-flow] useOnboarding preserves original completedAt on replay', async () => {
-  const src = await readFile('src/components/onboarding/useOnboarding.js', 'utf8')
-  assert.match(src, /state\?\.completedAt/, 'completedAt guard must reference state?.completedAt')
+test('[tutorial-v3] route and target registries are semantic and not text-selector based', () => {
+  assert.ok(TUTORIAL_ROUTE_TARGETS.dashboard.includes(TUTORIAL_TARGETS.workingEventSelector))
+  assert.ok(TUTORIAL_ROUTE_TARGETS.registrations.includes(TUTORIAL_TARGETS.registrationFilters))
+  assert.ok(TUTORIAL_ROUTE_TARGETS.operations.includes(TUTORIAL_TARGETS.partnersSponsors))
+  assert.ok(TUTORIAL_ROUTE_TARGETS['system-qa'].includes(TUTORIAL_TARGETS.systemQa))
 })
 
-// ── WelcomeCelebration portal and logo ────────────────────────────────────────
-
-test('[onboarding-flow] WelcomeCelebration renders via React Portal to document.body', async () => {
-  const src = await readFile('src/components/onboarding/WelcomeCelebration.jsx', 'utf8')
-  assert.match(src, /createPortal/)
-  assert.match(src, /document\.body/)
+test('[tutorial-v3] target registry chooses a measurable target when duplicate layouts exist', async () => {
+  const registry = await readFile('src/tutorial/tutorialRegistry.js', 'utf8')
+  const overlay = await readFile('src/tutorial/TutorialOverlay.jsx', 'utf8')
+  assert.match(registry, /document\.querySelectorAll\(selectorForTutorialTarget\(targetId\)\)/)
+  assert.match(registry, /rect\.width > 0 && rect\.height > 0/)
+  assert.match(overlay, /findRegisteredTarget\(step\.targetId\)/)
 })
 
-test('[onboarding-flow] WelcomeCelebration uses BrandMark with light={false} for cream background', async () => {
-  const src = await readFile('src/components/onboarding/WelcomeCelebration.jsx', 'utf8')
-  assert.match(src, /BrandMark light=\{false\}/, 'Must use dark-background-safe BrandMark treatment')
+test('[tutorial-v3] storage uses the secure onboarding preference subcollection', async () => {
+  const storage = await readFile('src/tutorial/tutorialStorage.js', 'utf8')
+  assert.match(storage, /'staffProfiles', uid, 'preferences', 'onboarding'/)
+  assert.match(storage, /setDoc\(/)
+  assert.match(storage, /\{ merge: true \}/)
+  assert.doesNotMatch(storage, /updateDoc\(/)
+  assert.doesNotMatch(storage, /doc\(db, 'staffProfiles', uid\)\s*\n\s*await (setDoc|updateDoc)/)
 })
 
-test('[onboarding-flow] WelcomeCelebration delegates organizer greeting to trusted display helper', async () => {
-  const src = await readFile('src/components/onboarding/WelcomeCelebration.jsx', 'utf8')
-  assert.match(src, /welcomeGreeting\(user, staffProfile\)/)
-  assert.doesNotMatch(src, /Welcome, Anica/)
-  assert.doesNotMatch(src, /WM2UOQtSeuOglCI5uMZQKrYYqP53/)
+test('[tutorial-v3] legacy stored progress is preserved but not resumed as v3 progress', async () => {
+  const storage = await readFile('src/tutorial/tutorialStorage.js', 'utf8')
+  assert.match(storage, /const isCurrentVersion = data\.version === TUTORIAL_VERSION/)
+  assert.match(storage, /lastStep: isCurrentVersion \? normalizeLastStep\(data\.lastStep\) : 0/)
+  assert.match(storage, /legacyVersion: isCurrentVersion \? null : data\.version \|\| null/)
 })
 
-// ── AppWalkthrough portal and navigation ─────────────────────────────────────
-
-test('[onboarding-flow] AppWalkthrough renders via React Portal to document.body', async () => {
-  const src = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
-  assert.match(src, /createPortal/)
-  assert.match(src, /document\.body/)
+test('[tutorial-v3] normal guided tour writes no business records', async () => {
+  const files = [
+    'src/tutorial/TutorialProvider.jsx',
+    'src/tutorial/TutorialController.js',
+    'src/tutorial/tutorialStorage.js',
+    'src/tutorial/tutorialSteps.js',
+  ]
+  const source = (await Promise.all(files.map((file) => readFile(file, 'utf8')))).join('\n')
+  assert.doesNotMatch(source, /addDoc\(|commitImport\(|completeCheckIn\(|saveTicketAssignment\(|recordHistoricalAttendance\(/)
+  assert.doesNotMatch(await readFile('src/tutorial/tutorialStorage.js', 'utf8'), /'events'|"events"|'registrations'|"registrations"|'tickets'|"tickets"|'auditLogs'|"auditLogs"/)
+  assert.match(source, /staffProfiles/)
 })
 
-test('[onboarding-flow] AppWalkthrough does not contain the manual "Open This Page" link', async () => {
-  const src = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
-  assert.doesNotMatch(src, /Open This Page/)
+test('[tutorial-v3] practice missions are non-writing by default and CPB isolated', () => {
+  assert.ok(practiceMissions.length >= 5)
+  assert.ok(practiceMissions.every((mission) => mission.writes === false))
+  assert.ok(guidedTutorialSteps.every((step) => !/Cake Piknik Barbados|zhaPxi31cpqLAW0cuS20/.test(JSON.stringify(step))))
 })
 
-test('[onboarding-flow] AppWalkthrough contains "Retry Navigation" action', async () => {
-  const src = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
-  assert.match(src, /Retry Navigation/)
+test('[tutorial-v3] legacy runtime files are removed from AppShell imports', async () => {
+  const appShell = await readFile('src/layout/AppShell.jsx', 'utf8')
+  assert.doesNotMatch(appShell, /components\/onboarding/)
+  assert.doesNotMatch(appShell, /AppWalkthrough|useOnboarding/)
+  assert.match(appShell, /TutorialProvider/)
 })
 
-test('[onboarding-flow] AppWalkthrough uses route-specific header title matching (not only generic h1)', async () => {
-  const src = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
-  assert.match(src, /ROUTE_HEADER_TITLES/)
-  assert.match(src, /ROUTE_READY_MARKERS/)
+test('[tutorial-v3] replay starts from the beginning without clearing completion', async () => {
+  const provider = await readFile('src/tutorial/TutorialProvider.jsx', 'utf8')
+  assert.match(provider, /markTutorialReplay\(user\)/)
+  assert.match(provider, /setStoredState\(\(prev\) => \(\{ \.\.\.prev, lastStep: 0 \}\)\)/)
+  assert.match(provider, /completedAt: prev\?\.completedAt \|\| new Date\(\)/)
 })
 
-test('[onboarding-flow] AppWalkthrough recovers when history changes before route content renders', async () => {
-  const src = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
-  assert.match(src, /window\.setTimeout\(check, 100\)/)
-  assert.match(src, /new PopStateEvent\('popstate'/)
-  assert.match(src, /window\.location\.pathname === nextStep\.route/)
+test('[tutorial-v3] transition controller is not recreated during route changes', async () => {
+  const provider = await readFile('src/tutorial/TutorialProvider.jsx', 'utf8')
+  assert.match(provider, /const navigateRef = useRef\(navigate\)/)
+  assert.match(provider, /const activeEventNameRef = useRef\(null\)/)
+  assert.match(provider, /navigate: \(pathname\) => navigateRef\.current\(pathname\)/)
+  assert.match(provider, /activeEventName: \(\) => activeEventNameRef\.current/)
+  assert.doesNotMatch(provider, /\}, \[activeEventName, navigate\]\)/)
 })
 
-test('[onboarding-flow] AppWalkthrough uses anchored spotlight targets with arrowed tooltip copy', async () => {
-  const src = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
-  assert.match(src, /targetSelector/)
-  assert.match(src, /data-tour-id/)
-  assert.match(src, /scrollIntoView/)
-  assert.match(src, /shadow-\[0_0_0_9999px/)
-  assert.match(src, /ArrowIcon/)
-  assert.match(src, /When to use it/)
-  assert.match(src, /Example:/)
+test('[tutorial-v3] overlay uses observer-based measurement and one document-body portal', async () => {
+  const overlay = await readFile('src/tutorial/TutorialOverlay.jsx', 'utf8')
+  assert.match(overlay, /ResizeObserver/)
+  assert.match(overlay, /IntersectionObserver/)
+  assert.match(overlay, /requestAnimationFrame/)
+  assert.match(overlay, /visualViewport/)
+  assert.match(overlay, /createPortal/)
+  assert.match(overlay, /document\.body/)
+  assert.match(overlay, /const height = Math\.min\(TOOLTIP_HEIGHT, viewportHeight - SAFE_MARGIN \* 2\)/)
+  assert.match(overlay, /maxHeight: height/)
 })
 
-test('[onboarding-flow] AppWalkthrough does not contain the weak "Finish Tour" text button', async () => {
-  const src = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
-  assert.doesNotMatch(src, /Finish Tour/)
+test('[tutorial-v3] controller uses AbortController-backed transitions without fixed route sleeps', async () => {
+  const controller = await readFile('src/tutorial/TutorialController.js', 'utf8')
+  assert.match(controller, /AbortController/)
+  assert.match(controller, /transitionId/)
+  assert.match(controller, /MutationObserver/)
+  assert.match(controller, /requestAnimationFrame/)
+  assert.doesNotMatch(controller, /setTimeout\(.*100/)
 })
 
-// ── Firestore rules contain subcollection path ───────────────────────────────
-
-test('[onboarding-flow] firestore.rules references dedicated onboarding subcollection path', async () => {
+test('[tutorial-v3] Firestore rules allow v3 19-step boundary', async () => {
   const rules = await readFile('firestore.rules', 'utf8')
-  assert.match(rules, /\/staffProfiles\/\{uid\}\/preferences\/onboarding/)
-  assert.match(rules, /validOnboardingData/)
+  assert.match(rules, /staffProfiles\/\{uid\}\/preferences\/onboarding/)
+  assert.match(rules, /lastStep.*<= 19/)
+  assert.match(rules, /lastStep.*>= 0/)
 })

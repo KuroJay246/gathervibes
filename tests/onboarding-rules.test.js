@@ -114,7 +114,7 @@ rulesTest('[onboarding-rules] Jaylan can create with all optional onboarding fie
           completed: true,
           completedAt: serverTimestamp(),
           skippedAt: serverTimestamp(),
-          lastStep: 13,
+          lastStep: 19,
           replayRequestedAt: serverTimestamp(),
         })
       )
@@ -233,41 +233,41 @@ rulesTest('[onboarding-rules] Rejects write with arbitrary extra field "adminOve
 
 // ── Field type validation ─────────────────────────────────────────────────────
 
-rulesTest('[onboarding-rules] Rejects lastStep below minimum (0)', async () => {
+rulesTest('[onboarding-rules] Rejects lastStep below minimum (-1)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
-    await assertFails(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 0 })))
+    await assertFails(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: -1 })))
   } finally {
     await testEnv.cleanup()
   }
 })
 
-rulesTest('[onboarding-rules] Rejects lastStep above maximum (17)', async () => {
+rulesTest('[onboarding-rules] Rejects lastStep above maximum (20)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
-    await assertFails(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 17 })))
+    await assertFails(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 20 })))
   } finally {
     await testEnv.cleanup()
   }
 })
 
-rulesTest('[onboarding-rules] Accepts lastStep at minimum boundary (1)', async () => {
+rulesTest('[onboarding-rules] Accepts lastStep at unopened boundary (0)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
-    await assertSucceeds(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 1 })))
+    await assertSucceeds(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 0 })))
   } finally {
     await testEnv.cleanup()
   }
 })
 
-rulesTest('[onboarding-rules] Accepts lastStep at maximum boundary (16)', async () => {
+rulesTest('[onboarding-rules] Accepts lastStep at maximum boundary (19)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
-    await assertSucceeds(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 16 })))
+    await assertSucceeds(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 19 })))
   } finally {
     await testEnv.cleanup()
   }
