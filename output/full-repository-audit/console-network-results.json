@@ -7,5 +7,25 @@
   "relevantLogs": [],
   "limitations": [
     "Network tab request/response status capture was not available in this Browser pass; no claim is made about every network request status."
-  ]
+  ],
+  "pass3": {
+    "generatedAt": "2026-07-30T18:50:58.721Z",
+    "highRiskRoutes": [
+      "/dashboard",
+      "/events",
+      "/registrations",
+      "/payments",
+      "/payments/reconciliation",
+      "/imports",
+      "/tickets",
+      "/check-in",
+      "/operations",
+      "/event-review",
+      "/settings",
+      "/qa"
+    ],
+    "cdpNetworkCoverage": "limited/not complete",
+    "appOriginatedErrorsObserved": 0,
+    "browserExtensionNoise": "not captured"
+  }
 }

@@ -2,6 +2,7 @@
 
 Generated for Audit Pass 1 on 2026-07-30T16:16:59.942Z.
 Updated for Audit Pass 2 on 2026-07-30.
+Updated for Audit Pass 3 on 2026-07-30.
 
 ## Git State
 - Branch: `codex/full-repository-product-audit-2026-07`
@@ -23,6 +24,9 @@ Updated for Audit Pass 2 on 2026-07-30.
 - `output/full-repository-audit/tutorial-step-matrix.json`: Tutorial V3 source/E2E step matrix.
 - `output/full-repository-audit/working-event-results.json`: CPB, CODEX_TEST, and no-selected Working Event browser checks.
 - `output/full-repository-audit/findings.json`: Consolidated Pass 1 and Pass 2 findings register.
+- `output/full-repository-audit/write-path-matrix.json`: Pass 3 mapped production write-capable operations, role boundaries, audit actions, and partial-write risks.
+- `output/full-repository-audit/data-calculation-results.json`: Pass 3 registration finance and Operations calculation truth table.
+- `output/full-repository-audit/integration-status.json`: Pass 3 Forms Inbox, XLSX, and reconciliation integration status.
 
 ## Command Output Evidence
 - `*.out.txt` and `*.err.txt` files in this folder contain saved stdout/stderr from each required validation command.
@@ -36,5 +40,6 @@ Updated for Audit Pass 2 on 2026-07-30.
 ## Scope Notes
 - Browser/visual/route-by-route product workflow inspection was intentionally excluded from Pass 1.
 - Browser/visual/route-by-route product workflow inspection was added in Pass 2.
+- Financial workflow, import, write-path, audit-log, and role/rules consistency inspection was added in Pass 3.
 - No production records were modified by this pass.
 - No application behavior files were intentionally changed; only docs and audit evidence were created.

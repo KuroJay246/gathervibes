@@ -1,0 +1,152 @@
+{
+  "generatedAt": "2026-07-30T18:50:58.721Z",
+  "financeTruthTable": [
+    {
+      "case": "explicit price x persons",
+      "input": {
+        "ticketPrice": 50,
+        "personsAttending": 2,
+        "amountPaid": 25,
+        "paymentStatus": "pending"
+      },
+      "expected": {
+        "amountDue": 100,
+        "amountPaid": 25,
+        "balanceDue": 75,
+        "statusGroup": "partial/pending"
+      }
+    },
+    {
+      "case": "explicit amountDue overrides multiplication",
+      "input": {
+        "ticketPrice": 50,
+        "personsAttending": 2,
+        "amountDue": 90,
+        "amountPaid": 90,
+        "paymentStatus": "paid"
+      },
+      "expected": {
+        "amountDue": 90,
+        "warning": "amount due mismatch"
+      }
+    },
+    {
+      "case": "complimentary zero",
+      "input": {
+        "ticketPrice": 0,
+        "personsAttending": 1,
+        "amountDue": 0,
+        "amountPaid": 0,
+        "paymentStatus": "complimentary"
+      },
+      "expected": {
+        "balanceDue": 0,
+        "followUp": false
+      }
+    },
+    {
+      "case": "overpaid",
+      "input": {
+        "amountDue": 100,
+        "amountPaid": 125,
+        "paymentStatus": "paid"
+      },
+      "expected": {
+        "balanceDue": 0,
+        "warning": "overpaid"
+      }
+    },
+    {
+      "case": "paid missing amount",
+      "input": {
+        "paymentStatus": "paid"
+      },
+      "expected": {
+        "review": "paid amount not recorded / missing amount due"
+      }
+    },
+    {
+      "case": "door list",
+      "input": {
+        "amountDue": 110,
+        "amountPaid": 0,
+        "balanceDue": 110,
+        "paymentStatus": "door-list"
+      },
+      "expected": {
+        "followUp": true
+      }
+    },
+    {
+      "case": "operations received income",
+      "input": {
+        "entryType": "income",
+        "status": "received",
+        "amount": 500
+      },
+      "expected": {
+        "incomeReceived": 500,
+        "registrationIncome": 0
+      }
+    },
+    {
+      "case": "operations expected income",
+      "input": {
+        "entryType": "income",
+        "status": "expected",
+        "amount": 500
+      },
+      "expected": {
+        "incomeExpected": 500,
+        "incomeReceived": 0
+      }
+    },
+    {
+      "case": "expense paid",
+      "input": {
+        "entryType": "expense",
+        "status": "paid",
+        "amount": 200
+      },
+      "expected": {
+        "expensePaid": 200
+      }
+    },
+    {
+      "case": "expense pending",
+      "input": {
+        "entryType": "expense",
+        "status": "pending",
+        "amount": 200
+      },
+      "expected": {
+        "expensePending": 200,
+        "expensePaid": 0
+      }
+    },
+    {
+      "case": "in-kind sponsor partner",
+      "input": {
+        "recordType": "sponsor",
+        "sponsorType": "in-kind",
+        "estimatedValue": 300
+      },
+      "expected": {
+        "cashIncome": 0,
+        "inKindValue": 300
+      }
+    }
+  ],
+  "reviewedUtilities": [
+    "financeUtils.calculateRegistrationFinance",
+    "financeUtils.classifyRegistrationFinance",
+    "financeUtils.buildFinanceSummary",
+    "operationsReport",
+    "eventReview",
+    "paymentReconciliation",
+    "registrationMetrics",
+    "attendanceUtils",
+    "ticketUtils",
+    "qrTicketUtils"
+  ]
+}

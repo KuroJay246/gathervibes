@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-07-30T18:50:58.721Z",
+  "googleFormsResponseInbox": {
+    "status": "manual UI and utility package; no deployed automatic receiver verified in Pass 3",
+    "frontend": "ImportsPage manual inbox parses pasted rows and applies local review statuses",
+    "automaticReceiver": "packaged/expected by tests and docs but deployment not verified; billing/form access/secrets not confirmed",
+    "hmac": "reviewed as expected package topic; no frontend secret found by source scan",
+    "blocker": "No live Google Form access or production receiver invocation was used in audit-only pass"
+  },
+  "xlsx": {
+    "package": "read-excel-file@9.2.0",
+    "xlsxPackage": "absent",
+    "formulas": "read path treats workbook values as data; spreadsheet formulas are not executed by app code"
+  },
+  "paymentReconciliation": {
+    "status": "dry-run only",
+    "writesPerformed": false,
+    "targetEvent": "selected Working Event"
+  }
+}

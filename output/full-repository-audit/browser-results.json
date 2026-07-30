@@ -2087,5 +2087,11 @@
       "url": "https://gathervibeshub.web.app/unknown-audit-route",
       "workingEvent": ""
     }
-  ]
+  ],
+  "pass3": {
+    "generatedAt": "2026-07-30T18:50:58.721Z",
+    "cdpNetwork": "not completed; Browser runtime did not provide full route-by-route request capture in this pass",
+    "zoom200": "source and screenshot evidence reviewed; true 200 percent browser zoom not completed",
+    "tutorialProduction": "not completed; use E2E/source coverage plus Pass 2 limitation"
+  }
 }
