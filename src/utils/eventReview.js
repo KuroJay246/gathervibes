@@ -18,6 +18,7 @@ import {
   formatRegistrationGuestSummary,
 } from './registrationMetrics.js'
 import { dateFromValue } from './dateUtils.js'
+import { buildOrganizerOverview } from './eventPlanning.js'
 import { normalizeTicketCode } from './ticketUtils.js'
 
 const PREVIEW_LIMIT = 5
@@ -218,6 +219,7 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
 
   const timing = getEventTiming(event, asOf)
   const readiness = buildEventReadiness(event, rows, ledgerRows)
+  const planningOverview = buildOrganizerOverview(event, rows, ledgerRows)
   const metrics = buildRegistrationMetrics(rows, event)
   const finance = buildRegistrationPaymentBreakdown(rows, event)
   const financeContext = buildFinanceClassificationContext(rows, event)
@@ -431,6 +433,22 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
         cancelledItems: ledger.counts.cancelled,
         openItemCount: ledger.control.openEntries,
         netPosition: ledger.totals.net,
+      },
+      outstandingCommitments: {
+        operationsPendingExpenses: ledger.pendingExpenses,
+        operationsPendingRefunds: ledger.pendingRefunds,
+        partnerOutstandingBalance: planningOverview.partners.outstandingBalance,
+        totalOutstandingCommitments: planningOverview.totalOutstandingCommitments,
+      },
+      plannedFigures: {
+        plannedRegistrationIncome: planningOverview.budgets.projectedRegistrationIncome,
+        plannedExpenses: planningOverview.budgets.totalBudget,
+        plannedVenueCost: planningOverview.budgets.venueBudget,
+        plannedSupplierCost: planningOverview.budgets.supplierBudget,
+        plannedMarketingCost: planningOverview.budgets.marketingBudget,
+        plannedStaffingCost: planningOverview.budgets.staffingBudget,
+        plannedContingency: planningOverview.budgets.contingencyBudget,
+        plannedCashPosition: planningOverview.projectedCashPosition,
       },
       comparison: {
         label: 'Boundary comparison for review only',

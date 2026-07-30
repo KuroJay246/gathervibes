@@ -12,7 +12,7 @@ import {
   paymentFilterMatches,
   paymentSearchMatches,
 } from '../utils/financeUtils'
-import { countEvidenceClasses, getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
+import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 
 const PAYMENT_FILTERS = [
   ['all', 'All'],
@@ -279,35 +279,14 @@ export function PaymentsPage() {
       </details>
 
       {evidenceAudit && (
-        <details className="phase23v-panel border-[#D8C5A8] bg-[#FFFCF6]" aria-labelledby="payments-evidence-heading">
-          <summary className="phase23v-summary text-[#4E3928]">Payment evidence detail</summary>
-          <div className="phase23v-body">
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Payment Evidence</p>
-              <h2 id="payments-evidence-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Documentary support for CPB ticket income</h2>
-              <p className="mt-2 max-w-3xl text-xs leading-5 text-[#715D46]">
-                Evidence classification is separate from payment status. The row-level matching package remains private until organizer review.
-              </p>
-            </div>
-            <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
-              BBD {evidenceAudit.ticketIncome.documentaryToAppVariance.toFixed(2)} variance unresolved
-            </span>
+        <section className="rounded-2xl border border-[#D8C5A8] bg-[#FFFCF6] p-4 text-sm leading-6 text-[#715D46]" aria-label="Historical reconciliation moved to Reports">
+          <strong className="text-[#4E3928]">Historical reconciliation evidence is not part of the daily Registration Payments workflow.</strong>
+          {' '}Use Reports for CPB historical reconciliation details and use Reconciliation Preview for locked workbook comparison. The daily totals above remain the registration payment records only.
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link to="/event-review" className="inline-flex min-h-10 items-center rounded-xl border border-[#D8C5A8] bg-white px-4 text-xs font-bold text-[#7A5818]">Open Reports</Link>
+            <Link to="/payments/reconciliation" className="inline-flex min-h-10 items-center rounded-xl border border-[#D8C5A8] bg-white px-4 text-xs font-bold text-[#7A5818]">Open Reconciliation Preview</Link>
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {countEvidenceClasses(evidenceAudit).map(([label, value]) => (
-              <Metric
-                key={label}
-                label={label}
-                value={typeof value === 'number' && value > 100 ? formatCurrency(value, currency) : value}
-              />
-            ))}
-          </div>
-          <p className="mt-3 text-xs leading-5 text-[#715D46]">
-            BBD $5,420 remains the app payment record. BBD $5,415 is the maximum Gmail-supported ticket value and must not replace app totals without row-level bank or 1stPay evidence.
-          </p>
-          </div>
-        </details>
+        </section>
       )}
 
       <ReviewList

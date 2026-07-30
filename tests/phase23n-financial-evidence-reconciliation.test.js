@@ -88,11 +88,11 @@ test('Phase 23N UI surfaces documentary audit without reopening completed-event 
   assert.match(dashboard, /Historical Reference/)
   assert.match(dashboard, /Financial audit history/)
   assert.match(dashboard, /completed historical event/i)
-  assert.match(payments, /Evidence classification is separate from payment status/)
+  assert.match(payments, /Historical reconciliation evidence is not part of the daily Registration Payments workflow/)
   assert.match(registrations, /Registration Evidence Reconciliation/)
   assert.match(checkIn, /Historical attendance is not system check-in/)
-  assert.match(operations, /Financial Audit and Closeout History/)
-  assert.match(reports, /Documentary Financial Audit/)
+  assert.match(operations, /Historical reconciliation evidence is shown in Reports/)
+  assert.match(reports, /Historical Reconciliation/)
   assert.match(reports, /Final profit cannot be confirmed until bank, 1stPay, baker and supplier evidence is complete/)
 })
 
@@ -133,10 +133,11 @@ test('Phase 23N-B paid expenses and commitments remain separate', () => {
 
 test('Phase 23N-B completed closeout panel cannot reapply records', async () => {
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
+  const reports = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
 
-  assert.match(operations, /Operations closeout records applied/)
-  assert.match(operations, /Applied/)
-  assert.match(operations, /Registration and attendance corrections locked/)
+  assert.match(operations, /Historical reconciliation evidence is shown in Reports/)
+  assert.match(reports, /Historical Reconciliation/)
+  assert.match(reports, /Historical reconciliation evidence is preserved here for CPB review/)
   assert.doesNotMatch(operations, /waiting for organizer approval/)
   assert.doesNotMatch(operations, /Apply Phase 23N|Apply approved|Reapply/)
 })
@@ -169,9 +170,11 @@ test('Phase 23N-B applied proposal-count reporting is internally consistent', as
 
 test('Phase 23N-B Subsets 5 and 6 remain locked in UI and report', async () => {
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
+  const reportsPage = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
   const report = await readFile('PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md', 'utf8')
 
-  assert.match(operations, /Registration and attendance corrections locked/)
+  assert.match(operations, /Historical reconciliation evidence is shown in Reports/)
+  assert.match(reportsPage, /Final profit cannot be confirmed/)
   assert.match(report, /Subset 5: Registration Evidence Metadata/)
   assert.match(report, /Subset 6: Registration\/Attendance Corrections/)
 })

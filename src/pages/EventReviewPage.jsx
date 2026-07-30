@@ -219,8 +219,8 @@ export function EventReviewPage() {
         <div className="mt-5 grid gap-6 xl:grid-cols-2">
           <div className="space-y-4">
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Registration payment records</p>
-              <h3 className="mt-1 text-sm font-bold text-[#2B1723]">Guest-facing payment data</h3>
+              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Registration Payments</p>
+              <h3 className="mt-1 text-sm font-bold text-[#2B1723]">Guest-facing payment data only</h3>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <SummaryCard label="Registration records" value={review.paymentReview.registrationRecords.registrationCount} />
@@ -249,7 +249,7 @@ export function EventReviewPage() {
           <div className="space-y-4">
             <div>
               <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Operations Ledger</p>
-              <h3 className="mt-1 text-sm font-bold text-[#2B1723]">Manually recorded event money</h3>
+              <h3 className="mt-1 text-sm font-bold text-[#2B1723]">Manually recorded event money only</h3>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <SummaryCard label="Income received" value={formatEventReviewMoney(review.paymentReview.operationsLedger.incomeReceived, currency)} />
@@ -262,6 +262,44 @@ export function EventReviewPage() {
               <SummaryCard label="Cancelled items" value={review.paymentReview.operationsLedger.cancelledItems} />
               <SummaryCard label="Open ledger items" value={review.paymentReview.operationsLedger.openItemCount} />
               <SummaryCard label="Operations cash position" value={formatEventReviewMoney(review.paymentReview.operationsLedger.netPosition, currency)} help="This is not final event profit." />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-6 xl:grid-cols-2">
+          <div className="space-y-4 rounded-2xl border border-[#EEDFD6] bg-[#FFFDFC] p-4">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Outstanding Commitments</p>
+              <h3 className="mt-1 text-sm font-bold text-[#2B1723]">Open Operations and partner obligations</h3>
+              <p className="mt-2 text-xs leading-5 text-[#816D62]">
+                These are unsettled commitments. They are not paid expenses until the source record is marked paid, received, or otherwise settled.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <SummaryCard label="Operations pending expenses" value={formatEventReviewMoney(review.paymentReview.outstandingCommitments.operationsPendingExpenses, currency)} />
+              <SummaryCard label="Operations pending refunds" value={formatEventReviewMoney(review.paymentReview.outstandingCommitments.operationsPendingRefunds, currency)} />
+              <SummaryCard label="Partner outstanding balance" value={formatEventReviewMoney(review.paymentReview.outstandingCommitments.partnerOutstandingBalance, currency)} />
+              <SummaryCard label="Total outstanding commitments" value={formatEventReviewMoney(review.paymentReview.outstandingCommitments.totalOutstandingCommitments, currency)} />
+            </div>
+          </div>
+
+          <div className="space-y-4 rounded-2xl border border-[#EEDFD6] bg-[#FFFDFC] p-4">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Planned Figures</p>
+              <h3 className="mt-1 text-sm font-bold text-[#2B1723]">Event setup estimates only</h3>
+              <p className="mt-2 text-xs leading-5 text-[#816D62]">
+                Planned figures come from Events setup. They are not actual registration payments, Operations Ledger entries, or final event profit.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <SummaryCard label="Planned registration income" value={formatEventReviewMoney(review.paymentReview.plannedFigures.plannedRegistrationIncome, currency)} />
+              <SummaryCard label="Planned expenses" value={formatEventReviewMoney(review.paymentReview.plannedFigures.plannedExpenses, currency)} />
+              <SummaryCard label="Planned venue cost" value={formatEventReviewMoney(review.paymentReview.plannedFigures.plannedVenueCost, currency)} />
+              <SummaryCard label="Planned supplier cost" value={formatEventReviewMoney(review.paymentReview.plannedFigures.plannedSupplierCost, currency)} />
+              <SummaryCard label="Planned marketing cost" value={formatEventReviewMoney(review.paymentReview.plannedFigures.plannedMarketingCost, currency)} />
+              <SummaryCard label="Planned staffing cost" value={formatEventReviewMoney(review.paymentReview.plannedFigures.plannedStaffingCost, currency)} />
+              <SummaryCard label="Planned contingency" value={formatEventReviewMoney(review.paymentReview.plannedFigures.plannedContingency, currency)} />
+              <SummaryCard label="Planned cash position" value={formatEventReviewMoney(review.paymentReview.plannedFigures.plannedCashPosition, currency)} help="Planning view only, not final profit." />
             </div>
           </div>
         </div>
@@ -283,9 +321,9 @@ export function EventReviewPage() {
       </Section>
 
       {evidenceAudit && (
-        <Section eyebrow="Documentary Financial Audit" title={evidenceAudit.auditStatus}>
+        <Section eyebrow="Historical Reconciliation" title={evidenceAudit.auditStatus}>
           <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-            Final profit cannot be confirmed until bank, 1stPay, baker and supplier evidence is complete.
+            Historical reconciliation evidence is preserved here for CPB review. It is not part of the daily Registration Payments workflow and it is not an automatic accounting ledger. Final profit cannot be confirmed until bank, 1stPay, baker and supplier evidence is complete.
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

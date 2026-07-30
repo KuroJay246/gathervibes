@@ -97,6 +97,7 @@ test('Phase 23O guardrails preserve QR privacy, CODEX_TEST isolation, CPB locks,
   const qaPage = await source('src/pages/QaPage.jsx')
   const qaHelper = await source('src/utils/qaHelper.js')
   const operations = await source('src/pages/OperationsPage.jsx')
+  const reports = await source('src/pages/EventReviewPage.jsx')
   const phase23n = await source('PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md')
   const paymentAuditEngine = await source('src/services/cpbAuditBackfill.js')
 
@@ -105,7 +106,8 @@ test('Phase 23O guardrails preserve QR privacy, CODEX_TEST isolation, CPB locks,
   assert.match(qaHelper, new RegExp(CPB_EVENT_ID))
   assert.match(qaPage, /CPB is production data and remains read-only during normal QA/)
   assert.match(qaPage, /Legacy CPB write controls remain unavailable/)
-  assert.match(operations, /Registration and attendance corrections locked/)
+  assert.match(operations, /Historical reconciliation evidence is shown in Reports/)
+  assert.match(reports, /Historical reconciliation evidence is preserved here for CPB review/)
   assert.match(phase23n, /Subset 5: Registration Evidence Metadata/)
   assert.match(phase23n, /Subset 6: Registration\/Attendance Corrections/)
   assert.match(paymentAuditEngine, /CPB_AUDIT_APPROVAL_TEXT/)

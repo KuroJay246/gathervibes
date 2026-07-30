@@ -44,7 +44,7 @@ test('Phase 23V dense organizer pages keep primary work visible and collapse sec
   assert.match(registrations, /Registration evidence reconciliation/)
 
   assert.match(payments, /Payment status and review detail/)
-  assert.match(payments, /Payment evidence detail/)
+  assert.match(payments, /Historical reconciliation evidence is not part of the daily Registration Payments workflow/)
   assert.match(payments, /Historical and informational review/)
 
   assert.match(tickets, /Advanced ticket filters/)
@@ -56,7 +56,7 @@ test('Phase 23V dense organizer pages keep primary work visible and collapse sec
   assert.match(checkIn, /Advanced check-in filters/)
 
   assert.match(operations, /Partner commitments, sponsors, and supplier contacts/)
-  assert.match(operations, /Financial audit and closeout history/)
+  assert.match(operations, /Historical reconciliation evidence is shown in Reports/)
   assert.match(reports, /Show full report metrics/)
 })
 
