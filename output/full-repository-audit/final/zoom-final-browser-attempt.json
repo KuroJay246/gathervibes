@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-07-30T21:39:05.872Z",
+  "browser": "in-app Browser",
+  "method": "keyboard CTRL+0 then six CTRL+plus attempts",
+  "beforeZoomFinal": {
+    "clientWidth": 1280,
+    "dpr": 1.25,
+    "innerHeight": 720,
+    "innerWidth": 1280,
+    "outerHeight": 28,
+    "outerWidth": 160,
+    "scrollWidth": 1280,
+    "visualScale": 1
+  },
+  "afterZoomFinal": {
+    "clientWidth": 1280,
+    "dpr": 1.25,
+    "h1": "",
+    "innerHeight": 720,
+    "innerWidth": 1280,
+    "outerHeight": 28,
+    "outerWidth": 160,
+    "overflowX": false,
+    "scrollWidth": 1280,
+    "visualScale": 1
+  },
+  "confirmedTrue200": false
+}

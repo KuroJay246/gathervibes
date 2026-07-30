@@ -1,0 +1,208 @@
+{
+  "generatedAt": "2026-07-30T21:38:46.592Z",
+  "limitation": "in-app Browser click failed: no element found at Next button point",
+  "stateAfterFail": {
+    "appErrorBoundary": false,
+    "bodySample": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCODEX_TEST Live Verification Event\n15 Jan 2027 · draft\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nEvents\n\nPlan and organize every gathering\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · draft\n\nChange event\nLIVE EVENTS\nYour gatherings\n\nCreate each event once, plan it progressively, and keep one Working Event selected for the organizer team.\n\nThe event planner now includes event setup, budget planning, readiness, and task tracking without leaving the normal organizer workflow.\n\nShow Test Events\nPlan a New Event\n\nALL EVENTS\n\n1\n\nUPCOMING / ACTIVE\n\n0\n\nPLANNED CAPACITY\n\n80\n\nEvent calendar\n\n1 event shown · test events hidden\n\nEVENT\tDATE\tSTATUS\tCAPACITY\tBASE PRICE\tACTIONS\n\n\nCPB\n\nLESC\n\n3 price tiers active\n\n\t20 Jun 2026\tCOMPLETED\t80\t$85.00\t\nSelect\n\nPLAN A NEW EVENT\n\nCODEX_TEST Live Verification Event\n\n15 Jan 2027 · QA / Smoke Test · Draft\n\nCapture the event idea and basic details before planning starts.\n\nEdit setup\nOpen Overview\nOpen Operations\n\n169 days away\n\nDAYS REMAINING\n\n10\n\nCAPACITY\n\nRegistration is required\n\nBBD $0.00\n\nPROJECTED CASH POSITION\n\nBudget plan only, not final profit\n\nBBD $0.00\n\nBUDGETED EXPENSES\n\n0 / 0\n\nTASKS COMPLETED\n\n0 overdue\n\nBBD $0.00\n\nOUTSTANDING COMMITMENTS\n\n0 partner records\n\nS",
+    "dialogs": [
+      {
+        "buttons": [
+          {
+            "label": "",
+            "rect": {
+              "bottom": 94.73749923706055,
+              "h": 36,
+              "right": 1116.4000244140625,
+              "w": 36,
+              "x": 1080.4000244140625,
+              "y": 58.73749923706055
+            }
+          },
+          {
+            "label": "1Event Basics",
+            "rect": {
+              "bottom": 203.86250686645508,
+              "h": 57.57500076293945,
+              "right": 332.40000915527344,
+              "w": 184,
+              "x": 148.40000915527344,
+              "y": 146.28750610351562
+            }
+          },
+          {
+            "label": "2Capacity and Registration",
+            "rect": {
+              "bottom": 203.86250686645508,
+              "h": 57.57500076293945,
+              "right": 528.3999938964844,
+              "w": 184,
+              "x": 344.3999938964844,
+              "y": 146.28750610351562
+            }
+          },
+          {
+            "label": "3Financial Plan",
+            "rect": {
+              "bottom": 203.86250686645508,
+              "h": 57.57500076293945,
+              "right": 724.4000244140625,
+              "w": 184,
+              "x": 540.4000244140625,
+              "y": 146.28750610351562
+            }
+          },
+          {
+            "label": "4Operations",
+            "rect": {
+              "bottom": 203.86250686645508,
+              "h": 57.57500076293945,
+              "right": 920.4000244140625,
+              "w": 184,
+              "x": 736.4000244140625,
+              "y": 146.28750610351562
+            }
+          },
+          {
+            "label": "5Readiness",
+            "rect": {
+              "bottom": 203.86250686645508,
+              "h": 57.57500076293945,
+              "right": 1116.4000244140625,
+              "w": 184,
+              "x": 932.4000244140625,
+              "y": 146.28750610351562
+            }
+          },
+          {
+            "label": "Cancel",
+            "rect": {
+              "bottom": 680.0000381469727,
+              "h": 41.587501525878906,
+              "right": 226.87500762939453,
+              "w": 78.4749984741211,
+              "x": 148.40000915527344,
+              "y": 638.4125366210938
+            }
+          },
+          {
+            "label": "Next",
+            "rect": {
+              "bottom": 680.0000381469727,
+              "h": 41.587501525878906,
+              "right": 1116.4000244140625,
+              "w": 128,
+              "x": 988.4000244140625,
+              "y": 638.4125366210938
+            }
+          }
+        ],
+        "rect": {
+          "bottom": 696,
+          "h": 672,
+          "right": 1144.400001525879,
+          "w": 1024,
+          "x": 120.4000015258789,
+          "y": 24
+        },
+        "text": "PLAN A NEW EVENT\n\nCreate an organizer-ready event\n\nEvent Basics: Set the event name, type, date, time, venue, and overall status.\n\n1\nEvent Basics\n2\nCapacity and Registration\n3\nFinancial Plan\n4\nOperations\n5\nReadiness\n\nSTEP 1\n\nEvent Basics\n\nThis is the organizer-friendly event profile guests and staff will work from later.\n\nEvent name *\nEvent type *\nBirthday\nBridal Shower\nWedding\nWorkshop\nCake Tasting or Food Showcase\nCultural Experience\nCorporate Event\nHospitality Event\nParty\nPrivate Event\nOther\nCake Picnic\nCake Tasting\nBrunch\nTasting\nFood Event\nVendor Pop-Up\nPrivate Food Experience\n\nEvent type suggests default capabilities. You can review and override them in the next step.\n\nLifecycle status *\nDraft\nPlanning\nRegistration Open\nRegistration Closed\nReady for Event\nIn Progress\nCompleted\nArchived\nCancelled\n\nBuild the guest plan, budget, partners, tasks, and readiness details.\n\nEvent date *\nVenue *\nStart time *\nEnd time\nLocation *\nEvent description\nCancel\nNext"
+      },
+      {
+        "buttons": [
+          {
+            "label": "",
+            "rect": {
+              "bottom": 197.8000030517578,
+              "h": 36,
+              "right": 791.4000244140625,
+              "w": 36,
+              "x": 755.4000244140625,
+              "y": 161.8000030517578
+            }
+          },
+          {
+            "label": "Exit Tour",
+            "rect": {
+              "bottom": 866,
+              "h": 56,
+              "right": 509.4000129699707,
+              "w": 51.20000076293945,
+              "x": 458.20001220703125,
+              "y": 810
+            }
+          },
+          {
+            "label": "Show Me",
+            "rect": {
+              "bottom": 834,
+              "h": 40,
+              "right": 623.4375,
+              "w": 86.4375,
+              "x": 537,
+              "y": 794
+            }
+          },
+          {
+            "label": "Let Me Try",
+            "rect": {
+              "bottom": 834,
+              "h": 40,
+              "right": 726.7375030517578,
+              "w": 95.30000305175781,
+              "x": 631.4375,
+              "y": 794
+            }
+          },
+          {
+            "label": "Back",
+            "rect": {
+              "bottom": 834,
+              "h": 40,
+              "right": 791.3999900817871,
+              "w": 56.66250228881836,
+              "x": 734.7374877929688,
+              "y": 794
+            }
+          },
+          {
+            "label": "Skip Step",
+            "rect": {
+              "bottom": 882,
+              "h": 40,
+              "right": 719.5750045776367,
+              "w": 86.95000457763672,
+              "x": 632.625,
+              "y": 842
+            }
+          },
+          {
+            "label": "Next",
+            "rect": {
+              "bottom": 882,
+              "h": 40,
+              "right": 791.4000129699707,
+              "w": 63.82500076293945,
+              "x": 727.5750122070312,
+              "y": 842
+            }
+          }
+        ],
+        "rect": {
+          "bottom": 575,
+          "h": 430,
+          "right": 827.3999938964844,
+          "w": 390,
+          "x": 437.3999938964844,
+          "y": 145
+        },
+        "text": "STEP 5 OF 20\n\nEvent Category\nEVENT SETUP\n\nWhat this is: Event Category tells the app what kind of event you are planning.\n\nWhy you use it: Use it so the planning language and optional prompts match the event instead of assuming every event is the same.\n\nWhat to do now: Choose the category that most closely matches the event you are planning.\n\nWhat happens next: The category suggests suitable capabilities; it does not save until you create or update the event.\n\nPractical example: Birthday, Bridal Shower, Wedding, Workshop, Food Showcase, Cultural Experience, Corporate Event, Party, Private Event, and Other are normal choices.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext"
+      }
+    ],
+    "url": "https://gathervibeshub.web.app/events",
+    "viewport": {
+      "dpr": 1.25,
+      "innerHeight": 720,
+      "innerWidth": 1280,
+      "visualScale": 1
+    }
+  }
+}

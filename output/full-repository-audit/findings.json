@@ -9,7 +9,10 @@
     "pass4Disposition": "downgraded",
     "pass4Priority": "P3",
     "pass4Status": "closed-as-runner-tooling-after-pass2-rerun",
-    "pass4Evidence": "Direct reruns previously passed; no production browser failure reproduced in Pass 4 route checks."
+    "pass4Evidence": "Direct reruns previously passed; no production browser failure reproduced in Pass 4 route checks.",
+    "finalAuditDisposition": "closed-as-runner-tooling-after-pass2-rerun",
+    "finalAuditPriority": "P3",
+    "finalAuditEvidence": "Direct reruns previously passed; no production browser failure reproduced in Pass 4 route checks."
   },
   {
     "id": "PASS1-P2-001",
@@ -18,7 +21,10 @@
     "status": "open",
     "evidence": "Firebase emulator output warns firebase-tools will drop Java <21 support in firebase-tools@15.",
     "recommendedAction": "Plan Java 21 migration while keeping firebase-tools@14.19.0 pin intentional for emulator E2E.",
-    "pass4Disposition": "confirmed-or-open"
+    "pass4Disposition": "confirmed-or-open",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Firebase emulator output warns firebase-tools will drop Java <21 support in firebase-tools@15."
   },
   {
     "id": "PASS1-P2-002",
@@ -27,7 +33,10 @@
     "status": "open",
     "evidence": "Production audit is clean, but dev dependency audit from Pass 1 reported vulnerabilities.",
     "recommendedAction": "Run scoped dev-dependency remediation separately.",
-    "pass4Disposition": "confirmed-or-open"
+    "pass4Disposition": "confirmed-or-open",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Production audit is clean, but dev dependency audit from Pass 1 reported vulnerabilities."
   },
   {
     "id": "PASS1-P2-003",
@@ -36,7 +45,10 @@
     "status": "open",
     "evidence": "Pass 1 React Doctor scan reported 165 warnings across 57 files.",
     "recommendedAction": "Schedule focused React Doctor remediation after release-critical workflow audits.",
-    "pass4Disposition": "confirmed-or-open"
+    "pass4Disposition": "confirmed-or-open",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Pass 1 React Doctor scan reported 165 warnings across 57 files."
   },
   {
     "id": "PASS2-P2-001",
@@ -47,7 +59,10 @@
     "recommendedAction": "Run a CDP-backed production smoke harness in Pass 3.",
     "pass4Disposition": "closed",
     "pass4Status": "closed-with-cdp-evidence",
-    "pass4Evidence": "CDP route capture completed for 13 production routes; no app console errors, failed requests, Firestore permission errors, or repeated Firestore/Auth loops captured."
+    "pass4Evidence": "CDP route capture completed for 13 production routes; no app console errors, failed requests, Firestore permission errors, or repeated Firestore/Auth loops captured.",
+    "finalAuditDisposition": "closed-with-cdp-evidence",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "CDP route capture completed for 13 production routes; no app console errors, failed requests, Firestore permission errors, or repeated Firestore/Auth loops captured."
   },
   {
     "id": "PASS2-P2-002",
@@ -58,7 +73,10 @@
     "recommendedAction": "Verify full Tutorial V3 replay in production with the same authenticated session in Pass 3.",
     "pass4Disposition": "unresolved",
     "pass4Status": "limited-production-walkthrough",
-    "pass4Evidence": "Tutorial replay opened and Step 1-4 evidence collected; full completion was not reached because Chrome control timed out around prepared event-form steps. Source and E2E coverage remain stronger than production browser completion evidence."
+    "pass4Evidence": "Tutorial replay opened and Step 1-4 evidence collected; full completion was not reached because Chrome control timed out around prepared event-form steps. Source and E2E coverage remain stronger than production browser completion evidence.",
+    "finalAuditDisposition": "limited-production-walkthrough",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Tutorial replay opened and Step 1-4 evidence collected; full completion was not reached because Chrome control timed out around prepared event-form steps. Source and E2E coverage remain stronger than production browser completion evidence."
   },
   {
     "id": "PASS2-P3-001",
@@ -69,7 +87,10 @@
     "recommendedAction": "Add 200 percent zoom review for high-risk table/report routes.",
     "pass4Disposition": "blocked-by-tooling",
     "pass4Status": "true-200-zoom-not-confirmed",
-    "pass4Evidence": "Chrome keyboard zoom attempts did not change exposed viewport/DPR/visualViewport signals. Screenshots saved as layout evidence but not claimed as true 200 percent zoom."
+    "pass4Evidence": "Chrome keyboard zoom attempts did not change exposed viewport/DPR/visualViewport signals. Screenshots saved as layout evidence but not claimed as true 200 percent zoom.",
+    "finalAuditDisposition": "true-200-zoom-not-confirmed",
+    "finalAuditPriority": "P3",
+    "finalAuditEvidence": "Chrome keyboard zoom attempts did not change exposed viewport/DPR/visualViewport signals. Screenshots saved as layout evidence but not claimed as true 200 percent zoom."
   },
   {
     "id": "PASS3-FORMS-P1-001",
@@ -91,7 +112,10 @@
     "pass4Disposition": "downgraded",
     "pass4Priority": "P2",
     "pass4Status": "confirmed-non-live-automatic-receiver-gap",
-    "pass4Evidence": "Pass 4 source/UI review confirms manual Forms inbox/package only; no automatic receiver deployment/secret verification evidence. Not a current production data-loss blocker because no automatic conversion is claimed as verified."
+    "pass4Evidence": "Pass 4 source/UI review confirms manual Forms inbox/package only; no automatic receiver deployment/secret verification evidence. Not a current production data-loss blocker because no automatic conversion is claimed as verified.",
+    "finalAuditDisposition": "confirmed-non-live-automatic-receiver-gap",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Pass 4 source/UI review confirms manual Forms inbox/package only; no automatic receiver deployment/secret verification evidence. Not a current production data-loss blocker because no automatic conversion is claimed as verified."
   },
   {
     "id": "PASS3-WRITE-P1-001",
@@ -113,7 +137,10 @@
     "pass4Disposition": "downgraded",
     "pass4Priority": "P2",
     "pass4Status": "confirmed-partial-operation-recovery-risk",
-    "pass4Evidence": "Bulk/import services use atomic batches per chunk (5 for bulk registration operations, 50 imported rows/100 writes for imports) but no all-or-nothing transaction across chunks. Audit logs remain paired inside committed chunks."
+    "pass4Evidence": "Bulk/import services use atomic batches per chunk (5 for bulk registration operations, 50 imported rows/100 writes for imports) but no all-or-nothing transaction across chunks. Audit logs remain paired inside committed chunks.",
+    "finalAuditDisposition": "confirmed-partial-operation-recovery-risk",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Bulk/import services use atomic batches per chunk (5 for bulk registration operations, 50 imported rows/100 writes for imports) but no all-or-nothing transaction across chunks. Audit logs remain paired inside committed chunks."
   },
   {
     "id": "PASS3-PAY-P2-001",
@@ -132,7 +159,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
     "status": "open",
-    "pass4Disposition": "confirmed-or-open"
+    "pass4Disposition": "confirmed-or-open",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "bulkUpdatePaymentStatus updates paymentStatus only."
   },
   {
     "id": "PASS3-WRITE-P2-001",
@@ -151,7 +181,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
     "status": "open",
-    "pass4Disposition": "confirmed-or-open"
+    "pass4Disposition": "confirmed-or-open",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "deleteEvent deletes the event document and writes event.delete audit log; related records are not cascaded by the service."
   },
   {
     "id": "PASS3-WRITE-P2-002",
@@ -170,7 +203,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
     "status": "open",
-    "pass4Disposition": "confirmed-or-open"
+    "pass4Disposition": "confirmed-or-open",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Audit details usually contain labels, names, type, amount, or flags rather than full before/after snapshots."
   },
   {
     "id": "PASS3-REP-P2-001",
@@ -191,7 +227,10 @@
     "status": "closed-with-read-only-raw-totals",
     "pass4Disposition": "closed",
     "pass4Status": "closed-with-read-only-raw-totals",
-    "pass4Evidence": "Read-only aggregate verified CPB 69 registrations, 73 guests, BBD 6530 due, BBD 6530 paid, BBD 0 balance."
+    "pass4Evidence": "Read-only aggregate verified CPB 69 registrations, 73 guests, BBD 6530 due, BBD 6530 paid, BBD 0 balance.",
+    "finalAuditDisposition": "closed-with-read-only-raw-totals",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Read-only aggregate verified CPB 69 registrations, 73 guests, BBD 6530 due, BBD 6530 paid, BBD 0 balance."
   },
   {
     "id": "PASS3-REC-P2-001",
@@ -210,7 +249,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
     "status": "open",
-    "pass4Disposition": "confirmed-or-open"
+    "pass4Disposition": "confirmed-or-open",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Reconciliation preview has no apply action."
   },
   {
     "id": "PASS3-ROLE-P2-001",
@@ -231,7 +273,10 @@
     "status": "confirmed-copy-rules-mismatch",
     "pass4Disposition": "confirmed",
     "pass4Status": "confirmed-copy-rules-mismatch",
-    "pass4Evidence": "Rules enforce assigned-event staff boundaries; accessRoles copy still says live staff access does not enforce scoped rules yet."
+    "pass4Evidence": "Rules enforce assigned-event staff boundaries; accessRoles copy still says live staff access does not enforce scoped rules yet.",
+    "finalAuditDisposition": "confirmed-copy-rules-mismatch",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Rules enforce assigned-event staff boundaries; accessRoles copy still says live staff access does not enforce scoped rules yet."
   },
   {
     "id": "PASS3-FORMS-P2-001",
@@ -250,7 +295,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
     "status": "open",
-    "pass4Disposition": "confirmed-or-open"
+    "pass4Disposition": "confirmed-or-open",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Non-registration target types are listed but conversion workflows are not live."
   },
   {
     "id": "PASS3-IMP-P2-001",
@@ -269,7 +317,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
     "status": "open",
-    "pass4Disposition": "confirmed-or-open"
+    "pass4Disposition": "confirmed-or-open",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "commitImport uses 50-row chunks."
   },
   {
     "id": "PASS3-REG-P3-001",
@@ -288,7 +339,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
     "status": "open",
-    "pass4Disposition": "open-low-priority"
+    "pass4Disposition": "open-low-priority",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P3",
+    "finalAuditEvidence": "Manual registration save trims phone; import utility normalizes phone."
   },
   {
     "id": "PASS3-TKT-P3-001",
@@ -307,7 +361,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
     "status": "open",
-    "pass4Disposition": "open-low-priority"
+    "pass4Disposition": "open-low-priority",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P3",
+    "finalAuditEvidence": "Tickets are fields on registrations, not standalone ticket documents."
   },
   {
     "id": "PASS3-ZOOM-P3-001",
@@ -326,7 +383,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
     "status": "open",
-    "pass4Disposition": "open-low-priority"
+    "pass4Disposition": "open-low-priority",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P3",
+    "finalAuditEvidence": "True 200 percent browser zoom was not completed in Pass 3."
   },
   {
     "id": "PASS3-OPS-P2-001",
@@ -345,7 +405,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
     "status": "open",
-    "pass4Disposition": "confirmed-or-open"
+    "pass4Disposition": "confirmed-or-open",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P2",
+    "finalAuditEvidence": "Operations create/update/cancel writes are paired with audit logs, but audit summaries are compact."
   },
   {
     "id": "PASS3-OPS-P3-001",
@@ -364,7 +427,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
     "status": "open",
-    "pass4Disposition": "open-low-priority"
+    "pass4Disposition": "open-low-priority",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P3",
+    "finalAuditEvidence": "Summary calculations separate income and costs from direction/type."
   },
   {
     "id": "PASS3-CHK-P3-001",
@@ -383,7 +449,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
     "status": "open",
-    "pass4Disposition": "open-low-priority"
+    "pass4Disposition": "open-low-priority",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P3",
+    "finalAuditEvidence": "Historical attendance is intentionally separate from live checkedIn state."
   },
   {
     "id": "PASS3-IMP-P3-001",
@@ -402,7 +471,10 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
     "status": "open",
-    "pass4Disposition": "open-low-priority"
+    "pass4Disposition": "open-low-priority",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P3",
+    "finalAuditEvidence": "Imports preserve source row IDs and audit import origin."
   },
   {
     "id": "PASS3-ROLE-P3-001",
@@ -421,6 +493,9 @@
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
     "status": "open",
-    "pass4Disposition": "open-low-priority"
+    "pass4Disposition": "open-low-priority",
+    "finalAuditDisposition": "open",
+    "finalAuditPriority": "P3",
+    "finalAuditEvidence": "Product wording and rules implementation are close but not perfectly aligned."
   }
 ]

@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-07-30T21:43:43.074Z",
+  "result": "FULL APPLICATION AUDIT COMPLETE WITH MANUAL LIMITATIONS",
+  "auditBranch": "codex/full-repository-product-audit-2026-07",
+  "baseReleaseMain": "f65aeba9bcf5f44372f7a49816386cef547ebb46",
+  "passCommits": {
+    "pass1": "47041270ff3fbec1bd6b91a4735255c7cf055169",
+    "pass2": "af359e815592349170525cec348fb38642e41bb2",
+    "pass3": "acf12dd117ce0e3f315b03bb2f0866022e1c678d",
+    "pass4": "dd94101c1852cfcfc2f3787bf86abbc942d7d8f5"
+  },
+  "productionReadinessClassification": "READY WITH HIGH-PRIORITY CORRECTIONS",
+  "counts": {
+    "repositoryTrackedFiles": 617,
+    "routes": 36,
+    "writePaths": 25,
+    "p0": 0,
+    "p1": 0,
+    "p2": 16,
+    "p3": 9,
+    "capabilities": {
+      "fullyOperational": 17,
+      "operationalWithLimitations": 12,
+      "manualWorkflow": 4,
+      "packagedButUndeployed": 1,
+      "disconnected": 4,
+      "unsupported": 1
+    }
+  },
+  "productionEvidence": {
+    "consoleNetwork": {
+      "routes": 13,
+      "appConsoleErrors": 0,
+      "failedResponses": 0,
+      "loadingFailures": 0,
+      "repeatedFirestoreOrAuthLoops": 0,
+      "extensionNoise": 3
+    },
+    "cpb": {
+      "eventId": "zhaPxi31cpqLAW0cuS20",
+      "status": "completed",
+      "isTestEvent": false,
+      "registrationRecordCount": 69,
+      "guestCountFromPersonsAttending": 73,
+      "totalAmountDue": 6530,
+      "totalAmountPaid": 6530,
+      "totalBalanceDue": 0
+    },
+    "codexTest": {
+      "eventId": "xPfa0b3KZyLSDnAD2uGI",
+      "exists": true,
+      "eventName": "CODEX_TEST Live Verification Event",
+      "status": "draft",
+      "isTestEvent": true,
+      "registrationRecordCount": 5,
+      "excludedFromDefaultRealEventCounts": true,
+      "browserVisibility": {
+        "before": {
+          "hasCodex": false,
+          "shownLine": "1 event shown · test events hidden"
+        },
+        "showButtonCount": 1,
+        "after": {
+          "hasCodex": true,
+          "shownLine": "2 events shown",
+          "hasTestBadge": true
+        }
+      }
+    }
+  },
+  "manualLimitations": [
+    "Full Tutorial V3 production walkthrough completion remains manual because Browser automation failed around tutorial/form modal control translation.",
+    "True 200 percent browser zoom remains manual because Browser zoom input did not change exposed viewport/DPR/visualViewport metrics.",
+    "Scanner-session browser verification requires a legitimate scanner session; source and test boundaries remain the verification method unless that session is available."
+  ],
+  "finalEvidenceFiles": [
+    "output/full-repository-audit/final/tutorial-final-browser-limitation.json",
+    "output/full-repository-audit/final/zoom-final-browser-attempt.json"
+  ],
+  "finalDocuments": [
+    "docs/FULL_REPOSITORY_AND_PRODUCT_AUDIT_2026-07.md",
+    "docs/CURRENT_PRODUCT_CAPABILITY_MATRIX_2026-07.md",
+    "docs/FINAL_PRODUCT_GAP_AND_RISK_REGISTER_2026-07.md",
+    "docs/NEXT_PRODUCT_PHASE_RECOMMENDATION_2026-07.md",
+    "docs/MANUAL_OPERATOR_ACCEPTANCE_CHECKLIST_2026-07.md"
+  ],
+  "nextImplementationPhase": "Phase 1 - Immediate Stabilization",
+  "nextBranchName": "codex/immediate-stabilization-data-write-audit-quality",
+  "guardrails": {
+    "noApplicationBehaviorChanges": true,
+    "noFirestoreRulesChange": true,
+    "noFirestoreIndexesChange": true,
+    "noDependencyChange": true,
+    "noDeployment": true,
+    "noMerge": true,
+    "noProductionBusinessRecordWrites": true,
+    "qrPayload": "GSV:TICKET:{ticketCode}"
+  }
+}

@@ -17,3 +17,11 @@ Screenshots are stored in `output/full-repository-audit/screenshots/pass-4/zoom-
 Route metrics are stored in `output/full-repository-audit/pass-4/zoom-200-summary.json`.
 
 `PASS2-P3-001` and `PASS3-ZOOM-P3-001` remain open as tooling-blocked true zoom verification gaps.
+
+## Final Audit Synthesis Attempt
+
+A final in-app Browser keyboard-zoom attempt was run with `Ctrl+0` followed by repeated `Ctrl++` input. The exposed browser metrics did not change: `innerWidth`, `innerHeight`, `devicePixelRatio`, `visualViewport.scale`, and document client width remained stable. No document-level horizontal overflow was detected in that captured state, but the result still cannot be claimed as true 200 percent browser zoom.
+
+Evidence: `output/full-repository-audit/final/zoom-final-browser-attempt.json`
+
+Disposition: true 200 percent browser zoom remains a manual operator acceptance item.
