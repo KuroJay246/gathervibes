@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2026-07-30T17:52:37.495Z",
+  "productionUrl": "https://gathervibeshub.web.app",
+  "method": "Browser dev console logs on authenticated production tab after route audit; route-by-route CDP network capture was not used.",
+  "appOriginatedErrorCount": 0,
+  "appOriginatedWarningCount": 0,
+  "relevantLogs": [],
+  "limitations": [
+    "Network tab request/response status capture was not available in this Browser pass; no claim is made about every network request status."
+  ]
+}

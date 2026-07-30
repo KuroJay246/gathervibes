@@ -1,0 +1,28 @@
+[31m[1m!!  emulators:[22m[39m firebase-tools will drop support for Java version < 21 soon in firebase-tools@15. Please install a JDK at version 21 or above to get a compatible runtime.
+[36m[1mi  emulators:[22m[39m Starting emulators: auth, firestore
+[36m[1mi  firestore:[22m[39m Firestore Emulator logging to [1mfirestore-debug.log[22m
+[32m[1m+  firestore:[22m[39m Firestore Emulator UI websocket is running on 9150.
+[36m[1mi [22m[39m Running script: [1mplaywright test --project=chromium[22m
+
+Running 10 tests using 1 worker
+
+  ok  1 [chromium] › e2e\accessibility.spec.js:9:3 › organizer routes have no automated WCAG A or AA violations on desktop (29.9s)
+  ok  2 [chromium] › e2e\accessibility.spec.js:9:3 › organizer routes have no automated WCAG A or AA violations on mobile (33.5s)
+  ok  3 [chromium] › e2e\navigation.spec.js:5:1 › approved emulator organizer can open every organizer route without application errors (25.9s)
+  ok  4 [chromium] › e2e\responsive.spec.js:17:1 › all organizer routes remain reachable without page-level overflow at required viewports (2.3m)
+  ok  5 [chromium] › e2e\tutorial.spec.js:31:1 › tutorial v3 supports deterministic replay, next, back, refresh, and completion (20.2s)
+  ok  6 [chromium] › e2e\tutorial.spec.js:102:1 › tutorial v3 remains usable on small mobile viewports and supports rapid retracing (14.2s)
+  ok  7 [chromium] › e2e\workflows.spec.js:13:1 › organizer can create a full planner event through the normal event wizard (17.3s)
+  ok  8 [chromium] › e2e\workflows.spec.js:85:1 › registration, ticket, and check-in journey preserves finance distinctions (22.4s)
+  ok  9 [chromium] › e2e\workflows.spec.js:154:1 › Operations journey records paid, outstanding, and in-kind entries then cancels them (14.7s)
+  ok 10 [chromium] › e2e\workflows.spec.js:187:1 › pasted-table import completes mapping, previews, confirms, and cleans up (15.0s)
+
+  10 passed (5.7m)
+[32m[1m+ [22m[39m Script exited successfully (code 0)
+[36m[1mi  emulators:[22m[39m Shutting down emulators.
+[36m[1mi  firestore:[22m[39m Stopping Firestore Emulator
+[33m[1m! [22m[39m Firestore Emulator has exited upon receiving signal: SIGINT
+[36m[1mi  auth:[22m[39m Stopping Authentication Emulator
+[36m[1mi  hub:[22m[39m Stopping emulator hub
+[36m[1mi  logging:[22m[39m Stopping Logging Emulator
+[33m[1m!  emulators:[22m[39m firebase-tools will drop support for Java version < 21 soon in firebase-tools@15. Please install a JDK at version 21 or above to get a compatible runtime.

@@ -1,0 +1,152 @@
+[
+  {
+    "name": "accessibility-alone-run-1",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js --trace=on --screenshot=on --reporter=line\"",
+    "exitCode": 1,
+    "durationSeconds": 6.61,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-alone-run-1.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-alone-run-1.err.txt",
+    "stdoutTail": "",
+    "stderrTail": "error: unknown option '--trace=on'"
+  },
+  {
+    "name": "accessibility-alone-run-2",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js --trace=on --screenshot=on --reporter=line\"",
+    "exitCode": 1,
+    "durationSeconds": 5.94,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-alone-run-2.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-alone-run-2.err.txt",
+    "stdoutTail": "",
+    "stderrTail": "error: unknown option '--trace=on'"
+  },
+  {
+    "name": "accessibility-alone-run-3",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js --trace=on --screenshot=on --reporter=line\"",
+    "exitCode": 1,
+    "durationSeconds": 5.87,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-alone-run-3.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-alone-run-3.err.txt",
+    "stdoutTail": "",
+    "stderrTail": "error: unknown option '--trace=on'"
+  },
+  {
+    "name": "accessibility-fresh-cache",
+    "command": "Remove-Item -Recurse -Force test-results -ErrorAction SilentlyContinue; npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js --trace=on --screenshot=on --reporter=line\"",
+    "exitCode": 1,
+    "durationSeconds": 5.91,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-fresh-cache.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-fresh-cache.err.txt",
+    "stdoutTail": "",
+    "stderrTail": "error: unknown option '--trace=on'"
+  },
+  {
+    "name": "full-suite",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium --trace=on --screenshot=on --reporter=line\"",
+    "exitCode": 1,
+    "durationSeconds": 5.93,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/full-suite.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/full-suite.err.txt",
+    "stdoutTail": "",
+    "stderrTail": "error: unknown option '--trace=on'"
+  },
+  {
+    "name": "accessibility-alone-supported-run-1",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js --trace on --screenshot on --reporter=line\"",
+    "exitCode": 1,
+    "durationSeconds": 5.91,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-alone-supported-run-1.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-alone-supported-run-1.err.txt",
+    "stdoutTail": "",
+    "stderrTail": "error: unknown option '--trace'"
+  },
+  {
+    "name": "accessibility-alone-supported-run-2",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js --trace on --screenshot on --reporter=line\"",
+    "exitCode": 1,
+    "durationSeconds": 5.81,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-alone-supported-run-2.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-alone-supported-run-2.err.txt",
+    "stdoutTail": "",
+    "stderrTail": "error: unknown option '--trace'"
+  },
+  {
+    "name": "accessibility-alone-supported-run-3",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js --trace on --screenshot on --reporter=line\"",
+    "exitCode": 1,
+    "durationSeconds": 5.87,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-alone-supported-run-3.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-alone-supported-run-3.err.txt",
+    "stdoutTail": "",
+    "stderrTail": "error: unknown option '--trace'"
+  },
+  {
+    "name": "accessibility-fresh-cache-supported",
+    "command": "Remove-Item -Recurse -Force test-results -ErrorAction SilentlyContinue; npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js --trace on --screenshot on --reporter=line\"",
+    "exitCode": 1,
+    "durationSeconds": 5.85,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-fresh-cache-supported.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-fresh-cache-supported.err.txt",
+    "stdoutTail": "",
+    "stderrTail": "error: unknown option '--trace'"
+  },
+  {
+    "name": "full-suite-supported",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium --trace on --screenshot on --reporter=line\"",
+    "exitCode": 1,
+    "durationSeconds": 5.83,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/full-suite-supported.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/full-suite-supported.err.txt",
+    "stdoutTail": "",
+    "stderrTail": "error: unknown option '--trace'"
+  },
+  {
+    "name": "accessibility-config-run-1",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js\"",
+    "exitCode": 1,
+    "durationSeconds": 6.31,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-config-run-1.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-config-run-1.err.txt",
+    "stdoutTail": "",
+    "stderrTail": ""
+  },
+  {
+    "name": "accessibility-config-run-2",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js\"",
+    "exitCode": 1,
+    "durationSeconds": 6.16,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-config-run-2.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-config-run-2.err.txt",
+    "stdoutTail": "",
+    "stderrTail": ""
+  },
+  {
+    "name": "accessibility-config-run-3",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js\"",
+    "exitCode": 1,
+    "durationSeconds": 6.08,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-config-run-3.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-config-run-3.err.txt",
+    "stdoutTail": "",
+    "stderrTail": ""
+  },
+  {
+    "name": "accessibility-config-fresh-cache",
+    "command": "Remove-Item -Recurse -Force test-results -ErrorAction SilentlyContinue; npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium e2e/accessibility.spec.js\"",
+    "exitCode": 1,
+    "durationSeconds": 6.02,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/accessibility-config-fresh-cache.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/accessibility-config-fresh-cache.err.txt",
+    "stdoutTail": "",
+    "stderrTail": ""
+  },
+  {
+    "name": "full-suite-config",
+    "command": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=chromium\"",
+    "exitCode": 1,
+    "durationSeconds": 6.03,
+    "stdoutFile": "output/full-repository-audit/e2e-failure/full-suite-config.out.txt",
+    "stderrFile": "output/full-repository-audit/e2e-failure/full-suite-config.err.txt",
+    "stdoutTail": "",
+    "stderrTail": ""
+  }
+]

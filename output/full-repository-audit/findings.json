@@ -1,0 +1,58 @@
+[
+  {
+    "id": "PASS1-P1-001",
+    "priority": "P1",
+    "area": "E2E",
+    "status": "reclassified-in-pass2",
+    "evidence": "Pass 1 full E2E failed on mobile accessibility login flow. Pass 2 direct accessibility rerun passed 2/2 and direct full E2E rerun passed 10/10.",
+    "recommendedAction": "Treat as runner/tooling/auth-fixture flake unless it recurs in direct command execution."
+  },
+  {
+    "id": "PASS1-P2-001",
+    "priority": "P2",
+    "area": "Environment",
+    "status": "open",
+    "evidence": "Firebase emulator output warns firebase-tools will drop Java <21 support in firebase-tools@15.",
+    "recommendedAction": "Plan Java 21 migration while keeping firebase-tools@14.19.0 pin intentional for emulator E2E."
+  },
+  {
+    "id": "PASS1-P2-002",
+    "priority": "P2",
+    "area": "Dependencies",
+    "status": "open",
+    "evidence": "Production audit is clean, but dev dependency audit from Pass 1 reported vulnerabilities.",
+    "recommendedAction": "Run scoped dev-dependency remediation separately."
+  },
+  {
+    "id": "PASS1-P2-003",
+    "priority": "P2",
+    "area": "React Doctor",
+    "status": "open",
+    "evidence": "Pass 1 React Doctor scan reported 165 warnings across 57 files.",
+    "recommendedAction": "Schedule focused React Doctor remediation after release-critical workflow audits."
+  },
+  {
+    "id": "PASS2-P2-001",
+    "priority": "P2",
+    "area": "Production network evidence",
+    "status": "open",
+    "evidence": "Pass 2 Browser runtime produced console evidence but did not complete route-by-route CDP network request capture.",
+    "recommendedAction": "Run a CDP-backed production smoke harness in Pass 3."
+  },
+  {
+    "id": "PASS2-P2-002",
+    "priority": "P2",
+    "area": "Tutorial production replay",
+    "status": "open-limited-browser-evidence",
+    "evidence": "Tutorial V3 source matrix and E2E replay passed, but production browser step-through was not completed because the replay control was not consistently available after route reload in the Browser runtime.",
+    "recommendedAction": "Verify full Tutorial V3 replay in production with the same authenticated session in Pass 3."
+  },
+  {
+    "id": "PASS2-P3-001",
+    "priority": "P3",
+    "area": "Responsive accessibility",
+    "status": "open",
+    "evidence": "Pass 2 captured desktop/tablet/mobile screenshots but did not perform a true 200 percent zoom pass.",
+    "recommendedAction": "Add 200 percent zoom review for high-risk table/report routes."
+  }
+]

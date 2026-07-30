@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-07-30T17:39:03.396Z",
+  "results": [
+    {
+      "case": "events-initial-cpb-normal-list",
+      "codexShown": false,
+      "completed": true,
+      "cpbShown": true,
+      "editCPB": true,
+      "excerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCPB\n20 Jun 2026 · completed\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nEvents\n\nPlan and organize every gathering\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCPB\n\n20 Jun 2026 · completed\n\nChange event\nLIVE EVENTS\nYour gatherings\n\nCreate each event once, plan it progressively, and keep one Working Event selected for the organizer team.\n\nThe event planner now includes event setup, budget planning, readiness, and task tracking without leaving the normal organizer workflow.\n\nShow Test Events\nPlan a New Event\n\nALL EVENTS\n\n1\n\nUPCOMING / ACTIVE\n\n0\n\nPLANNED CAPACITY\n\n80\n\nEvent calendar\n\n1 event shown · test events hidden\n\nEVENT\tDATE\tSTATUS\tCAPACITY\tBASE PRICE\tACTIONS\n\n\nCPB\n\nLESC\n\n3 price tiers active\n\n\t20 Jun 2026\tCOMPLETED\t80\t$85.00\t\nSelected event\n\nPLAN A NEW EVENT\n\nCPB\n\n20 Jun 2026 · LESC · Completed\n\nShow final results, unpaid commitments, sponsor support, and closeout work.\n\nEdit setup\nOpen Overview\nOpen Operations\n\n40 days ago\n\nDAYS REMAINING\n\n80\n\nCAPACITY\n\nRegistration is required\n\nBBD $0.00\n\nPROJECTED CASH POSITION\n\nBudget plan only, not final profit\n\nBBD $0.00\n\nBUDGETED EXPENSES\n\n0 / 0\n\nTASKS COMPLETED\n\n0 overdue\n\nBBD $0.00\n\nOUTSTANDING COMMITMENTS\n\n0 partner records\n\nSETUP SUMMARY\n\nWhat is already defined\n\nEVENT TYPE\n\nCake Picnic\n\nDATE AND TIME\n\n20 Jun 2026\n\nVENUE\n\nNot set\n\nLOCATION\n\nLESC\n\nREGISTRATION WINDOW\n\nNot set yet\n\nEVENT NOTES\n\nNot ",
+      "showTest": true,
+      "specialLock": false,
+      "testHidden": true,
+      "url": "https://gathervibeshub.web.app/events"
+    },
+    {
+      "case": "show-test-events",
+      "codexShown": true,
+      "cpbStillShown": true,
+      "excerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCPB\n20 Jun 2026 · completed\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nEvents\n\nPlan and organize every gathering\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCPB\n\n20 Jun 2026 · completed\n\nChange event\nLIVE EVENTS\nYour gatherings\n\nCreate each event once, plan it progressively, and keep one Working Event selected for the organizer team.\n\nThe event planner now includes event setup, budget planning, readiness, and task tracking without leaving the normal organizer workflow.\n\nHide Test Events\nPlan a New Event\n\nALL EVENTS\n\n2\n\nUPCOMING / ACTIVE\n\n0\n\nPLANNED CAPACITY\n\n90\n\nEvent calendar\n\n2 events shown\n\nEVENT\tDATE\tSTATUS\tCAPACITY\tBASE PRICE\tACTIONS\n\n\nCPB\n\nLESC\n\n3 price tiers active\n\n\t20 Jun 2026\tCOMPLETED\t80\t$85.00\t\nSelected event\n\n\n\nCODEX_TEST Live Verification Event TEST EVENT\n\nQA / Smoke Test\n\nDefault base ticket price only\n\n\t15 Jan 2027\tDRAFT\t10\t$45.00\t\nSelect\n\nPLAN A NEW EVENT\n\nCPB\n\n20 Jun 2026 · LESC · Completed\n\nShow final results, unpaid commitments, sponsor support, and closeout work.\n\nEdit setup\nOpen Overview\nOpen Operations\n\n40 days ago\n\nDAYS REMAINING\n\n80\n\nCAPACITY\n\nRegistration is required\n\nBBD $0.00\n\nPROJECTED CASH POSITION\n\nBudget plan only, not final profit\n\nBBD $0.00\n\nBUDGETED EXPENSES\n\n0 / 0\n\nTASKS COMPLETED\n\n0 overdue\n\nBBD $0.00\n\nOUTSTANDING COMMITMENTS\n\n0 partner records\n\nSETUP SUMMARY\n\nWhat is already defined\n\nEVENT TYPE\n\nCake Picnic\n\nDATE AND TIME\n\n20 Jun 2026\n\nVENUE\n\nNot set\n\nLOCATION\n\nLESC\n\nREGISTRATION WINDOW\n\nNot set yet\n\nEVENT NOTES\n\nNot set\n\nWHAT TO DO NEXT\n\nOrganizer next steps\n\nVenue confirmed\n\nThis readiness item sti",
+      "hideTest": true,
+      "testMarked": true
+    },
+    {
+      "case": "no-selected-dashboard",
+      "excerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nNo event selected\nChoose one from Events\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nOverview\n\nCurrent event status, priorities, and next actions\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nNo selected Working Event\n\nChoose an event before using event-scoped pages.\n\nChange event\n\nOVERVIEW\n\nNo selected Working Event\n\nSelect a Working Event to see planning progress, event-day actions, and final reporting for that event.\n\nChange event\nChoose or create an event\n\nStart from Events to create the next gathering, set the Working Event, and open the organizer planning workflow. Every route after that will stay scoped to the selected event.\n\nPlan a New Event\nOpen Events\n\n© 2026 Gather & Savor Event Hub. All rights reserved.\n\nCreated and developed by Jaylan Maynard — built to plan, organize and deliver memorable events.",
+      "noSelected": true,
+      "staleCPBTotals": false,
+      "url": "https://gathervibeshub.web.app/dashboard"
+    },
+    {
+      "case": "no-selected-reports",
+      "excerpt": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nNo event selected\nChoose one from Events\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nReports\n\nRead-only follow-up, payments, operations, and summary\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nNo selected Working Event\n\nChoose an event before using event-scoped pages.\n\nChange event\nNo selected event\n\nSelect a Working Event before reviewing follow-up, payment records, and event summary details.\n\nChoose an event\n\n© 2026 Gather & Savor Event Hub. All rights reserved.\n\nCreated and developed by Jaylan Maynard — built to plan, organize and deliver memorable events.",
+      "noSelected": true,
+      "staleCPBTotals": false,
+      "url": "https://gathervibeshub.web.app/event-review"
+    }
+  ]
+}

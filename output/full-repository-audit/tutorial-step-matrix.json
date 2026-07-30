@@ -1,0 +1,286 @@
+{
+  "generatedAt": "2026-07-30T17:52:47.925Z",
+  "tutorialVersion": "tutorial-v3-specific-guidance",
+  "totalLessons": 20,
+  "source": "src/tutorial/tutorialSteps.js",
+  "e2eSource": "e2e/tutorial.spec.js",
+  "browserProductionReplay": "blocked: replay control unavailable in current authenticated Browser pass after route reload",
+  "lessons": [
+    {
+      "index": 1,
+      "id": "working-event",
+      "title": "Working Event",
+      "pathname": "/dashboard",
+      "routeId": "dashboard",
+      "targetId": "working-event-selector",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 2,
+      "id": "overview",
+      "title": "Overview",
+      "pathname": "/dashboard",
+      "routeId": "dashboard",
+      "targetId": "overview-summary",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 3,
+      "id": "create-event",
+      "title": "Create Event",
+      "pathname": "/events",
+      "routeId": "events",
+      "targetId": "create-event-action",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": {
+        "type": "close-event-form"
+      },
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 4,
+      "id": "event-basics",
+      "title": "Event Basics",
+      "pathname": "/events",
+      "routeId": "events",
+      "targetId": "event-name-field",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": {
+        "type": "open-event-form",
+        "formStep": "basics"
+      },
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 5,
+      "id": "event-category",
+      "title": "Event Category",
+      "pathname": "/events",
+      "routeId": "events",
+      "targetId": "event-category-selector",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": {
+        "type": "open-event-form",
+        "formStep": "basics"
+      },
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 6,
+      "id": "event-capabilities",
+      "title": "Optional Capabilities",
+      "pathname": "/events",
+      "routeId": "events",
+      "targetId": "event-capabilities-controls",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": {
+        "type": "open-event-form",
+        "formStep": "registration"
+      },
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 7,
+      "id": "event-planning",
+      "title": "Planning Tasks",
+      "pathname": "/events",
+      "routeId": "events",
+      "targetId": "event-planning-workspace",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": {
+        "type": "close-event-form"
+      },
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 8,
+      "id": "registrations",
+      "title": "Guests & Registrations",
+      "pathname": "/registrations",
+      "routeId": "registrations",
+      "targetId": "registrations-workspace",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 9,
+      "id": "add-registration",
+      "title": "Add Registration",
+      "pathname": "/registrations",
+      "routeId": "registrations",
+      "targetId": "add-registration-action",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 10,
+      "id": "registration-filters",
+      "title": "Registration Filters",
+      "pathname": "/registrations",
+      "routeId": "registrations",
+      "targetId": "registration-filters-panel",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 11,
+      "id": "payments",
+      "title": "Registration Payments",
+      "pathname": "/payments",
+      "routeId": "payments",
+      "targetId": "payments-summary-metrics",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 12,
+      "id": "tickets",
+      "title": "Tickets",
+      "pathname": "/tickets",
+      "routeId": "tickets",
+      "targetId": "tickets-workspace",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 13,
+      "id": "check-in",
+      "title": "Check-In",
+      "pathname": "/check-in",
+      "routeId": "check-in",
+      "targetId": "checkin-search-field",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 14,
+      "id": "operations",
+      "title": "Operations Ledger",
+      "pathname": "/operations",
+      "routeId": "operations",
+      "targetId": "operations-workspace",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 15,
+      "id": "partners",
+      "title": "Partners, Suppliers, and Sponsors",
+      "pathname": "/operations",
+      "routeId": "operations",
+      "targetId": "partners-commitments-panel",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": {
+        "type": "open-details",
+        "selector": "[data-tour-container=\"partners-commitments\"]"
+      },
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 16,
+      "id": "communications",
+      "title": "Message Builder",
+      "pathname": "/communications",
+      "routeId": "communications",
+      "targetId": "message-builder-workspace",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 17,
+      "id": "reports",
+      "title": "Reports",
+      "pathname": "/event-review",
+      "routeId": "reports",
+      "targetId": "reports-workspace",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 18,
+      "id": "imports",
+      "title": "Import Center",
+      "pathname": "/imports",
+      "routeId": "imports",
+      "targetId": "imports-workspace",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 19,
+      "id": "settings",
+      "title": "Settings",
+      "pathname": "/settings",
+      "routeId": "settings",
+      "targetId": "settings-workspace",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    },
+    {
+      "index": 20,
+      "id": "system-qa",
+      "title": "System QA and Help",
+      "pathname": "/qa",
+      "routeId": "system-qa",
+      "targetId": "system-qa-workspace",
+      "writesBusinessData": false,
+      "showMe": true,
+      "letMeTry": true,
+      "prepare": null,
+      "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
+    }
+  ]
+}
