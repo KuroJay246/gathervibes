@@ -200,8 +200,8 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
         <SummaryCard label="Outstanding commitments" value={formatCurrency(overview.totalOutstandingCommitments)} detail={`${overview.partners.totalRecords} partner records`} />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+      <section className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
+        <article className="gsv-section-card sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Setup summary</p>
           <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">What is already defined</h3>
           <div className="mt-4">
@@ -214,7 +214,7 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
           </div>
         </article>
 
-        <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+        <article className="gsv-section-card sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">What to do next</p>
           <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Organizer next steps</h3>
           {quickActions.length === 0 ? (
@@ -234,24 +234,27 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
         </article>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Budget and cash position</p>
-          <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Planning numbers</h3>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <SummaryCard label="Projected registration income" value={formatCurrency(overview.budgets.projectedRegistrationIncome)} />
-            <SummaryCard label="Venue budget" value={formatCurrency(overview.budgets.venueBudget)} />
-            <SummaryCard label="Supplier budget" value={formatCurrency(overview.budgets.supplierBudget)} />
-            <SummaryCard label="Marketing budget" value={formatCurrency(overview.budgets.marketingBudget)} />
-            <SummaryCard label="Staffing budget" value={formatCurrency(overview.budgets.staffingBudget)} />
-            <SummaryCard label="Contingency" value={formatCurrency(overview.budgets.contingencyBudget)} />
+      <section className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+        <article className="gsv-section-card sm:p-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Planning figures</p>
+          <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Budget and cash planning</h3>
+          <p className="mt-2 text-xs leading-5 text-[#816D62]">
+            These are setup and planning figures. Registration payments and Operations ledger records remain separate sources.
+          </p>
+          <div className="mt-4 gsv-compact-metric-grid">
+            <SummaryCard label="Planned registration income" value={formatCurrency(overview.budgets.projectedRegistrationIncome)} detail="Event setup source" />
+            <SummaryCard label="Planned venue cost" value={formatCurrency(overview.budgets.venueBudget)} detail="Event setup source" />
+            <SummaryCard label="Planned suppliers" value={formatCurrency(overview.budgets.supplierBudget)} detail="Event setup source" />
+            <SummaryCard label="Planned marketing" value={formatCurrency(overview.budgets.marketingBudget)} detail="Event setup source" />
+            <SummaryCard label="Planned staffing" value={formatCurrency(overview.budgets.staffingBudget)} detail="Event setup source" />
+            <SummaryCard label="Planned contingency" value={formatCurrency(overview.budgets.contingencyBudget)} detail="Event setup source" />
           </div>
           <div className="mt-4 rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
             Confirmed sponsor cash and in-kind support are managed in Operations. Requested sponsorship does not count as confirmed income.
           </div>
         </article>
 
-        <article className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+        <article className="gsv-section-card sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Readiness checklist</p>
           <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">What still needs attention</h3>
           <div className="mt-5 space-y-3">
