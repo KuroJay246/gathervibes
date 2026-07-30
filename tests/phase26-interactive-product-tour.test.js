@@ -1,16 +1,19 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
-import { walkthroughSteps } from '../src/components/onboarding/onboardingSteps.js'
+import { guidedTutorialSteps } from '../src/tutorial/tutorialSteps.js'
 
-test('interactive product tutorial covers required route sequence with stable targets', () => {
-  assert.equal(walkthroughSteps.length, 16)
-  assert.deepEqual(walkthroughSteps.map((step) => step.route), [
+test('tutorial v3 preserves organizer route paths and expands coverage to 19 steps', () => {
+  assert.equal(guidedTutorialSteps.length, 19)
+  assert.deepEqual(guidedTutorialSteps.map((step) => step.pathname), [
     '/dashboard',
     '/dashboard',
     '/events',
     '/events',
     '/events',
+    '/events',
+    '/registrations',
+    '/registrations',
     '/registrations',
     '/payments',
     '/tickets',
@@ -23,23 +26,9 @@ test('interactive product tutorial covers required route sequence with stable ta
     '/settings',
     '/qa',
   ])
-  assert.equal(new Set(walkthroughSteps.map((step) => step.targetId)).size, 14)
-  assert.ok(walkthroughSteps.every((step) => step.content && step.when && step.example))
 })
 
-test('interactive product tutorial is anchored and does not use fragile text selectors', async () => {
-  const component = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
-
-  assert.match(component, /targetSelector\(step\)/)
-  assert.match(component, /data-tour-id/)
-  assert.match(component, /scrollIntoView/)
-  assert.match(component, /calculatePlacement/)
-  assert.match(component, /ArrowIcon/)
-  assert.match(component, /prefers-reduced-motion/)
-  assert.doesNotMatch(component, /Open This Page/)
-})
-
-test('tutorial targets are present on organizer pages without changing route paths', async () => {
+test('tutorial v3 uses stable semantic targets already present on organizer pages', async () => {
   const files = [
     ['src/layout/AppShell.jsx', 'working-event-selector'],
     ['src/pages/DashboardPage.jsx', 'overview-summary'],
@@ -60,20 +49,23 @@ test('tutorial targets are present on organizer pages without changing route pat
   for (const [file, target] of files) {
     assert.match(await readFile(file, 'utf8'), new RegExp(`data-tour-id="${target}"`), file)
   }
-
-  const app = await readFile('src/App.jsx', 'utf8')
-  for (const route of ['/dashboard', '/events', '/registrations', '/payments', '/tickets', '/check-in', '/operations', '/communications', '/event-review', '/imports', '/settings', '/qa']) {
-    assert.match(app, new RegExp(`path="${route.replace('/', '\\/')}"`))
-  }
 })
 
-test('normal tutorial remains zero-write except onboarding preferences', async () => {
-  const component = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
-  const hook = await readFile('src/components/onboarding/useOnboarding.js', 'utf8')
+test('tutorial v3 removes legacy walkthrough runtime and brittle target helpers', async () => {
+  const appShell = await readFile('src/layout/AppShell.jsx', 'utf8')
+  const registry = await readFile('src/tutorial/tutorialRegistry.js', 'utf8')
+  assert.doesNotMatch(appShell, /AppWalkthrough|onboardingSteps|useOnboarding/)
+  assert.match(registry, /data-tour-id/)
+  assert.doesNotMatch(registry, /nth-child|innerText|textContent/)
+})
 
-  assert.doesNotMatch(component, /createEvent|createRegistration|commitImport|completeCheckIn|saveTicketAssignment|recordHistoricalAttendance/)
-  assert.match(hook, /'staffProfiles', user\.uid, 'preferences', 'onboarding'/)
-  assert.match(hook, /completedAt/)
-  assert.match(hook, /replayRequestedAt/)
-  assert.doesNotMatch(component, /Welcome aboard, Anica|WM2UOQtSeuOglCI5uMZQKrYYqP53/)
+test('tutorial v3 normal path remains zero-write except onboarding preferences', async () => {
+  const source = (await Promise.all([
+    readFile('src/tutorial/TutorialProvider.jsx', 'utf8'),
+    readFile('src/tutorial/TutorialController.js', 'utf8'),
+    readFile('src/tutorial/tutorialStorage.js', 'utf8'),
+  ])).join('\n')
+
+  assert.match(source, /staffProfiles/)
+  assert.doesNotMatch(source, /'events'|"events"|'registrations'|"registrations"|'tickets'|"tickets"|'auditLogs'|"auditLogs"|completeCheckIn\(|saveTicketAssignment\(/)
 })

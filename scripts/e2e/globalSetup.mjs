@@ -5,6 +5,7 @@ import { Timestamp, getFirestore } from 'firebase-admin/firestore'
 
 export const E2E_EMAIL = 'qa-phase23p@example.test'
 export const E2E_PASSWORD = 'LocalEmulatorOnly-23P!'
+export const E2E_UID = 'phase23p-e2e-organizer'
 export const E2E_EVENT_ID = 'phase23p-codex-test'
 export const E2E_EVENT_NAME = 'CODEX_TEST Phase 23P E2E Event'
 
@@ -26,7 +27,7 @@ export default async function globalSetup() {
   }
 
   await auth.createUser({
-    uid: 'phase23p-e2e-organizer',
+    uid: E2E_UID,
     email: E2E_EMAIL,
     password: E2E_PASSWORD,
     emailVerified: true,
@@ -63,6 +64,13 @@ export default async function globalSetup() {
       performedBy: 'phase23p-e2e',
       timestamp: now,
       details: { synthetic: true },
+    }),
+    firestore.doc(`staffProfiles/${E2E_UID}/preferences/onboarding`).set({
+      version: 'tutorial-v3-ground-up',
+      completed: true,
+      completedAt: now,
+      lastStep: 19,
+      updatedAt: now,
     }),
   ])
 
