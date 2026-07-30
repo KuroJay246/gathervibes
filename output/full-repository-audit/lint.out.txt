@@ -1,0 +1,4 @@
+
+> gather-savor-event-hub@0.1.0 lint
+> eslint src tests scripts e2e eslint.config.js vite.config.js playwright.config.js
+

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "PASS1-P1-001",
+    "priority": "P1",
+    "area": "E2E",
+    "evidence": "`npm run e2e:full` failed 1/10 tests; mobile accessibility flow stayed on `/login` after emulator email/password sign-in. Focused rerun exited 1 without useful output.",
+    "file": "e2e/support.js",
+    "technicalCause": "Sign-in helper assumes dashboard redirect after click; emulator auth/browser state can remain on login for mobile accessibility run.",
+    "userImpact": "Full release confidence is reduced because a required full E2E command did not pass in this pass.",
+    "recommendedAction": "Stabilize emulator auth setup and make sign-in helper assert visible auth errors before URL wait.",
+    "complexity": "medium",
+    "nextAuditPassRequired": true
+  },
+  {
+    "id": "PASS1-P2-001",
+    "priority": "P2",
+    "area": "Environment",
+    "evidence": "Java is OpenJDK 17.0.19 and emulator output warns firebase-tools will drop Java <21 support in firebase-tools@15.",
+    "file": "package.json / e2e scripts",
+    "technicalCause": "E2E scripts pin firebase-tools@14.19.0 but general CLI is 15.22.2; host Java remains 17.",
+    "userImpact": "Future emulator runs may fail after tool updates or when script pin is removed.",
+    "recommendedAction": "Plan Java 21 runtime upgrade and keep firebase-tools pin intentional until migrated.",
+    "complexity": "small",
+    "nextAuditPassRequired": false
+  },
+  {
+    "id": "PASS1-P2-002",
+    "priority": "P2",
+    "area": "Dependencies",
+    "evidence": "`npm ci` reports 16 total vulnerabilities including dev dependencies, while `npm audit --omit=dev` is clean.",
+    "file": "package-lock.json",
+    "technicalCause": "Tooling/dev dependency graph contains moderate/high advisories.",
+    "userImpact": "Production bundle audit is clean, but developer/CI tooling risk remains.",
+    "recommendedAction": "Run scoped dev-dependency remediation phase; do not force-upgrade during audit.",
+    "complexity": "medium",
+    "nextAuditPassRequired": false
+  },
+  {
+    "id": "PASS1-P2-003",
+    "priority": "P2",
+    "area": "Code quality",
+    "evidence": "React Doctor full scan is ok but reports 165 warnings across 57 files.",
+    "file": "output/full-repository-audit/doctor-json.out.txt",
+    "technicalCause": "Large components, modal accessibility, array index keys, loading flag paths, and performance patterns are accumulated.",
+    "userImpact": "Non-blocking today, but maintenance and accessibility debt can hide regressions.",
+    "recommendedAction": "Create a focused React Doctor remediation phase after release-critical workflow issues.",
+    "complexity": "large",
+    "nextAuditPassRequired": true
+  },
+  {
+    "id": "PASS1-P2-004",
+    "priority": "P2",
+    "area": "Data scripts",
+    "evidence": "Risk scan found admin/verify/apply/backfill scripts and direct Firestore write APIs in scripts and services.",
+    "file": "scripts/admin/*, src/services/*",
+    "technicalCause": "Repository intentionally contains write-capable admin tooling.",
+    "userImpact": "Safe with discipline, but dangerous if run against production without explicit approval.",
+    "recommendedAction": "Keep scripts documented, gated, and excluded from broad daily QA; add dry-run manifests where missing.",
+    "complexity": "medium",
+    "nextAuditPassRequired": true
+  },
+  {
+    "id": "PASS1-P3-001",
+    "priority": "P3",
+    "area": "Repository hygiene",
+    "evidence": "Several prunable worktrees exist outside the active audit worktree.",
+    "file": "git worktree list",
+    "technicalCause": "Historical phase worktrees remain attached.",
+    "userImpact": "Low direct app risk, but increases operator confusion.",
+    "recommendedAction": "Clean up prunable worktrees in a separate repo hygiene task only.",
+    "complexity": "small",
+    "nextAuditPassRequired": false
+  },
+  {
+    "id": "PASS1-P3-002",
+    "priority": "P3",
+    "area": "Dead code",
+    "evidence": "Preliminary scan finds legacy/phase/CPB references and unused exports from React Doctor/deslop.",
+    "file": "docs/*, tests/*, src/utils/*",
+    "technicalCause": "Historical documents and compatibility helpers remain.",
+    "userImpact": "Can confuse future audits if not separated from active product truth.",
+    "recommendedAction": "Deep dead-code pass should confirm before deleting anything.",
+    "complexity": "medium",
+    "nextAuditPassRequired": true
+  }
+]

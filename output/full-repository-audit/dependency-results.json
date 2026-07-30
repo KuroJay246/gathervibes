@@ -1,0 +1,46 @@
+{
+  "node": "v24.16.0",
+  "npm": "11.13.0",
+  "java": "openjdk version \"17.0.19\" 2026-04-21 LTS\r\nOpenJDK Runtime Environment Microsoft-13877129 (build 17.0.19+10-LTS)\r\nOpenJDK 64-Bit Server VM Microsoft-13877129 (build 17.0.19+10-LTS, mixed mode, sharing)",
+  "firebaseTools": "15.22.2",
+  "dependencies": {
+    "@sentry/react": "^10.67.0",
+    "firebase": "^12.6.0",
+    "html5-qrcode": "^2.3.8",
+    "lucide-react": "^0.468.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router": "^8.3.0",
+    "read-excel-file": "^9.2.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@eslint/js": "^9.39.1",
+    "@firebase/rules-unit-testing": "^5.0.1",
+    "@playwright/test": "^1.61.1",
+    "@tailwindcss/vite": "^4.1.17",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "firebase-admin": "^14.0.0",
+    "globals": "^16.5.0",
+    "react-doctor": "0.8.3",
+    "tailwindcss": "^4.1.17",
+    "vite": "^7.2.4"
+  },
+  "outdated": "Package                      Current   Wanted   Latest  Location                                  Depended by\n@eslint/js                    9.39.4   9.39.5   10.0.1  node_modules/@eslint/js                   gathetr\n@playwright/test              1.61.1   1.62.0   1.62.0  node_modules/@playwright/test             gathetr\n@sentry/react                10.67.0  10.69.0  10.69.0  node_modules/@sentry/react                gathetr\n@tailwindcss/vite              4.3.1    4.3.3    4.3.3  node_modules/@tailwindcss/vite            gathetr\n@vitejs/plugin-react           5.2.0    5.2.0    6.0.5  node_modules/@vitejs/plugin-react         gathetr\neslint                        9.39.4   9.39.5   10.8.0  node_modules/eslint                       gathetr\neslint-plugin-react-refresh   0.4.26   0.4.26    0.5.3  node_modules/eslint-plugin-react-refresh  gathetr\nfirebase                     12.15.0  12.16.0  12.16.0  node_modules/firebase                     gathetr\nglobals                       16.5.0   16.5.0   17.8.0  node_modules/globals                      gathetr\nlucide-react                 0.468.0  0.468.0   1.28.0  node_modules/lucide-react                 gathetr\nreact                         19.2.7   19.2.8   19.2.8  node_modules/react                        gathetr\nreact-doctor                   0.8.3    0.8.3    0.9.2  node_modules/react-doctor                 gathetr\nreact-dom                     19.2.7   19.2.8   19.2.8  node_modules/react-dom                    gathetr\nread-excel-file                9.2.0    9.3.5    9.3.5  node_modules/read-excel-file              gathetr\ntailwindcss                    4.3.1    4.3.3    4.3.3  node_modules/tailwindcss                  gathetr\nvite                           7.3.5    7.3.6    8.2.0  node_modules/vite                         gathetr\n",
+  "auditProd": "found 0 vulnerabilities",
+  "npmCiAuditNotice": "\nadded 540 packages, and audited 541 packages in 21s\n\n96 packages are looking for funding\n  run `npm fund` for details\n\n16 vulnerabilities (6 moderate, 10 high)\n\nTo address issues that do not require attention, run:\n  npm audit fix\n\nTo address all issues (including breaking changes), run:\n  npm audit fix --force\n\nRun `npm audit` for details.\nnpm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nnpm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nnpm warn deprecated uuid@9.0.1: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).\n",
+  "reactDoctorSummary": {
+    "errorCount": 0,
+    "warningCount": 165,
+    "affectedFileCount": 57,
+    "totalDiagnosticCount": 165,
+    "score": null,
+    "scoreLabel": null
+  }
+}

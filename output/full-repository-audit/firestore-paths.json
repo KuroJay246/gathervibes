@@ -1,0 +1,178 @@
+{
+  "count": 21,
+  "paths": [
+    {
+      "path": ", ",
+      "files": [
+        "integrations/google-forms/function/googleFormsReceiver.js"
+      ],
+      "rules": false,
+      "classification": "source referenced"
+    },
+    {
+      "path": ");\r\n\r\n  let existingEmails = [];\r\n  try {\r\n    const doc = await accessControlRef.get();\r\n    if (doc.exists) {\r\n      const data = doc.data();\r\n      if (Array.isArray(data.approvedEmails)) {\r\n        existingEmails = data.approvedEmails;\r\n      }\r\n    }\r\n  } catch (error) {\r\n    console.error(",
+      "files": [
+        "scripts/admin/ensureAccessControl.mjs"
+      ],
+      "rules": false,
+      "classification": "source referenced"
+    },
+    {
+      "path": ");\r\n    const doc = await accessControlRef.get();\r\n    \r\n    if (!doc.exists) {\r\n      console.error(",
+      "files": [
+        "scripts/admin/verifyFirebaseSetup.mjs"
+      ],
+      "rules": false,
+      "classification": "source referenced"
+    },
+    {
+      "path": ");\r\n  const auditLogsRef = db.collection(",
+      "files": [
+        "scripts/admin/ensureCodexTestEvent.mjs"
+      ],
+      "rules": false,
+      "classification": "source referenced"
+    },
+    {
+      "path": ").get(),\r\n    db.collection(",
+      "files": [
+        "scripts/admin/verifyProductionCounts.mjs"
+      ],
+      "rules": false,
+      "classification": "source referenced"
+    },
+    {
+      "path": ").get();\r\n  const events = eventsSnapshot.docs.map(eventSummary);\r\n  const codexMatches = events.filter((event) => (\r\n    event.docId === codexTestEventId\r\n    || event.eventId === codexTestEventId\r\n    || event.eventName === codexTestEventName\r\n  ));\r\n  const auditSample = await db.collection(",
+      "files": [
+        "scripts/admin/verifyProductionFixtures.mjs"
+      ],
+      "rules": false,
+      "classification": "source referenced"
+    },
+    {
+      "path": ").set({\r\n      approvedEmails: [E2E_EMAIL],\r\n      rolesByEmail: { [E2E_EMAIL]: ",
+      "files": [
+        "scripts/e2e/globalSetup.mjs"
+      ],
+      "rules": false,
+      "classification": "source referenced"
+    },
+    {
+      "path": ").set({\r\n      logId: ",
+      "files": [
+        "scripts/e2e/globalSetup.mjs"
+      ],
+      "rules": false,
+      "classification": "source referenced"
+    },
+    {
+      "path": "accessRequests/",
+      "files": [
+        "firestore.rules"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "aiDrafts/",
+      "files": [
+        "firestore.rules",
+        "tests/phase45-ticketing.test.js"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "auditLogs/",
+      "files": [
+        "firestore.rules",
+        "tests/firestore-checkin-rules.test.js",
+        "tests/phase26-historical-attendance-foundation.test.js"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "checkIn/",
+      "files": [
+        "firestore.rules"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "communications/",
+      "files": [
+        "firestore.rules",
+        "tests/phase45-ticketing.test.js"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "databases/",
+      "files": [
+        "firestore.rules"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "events/",
+      "files": [
+        "firestore.rules"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "operationsLedger/",
+      "files": [
+        "firestore.rules",
+        "tests/firestore-checkin-rules.test.js"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "registrations/",
+      "files": [
+        "firestore.rules"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "settings/",
+      "files": [
+        "firestore.rules"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "settings/accessControl",
+      "files": [
+        "firestore.rules"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "staffProfiles/",
+      "files": [
+        "firestore.rules"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    },
+    {
+      "path": "tickets/",
+      "files": [
+        "firestore.rules"
+      ],
+      "rules": true,
+      "classification": "rules/source referenced"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "routes": [
+    {
+      "path": "/login",
+      "component": "LoginPage"
+    },
+    {
+      "path": "/security",
+      "component": "Navigate"
+    },
+    {
+      "path": "/scanner",
+      "component": "AssignedEventGate"
+    },
+    {
+      "path": "/dashboard",
+      "component": "DashboardPage"
+    },
+    {
+      "path": "/events",
+      "component": "EventsPage"
+    },
+    {
+      "path": "/registrations",
+      "component": "RegistrationsPage"
+    },
+    {
+      "path": "/payments",
+      "component": "AssignedEventGate"
+    },
+    {
+      "path": "/payments/reconciliation",
+      "component": "PaymentReconciliationPage"
+    },
+    {
+      "path": "/imports",
+      "component": "ImportsPage"
+    },
+    {
+      "path": "/tickets",
+      "component": "TicketsPage"
+    },
+    {
+      "path": "/check-in",
+      "component": "AssignedEventGate"
+    },
+    {
+      "path": "/operations",
+      "component": "AssignedEventGate"
+    },
+    {
+      "path": "/event-review",
+      "component": "EventReviewPage"
+    },
+    {
+      "path": "/qa",
+      "component": "QaPage"
+    },
+    {
+      "path": "/communications",
+      "component": "CommunicationsPage"
+    },
+    {
+      "path": "/settings",
+      "component": "SettingsPage"
+    },
+    {
+      "path": "*",
+      "component": "NotFoundPage"
+    }
+  ],
+  "routeCount": 17,
+  "productRoutesOutput": "\n> gather-savor-event-hub@0.1.0 product:routes\n> node scripts/product/routeInventory.mjs\n\nRoute inventory passed: 15 routes and 12 navigation labels.\n"
+}

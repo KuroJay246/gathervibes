@@ -1,0 +1,5 @@
+
+> gather-savor-event-hub@0.1.0 product:routes
+> node scripts/product/routeInventory.mjs
+
+Route inventory passed: 15 routes and 12 navigation labels.

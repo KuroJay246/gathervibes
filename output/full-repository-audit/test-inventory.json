@@ -1,0 +1,608 @@
+{
+  "count": 67,
+  "tests": [
+    {
+      "path": "e2e/accessibility.spec.js",
+      "area": "test",
+      "testCount": 1,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": true,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "e2e/navigation.spec.js",
+      "area": "test",
+      "testCount": 1,
+      "skippedCount": 0,
+      "usesEmulator": true,
+      "usesPlaywright": true,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "e2e/responsive.spec.js",
+      "area": "test",
+      "testCount": 1,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": true,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "e2e/support.js",
+      "area": "test",
+      "testCount": 0,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": true,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "e2e/tutorial.spec.js",
+      "area": "tutorial",
+      "testCount": 2,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": true,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "e2e/workflows.spec.js",
+      "area": "test",
+      "testCount": 4,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": true,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/auth-reliability.test.js",
+      "area": "authentication",
+      "testCount": 6,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/csv-parser.test.js",
+      "area": "test",
+      "testCount": 13,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/event-readiness.test.js",
+      "area": "test",
+      "testCount": 6,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/event-utils.test.js",
+      "area": "test",
+      "testCount": 5,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/firestore-checkin-rules.test.js",
+      "area": "check-in",
+      "testCount": 25,
+      "skippedCount": 0,
+      "usesEmulator": true,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/google-forms-response-inbox.test.js",
+      "area": "google forms",
+      "testCount": 5,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/import-center.test.js",
+      "area": "imports",
+      "testCount": 9,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/onboarding-flow.test.js",
+      "area": "tutorial",
+      "testCount": 24,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/onboarding-rules.test.js",
+      "area": "tutorial",
+      "testCount": 2,
+      "skippedCount": 1,
+      "usesEmulator": true,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase10-phase11-roles-communications.test.js",
+      "area": "message builder",
+      "testCount": 6,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase14-camera-checkin.test.js",
+      "area": "check-in",
+      "testCount": 30,
+      "skippedCount": 0,
+      "usesEmulator": true,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase14b-payment-audit-backfill.test.js",
+      "area": "finance",
+      "testCount": 10,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase15a-security-headers.test.js",
+      "area": "test",
+      "testCount": 4,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase15b-xlsx-roadmap-access-ops.test.js",
+      "area": "test",
+      "testCount": 7,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase16-live-load-ticket-checkin-qa.test.js",
+      "area": "tickets",
+      "testCount": 7,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase17b-staff-access.test.js",
+      "area": "test",
+      "testCount": 8,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase17c-b-scanner-page.test.js",
+      "area": "scanner",
+      "testCount": 16,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase17c-rules-readiness.test.js",
+      "area": "test",
+      "testCount": 10,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase17e-b-access-request-rules.test.js",
+      "area": "test",
+      "testCount": 2,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase17e-cde-ui-readiness-ci.test.js",
+      "area": "test",
+      "testCount": 3,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase17f-access-workflow-continuation.test.js",
+      "area": "test",
+      "testCount": 4,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase17r-release-stabilizer.test.js",
+      "area": "test",
+      "testCount": 5,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "mentions production smoke or production fixture"
+    },
+    {
+      "path": "tests/phase18-core-app-readiness.test.js",
+      "area": "test",
+      "testCount": 3,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase19-operations-productivity.test.js",
+      "area": "operations",
+      "testCount": 3,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase20-real-use.test.js",
+      "area": "test",
+      "testCount": 4,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "mentions production smoke or production fixture"
+    },
+    {
+      "path": "tests/phase21-command-center.test.js",
+      "area": "test",
+      "testCount": 3,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase22-event-review.test.js",
+      "area": "test",
+      "testCount": 12,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase23a-product-structure-ui-reset.test.js",
+      "area": "test",
+      "testCount": 6,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase23b-payments-operations-boundaries.test.js",
+      "area": "finance",
+      "testCount": 8,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase23c-payment-reconciliation.test.js",
+      "area": "finance",
+      "testCount": 11,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase23d0-registration-payment-editing-audit.test.js",
+      "area": "registrations",
+      "testCount": 7,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase23e-cpb-manifest-regeneration.test.js",
+      "area": "test",
+      "testCount": 4,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase23f-cpb-approval-package.test.js",
+      "area": "test",
+      "testCount": 5,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase23g-apply-rehearsal.test.js",
+      "area": "test",
+      "testCount": 6,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "mentions production smoke or production fixture"
+    },
+    {
+      "path": "tests/phase23m-overview-payments-usability.test.js",
+      "area": "finance",
+      "testCount": 6,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase23n-financial-evidence-reconciliation.test.js",
+      "area": "test",
+      "testCount": 15,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "mentions production smoke or production fixture"
+    },
+    {
+      "path": "tests/phase23o-protected-owner-access.test.js",
+      "area": "test",
+      "testCount": 6,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "mentions production smoke or production fixture"
+    },
+    {
+      "path": "tests/phase23p-product-foundation.test.js",
+      "area": "test",
+      "testCount": 5,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "mentions production smoke or production fixture"
+    },
+    {
+      "path": "tests/phase23q-finance-status-classification.test.js",
+      "area": "finance",
+      "testCount": 4,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase23r-cpb-data-review-rationalization.test.js",
+      "area": "test",
+      "testCount": 10,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase23s-prototype-readiness.test.js",
+      "area": "test",
+      "testCount": 3,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "mentions production smoke or production fixture"
+    },
+    {
+      "path": "tests/phase23t-organizer-ready-mvp.test.js",
+      "area": "test",
+      "testCount": 2,
+      "skippedCount": 0,
+      "usesEmulator": true,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase23v-visual-layout-information-architecture.test.js",
+      "area": "test",
+      "testCount": 4,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase25-foundation.test.js",
+      "area": "test",
+      "testCount": 8,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase26-event-categories-capabilities.test.js",
+      "area": "test",
+      "testCount": 5,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase26-historical-attendance-foundation.test.js",
+      "area": "test",
+      "testCount": 6,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase26-interactive-product-tour.test.js",
+      "area": "test",
+      "testCount": 4,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase26-personalization-navigation-footer.test.js",
+      "area": "test",
+      "testCount": 3,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase31-additions.test.js",
+      "area": "test",
+      "testCount": 27,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase45-ticketing.test.js",
+      "area": "tickets",
+      "testCount": 16,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase6-communications.test.js",
+      "area": "message builder",
+      "testCount": 7,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase7-qr-checkin.test.js",
+      "area": "check-in",
+      "testCount": 6,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase8-event-day-polish.test.js",
+      "area": "test",
+      "testCount": 6,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase81-import-center.test.js",
+      "area": "imports",
+      "testCount": 46,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase82-admin-polish.test.js",
+      "area": "test",
+      "testCount": 8,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/phase83-phase9-finance.test.js",
+      "area": "finance",
+      "testCount": 11,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/production-qa.test.js",
+      "area": "system qa",
+      "testCount": 4,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "mentions production smoke or production fixture"
+    },
+    {
+      "path": "tests/registration-metrics.test.js",
+      "area": "registrations",
+      "testCount": 7,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "mentions production smoke or production fixture"
+    },
+    {
+      "path": "tests/registration-utils.test.js",
+      "area": "registrations",
+      "testCount": 5,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/repository-hygiene.test.js",
+      "area": "test",
+      "testCount": 2,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    },
+    {
+      "path": "tests/search-health.test.js",
+      "area": "test",
+      "testCount": 4,
+      "skippedCount": 0,
+      "usesEmulator": false,
+      "usesPlaywright": false,
+      "notes": "local/unit/e2e coverage"
+    }
+  ]
+}
