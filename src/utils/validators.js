@@ -2,6 +2,7 @@ import { PAYMENT_STATUSES, normalizePaymentStatus } from './paymentStatus.js'
 import { PAYMENT_METHODS, normalizePaymentMethod, parseMoney } from './financeUtils.js'
 import {
   EVENT_STATUS_OPTIONS,
+  EVENT_CAPABILITY_OPTIONS,
   EVENT_TYPE_OPTIONS,
   PARTNER_STATUS_OPTIONS,
   PARTNER_TYPE_OPTIONS,
@@ -73,6 +74,16 @@ export function validateEvent(values) {
   if (!allowedEventTypes.includes(values.eventType)) errors.eventType = 'Event type is required.'
   if (!allowedStatuses.includes(values.status)) errors.status = 'Status is required.'
   if (!String(values.eventStartTime || '').trim()) errors.eventStartTime = 'Start time is required.'
+
+  if (values.eventCapabilities && typeof values.eventCapabilities === 'object') {
+    const allowedCapabilities = new Set(EVENT_CAPABILITY_OPTIONS.map((option) => option.key))
+    const capabilityErrors = {}
+    Object.entries(values.eventCapabilities).forEach(([key, value]) => {
+      if (!allowedCapabilities.has(key)) capabilityErrors[key] = 'Unsupported event capability.'
+      else if (typeof value !== 'boolean') capabilityErrors[key] = 'Capability values must be true or false.'
+    })
+    if (Object.keys(capabilityErrors).length > 0) errors.eventCapabilities = capabilityErrors
+  }
 
   const capacity = Number(values.capacity)
   if (values.capacity === '' || !Number.isInteger(capacity) || capacity < 1) {

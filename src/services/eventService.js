@@ -62,6 +62,7 @@ function eventPayload(values) {
     financialPlan: event.financialPlan,
     operationsPlan: event.operationsPlan,
     readinessChecklist: event.readinessChecklist,
+    eventCapabilities: event.eventCapabilities,
     notes: event.notes.trim(),
   }
 

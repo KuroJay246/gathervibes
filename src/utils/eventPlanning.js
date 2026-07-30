@@ -3,20 +3,87 @@ import { buildFinanceSummary, formatCurrency, parseMoney } from './financeUtils.
 import { buildOperationsSettlementSummary } from './operationsReport.js'
 
 export const EVENT_TYPE_OPTIONS = [
+  { value: 'birthday', label: 'Birthday' },
+  { value: 'bridal-shower', label: 'Bridal Shower' },
+  { value: 'wedding', label: 'Wedding' },
+  { value: 'workshop', label: 'Workshop' },
+  { value: 'cake-tasting-food-showcase', label: 'Cake Tasting or Food Showcase' },
+  { value: 'cultural-experience', label: 'Cultural Experience' },
+  { value: 'corporate-event', label: 'Corporate Event' },
+  { value: 'hospitality-event', label: 'Hospitality Event' },
+  { value: 'party', label: 'Party' },
+  { value: 'private-event', label: 'Private Event' },
+  { value: 'other', label: 'Other' },
+  // Legacy stored values remain valid for existing events.
   { value: 'cake-picnic', label: 'Cake Picnic' },
   { value: 'cake-tasting', label: 'Cake Tasting' },
   { value: 'brunch', label: 'Brunch' },
   { value: 'tasting', label: 'Tasting' },
-  { value: 'cultural-experience', label: 'Cultural Experience' },
-  { value: 'hospitality-event', label: 'Hospitality Event' },
-  { value: 'workshop', label: 'Workshop' },
-  { value: 'party', label: 'Party' },
   { value: 'food-event', label: 'Food Event' },
   { value: 'vendor-pop-up', label: 'Vendor Pop-Up' },
   { value: 'private-food-experience', label: 'Private Food Experience' },
-  { value: 'private-event', label: 'Private Event' },
-  { value: 'other', label: 'Other' },
 ]
+
+export const EVENT_CAPABILITY_OPTIONS = [
+  { key: 'publicRegistration', label: 'Public registration', description: 'Registration intake is planned or expected.' },
+  { key: 'ticketing', label: 'Ticketing', description: 'Ticket codes, QR preparation, or ticket status matter.' },
+  { key: 'checkIn', label: 'Check-In', description: 'Event-day attendance will be tracked.' },
+  { key: 'seating', label: 'Seating', description: 'Seat, table, or room placement may be needed.' },
+  { key: 'suppliers', label: 'Suppliers', description: 'Suppliers or service providers need follow-up.' },
+  { key: 'vendors', label: 'Vendors', description: 'Vendor participation is part of the plan.' },
+  { key: 'sponsors', label: 'Sponsors', description: 'Cash or in-kind sponsors may be tracked.' },
+  { key: 'bakers', label: 'Bakers', description: 'Bakers or cake providers are relevant.' },
+  { key: 'tastingZones', label: 'Tasting zones', description: 'Food showcase zones or tasting flow matters.' },
+  { key: 'allergens', label: 'Allergens', description: 'Dietary and allergy requirements need visibility.' },
+  { key: 'schoolsYouth', label: 'Schools or youth', description: 'Youth, school, or guardian considerations apply.' },
+  { key: 'speakers', label: 'Speakers', description: 'Speakers, hosts, or presenters are part of the program.' },
+  { key: 'sessions', label: 'Sessions', description: 'The event has sessions, classes, or agenda blocks.' },
+  { key: 'certificates', label: 'Certificates', description: 'Certificates or completion records may be needed.' },
+  { key: 'bridalParty', label: 'Bridal party', description: 'Wedding or shower party roles may matter.' },
+  { key: 'accommodation', label: 'Accommodation', description: 'Hotel or lodging coordination may be needed.' },
+  { key: 'transport', label: 'Transport', description: 'Transport, shuttles, or arrival logistics may be needed.' },
+]
+
+const UNIVERSAL_CAPABILITIES = {
+  publicRegistration: true,
+  ticketing: true,
+  checkIn: true,
+  seating: false,
+  suppliers: true,
+  vendors: true,
+  sponsors: true,
+  bakers: false,
+  tastingZones: false,
+  allergens: false,
+  schoolsYouth: false,
+  speakers: false,
+  sessions: false,
+  certificates: false,
+  bridalParty: false,
+  accommodation: false,
+  transport: false,
+}
+
+const EVENT_CAPABILITY_DEFAULTS_BY_TYPE = {
+  birthday: { suppliers: true, vendors: true, ticketing: false, checkIn: true },
+  'bridal-shower': { suppliers: true, vendors: true, sponsors: false, bridalParty: true },
+  wedding: { seating: true, suppliers: true, vendors: true, bridalParty: true, accommodation: true, transport: true },
+  workshop: { speakers: true, sessions: true, certificates: true, ticketing: true, checkIn: true },
+  'cake-tasting-food-showcase': { bakers: true, tastingZones: true, allergens: true, suppliers: true, vendors: true, sponsors: true },
+  'cake-tasting': { bakers: true, tastingZones: true, allergens: true, suppliers: true, vendors: true, sponsors: true },
+  'cake-picnic': { bakers: true, tastingZones: true, allergens: true, suppliers: true, vendors: true, sponsors: true },
+  tasting: { tastingZones: true, allergens: true, suppliers: true },
+  'food-event': { allergens: true, suppliers: true, vendors: true },
+  'cultural-experience': { suppliers: true, vendors: true, sponsors: true, speakers: true, sessions: true },
+  'corporate-event': { speakers: true, sessions: true, sponsors: true, certificates: true },
+  'hospitality-event': { suppliers: true, vendors: true, sponsors: true, transport: true },
+  party: { suppliers: true, vendors: true, ticketing: false },
+  'private-event': { publicRegistration: false, ticketing: false, checkIn: true, sponsors: false },
+  'private-food-experience': { publicRegistration: false, ticketing: false, checkIn: true, suppliers: true, allergens: true },
+  brunch: { suppliers: true, vendors: true, allergens: true },
+  'vendor-pop-up': { vendors: true, sponsors: true, ticketing: false },
+  other: {},
+}
 
 export const EVENT_STATUS_OPTIONS = [
   { value: 'draft', label: 'Draft', description: 'Capture the event idea and basic details before planning starts.' },
@@ -173,6 +240,23 @@ export function normalizeEventStatus(value) {
 export function normalizeEventType(value) {
   const normalized = String(value || '').trim().toLowerCase()
   return normalized || 'other'
+}
+
+export function defaultEventCapabilitiesForType(eventType = 'other') {
+  return {
+    ...UNIVERSAL_CAPABILITIES,
+    ...(EVENT_CAPABILITY_DEFAULTS_BY_TYPE[normalizeEventType(eventType)] || {}),
+  }
+}
+
+export function normalizeEventCapabilities(value = null, eventType = 'other') {
+  const defaults = defaultEventCapabilitiesForType(eventType)
+  if (!value || typeof value !== 'object') return defaults
+  return Object.fromEntries(EVENT_CAPABILITY_OPTIONS.map(({ key }) => [key, Boolean(value[key] ?? defaults[key])]))
+}
+
+export function eventCapabilityLabel(key) {
+  return EVENT_CAPABILITY_OPTIONS.find((option) => option.key === key)?.label || key
 }
 
 export function eventTypeLabel(value) {
@@ -414,6 +498,7 @@ export function hydrateEventForPlanning(event = {}) {
     financialPlan: normalizeFinancialPlan(event?.financialPlan),
     operationsPlan: normalizeOperationsPlan(event?.operationsPlan),
     readinessChecklist: normalizeReadinessChecklist(event?.readinessChecklist),
+    eventCapabilities: normalizeEventCapabilities(event?.eventCapabilities, event?.eventType),
     planningTasks: Array.isArray(event?.planningTasks) ? event.planningTasks.map(normalizePlanningTask) : [],
     partnerRecords: Array.isArray(event?.partnerRecords) ? event.partnerRecords.map(normalizePartnerRecord) : [],
   }

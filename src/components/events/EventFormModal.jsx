@@ -4,8 +4,10 @@ import { toDateInput } from '../../utils/dateUtils'
 import {
   EVENT_STATUS_OPTIONS,
   EVENT_TYPE_OPTIONS,
+  EVENT_CAPABILITY_OPTIONS,
   buildReadinessChecklist,
   createUid,
+  defaultEventCapabilitiesForType,
   emptyFinancialPlan,
   emptyOperationsPlan,
   emptyReadinessChecklist,
@@ -21,6 +23,7 @@ const EMPTY_EVENT = {
   venueName: '',
   location: '',
   eventType: 'food-event',
+  eventCapabilities: defaultEventCapabilitiesForType('food-event'),
   status: 'planning',
   eventStartTime: '',
   eventEndTime: '',
@@ -85,6 +88,7 @@ function valuesFromEvent(event) {
     venueName: hydratedEvent.venueName || '',
     location: hydratedEvent.location || '',
     eventType: hydratedEvent.eventType || 'food-event',
+    eventCapabilities: hydratedEvent.eventCapabilities || defaultEventCapabilitiesForType(hydratedEvent.eventType),
     status: hydratedEvent.status || 'planning',
     eventStartTime: hydratedEvent.eventStartTime || '',
     eventEndTime: hydratedEvent.eventEndTime || '',
@@ -145,7 +149,7 @@ function stepHasErrors(stepId, errors) {
   }
 
   if (stepId === 'registration') {
-    return ['capacity', 'ticketPrice', 'ticketTypeCount', 'registrationOpenDate', 'registrationCloseDate', 'priceTiers'].some((key) => errors[key])
+    return ['capacity', 'ticketPrice', 'ticketTypeCount', 'registrationOpenDate', 'registrationCloseDate', 'priceTiers', 'eventCapabilities'].some((key) => errors[key])
   }
 
   if (stepId === 'financial-plan') return Boolean(errors.financialPlan)
@@ -178,7 +182,11 @@ export function EventFormModal({ event, onClose, onSave }) {
   }, [onClose, saving])
 
   function updateField(field, value) {
-    setValues((current) => ({ ...current, [field]: value }))
+    setValues((current) => ({
+      ...current,
+      [field]: value,
+      ...(field === 'eventType' ? { eventCapabilities: defaultEventCapabilitiesForType(value) } : {}),
+    }))
     if (errors[field]) setErrors((current) => ({ ...current, [field]: '' }))
   }
 
@@ -203,6 +211,10 @@ export function EventFormModal({ event, onClose, onSave }) {
 
   function updateReadiness(key, checked) {
     updateNestedField('readinessChecklist', key, checked)
+  }
+
+  function updateCapability(key, checked) {
+    updateNestedField('eventCapabilities', key, checked)
   }
 
   function addTier() {
@@ -403,6 +415,7 @@ export function EventFormModal({ event, onClose, onSave }) {
                     <select id="eventType" value={values.eventType} onChange={(changeEvent) => updateField('eventType', changeEvent.target.value)} className={inputClass('eventType')} disabled={saving}>
                       {EVENT_TYPE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                     </select>
+                    <p className="mt-1 text-[11px] leading-5 text-[#80685B]">Event type suggests default capabilities. You can review and override them in the next step.</p>
                     <FieldError id="eventType-error">{errors.eventType}</FieldError>
                   </div>
 
@@ -469,6 +482,29 @@ export function EventFormModal({ event, onClose, onSave }) {
                 />
 
                 <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="sm:col-span-2 rounded-2xl border border-[#EFE2DA] bg-white px-4 py-3">
+                    <p className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Event capabilities</p>
+                    <p className="mt-1 text-xs leading-5 text-[#816D62]">
+                      Review what this event needs. Turning a capability off only hides optional planning prompts; it does not delete registrations, tickets, Operations records, or reports.
+                    </p>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {EVENT_CAPABILITY_OPTIONS.map((option) => (
+                        <label key={option.key} className="flex items-start gap-3 rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3 text-sm text-[#2B1723]">
+                          <input
+                            type="checkbox"
+                            checked={Boolean(values.eventCapabilities?.[option.key])}
+                            onChange={(changeEvent) => updateCapability(option.key, changeEvent.target.checked)}
+                            className="mt-1"
+                          />
+                          <span>
+                            <span className="block font-bold">{option.label}</span>
+                            <span className="mt-1 block text-xs leading-5 text-[#816D62]">{option.description}</span>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
                   <div>
                     <label htmlFor="capacity" className="event-label">Expected capacity <span>*</span></label>
                     <input id="capacity" type="number" min="1" step="1" value={values.capacity} onChange={(changeEvent) => updateField('capacity', changeEvent.target.value)} className={inputClass('capacity')} placeholder="150" disabled={saving} />
