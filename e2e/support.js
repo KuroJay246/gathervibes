@@ -36,7 +36,11 @@ export async function signInAndSelectEvent(page) {
 
 async function dismissWelcomeTourIfPresent(page) {
   const welcomeDialog = page.getByRole('dialog').filter({ hasText: 'Guided Event Hub Orientation' })
-  if (await welcomeDialog.count() === 0) return
+  try {
+    await welcomeDialog.first().waitFor({ state: 'visible', timeout: 5000 })
+  } catch {
+    return
+  }
   const skipButton = welcomeDialog.getByRole('button', { name: 'Skip for Now' })
   if (await skipButton.count() === 1) {
     await skipButton.click()

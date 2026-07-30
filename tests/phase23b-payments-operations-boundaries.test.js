@@ -7,7 +7,11 @@ import {
   classifyRegistrationFinance,
   paymentFilterMatches,
 } from '../src/utils/financeUtils.js'
-import { findPossibleRegistrationPaymentOverlap } from '../src/utils/operationsReport.js'
+import {
+  buildOperationsSettlementSummary,
+  findPossibleRegistrationPaymentOverlap,
+} from '../src/utils/operationsReport.js'
+import { buildEventReview } from '../src/utils/eventReview.js'
 import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
 
 test('Payments route is organizer-facing while scanner navigation remains isolated', async () => {
@@ -102,10 +106,87 @@ test('Operations page and helpers keep registration payments separate from ledge
   assert.match(operationsPage, /Confirm the income was not already recorded under Payments/)
   assert.match(operationsPage, /Current Ledger Difference/)
   assert.match(operationsPage, /Visible Current Ledger Difference/)
+  assert.match(operationsPage, /Historical reconciliation evidence is shown in Reports/)
   assert.doesNotMatch(operationsPage, /Net event position/)
+  assert.doesNotMatch(operationsPage, /Operations closeout records applied/)
   assert.match(qaPage, /Overall event profit is not calculated automatically/)
   assert.match(reports, /Boundary comparison for review only/)
   assert.match(reports, /Do not add them together/)
+})
+
+test('Financial boundary examples stay separated across payments, operations, planning, and reports', async () => {
+  const event = {
+    eventId: 'phase-1-boundary',
+    eventName: 'Boundary QA Event',
+    currency: 'BBD',
+    capacity: 20,
+    financialPlan: {
+      projectedRegistrationIncome: 1000,
+      venueBudget: 300,
+      supplierBudget: 200,
+      marketingBudget: 75,
+      staffingBudget: 125,
+      contingencyBudget: 50,
+    },
+    partnerRecords: [
+      { recordType: 'sponsor', sponsorType: 'cash', status: 'Requested', requestedAmount: 500, confirmedCashAmount: 0 },
+      { recordType: 'sponsor', sponsorType: 'cash', status: 'Confirmed', confirmedCashAmount: 250 },
+      { recordType: 'sponsor', sponsorType: 'in-kind', status: 'Confirmed', estimatedValue: 300, itemOrService: 'Gift bags' },
+      { recordType: 'supplier', status: 'Confirmed', agreedAmount: 160, amountPaid: 80 },
+    ],
+  }
+  const registrations = [
+    { registrationId: 'paid', fullName: 'Fully Paid', personsAttending: 1, ticketPrice: 100, amountPaid: 100, paymentStatus: 'paid', paymentMethod: 'firstpay', paymentReference: 'P-1' },
+    { registrationId: 'partial', fullName: 'Partial Paid', personsAttending: 2, ticketPrice: 100, amountPaid: 50, paymentStatus: 'pending' },
+    { registrationId: 'unpaid', fullName: 'Unpaid Guest', personsAttending: 1, ticketPrice: 100, amountPaid: 0, paymentStatus: 'pending' },
+    { registrationId: 'comp', fullName: 'Comp Guest', personsAttending: 1, ticketPrice: 0, amountDue: 0, amountPaid: 0, paymentStatus: 'complimentary', paymentMethod: 'complimentary' },
+  ]
+  const operations = [
+    { entryType: 'income', status: 'received', category: 'Sponsor cash', label: 'Confirmed sponsor cash', amount: 250 },
+    { entryType: 'income', status: 'expected', category: 'Sponsor request', label: 'Requested sponsor not confirmed', amount: 500 },
+    { entryType: 'expense', status: 'paid', category: 'Vendor', label: 'Vendor paid expense', amount: 120 },
+    { entryType: 'expense', status: 'pending', category: 'Supplier', label: 'Unpaid commitment', amount: 80 },
+    { entryType: 'refund', status: 'paid', category: 'Refund', label: 'Refund paid', amount: 25 },
+    { entryType: 'adjustment', status: 'received', category: 'Reimbursement', label: 'Reimbursement adjustment', amount: 40 },
+    { entryType: 'income', status: 'received', category: 'Ticket revenue', label: 'Duplicate ticket revenue entry', amount: 100 },
+    { entryType: 'income', status: 'received', category: 'In-kind support', label: 'Gift bags in-kind support', amount: 0 },
+  ]
+
+  const payments = buildPaymentsWorkspace(registrations, event)
+  const settlement = buildOperationsSettlementSummary(operations)
+  const review = buildEventReview(event, registrations, operations, { asOf: new Date('2026-01-01T00:00:00Z') })
+  const overlaps = findPossibleRegistrationPaymentOverlap(operations)
+
+  assert.equal(payments.summary.expectedRegistrationIncome, 400)
+  assert.equal(payments.summary.recordedPayments, 150)
+  assert.equal(payments.summary.outstandingBalance, 250)
+  assert.equal(payments.summary.complimentaryRegistrations, 1)
+  assert.equal(settlement.incomeReceived, 350)
+  assert.equal(settlement.incomePending, 500)
+  assert.equal(settlement.paidExpenses, 120)
+  assert.equal(settlement.outstandingCommitments, 80)
+  assert.equal(settlement.paidRefunds, 25)
+  assert.equal(settlement.inKindContributions, 1)
+  assert.equal(overlaps.length, 1)
+  assert.equal(review.paymentReview.plannedFigures.plannedRegistrationIncome, 1000)
+  assert.equal(review.paymentReview.plannedFigures.plannedExpenses, 750)
+  assert.equal(review.paymentReview.outstandingCommitments.totalOutstandingCommitments, 160)
+  assert.equal(review.paymentReview.comparison.registrationCollected, 150)
+  assert.equal(review.paymentReview.comparison.ledgerReceivedIncome, 350)
+  assert.match(review.paymentReview.comparison.note, /Do not add them together/)
+})
+
+test('CPB historical evidence is relocated out of daily Payments and Operations presentation', async () => {
+  const paymentsPage = await readFile('src/pages/PaymentsPage.jsx', 'utf8')
+  const operationsPage = await readFile('src/pages/OperationsPage.jsx', 'utf8')
+  const reportsPage = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
+
+  assert.match(paymentsPage, /Historical reconciliation evidence is not part of the daily Registration Payments workflow/)
+  assert.doesNotMatch(paymentsPage, /Documentary support for CPB ticket income/)
+  assert.match(operationsPage, /Historical reconciliation evidence is shown in Reports/)
+  assert.doesNotMatch(operationsPage, /Baker payment schedule/)
+  assert.match(reportsPage, /Historical Reconciliation/)
+  assert.match(reportsPage, /Documentary-to-app variance/)
 })
 
 test('Phase 23B guardrails keep QR, dependencies, Firestore rules, and access workflows unchanged', async () => {

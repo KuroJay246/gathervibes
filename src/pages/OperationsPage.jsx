@@ -28,7 +28,6 @@ import {
 import { InfoHint } from '../components/ui/InfoHint'
 import { canWriteOperations, isApprovedAdmin } from '../utils/accessRoles'
 import { isCompletedEvent } from '../utils/eventPlanning'
-import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 
 const EMPTY_FORM = {
   entryType: 'income',
@@ -178,7 +177,7 @@ export function OperationsPage() {
   const filteredControl = useMemo(() => buildOperationsControlSummary(filteredEntries), [filteredEntries])
   const possibleRegistrationPaymentOverlap = useMemo(() => findPossibleRegistrationPaymentOverlap(entries), [entries])
   const filterScopeLabel = useMemo(() => buildFilterScopeLabel(filters), [filters])
-  const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(currentEvent?.eventId), [currentEvent?.eventId])
+  const hasHistoricalReconciliation = currentEvent?.eventId === 'zhaPxi31cpqLAW0cuS20'
 
   if (!currentEvent?.eventId) {
     return (
@@ -385,63 +384,14 @@ export function OperationsPage() {
         </div>
       </details>
 
-      {evidenceAudit && (
-        <details className="phase23v-panel border-[#D8C5A8] bg-[#FFFCF6]" aria-labelledby="operations-closeout-heading">
-          <summary className="phase23v-summary text-[#4E3928]">Financial audit and closeout history</summary>
-          <div className="phase23v-body">
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Financial Audit and Closeout History</p>
-              <h2 id="operations-closeout-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Operations closeout records applied</h2>
-              <p className="mt-2 max-w-3xl text-xs leading-5 text-[#715D46]">
-                The approved CPB audit package applied on July 22, 2026 created the completed Operations and in-kind records below. Registration evidence and attendance corrections remain locked for separate review, and open corrective tasks remain evidence review only.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="w-fit rounded-full bg-[#E5F3EC] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">Applied</span>
-              <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">Registration and attendance corrections locked</span>
-              <span className="w-fit rounded-full bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
-                CPB Operations entries now: {entries.length}
-              </span>
-            </div>
+      {hasHistoricalReconciliation && (
+        <section className="rounded-2xl border border-[#D8C5A8] bg-[#FFFCF6] p-4 text-sm leading-6 text-[#715D46]" aria-label="Historical reconciliation moved to Reports">
+          <strong className="text-[#4E3928]">Historical reconciliation evidence is shown in Reports, not in the daily Operations ledger workflow.</strong>
+          {' '}Use this page for current ledger entries, commitments, sponsor cash, expenses, refunds, reimbursements, and adjustments. Use Reports for CPB historical closeout evidence and corrective-action context.
+          <div className="mt-3">
+            <Link to="/event-review" className="inline-flex min-h-10 items-center rounded-xl border border-[#D8C5A8] bg-white px-4 text-xs font-bold text-[#7A5818]">Open Reports</Link>
           </div>
-          <div className="mt-4 grid gap-3 lg:grid-cols-3">
-            <article className="rounded-xl border border-[#EEDFD6] bg-white p-4">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">Completed financial entry</p>
-              <p className="text-sm font-bold text-[#2B1723]">LESC venue and 15 tables</p>
-              <p className="mt-1 text-lg font-bold text-[#2B1723]">{formatCurrency(evidenceAudit.operations.venuePaid)}</p>
-              <p className="mt-2 text-xs leading-5 text-[#715D46]">Directly Verified · Paid/Settled · Barbados Conference Services Limited / LESC.</p>
-            </article>
-            <article className="rounded-xl border border-[#EEDFD6] bg-white p-4">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">Completed and open ledger entries</p>
-              <p className="text-sm font-bold text-[#2B1723]">Baker payment schedule</p>
-              <p className="mt-1 text-lg font-bold text-[#2B1723]">{formatCurrency(evidenceAudit.operations.bakerPaidOrganizerReported)} paid / {formatCurrency(evidenceAudit.operations.bakerOutstandingOrganizerReported)} outstanding</p>
-              <p className="mt-2 text-xs leading-5 text-[#715D46]">Organizer Reported. Candyrain subset is directly documented; do not count it twice.</p>
-            </article>
-            <article className="rounded-xl border border-[#EEDFD6] bg-white p-4">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">Evidence-review task</p>
-              <p className="text-sm font-bold text-[#2B1723]">Cake boxes / printing evidence gap</p>
-              <p className="mt-1 text-lg font-bold text-[#2B1723]">{formatCurrency(evidenceAudit.operations.cakeBoxesPrinting)}</p>
-              <p className="mt-2 text-xs leading-5 text-[#715D46]">Unverified / Outstanding. This is not a paid expense or an additional Operations commitment until supplier, invoice, quantity and proof are confirmed.</p>
-            </article>
-          </div>
-          <div className="mt-4 grid gap-3 lg:grid-cols-3">
-            {evidenceAudit.sponsorship.map((item) => (
-              <article key={item.sponsor} className="rounded-xl border border-[#EEDFD6] bg-white p-4" aria-label={`${item.sponsor}: ${item.evidenceClass}`}>
-                <p className="text-sm font-bold text-[#2B1723]">{item.sponsor}</p>
-                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#80685B]">In-kind · {item.evidenceClass}</p>
-                <p className="mt-2 text-xs leading-5 text-[#715D46]">{item.quantity} · {item.item} · Cash impact {formatCurrency(item.cashReceived)} · Estimated value unknown.</p>
-              </article>
-            ))}
-          </div>
-          <details className="mt-4 rounded-xl border border-[#EEDFD6] bg-white p-4">
-            <summary className="cursor-pointer text-sm font-bold text-[#2B1723]">Open corrective and evidence-review tasks ({evidenceAudit.correctiveActions.length})</summary>
-            <ol className="mt-3 grid list-decimal gap-2 pl-5 text-xs leading-5 text-[#715D46] md:grid-cols-2">
-              {evidenceAudit.correctiveActions.map((item) => <li key={item}>{item}</li>)}
-            </ol>
-          </details>
-          </div>
-        </details>
+        </section>
       )}
 
       <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
