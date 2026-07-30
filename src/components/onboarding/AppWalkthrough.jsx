@@ -112,22 +112,22 @@ export function AppWalkthrough({ initialStep = 0, onComplete, onSkip, onClose })
           return
         }
         if (window.location.pathname !== targetRoute) {
-          requestAnimationFrame(check)
+          window.setTimeout(check, 100)
           return
         }
         const h1 = document.querySelector('header h1')
         if (expectedTitle && h1 && !h1.textContent.includes(expectedTitle)) {
-          requestAnimationFrame(check)
+          window.setTimeout(check, 100)
           return
         }
         if (marker && !document.querySelector(marker)) {
-          requestAnimationFrame(check)
+          window.setTimeout(check, 100)
           return
         }
         resolve()
       }
 
-      requestAnimationFrame(check)
+      window.setTimeout(check, 0)
     })
   }, [])
 
@@ -168,8 +168,15 @@ export function AppWalkthrough({ initialStep = 0, onComplete, onSkip, onClose })
       try {
         await waitForRouteReady(nextStep.route)
       } catch (error) {
+        if (window.location.pathname === nextStep.route) {
+          window.dispatchEvent(new PopStateEvent('popstate', { state: window.history.state }))
+          await waitForRouteReady(nextStep.route)
+          setCurrentStepIndex(nextIndex)
+          return
+        }
         if (import.meta.env.DEV) console.error('[Onboarding] Navigation timeout:', error)
         setErrorMsg('Navigation is taking longer than expected. Retry navigation or continue when the page finishes loading.')
+        return
       } finally {
         setNavPending(false)
       }

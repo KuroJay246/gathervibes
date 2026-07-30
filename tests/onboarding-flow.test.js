@@ -133,6 +133,13 @@ test('[onboarding-flow] AppWalkthrough uses route-specific header title matching
   assert.match(src, /ROUTE_READY_MARKERS/)
 })
 
+test('[onboarding-flow] AppWalkthrough recovers when history changes before route content renders', async () => {
+  const src = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
+  assert.match(src, /window\.setTimeout\(check, 100\)/)
+  assert.match(src, /new PopStateEvent\('popstate'/)
+  assert.match(src, /window\.location\.pathname === nextStep\.route/)
+})
+
 test('[onboarding-flow] AppWalkthrough uses anchored spotlight targets with arrowed tooltip copy', async () => {
   const src = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
   assert.match(src, /targetSelector/)
