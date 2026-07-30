@@ -9,7 +9,7 @@
 | `/events` | Events | Create, edit, select, and remove event records. | Working Event changes start here. |
 | `/registrations` | Guests & Registrations | Manage registration records, guests, finance fields, and review filters. | Registrations and guests stay distinct. |
 | `/payments` | Payments | Review registration charges, payments, balances, and finance follow-up. | Registration payments only. |
-| `/payments/reconciliation` | Reconciliation Preview | Compare the locked CPB workbook with live records in read-only mode. | Internal audit tool; no apply action. |
+| `/payments/reconciliation` | Reconciliation Preview | Compare an organizer-approved payment workbook with the selected event in read-only mode. | Internal audit tool; no apply action. |
 | `/tickets` | Tickets | Assign ticket codes and prepare QR-ready access. | QR payload stays `GSV:TICKET:{ticketCode}`. |
 | `/check-in` | Check-In | Search guests, confirm attendance, and use event-day helper lists. | Uses the selected event only. |
 | `/scanner` | Scanner | Assigned-event scanner workflow for event-day staff. | Separate from organizer navigation. |
@@ -24,5 +24,5 @@
 
 - Event-scoped routes use the selected Working Event.
 - CODEX_TEST is the safe QA event.
-- CPB is protected production data and must stay read-only during rehearsal and routine QA.
+- Real events share the same standard safeguards and must not be used for synthetic QA.
 - Clearing the Working Event should show clean empty states rather than stale data.

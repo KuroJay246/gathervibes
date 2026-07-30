@@ -4,19 +4,12 @@ import { useActiveEvent } from '../events/useActiveEvent'
 import { LoadingState } from '../components/ui/LoadingState'
 import { ErrorState } from '../components/ui/ErrorState'
 import {
-  CPB_DRY_RUN_CONFIRMATION_TEXT,
-  CPB_RECONCILIATION_EVENT_ID,
-  CPB_RECONCILIATION_EVENT_NAME,
   RECONCILIATION_FILTERS,
   buildPaymentReconciliationPreview,
 } from '../utils/paymentReconciliation'
 import { formatCurrency } from '../utils/financeUtils'
 import { readReconciliationWorkbook } from '../utils/reconciliationWorkbook'
 import { loadReconciliationOperations, loadReconciliationRegistrations } from '../services/reconciliationReadService'
-
-const TARGETS = [
-  { eventId: CPB_RECONCILIATION_EVENT_ID, eventName: CPB_RECONCILIATION_EVENT_NAME, currency: 'BBD' },
-]
 
 function Metric({ label, value, help }) {
   return (
@@ -36,8 +29,8 @@ function GuardrailNotice() {
         <div>
           <h3 className="font-bold text-[#4E3928]">Read-only reconciliation preview</h3>
           <p className="mt-1">
-            This tool loads workbook records, CPB registration records, and CPB Operations records for comparison only.
-            It does not use the selected Working Event, does not save changes, does not import registrations, and does not apply payment updates.
+            This tool loads workbook records, the selected event's registration records, and the selected event's Operations records for comparison only.
+            It uses the selected Working Event, does not save changes, does not import registrations, and does not apply payment updates.
           </p>
         </div>
       </div>
@@ -45,24 +38,18 @@ function GuardrailNotice() {
   )
 }
 
-function SetupPanel({ targetEventId, setTargetEventId, confirmation, setConfirmation, fileName, onFileChange, onLoad, onUseLocalWorkbook, localWorkbookLoading, showLocalWorkbookHelper, loading }) {
-  const canLoad = targetEventId === CPB_RECONCILIATION_EVENT_ID && confirmation === CPB_DRY_RUN_CONFIRMATION_TEXT && fileName && !loading
+function SetupPanel({ activeEvent, fileName, onFileChange, onLoad, loading }) {
+  const canLoad = Boolean(activeEvent?.eventId && fileName && !loading)
   return (
     <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
       <div className="grid gap-4 lg:grid-cols-3">
-        <label className="space-y-2">
+        <div className="space-y-2">
           <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Target event</span>
-          <select
-            value={targetEventId}
-            onChange={(event) => setTargetEventId(event.target.value)}
-            className="min-h-11 w-full rounded-xl border border-[#E5D7CF] bg-white px-3 text-sm font-semibold text-[#2B1723]"
-          >
-            <option value="">Select target event inside this tool</option>
-            {TARGETS.map((target) => (
-              <option key={target.eventId} value={target.eventId}>{target.eventName}</option>
-            ))}
-          </select>
-        </label>
+          <div className="min-h-11 rounded-xl border border-[#E5D7CF] bg-[#FBF8F5] px-3 py-3 text-sm font-semibold text-[#2B1723]">
+            {activeEvent?.eventName || 'Select a Working Event first'}
+          </div>
+          <p className="text-xs text-[#816D62]">The preview uses the current Working Event and does not change the event status.</p>
+        </div>
 
         <label className="space-y-2">
           <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Workbook</span>
@@ -72,24 +59,16 @@ function SetupPanel({ targetEventId, setTargetEventId, confirmation, setConfirma
             onChange={onFileChange}
             className="block min-h-11 w-full rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-sm text-[#2B1723] file:mr-3 file:rounded-lg file:border-0 file:bg-[#F7F1ED] file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-[#6B564C]"
           />
-          <p className="text-xs text-[#816D62]">{fileName || 'Choose Cake_Piknik_Payment_Audit.xlsx from the local workspace.'}</p>
-          {showLocalWorkbookHelper && (
-            <button type="button" onClick={onUseLocalWorkbook} disabled={localWorkbookLoading} className="rounded-lg border border-[#E7D6CC] bg-[#FBF8F5] px-3 py-1.5 text-xs font-bold text-[#6B564C] disabled:opacity-50">
-              {localWorkbookLoading ? 'Loading local workbook...' : 'Use local review workbook'}
-            </button>
-          )}
+          <p className="text-xs text-[#816D62]">{fileName || 'Choose the organizer-approved payment workbook for the selected event.'}</p>
         </label>
 
-        <label className="space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Confirmation</span>
-          <input
-            value={confirmation}
-            onChange={(event) => setConfirmation(event.target.value)}
-            placeholder={CPB_DRY_RUN_CONFIRMATION_TEXT}
-            className="min-h-11 w-full rounded-xl border border-[#E5D7CF] px-3 text-sm font-semibold text-[#2B1723]"
-          />
-          <p className="text-xs text-[#816D62]">Exact text required before CPB data loads.</p>
-        </label>
+        <div className="space-y-2">
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Write behavior</span>
+          <div className="min-h-11 rounded-xl border border-[#E5D7CF] bg-[#FBF8F5] px-3 py-3 text-sm font-semibold text-[#2B1723]">
+            Preview only
+          </div>
+          <p className="text-xs text-[#816D62]">Corrections are made through the normal audited registration and payment workflows.</p>
+        </div>
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -100,10 +79,10 @@ function SetupPanel({ targetEventId, setTargetEventId, confirmation, setConfirma
           className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
         >
           {loading ? <RefreshCw className="size-4 animate-spin" /> : <LockKeyhole className="size-4" />}
-          Load CPB Dry Run
+          Load Preview
         </button>
         <p className="text-xs leading-5 text-[#816D62]">
-          Refreshing this page returns to the locked setup state. CPB data is never silently reloaded.
+          Select the correct Working Event before loading. The preview never writes event, registration, ticket, attendance, Operations, or audit-log records.
         </p>
       </div>
     </section>
@@ -298,18 +277,14 @@ function ReconciliationTable({ preview, filter }) {
 
 export function PaymentReconciliationPage() {
   const { activeEvent } = useActiveEvent()
-  const [targetEventId, setTargetEventId] = useState('')
-  const [confirmation, setConfirmation] = useState('')
   const [workbookFile, setWorkbookFile] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [localWorkbookLoading, setLocalWorkbookLoading] = useState(false)
   const [error, setError] = useState('')
   const [preview, setPreview] = useState(null)
   const [filter, setFilter] = useState('all')
-  const selectedTarget = TARGETS.find((target) => target.eventId === targetEventId)
-  const showLocalWorkbookHelper = typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname)
 
-  const setupReady = targetEventId === CPB_RECONCILIATION_EVENT_ID && confirmation === CPB_DRY_RUN_CONFIRMATION_TEXT && workbookFile
+  const selectedTarget = activeEvent ? { ...activeEvent, currency: activeEvent.currency || 'BBD' } : null
+  const setupReady = Boolean(selectedTarget?.eventId && workbookFile)
 
   const workbookParserNote = useMemo(() => {
     const sheet = preview?.workbookSheets?.[0]
@@ -339,7 +314,7 @@ export function PaymentReconciliationPage() {
       setPreview({ ...nextPreview, workbookSheets })
       setFilter('all')
     } catch (err) {
-      setError(err?.message || 'CPB reconciliation preview could not load.')
+      setError(err?.message || 'Payment reconciliation preview could not load.')
     } finally {
       setLoading(false)
     }
@@ -351,23 +326,7 @@ export function PaymentReconciliationPage() {
     setError('')
   }
 
-  async function useLocalWorkbook() {
-    setLocalWorkbookLoading(true)
-    setError('')
-    setPreview(null)
-    try {
-      const response = await fetch('/Cake_Piknik_Payment_Audit.xlsx', { cache: 'no-store' })
-      if (!response.ok) throw new Error('Local review workbook is not being served from the local app root.')
-      const blob = await response.blob()
-      setWorkbookFile(new File([blob], 'Cake_Piknik_Payment_Audit.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }))
-    } catch (err) {
-      setError(err?.message || 'Local review workbook could not be loaded.')
-    } finally {
-      setLocalWorkbookLoading(false)
-    }
-  }
-
-  if (loading) return <LoadingState message="Loading CPB reconciliation dry run..." />
+  if (loading) return <LoadingState message="Loading payment reconciliation preview..." />
 
   return (
     <div className="space-y-6">
@@ -376,7 +335,7 @@ export function PaymentReconciliationPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Payments · dry-run only</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Payment Reconciliation Preview</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
-            Compare the CPB payment workbook to existing app registration payment records without changing data.
+            Compare a payment workbook to the selected event's registration payment records without changing data.
           </p>
         </div>
         <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
@@ -386,24 +345,10 @@ export function PaymentReconciliationPage() {
 
       <GuardrailNotice />
       <SetupPanel
-        targetEventId={targetEventId}
-        setTargetEventId={(value) => {
-          setTargetEventId(value)
-          setPreview(null)
-          setError('')
-        }}
-        confirmation={confirmation}
-        setConfirmation={(value) => {
-          setConfirmation(value)
-          setPreview(null)
-          setError('')
-        }}
+        activeEvent={activeEvent}
         fileName={workbookFile?.name || ''}
         onFileChange={onFileChange}
         onLoad={loadDryRun}
-        onUseLocalWorkbook={useLocalWorkbook}
-        localWorkbookLoading={localWorkbookLoading}
-        showLocalWorkbookHelper={showLocalWorkbookHelper}
         loading={loading}
       />
 
@@ -415,7 +360,7 @@ export function PaymentReconciliationPage() {
             <FileSpreadsheet className="mt-0.5 size-5 shrink-0" />
             <div>
               <h3 className="font-bold text-[#2B1723]">No target loaded</h3>
-              <p>Select CPB, choose the payment audit workbook, and enter the exact confirmation text to load a read-only preview.</p>
+              <p>Select a Working Event and choose its organizer-approved payment workbook to load a read-only preview.</p>
             </div>
           </div>
         </section>

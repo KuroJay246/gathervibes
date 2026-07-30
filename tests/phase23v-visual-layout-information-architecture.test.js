@@ -56,7 +56,7 @@ test('Phase 23V dense organizer pages keep primary work visible and collapse sec
   assert.match(checkIn, /Advanced check-in filters/)
 
   assert.match(operations, /Partner commitments, sponsors, and supplier contacts/)
-  assert.match(operations, /Historical reconciliation evidence is shown in Reports/)
+  assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
   assert.match(reports, /Show full report metrics/)
 })
 

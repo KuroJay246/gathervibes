@@ -12,8 +12,6 @@ import { COMMUNICATION_SEGMENTS, COMMUNICATION_TEMPLATES, buildCommunicationsSeg
 import {
   CODEX_TEST_EVENT_ID,
   CODEX_TEST_EVENT_NAME,
-  CPB_EVENT_ID,
-  CPB_EVENT_NAME,
   organizerReadinessChecklist,
   QA_PHASE23T_PREFIX,
   buildQaSampleCsv,
@@ -78,7 +76,6 @@ export function QaPage() {
   const sampleCsv = useMemo(() => buildQaSampleCsv(prefix), [prefix])
   const codexEvents = events.filter((event) => event.eventId === CODEX_TEST_EVENT_ID || event.eventName === CODEX_TEST_EVENT_NAME)
   const codexTestEvent = useMemo(() => findCodexTestEvent(events), [events])
-  const cpbEvent = events.find((event) => event.eventId === CPB_EVENT_ID || event.eventName === CPB_EVENT_NAME)
   const workingEventIsCodex = isCodexTestWorkingEvent(activeEvent)
 
   useEffect(() => {
@@ -208,8 +205,8 @@ export function QaPage() {
         { label: 'Outstanding balance segment', status: communicationsSummary.outstandingBalance ? 'warning' : 'pass', detail: `${communicationsSummary.outstandingBalance} rows` },
         { label: 'No external message sending enabled', status: 'pass', detail: 'Message Builder is copy-only.' },
         { label: 'Import readiness', status: workingEventIsCodex ? 'pass' : 'warning', detail: workingEventIsCodex ? 'CODEX_TEST selected' : 'Use CODEX_TEST for QA imports' },
-        { label: 'Legacy CPB recovery tools hidden', status: 'pass', detail: 'Import Center contains only normal organizer import sources.' },
-        { label: 'Payment audit engine remains write-locked', status: 'pass', detail: 'Historical recovery code is not reachable from the organizer interface.' },
+        { label: 'Standard import tools only', status: 'pass', detail: 'Import Center contains normal organizer import sources.' },
+        { label: 'Legacy recovery tools absent', status: 'pass', detail: 'Historical one-off recovery code is not reachable from the organizer interface.' },
         { label: 'Registration search overlap fixed', status: 'pass', detail: 'Search and filters sit above wrapped category tabs.' },
         { label: 'Registration count cards are clickable/filterable', status: 'pass', detail: 'Finance Review, Missing Ticket Code, Outstanding, Door, and Check-In cards filter registrations.' },
         { label: 'Finance review card opens matching registration', status: 'pass', detail: 'Finance Review card filters to registrations with warning/review state.' },
@@ -225,7 +222,7 @@ export function QaPage() {
         { label: 'operationsLedger read/list/write rules pass for approved admin', status: 'pass', detail: `${operationRows.length} entries readable for selected event; writes remain admin-only.` },
         { label: 'Operations form helper text exists', status: 'pass', detail: 'Entry type, category, amount, method, reference, paid by/to, status are explained.' },
         { label: 'Import template explanations exist', status: 'pass', detail: 'Each template explains use, columns, blanks, duplicates, and effects.' },
-        { label: 'Legacy CPB write controls remain unavailable', status: 'pass', detail: 'Historical recovery code is not reachable from the organizer interface.' },
+        { label: 'Legacy one-off write controls unavailable', status: 'pass', detail: 'Historical recovery code is not reachable from the organizer interface.' },
         { label: 'Event Operations tracker exists', status: 'pass', detail: 'Operations ledger is scoped to the selected Working Event.' },
         { label: 'Event Operations boundaries visible', status: 'pass', detail: 'Operations now separates partner commitments from the event ledger and keeps registration payments outside both.' },
         { label: 'Export presets available', status: 'pass', detail: 'Basic, Door, Finance, Communications, Admin, Re-import' },
@@ -333,8 +330,8 @@ export function QaPage() {
           ...item,
           status: codexEvents.length === 1 ? 'ready' : 'not-ready',
           detail: codexEvents.length === 1
-            ? 'CODEX_TEST is available for organizer rehearsal and CPB remains protected.'
-            : 'The QA fixture must exist exactly once before destructive QA.',
+            ? 'CODEX_TEST is available for organizer rehearsal.'
+            : 'The QA fixture must exist exactly once before synthetic QA.',
         }
       case 'productionDeployment':
         return {
@@ -369,7 +366,7 @@ export function QaPage() {
       label: 'Current Event',
       status: activeEvent?.eventId ? 'ok' : 'warn',
       value: activeEvent?.eventName || 'No event selected',
-      detail: workingEventIsCodex ? 'Safe test event selected.' : 'Use CODEX_TEST before running any destructive QA workflow.',
+      detail: workingEventIsCodex ? 'Safe test event selected.' : 'Use CODEX_TEST before running any synthetic QA workflow.',
     },
     {
       label: 'Core Workflows',
@@ -430,7 +427,7 @@ export function QaPage() {
         </div>
 
         <div className="mt-6 rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#5F4A2A]">
-          Use <strong>{CODEX_TEST_EVENT_NAME}</strong> for test registrations, imports, tickets, or check-ins. CPB is production data and remains read-only during normal QA.
+          Use <strong>{CODEX_TEST_EVENT_NAME}</strong> for test registrations, imports, tickets, or check-ins. Real events use the same standard safeguards and should not be used for synthetic QA writes.
         </div>
 
         <div className="mt-4 rounded-2xl border border-[#D8C5A8] bg-[#FFFCF6] p-5">
@@ -548,12 +545,10 @@ export function QaPage() {
           </p>
         </div>
 
-          {cpbEvent && (
           <p className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#F7F1ED] px-3 py-2 text-xs font-semibold text-[#6B564C]">
             <Database className="size-4" aria-hidden="true" />
-            CPB detected as {cpbEvent.status || 'unknown status'} and left untouched.
+            Real events are protected by authentication, event scoping, validation, confirmations, and append-only audit logs.
           </p>
-          )}
         </div>
       </details>
 
@@ -611,7 +606,7 @@ export function QaPage() {
         </div>
         <pre className="mt-3 max-h-72 overflow-auto rounded-2xl border border-[#EFE2DA] bg-[#23131C] p-4 text-[11px] leading-5 text-[#FFF8F2]">{sampleCsv}</pre>
         <p className="mt-4 text-xs leading-5 text-[#80685B]">
-          Do not paste this into CPB. First select CODEX_TEST as the Working Event, then use Import Center preview before saving.
+          Do not paste this into any real event. First select CODEX_TEST as the Working Event, then use Import Center preview before saving.
         </p>
         </div>
       </details>

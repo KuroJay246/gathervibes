@@ -5,7 +5,6 @@ import { getFirestore } from 'firebase-admin/firestore';
 const projectId = 'gathervibeshub';
 const codexTestEventId = 'xPfa0b3KZyLSDnAD2uGI';
 const codexTestEventName = 'CODEX_TEST Live Verification Event';
-const cpbEventId = 'zhaPxi31cpqLAW0cuS20';
 
 function eventSummary(doc) {
   const data = doc.data();
@@ -15,6 +14,8 @@ function eventSummary(doc) {
     eventName: data.eventName ?? null,
     status: data.status ?? null,
     eventType: data.eventType ?? null,
+    isTestEvent: data.isTestEvent ?? false,
+    eventClassification: data.eventClassification ?? null,
     notes: data.notes ?? null,
   };
 }
@@ -41,25 +42,19 @@ async function main() {
     || event.eventId === codexTestEventId
     || event.eventName === codexTestEventName
   ));
-  const cpb = events.find((event) => event.docId === cpbEventId || event.eventId === cpbEventId);
   const auditSample = await db.collection('auditLogs').limit(1).get();
 
   const result = {
     eventCount: events.length,
-    codexTestMatches: codexMatches.map(({ docId, eventId, eventName, status, eventType }) => ({
+    codexTestMatches: codexMatches.map(({ docId, eventId, eventName, status, eventType, isTestEvent, eventClassification }) => ({
       docId,
       eventId,
       eventName,
       status,
       eventType,
+      isTestEvent,
+      eventClassification,
     })),
-    cpb: cpb ? {
-      docId: cpb.docId,
-      eventId: cpb.eventId,
-      eventName: cpb.eventName,
-      status: cpb.status,
-      eventType: cpb.eventType,
-    } : null,
     auditLogsExist: !auditSample.empty,
   };
 
@@ -76,8 +71,8 @@ async function main() {
     process.exit(1);
   }
 
-  if (!cpb || cpb.docId !== cpbEventId || cpb.eventName !== 'CPB' || cpb.status !== 'completed' || cpb.eventType !== 'cake-picnic') {
-    console.error('Error: CPB fixture check failed. CPB may be missing or changed.');
+  if (codex.isTestEvent !== true && codex.eventClassification !== 'test') {
+    console.error('Error: CODEX_TEST fixture is not marked as a Test Event.');
     process.exit(1);
   }
 
@@ -86,7 +81,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log('Verified production fixtures: CODEX_TEST exists exactly once, CPB is unchanged, and auditLogs exist.');
+  console.log('Verified production fixtures: CODEX_TEST exists exactly once, is marked as a Test Event, and auditLogs exist.');
 }
 
 main().catch((error) => {

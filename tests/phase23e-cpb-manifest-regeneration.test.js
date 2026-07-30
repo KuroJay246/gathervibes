@@ -3,10 +3,11 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
 import {
-  CPB_RECONCILIATION_EVENT_ID,
   buildPaymentReconciliationPreview,
   parsePaymentWorkbookSheet,
 } from '../src/utils/paymentReconciliation.js'
+
+const CPB_RECONCILIATION_EVENT_ID = 'zhaPxi31cpqLAW0cuS20'
 
 const headers = [
   'Ticket/Door ID',

@@ -5,12 +5,10 @@ import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import { TextDecoder } from 'node:util'
 import { unzipSync } from 'fflate'
-import {
-  CPB_RECONCILIATION_EVENT_ID,
-  buildPaymentReconciliationPreview,
-} from '../../src/utils/paymentReconciliation.js'
+import { buildPaymentReconciliationPreview } from '../../src/utils/paymentReconciliation.js'
 
 const projectId = 'gathervibeshub'
+const CPB_RECONCILIATION_EVENT_ID = 'zhaPxi31cpqLAW0cuS20'
 const workbookPath = 'C:\\Users\\Jaylan\\Documents\\gathetr\\Cake_Piknik_Payment_Audit.xlsx'
 const outputRoot = 'C:\\Users\\Jaylan\\Desktop\\GSV_New_CPB_Manifest'
 const expectedWorkbookHash = '77AF3050F82D97D12067728FC1314E51CA734F73B798AAD8D63C263421029D96'

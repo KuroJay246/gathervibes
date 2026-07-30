@@ -161,7 +161,7 @@ const EVENT_DAY_ACTIONS = [
 
 const COMPLETED_ACTIONS = [
   { to: '/event-review', label: 'Open Final Report', icon: CheckCircle2 },
-  { to: '/operations', label: 'Review Baker Payments', icon: ReceiptText },
+  { to: '/operations', label: 'Review Supplier Payments', icon: ReceiptText },
   { to: '/events', label: 'Open Event Plan', icon: CalendarDays },
 ]
 
@@ -280,7 +280,7 @@ export function DashboardPage() {
           <Section eyebrow="Completed Event" title="Historical event overview">
             <div className="rounded-2xl border border-[#E9EFFB] bg-[#F6F9FF] p-4 text-sm leading-6 text-[#415F91]">
               This event is completed. Upcoming-event reminders, ticket prompts, and guest payment follow-up are no longer treated as active organizer work.
-              {selectedEvent?.eventId === 'zhaPxi31cpqLAW0cuS20' && ' CPB remains a completed historical event. Guest payment totals stay locked while supplier payment evidence remains in Operations and Reports.'}
+              Completed status does not make an event read-only; approved organizers can still make audited corrections through the normal event workflows.
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
               <Metric label="Status" value={eventStatusLabel(selectedEvent.status)} />

@@ -1,6 +1,6 @@
 import { normalizeTicketCode } from '../utils/ticketUtils.js'
 
-export const CPB_AUDIT_REQUIRED_HEADERS = [
+export const PAYMENT_AUDIT_REQUIRED_HEADERS = [
   'Ticket/Door ID',
   'Guest Name',
   'Buyer/Contact',
@@ -13,8 +13,6 @@ export const CPB_AUDIT_REQUIRED_HEADERS = [
   'Evidence Summary',
   'Confidence',
 ]
-
-export const CPB_AUDIT_APPROVAL_TEXT = 'APPROVE CPB PAYMENT AUDIT'
 
 function normalizeText(value) {
   return String(value || '').trim().replace(/\s+/g, ' ')
@@ -53,7 +51,7 @@ function headerLookup(headers = []) {
 
 export function workbookHeadersRecognized(headers = []) {
   const headerSet = new Set(headers.map((header) => normalizeText(header)))
-  return CPB_AUDIT_REQUIRED_HEADERS.every((header) => headerSet.has(header))
+  return PAYMENT_AUDIT_REQUIRED_HEADERS.every((header) => headerSet.has(header))
 }
 
 export function normalizeAuditSheet(sheetOrRows) {
@@ -308,7 +306,7 @@ function totalsComparison(rows) {
 export function generateAuditMatches(sheetOrRows, existingRegistrations = []) {
   const { headers, rows } = normalizeAuditSheet(sheetOrRows)
   if (!workbookHeadersRecognized(headers)) {
-    throw new Error(`Payment Audit sheet is missing required headers: ${CPB_AUDIT_REQUIRED_HEADERS.join(', ')}`)
+    throw new Error(`Payment Audit sheet is missing required headers: ${PAYMENT_AUDIT_REQUIRED_HEADERS.join(', ')}`)
   }
 
   const results = {
@@ -394,7 +392,7 @@ export function generateAuditMatches(sheetOrRows, existingRegistrations = []) {
 
 export function buildDryRunReport(results) {
   const lines = [
-    '# CPB Payment Audit Backfill Dry Run',
+    '# Payment Audit Backfill Dry Run',
     '',
     'No Firestore writes were performed.',
     '',
@@ -422,11 +420,4 @@ export function buildDryRunReport(results) {
   })
 
   return lines.join('\n')
-}
-
-export function assertApplyApproval(confirmationText) {
-  if (confirmationText !== CPB_AUDIT_APPROVAL_TEXT) {
-    throw new Error(`Apply requires exact confirmation text: ${CPB_AUDIT_APPROVAL_TEXT}`)
-  }
-  return true
 }

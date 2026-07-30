@@ -5,7 +5,6 @@ import { pathToFileURL } from 'node:url'
 
 import {
   CODEX_TEST_EVENT_ID,
-  CPB_EVENT_ID,
   PHASE_23G_MANIFEST_SHA256,
   assertPhase23gApplyLock,
   buildRegistrationApplyPlan,
@@ -103,18 +102,18 @@ async function main() {
     rehearsalOnly: true,
   })
 
-  let cpbDenied = false
+  let realEventDenied = false
   try {
     assertPhase23gApplyLock({
-      targetEventId: CPB_EVENT_ID,
+      targetEventId: 'real-event-example',
       manifestSha256: PHASE_23G_MANIFEST_SHA256,
       approvalPhrase,
       rehearsalOnly: true,
     })
   } catch {
-    cpbDenied = true
+    realEventDenied = true
   }
-  if (!cpbDenied) throw new Error('CPB denial check failed.')
+  if (!realEventDenied) throw new Error('Real-event denial check failed.')
 
   const token = await firebaseCliToken()
   await mkdir(outputRoot, { recursive: true })
@@ -207,8 +206,7 @@ async function main() {
     manifestSha256: PHASE_23G_MANIFEST_SHA256,
     approvalPhrase,
     targetEventId: CODEX_TEST_EVENT_ID,
-    cpbEventId: CPB_EVENT_ID,
-    cpbDenied,
+    realEventDenied,
     createdSyntheticRegistration: true,
     updateVerified,
     cleanupVerified,
@@ -220,7 +218,7 @@ async function main() {
       operationsWrites: 0,
       ticketWrites: 0,
       checkInWrites: 0,
-      cpbWrites: 0,
+      realEventWrites: 0,
     },
   }
   await writeFile(join(outputRoot, `${runId}_result.json`), JSON.stringify(result, null, 2))

@@ -79,7 +79,7 @@ const pageTitles = {
   '/events': ['Events', 'Plan and organize every gathering'],
   '/registrations': ['Guests & Registrations', 'Manage registration records and guest counts'],
   '/payments': ['Payments', 'Review registration charges, payments, balances, and follow-up'],
-  '/payments/reconciliation': ['Reconciliation Preview', 'Read-only CPB payment audit comparison'],
+  '/payments/reconciliation': ['Reconciliation Preview', 'Read-only payment workbook comparison'],
   '/tickets': ['Tickets', 'Assign ticket codes and prepare QR access'],
   '/check-in': ['Check-In', 'Track event-day attendance'],
   '/operations': ['Operations', 'Track event-level money and obligations'],

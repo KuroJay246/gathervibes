@@ -1,13 +1,11 @@
 export const CODEX_TEST_EVENT_ID = 'xPfa0b3KZyLSDnAD2uGI'
 export const CODEX_TEST_EVENT_NAME = 'CODEX_TEST Live Verification Event'
-export const CPB_EVENT_ID = 'zhaPxi31cpqLAW0cuS20'
-export const CPB_EVENT_NAME = 'CPB'
 export const CODEX_TEST_NOTES = 'Permanent QA fixture. Do not use for real guests. Do not delete unless the organizer explicitly approves.'
 export const QA_PHASE23T_PREFIX = 'QA_PHASE23T'
 
 export const organizerReadinessChecklist = [
   { key: 'authentication', label: 'Authentication', detail: 'Approved organizer access and protected-owner boundaries remain required.' },
-  { key: 'eventCreation', label: 'Event Creation', detail: 'Create and select a new event without touching CPB.' },
+  { key: 'eventCreation', label: 'Event Creation', detail: 'Create and select real events using standard organizer safeguards.' },
   { key: 'registrationWorkflow', label: 'Registration Workflow', detail: 'Add registrations, group bookings, guest counts, and finance fields clearly.' },
   { key: 'paymentWorkflow', label: 'Payment Workflow', detail: 'Review charges, recorded payments, outstanding balances, and finance follow-up.' },
   { key: 'ticketWorkflow', label: 'Ticket Workflow', detail: 'Assign ticket codes and preserve the QR payload contract.' },
@@ -18,7 +16,7 @@ export const organizerReadinessChecklist = [
   { key: 'imports', label: 'Import', detail: 'Use preview-first CSV, pasted table, and XLSX imports.' },
   { key: 'responsiveDesign', label: 'Responsive Design', detail: 'Primary organizer workflows remain usable on desktop, tablet, and mobile.' },
   { key: 'accessibility', label: 'Accessibility', detail: 'Keyboard, labels, focus treatment, and readable layout need a release check before sign-off.' },
-  { key: 'dataSafety', label: 'Data Safety', detail: 'CPB remains protected, audit logs remain append-only, and QA work stays in CODEX_TEST.' },
+  { key: 'dataSafety', label: 'Data Safety', detail: 'Real events use the same authentication, validation, confirmation, and append-only audit safeguards. QA work stays in CODEX_TEST.' },
   { key: 'productionDeployment', label: 'Production Deployment', detail: 'Release status stays separate from local organizer readiness work until validation and smoke pass.' },
 ]
 
@@ -44,7 +42,7 @@ export const qaChecklist = [
   'Confirm dashboard capacity equals persons attending divided by event capacity',
   'Confirm duplicate check-in is blocked',
   'Confirm audit logs remain append-only after ticket and check-in actions',
-  'Confirm CPB is not selected and not touched during QA',
+  'Confirm real-event records are not used for synthetic QA writes',
   'Confirm a Ticket Code can be manually entered or edited',
   'Confirm the next event-style ticket code can be generated',
   'Confirm an imported ticket code is preserved through preview and import',
@@ -54,7 +52,7 @@ export const qaChecklist = [
   'Confirm finance totals: expected, collected, outstanding, door, and complimentary',
   'Confirm missing ticket price, missing paid amount, and balance mismatch warnings',
   'Confirm QR payload still contains ticket code only and no money or private data',
-  'Confirm Import Center does not expose legacy CPB payment-audit, backfill, or Apply controls',
+  'Confirm Import Center exposes only standard organizer import workflows',
   'Confirm Registration filters include Door Paid, To Pay at Door, Missing Ticket Code, Missing Amount, and Needs Review',
   'Confirm Registration count cards are clickable and finance warnings filter to exact rows',
   'Confirm group/person explanations and Group of X badges are visible for group registrations',
@@ -66,7 +64,7 @@ export const qaChecklist = [
   'Confirm current user role appears in Settings and System Health',
   'Confirm approved-admin allowlist remains active and no public access is enabled',
   'Confirm product boundaries remain clear: private admin app, CODEX_TEST QA, access, operations, and external integrations',
-  'Confirm scanner smoke safety is preserved: CODEX_TEST only, no CPB access, no scanner undo',
+  'Confirm scanner smoke safety is preserved: CODEX_TEST for QA, assigned-event access only, no scanner undo',
   'Confirm Access Summary stays admin-only and does not claim live approval, revoke, assign, edit, or lead-scanner features',
   'Confirm scanner success, duplicate, pending-payment, and no-ticket messaging is clear on /scanner',
   'Confirm scanner next guest flow clears safely and returns focus to manual lookup where practical',
@@ -74,7 +72,7 @@ export const qaChecklist = [
   'Confirm Message Builder segments and templates are copy-only',
   'Confirm copy packet, recipient list, and CSV packet work without sending messages',
   'Confirm AI generation, Gmail/Outlook OAuth, Google Sheets OAuth, Cloud Functions, and Storage remain disabled',
-  'Confirm CPB is protected and not used for role or communications QA',
+  'Confirm real events are not used for role or communications QA',
   'Assign, regenerate, and unassign a ticket code',
   'Verify auditLogs show registration, ticket, and check-in activity',
 ]

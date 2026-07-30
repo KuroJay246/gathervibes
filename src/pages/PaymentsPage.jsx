@@ -281,7 +281,7 @@ export function PaymentsPage() {
       {evidenceAudit && (
         <section className="rounded-2xl border border-[#D8C5A8] bg-[#FFFCF6] p-4 text-sm leading-6 text-[#715D46]" aria-label="Historical reconciliation moved to Reports">
           <strong className="text-[#4E3928]">Historical reconciliation evidence is not part of the daily Registration Payments workflow.</strong>
-          {' '}Use Reports for CPB historical reconciliation details and use Reconciliation Preview for locked workbook comparison. The daily totals above remain the registration payment records only.
+          {' '}Use Reports for historical reconciliation details and use Reconciliation Preview for a read-only workbook comparison. The daily totals above remain the registration payment records only.
           <div className="mt-3 flex flex-wrap gap-2">
             <Link to="/event-review" className="inline-flex min-h-10 items-center rounded-xl border border-[#D8C5A8] bg-white px-4 text-xs font-bold text-[#7A5818]">Open Reports</Link>
             <Link to="/payments/reconciliation" className="inline-flex min-h-10 items-center rounded-xl border border-[#D8C5A8] bg-white px-4 text-xs font-bold text-[#7A5818]">Open Reconciliation Preview</Link>

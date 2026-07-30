@@ -4,10 +4,6 @@ import { normalizePaymentStatus } from './paymentStatus.js'
 import { normalizePersonsAttending } from './registrationMetrics.js'
 import { normalizeTicketCode } from './ticketUtils.js'
 
-export const CPB_RECONCILIATION_EVENT_ID = 'zhaPxi31cpqLAW0cuS20'
-export const CPB_RECONCILIATION_EVENT_NAME = 'Cake Piknik Barbados'
-export const CPB_DRY_RUN_CONFIRMATION_TEXT = 'CPB DRY RUN'
-
 export const RECONCILIATION_CLASSIFICATIONS = {
   noChange: 'Exact Match - No Change',
   proposedUpdate: 'Exact Match - Proposed Update',
@@ -532,8 +528,8 @@ export function buildPaymentReconciliationPreview({ workbookSheet, registrations
 
   return {
     targetEvent: {
-      eventId: event.eventId || CPB_RECONCILIATION_EVENT_ID,
-      eventName: event.eventName || CPB_RECONCILIATION_EVENT_NAME,
+      eventId: event.eventId || '',
+      eventName: event.eventName || 'Selected event',
       currency: event.currency || 'BBD',
     },
     recordSets: {

@@ -157,7 +157,7 @@ Append-only audit logs were not deleted.
 
 ## Data And Financial Boundaries
 
-- CPB locked patron finance target remains the documented baseline: 69 registrations, 73 guests, BBD 6,530 expected, BBD 6,530 received, BBD 0 patron outstanding.
+- CPB closeout values remain historical audit evidence: 69 registrations, 73 guests, BBD 6,530 expected, BBD 6,530 received, BBD 0 patron outstanding. CPB is not a special read-only event.
 - No CPB production writes were performed.
 - No CPB import, check-in, ticket, Operations, or audit-log mutation was performed.
 - Registration payment calculations and Operations ledger calculations were not changed.

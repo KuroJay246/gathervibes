@@ -17,7 +17,6 @@ import {
 } from '../src/config/protectedOwner.js'
 import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
 
-const CPB_EVENT_ID = 'zhaPxi31cpqLAW0cuS20'
 const CODEX_TEST_EVENT_ID = 'xPfa0b3KZyLSDnAD2uGI'
 
 async function source(path) {
@@ -93,9 +92,11 @@ test('Phase 23O Firestore rules grant owner UID first without widening signed-in
   assert.doesNotMatch(rules, /allow (read|write|create|update|delete|list|get): if request\.auth != null/)
 })
 
-test('Phase 23O guardrails preserve QR privacy, CODEX_TEST isolation, CPB locks, and registration correction hold', async () => {
+test('Phase 23O guardrails preserve QR privacy, CODEX_TEST isolation, and standard real-event safeguards', async () => {
   const qaPage = await source('src/pages/QaPage.jsx')
   const qaHelper = await source('src/utils/qaHelper.js')
+  const dashboard = await source('src/pages/DashboardPage.jsx')
+  const events = await source('src/pages/EventsPage.jsx')
   const operations = await source('src/pages/OperationsPage.jsx')
   const reports = await source('src/pages/EventReviewPage.jsx')
   const phase23n = await source('PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md')
@@ -103,14 +104,15 @@ test('Phase 23O guardrails preserve QR privacy, CODEX_TEST isolation, CPB locks,
 
   assert.equal(qrPayloadForTicketCode('QA23O-001'), 'GSV:TICKET:QA23O-001')
   assert.match(qaHelper, new RegExp(CODEX_TEST_EVENT_ID))
-  assert.match(qaHelper, new RegExp(CPB_EVENT_ID))
-  assert.match(qaPage, /CPB is production data and remains read-only during normal QA/)
-  assert.match(qaPage, /Legacy CPB write controls remain unavailable/)
-  assert.match(operations, /Historical reconciliation evidence is shown in Reports/)
+  assert.doesNotMatch(qaHelper, /zhaPxi31cpqLAW0cuS20|CPB remains protected/)
+  assert.match(qaPage, /Real events use the same standard safeguards/)
+  assert.match(qaPage, /Legacy one-off write controls unavailable/)
+  assert.match(dashboard, /Completed status does not make an event read-only/)
+  assert.match(events, /showTestEvents/)
+  assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
   assert.match(reports, /Historical reconciliation evidence is preserved here for CPB review/)
   assert.match(phase23n, /Subset 5: Registration Evidence Metadata/)
   assert.match(phase23n, /Subset 6: Registration\/Attendance Corrections/)
-  assert.match(paymentAuditEngine, /CPB_AUDIT_APPROVAL_TEXT/)
-  assert.match(paymentAuditEngine, /assertApplyApproval/)
+  assert.doesNotMatch(paymentAuditEngine, /CPB_AUDIT_APPROVAL_TEXT|assertApplyApproval/)
   assert.doesNotMatch(paymentAuditEngine, /batch\.commit|writeBatch|setDoc|updateDoc/)
 })

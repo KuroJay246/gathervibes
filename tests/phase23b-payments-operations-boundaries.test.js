@@ -106,7 +106,7 @@ test('Operations page and helpers keep registration payments separate from ledge
   assert.match(operationsPage, /Confirm the income was not already recorded under Payments/)
   assert.match(operationsPage, /Current Ledger Difference/)
   assert.match(operationsPage, /Visible Current Ledger Difference/)
-  assert.match(operationsPage, /Historical reconciliation evidence is shown in Reports/)
+  assert.match(operationsPage, /Registration ticket payments are recorded separately under Payments/)
   assert.doesNotMatch(operationsPage, /Net event position/)
   assert.doesNotMatch(operationsPage, /Operations closeout records applied/)
   assert.match(qaPage, /Overall event profit is not calculated automatically/)
@@ -183,7 +183,7 @@ test('CPB historical evidence is relocated out of daily Payments and Operations 
 
   assert.match(paymentsPage, /Historical reconciliation evidence is not part of the daily Registration Payments workflow/)
   assert.doesNotMatch(paymentsPage, /Documentary support for CPB ticket income/)
-  assert.match(operationsPage, /Historical reconciliation evidence is shown in Reports/)
+  assert.match(operationsPage, /Registration ticket payments are recorded separately under Payments/)
   assert.doesNotMatch(operationsPage, /Baker payment schedule/)
   assert.match(reportsPage, /Historical Reconciliation/)
   assert.match(reportsPage, /Documentary-to-app variance/)

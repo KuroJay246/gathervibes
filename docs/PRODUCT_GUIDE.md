@@ -6,7 +6,7 @@ Gather & Savor Event Hub is a private React and Firebase workspace for event org
 
 The organizer-ready MVP goal is simple: the organizer should be able to sign in, create the next real event, and manage it through the normal interface without developer tools, Firebase knowledge, or phase-history context.
 
-All daily work is scoped to the selected Working Event. `CODEX_TEST` is the permanent synthetic QA event. Cake Piknik Barbados (CPB) contains production data and is read-only during normal QA.
+All daily work is scoped to the selected Working Event. `CODEX_TEST` is the permanent synthetic QA event and is hidden from normal event lists by default. Real events use the same standard safeguards whether active, upcoming, or completed.
 
 ## Current companion docs
 
@@ -18,7 +18,7 @@ All daily work is scoped to the selected Working Event. `CODEX_TEST` is the perm
 - [Organizer Rehearsal Guide](./PROTOTYPE_DEMO_GUIDE.md): organizer rehearsal path using CODEX_TEST
 - [Operations Guide](./OPERATIONS_GUIDE.md): event-level money boundaries
 - [Baker Payment Guide](./BAKER_PAYMENT_GUIDE.md): baker commitments and payment-closeout boundaries
-- [Finance Evidence Guide](./FINANCE_EVIDENCE_GUIDE.md): evidence handling and CPB safety rules
+- [Finance Evidence Guide](./FINANCE_EVIDENCE_GUIDE.md): evidence handling and real-event correction rules
 - [QA Guide](./QA_GUIDE.md): local, browser, and cleanup QA workflow
 - [Deployment Guide](./DEPLOYMENT_GUIDE.md): merge, deploy, and smoke sequence
 - [Known Limitations](./KNOWN_LIMITATIONS.md): current product limits
@@ -32,7 +32,7 @@ All daily work is scoped to the selected Working Event. `CODEX_TEST` is the perm
 | `/events` | Create, edit, select, and remove event records. |
 | `/registrations` | Manage registrations, guests, finance fields, and review filters. |
 | `/payments` | Review registration charges, receipts, balances, and follow-up needs. |
-| `/payments/reconciliation` | Run a locked, read-only CPB workbook comparison. |
+| `/payments/reconciliation` | Run a read-only payment workbook comparison for the selected Working Event. |
 | `/imports` | Import CSV, pasted tables, and XLSX through mapping and preview. |
 | `/tickets` | Assign unique ticket codes and produce ticket-code-only QR payloads. |
 | `/check-in` | Search guests, confirm attendance, and use event-day helper lists. |
@@ -73,7 +73,7 @@ Approximate historical attendance is displayed as aggregate evidence only. It mu
 
 The organizer workflow is: select an event, choose a source, map columns, review validation, preview changes, confirm import, and review results. CSV, pasted table, and XLSX sources share the same preview-first contract. Imports never use private browser state in automated tests.
 
-Completed CPB backfills, consumed manifests, and old recovery Apply controls are not exposed in the normal Import Center. Historical parsers and evidence remain preserved outside the organizer workflow where still needed for audit history.
+Consumed backfills, historical manifests, and old recovery Apply controls are not exposed in the normal Import Center. Historical parsers and evidence remain preserved outside the organizer workflow where still needed for audit history.
 
 ### Communications
 
@@ -91,9 +91,9 @@ System QA starts with organizer-facing status for authentication, database acces
 
 ## Evidence reconciliation
 
-CPB reconciliation is evidence-sensitive and approval-gated. Missing values are not converted to zero, zero is not automatically complimentary, and ambiguous identities are never guessed. Production corrections require an exact record, before snapshot, drift check, narrow fields, explicit authorization, and append-only audit evidence.
+Real-event reconciliation is evidence-sensitive and uses the same production correction safeguards for every event. Missing values are not converted to zero, zero is not automatically complimentary, and ambiguous identities are never guessed. Production corrections require an exact record, before snapshot, drift check, narrow fields, explicit authorization, and append-only audit evidence.
 
-Phase 23N registration/attendance Subsets 5 and 6 remain locked. Christina Morris, Paula Gittens, Rossy Donawa, and the organizer-described Flour Mill attendee require exact identity/payment evidence before any registration or attendance correction.
+Historical CPB reconciliation records remain available as audit evidence, but CPB is not a special protected event. Christina Morris, Paula Gittens, Rossy Donawa, and the organizer-described Flour Mill attendee require exact identity/payment evidence before any registration or attendance correction.
 
 ## Product QA
 
@@ -129,7 +129,7 @@ The repository includes Dependabot configuration and CodeQL analysis configurati
 - Messaging is copy-only and does not send automatically.
 - The prompt builder does not call a live AI API.
 - No public attendee portal, payment gateway, native app, or broad staff-management workflow is active.
-- Historical CPB identity and attendance questions remain evidence-gated.
+- Historical identity and attendance questions remain evidence-gated.
 - Final event profit is not calculated automatically.
 
 Historical implementation records are indexed in [HISTORICAL_ARCHIVE_INDEX.md](./HISTORICAL_ARCHIVE_INDEX.md).
