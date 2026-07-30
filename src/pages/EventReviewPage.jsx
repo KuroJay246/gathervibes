@@ -202,7 +202,7 @@ export function EventReviewPage() {
       <Section eyebrow="Payment Follow-Up and Finance Review" title="What needs attention now">
         {review.followUp.items.length === 0 ? (
           <div className="rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
-            No patron payment follow-up or active finance review items were detected for the selected Working Event from current registration and operations data.
+            No guest payment follow-up or active finance review items were detected for the selected Working Event from current registration and operations data.
           </div>
         ) : (
           <div className="grid gap-4 xl:grid-cols-2">

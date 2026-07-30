@@ -24,10 +24,22 @@ export async function signInAndSelectEvent(page) {
   await page.getByRole('button', { name: 'Sign in securely' }).click()
   await expect(page).toHaveURL(/\/dashboard$/)
   await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible()
+  await dismissWelcomeTourIfPresent(page)
 
   await page.goto('/events')
+  await dismissWelcomeTourIfPresent(page)
   const eventContainer = page.locator('tr:visible, article:visible').filter({ hasText: E2E_EVENT_NAME }).first()
   await expect(eventContainer).toBeVisible()
   await eventContainer.getByRole('button', { name: 'Select', exact: true }).click()
   await expect(page.getByText(`${E2E_EVENT_NAME} is now the selected event.`)).toBeVisible()
+}
+
+async function dismissWelcomeTourIfPresent(page) {
+  const welcomeDialog = page.getByRole('dialog').filter({ hasText: 'Guided Event Hub Orientation' })
+  if (await welcomeDialog.count() === 0) return
+  const skipButton = welcomeDialog.getByRole('button', { name: 'Skip for Now' })
+  if (await skipButton.count() === 1) {
+    await skipButton.click()
+    await expect(welcomeDialog).toHaveCount(0)
+  }
 }

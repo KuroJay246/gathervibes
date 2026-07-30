@@ -32,7 +32,6 @@ import {
 } from '../services/eventService'
 import { formatEventDate } from '../utils/dateUtils'
 import { eventStatusLabel, hydrateEventForPlanning } from '../utils/eventPlanning'
-import { findCodexTestEvent, isCodexTestWorkingEvent } from '../utils/qaHelper'
 
 const statusStyles = {
   draft: 'bg-[#F1ECE8] text-[#725F55]',
@@ -135,8 +134,6 @@ export function EventsPage() {
     upcoming: events.filter((event) => ['planning', 'registration-open', 'registration-closed', 'ready-for-event', 'in-progress', 'upcoming', 'active'].includes(event.status)).length,
     capacity: events.reduce((total, event) => total + (Number(event.capacity) || 0), 0),
   }), [events])
-  const codexTestEvent = useMemo(() => findCodexTestEvent(events), [events])
-  const qaEventSelected = isCodexTestWorkingEvent(activeEvent)
 
   function openCreate() {
     setFormEvent(undefined)
@@ -258,24 +255,8 @@ export function EventsPage() {
           <h2 className="font-serif text-3xl text-[#2B1723]">Your gatherings</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-[#806C61]">Create each event once, plan it progressively, and keep one Working Event selected for the organizer team.</p>
           <p className="mt-1 max-w-xl text-xs leading-5 text-[#80685B]">The event planner now includes event setup, budget planning, readiness, and task tracking without leaving the normal organizer workflow.</p>
-          {codexTestEvent && (
-            <p className="mt-3 max-w-xl text-xs leading-5 text-[#7A5818]">
-              {qaEventSelected
-                ? 'CODEX_TEST is selected. Use it for organizer rehearsal and clean up QA_PHASE23T_ records after the review.'
-                : 'Use CODEX_TEST for organizer rehearsal so CPB stays untouched.'}
-            </p>
-          )}
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
-          {codexTestEvent && !qaEventSelected && (
-            <button
-              type="button"
-              onClick={() => chooseActiveEvent(codexTestEvent)}
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E6D4B4] bg-[#FFF8EA] px-4 py-3 text-xs font-bold text-[#7A5818]"
-            >
-              Use CODEX_TEST
-            </button>
-          )}
           <button type="button" data-tour-id="create-event-action" onClick={openCreate} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B]">
             <Plus className="size-4" strokeWidth={2.5} /> Plan a New Event
           </button>

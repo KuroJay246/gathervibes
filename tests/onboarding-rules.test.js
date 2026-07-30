@@ -114,7 +114,7 @@ rulesTest('[onboarding-rules] Jaylan can create with all optional onboarding fie
           completed: true,
           completedAt: serverTimestamp(),
           skippedAt: serverTimestamp(),
-          lastStep: 19,
+          lastStep: 20,
           replayRequestedAt: serverTimestamp(),
         })
       )
@@ -243,11 +243,11 @@ rulesTest('[onboarding-rules] Rejects lastStep below minimum (-1)', async () => 
   }
 })
 
-rulesTest('[onboarding-rules] Rejects lastStep above maximum (20)', async () => {
+rulesTest('[onboarding-rules] Rejects lastStep above maximum (21)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
-    await assertFails(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 20 })))
+    await assertFails(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 21 })))
   } finally {
     await testEnv.cleanup()
   }
@@ -263,11 +263,11 @@ rulesTest('[onboarding-rules] Accepts lastStep at unopened boundary (0)', async 
   }
 })
 
-rulesTest('[onboarding-rules] Accepts lastStep at maximum boundary (19)', async () => {
+rulesTest('[onboarding-rules] Accepts lastStep at maximum boundary (20)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
-    await assertSucceeds(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 19 })))
+    await assertSucceeds(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 20 })))
   } finally {
     await testEnv.cleanup()
   }

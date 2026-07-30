@@ -246,7 +246,7 @@ export function PaymentsPage() {
 
       <BoundaryNotice />
 
-      <section className="phase23v-metric-grid">
+      <section data-tour-id="payments-summary-metrics" className="phase23v-metric-grid">
         <Metric label="Registration records" value={workspace.summary.registrationCount} />
         <Metric label="Guests" value={workspace.summary.guestCount} />
         <Metric label="Expected Registration Income" value={formatCurrency(workspace.summary.expectedRegistrationIncome, currency)} />
@@ -269,7 +269,7 @@ export function PaymentsPage() {
           </section>
 
           <section className="phase23v-metric-grid">
-            <Metric label="Payment Follow-Up" value={workspace.summary.paymentFollowUpCount} help="May still require patron contact" />
+            <Metric label="Payment Follow-Up" value={workspace.summary.paymentFollowUpCount} help="May still require guest contact" />
             <Metric label="Action Required" value={workspace.summary.actionRequiredCount} help="Could affect totals, duplicates, or reminder accuracy" />
             <Metric label="Internal Cleanup" value={workspace.summary.internalCleanupCount} help="Resolved records that still need organizer review" />
             <Metric label="Historical Limitations" value={workspace.summary.historicalLimitationCount} help="Historical gaps kept out of urgent attention" />
@@ -312,13 +312,13 @@ export function PaymentsPage() {
 
       <ReviewList
         eyebrow="Payment Follow-Up"
-        title="Records that may still need patron contact"
+        title="Records that may still need guest contact"
         description="Use this list for registrations that still look unresolved for payment collection or balance follow-up."
         rows={workspace.paymentFollowUpRows}
         currency={currency}
         emptyMessage={workspace.summary.prominentDataReviewCount > 0 || workspace.summary.historicalLimitationCount > 0
-          ? 'No patron payment follow-up is detected. Review counts below are internal finance review only.'
-          : 'No patron payment follow-up is detected from the current records.'}
+          ? 'No guest payment follow-up is detected. Review counts below are internal finance review only.'
+          : 'No guest payment follow-up is detected from the current records.'}
       />
 
       <ReviewList
@@ -338,7 +338,7 @@ export function PaymentsPage() {
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Historical and Informational Review</p>
             <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Resolved records kept out of urgent attention</h2>
             <p className="mt-2 max-w-3xl text-xs leading-5 text-[#816D62]">
-              These records stay searchable for audit context, but they do not imply patron debt or active organizer follow-up when the missing information is historical, optional, or no longer recoverable.
+              These records stay searchable for audit context, but they do not imply guest debt or active organizer follow-up when the missing information is historical, optional, or no longer recoverable.
             </p>
           </div>
         </div>

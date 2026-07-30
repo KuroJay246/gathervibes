@@ -170,7 +170,7 @@ export function buildEventReadiness(event = null, registrations = [], operations
             ? 'review'
             : 'ready',
       planningOverview.partners.totalRecords === 0
-        ? 'No suppliers, sponsors, venue contacts, bakers, or helpers are recorded yet.'
+        ? 'No suppliers, sponsors, venue contacts, vendors, or helpers are recorded yet.'
         : `${planningOverview.partners.totalRecords} contact or commitment record${planningOverview.partners.totalRecords === 1 ? '' : 's'} in Operations.`,
     ),
     buildCategory(
@@ -238,7 +238,7 @@ export function buildEventReadiness(event = null, registrations = [], operations
       key: 'partners-missing',
       label: 'Add partners and commitments',
       statusLabel: 'Needs attention',
-      summary: 'Suppliers, sponsors, bakers, vendors, venue contacts, and helpers are not recorded yet.',
+      summary: 'Suppliers, sponsors, vendors, venue contacts, and helpers are not recorded yet.',
       to: '/operations',
       linkLabel: 'Open Operations',
     })
@@ -300,7 +300,7 @@ export function buildEventReadiness(event = null, registrations = [], operations
       key: 'completed-event',
       label: 'Completed event review',
       statusLabel: 'Ready',
-      summary: 'This event is in completed-history mode. Use Reports for final results and Operations for baker or supplier closeout.',
+      summary: 'This event is in completed-history mode. Use Reports for final results and Operations for vendor or supplier closeout.',
       to: '/event-review',
       linkLabel: 'Open Reports',
     })

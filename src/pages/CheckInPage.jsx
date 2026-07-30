@@ -338,7 +338,7 @@ export function CheckInPage() {
     setActiveView('search')
     setSelectedId('')
     setMessage('')
-    setActionError(`No matching ticket code ${ticketCode} was found for ${activeEvent.eventName}. Check that CODEX_TEST is the Working Event before testing.`)
+    setActionError(`No matching ticket code ${ticketCode} was found for ${activeEvent.eventName}. Confirm the Working Event before trying again.`)
   }
 
   function handleQrInvalid(errorMessage) {
@@ -412,7 +412,7 @@ export function CheckInPage() {
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Attendance Evidence Reconciliation</p>
               <h2 id="checkin-evidence-heading" className="mt-2 font-serif text-2xl text-[#2B1723]">Historical attendance is not system check-in</h2>
               <p className="mt-2 text-xs leading-5 text-[#715D46]">
-                The audit reports approximately {evidenceAudit.attendance.approximateAttendance} patrons checked in, while the app currently records {summary.checkedInPersons} checked-in guests. Do not create check-ins from the approximate count.
+                The audit reports approximately {evidenceAudit.attendance.approximateAttendance} guests from historical evidence, while the app currently records {summary.checkedInPersons} checked-in guests. Do not create check-ins from the approximate count.
               </p>
             </div>
           </div>
@@ -587,6 +587,7 @@ export function CheckInPage() {
               <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#B8A49A]" />
               <input
                 id="door-search"
+                data-tour-id="checkin-search-field"
                 value={searchQuery}
                 onChange={(event) => {
                   setSearchQuery(event.target.value)

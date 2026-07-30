@@ -426,6 +426,7 @@ export function RegistrationsPage() {
           </Link>
           <button
             type="button"
+            data-tour-id="add-registration-action"
             onClick={() => { setEditingRegistration(null); setIsModalOpen(true) }}
             className="flex items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B]"
           >
@@ -539,12 +540,14 @@ export function RegistrationsPage() {
       )}
 
       <div className="flex flex-col gap-6">
-        <RegistrationFilters 
-          filters={effectiveFilters}
-          onFilterChange={setFilters} 
-          onClearFilters={() => { setFilters({}); setActiveTab('All'); setCardFilter('') }} 
-          activeFilterCount={activeFilterCount}
-        />
+        <div data-tour-id="registration-filters-panel">
+          <RegistrationFilters
+            filters={effectiveFilters}
+            onFilterChange={setFilters}
+            onClearFilters={() => { setFilters({}); setActiveTab('All'); setCardFilter('') }}
+            activeFilterCount={activeFilterCount}
+          />
+        </div>
 
         <div className="overflow-x-auto pb-2">
           <div className="flex flex-wrap gap-2">

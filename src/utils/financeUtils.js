@@ -416,14 +416,14 @@ export function classifyRegistrationFinance(registration = {}, event = {}, conte
     paymentFollowUpReasons.push(reviewReason(
       'outstanding-payment',
       'Outstanding Payment',
-      'A positive balance remains on this registration and may still require patron payment follow-up.',
+      'A positive balance remains on this registration and may still require guest payment follow-up.',
       'payment-follow-up',
     ))
   } else if (statusGroup === 'unknown' || statusGroup === 'pending' || statusGroup === 'door-list') {
     paymentFollowUpReasons.push(reviewReason(
       'payment-follow-up-required',
       'Payment Follow-Up Required',
-      'Payment status is unresolved and may still require organizer follow-up with the patron.',
+      'Payment status is unresolved and may still require organizer follow-up with the guest or buyer.',
       'payment-follow-up',
     ))
   }

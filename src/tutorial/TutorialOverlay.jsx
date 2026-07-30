@@ -5,7 +5,7 @@ import { TutorialSpotlight } from './TutorialSpotlight.jsx'
 import { TutorialTooltip } from './TutorialTooltip.jsx'
 
 const SAFE_MARGIN = 12
-const SPOTLIGHT_PADDING = 8
+const SPOTLIGHT_PADDING = 12
 const TOOLTIP_WIDTH = 390
 const TOOLTIP_HEIGHT = 430
 const TOOLTIP_GAP = 16

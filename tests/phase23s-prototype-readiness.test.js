@@ -14,7 +14,7 @@ test('Phase 23T keeps organizer navigation and QA actions product-facing', async
   assert.match(shell, /Reports/)
   assert.match(shell, /System QA/)
   assert.match(dashboard, /Plan a New Event|Choose or create an event/)
-  assert.match(events, /Use CODEX_TEST/)
+  assert.doesNotMatch(events, /Use CODEX_TEST/)
   assert.match(qa, /Use CODEX_TEST/)
   assert.match(qa, /Readiness checklist/)
   assert.match(qa, /QA_PHASE23T_/)
