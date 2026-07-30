@@ -222,7 +222,7 @@ export function PaymentsPage() {
   if (loading) return <LoadingState message="Loading registration payments..." />
 
   return (
-    <div className="space-y-6">
+    <div data-tour-id="payments-workspace" className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Selected Working Event only</p>

@@ -276,7 +276,7 @@ export function EventsPage() {
               Use CODEX_TEST
             </button>
           )}
-          <button type="button" onClick={openCreate} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B]">
+          <button type="button" data-tour-id="create-event-action" onClick={openCreate} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B]">
             <Plus className="size-4" strokeWidth={2.5} /> Plan a New Event
           </button>
         </div>

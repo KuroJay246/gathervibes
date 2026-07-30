@@ -170,7 +170,7 @@ export function EventReviewPage() {
   const currency = review?.paymentReview?.registrationRecords?.currency || 'BBD'
 
   return (
-    <div className="space-y-6">
+    <div data-tour-id="reports-workspace" className="space-y-6">
       <section className="rounded-[28px] bg-[#2B1723] px-6 py-8 text-white shadow-[0_18px_50px_rgba(43,23,35,0.15)] sm:px-9 sm:py-10">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-3xl">

@@ -160,7 +160,7 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
   }
 
   return (
-    <section id="planning-workspace" className="space-y-6">
+    <section id="planning-workspace" data-tour-id="event-planning-workspace" className="space-y-6">
       <section className="rounded-[26px] border border-[#EEDFD6] bg-white p-6 shadow-[0_10px_32px_rgba(84,53,67,0.05)] sm:p-7">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">

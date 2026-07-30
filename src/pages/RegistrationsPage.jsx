@@ -393,7 +393,7 @@ export function RegistrationsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div data-tour-id="registrations-workspace" className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-serif text-3xl text-[#2B1723]">Guests & Registrations</h2>

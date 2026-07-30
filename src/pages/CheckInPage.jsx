@@ -347,7 +347,7 @@ export function CheckInPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div data-tour-id="checkin-workspace" className="space-y-6">
       <header className="sticky top-0 z-40 -mx-4 -mt-6 mb-6 flex flex-col gap-3 border-b border-[#EEDFD6] bg-[#FBF8F5]/95 px-4 py-4 backdrop-blur-md lg:static lg:mx-0 lg:mt-0 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#1E7345]">Event-Day Mode</p>
