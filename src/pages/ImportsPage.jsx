@@ -15,6 +15,16 @@ import { InfoHint } from '../components/ui/InfoHint'
 import { IMPORT_SOURCES, getImportSource } from '../utils/importSources'
 import { readXlsxWorkbook } from '../utils/xlsxImport'
 import { calculateRegistrationFinance } from '../utils/financeUtils'
+import {
+  FORM_INBOX_COLUMNS,
+  FORM_REVIEW_ACTIONS,
+  FORM_TARGET_TYPES,
+  applyFormInboxAction,
+  buildFormInboxSummary,
+  buildFormResponsesFromParsedRows,
+  buildManualFormConnection,
+  findFormResponseDuplicateCandidates,
+} from '../utils/formResponseInbox'
 
 function isPermissionDeniedImportError(err) {
   const text = `${err?.code || ''} ${err?.message || ''}`.toLowerCase()
@@ -54,6 +64,9 @@ export function ImportsPage() {
   const [existingRegistrations, setExistingRegistrations] = useState([])
   const [existingRegistrationsLoaded, setExistingRegistrationsLoaded] = useState(false)
   const [ticketMode, setTicketMode] = useState('use-imported')
+  const [formsInboxText, setFormsInboxText] = useState('')
+  const [formsInboxTargetType, setFormsInboxTargetType] = useState('guest-registration')
+  const [formsInboxResponses, setFormsInboxResponses] = useState([])
 
   const [importing, setImporting] = useState(false)
   const [importProgress, setImportProgress] = useState(0)
@@ -63,6 +76,7 @@ export function ImportsPage() {
   const selectedSource = getImportSource(sourceType)
   const selectedSheet = workbookSheets.find((sheet) => sheet.id === selectedSheetId)
   const canConfirmSheet = Boolean(selectedSheet?.importable)
+  const formsInboxSummary = buildFormInboxSummary(formsInboxResponses)
 
   useEffect(() => {
     resetImportState()
@@ -413,6 +427,60 @@ export function ImportsPage() {
     setImportResult(null)
     setError('')
     setImportErrorDetails(null)
+    setFormsInboxText('')
+    setFormsInboxResponses([])
+  }
+
+  function previewFormsInbox() {
+    const parsed = parseCSV(formsInboxText)
+    if (parsed.headers.length === 0 || parsed.rows.length === 0) {
+      setError('The Google Forms response export appears to be empty or invalid.')
+      return
+    }
+    const connection = buildManualFormConnection(activeEvent, {
+      targetType: formsInboxTargetType,
+      status: 'draft',
+      connectionName: `${activeEvent.eventName} manual form response review`,
+    })
+    const responses = buildFormResponsesFromParsedRows(parsed.headers, parsed.rows, { connection })
+      .map((response) => ({
+        ...response,
+        duplicateCandidates: findFormResponseDuplicateCandidates(response, formsInboxResponses, existingRegistrations),
+      }))
+      .map((response) => response.duplicateCandidates.length > 0
+        ? { ...response, status: 'needs-review', warnings: [...response.warnings, 'Possible duplicate found.'] }
+        : response)
+    setParsedData(parsed)
+    setImportContext({
+      sourceFileName: 'google-forms-response-inbox',
+      importBatchId: `forms-inbox-${Date.now()}`,
+      formTargetType: formsInboxTargetType,
+    })
+    setFormsInboxResponses(responses)
+    setError('')
+  }
+
+  function handleFormsInboxAction(responseId, action) {
+    setFormsInboxResponses((prev) => prev.map((response) => (
+      response.responseId === responseId ? applyFormInboxAction(response, action) : response
+    )))
+  }
+
+  function continueApprovedFormsToMapping() {
+    const approvedIds = new Set(formsInboxResponses.filter((response) => response.status === 'approved').map((response) => response.responseId))
+    if (approvedIds.size === 0) {
+      setError('Approve at least one response before continuing to mapping. Nothing is imported automatically.')
+      return
+    }
+    const filteredRows = parsedData.rows.filter((row, index) => {
+      const response = formsInboxResponses[index]
+      return response && approvedIds.has(response.responseId)
+    })
+    loadParsedData(parsedData.headers, filteredRows, {
+      ...importContext,
+      approvedResponseCount: approvedIds.size,
+      sourceFileName: 'google-forms-response-inbox',
+    })
   }
 
   function reset() {
@@ -574,6 +642,97 @@ export function ImportsPage() {
 
       {step === 1 && (
         <div className="mt-8">
+          <section className="mb-8 rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Google Forms Response Inbox</p>
+                <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Review responses before mapping or import</h3>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
+                  Connections, New Responses, Needs Review, Approved, Imported, Wait-Listed, Rejected, Sync History, and Mapping Templates all stay event-scoped. No response becomes a registration automatically.
+                </p>
+              </div>
+              <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
+                Manual fallback active
+              </span>
+            </div>
+
+            <div className="mt-5 grid gap-2 sm:grid-cols-3 lg:grid-cols-5">
+              {FORM_INBOX_COLUMNS.map((label) => (
+                <div key={label} className="rounded-xl bg-[#FBF8F5] px-3 py-2 text-xs font-bold text-[#5D4A52]">{label}</div>
+              ))}
+            </div>
+
+            <div className="mt-5 grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+              <div className="space-y-3 rounded-2xl border border-[#F2E8E1] bg-[#FFFDFC] p-4">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#6B564C]" htmlFor="forms-target-type">Target type</label>
+                <select
+                  id="forms-target-type"
+                  value={formsInboxTargetType}
+                  onChange={(event) => setFormsInboxTargetType(event.target.value)}
+                  className="w-full rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-sm focus:border-[#9A5260] focus:outline-none"
+                >
+                  {FORM_TARGET_TYPES.map((target) => <option key={target} value={target}>{target.replaceAll('-', ' ')}</option>)}
+                </select>
+                <p className="text-xs leading-5 text-[#816D62]">
+                  Guest registration responses can continue into the existing import mapper. Baker, vendor, sponsor, volunteer, school, feedback, and custom responses remain review records until a supported conversion is approved.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <textarea
+                  aria-label="Paste Google Forms response export"
+                  rows={6}
+                  value={formsInboxText}
+                  onChange={(event) => setFormsInboxText(event.target.value)}
+                  placeholder={'Timestamp,Response ID,Full Name,Email Address,Contact Number\n2026-07-30T12:00:00Z,response-1,Test Guest,test@example.com,2465550100'}
+                  className="w-full rounded-xl border border-[#E5D7CF] p-4 font-mono text-sm focus:border-[#9A5260] focus:outline-none"
+                />
+                <div className="flex flex-wrap justify-end gap-2">
+                  <button type="button" onClick={previewFormsInbox} disabled={!formsInboxText.trim()} className="rounded-xl bg-[#2B1723] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50">
+                    Preview in Response Inbox
+                  </button>
+                  <button type="button" onClick={continueApprovedFormsToMapping} disabled={formsInboxSummary.convertible === 0 || formsInboxTargetType !== 'guest-registration'} className="rounded-xl bg-[#9A5260] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50">
+                    Continue Approved to Mapping
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {formsInboxResponses.length > 0 && (
+              <div className="mt-5 space-y-3">
+                <div className="grid gap-2 sm:grid-cols-4">
+                  <div className="rounded-xl bg-[#FBF8F5] p-3 text-sm"><strong>{formsInboxSummary.total}</strong><br />Total responses</div>
+                  <div className="rounded-xl bg-[#FFF8EA] p-3 text-sm"><strong>{formsInboxSummary.reviewRequired}</strong><br />Require review</div>
+                  <div className="rounded-xl bg-[#EAF6EF] p-3 text-sm"><strong>{formsInboxSummary.approved}</strong><br />Approved</div>
+                  <div className="rounded-xl bg-[#F7F1ED] p-3 text-sm"><strong>{formsInboxSummary.convertible}</strong><br />Ready for mapping</div>
+                </div>
+                {formsInboxResponses.map((response) => (
+                  <article key={response.responseId} className="rounded-2xl border border-[#F2E8E1] bg-[#FFFDFC] p-4">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                      <div>
+                        <p className="text-sm font-bold text-[#2B1723]">{response.respondentSummary.name}</p>
+                        <p className="mt-1 text-xs leading-5 text-[#816D62]">
+                          {response.sourceForm} · {response.targetType.replaceAll('-', ' ')} · {response.receivedAt || 'Received time not mapped'}
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-[#816D62]">
+                          Mapped fields: {response.mappedFields} · Missing: {response.missingInformation.join(', ') || 'none'} · Duplicates: {response.duplicateCandidates.join(', ') || 'none'}
+                        </p>
+                      </div>
+                      <span className="w-fit rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{response.status}</span>
+                    </div>
+                    {response.warnings.length > 0 && <p className="mt-3 rounded-xl bg-[#FFF8EA] p-3 text-xs leading-5 text-[#7A5818]">{response.warnings.join(' ')}</p>}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {FORM_REVIEW_ACTIONS.map(([action, label]) => (
+                        <button key={action} type="button" onClick={() => handleFormsInboxAction(response.responseId, action)} className="rounded-lg border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#5D4A52] hover:bg-[#FFF8F2]">
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
           <ImportTemplatesPanel />
         </div>
       )}
