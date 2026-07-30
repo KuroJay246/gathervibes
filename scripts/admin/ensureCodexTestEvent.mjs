@@ -17,6 +17,7 @@ function summarizeEvent(doc) {
     title: data.title ?? null,
     status: data.status ?? null,
     eventType: data.eventType ?? null,
+    isTestEvent: data.isTestEvent ?? false,
     notes: data.notes ?? null,
   };
 }
@@ -53,18 +54,18 @@ async function main() {
   const events = eventsSnapshot.docs.map(summarizeEvent);
   const codexMatches = events.filter((event) => /CODEX_TEST/i.test(JSON.stringify(event)));
   const qaMatches = events.filter(eventLooksLikeQaFixture);
-  const cpbBefore = events.find((event) => event.eventName === 'CPB') ?? null;
 
   console.log('Before summary:');
   console.log(JSON.stringify({
     eventsBefore,
     auditLogsBefore,
-    existingEvents: events.map(({ docId, eventId, eventName, status, eventType }) => ({
+    existingEvents: events.map(({ docId, eventId, eventName, status, eventType, isTestEvent }) => ({
       docId,
       eventId,
       eventName,
       status,
       eventType,
+      isTestEvent,
     })),
     codexMatches: codexMatches.length,
     qaFixtureMatches: qaMatches.length,
@@ -76,15 +77,20 @@ async function main() {
   }
 
   if (codexMatches.length === 1) {
-    console.log(`CODEX_TEST fixture already exists: ${codexMatches[0].docId}. No write needed.`);
+    const existingCodex = codexMatches[0];
+    if (existingCodex.isTestEvent !== true) {
+      console.error('Error: CODEX_TEST fixture exists but is not marked isTestEvent: true. Repair it through an approved fixture maintenance run.');
+      process.exit(1);
+    }
+    console.log(`CODEX_TEST fixture already exists and is marked as a Test Event: ${existingCodex.docId}. No write needed.`);
     console.log(JSON.stringify({
       created: false,
-      eventId: codexMatches[0].docId,
+      eventId: existingCodex.docId,
+      isTestEvent: true,
       eventsBefore,
       eventsAfter: eventsBefore,
       auditLogsBefore,
       auditLogsAfter: auditLogsBefore,
-      cpbUnchanged: true,
     }, null, 2));
     return;
   }
@@ -105,6 +111,8 @@ async function main() {
     eventDate,
     location: 'QA / Smoke Test',
     eventType: 'other',
+    isTestEvent: true,
+    eventClassification: 'test',
     status: 'upcoming',
     capacity: 10,
     ticketPrice: 0,
@@ -142,7 +150,6 @@ async function main() {
   const afterEventsSnapshot = await eventsRef.get();
   const afterEvents = afterEventsSnapshot.docs.map(summarizeEvent);
   const afterCodexMatches = afterEvents.filter((event) => /CODEX_TEST/i.test(JSON.stringify(event)));
-  const cpbAfter = afterEvents.find((event) => event.eventName === 'CPB') ?? null;
 
   console.log('After summary:');
   console.log(JSON.stringify({
@@ -155,7 +162,7 @@ async function main() {
     auditLogsBefore,
     auditLogsAfter,
     codexTestMatchesAfter: afterCodexMatches.length,
-    cpbUnchanged: JSON.stringify(cpbBefore) === JSON.stringify(cpbAfter),
+    codexTestMarked: afterCodexMatches[0]?.isTestEvent === true,
     verifiedEventExists: verifyEvent.exists,
   }, null, 2));
 }

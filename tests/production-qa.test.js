@@ -5,7 +5,6 @@ import { readFile } from 'node:fs/promises'
 import {
   CODEX_TEST_EVENT_ID,
   CODEX_TEST_EVENT_NAME,
-  CPB_EVENT_ID,
   buildQaSampleCsv,
   buildQaTestPrefix,
   isCodexTestWorkingEvent,
@@ -30,7 +29,7 @@ test('QA helper creates stable CODEX_TEST prefixes and fake sample CSV rows', ()
 test('QA helper recognizes only the CODEX_TEST Working Event', () => {
   assert.equal(isCodexTestWorkingEvent({ eventId: CODEX_TEST_EVENT_ID, eventName: 'Anything' }), true)
   assert.equal(isCodexTestWorkingEvent({ eventId: 'other', eventName: CODEX_TEST_EVENT_NAME }), true)
-  assert.equal(isCodexTestWorkingEvent({ eventId: CPB_EVENT_ID, eventName: 'CPB' }), false)
+  assert.equal(isCodexTestWorkingEvent({ eventId: 'real-event-id', eventName: 'Cake Piknik Barbados' }), false)
 })
 
 test('System QA route and text keep production QA scoped to CODEX_TEST', async () => {
@@ -41,7 +40,7 @@ test('System QA route and text keep production QA scoped to CODEX_TEST', async (
   assert.match(app, /path="\/qa"/)
   assert.match(shell, /System QA/)
   assert.match(page, /System status and event checks/)
-  assert.match(page, /CPB is production data and remains read-only during normal QA/)
+  assert.match(page, /Real events use the same standard safeguards/)
   assert.match(page, /Use CODEX_TEST/)
   assert.match(page, /Readiness checklist/)
   assert.match(page, /do not create or change event records/)
@@ -57,8 +56,9 @@ test('production fixture verification script is read-only and strict', async () 
   assert.equal(pkg.scripts['admin:verify-production-fixtures'], 'node scripts/admin/verifyProductionFixtures.mjs')
   assert.match(script, /const projectId = 'gathervibeshub'/)
   assert.match(script, /codexMatches\.length !== 1/)
-  assert.match(script, /CPB/)
+  assert.match(script, /isTestEvent/)
   assert.match(script, /auditLogs/)
+  assert.doesNotMatch(script, /cpb|CPB|Cake Piknik/)
   assert.doesNotMatch(script, /\.set\(/)
   assert.doesNotMatch(script, /\.update\(/)
   assert.doesNotMatch(script, /\.delete\(/)

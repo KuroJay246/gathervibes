@@ -108,7 +108,7 @@ test('Phase 17D planning docs and readiness docs exist and preserve current live
   assert.match(plan, /staffProfiles\/\{uid\}/)
   assert.match(plan, /events\/\{eventId\}\/staffAssignments\/\{uid\}/)
   assert.match(plan, /Scanner\/check-in-only remains assigned-event-only check-in access with no undo\/check-out/i)
-  assert.match(plan, /CPB remains protected production data/i)
+  assert.match(plan, /Real events use the same standard safeguards/i)
   assert.match(plan, /QR payload exactly as `GSV:TICKET:\{ticketCode\}`/i)
   assert.doesNotMatch(plan, /approve users live|revoke users live|lead scanner implemented/i)
   assert.match(readiness, /No approval workflow is live yet\./)

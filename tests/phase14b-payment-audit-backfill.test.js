@@ -3,8 +3,6 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
 import {
-  CPB_AUDIT_APPROVAL_TEXT,
-  assertApplyApproval,
   generateAuditMatches,
   mapAuditPaymentMethod,
   mapAuditPaymentStatus,
@@ -148,11 +146,11 @@ const registrations = [
   { registrationId: 'fuzzy', fullName: 'Fuzzy Guest', paymentStatus: 'pending' },
 ]
 
-test('CPB payment audit workbook headers are recognized', () => {
+test('payment audit workbook headers are recognized', () => {
   assert.equal(workbookHeadersRecognized(headers), true)
 })
 
-test('CPB audit dry-run matches rows, flags review, and writes nothing', () => {
+test('payment audit dry-run matches rows, flags review, and writes nothing', () => {
   const result = generateAuditMatches(sheet, registrations)
 
   assert.equal(result.writesPerformed, false)
@@ -167,7 +165,7 @@ test('CPB audit dry-run matches rows, flags review, and writes nothing', () => {
   assert.ok(result.reviewNeeded.some((item) => item.confidence === 'medium'))
 })
 
-test('CPB audit finance mapping is explicit and privacy-safe', () => {
+test('payment audit finance mapping is explicit and privacy-safe', () => {
   const result = generateAuditMatches(sheet, registrations)
   const ticket = result.matches.find((item) => item.auditData.ticketDoorId === 'CPB-001')
   const door = result.matches.find((item) => item.auditData.guestName === 'Contact Match Guest')
@@ -184,12 +182,7 @@ test('CPB audit finance mapping is explicit and privacy-safe', () => {
   assert.equal(door.proposedUpdates.paymentMethod, 'door')
 })
 
-test('CPB apply requires exact organizer approval text', () => {
-  assert.throws(() => assertApplyApproval('APPROVE'), /requires exact confirmation/)
-  assert.equal(assertApplyApproval(CPB_AUDIT_APPROVAL_TEXT), true)
-})
-
-test('CPB payment mapping does not invent methods or store Gmail links', () => {
+test('payment mapping does not invent methods or store Gmail links', () => {
   assert.equal(mapAuditPaymentStatus('Paid – Confirmed (Price Inferred)'), 'paid')
   assert.equal(mapAuditPaymentStatus('General Partial / Balance Due'), 'pending')
   assert.equal(mapAuditPaymentStatus('To Pay at Door'), 'door-list')

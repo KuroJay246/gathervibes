@@ -3,12 +3,12 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
 import {
-  CPB_DRY_RUN_CONFIRMATION_TEXT,
-  CPB_RECONCILIATION_EVENT_ID,
   buildPaymentReconciliationPreview,
   parsePaymentWorkbookSheet,
 } from '../src/utils/paymentReconciliation.js'
 import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
+
+const REAL_EVENT_ID = 'real-event-id'
 
 const headers = [
   'Ticket/Door ID',
@@ -32,7 +32,7 @@ function sheet(rows) {
   }
 }
 
-test('Phase 23C route is preview-only, CPB-gated, and does not require Working Event selection', async () => {
+test('Phase 23C route is preview-only, Working Event-scoped, and not CPB-gated', async () => {
   const app = await readFile('src/App.jsx', 'utf8')
   const paymentsPage = await readFile('src/pages/PaymentsPage.jsx', 'utf8')
   const reconciliationPage = await readFile('src/pages/PaymentReconciliationPage.jsx', 'utf8')
@@ -41,10 +41,9 @@ test('Phase 23C route is preview-only, CPB-gated, and does not require Working E
   assert.match(app, /path="\/payments\/reconciliation"/)
   assert.doesNotMatch(app, /path="\/payments\/reconciliation" element=\{<AssignedEventGate/)
   assert.match(paymentsPage, /Reconciliation Preview/)
-  assert.match(await readFile('src/utils/paymentReconciliation.js', 'utf8'), new RegExp(CPB_DRY_RUN_CONFIRMATION_TEXT))
-  assert.match(await readFile('src/utils/paymentReconciliation.js', 'utf8'), new RegExp(CPB_RECONCILIATION_EVENT_ID))
-  assert.match(reconciliationPage, /Working Event unchanged/)
-  assert.match(reconciliationPage, /CPB data is never silently reloaded/)
+  assert.doesNotMatch(await readFile('src/utils/paymentReconciliation.js', 'utf8'), /CPB_DRY_RUN_CONFIRMATION_TEXT|CPB_RECONCILIATION_EVENT_ID/)
+  assert.match(reconciliationPage, /selected Working Event/)
+  assert.match(reconciliationPage, /Load Preview/)
   assert.doesNotMatch(reconciliationPage, /localStorage|setActiveEvent|updateDoc|writeBatch|setDoc|addDoc|deleteDoc|runTransaction/)
   assert.doesNotMatch(access, /scanner:[\s\S]*'\/payments'/)
 })
@@ -75,7 +74,7 @@ test('Payment reconciliation uses strong identifiers and never treats name-only 
       { registrationId: 'name-only', fullName: 'Name Only', ticketPrice: 100, amountDue: 100, amountPaid: 0, balanceDue: 100, paymentStatus: 'pending' },
     ],
     operationsEntries: [],
-    event: { eventId: CPB_RECONCILIATION_EVENT_ID, currency: 'BBD' },
+    event: { eventId: REAL_EVENT_ID, currency: 'BBD' },
   })
 
   const proposed = preview.rows.find((row) => row.registrationRecord?.registrationId === 'exact')
@@ -146,10 +145,10 @@ test('Payment reconciliation blocks duplicate identifiers and keeps Operations s
       { registrationId: 'dup', fullName: 'Duplicate A', ticketCode: 'CPB-002', ticketPrice: 100, amountDue: 100, amountPaid: 100, paymentStatus: 'paid' },
     ],
     operationsEntries: [
-      { ledgerEntryId: 'op-1', eventId: CPB_RECONCILIATION_EVENT_ID, entryType: 'income', label: 'Ticket revenue from door guest', status: 'received', amount: 100 },
-      { ledgerEntryId: 'op-2', eventId: CPB_RECONCILIATION_EVENT_ID, entryType: 'income', label: 'Sponsor income', status: 'received', amount: 500 },
+      { ledgerEntryId: 'op-1', eventId: REAL_EVENT_ID, entryType: 'income', label: 'Ticket revenue from door guest', status: 'received', amount: 100 },
+      { ledgerEntryId: 'op-2', eventId: REAL_EVENT_ID, entryType: 'income', label: 'Sponsor income', status: 'received', amount: 500 },
     ],
-    event: { eventId: CPB_RECONCILIATION_EVENT_ID, currency: 'BBD' },
+    event: { eventId: REAL_EVENT_ID, currency: 'BBD' },
   })
 
   assert.equal(preview.counts.duplicate, 2)

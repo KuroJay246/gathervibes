@@ -177,7 +177,6 @@ export function OperationsPage() {
   const filteredControl = useMemo(() => buildOperationsControlSummary(filteredEntries), [filteredEntries])
   const possibleRegistrationPaymentOverlap = useMemo(() => findPossibleRegistrationPaymentOverlap(entries), [entries])
   const filterScopeLabel = useMemo(() => buildFilterScopeLabel(filters), [filters])
-  const hasHistoricalReconciliation = currentEvent?.eventId === 'zhaPxi31cpqLAW0cuS20'
 
   if (!currentEvent?.eventId) {
     return (
@@ -383,16 +382,6 @@ export function OperationsPage() {
           />
         </div>
       </details>
-
-      {hasHistoricalReconciliation && (
-        <section className="rounded-2xl border border-[#D8C5A8] bg-[#FFFCF6] p-4 text-sm leading-6 text-[#715D46]" aria-label="Historical reconciliation moved to Reports">
-          <strong className="text-[#4E3928]">Historical reconciliation evidence is shown in Reports, not in the daily Operations ledger workflow.</strong>
-          {' '}Use this page for current ledger entries, commitments, sponsor cash, expenses, refunds, reimbursements, and adjustments. Use Reports for CPB historical closeout evidence and corrective-action context.
-          <div className="mt-3">
-            <Link to="/event-review" className="inline-flex min-h-10 items-center rounded-xl border border-[#D8C5A8] bg-white px-4 text-xs font-bold text-[#7A5818]">Open Reports</Link>
-          </div>
-        </section>
-      )}
 
       <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         {canEditOperations && <form onSubmit={saveEntry} className="rounded-2xl border border-[#EEDFD6] bg-white p-5">

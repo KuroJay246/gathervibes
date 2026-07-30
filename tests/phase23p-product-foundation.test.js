@@ -61,7 +61,7 @@ test('Phase 23P adds Dependabot and CodeQL repository guardrails', async () => {
   assert.match(codeql, /tags contain: security/)
 })
 
-test('Phase 23P keeps completed CPB recovery controls out of normal organizer imports', async () => {
+test('Phase 23P keeps legacy payment-audit recovery controls out of normal organizer imports', async () => {
   const importsPage = await readFile('src/pages/ImportsPage.jsx', 'utf8')
   const importSources = await readFile('src/utils/importSources.js', 'utf8')
   const importTemplates = await readFile('src/components/imports/ImportTemplatesPanel.jsx', 'utf8')
@@ -70,7 +70,7 @@ test('Phase 23P keeps completed CPB recovery controls out of normal organizer im
   assert.doesNotMatch(importsPage, /PaymentAuditBackfillPanel|cpb-audit-preview|CPB Payment Audit Backfill/)
   assert.doesNotMatch(importSources, /cpb-payment-audit|special:/)
   assert.doesNotMatch(importTemplates, /CPB Payment Audit Backfill|Christina Morris|Cole also has/)
-  assert.match(auditEngine, /assertApplyApproval/)
+  assert.doesNotMatch(auditEngine, /CPB_AUDIT_APPROVAL_TEXT|assertApplyApproval/)
   assert.doesNotMatch(auditEngine, /batch\.commit|writeBatch|setDoc|updateDoc/)
 })
 

@@ -89,7 +89,7 @@ test('System QA includes browser and CODEX_TEST retest guidance', async () => {
     'QR camera lookup works',
     'manual ticket-code fallback works',
     'audit logs remain append-only',
-    'CPB is not selected and not touched during QA',
+    'Real events use the same standard safeguards',
   ]) {
     assert.match(`${qaPage}\n${qaHelper}`, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'))
   }

@@ -5,7 +5,6 @@ import { buildRegistrationMetrics } from '../../src/utils/registrationMetrics.js
 
 const projectId = 'gathervibeshub';
 const codexTestEventId = 'xPfa0b3KZyLSDnAD2uGI';
-const cpbEventId = 'zhaPxi31cpqLAW0cuS20';
 
 function summarizeEvent(doc) {
   const data = doc.data();
@@ -15,7 +14,13 @@ function summarizeEvent(doc) {
     capacity: data.capacity ?? 0,
     status: data.status ?? '',
     eventType: data.eventType ?? '',
+    isTestEvent: data.isTestEvent ?? false,
+    eventClassification: data.eventClassification ?? '',
   };
+}
+
+function isTestEvent(event) {
+  return event.eventId === codexTestEventId || event.isTestEvent === true || event.eventClassification === 'test';
 }
 
 async function main() {
@@ -49,6 +54,7 @@ async function main() {
       eventId: event.eventId,
       status: event.status,
       eventType: event.eventType,
+      isTestEvent: isTestEvent(event),
       capacity: event.capacity,
       totalRegistrations: metrics.totalRegistrations,
       totalPersons: metrics.totalPersons,
@@ -67,19 +73,17 @@ async function main() {
   });
 
   const codex = result.find((event) => event.eventId === codexTestEventId);
-  const cpb = result.find((event) => event.eventId === cpbEventId);
+  const realEvents = result.filter((event) => !event.isTestEvent);
+  const testEvents = result.filter((event) => event.isTestEvent);
 
   console.log(JSON.stringify({
     eventCount: events.length,
     registrationCount: registrations.length,
-    events: result,
+    realEventCount: realEvents.length,
+    testEventCount: testEvents.length,
+    realEvents,
+    testEvents,
     codexTestExists: Boolean(codex),
-    cpbReadOnlyCheck: cpb ? {
-      eventId: cpb.eventId,
-      eventName: cpb.eventName,
-      status: cpb.status,
-      eventType: cpb.eventType,
-    } : null,
   }, null, 2));
 
   if (!codex) {
@@ -87,12 +91,12 @@ async function main() {
     process.exit(1);
   }
 
-  if (!cpb || cpb.eventName !== 'CPB' || cpb.status !== 'completed' || cpb.eventType !== 'cake-picnic') {
-    console.error('Error: CPB read-only check failed.');
+  if (codex.isTestEvent !== true) {
+    console.error('Error: CODEX_TEST event is not classified as a Test Event.');
     process.exit(1);
   }
 
-  console.log('Verified production counts read-only. CODEX_TEST exists and CPB is unchanged.');
+  console.log('Verified production counts read-only. CODEX_TEST exists, is classified as a Test Event, and is separated from real-event totals.');
 }
 
 main().catch((error) => {

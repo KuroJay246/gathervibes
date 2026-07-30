@@ -3,7 +3,7 @@
 ## Safe QA event
 
 - Use `CODEX_TEST Live Verification Event` for destructive QA and organizer rehearsal.
-- Keep CPB read-only unless a separate production-safe approval exists.
+- Real events use the same standard safeguards and must not be used for synthetic QA.
 - Prefix temporary QA business records with `QA_PHASE23T_`.
 
 ## Local validation

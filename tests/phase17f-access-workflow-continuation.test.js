@@ -32,7 +32,7 @@ test('Phase 17F-A plan and 17F-C checklist stay planning-only and preserve guard
   assert.match(plan, /No live approval, decline, revoke, profile-edit, assignment-edit, or lead-scanner workflow is implemented in Phase 17F-A\./)
   assert.match(plan, /Firestore rules are not deployed in Phase 17F-A\./)
   assert.match(plan, /Firestore indexes are not deployed in Phase 17F-A\./)
-  assert.match(plan, /CPB remains protected production data\./)
+  assert.match(plan, /Real events use the same standard safeguards/)
   assert.match(plan, /CODEX_TEST only/i)
 
   assert.match(checklist, /Status: active manual checklist only/)

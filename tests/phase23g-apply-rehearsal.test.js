@@ -5,14 +5,13 @@ import assert from 'node:assert/strict'
 import {
   APPLY_SUPPORTED_FIELDS,
   CODEX_TEST_EVENT_ID,
-  CPB_EVENT_ID,
   PHASE_23G_MANIFEST_SHA256,
   PHASE_23J_MANIFEST_SHA256,
   assertPhase23gApplyLock,
-  assertPhase23jProductionApplyLock,
+  assertRealEventProductionApplyApproval,
   buildRegistrationApplyPlan,
   expectedPhase23gApprovalPhrase,
-  expectedPhase23jApprovalPhrase,
+  expectedRealEventApprovalPhrase,
 } from '../src/utils/manifestApplyEngine.js'
 
 test('Phase 23G apply lock allows CODEX_TEST rehearsal only with exact manifest approval phrase', () => {
@@ -24,11 +23,11 @@ test('Phase 23G apply lock allows CODEX_TEST rehearsal only with exact manifest 
   }), true)
 
   assert.throws(() => assertPhase23gApplyLock({
-    targetEventId: CPB_EVENT_ID,
+    targetEventId: 'real-event-id',
     manifestSha256: PHASE_23G_MANIFEST_SHA256,
     approvalPhrase: expectedPhase23gApprovalPhrase(),
     rehearsalOnly: true,
-  }), /CPB is denied/)
+  }), /locked to CODEX_TEST/)
 
   assert.throws(() => assertPhase23gApplyLock({
     targetEventId: CODEX_TEST_EVENT_ID,
@@ -64,7 +63,7 @@ test('Phase 23G apply plan supports only registration finance fields and audit m
 test('Phase 23G apply plan rejects unsupported fields and scope drift', () => {
   assert.throws(() => buildRegistrationApplyPlan({
     targetEventId: CODEX_TEST_EVENT_ID,
-    registration: { registrationId: 'qa-reg', eventId: CPB_EVENT_ID },
+    registration: { registrationId: 'qa-reg', eventId: 'real-event-id' },
     proposal: { changedFields: ['amountPaid'], proposedValues: { amountPaid: 25 } },
   }), /event scope mismatch/)
 
@@ -78,58 +77,48 @@ test('Phase 23G apply plan rejects unsupported fields and scope drift', () => {
   assert.equal(APPLY_SUPPORTED_FIELDS.includes('checkedIn'), false)
 })
 
-test('Phase 23J production apply lock requires CPB, exact approval, and full proposal count', () => {
-  assert.deepEqual(assertPhase23jProductionApplyLock({
-    targetEventId: CPB_EVENT_ID,
+test('real-event production apply approval is not CPB-specific and requires exact approval plus a positive proposal count', () => {
+  assert.deepEqual(assertRealEventProductionApplyApproval({
+    targetEventId: 'real-event-id',
     manifestSha256: PHASE_23J_MANIFEST_SHA256,
-    approvalPhrase: expectedPhase23jApprovalPhrase(),
+    approvalPhrase: expectedRealEventApprovalPhrase({ targetEventId: 'real-event-id' }),
     dryRun: false,
-    proposalCount: 65,
+    proposalCount: 1,
   }), { approved: true, dryRun: false })
 
-  assert.throws(() => assertPhase23jProductionApplyLock({
+  assert.throws(() => assertRealEventProductionApplyApproval({
     targetEventId: CODEX_TEST_EVENT_ID,
     manifestSha256: PHASE_23J_MANIFEST_SHA256,
-    approvalPhrase: expectedPhase23jApprovalPhrase(),
-    proposalCount: 65,
-  }), /locked to CPB/)
+    approvalPhrase: expectedRealEventApprovalPhrase({ targetEventId: 'real-event-id' }),
+    proposalCount: 1,
+  }), /real event target/)
 
-  assert.throws(() => assertPhase23jProductionApplyLock({
-    targetEventId: CPB_EVENT_ID,
+  assert.throws(() => assertRealEventProductionApplyApproval({
+    targetEventId: 'real-event-id',
     manifestSha256: PHASE_23J_MANIFEST_SHA256,
     approvalPhrase: expectedPhase23gApprovalPhrase(),
-    proposalCount: 65,
-  }), /Exact Phase 23J production approval phrase/)
+    proposalCount: 1,
+  }), /Exact real-event production approval phrase/)
 
-  assert.throws(() => assertPhase23jProductionApplyLock({
-    targetEventId: CPB_EVENT_ID,
+  assert.throws(() => assertRealEventProductionApplyApproval({
+    targetEventId: 'real-event-id',
     manifestSha256: PHASE_23J_MANIFEST_SHA256,
-    approvalPhrase: expectedPhase23jApprovalPhrase(),
-    proposalCount: 64,
-  }), /expected exactly 65/)
+    approvalPhrase: expectedRealEventApprovalPhrase({ targetEventId: 'real-event-id' }),
+    proposalCount: 0,
+  }), /positive proposal count/)
 })
 
 test('Phase 23G rehearsal script is CODEX_TEST-only and does not write Operations, tickets, or check-ins', () => {
   const script = readFileSync('scripts/admin/runCodexApplyRehearsal.mjs', 'utf8')
   assert.match(script, /CODEX_TEST_EVENT_ID/)
-  assert.match(script, /CPB_EVENT_ID/)
-  assert.match(script, /cpbDenied/)
+  assert.match(script, /realEventDenied/)
+  assert.doesNotMatch(script, /CPB_EVENT_ID|cpbDenied|cpbWrites/)
   assert.doesNotMatch(script, /operationsLedger/)
   assert.doesNotMatch(script, /checkedIn:\s*true/)
   assert.doesNotMatch(script, /ticketCode:\s*'[^']+'/)
 })
 
-test('Phase 23J production script is locked to manifest approval, backups, audit logs, and registration finance only', () => {
-  const script = readFileSync('scripts/admin/runCpbProductionApply.mjs', 'utf8')
-
-  assert.match(script, /CPB_PRODUCTION_APPLY_APPROVAL/)
-  assert.match(script, /assertPhase23jProductionApplyLock/)
-  assert.match(script, /backup_private\.json/)
-  assert.match(script, /rawAuditValidated/)
-  assert.match(script, /registration\.finance-update/)
-  assert.match(script, /updateMask/)
-  assert.doesNotMatch(script, /operationsLedger/)
-  assert.doesNotMatch(script, /checkedIn:\s*true/)
-  assert.doesNotMatch(script, /ticketCode:\s*'[^']+'/)
-  assert.doesNotMatch(script, /\{\s*delete:/)
+test('package scripts do not expose a CPB-specific production apply path', () => {
+  const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
+  assert.equal(pkg.scripts['admin:cpb-production-apply'], undefined)
 })

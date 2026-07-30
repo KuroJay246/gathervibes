@@ -31,7 +31,7 @@ Phase 17D-A is a planning and readiness phase only. It defines the implementatio
 - Scanner/check-in-only remains assigned-event-only check-in access with no undo/check-out.
 - Admin undo remains admin-only where already implemented.
 - CODEX_TEST remains the only safe QA/smoke event.
-- CPB remains protected production data and must never be used for QA.
+- Real events use the same standard safeguards and must never be used for synthetic QA.
 - QR payload exactly as `GSV:TICKET:{ticketCode}` remains unchanged.
 
 ## 4. Role capability matrix
@@ -82,7 +82,7 @@ Design rule:
 
 - Event Assignments section should manage `events/{eventId}/staffAssignments/{uid}` only.
 - Required fields remain UID, email, eventId, role, status, createdAt, updatedAt, createdBy, updatedBy.
-- UI should enforce assigned-event scope clearly and never use CPB for QA.
+- UI should enforce assigned-event scope clearly and never use real events for synthetic QA.
 - No assignment creation or editing in 17D-A.
 
 ## 9. Revoke / suspend plan
@@ -156,7 +156,7 @@ Design rule:
 - Verify `approvedEmails` remains admin-only in docs and UI copy.
 - Verify staff/scanner access remains `staffProfiles` plus `staffAssignments`.
 - Verify scanner no-undo and admin undo boundaries remain documented.
-- Verify CPB protection, CODEX_TEST QA-only scope, QR payload, `xlsx` absence, and `read-excel-file` presence remain unchanged.
+- Verify standard real-event safeguards, CODEX_TEST QA-only scope, QR payload, `xlsx` absence, and `read-excel-file` presence remain unchanged.
 
 ## 16. Firestore rules review gates
 
@@ -170,7 +170,7 @@ Design rule:
 - Keep planning-only changes isolated to docs, status copy, and tests in 17D-A.
 - Do not claim live approval or revoke capability before implementation.
 - Preserve current admin and scanner behavior exactly.
-- Stop immediately if any change broadens permissions, touches CPB, modifies `approvedEmails`, changes QR payload, or introduces new dependencies.
+- Stop immediately if any change broadens permissions, uses a real event for synthetic QA, modifies `approvedEmails`, changes QR payload, or introduces new dependencies.
 
 ## 18. Recommended implementation sequence
 

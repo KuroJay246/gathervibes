@@ -8,6 +8,6 @@
 - Baker settlements still depend on manual confirmation of real payments and evidence.
 - Public attendee, vendor, sponsor, or partner portals are not active.
 - Payment gateway integration is not active.
-- CPB reconciliation changes remain evidence-gated and approval-gated.
-- CPB patron totals remain locked during normal organizer work.
+- Real-event reconciliation changes remain evidence-gated and approval-gated.
+- Completed status does not make an event read-only; approved organizers can make audited corrections through normal workflows.
 - Staff access management remains intentionally narrow and safety-first.

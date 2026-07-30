@@ -32,7 +32,7 @@ It does not implement:
 
 - Assignment editing must stay scoped to `events/{eventId}/staffAssignments/{uid}`.
 - Event scoping must remain explicit in UI copy and data shape.
-- CPB must remain protected production data and must not be used for QA or workflow rehearsal.
+- Real events use the same standard safeguards and must not be used for QA or workflow rehearsal.
 - Assignment editing must not go live until rules prove event-scoped writes are safe.
 
 ## 5. Audit log requirements
@@ -67,7 +67,7 @@ It does not implement:
   - scanner assigned-event-only access
   - scanner no-undo/no-check-out
   - admin undo remains admin-only
-  - CPB protection
+  - standard real-event safeguards
   - CODEX_TEST-only QA scope
   - QR payload `GSV:TICKET:{ticketCode}`
   - `xlsx` absent
@@ -101,7 +101,7 @@ Before any live workflow is implemented, review:
 - Firestore rules and dry-run result
 - scanner/admin route isolation
 - QA copy and runtime health wording
-- CPB protection
+- standard real-event safeguards
 - CODEX_TEST-only smoke guidance
 - no public portal/native/payment/function/storage scope creep
 

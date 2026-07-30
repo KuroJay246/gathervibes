@@ -29,7 +29,7 @@ It does not implement:
 - Phase 17E-C remains read-only/admin-visible only.
 - Phase 17E-D remains disabled requester-form preview only.
 - Phase 17E-E remains deployment-readiness and rollback planning only.
-- CPB remains untouched and unavailable for QA.
+- Real events use the same standard safeguards and are unavailable for synthetic QA.
 - CODEX_TEST remains the only safe smoke and rehearsal event.
 - QR payload remains `GSV:TICKET:{ticketCode}`.
 - `xlsx` remains absent and `read-excel-file` remains active.
@@ -74,7 +74,7 @@ It does not implement:
 ## 7. Future staffAssignment create/update sequence
 
 1. Verify approved-admin authority.
-2. Verify target event is intended and not CPB for smoke or rehearsal.
+2. Verify target event is intended and not a real event being used for smoke or rehearsal.
 3. Create or update `events/{eventId}/staffAssignments/{uid}` with role, status, timestamps, and reviewer metadata where needed.
 4. Keep scanner assignment scoped to the assigned event only.
 5. Do not grant undo/check-out to scanner/check-in-only.
@@ -98,7 +98,7 @@ It does not implement:
 - Requesters must not self-approve, self-decline, self-revoke, or create profile or assignment records.
 - `approvedEmails` must not be used as a workaround for staff/scanner access.
 - `auditLogs` must remain append-only.
-- CPB must stay protected and unavailable for scanner rehearsal or QA.
+- Real events must stay unavailable for scanner rehearsal or synthetic QA.
 - Any future requester route must remain non-public until separately approved.
 - Any live workflow must be backed by reviewed Firestore rules, not UI visibility alone.
 
@@ -114,9 +114,9 @@ Firestore rules are not deployed in Phase 17F-A.
 
 Firestore indexes are not deployed in Phase 17F-A.
 
-## 13. CPB protection statement
+## 13. Real-event safeguards statement
 
-CPB remains protected production data. Do not target CPB for access workflow rehearsal, assignment tests, or QA smoke.
+Real events use the same standard safeguards. Do not target a real event for access workflow rehearsal, assignment tests, or QA smoke.
 
 ## 14. CODEX_TEST-only smoke statement
 
