@@ -98,10 +98,11 @@ test('[onboarding-flow] WelcomeCelebration uses BrandMark with light={false} for
   assert.match(src, /BrandMark light=\{false\}/, 'Must use dark-background-safe BrandMark treatment')
 })
 
-test('[onboarding-flow] WelcomeCelebration contains Anica UID fallback greeting', async () => {
+test('[onboarding-flow] WelcomeCelebration delegates organizer greeting to trusted display helper', async () => {
   const src = await readFile('src/components/onboarding/WelcomeCelebration.jsx', 'utf8')
-  assert.match(src, /Welcome, Anica/)
-  assert.match(src, /WM2UOQtSeuOglCI5uMZQKrYYqP53/)
+  assert.match(src, /welcomeGreeting\(user, staffProfile\)/)
+  assert.doesNotMatch(src, /Welcome, Anica/)
+  assert.doesNotMatch(src, /WM2UOQtSeuOglCI5uMZQKrYYqP53/)
 })
 
 // ── AppWalkthrough portal and navigation ─────────────────────────────────────

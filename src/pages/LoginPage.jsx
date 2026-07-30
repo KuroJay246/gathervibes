@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, Sparkles } from 'lucide-react'
 import { Navigate, useLocation, useNavigate } from 'react-router'
 import { BrandMark } from '../components/BrandMark'
+import { ProductFooter } from '../components/ProductFooter'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { useAuth } from '../auth/useAuth'
 import {
@@ -167,6 +168,7 @@ export function LoginPage() {
                 Sign out
               </button>
             </div>
+            <ProductFooter compact />
           </section>
         </div>
       </main>
@@ -326,6 +328,7 @@ export function LoginPage() {
               <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[#2F855A]" aria-hidden="true" />
               Access is restricted to approved staff. Activity inside the hub will be recorded for operational security.
             </div>
+            <ProductFooter compact />
           </div>
         </section>
       </div>

@@ -14,13 +14,11 @@
 }
 
 html {
-  min-width: 320px;
   background: #fff8f2;
   overflow-x: hidden;
 }
 
 body {
-  min-width: 320px;
   min-height: 100vh;
   margin: 0;
   overflow-x: hidden;
@@ -86,7 +84,7 @@ input:focus-visible {
   left: 0.75rem;
   z-index: 35;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(3.8rem, 1fr));
   min-height: 4.25rem;
   padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
   overflow: hidden;
