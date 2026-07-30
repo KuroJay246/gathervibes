@@ -282,5 +282,12 @@
       "prepare": null,
       "verification": "Source registry plus e2e/tutorial.spec.js direct full-suite pass. Production replay button was not available in the current browser tab during Pass 2, so step-by-step production replay is not claimed."
     }
-  ]
+  ],
+  "pass4ProductionReplay": {
+    "status": "partial-with-limitations",
+    "evidence": "output/full-repository-audit/pass-4/tutorial-production-walkthrough.json",
+    "lessonsCompleted": 0,
+    "uniqueSteps": [],
+    "limitation": "Full completion blocked by Chrome control timeout around prepared event-form tutorial steps; no business save action executed."
+  }
 }

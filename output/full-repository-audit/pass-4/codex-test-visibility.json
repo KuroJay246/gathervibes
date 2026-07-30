@@ -1,0 +1,12 @@
+{
+  "before": {
+    "hasCodex": false,
+    "shownLine": "1 event shown · test events hidden"
+  },
+  "showButtonCount": 1,
+  "after": {
+    "hasCodex": true,
+    "shownLine": "2 events shown",
+    "hasTestBadge": true
+  }
+}

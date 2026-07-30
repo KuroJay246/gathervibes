@@ -1,0 +1,5506 @@
+{
+  "generatedAt": "2026-07-30T21:16:01.313Z",
+  "method": "Chrome coordinate clicks from measured button rects",
+  "observedLessons": 30,
+  "observed": [
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 764
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 740
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 740
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 740
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 788
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 788
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    },
+    {
+      "appErrorBoundary": false,
+      "buttons": [
+        {
+          "label": "Exit Tour",
+          "visible": true,
+          "x": 332,
+          "y": 822
+        },
+        {
+          "label": "Show Me",
+          "visible": true,
+          "x": 429,
+          "y": 798
+        },
+        {
+          "label": "Let Me Try",
+          "visible": true,
+          "x": 528,
+          "y": 798
+        },
+        {
+          "label": "Back",
+          "visible": true,
+          "x": 612,
+          "y": 798
+        },
+        {
+          "label": "Skip Step",
+          "visible": true,
+          "x": 525,
+          "y": 846
+        },
+        {
+          "label": "Next",
+          "visible": true,
+          "x": 608,
+          "y": 846
+        }
+      ],
+      "route": "/dashboard",
+      "step": 2,
+      "target": {
+        "id": "working-event-selector",
+        "rect": {
+          "h": 90,
+          "w": 226,
+          "x": 16,
+          "y": 100
+        },
+        "visible": true
+      },
+      "targetVisible": true,
+      "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+      "title": "Overview",
+      "tooltipOnScreen": true,
+      "total": 20,
+      "issueFound": null
+    }
+  ],
+  "actions": [
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Show Me",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nTarget verified and brought into view.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    },
+    {
+      "action": "Let Me Try",
+      "fromStep": 2,
+      "state": {
+        "appErrorBoundary": false,
+        "buttons": [
+          {
+            "label": "Exit Tour",
+            "visible": true,
+            "x": 332,
+            "y": 822
+          },
+          {
+            "label": "Show Me",
+            "visible": true,
+            "x": 429,
+            "y": 798
+          },
+          {
+            "label": "Let Me Try",
+            "visible": true,
+            "x": 528,
+            "y": 798
+          },
+          {
+            "label": "Back",
+            "visible": true,
+            "x": 612,
+            "y": 798
+          },
+          {
+            "label": "Skip Step",
+            "visible": true,
+            "x": 525,
+            "y": 846
+          },
+          {
+            "label": "Next",
+            "visible": true,
+            "x": 608,
+            "y": 846
+          }
+        ],
+        "route": "/dashboard",
+        "step": 2,
+        "target": {
+          "id": "working-event-selector",
+          "rect": {
+            "h": 90,
+            "w": 226,
+            "x": 16,
+            "y": 100
+          },
+          "visible": true
+        },
+        "targetVisible": true,
+        "text": "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Tickets before event-day check-in starts.\n\nVerified: Verify the Overview metrics are visible.\n\nExit Tour\nShow Me\nLet Me Try\nBack\nSkip Step\nNext",
+        "title": "Overview",
+        "tooltipOnScreen": true,
+        "total": 20
+      }
+    }
+  ],
+  "completion": {
+    "bodyHasComplete": false,
+    "dialogs": [
+      "STEP 2 OF 20\n\nOverview\nDAILY STARTING POINT\n\nWhat this is: Overview is the first scan of event health: registrations, guests, money recorded, capacity, and attention items.\n\nWhy you use it: Use it to decide where to work next instead of opening every page manually.\n\nWhat to do now: Read the metric row and choose the highest-priority Needs Attention item.\n\nWhat happens next: The destination link sends you to the page that owns the follow-up.\n\nPractical example: If missing tickets appear, go to Ti"
+    ],
+    "url": "/dashboard"
+  }
+}

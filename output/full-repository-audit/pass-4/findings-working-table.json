@@ -1,0 +1,477 @@
+[
+  {
+    "id": "PASS1-P1-001",
+    "priority": "P1",
+    "status": "reclassified-in-pass2",
+    "area": "E2E",
+    "route": null,
+    "file": null,
+    "dataPath": null,
+    "evidence": "Pass 1 full E2E failed on mobile accessibility login flow. Pass 2 direct accessibility rerun passed 2/2 and direct full E2E rerun passed 10/10.",
+    "recommendedAction": "Treat as runner/tooling/auth-fixture flake unless it recurs in direct command execution.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS1-P2-001",
+    "priority": "P2",
+    "status": "open",
+    "area": "Environment",
+    "route": null,
+    "file": null,
+    "dataPath": null,
+    "evidence": "Firebase emulator output warns firebase-tools will drop Java <21 support in firebase-tools@15.",
+    "recommendedAction": "Plan Java 21 migration while keeping firebase-tools@14.19.0 pin intentional for emulator E2E.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS1-P2-002",
+    "priority": "P2",
+    "status": "open",
+    "area": "Dependencies",
+    "route": null,
+    "file": null,
+    "dataPath": null,
+    "evidence": "Production audit is clean, but dev dependency audit from Pass 1 reported vulnerabilities.",
+    "recommendedAction": "Run scoped dev-dependency remediation separately.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS1-P2-003",
+    "priority": "P2",
+    "status": "open",
+    "area": "React Doctor",
+    "route": null,
+    "file": null,
+    "dataPath": null,
+    "evidence": "Pass 1 React Doctor scan reported 165 warnings across 57 files.",
+    "recommendedAction": "Schedule focused React Doctor remediation after release-critical workflow audits.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS2-P2-001",
+    "priority": "P2",
+    "status": "open",
+    "area": "Production network evidence",
+    "route": null,
+    "file": null,
+    "dataPath": null,
+    "evidence": "Pass 2 Browser runtime produced console evidence but did not complete route-by-route CDP network request capture.",
+    "recommendedAction": "Run a CDP-backed production smoke harness in Pass 3.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS2-P2-002",
+    "priority": "P2",
+    "status": "open-limited-browser-evidence",
+    "area": "Tutorial production replay",
+    "route": null,
+    "file": null,
+    "dataPath": null,
+    "evidence": "Tutorial V3 source matrix and E2E replay passed, but production browser step-through was not completed because the replay control was not consistently available after route reload in the Browser runtime.",
+    "recommendedAction": "Verify full Tutorial V3 replay in production with the same authenticated session in Pass 3.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS2-P3-001",
+    "priority": "P3",
+    "status": "open",
+    "area": "Responsive accessibility",
+    "route": null,
+    "file": null,
+    "dataPath": null,
+    "evidence": "Pass 2 captured desktop/tablet/mobile screenshots but did not perform a true 200 percent zoom pass.",
+    "recommendedAction": "Add 200 percent zoom review for high-risk table/report routes.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-FORMS-P1-001",
+    "priority": "P1",
+    "status": "open",
+    "area": "Google Forms Response Inbox",
+    "route": "/imports",
+    "file": "src/utils/formResponseInbox.js",
+    "dataPath": "manual client state / packaged receiver not verified",
+    "evidence": "Automatic receiver deployment, HMAC secrets, billing, and real Form access were not production-verified.",
+    "recommendedAction": "Run a dedicated receiver deployment/security audit before calling automatic intake live.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-WRITE-P1-001",
+    "priority": "P1",
+    "status": "open",
+    "area": "Write integrity",
+    "route": "/imports,/registrations,/payments",
+    "file": "src/services/importService.js; src/services/registrationService.js",
+    "dataPath": "registrations/{registrationId}, auditLogs/{logId}",
+    "evidence": "Import and bulk registration operations commit in chunks.",
+    "recommendedAction": "Add resumable import/bulk operation manifests and post-failure recovery report.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-PAY-P2-001",
+    "priority": "P2",
+    "status": "open",
+    "area": "Registration Payments",
+    "route": "/payments",
+    "file": "src/services/registrationService.js",
+    "dataPath": "registrations/{registrationId}",
+    "evidence": "bulkUpdatePaymentStatus updates paymentStatus only.",
+    "recommendedAction": "Prefer bulk finance update for financial changes or add stronger UI warning.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-WRITE-P2-001",
+    "priority": "P2",
+    "status": "open",
+    "area": "Event deletion",
+    "route": "/events",
+    "file": "src/services/eventService.js",
+    "dataPath": "events/{eventId}",
+    "evidence": "deleteEvent deletes the event document and writes event.delete audit log; related records are not cascaded by the service.",
+    "recommendedAction": "Before enabling broad event deletion, require related-record impact preview or soft-delete design.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-WRITE-P2-002",
+    "priority": "P2",
+    "status": "open",
+    "area": "Audit logs",
+    "route": "multiple",
+    "file": "src/services/*Service.js",
+    "dataPath": "auditLogs/{logId}",
+    "evidence": "Audit details usually contain labels, names, type, amount, or flags rather than full before/after snapshots.",
+    "recommendedAction": "Add structured before/after field diffs for financial/ticket/attendance updates.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-REP-P2-001",
+    "priority": "P2",
+    "status": "open",
+    "area": "Reports",
+    "route": "/event-review",
+    "file": "src/utils/eventReview.js",
+    "dataPath": "selected event registrations and operationsLedger",
+    "evidence": "Pass 3 avoided production business-record recomputation.",
+    "recommendedAction": "Run read-only production totals harness for selected event with private evidence handling.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-REC-P2-001",
+    "priority": "P2",
+    "status": "open",
+    "area": "Payment Reconciliation",
+    "route": "/payments/reconciliation",
+    "file": "src/pages/PaymentReconciliationPage.jsx",
+    "dataPath": "read-only registrations and operationsLedger",
+    "evidence": "Reconciliation preview has no apply action.",
+    "recommendedAction": "Document the correction workflow from preview to audited payment updates.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-ROLE-P2-001",
+    "priority": "P2",
+    "status": "open",
+    "area": "Roles and rules",
+    "route": "/settings",
+    "file": "src/utils/accessRoles.js; firestore.rules",
+    "dataPath": "staffProfiles/{uid}, events/{eventId}/staffAssignments/{uid}",
+    "evidence": "Role summary says live staff access does not enforce scoped rules yet; Firestore rules contain assigned-event checks.",
+    "recommendedAction": "Update wording after a focused role/rules acceptance pass.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-FORMS-P2-001",
+    "priority": "P2",
+    "status": "open",
+    "area": "Forms Inbox",
+    "route": "/imports",
+    "file": "src/utils/formResponseInbox.js",
+    "dataPath": "none/current UI state",
+    "evidence": "Non-registration target types are listed but conversion workflows are not live.",
+    "recommendedAction": "Keep copy explicit: manual review only unless conversion path is implemented.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-IMP-P2-001",
+    "priority": "P2",
+    "status": "open",
+    "area": "Import Center",
+    "route": "/imports",
+    "file": "src/services/importService.js",
+    "dataPath": "registrations/{registrationId}, auditLogs/{logId}",
+    "evidence": "commitImport uses 50-row chunks.",
+    "recommendedAction": "Add import run manifest or stronger post-failure report.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-REG-P3-001",
+    "priority": "P3",
+    "status": "open",
+    "area": "Registrations",
+    "route": "/registrations",
+    "file": "src/services/registrationService.js",
+    "dataPath": "registrations.phone",
+    "evidence": "Manual registration save trims phone; import utility normalizes phone.",
+    "recommendedAction": "Normalize manual phone fields consistently.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-TKT-P3-001",
+    "priority": "P3",
+    "status": "open",
+    "area": "Tickets",
+    "route": "/tickets",
+    "file": "src/services/ticketService.js",
+    "dataPath": "registrations.ticketCode",
+    "evidence": "Tickets are fields on registrations, not standalone ticket documents.",
+    "recommendedAction": "Keep current model unless ticket history becomes a product requirement.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-ZOOM-P3-001",
+    "priority": "P3",
+    "status": "open",
+    "area": "Responsive QA",
+    "route": "multiple high-risk routes",
+    "file": "output/full-repository-audit/browser-results.json",
+    "dataPath": "n/a",
+    "evidence": "True 200 percent browser zoom was not completed in Pass 3.",
+    "recommendedAction": "Run dedicated 200 percent zoom visual pass.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-OPS-P2-001",
+    "priority": "P2",
+    "status": "open",
+    "area": "Operations Ledger",
+    "route": "/operations",
+    "file": "src/services/operationsLedgerService.js",
+    "dataPath": "operationsLedger/{entryId}, auditLogs/{logId}",
+    "evidence": "Operations create/update/cancel writes are paired with audit logs, but audit summaries are compact.",
+    "recommendedAction": "Expand financial audit details for before/after values in a future integrity phase.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-OPS-P3-001",
+    "priority": "P3",
+    "status": "open",
+    "area": "Operations Ledger",
+    "route": "/operations",
+    "file": "src/utils/operationsReport.js",
+    "dataPath": "operationsLedger.amount, operationsLedger.direction",
+    "evidence": "Summary calculations separate income and costs from direction/type.",
+    "recommendedAction": "Improve wording in the financial-boundaries phase.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-CHK-P3-001",
+    "priority": "P3",
+    "status": "open",
+    "area": "Check-In",
+    "route": "/check-in",
+    "file": "src/utils/attendanceUtils.js",
+    "dataPath": "registrations.attendanceRecordType",
+    "evidence": "Historical attendance is intentionally separate from live checkedIn state.",
+    "recommendedAction": "Keep this distinction explicit in future UI edits.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-IMP-P3-001",
+    "priority": "P3",
+    "status": "open",
+    "area": "Import Center",
+    "route": "/imports",
+    "file": "src/services/importService.js",
+    "dataPath": "registrations.sourceRowId",
+    "evidence": "Imports preserve source row IDs and audit import origin.",
+    "recommendedAction": "Add import-run manifest if import volume grows.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  },
+  {
+    "id": "PASS3-ROLE-P3-001",
+    "priority": "P3",
+    "status": "open",
+    "area": "Roles and Rules",
+    "route": "/settings, /qa",
+    "file": "src/utils/accessRoles.js",
+    "dataPath": "staffProfiles, staffAssignments",
+    "evidence": "Product wording and rules implementation are close but not perfectly aligned.",
+    "recommendedAction": "Update role status copy without changing permissions.",
+    "pass4": {
+      "missingEvidence": null,
+      "reproducible": null,
+      "affectsProduction": null,
+      "risksDataLossIncorrectTotalsOrBrokenWorkflow": null,
+      "priorityCorrect": null,
+      "disposition": "pending"
+    }
+  }
+]

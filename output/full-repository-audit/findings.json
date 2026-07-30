@@ -1,11 +1,15 @@
 [
   {
     "id": "PASS1-P1-001",
-    "priority": "P1",
+    "priority": "P3",
     "area": "E2E",
-    "status": "reclassified-in-pass2",
+    "status": "closed-as-runner-tooling-after-pass2-rerun",
     "evidence": "Pass 1 full E2E failed on mobile accessibility login flow. Pass 2 direct accessibility rerun passed 2/2 and direct full E2E rerun passed 10/10.",
-    "recommendedAction": "Treat as runner/tooling/auth-fixture flake unless it recurs in direct command execution."
+    "recommendedAction": "Treat as runner/tooling/auth-fixture flake unless it recurs in direct command execution.",
+    "pass4Disposition": "downgraded",
+    "pass4Priority": "P3",
+    "pass4Status": "closed-as-runner-tooling-after-pass2-rerun",
+    "pass4Evidence": "Direct reruns previously passed; no production browser failure reproduced in Pass 4 route checks."
   },
   {
     "id": "PASS1-P2-001",
@@ -13,7 +17,8 @@
     "area": "Environment",
     "status": "open",
     "evidence": "Firebase emulator output warns firebase-tools will drop Java <21 support in firebase-tools@15.",
-    "recommendedAction": "Plan Java 21 migration while keeping firebase-tools@14.19.0 pin intentional for emulator E2E."
+    "recommendedAction": "Plan Java 21 migration while keeping firebase-tools@14.19.0 pin intentional for emulator E2E.",
+    "pass4Disposition": "confirmed-or-open"
   },
   {
     "id": "PASS1-P2-002",
@@ -21,7 +26,8 @@
     "area": "Dependencies",
     "status": "open",
     "evidence": "Production audit is clean, but dev dependency audit from Pass 1 reported vulnerabilities.",
-    "recommendedAction": "Run scoped dev-dependency remediation separately."
+    "recommendedAction": "Run scoped dev-dependency remediation separately.",
+    "pass4Disposition": "confirmed-or-open"
   },
   {
     "id": "PASS1-P2-003",
@@ -29,35 +35,45 @@
     "area": "React Doctor",
     "status": "open",
     "evidence": "Pass 1 React Doctor scan reported 165 warnings across 57 files.",
-    "recommendedAction": "Schedule focused React Doctor remediation after release-critical workflow audits."
+    "recommendedAction": "Schedule focused React Doctor remediation after release-critical workflow audits.",
+    "pass4Disposition": "confirmed-or-open"
   },
   {
     "id": "PASS2-P2-001",
     "priority": "P2",
     "area": "Production network evidence",
-    "status": "open",
+    "status": "closed-with-cdp-evidence",
     "evidence": "Pass 2 Browser runtime produced console evidence but did not complete route-by-route CDP network request capture.",
-    "recommendedAction": "Run a CDP-backed production smoke harness in Pass 3."
+    "recommendedAction": "Run a CDP-backed production smoke harness in Pass 3.",
+    "pass4Disposition": "closed",
+    "pass4Status": "closed-with-cdp-evidence",
+    "pass4Evidence": "CDP route capture completed for 13 production routes; no app console errors, failed requests, Firestore permission errors, or repeated Firestore/Auth loops captured."
   },
   {
     "id": "PASS2-P2-002",
     "priority": "P2",
     "area": "Tutorial production replay",
-    "status": "open-limited-browser-evidence",
+    "status": "limited-production-walkthrough",
     "evidence": "Tutorial V3 source matrix and E2E replay passed, but production browser step-through was not completed because the replay control was not consistently available after route reload in the Browser runtime.",
-    "recommendedAction": "Verify full Tutorial V3 replay in production with the same authenticated session in Pass 3."
+    "recommendedAction": "Verify full Tutorial V3 replay in production with the same authenticated session in Pass 3.",
+    "pass4Disposition": "unresolved",
+    "pass4Status": "limited-production-walkthrough",
+    "pass4Evidence": "Tutorial replay opened and Step 1-4 evidence collected; full completion was not reached because Chrome control timed out around prepared event-form steps. Source and E2E coverage remain stronger than production browser completion evidence."
   },
   {
     "id": "PASS2-P3-001",
     "priority": "P3",
     "area": "Responsive accessibility",
-    "status": "open",
+    "status": "true-200-zoom-not-confirmed",
     "evidence": "Pass 2 captured desktop/tablet/mobile screenshots but did not perform a true 200 percent zoom pass.",
-    "recommendedAction": "Add 200 percent zoom review for high-risk table/report routes."
+    "recommendedAction": "Add 200 percent zoom review for high-risk table/report routes.",
+    "pass4Disposition": "blocked-by-tooling",
+    "pass4Status": "true-200-zoom-not-confirmed",
+    "pass4Evidence": "Chrome keyboard zoom attempts did not change exposed viewport/DPR/visualViewport signals. Screenshots saved as layout evidence but not claimed as true 200 percent zoom."
   },
   {
     "id": "PASS3-FORMS-P1-001",
-    "priority": "P1",
+    "priority": "P2",
     "productArea": "Google Forms Response Inbox",
     "route": "/imports",
     "file": "src/utils/formResponseInbox.js",
@@ -71,11 +87,15 @@
     "complexity": "medium",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
-    "status": "open"
+    "status": "confirmed-non-live-automatic-receiver-gap",
+    "pass4Disposition": "downgraded",
+    "pass4Priority": "P2",
+    "pass4Status": "confirmed-non-live-automatic-receiver-gap",
+    "pass4Evidence": "Pass 4 source/UI review confirms manual Forms inbox/package only; no automatic receiver deployment/secret verification evidence. Not a current production data-loss blocker because no automatic conversion is claimed as verified."
   },
   {
     "id": "PASS3-WRITE-P1-001",
-    "priority": "P1",
+    "priority": "P2",
     "productArea": "Write integrity",
     "route": "/imports,/registrations,/payments",
     "file": "src/services/importService.js; src/services/registrationService.js",
@@ -89,7 +109,11 @@
     "complexity": "medium",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
-    "status": "open"
+    "status": "confirmed-partial-operation-recovery-risk",
+    "pass4Disposition": "downgraded",
+    "pass4Priority": "P2",
+    "pass4Status": "confirmed-partial-operation-recovery-risk",
+    "pass4Evidence": "Bulk/import services use atomic batches per chunk (5 for bulk registration operations, 50 imported rows/100 writes for imports) but no all-or-nothing transaction across chunks. Audit logs remain paired inside committed chunks."
   },
   {
     "id": "PASS3-PAY-P2-001",
@@ -107,7 +131,8 @@
     "complexity": "small",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "confirmed-or-open"
   },
   {
     "id": "PASS3-WRITE-P2-001",
@@ -125,7 +150,8 @@
     "complexity": "medium",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "confirmed-or-open"
   },
   {
     "id": "PASS3-WRITE-P2-002",
@@ -143,7 +169,8 @@
     "complexity": "medium",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "confirmed-or-open"
   },
   {
     "id": "PASS3-REP-P2-001",
@@ -161,7 +188,10 @@
     "complexity": "medium",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
-    "status": "open"
+    "status": "closed-with-read-only-raw-totals",
+    "pass4Disposition": "closed",
+    "pass4Status": "closed-with-read-only-raw-totals",
+    "pass4Evidence": "Read-only aggregate verified CPB 69 registrations, 73 guests, BBD 6530 due, BBD 6530 paid, BBD 0 balance."
   },
   {
     "id": "PASS3-REC-P2-001",
@@ -179,7 +209,8 @@
     "complexity": "small",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "confirmed-or-open"
   },
   {
     "id": "PASS3-ROLE-P2-001",
@@ -197,7 +228,10 @@
     "complexity": "small",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
-    "status": "open"
+    "status": "confirmed-copy-rules-mismatch",
+    "pass4Disposition": "confirmed",
+    "pass4Status": "confirmed-copy-rules-mismatch",
+    "pass4Evidence": "Rules enforce assigned-event staff boundaries; accessRoles copy still says live staff access does not enforce scoped rules yet."
   },
   {
     "id": "PASS3-FORMS-P2-001",
@@ -215,7 +249,8 @@
     "complexity": "small",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "confirmed-or-open"
   },
   {
     "id": "PASS3-IMP-P2-001",
@@ -233,7 +268,8 @@
     "complexity": "medium",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "confirmed-or-open"
   },
   {
     "id": "PASS3-REG-P3-001",
@@ -251,7 +287,8 @@
     "complexity": "small",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "open-low-priority"
   },
   {
     "id": "PASS3-TKT-P3-001",
@@ -269,7 +306,8 @@
     "complexity": "small",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "open-low-priority"
   },
   {
     "id": "PASS3-ZOOM-P3-001",
@@ -287,7 +325,8 @@
     "complexity": "small",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "open-low-priority"
   },
   {
     "id": "PASS3-OPS-P2-001",
@@ -305,7 +344,8 @@
     "complexity": "medium",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": true,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "confirmed-or-open"
   },
   {
     "id": "PASS3-OPS-P3-001",
@@ -323,7 +363,8 @@
     "complexity": "small",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "open-low-priority"
   },
   {
     "id": "PASS3-CHK-P3-001",
@@ -341,7 +382,8 @@
     "complexity": "small",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "open-low-priority"
   },
   {
     "id": "PASS3-IMP-P3-001",
@@ -359,7 +401,8 @@
     "complexity": "medium",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "open-low-priority"
   },
   {
     "id": "PASS3-ROLE-P3-001",
@@ -377,6 +420,7 @@
     "complexity": "small",
     "productionMigrationRequired": false,
     "fixBeforeNewFeatures": false,
-    "status": "open"
+    "status": "open",
+    "pass4Disposition": "open-low-priority"
   }
 ]

@@ -1,0 +1,8 @@
+{
+  "route": "/check-in",
+  "url": "https://gathervibeshub.web.app/check-in",
+  "rawCdpConsoleEventCount": 0,
+  "warningsAndErrors": [],
+  "appOriginated": [],
+  "extensionNoise": []
+}

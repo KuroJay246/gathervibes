@@ -2093,5 +2093,12 @@
     "cdpNetwork": "not completed; Browser runtime did not provide full route-by-route request capture in this pass",
     "zoom200": "source and screenshot evidence reviewed; true 200 percent browser zoom not completed",
     "tutorialProduction": "not completed; use E2E/source coverage plus Pass 2 limitation"
+  },
+  "pass4": {
+    "consoleNetworkEvidence": "output/full-repository-audit/pass-4/console-network-summary.json",
+    "zoomEvidence": "output/full-repository-audit/pass-4/zoom-200-summary.json",
+    "tutorialEvidence": "output/full-repository-audit/pass-4/tutorial-production-walkthrough.json",
+    "true200ZoomConfirmed": false,
+    "tutorialFullCompletionConfirmed": false
   }
 }

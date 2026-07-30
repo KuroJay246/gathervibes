@@ -1,0 +1,34 @@
+{
+  "route": "/operations",
+  "url": "https://gathervibeshub.web.app/operations",
+  "bodyInfo": {
+    "h1": "Operations",
+    "hasCompleted": true,
+    "hasCpb": true,
+    "hasErrorBoundary": false,
+    "textSample": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCPB\n20 Jun 2026 · completed\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nOperations\n\nTrack event-level money and obligations\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCPB\n\n20 Jun 2026 · completed\n\nChange event\n\nSELECTED WORKING EVENT ONLY\n\nOperations Ledger Summary\n\nTrack partner commitments and event-level money for CPB. Registration payments are reviewed separately in Payments.\n\nOpen Payments\nOpen Event Review\nBack to Overview\n\nOperations now covers both planning commitments and the event-level ledger.\n\nOperations finance boundary\nThis event is completed.",
+    "url": "/operations"
+  },
+  "requestCount": 41,
+  "responseCount": 41,
+  "firestoreOrAuthRequestCount": 8,
+  "authRefreshRequestCount": 1,
+  "failedResponses": [],
+  "loadingFailures": [],
+  "repeatedFirestoreOrAuthRequests": [],
+  "lazyLoadedChunks": [
+    "index-DYbrqdkh.js",
+    "react-vendor-CErAWrki.js",
+    "icons-BQlMzXNw.js",
+    "firebase-core-C3yvdNLm.js",
+    "firebase-firestore-Bx5hiaOG.js",
+    "firebase-auth-DxP5RQdZ.js",
+    "OperationsPage-CvuOaIBi.js",
+    "validators-DvJVDETb.js",
+    "EmptyState-BVxCTnud.js",
+    "LoadingState-B7OO-4KN.js",
+    "operationsLedgerService-CgBxrT-n.js",
+    "InfoHint-DuTY_X5M.js"
+  ],
+  "rawEventCount": 220
+}

@@ -3,6 +3,7 @@
 Generated for Audit Pass 1 on 2026-07-30T16:16:59.942Z.
 Updated for Audit Pass 2 on 2026-07-30.
 Updated for Audit Pass 3 on 2026-07-30.
+Updated for Audit Pass 4 on 2026-07-30.
 
 ## Git State
 - Branch: `codex/full-repository-product-audit-2026-07`
@@ -27,6 +28,13 @@ Updated for Audit Pass 3 on 2026-07-30.
 - `output/full-repository-audit/write-path-matrix.json`: Pass 3 mapped production write-capable operations, role boundaries, audit actions, and partial-write risks.
 - `output/full-repository-audit/data-calculation-results.json`: Pass 3 registration finance and Operations calculation truth table.
 - `output/full-repository-audit/integration-status.json`: Pass 3 Forms Inbox, XLSX, and reconciliation integration status.
+- `output/full-repository-audit/pass-4/console-network-summary.json`: Pass 4 authenticated CDP production route console/network summary.
+- `output/full-repository-audit/pass-4/read-only-production-totals.json`: Pass 4 read-only CPB and CODEX_TEST Firestore aggregate verification.
+- `output/full-repository-audit/pass-4/ui-total-comparison-text.json`: Pass 4 safe visible UI aggregate comparison.
+- `output/full-repository-audit/pass-4/codex-test-visibility.json`: Pass 4 CODEX_TEST default-hidden and Show Test Events verification.
+- `output/full-repository-audit/pass-4/tutorial-production-walkthrough.json`: Pass 4 partial production Tutorial V3 walkthrough evidence.
+- `output/full-repository-audit/pass-4/zoom-200-summary.json`: Pass 4 high-risk route layout metrics; true 200 percent zoom not confirmed.
+- `output/full-repository-audit/pass-4/release-readiness-summary.json`: Pass 4 release-readiness classification and finding counts.
 
 ## Command Output Evidence
 - `*.out.txt` and `*.err.txt` files in this folder contain saved stdout/stderr from each required validation command.
@@ -36,10 +44,12 @@ Updated for Audit Pass 3 on 2026-07-30.
 
 ## Screenshot Evidence
 - `output/full-repository-audit/screenshots/pass-2/`: 162 authenticated production screenshots across 18 routes and desktop/tablet/mobile viewport groups.
+- `output/full-repository-audit/screenshots/pass-4/zoom-200/`: high-risk route visual evidence from the attempted true 200 percent zoom pass.
 
 ## Scope Notes
 - Browser/visual/route-by-route product workflow inspection was intentionally excluded from Pass 1.
 - Browser/visual/route-by-route product workflow inspection was added in Pass 2.
 - Financial workflow, import, write-path, audit-log, and role/rules consistency inspection was added in Pass 3.
+- Production acceptance closeout, CDP network evidence, read-only aggregate verification, tutorial production replay, and attempted true 200 percent zoom were added in Pass 4.
 - No production records were modified by this pass.
 - No application behavior files were intentionally changed; only docs and audit evidence were created.

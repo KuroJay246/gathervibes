@@ -1,0 +1,32 @@
+{
+  "route": "/dashboard",
+  "url": "https://gathervibeshub.web.app/dashboard",
+  "bodyInfo": {
+    "h1": "Overview",
+    "hasCompleted": true,
+    "hasCpb": true,
+    "hasErrorBoundary": false,
+    "textSample": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCPB\n20 Jun 2026 · completed\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nOverview\n\nCurrent event status, priorities, and next actions\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCPB\n\n20 Jun 2026 · completed\n\nChange event\n\nOVERVIEW\n\nCPB\n\n20 Jun 2026 · LESC · Completed\n\nChange event\nClear selection\n\nCOMPLETED EVENT\n\nHistorical event overview\nThis event is completed. Upcoming-event reminders, ticket prompts, and guest payment follow-up are no longer treated as active organizer work. Completed status does not make an event read-only; approved organizers can still",
+    "url": "/dashboard"
+  },
+  "requestCount": 39,
+  "responseCount": 39,
+  "firestoreOrAuthRequestCount": 9,
+  "authRefreshRequestCount": 1,
+  "failedResponses": [],
+  "loadingFailures": [],
+  "repeatedFirestoreOrAuthRequests": [],
+  "lazyLoadedChunks": [
+    "index-DYbrqdkh.js",
+    "react-vendor-CErAWrki.js",
+    "icons-BQlMzXNw.js",
+    "firebase-core-C3yvdNLm.js",
+    "firebase-firestore-Bx5hiaOG.js",
+    "firebase-auth-DxP5RQdZ.js",
+    "DashboardPage-DtKWMmyX.js",
+    "operationsLedgerService-CgBxrT-n.js",
+    "eventReadiness-BE3EnL0s.js",
+    "financialEvidenceAudit-t8bUzr9l.js"
+  ],
+  "rawEventCount": 211
+}

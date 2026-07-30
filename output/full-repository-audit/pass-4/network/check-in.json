@@ -1,0 +1,37 @@
+{
+  "route": "/check-in",
+  "url": "https://gathervibeshub.web.app/check-in",
+  "bodyInfo": {
+    "h1": "Check-In",
+    "hasCompleted": true,
+    "hasCpb": true,
+    "hasErrorBoundary": false,
+    "textSample": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCPB\n20 Jun 2026 · completed\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nCheck-In\n\nTrack event-day attendance\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCPB\n\n20 Jun 2026 · completed\n\nChange event\n\nEVENT-DAY MODE\n\nDoor Check-In / QR Scan\n\nChecking in guests for CPB. Checked In: 0 registrations / 0 guests\n\nQR scan, manual ticket lookup, and name search all use this Working Event only.\nOpen Scanner Mode\n\nTOTAL REGISTRATIONS\n\n69\n\nTOTAL GUESTS\n\n73\n\nCHECKED-IN REGISTRATIONS\n\n0\n\nCHECKED-IN GUESTS\n\n0\n\nMore attendance and readiness counts\nAttendance evidence context\n",
+    "url": "/check-in"
+  },
+  "requestCount": 44,
+  "responseCount": 44,
+  "firestoreOrAuthRequestCount": 9,
+  "authRefreshRequestCount": 1,
+  "failedResponses": [],
+  "loadingFailures": [],
+  "repeatedFirestoreOrAuthRequests": [],
+  "lazyLoadedChunks": [
+    "index-DYbrqdkh.js",
+    "react-vendor-CErAWrki.js",
+    "icons-BQlMzXNw.js",
+    "firebase-core-C3yvdNLm.js",
+    "firebase-firestore-Bx5hiaOG.js",
+    "firebase-auth-DxP5RQdZ.js",
+    "CheckInPage-CJ4KPk0a.js",
+    "ticketService-cQecfNL2.js",
+    "EmptyState-BVxCTnud.js",
+    "ErrorState-C36-QDx8.js",
+    "LoadingState-B7OO-4KN.js",
+    "checkInUtils-CHfTB0OX.js",
+    "qrTicketUtils-CHpxW0o4.js",
+    "InfoHint-DuTY_X5M.js",
+    "financialEvidenceAudit-t8bUzr9l.js"
+  ],
+  "rawEventCount": 233
+}

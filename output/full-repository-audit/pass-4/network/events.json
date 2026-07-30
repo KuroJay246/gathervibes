@@ -1,0 +1,33 @@
+{
+  "route": "/events",
+  "url": "https://gathervibeshub.web.app/events",
+  "bodyInfo": {
+    "h1": "Events",
+    "hasCompleted": true,
+    "hasCpb": true,
+    "hasErrorBoundary": false,
+    "textSample": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCPB\n20 Jun 2026 · completed\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nEvents\n\nPlan and organize every gathering\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCPB\n\n20 Jun 2026 · completed\n\nChange event\nLIVE EVENTS\nYour gatherings\n\nCreate each event once, plan it progressively, and keep one Working Event selected for the organizer team.\n\nThe event planner now includes event setup, budget planning, readiness, and task tracking without leaving the normal organizer workflow.\n\nShow Test Events\nPlan a New Event\n\nALL EVENTS\n\n1\n\nUPCOMING / ACTIVE\n\n0\n\nPLANNED CAPACITY",
+    "url": "/events"
+  },
+  "requestCount": 41,
+  "responseCount": 41,
+  "firestoreOrAuthRequestCount": 9,
+  "authRefreshRequestCount": 1,
+  "failedResponses": [],
+  "loadingFailures": [],
+  "repeatedFirestoreOrAuthRequests": [],
+  "lazyLoadedChunks": [
+    "index-DYbrqdkh.js",
+    "react-vendor-CErAWrki.js",
+    "icons-BQlMzXNw.js",
+    "firebase-core-C3yvdNLm.js",
+    "firebase-firestore-Bx5hiaOG.js",
+    "firebase-auth-DxP5RQdZ.js",
+    "EventsPage-D7wN4WlU.js",
+    "validators-DvJVDETb.js",
+    "EmptyState-BVxCTnud.js",
+    "ErrorState-C36-QDx8.js",
+    "LoadingState-B7OO-4KN.js"
+  ],
+  "rawEventCount": 224
+}

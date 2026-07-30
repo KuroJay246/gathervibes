@@ -1,0 +1,38 @@
+{
+  "route": "/payments",
+  "url": "https://gathervibeshub.web.app/payments",
+  "rawCdpConsoleEventCount": 2,
+  "warningsAndErrors": [
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-30T21:06:47.098Z",
+      "url": "https://gathervibeshub.web.app/payments?pass4=1785445606510",
+      "classification": "browser-extension noise"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-30T21:06:47.099Z",
+      "url": "https://gathervibeshub.web.app/payments?pass4=1785445606510",
+      "classification": "browser-extension noise"
+    }
+  ],
+  "appOriginated": [],
+  "extensionNoise": [
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-30T21:06:47.098Z",
+      "url": "https://gathervibeshub.web.app/payments?pass4=1785445606510",
+      "classification": "browser-extension noise"
+    },
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-30T21:06:47.099Z",
+      "url": "https://gathervibeshub.web.app/payments?pass4=1785445606510",
+      "classification": "browser-extension noise"
+    }
+  ]
+}

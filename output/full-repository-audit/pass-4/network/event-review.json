@@ -1,0 +1,35 @@
+{
+  "route": "/event-review",
+  "url": "https://gathervibeshub.web.app/event-review",
+  "bodyInfo": {
+    "h1": "Reports | Event Report & Review",
+    "hasCompleted": true,
+    "hasCpb": true,
+    "hasErrorBoundary": false,
+    "textSample": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCPB\n20 Jun 2026 · completed\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nReports\n\nRead-only follow-up, payments, operations, and summary\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCPB\n\n20 Jun 2026 · completed\n\nChange event\n\nReports\n\nEvent Report & Review\n\n20 Jun 2026\n·\nStatus: completed\n\nThis read-only report combines follow-up items, registration payment records, Operations Ledger figures, and a current or post-event summary for the selected Working Event only.\n\nOpen Payments\n\nPAYMENT FOLLOW-UP AND FINANCE REVIEW\n\nWhat needs attention now\n\nMissing contact i",
+    "url": "/event-review"
+  },
+  "requestCount": 42,
+  "responseCount": 42,
+  "firestoreOrAuthRequestCount": 9,
+  "authRefreshRequestCount": 1,
+  "failedResponses": [],
+  "loadingFailures": [],
+  "repeatedFirestoreOrAuthRequests": [],
+  "lazyLoadedChunks": [
+    "index-DYbrqdkh.js",
+    "react-vendor-CErAWrki.js",
+    "icons-BQlMzXNw.js",
+    "firebase-core-C3yvdNLm.js",
+    "firebase-firestore-Bx5hiaOG.js",
+    "firebase-auth-DxP5RQdZ.js",
+    "EventReviewPage-DnpL6mwn.js",
+    "EmptyState-BVxCTnud.js",
+    "ErrorState-C36-QDx8.js",
+    "LoadingState-B7OO-4KN.js",
+    "operationsLedgerService-CgBxrT-n.js",
+    "eventReadiness-BE3EnL0s.js",
+    "financialEvidenceAudit-t8bUzr9l.js"
+  ],
+  "rawEventCount": 228
+}

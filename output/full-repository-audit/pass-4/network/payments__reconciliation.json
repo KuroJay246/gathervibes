@@ -1,0 +1,32 @@
+{
+  "route": "/payments/reconciliation",
+  "url": "https://gathervibeshub.web.app/payments/reconciliation",
+  "bodyInfo": {
+    "h1": "Reconciliation Preview",
+    "hasCompleted": true,
+    "hasCpb": true,
+    "hasErrorBoundary": false,
+    "textSample": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCPB\n20 Jun 2026 · completed\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nReconciliation Preview\n\nRead-only payment workbook comparison\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCPB\n\n20 Jun 2026 · completed\n\nChange event\n\nPAYMENTS · DRY-RUN ONLY\n\nPayment Reconciliation Preview\n\nCompare a payment workbook to the selected event's registration payment records without changing data.\n\nWorking Event unchanged: CPB\nRead-only reconciliation preview\n\nThis tool loads workbook records, the selected event's registration records, and the selected event's Operations recor",
+    "url": "/payments/reconciliation"
+  },
+  "requestCount": 39,
+  "responseCount": 39,
+  "firestoreOrAuthRequestCount": 9,
+  "authRefreshRequestCount": 1,
+  "failedResponses": [],
+  "loadingFailures": [],
+  "repeatedFirestoreOrAuthRequests": [],
+  "lazyLoadedChunks": [
+    "index-DYbrqdkh.js",
+    "react-vendor-CErAWrki.js",
+    "icons-BQlMzXNw.js",
+    "firebase-core-C3yvdNLm.js",
+    "firebase-firestore-Bx5hiaOG.js",
+    "firebase-auth-DxP5RQdZ.js",
+    "PaymentReconciliationPage-B6Fk-bry.js",
+    "LoadingState-B7OO-4KN.js",
+    "ErrorState-C36-QDx8.js",
+    "readXlsxFileBrowser-aArUGNv0.js"
+  ],
+  "rawEventCount": 208
+}

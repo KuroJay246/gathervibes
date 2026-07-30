@@ -1,0 +1,24 @@
+{
+  "route": "/events",
+  "url": "https://gathervibeshub.web.app/events",
+  "rawCdpConsoleEventCount": 0,
+  "warningsAndErrors": [
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-30T21:04:57.492Z",
+      "url": "https://gathervibeshub.web.app/events",
+      "classification": "browser-extension noise"
+    }
+  ],
+  "appOriginated": [],
+  "extensionNoise": [
+    {
+      "level": "error",
+      "message": "Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "timestamp": "2026-07-30T21:04:57.492Z",
+      "url": "https://gathervibeshub.web.app/events",
+      "classification": "browser-extension noise"
+    }
+  ]
+}

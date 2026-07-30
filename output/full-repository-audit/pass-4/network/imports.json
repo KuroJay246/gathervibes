@@ -1,0 +1,33 @@
+{
+  "route": "/imports",
+  "url": "https://gathervibeshub.web.app/imports",
+  "bodyInfo": {
+    "h1": "Import Center",
+    "hasCompleted": true,
+    "hasCpb": true,
+    "hasErrorBoundary": false,
+    "textSample": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCPB\n20 Jun 2026 · completed\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nImport Center\n\nBring in CSV exports and pasted table rows safely\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCPB\n\n20 Jun 2026 · completed\n\nChange event\nBack to Registrations\nImport Center\n\nFor event: CPB. CSV, pasted table rows, and Excel/XLSX workbooks all use preview before saving.\n\nChoose source\n\nPick the closest source so the mapping step starts with the right expectations.\n\nGoogle Forms CSV\nExport responses from Google Forms/Sheets as CSV, then upload here.\nGoogle Sheets CSV\nDownloa",
+    "url": "/imports"
+  },
+  "requestCount": 39,
+  "responseCount": 39,
+  "firestoreOrAuthRequestCount": 8,
+  "authRefreshRequestCount": 1,
+  "failedResponses": [],
+  "loadingFailures": [],
+  "repeatedFirestoreOrAuthRequests": [],
+  "lazyLoadedChunks": [
+    "index-DYbrqdkh.js",
+    "react-vendor-CErAWrki.js",
+    "icons-BQlMzXNw.js",
+    "firebase-core-C3yvdNLm.js",
+    "firebase-firestore-Bx5hiaOG.js",
+    "firebase-auth-DxP5RQdZ.js",
+    "ImportsPage-C08YbK4m.js",
+    "exportUtils-__7Fae22.js",
+    "EmptyState-BVxCTnud.js",
+    "InfoHint-DuTY_X5M.js",
+    "readXlsxFileBrowser-aArUGNv0.js"
+  ],
+  "rawEventCount": 208
+}

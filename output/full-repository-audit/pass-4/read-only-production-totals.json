@@ -1,0 +1,120 @@
+{
+  "generatedAt": "2026-07-30T21:19:29.507Z",
+  "projectId": "gathervibeshub",
+  "mode": "read-only firebase-admin aggregate; no writes executed",
+  "eventCounts": {
+    "totalEvents": 2,
+    "realEventsDefault": 1,
+    "testEvents": 1
+  },
+  "cpb": {
+    "eventId": "zhaPxi31cpqLAW0cuS20",
+    "exists": true,
+    "eventName": "CPB",
+    "status": "completed",
+    "isTestEvent": false,
+    "registrationRecordCount": 69,
+    "guestCountFromPersonsAttending": 73,
+    "totalAmountDue": 6530,
+    "totalAmountPaid": 6530,
+    "totalBalanceDue": 0,
+    "financeSummary": {
+      "currency": "BBD",
+      "totalExpected": 6530,
+      "totalCollected": 6530,
+      "totalOutstanding": 0,
+      "paidTotal": 6530,
+      "pendingTotal": 0,
+      "doorTotal": 0,
+      "doorPaidTotal": 660,
+      "doorListTotal": 0,
+      "complimentaryValue": 0,
+      "paidRegistrations": 65,
+      "pendingRegistrations": 0,
+      "doorRegistrations": 6,
+      "complimentaryRegistrations": 4,
+      "paidPersons": 69,
+      "pendingPersons": 0,
+      "doorPersons": 6,
+      "doorListRegistrations": 0,
+      "doorListPersons": 0,
+      "partialPaymentRegistrations": 0,
+      "partialPaymentPersons": 0,
+      "partialPaymentTotal": 0,
+      "complimentaryPersons": 4,
+      "missingFinanceInfo": 1,
+      "financeWarningCount": 0
+    },
+    "fullyPaidCount": 59,
+    "partiallyPaidCount": 0,
+    "unpaidCount": 0,
+    "complimentaryCount": 4,
+    "statusCounts": {
+      "paid": 59,
+      "complimentary": 4,
+      "door": 6
+    },
+    "assignedTicketCount": 68,
+    "liveCheckedInCount": 0,
+    "historicalAttendanceCount": 0,
+    "metrics": {
+      "totalRegistrations": 69,
+      "totalPersons": 73,
+      "checkedInRegistrations": 0,
+      "checkedInPersons": 0,
+      "paidRegistrations": 59,
+      "pendingRegistrations": 0,
+      "complimentaryRegistrations": 4,
+      "doorRegistrations": 6,
+      "missingTicketRegistrations": 1,
+      "paidPersons": 63,
+      "pendingPersons": 0,
+      "complimentaryPersons": 4,
+      "doorPersons": 6,
+      "missingTicketPersons": 3,
+      "remainingRegistrations": 69,
+      "remainingPersons": 73,
+      "capacity": 80,
+      "capacityUsed": 73,
+      "capacityPercent": 91
+    },
+    "operations": {
+      "totals": {
+        "income": 0,
+        "expenses": 3502.88,
+        "refunds": 0,
+        "adjustments": 0,
+        "net": -3502.88
+      },
+      "control": {
+        "openEntries": 1,
+        "settledEntries": 5,
+        "cancelledEntries": 0,
+        "pendingIncome": 0,
+        "pendingExpenses": 1050,
+        "pendingRefunds": 0
+      },
+      "settlement": {
+        "incomeReceived": 0,
+        "incomePending": 0,
+        "paidExpenses": 2452.88,
+        "outstandingCommitments": 1050,
+        "paidRefunds": 0,
+        "pendingRefunds": 0,
+        "adjustments": 0,
+        "operationsCashPosition": -2452.88,
+        "inKindContributions": 3
+      }
+    },
+    "operationsEntryCount": 6
+  },
+  "codexTest": {
+    "eventId": "xPfa0b3KZyLSDnAD2uGI",
+    "exists": true,
+    "eventName": "CODEX_TEST Live Verification Event",
+    "status": "draft",
+    "isTestEvent": true,
+    "registrationRecordCount": 5,
+    "excludedFromDefaultRealEventCounts": true
+  }
+}

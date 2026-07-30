@@ -27,3 +27,13 @@ Protected owner and approved organizers have full organizer access. Staff roles 
 | --- | --- | --- |
 | PASS3-ROLE-P2-001 | P2 | `roleCapabilitySummary` includes wording that live staff access does not enforce scoped rules yet, while Firestore rules now contain assigned-event role checks. This creates operator confusion. |
 | PASS3-ROLE-P3-001 | P3 | Client route access is intentionally narrower than some rules reads for staff roles; this is safe but should remain documented so hidden buttons are not confused with missing backend enforcement. |
+
+## Pass 4 Closeout
+
+Pass 4 confirms the mismatch remains a wording/product-status issue rather than an access expansion.
+
+Rules enforce protected owner and approved organizer admin access, assigned-event staff reads, scanner assigned-event check-in completion, Operations helper assigned-event Operations reads, append-only audit logs, and default deny for undeclared collections.
+
+Client route access remains intentionally narrower than some rules reads: scanner routes to `/scanner`, operations helper routes to `/operations`, viewer routes to `/dashboard`, and event manager routes to `/dashboard` and `/check-in`.
+
+The P2 finding remains confirmed because organizer-facing wording should match deployed rule behavior, but no client-only security boundary was identified as the only protection.

@@ -27,5 +27,13 @@
     "cdpNetworkCoverage": "limited/not complete",
     "appOriginatedErrorsObserved": 0,
     "browserExtensionNoise": "not captured"
+  },
+  "pass4": {
+    "routes": 13,
+    "appConsoleErrors": 0,
+    "failedResponses": 0,
+    "loadingFailures": 0,
+    "repeatedFirestoreOrAuthLoops": 0,
+    "extensionNoise": 3
   }
 }

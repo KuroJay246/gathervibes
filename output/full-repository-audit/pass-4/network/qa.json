@@ -1,0 +1,31 @@
+{
+  "route": "/qa",
+  "url": "https://gathervibeshub.web.app/qa",
+  "bodyInfo": {
+    "h1": "System QA",
+    "hasCompleted": true,
+    "hasCpb": true,
+    "hasErrorBoundary": false,
+    "textSample": "&\n\nGather & Savor\n\nEVENT HUB\n\nWORKING EVENT\n\nCPB\n20 Jun 2026 · completed\n\nDAILY WORKSPACE\n\nOverview\nEvents\nGuests & Registrations\nPayments\nTickets\nCheck-In\nOperations\nMessage Builder\nReports\n\nADMIN\n\nImport Center\nSettings\nSystem QA\n\nACCOUNT\n\nJ\n\nOwner/Admin\n\njaylanspencer99@gmail.com\n\nSystem QA\n\nSystem health, data checks, and safe test guidance\n\nSearch admin workspace\nOwner/Admin\n\nEVERYTHING HERE IS SCOPED TO\n\nCPB\n\n20 Jun 2026 · completed\n\nChange event\n\nSYSTEM QA\n\nSystem status and event checks\n\nReview account access, the current event, core data, and follow-up items. The checks on this page are read-only and do not create or change event records.\n\nREVIEW NEEDED\n\nOverall Status\n\nREVIEW\n\nRun the event checks\n\nThis status combines live access checks with the latest read-only review for the s",
+    "url": "/qa"
+  },
+  "requestCount": 41,
+  "responseCount": 41,
+  "firestoreOrAuthRequestCount": 12,
+  "authRefreshRequestCount": 1,
+  "failedResponses": [],
+  "loadingFailures": [],
+  "repeatedFirestoreOrAuthRequests": [],
+  "lazyLoadedChunks": [
+    "index-DYbrqdkh.js",
+    "react-vendor-CErAWrki.js",
+    "icons-BQlMzXNw.js",
+    "firebase-core-C3yvdNLm.js",
+    "firebase-firestore-Bx5hiaOG.js",
+    "firebase-auth-DxP5RQdZ.js",
+    "QaPage-CG5LA31B.js",
+    "qrTicketUtils-CHpxW0o4.js",
+    "communicationsUtils-DHwmM4A5.js"
+  ],
+  "rawEventCount": 234
+}
