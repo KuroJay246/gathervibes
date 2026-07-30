@@ -1,6 +1,6 @@
 import { Search, X } from 'lucide-react'
 
-export function RegistrationFilters({ filters, onFilterChange, onClearFilters }) {
+export function RegistrationFilters({ filters, onFilterChange, onClearFilters, activeFilterCount = 0 }) {
   const handleChange = (key, value) => {
     onFilterChange({ ...filters, [key]: value })
   }
@@ -9,21 +9,26 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
   const selectClasses = "rounded-xl border border-[#E5D7CF] bg-white px-3 py-2 text-sm focus:border-[#9A5260] focus:outline-none focus:ring-1 focus:ring-[#9A5260]"
 
   return (
-    <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-sm space-y-4">
+    <section className="gsv-section-card space-y-4" aria-labelledby="registration-filter-heading">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="font-bold text-[#2B1723]">Advanced Filters</h3>
+          <h3 id="registration-filter-heading" className="font-bold text-[#2B1723]">Find and filter registrations</h3>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">
             Search buyer, guest, contact, group, ticket, payment, and review fields without covering the category tabs below.
           </p>
         </div>
-        <button 
-          type="button"
-          onClick={onClearFilters}
-          className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold text-[#80685B] hover:bg-[#F2E8E1] transition"
-        >
-          <X className="size-3" /> Clear filters
-        </button>
+        <div className="gsv-action-toolbar">
+          <span className="rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">
+            {activeFilterCount} active
+          </span>
+          <button
+            type="button"
+            onClick={onClearFilters}
+            className="flex min-h-10 items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold text-[#80685B] hover:bg-[#F2E8E1] transition"
+          >
+            <X className="size-3" /> Clear filters
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -178,6 +183,6 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters })
           Repeated Contact Details
         </label>
       </div>
-    </div>
+    </section>
   )
 }

@@ -1,6 +1,7 @@
 import { User } from 'lucide-react'
 import { formatPaymentLabel, normalizePaymentStatus } from '../../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency, formatPaymentMethod } from '../../utils/financeUtils'
+import { attendanceRecordHelp, attendanceRecordLabel, deriveAttendanceRecordType } from '../../utils/attendanceUtils'
 
 function attendeesText(registration = {}) {
   return Array.isArray(registration.attendeeNames) && registration.attendeeNames.length > 0
@@ -13,6 +14,7 @@ export function RegistrationCard({ registration, onEdit, onDelete, highlighted =
   const paymentStatus = normalizePaymentStatus(registration.paymentStatus)
   const finance = calculateRegistrationFinance(registration)
   const persons = Number(registration.personsAttending) || 1
+  const attendanceType = deriveAttendanceRecordType(registration)
   return (
     <div
       id={`registration-${registration.registrationId}`}
@@ -82,10 +84,17 @@ export function RegistrationCard({ registration, onEdit, onDelete, highlighted =
         }`}>
           {registration.ticketStatus.replace(/-/g, ' ')}
         </span>
-        <span className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
-          registration.checkedIn ? 'bg-[#E5F3EC] text-[#1E7345]' : 'bg-[#F7F1ED] text-[#80685B]'
-        }`}>
-          {registration.checkedIn ? 'Checked in' : 'Not checked in'}
+        <span
+          className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
+            attendanceType === 'scanner-confirmed' || attendanceType === 'manual-live'
+              ? 'bg-[#E5F3EC] text-[#1E7345]'
+              : attendanceType === 'organizer-confirmed-historical'
+                ? 'bg-[#E6F0FA] text-[#285E9E]'
+                : 'bg-[#F7F1ED] text-[#80685B]'
+          }`}
+          title={attendanceRecordHelp(registration)}
+        >
+          {attendanceRecordLabel(registration)}
         </span>
         
         <div className="ml-auto flex items-center gap-2">

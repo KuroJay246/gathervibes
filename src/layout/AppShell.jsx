@@ -27,6 +27,9 @@ import { canUseSettings, canViewRoute, isApprovedAdmin } from '../utils/accessRo
 import { useOnboarding } from '../components/onboarding/useOnboarding'
 import { WelcomeCelebration } from '../components/onboarding/WelcomeCelebration'
 import { AppWalkthrough } from '../components/onboarding/AppWalkthrough'
+import { ProductFooter } from '../components/ProductFooter'
+import { welcomeAboardMessage } from '../utils/organizerDisplay'
+import { mobilePrimaryNavigationForAccess } from '../utils/navigation'
 
 const navGroups = [
   {
@@ -90,6 +93,13 @@ const pageTitles = {
   '/settings': ['Settings', 'Practical workspace and event defaults'],
 }
 
+const mobileIconMap = {
+  LayoutDashboard,
+  UsersRound,
+  TicketCheck,
+  ClipboardCheck,
+}
+
 function SidebarContent({ onNavigate, mobile = false, groups = navGroups }) {
   const { user, signOut, currentRoleLabel, access } = useAuth()
   const { activeEvent } = useActiveEvent()
@@ -102,7 +112,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups }) {
         <BrandMark light />
       </Link>
 
-      <div className="mx-4 max-w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-3.5">
+      <div data-tour-id="working-event-selector" className="mx-4 max-w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-3.5">
         <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.24em] text-[#D7B8BD]">Working Event</p>
         <Link to={adminUser ? '/events' : '/check-in'} onClick={onNavigate} className="flex w-full min-w-0 items-center justify-between gap-3 text-left">
           <span className="min-w-0 flex-1 overflow-hidden">
@@ -173,7 +183,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups }) {
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
-  const { currentRoleLabel, access } = useAuth()
+  const { currentRoleLabel, access, user, staffProfile } = useAuth()
   const { activeEvent } = useActiveEvent()
   const [title, subtitle] = pageTitles[location.pathname] || ['Event Hub', 'Gather & Savor Vibes']
   const adminUser = isApprovedAdmin(access)
@@ -194,7 +204,7 @@ export function AppShell() {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#F7DDE6] mb-4">
               <span className="text-xl">✨</span>
             </div>
-            <h2 className="text-xl font-serif font-bold text-[#2B1723] mb-2">Welcome aboard, Anica.</h2>
+            <h2 className="text-xl font-serif font-bold text-[#2B1723] mb-2">{welcomeAboardMessage(user, staffProfile)}</h2>
             <p className="text-[#5F493F]">Your Event Hub is ready.</p>
           </div>
         </div>
@@ -251,9 +261,9 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-6 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
+        <main className="px-3 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-6 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
           <div className="mx-auto max-w-[1480px] min-w-0 overflow-x-clip">
-            <div className="mb-5 rounded-2xl border border-[#EEDDD3] bg-white px-4 py-3 shadow-[0_6px_18px_rgba(84,53,67,0.04)]">
+            <div data-tour-id="working-event-selector" className="mb-5 rounded-2xl border border-[#EEDDD3] bg-white px-4 py-3 shadow-[0_6px_18px_rgba(84,53,67,0.04)]">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#8A3F4B]">Everything here is scoped to</p>
@@ -268,40 +278,20 @@ export function AppShell() {
               </div>
             </div>
             <Outlet />
+            <ProductFooter />
           </div>
         </main>
 
         <nav className="mobile-tab-bar lg:hidden" aria-label="Mobile navigation">
-          {canViewRoute(access, '/dashboard') && (
-            <NavLink to="/dashboard" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
-              <LayoutDashboard className="size-5" strokeWidth={1.8} aria-hidden="true" />
-              <span>Overview</span>
+          {mobilePrimaryNavigationForAccess(access).map(({ to, label, icon }) => {
+            const Icon = mobileIconMap[icon]
+            return (
+            <NavLink key={to} to={to} className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
+              <Icon className="size-5" strokeWidth={1.8} aria-hidden="true" />
+              <span>{label}</span>
             </NavLink>
-          )}
-          {canViewRoute(access, '/check-in') && !canViewRoute(access, '/dashboard') && (
-            <NavLink to="/check-in" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
-              <ClipboardCheck className="size-5" strokeWidth={1.8} aria-hidden="true" />
-              <span>Check-In</span>
-            </NavLink>
-          )}
-          {canViewRoute(access, '/registrations') && (
-            <NavLink to="/registrations" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
-              <UsersRound className="size-5" strokeWidth={1.8} aria-hidden="true" />
-              <span>Guests</span>
-            </NavLink>
-          )}
-          {canViewRoute(access, '/tickets') && (
-            <NavLink to="/tickets" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
-              <TicketCheck className="size-5" strokeWidth={1.8} aria-hidden="true" />
-              <span>Tickets</span>
-            </NavLink>
-          )}
-          {canViewRoute(access, '/check-in') && (
-            <NavLink to="/check-in" className={({ isActive }) => `mobile-tab-item ${isActive ? 'mobile-tab-item-active' : ''}`}>
-              <ClipboardCheck className="size-5" strokeWidth={1.8} aria-hidden="true" />
-              <span>Check-In</span>
-            </NavLink>
-          )}
+            )
+          })}
           <button type="button" onClick={() => setMenuOpen(true)} className="mobile-tab-item" aria-label="Open all navigation">
             <Menu className="size-5" strokeWidth={1.8} aria-hidden="true" />
             <span>More</span>

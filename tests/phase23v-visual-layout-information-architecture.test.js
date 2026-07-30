@@ -8,7 +8,7 @@ test('Phase 23V adds reusable summary/detail layout primitives without new depen
   const styles = await readFile('src/styles.css', 'utf8')
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'))
 
-  for (const className of ['phase23v-panel', 'phase23v-summary', 'phase23v-body', 'phase23v-metric-grid']) {
+  for (const className of ['phase23v-panel', 'phase23v-summary', 'phase23v-body', 'phase23v-metric-grid', 'gsv-compact-metric-grid', 'gsv-section-card']) {
     assert.match(styles, new RegExp(`\\.${className}`))
   }
 
@@ -40,7 +40,7 @@ test('Phase 23V dense organizer pages keep primary work visible and collapse sec
   const reports = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
 
   assert.match(registrations, /registrationMetricCards\.slice\(0, 6\)/)
-  assert.match(registrations, /More registration metrics and review filters/)
+  assert.match(registrations, /Daily review shortcuts/)
   assert.match(registrations, /Registration evidence reconciliation/)
 
   assert.match(payments, /Payment status and review detail/)

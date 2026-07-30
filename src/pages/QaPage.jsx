@@ -412,7 +412,7 @@ export function QaPage() {
   ]
 
   return (
-    <div className="min-w-0 space-y-6">
+    <div data-tour-id="system-qa-workspace" className="min-w-0 space-y-6">
       <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>

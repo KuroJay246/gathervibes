@@ -250,6 +250,11 @@ export function RegistrationsPage() {
   const financeSummary = buildFinanceSummary(registrations, activeEvent)
   const evidenceAudit = getEventFinancialEvidenceAudit(activeEvent?.eventId)
   const isFiltering = effectiveActiveTab !== 'All' || Boolean(effectiveCardFilter) || Object.values(effectiveFilters).some(Boolean)
+  const activeFilterCount = [
+    effectiveActiveTab !== 'All',
+    Boolean(effectiveCardFilter),
+    ...Object.values(effectiveFilters).map(Boolean),
+  ].filter(Boolean).length
   const showingText = isFiltering
     ? `Showing ${filteredMetrics.totalRegistrations} registration${filteredMetrics.totalRegistrations === 1 ? '' : 's'} covering ${filteredMetrics.totalPersons} guest${filteredMetrics.totalPersons === 1 ? '' : 's'}.`
     : 'Showing all registrations.'
@@ -388,7 +393,7 @@ export function RegistrationsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div data-tour-id="registrations-workspace" className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-serif text-3xl text-[#2B1723]">Guests & Registrations</h2>
@@ -460,10 +465,20 @@ export function RegistrationsPage() {
         ))}
       </section>
 
-      <details className="phase23v-panel">
-        <summary className="phase23v-summary">More registration metrics and review filters</summary>
-        <div className="phase23v-body phase23v-metric-grid">
-          {registrationMetricCards.slice(6).map((item) => (
+      <section className="gsv-section-card">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="font-serif text-xl text-[#2B1723]">Daily review shortcuts</h3>
+            <p className="mt-1 text-xs leading-5 text-[#816D62]">Common registration review states are visible so normal work does not depend on nested disclosures.</p>
+          </div>
+          {activeFilterCount > 0 && (
+            <button type="button" onClick={() => { setFilters({}); setActiveTab('All'); setCardFilter('') }} className="w-fit rounded-xl border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#6B564C]">
+              Clear all filters
+            </button>
+          )}
+        </div>
+        <div className="mt-4 gsv-compact-metric-grid">
+          {registrationMetricCards.slice(6, 14).map((item) => (
             <CountCard
               key={item.label}
               label={item.label}
@@ -477,7 +492,25 @@ export function RegistrationsPage() {
             />
           ))}
         </div>
-      </details>
+        <details className="mt-4 rounded-2xl border border-[#F2E8E1] bg-[#FBF8F5]">
+          <summary className="phase23v-summary">Secondary totals</summary>
+          <div className="phase23v-body gsv-compact-metric-grid">
+            {registrationMetricCards.slice(14).map((item) => (
+              <CountCard
+                key={item.label}
+                label={item.label}
+                value={item.value}
+                help={item.help}
+                active={(item.card && cardFilter === item.card) || (item.tab && activeTab === item.tab)}
+                onClick={() => {
+                  if (item.tab) setActiveTab(item.tab)
+                  setCardFilter((current) => (item.card && current !== item.card ? item.card : ''))
+                }}
+              />
+            ))}
+          </div>
+        </details>
+      </section>
 
       {evidenceAudit && (
         <details className="phase23v-panel border-[#D8C5A8] bg-[#FFFCF6]" aria-labelledby="registration-audit-heading">
@@ -510,6 +543,7 @@ export function RegistrationsPage() {
           filters={effectiveFilters}
           onFilterChange={setFilters} 
           onClearFilters={() => { setFilters({}); setActiveTab('All'); setCardFilter('') }} 
+          activeFilterCount={activeFilterCount}
         />
 
         <div className="overflow-x-auto pb-2">

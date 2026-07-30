@@ -223,7 +223,7 @@ export function SettingsPage() {
   }), [activeEvent?.eventName, currentRole, currentRoleLabel, scannerLinkCopied, secondaryOrganizerCount, signOut, user])
 
   return (
-    <div className="min-w-0 space-y-6">
+    <div data-tour-id="settings-workspace" className="min-w-0 space-y-6">
       <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-4 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-5">
         <div className="flex min-w-0 gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Settings categories">
           {SETTINGS_TABS.map(([id, label], index) => (

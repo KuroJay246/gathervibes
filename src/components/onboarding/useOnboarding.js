@@ -4,7 +4,7 @@ import { db } from '../../lib/firebase'
 import { useAuth } from '../../auth/useAuth'
 
 export const TARGET_UIDS = ['WcDU2jmbopdAgDlMMWvD3TkqqbC3', 'WM2UOQtSeuOglCI5uMZQKrYYqP53']
-export const ONBOARDING_VERSION = 'mother-launch-v1'
+export const ONBOARDING_VERSION = 'interactive-product-tour-v2'
 
 export function useOnboarding() {
   const { user } = useAuth()
@@ -131,7 +131,7 @@ export function useOnboarding() {
     }
   }, [user])
 
-  const completeTour = useCallback(async (lastStep = 13) => {
+  const completeTour = useCallback(async (lastStep = 16) => {
     try {
       const docRef = doc(db, 'staffProfiles', user.uid, 'preferences', 'onboarding')
       

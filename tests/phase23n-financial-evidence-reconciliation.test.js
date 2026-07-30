@@ -100,7 +100,7 @@ test('Phase 23N-B Operations cash position is not labelled final profit', async 
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
   const reports = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
 
-  assert.match(operations, /Operations Cash Position/)
+  assert.match(operations, /Current Ledger Difference/)
   assert.match(operations, /This is not final event profit/)
   assert.match(reports, /Operations cash position/)
   assert.doesNotMatch(operations, /final profit\/loss|final event loss|event loss|final balance/i)

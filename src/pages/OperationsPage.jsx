@@ -287,11 +287,11 @@ export function OperationsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div data-tour-id="operations-workspace" className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Selected Working Event only</p>
-          <h2 className="font-serif text-3xl text-[#2B1723]">Operations and Commitments</h2>
+          <h2 className="font-serif text-3xl text-[#2B1723]">Operations Ledger Summary</h2>
           <p className="mt-2 text-sm text-[#816D62]">
             Track partner commitments and event-level money for <strong>{currentEvent.eventName}</strong>. Registration payments are reviewed separately in Payments.
           </p>
@@ -357,17 +357,17 @@ export function OperationsPage() {
             ['Registration payments recorded', formatCurrency(financeSummary.totalCollected)],
             ['Registration balance outstanding', formatCurrency(financeSummary.totalOutstanding)],
           ] : []),
-          ['Operations Income', formatCurrency(operationsSettlement.incomeReceived)],
-          ['Paid Event Expenses', formatCurrency(operationsSettlement.paidExpenses)],
+          ['Recorded Event Income', formatCurrency(operationsSettlement.incomeReceived)],
+          ['Recorded Event Expenses', formatCurrency(operationsSettlement.paidExpenses)],
           ['Outstanding Commitments', formatCurrency(operationsSettlement.outstandingCommitments)],
           ['Refunds Paid', formatCurrency(operationsSettlement.paidRefunds)],
           ['Adjustments', formatCurrency(operationsTotals.adjustments)],
-          ['Operations Cash Position', formatCurrency(operationsSettlement.operationsCashPosition)],
+          ['Current Ledger Difference', formatCurrency(operationsSettlement.operationsCashPosition)],
         ].map(([label, value]) => (
           <div key={label} className="rounded-xl border border-[#EEDFD6] bg-white p-4">
             <p className="text-lg font-bold text-[#2B1723]">{value}</p>
             <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{label}</p>
-            {label === 'Operations Cash Position' && (
+            {label === 'Current Ledger Difference' && (
               <p className="mt-2 text-[11px] leading-5 text-[#816D62]">This is not final event profit.</p>
             )}
           </div>
@@ -577,7 +577,7 @@ export function OperationsPage() {
               ['Visible income', formatCurrency(filteredTotals.income)],
               ['Visible expenses', formatCurrency(filteredTotals.expenses)],
               ['Visible refunds', formatCurrency(filteredTotals.refunds)],
-              ['Visible Operations Cash Position', formatCurrency(filteredTotals.net)],
+              ['Visible Current Ledger Difference', formatCurrency(filteredTotals.net)],
             ].map(([label, value]) => (
               <div key={label} className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
                 <p className="text-sm font-bold text-[#2B1723]">{value}</p>
@@ -591,7 +591,7 @@ export function OperationsPage() {
           </div>
 
           <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-            <strong className="text-[#6B564C]">What this means:</strong> open ledger items are still expected or pending, while visible Operations Cash Position reflects only the filtered Operations rows on screen. This is not final event profit and should not be added automatically to registration payment totals.
+            <strong className="text-[#6B564C]">What this means:</strong> open ledger items are still expected or pending, while the visible Current Ledger Difference reflects only the filtered Operations rows on screen. This is not final event profit and should not be added automatically to registration payment totals.
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">

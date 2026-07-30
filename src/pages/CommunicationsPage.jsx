@@ -146,7 +146,7 @@ Data context for this segment:
 - Outstanding balance for segment: ${formatCurrency(summary.finance.totalOutstanding)}`
 
   return (
-    <div className="space-y-6">
+    <div data-tour-id="message-builder-workspace" className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#9A5260]">Message Builder</p>

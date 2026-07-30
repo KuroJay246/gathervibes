@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Sparkles, X } from 'lucide-react'
 import { BrandMark } from '../BrandMark'
 import { useAuth } from '../../auth/useAuth'
+import { welcomeGreeting } from '../../utils/organizerDisplay'
 
 const CONFETTI_PIECES = [...Array(50)].map((_, i) => ({
   id: i,
@@ -48,17 +49,6 @@ function Confetti() {
 export function WelcomeCelebration({ onStart, onSkip, onClose }) {
   const { user, staffProfile } = useAuth()
   const modalRef = useRef(null)
-  
-  const getGreeting = () => {
-    if (user?.uid === 'WM2UOQtSeuOglCI5uMZQKrYYqP53') {
-      return 'Welcome, Anica'
-    }
-    const displayName = staffProfile?.displayName?.split(' ')?.[0] || user?.displayName?.split(' ')?.[0] || ''
-    if (user?.uid === 'WcDU2jmbopdAgDlMMWvD3TkqqbC3') {
-      return displayName ? `Welcome, ${displayName}` : 'Welcome, Jaylan'
-    }
-    return displayName ? `Welcome, ${displayName}` : 'Welcome to Your Gather & Savor Event Hub'
-  }
   
   useEffect(() => {
     // Focus trap setup
@@ -125,7 +115,7 @@ export function WelcomeCelebration({ onStart, onSkip, onClose }) {
           </div>
           
           <h1 id="welcome-title" className="mb-2 font-serif text-2xl font-bold text-[#2B1723] sm:text-3xl">
-            {getGreeting()}
+            {welcomeGreeting(user, staffProfile)}
           </h1>
           
           <p className="mb-6 text-[15px] leading-relaxed text-[#5F493F]">

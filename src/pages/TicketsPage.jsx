@@ -314,7 +314,7 @@ export function TicketsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div data-tour-id="tickets-workspace" className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="font-serif text-3xl text-[#2B1723]">Tickets</h2>

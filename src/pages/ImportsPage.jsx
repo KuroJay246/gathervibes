@@ -420,7 +420,7 @@ export function ImportsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div data-tour-id="imports-workspace" className="space-y-6">
       <header>
         <Link to="/registrations" className="mb-4 inline-flex items-center gap-2 text-xs font-bold text-[#6B564C] hover:text-[#2B1723]">
           <ArrowLeft className="size-4" /> Back to Registrations

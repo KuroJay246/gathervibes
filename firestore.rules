@@ -21,6 +21,7 @@ service cloud.firestore {
     //   location: string (1..250)
     //   venueName: string (0..250)
     //   eventType: supported enum
+    //   eventCapabilities: optional map of supported boolean capability flags
     //   status: supported enum
     //   eventStartTime / eventEndTime: string (0..32)
     //   eventDescription: string (0..5000)
@@ -46,6 +47,10 @@ service cloud.firestore {
     //   ticketAssignedAt: timestamp|null
     //   ticketAssignedBy: string|null
     //   checkedInBy: string|null
+    //   attendanceRecordType: optional enum
+    //   attendanceConfirmedAt: timestamp|null
+    //   attendanceConfirmedBy: string|null
+    //   attendanceEvidenceNote: string
     //
     // auditLogs/{logId}
     //   append-only event/registration audit record created in the same batch.
@@ -78,8 +83,6 @@ service cloud.firestore {
         || (
           isSignedIn()
           && request.auth.token.email is string
-          && exists(/databases/$(database)/documents/settings/accessControl)
-          && get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails is list
           && request.auth.token.email.lower() in
             get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails
         );
@@ -338,11 +341,24 @@ service cloud.firestore {
 
     function validEventType(value) {
       return value in [
+        'birthday', 'bridal-shower', 'wedding', 'workshop',
+        'cake-tasting-food-showcase', 'cultural-experience',
+        'corporate-event', 'hospitality-event', 'party',
+        'private-event', 'other',
         'cake-picnic', 'cake-tasting', 'brunch', 'tasting',
-        'cultural-experience', 'hospitality-event', 'workshop', 'party',
-        'food-event', 'vendor-pop-up', 'private-food-experience',
-        'private-event', 'other'
+        'food-event', 'vendor-pop-up', 'private-food-experience'
       ];
+    }
+
+    function validEventCapabilities(capabilities) {
+      return capabilities is map
+        && capabilities.keys().hasOnly([
+          'publicRegistration', 'ticketing', 'checkIn', 'seating',
+          'suppliers', 'vendors', 'sponsors', 'bakers', 'tastingZones',
+          'allergens', 'schoolsYouth', 'speakers', 'sessions',
+          'certificates', 'bridalParty', 'accommodation', 'transport'
+        ])
+        && capabilities.values().hasOnly([true, false]);
     }
 
     function validEventStatus(value) {
@@ -359,15 +375,7 @@ service cloud.firestore {
           'projectedRegistrationIncome', 'venueBudget', 'supplierBudget',
           'entertainmentBudget', 'marketingBudget', 'staffingBudget',
           'contingencyBudget', 'otherBudget'
-        ])
-        && (!('projectedRegistrationIncome' in plan) || validOptionalMoney(plan.projectedRegistrationIncome))
-        && (!('venueBudget' in plan) || validOptionalMoney(plan.venueBudget))
-        && (!('supplierBudget' in plan) || validOptionalMoney(plan.supplierBudget))
-        && (!('entertainmentBudget' in plan) || validOptionalMoney(plan.entertainmentBudget))
-        && (!('marketingBudget' in plan) || validOptionalMoney(plan.marketingBudget))
-        && (!('staffingBudget' in plan) || validOptionalMoney(plan.staffingBudget))
-        && (!('contingencyBudget' in plan) || validOptionalMoney(plan.contingencyBudget))
-        && (!('otherBudget' in plan) || validOptionalMoney(plan.otherBudget));
+        ]);
     }
 
     function validPlanningTimeline(timeline) {
@@ -381,9 +389,6 @@ service cloud.firestore {
           'bakerVendorNote', 'sponsorNote', 'staffNote', 'equipmentNote',
           'licencesNote', 'insuranceNote', 'setupTime', 'timeline'
         ])
-        && (!('venueAccessTime' in plan) || validOptionalString(plan.venueAccessTime, 32))
-        && (!('emergencyContact' in plan) || validOptionalString(plan.emergencyContact, 250))
-        && (!('setupTime' in plan) || validOptionalString(plan.setupTime, 64))
         && (!('timeline' in plan) || validPlanningTimeline(plan.timeline));
     }
 
@@ -394,7 +399,8 @@ service cloud.firestore {
           'suppliersConfirmed', 'staffAssigned', 'eventDayTimelineReady',
           'ticketProcessReady', 'checkInProcessReady',
           'communicationsPrepared', 'licencesReviewed', 'insuranceReviewed'
-        ]);
+        ])
+        && checklist.values().hasOnly([true, false]);
     }
 
     function validPlanningTasks(tasks) {
@@ -408,19 +414,14 @@ service cloud.firestore {
     // ── Event allowed keys with optional planner fields ────────────────────
     function isValidEvent(data, eventId) {
       return (
-          // Must have all required keys
-          data.keys().hasAll([
-            'eventId', 'eventName', 'eventDate', 'location', 'eventType',
-            'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt'
-          ])
           // May optionally include planner and ticket configuration fields
-          && data.keys().hasOnly([
+          data.keys().hasOnly([
             'eventId', 'eventName', 'eventDate', 'location', 'eventType',
             'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt',
             'priceTiers', 'venueName', 'eventStartTime', 'eventEndTime',
             'eventDescription', 'registrationRequired', 'ticketTypeCount',
             'complimentaryAllowed', 'doorPaymentAllowed',
-            'registrationOpenDate', 'registrationCloseDate', 'financialPlan',
+            'registrationOpenDate', 'registrationCloseDate', 'eventCapabilities', 'financialPlan',
             'operationsPlan', 'readinessChecklist', 'planningTasks',
             'partnerRecords'
           ])
@@ -457,6 +458,7 @@ service cloud.firestore {
           && (!('doorPaymentAllowed' in data) || data.doorPaymentAllowed is bool)
           && (!('registrationOpenDate' in data) || data.registrationOpenDate == null || data.registrationOpenDate is timestamp)
           && (!('registrationCloseDate' in data) || data.registrationCloseDate == null || data.registrationCloseDate is timestamp)
+          && (!('eventCapabilities' in data) || validEventCapabilities(data.eventCapabilities))
           && (!('financialPlan' in data) || validFinancialPlan(data.financialPlan))
           && (!('operationsPlan' in data) || validOperationsPlan(data.operationsPlan))
           && (!('readinessChecklist' in data) || validReadinessChecklist(data.readinessChecklist))
@@ -480,6 +482,7 @@ service cloud.firestore {
           'priceTier', 'ticketPrice', 'amountDue', 'amountPaid', 'balanceDue', 'paymentMethod',
           'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy',
           'notes', 'checkedIn', 'checkInTime', 'checkedInBy', 'source', 'sourceRowId', 'timestamp',
+          'attendanceRecordType', 'attendanceConfirmedAt', 'attendanceConfirmedBy', 'attendanceEvidenceNote',
           'createdAt', 'updatedAt'
         ])
         && data.registrationId == registrationId
@@ -513,6 +516,10 @@ service cloud.firestore {
         && data.checkedIn is bool
         && (data.checkInTime == null || data.checkInTime is timestamp)
         && validOptionalString(data.checkedInBy, 256)
+        && (!('attendanceRecordType' in data) || data.attendanceRecordType in ['none', 'scanner-confirmed', 'manual-live', 'organizer-confirmed-historical'])
+        && (!('attendanceConfirmedAt' in data) || data.attendanceConfirmedAt == null || data.attendanceConfirmedAt is timestamp)
+        && (!('attendanceConfirmedBy' in data) || validOptionalString(data.attendanceConfirmedBy, 256))
+        && (!('attendanceEvidenceNote' in data) || validOptionalString(data.attendanceEvidenceNote, 1000))
         && data.source in ['manual', 'csv-import']
         && validOptionalString(data.sourceRowId, 128)
         && (data.timestamp == null || data.timestamp is timestamp)
@@ -558,7 +565,7 @@ service cloud.firestore {
         && validShortId(data.eventId)
         && data.action in [
           'registration.create', 'registration.update', 'registration.delete', 'registration.import',
-          'registration.finance-update',
+          'registration.finance-update', 'registration.attendance-update',
           'ticket.assign', 'ticket.unassign', 'ticket.regenerate',
           'checkin.complete', 'checkin.undo', 'checkin.duplicate-attempt'
         ]
@@ -682,7 +689,7 @@ service cloud.firestore {
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.checkedInBy == null
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.updatedAt == data.timestamp
           ) || (
-            data.action in ['registration.update', 'registration.finance-update']
+            data.action in ['registration.update', 'registration.finance-update', 'registration.attendance-update']
             && exists(/databases/$(database)/documents/registrations/$(data.targetId))
             && existsAfter(/databases/$(database)/documents/registrations/$(data.targetId))
             && getAfter(/databases/$(database)/documents/registrations/$(data.targetId)).data.eventId == data.eventId
@@ -790,6 +797,13 @@ service cloud.firestore {
         && request.resource.data.checkedInBy == resource.data.checkedInBy;
     }
 
+    function attendanceEvidenceFieldsUnchanged() {
+      return request.resource.data.get('attendanceRecordType', 'none') == resource.data.get('attendanceRecordType', 'none')
+        && request.resource.data.get('attendanceConfirmedAt', null) == resource.data.get('attendanceConfirmedAt', null)
+        && request.resource.data.get('attendanceConfirmedBy', null) == resource.data.get('attendanceConfirmedBy', null)
+        && request.resource.data.get('attendanceEvidenceNote', '') == resource.data.get('attendanceEvidenceNote', '');
+    }
+
     function hasNoTicketAssigned(data) {
       return data.ticketStatus == 'no-ticket-assigned'
         && data.ticketCode == null
@@ -810,6 +824,7 @@ service cloud.firestore {
       return registrationIdentityUnchanged()
         && ticketFieldsUnchanged()
         && checkInFieldsUnchanged()
+        && attendanceEvidenceFieldsUnchanged()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'fullName', 'buyerName', 'attendeeNames', 'email', 'phone',
           'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
@@ -821,6 +836,7 @@ service cloud.firestore {
     function isTicketAssignmentUpdate() {
       return registrationDetailsUnchanged()
         && checkInFieldsUnchanged()
+        && attendanceEvidenceFieldsUnchanged()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy', 'updatedAt'
         ])
@@ -835,6 +851,7 @@ service cloud.firestore {
     function isTicketUnassignmentUpdate() {
       return registrationDetailsUnchanged()
         && checkInFieldsUnchanged()
+        && attendanceEvidenceFieldsUnchanged()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy', 'updatedAt'
         ])
@@ -856,11 +873,34 @@ service cloud.firestore {
         )
         : changedKeys.hasAny(['checkedIn', 'checkInTime', 'checkedInBy'])
           ? (isCheckInCompletionUpdate(registrationId) || isCheckInUndoUpdate(registrationId))
+          : changedKeys.hasAny(['attendanceRecordType', 'attendanceConfirmedAt', 'attendanceConfirmedBy', 'attendanceEvidenceNote'])
+            ? isHistoricalAttendanceUpdate(registrationId)
           : (
             isValidRegistration(request.resource.data, registrationId)
             && request.resource.data.updatedAt == request.time
             && isRegistrationDetailsUpdate()
           );
+    }
+
+    function isHistoricalAttendanceUpdate(registrationId) {
+      return isValidRegistration(request.resource.data, registrationId)
+        && registrationDetailsUnchanged()
+        && ticketFieldsUnchanged()
+        && checkInFieldsUnchanged()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'attendanceRecordType', 'attendanceConfirmedAt', 'attendanceConfirmedBy', 'attendanceEvidenceNote', 'updatedAt'
+        ])
+        && request.resource.data.registrationId == registrationId
+        && request.resource.data.eventId == resource.data.eventId
+        && resource.data.checkedIn == false
+        && request.resource.data.checkedIn == false
+        && request.resource.data.attendanceRecordType == 'organizer-confirmed-historical'
+        && request.resource.data.attendanceConfirmedAt == request.time
+        && validPerformedBy(request.resource.data.attendanceConfirmedBy)
+        && request.resource.data.attendanceEvidenceNote is string
+        && request.resource.data.attendanceEvidenceNote.size() > 0
+        && request.resource.data.attendanceEvidenceNote.size() <= 1000
+        && request.resource.data.updatedAt == request.time;
     }
 
     function checkInCompletionChangedKeysOnly() {
@@ -1002,7 +1042,7 @@ service cloud.firestore {
             || (
               request.resource.data.action in [
                 'registration.create', 'registration.update', 'registration.delete',
-                'registration.import', 'registration.finance-update',
+                'registration.import', 'registration.finance-update', 'registration.attendance-update',
                 'checkin.complete', 'checkin.undo'
               ]
               && isValidRegistrationAuditLog(request.resource.data, logId)

@@ -36,21 +36,24 @@ test('[onboarding-flow] ONBOARDING_VERSION is exported and valid length', async 
 
 // ── walkthroughSteps ──────────────────────────────────────────────────────────
 
-test('[onboarding-flow] walkthroughSteps contains exactly 13 steps', () => {
-  assert.equal(walkthroughSteps.length, 13)
+test('[onboarding-flow] walkthroughSteps contains exactly 16 steps', () => {
+  assert.equal(walkthroughSteps.length, 16)
 })
 
-test('[onboarding-flow] every step has a non-empty id, title, content, and route', () => {
+test('[onboarding-flow] every step has a non-empty id, title, content, route, target, and practical example', () => {
   const VALID_ROUTES = [
     '/dashboard', '/events', '/registrations', '/payments',
     '/tickets', '/check-in', '/operations', '/event-review',
-    '/communications', '/imports', '/settings',
+    '/communications', '/imports', '/settings', '/qa',
   ]
   for (const [i, step] of walkthroughSteps.entries()) {
     assert.ok(step.id, `step ${i} must have id`)
     assert.ok(step.title, `step ${i} must have title`)
     assert.ok(step.content, `step ${i} must have content`)
+    assert.ok(step.when, `step ${i} must explain when to use it`)
+    assert.ok(step.example, `step ${i} must include an example`)
     assert.ok(step.route, `step ${i} must have route`)
+    assert.ok(step.targetId, `step ${i} must have targetId`)
     assert.ok(step.route.startsWith('/'), `step ${i} route must start with /`)
     assert.ok(VALID_ROUTES.includes(step.route), `step ${i} route "${step.route}" must be a valid app path`)
   }
@@ -58,8 +61,9 @@ test('[onboarding-flow] every step has a non-empty id, title, content, and route
 
 test('[onboarding-flow] step sequence matches required order', () => {
   const expectedIds = [
-    'working-event', 'overview', 'events', 'guests', 'payments', 'tickets',
-    'check-in', 'operations', 'tasks', 'communications', 'reports', 'imports', 'settings',
+    'working-event', 'overview', 'create-event', 'event-capabilities', 'event-planning',
+    'guests', 'payments', 'tickets', 'check-in', 'operations', 'partners',
+    'communications', 'reports', 'imports', 'settings', 'system-qa',
   ]
   assert.deepEqual(walkthroughSteps.map((s) => s.id), expectedIds)
 })
@@ -98,10 +102,11 @@ test('[onboarding-flow] WelcomeCelebration uses BrandMark with light={false} for
   assert.match(src, /BrandMark light=\{false\}/, 'Must use dark-background-safe BrandMark treatment')
 })
 
-test('[onboarding-flow] WelcomeCelebration contains Anica UID fallback greeting', async () => {
+test('[onboarding-flow] WelcomeCelebration delegates organizer greeting to trusted display helper', async () => {
   const src = await readFile('src/components/onboarding/WelcomeCelebration.jsx', 'utf8')
-  assert.match(src, /Welcome, Anica/)
-  assert.match(src, /WM2UOQtSeuOglCI5uMZQKrYYqP53/)
+  assert.match(src, /welcomeGreeting\(user, staffProfile\)/)
+  assert.doesNotMatch(src, /Welcome, Anica/)
+  assert.doesNotMatch(src, /WM2UOQtSeuOglCI5uMZQKrYYqP53/)
 })
 
 // ── AppWalkthrough portal and navigation ─────────────────────────────────────
@@ -126,6 +131,17 @@ test('[onboarding-flow] AppWalkthrough uses route-specific header title matching
   const src = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
   assert.match(src, /ROUTE_HEADER_TITLES/)
   assert.match(src, /ROUTE_READY_MARKERS/)
+})
+
+test('[onboarding-flow] AppWalkthrough uses anchored spotlight targets with arrowed tooltip copy', async () => {
+  const src = await readFile('src/components/onboarding/AppWalkthrough.jsx', 'utf8')
+  assert.match(src, /targetSelector/)
+  assert.match(src, /data-tour-id/)
+  assert.match(src, /scrollIntoView/)
+  assert.match(src, /shadow-\[0_0_0_9999px/)
+  assert.match(src, /ArrowIcon/)
+  assert.match(src, /When to use it/)
+  assert.match(src, /Example:/)
 })
 
 test('[onboarding-flow] AppWalkthrough does not contain the weak "Finish Tour" text button', async () => {
