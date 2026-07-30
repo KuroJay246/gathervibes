@@ -314,6 +314,17 @@ export function EventFormModal({ event, onClose, onSave }) {
     setStepIndex((current) => Math.max(0, current - 1))
   }
 
+  useEffect(() => {
+    function handleTutorialFormStep(customEvent) {
+      const requestedStepId = customEvent.detail?.stepId
+      const requestedIndex = STEPS.findIndex((step) => step.id === requestedStepId)
+      if (requestedIndex >= 0) setStepIndex(requestedIndex)
+    }
+
+    window.addEventListener('tutorial:event-form-step', handleTutorialFormStep)
+    return () => window.removeEventListener('tutorial:event-form-step', handleTutorialFormStep)
+  }, [])
+
   function handlePrimaryAction() {
     if (stepIndex < STEPS.length - 1) {
       handleNextStep()
@@ -400,6 +411,7 @@ export function EventFormModal({ event, onClose, onSave }) {
                     <label htmlFor="eventName" className="event-label">Event name <span>*</span></label>
                     <input
                       id="eventName"
+                      data-tour-id="event-name-field"
                       value={values.eventName}
                       onChange={(changeEvent) => updateField('eventName', changeEvent.target.value)}
                       className={inputClass('eventName')}
@@ -412,7 +424,7 @@ export function EventFormModal({ event, onClose, onSave }) {
 
                   <div>
                     <label htmlFor="eventType" className="event-label">Event type <span>*</span></label>
-                    <select id="eventType" value={values.eventType} onChange={(changeEvent) => updateField('eventType', changeEvent.target.value)} className={inputClass('eventType')} disabled={saving}>
+                    <select id="eventType" data-tour-id="event-category-selector" value={values.eventType} onChange={(changeEvent) => updateField('eventType', changeEvent.target.value)} className={inputClass('eventType')} disabled={saving}>
                       {EVENT_TYPE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                     </select>
                     <p className="mt-1 text-[11px] leading-5 text-[#80685B]">Event type suggests default capabilities. You can review and override them in the next step.</p>
@@ -482,7 +494,7 @@ export function EventFormModal({ event, onClose, onSave }) {
                 />
 
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <div className="sm:col-span-2 rounded-2xl border border-[#EFE2DA] bg-white px-4 py-3">
+                  <div data-tour-id="event-capabilities-controls" className="sm:col-span-2 rounded-2xl border border-[#EFE2DA] bg-white px-4 py-3">
                     <p className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Event capabilities</p>
                     <p className="mt-1 text-xs leading-5 text-[#816D62]">
                       Review what this event needs. Turning a capability off only hides optional planning prompts; it does not delete registrations, tickets, Operations records, or reports.
@@ -707,7 +719,7 @@ export function EventFormModal({ event, onClose, onSave }) {
                 <SectionHeading
                   eyebrow="Step 4"
                   title="Operations"
-                  description="Set the core logistics now. Detailed suppliers, sponsors, bakers, and commitments can be managed from Operations after the event is created."
+                  description="Set the core logistics now. Detailed suppliers, sponsors, vendors, venue contacts, helpers, and commitments can be managed from Operations after the event is created."
                 />
 
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -728,7 +740,7 @@ export function EventFormModal({ event, onClose, onSave }) {
 
                   {[
                     ['suppliersNote', 'Suppliers'],
-                    ['bakerVendorNote', 'Bakers and vendors'],
+                    ['bakerVendorNote', 'Vendors and suppliers'],
                     ['sponsorNote', 'Sponsors'],
                     ['staffNote', 'Staff and helpers'],
                     ['equipmentNote', 'Equipment'],
@@ -882,7 +894,7 @@ export function EventFormModal({ event, onClose, onSave }) {
 
           <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-[#EEDFD6] bg-white px-5 py-4 sm:flex-row sm:justify-between sm:px-7">
             <div className="flex flex-col gap-3 sm:flex-row">
-              <button type="button" onClick={onClose} disabled={saving} className="rounded-xl border border-[#E1D1C8] px-5 py-3 text-xs font-bold text-[#6B564C] hover:bg-[#FFF8F2] disabled:opacity-50">Cancel</button>
+              <button type="button" data-tour-id="event-form-cancel" onClick={onClose} disabled={saving} className="rounded-xl border border-[#E1D1C8] px-5 py-3 text-xs font-bold text-[#6B564C] hover:bg-[#FFF8F2] disabled:opacity-50">Cancel</button>
               {stepIndex > 0 && (
                 <button type="button" onClick={handlePreviousStep} disabled={saving} className="inline-flex items-center gap-2 rounded-xl border border-[#E1D1C8] px-5 py-3 text-xs font-bold text-[#6B564C] hover:bg-[#FFF8F2] disabled:opacity-50">
                   <ChevronLeft className="size-4" />

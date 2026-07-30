@@ -197,7 +197,7 @@ export function ImportTemplatesPanel() {
           <div>
             <h3 className="font-bold text-[#1F5763]">Google Sheets Workflow</h3>
             <p className="mt-1 text-sm text-[#245F6B]">
-              Because direct Google Sheets integration is deferred, follow these manual steps to sync data:
+              To sync Google Sheets data manually, follow these steps:
             </p>
             <ol className="ml-4 mt-3 list-decimal space-y-2 text-sm text-[#245F6B]">
               <li>Go to the <strong>Registrations</strong> page and click <strong>Export CSV</strong> (use "Google Forms re-import template").</li>

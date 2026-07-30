@@ -317,7 +317,7 @@ export function OperationsPage() {
           {!canEditOperations && ' Your role is read-only for this assigned event.'}
         </p>
         <InfoHint label="Operations Ledger Info">
-          Use the contact and commitment workspace for bakers, vendors, suppliers, sponsors, venue contacts, and helpers. Use the ledger for event-level income, expenses, refunds, reimbursements, and adjustments. Registration payments stay in Payments.
+          Use the contact and commitment workspace for partners, vendors, suppliers, sponsors, venue contacts, and helpers. Use the ledger for event-level income, expenses, refunds, reimbursements, and adjustments. Registration payments stay in Payments.
         </InfoHint>
       </section>
 
@@ -333,7 +333,7 @@ export function OperationsPage() {
 
       {completedEvent && (
         <section className="rounded-xl border border-[#D9E3F8] bg-[#F6F9FF] px-4 py-3 text-sm leading-6 text-[#415F91]">
-          This event is completed. Use this page mainly for historical reference, outstanding supplier or baker commitments, and closeout checks instead of normal upcoming-event setup.
+          This event is completed. Use this page mainly for historical reference, outstanding supplier or vendor commitments, and closeout checks instead of normal upcoming-event setup.
         </section>
       )}
 
@@ -374,7 +374,7 @@ export function OperationsPage() {
         ))}
       </section>
 
-      <details className="phase23v-panel">
+      <details className="phase23v-panel" data-tour-container="partners-commitments">
         <summary className="phase23v-summary">Partner commitments, sponsors, and supplier contacts</summary>
         <div className="phase23v-body">
           <PartnerCommitmentsPanel

@@ -3,11 +3,12 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { guidedTutorialSteps } from '../src/tutorial/tutorialSteps.js'
 
-test('tutorial v3 preserves organizer route paths and expands coverage to 19 steps', () => {
-  assert.equal(guidedTutorialSteps.length, 19)
+test('tutorial v3 preserves organizer route paths and expands coverage to 20 anchored lessons', () => {
+  assert.equal(guidedTutorialSteps.length, 20)
   assert.deepEqual(guidedTutorialSteps.map((step) => step.pathname), [
     '/dashboard',
     '/dashboard',
+    '/events',
     '/events',
     '/events',
     '/events',
@@ -33,12 +34,18 @@ test('tutorial v3 uses stable semantic targets already present on organizer page
     ['src/layout/AppShell.jsx', 'working-event-selector'],
     ['src/pages/DashboardPage.jsx', 'overview-summary'],
     ['src/pages/EventsPage.jsx', 'create-event-action'],
+    ['src/components/events/EventFormModal.jsx', 'event-name-field'],
+    ['src/components/events/EventFormModal.jsx', 'event-category-selector'],
+    ['src/components/events/EventFormModal.jsx', 'event-capabilities-controls'],
     ['src/components/events/EventPlanningWorkspace.jsx', 'event-planning-workspace'],
     ['src/pages/RegistrationsPage.jsx', 'registrations-workspace'],
-    ['src/pages/PaymentsPage.jsx', 'payments-workspace'],
+    ['src/pages/RegistrationsPage.jsx', 'add-registration-action'],
+    ['src/pages/RegistrationsPage.jsx', 'registration-filters-panel'],
+    ['src/pages/PaymentsPage.jsx', 'payments-summary-metrics'],
     ['src/pages/TicketsPage.jsx', 'tickets-workspace'],
-    ['src/pages/CheckInPage.jsx', 'checkin-workspace'],
+    ['src/pages/CheckInPage.jsx', 'checkin-search-field'],
     ['src/pages/OperationsPage.jsx', 'operations-workspace'],
+    ['src/components/operations/PartnerCommitmentsPanel.jsx', 'partners-commitments-panel'],
     ['src/pages/CommunicationsPage.jsx', 'message-builder-workspace'],
     ['src/pages/EventReviewPage.jsx', 'reports-workspace'],
     ['src/pages/ImportsPage.jsx', 'imports-workspace'],

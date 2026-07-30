@@ -29,6 +29,7 @@ export function TutorialProvider({ children }) {
   const [storedState, setStoredState] = useState(null)
   const [loading, setLoading] = useState(true)
   const [completionVisible, setCompletionVisible] = useState(false)
+  const [actionFeedback, setActionFeedback] = useState('')
   const controllerRef = useRef(null)
   const navigateRef = useRef(navigate)
   const activeEventNameRef = useRef(null)
@@ -82,6 +83,7 @@ export function TutorialProvider({ children }) {
   }, [])
 
   const goToStep = useCallback(async (stepIndex, direction = 'next') => {
+    setActionFeedback('')
     const boundedIndex = Math.max(0, Math.min(guidedTutorialSteps.length - 1, stepIndex))
     const step = guidedTutorialSteps[boundedIndex]
     if (!canViewRoute(access, step.pathname)) {
@@ -99,6 +101,20 @@ export function TutorialProvider({ children }) {
       })
     }
   }, [access, activeEventName, user])
+
+  const showMe = useCallback(async () => {
+    const step = guidedTutorialSteps[machine.stepIndex]
+    const result = await controllerRef.current?.performStepAction(step, 'show')
+    setActionFeedback(result?.message || step?.showMe || 'This step target is ready.')
+  }, [machine.stepIndex])
+
+  const letMeTry = useCallback(async () => {
+    const step = guidedTutorialSteps[machine.stepIndex]
+    const result = await controllerRef.current?.performStepAction(step, 'try')
+    setActionFeedback(result?.ok
+      ? (step?.letMeTry ? `Verified: ${step.letMeTry}` : 'Verified.')
+      : (result?.message || 'Try the action, then select Let Me Try again.'))
+  }, [machine.stepIndex])
 
   const startGuided = useCallback(async () => {
     if (!user) return
@@ -195,6 +211,9 @@ export function TutorialProvider({ children }) {
             onRetry={() => goToStep(machine.stepIndex, 'retry')}
             onSkipStep={() => goToStep(machine.stepIndex + 1, 'next')}
             onFinish={complete}
+            onShowMe={showMe}
+            onLetMeTry={letMeTry}
+            actionFeedback={actionFeedback}
           />
         </TutorialErrorBoundary>
       )}

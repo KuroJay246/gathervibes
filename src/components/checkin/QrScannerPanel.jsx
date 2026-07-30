@@ -296,7 +296,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
                 ref={manualInputRef}
                 value={manualValue}
                 onChange={(event) => setManualValue(event.target.value.toUpperCase())}
-                placeholder="CPB-001 or GSV:TICKET:CPB-001"
+                placeholder="TICKET-001 or GSV:TICKET:TICKET-001"
                 className="min-h-11 w-full rounded-xl border border-[#E5D7CF] bg-white py-3 pl-9 pr-3 text-sm font-semibold text-[#2B1723] focus:border-[#9A5260] focus:outline-none focus:ring-2 focus:ring-[#9A5260]/20"
               />
             </div>

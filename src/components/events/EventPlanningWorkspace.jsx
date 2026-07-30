@@ -103,7 +103,7 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
     if (overview.partners.totalRecords === 0) {
       items.push({
         label: 'Add suppliers, sponsors, or helpers',
-        detail: 'Operations now includes the contact and commitment workspace for bakers, vendors, suppliers, sponsors, and venue contacts.',
+        detail: 'Operations now includes the contact and commitment workspace for partners, vendors, suppliers, sponsors, and venue contacts.',
         to: '/operations',
       })
     }

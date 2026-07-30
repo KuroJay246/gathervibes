@@ -88,11 +88,11 @@ export function PartnerCommitmentsPanel({ event, onSaveRecord, onDeleteRecord })
 
   return (
     <section className="space-y-6">
-      <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+      <section data-tour-id="partners-commitments-panel" className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Partners and commitments</p>
-            <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Bakers, vendors, suppliers, sponsors, venue contacts, and helpers</h3>
+            <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Partners, vendors, suppliers, sponsors, venue contacts, and helpers</h3>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
               Keep planning contacts and event commitments here. Use Operations ledger entries below for settled event money and final adjustments.
             </p>

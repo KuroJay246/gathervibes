@@ -17,16 +17,17 @@ test('[tutorial-v3] eligible users are Jaylan and Anica without hardcoded organi
 })
 
 test('[tutorial-v3] version is new and does not reuse v2 completion', () => {
-  assert.equal(TUTORIAL_VERSION, 'tutorial-v3-ground-up')
+  assert.equal(TUTORIAL_VERSION, 'tutorial-v3-specific-guidance')
   assert.notEqual(TUTORIAL_VERSION, 'interactive-product-tour-v2')
 })
 
-test('[tutorial-v3] guided orientation covers the required 19-step sequence', () => {
-  assert.equal(guidedTutorialSteps.length, 19)
+test('[tutorial-v3] guided orientation covers 20 anchored lessons plus welcome and completion', () => {
+  assert.equal(guidedTutorialSteps.length, 20)
   assert.deepEqual(guidedTutorialSteps.map((step) => step.id), [
     'working-event',
     'overview',
     'create-event',
+    'event-basics',
     'event-category',
     'event-capabilities',
     'event-planning',
@@ -53,13 +54,28 @@ test('[tutorial-v3] every guided step has rich practical content and a registere
     assert.ok(step.pathname.startsWith('/'))
     assert.ok(step.routeId)
     assert.ok(step.targetId)
-    assert.ok(step.content.length > 40)
-    assert.ok(step.when.length > 30)
-    assert.ok(step.action.length > 30)
+    assert.ok(step.what.length > 40)
+    assert.ok(step.why.length > 30)
+    assert.ok(step.doNow.length > 30)
+    assert.ok(step.next.length > 30)
     assert.ok(step.example.length > 30)
-    assert.ok(step.affects.length > 30)
+    assert.ok(step.showMe.length > 20)
+    assert.ok(step.letMeTry.length > 20)
+    assert.equal(step.writesBusinessData, false)
     assert.ok(isTargetAllowedForRoute(step.routeId, step.targetId), `${step.id} target must be registered for route`)
   }
+})
+
+test('[tutorial-v3] exact targets replace broad workspace targets for action steps', () => {
+  const targets = Object.fromEntries(guidedTutorialSteps.map((step) => [step.id, step.targetId]))
+  assert.equal(targets['event-basics'], TUTORIAL_TARGETS.eventBasicsName)
+  assert.equal(targets['event-category'], TUTORIAL_TARGETS.eventCategorySelector)
+  assert.equal(targets['event-capabilities'], TUTORIAL_TARGETS.eventCapabilities)
+  assert.equal(targets['add-registration'], TUTORIAL_TARGETS.registrationsAddButton)
+  assert.equal(targets['registration-filters'], TUTORIAL_TARGETS.registrationFilters)
+  assert.equal(targets.payments, TUTORIAL_TARGETS.paymentsSummary)
+  assert.equal(targets['check-in'], TUTORIAL_TARGETS.checkInSearch)
+  assert.equal(targets.partners, TUTORIAL_TARGETS.partnersSponsors)
 })
 
 test('[tutorial-v3] state machine exposes explicit legal states', () => {
@@ -154,7 +170,31 @@ test('[tutorial-v3] normal guided tour writes no business records', async () => 
 test('[tutorial-v3] practice missions are non-writing by default and CPB isolated', () => {
   assert.ok(practiceMissions.length >= 5)
   assert.ok(practiceMissions.every((mission) => mission.writes === false))
-  assert.ok(guidedTutorialSteps.every((step) => !/Cake Piknik Barbados|zhaPxi31cpqLAW0cuS20/.test(JSON.stringify(step))))
+  assert.ok(practiceMissions.every((mission) => /Practice Mode — Nothing here affects your real events\./.test(mission.banner)))
+  assert.ok(guidedTutorialSteps.every((step) => !/Cake Piknik Barbados|zhaPxi31cpqLAW0cuS20|CODEX_TEST|\bCPB\b/.test(JSON.stringify(step))))
+})
+
+test('[tutorial-v3] tooltip exposes specific action controls', async () => {
+  const tooltip = await readFile('src/tutorial/TutorialTooltip.jsx', 'utf8')
+  assert.match(tooltip, /What this is/)
+  assert.match(tooltip, /Why you use it/)
+  assert.match(tooltip, /What to do now/)
+  assert.match(tooltip, /What happens next/)
+  assert.match(tooltip, /Practical example/)
+  assert.match(tooltip, /Show Me/)
+  assert.match(tooltip, /Let Me Try/)
+  assert.match(tooltip, /Skip Step/)
+  assert.match(tooltip, /Exit Tour/)
+})
+
+test('[tutorial-v3] hidden containers open automatically', async () => {
+  const controller = await readFile('src/tutorial/TutorialController.js', 'utf8')
+  assert.match(controller, /prepareStep/)
+  assert.match(controller, /openEventFormIfNeeded/)
+  assert.match(controller, /tutorial:event-form-step/)
+  assert.match(controller, /HTMLDetailsElement/)
+  assert.ok(guidedTutorialSteps.some((step) => step.prepare?.type === 'open-event-form'))
+  assert.ok(guidedTutorialSteps.some((step) => step.prepare?.type === 'open-details'))
 })
 
 test('[tutorial-v3] legacy runtime files are removed from AppShell imports', async () => {
@@ -201,9 +241,9 @@ test('[tutorial-v3] controller uses AbortController-backed transitions without f
   assert.doesNotMatch(controller, /setTimeout\(.*100/)
 })
 
-test('[tutorial-v3] Firestore rules allow v3 19-step boundary', async () => {
+test('[tutorial-v3] Firestore rules allow v3 20-step guided boundary', async () => {
   const rules = await readFile('firestore.rules', 'utf8')
   assert.match(rules, /staffProfiles\/\{uid\}\/preferences\/onboarding/)
-  assert.match(rules, /lastStep.*<= 19/)
+  assert.match(rules, /lastStep.*<= 20/)
   assert.match(rules, /lastStep.*>= 0/)
 })

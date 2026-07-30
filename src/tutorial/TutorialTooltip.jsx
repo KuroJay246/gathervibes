@@ -17,6 +17,9 @@ export function TutorialTooltip({
   onRetry,
   onSkipStep,
   onFinish,
+  onShowMe,
+  onLetMeTry,
+  actionFeedback,
   headingRef,
 }) {
   const busy = isTransitioning(machine.status)
@@ -49,13 +52,19 @@ export function TutorialTooltip({
         <div className="inline-flex rounded-full bg-[#F7DDE6] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8A3F4B]">
           {step.area}
         </div>
-        <p>{step.content}</p>
         <div className="space-y-3 rounded-2xl border border-[#EFE2DA] bg-[#FFF8F2] p-4">
-          <p><strong className="text-[#2B1723]">When to use it:</strong> {step.when}</p>
-          <p><strong className="text-[#2B1723]">Normal action:</strong> {step.action}</p>
-          <p><strong className="text-[#2B1723]">Example:</strong> {step.example}</p>
-          <p><strong className="text-[#2B1723]">How it connects:</strong> {step.affects}</p>
+          <p><strong className="text-[#2B1723]">What this is:</strong> {step.what}</p>
+          <p><strong className="text-[#2B1723]">Why you use it:</strong> {step.why}</p>
+          <p><strong className="text-[#2B1723]">What to do now:</strong> {step.doNow}</p>
+          <p><strong className="text-[#2B1723]">What happens next:</strong> {step.next}</p>
+          <p><strong className="text-[#2B1723]">Practical example:</strong> {step.example}</p>
         </div>
+
+        {actionFeedback && (
+          <p className="rounded-xl border border-[#DCC7B9] bg-white p-3 text-xs font-semibold text-[#6B564C]" aria-live="polite">
+            {actionFeedback}
+          </p>
+        )}
 
         {busy && (
           <p className="rounded-xl border border-[#E7D6CC] bg-[#FFF8F2] p-3 text-sm font-semibold text-[#8A3F4B]" aria-live="polite">
@@ -80,11 +89,20 @@ export function TutorialTooltip({
 
       <div className="flex flex-col gap-3 border-t border-[#EEDDD3] bg-[#FFF8F2] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <button type="button" onClick={onSkip} className="rounded-lg px-2 py-2 text-sm font-semibold text-[#5F493F] hover:text-[#2B1723] focus:outline-none focus:ring-2 focus:ring-[#8A3F4B]">
-          Skip
+          Exit Tour
         </button>
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <button type="button" onClick={onShowMe} disabled={busy} className="inline-flex min-h-10 items-center rounded-xl border border-[#E7D6CC] bg-white px-3 text-sm font-bold text-[#5F493F] disabled:cursor-not-allowed disabled:opacity-50">
+            Show Me
+          </button>
+          <button type="button" onClick={onLetMeTry} disabled={busy} className="inline-flex min-h-10 items-center rounded-xl border border-[#9A5260] bg-[#FFF8F2] px-3 text-sm font-bold text-[#8A3F4B] disabled:cursor-not-allowed disabled:opacity-50">
+            Let Me Try
+          </button>
           <button type="button" onClick={onBack} disabled={isFirst || busy} className="inline-flex min-h-10 items-center rounded-xl border border-[#E7D6CC] bg-white px-3 text-sm font-bold text-[#5F493F] disabled:cursor-not-allowed disabled:opacity-50">
             Back
+          </button>
+          <button type="button" onClick={onSkipStep} disabled={busy || isLast} className="inline-flex min-h-10 items-center rounded-xl border border-[#E7D6CC] bg-white px-3 text-sm font-bold text-[#5F493F] disabled:cursor-not-allowed disabled:opacity-50">
+            Skip Step
           </button>
           {isLast ? (
             <button type="button" onClick={onFinish} disabled={busy} className="inline-flex min-h-10 items-center rounded-xl bg-[#2B1723] px-4 text-sm font-bold text-white disabled:opacity-60">
