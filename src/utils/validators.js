@@ -1,5 +1,6 @@
 import { PAYMENT_STATUSES, normalizePaymentStatus } from './paymentStatus.js'
 import { PAYMENT_METHODS, normalizePaymentMethod, parseMoney } from './financeUtils.js'
+import { ATTENDANCE_RECORD_TYPES } from './attendanceUtils.js'
 import {
   EVENT_STATUS_OPTIONS,
   EVENT_CAPABILITY_OPTIONS,
@@ -187,6 +188,15 @@ export function validateRegistration(values) {
 
   if (values.ticketStatus && !validTicketStatuses.includes(values.ticketStatus)) {
     errors.ticketStatus = 'Invalid ticket status.'
+  }
+
+  if (values.attendanceRecordType && !ATTENDANCE_RECORD_TYPES.includes(values.attendanceRecordType)) {
+    errors.attendanceRecordType = 'Invalid attendance record type.'
+  }
+
+  if (values.attendanceRecordType === 'organizer-confirmed-historical') {
+    if (values.checkedIn) errors.attendanceRecordType = 'Historical attendance must stay separate from live check-in.'
+    if (!String(values.attendanceEvidenceNote || '').trim()) errors.attendanceEvidenceNote = 'Historical attendance requires an evidence note.'
   }
 
   return errors

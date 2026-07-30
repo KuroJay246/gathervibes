@@ -127,5 +127,6 @@ test('event save path persists capabilities without changing routes or rules', a
   assert.match(modal, /EVENT_CAPABILITY_OPTIONS\.map/)
   assert.match(modal, /Turning a capability off only hides optional planning prompts/)
   assert.doesNotMatch(app, /capabilities/)
-  assert.doesNotMatch(rules, /eventCapabilities/)
+  assert.match(rules, /function validEventCapabilities/)
+  assert.match(rules, /'eventCapabilities'/)
 })

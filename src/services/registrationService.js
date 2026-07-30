@@ -14,6 +14,7 @@ import { createAuditLogWrite } from './auditService.js'
 import { normalizeAttendeeNames } from '../utils/importUtils.js'
 import { financePayload, normalizePaymentMethod } from '../utils/financeUtils.js'
 import { normalizePaymentStatus } from '../utils/paymentStatus.js'
+import { historicalAttendancePayload } from '../utils/attendanceUtils.js'
 
 function requireDatabase() {
   if (!db) throw new Error('Firebase is not configured')
@@ -54,6 +55,15 @@ function registrationCheckInDefaults() {
   }
 }
 
+function registrationAttendanceDefaults() {
+  return {
+    attendanceRecordType: 'none',
+    attendanceConfirmedAt: null,
+    attendanceConfirmedBy: null,
+    attendanceEvidenceNote: '',
+  }
+}
+
 function existingTicketFields(registration = {}) {
   return {
     ticketStatus: registration.ticketStatus || 'no-ticket-assigned',
@@ -69,6 +79,19 @@ function existingCheckInFields(registration = {}) {
     checkInTime: registration.checkInTime || null,
     checkedInBy: registration.checkedInBy || null,
   }
+}
+
+function existingAttendanceFields(registration = {}) {
+  return {
+    attendanceRecordType: registration.attendanceRecordType || 'none',
+    attendanceConfirmedAt: registration.attendanceConfirmedAt || null,
+    attendanceConfirmedBy: registration.attendanceConfirmedBy || null,
+    attendanceEvidenceNote: registration.attendanceEvidenceNote || '',
+  }
+}
+
+function performedBy(user) {
+  return user?.email || user?.uid || 'unknown-admin'
 }
 
 export function subscribeToRegistrations(eventId, onRegistrations, onError) {
@@ -108,6 +131,7 @@ export async function createRegistration(values, eventId, user, event = {}) {
     ...registrationPayload(values, eventId, event),
     ...registrationTicketDefaults(),
     ...registrationCheckInDefaults(),
+    ...registrationAttendanceDefaults(),
     source: 'manual',
     sourceRowId: null,
     timestamp: null,
@@ -137,6 +161,39 @@ export async function updateRegistration(registrationId, eventId, values, user, 
     ...registrationPayload(values, eventId, event),
     ...existingTicketFields(existingRegistration),
     ...existingCheckInFields(existingRegistration),
+    ...existingAttendanceFields(existingRegistration),
+    updatedAt: serverTimestamp(),
+  })
+  batch.set(audit.ref, audit.data)
+  await batch.commit()
+}
+
+export async function recordHistoricalAttendance(registration, user, note = '') {
+  if (!registration?.registrationId || !registration?.eventId) throw new Error('Registration is required.')
+  if (registration.checkedIn) throw new Error('This registration already has a live system check-in.')
+  const evidenceNote = String(note || '').trim()
+  if (!evidenceNote) throw new Error('Historical attendance requires an evidence note.')
+
+  const firestore = requireDatabase()
+  const regRef = doc(firestore, 'registrations', registration.registrationId)
+  const audit = createAuditLogWrite({
+    eventId: registration.eventId,
+    action: 'registration.attendance-update',
+    targetType: 'registration',
+    targetId: registration.registrationId,
+    performedBy: user,
+    details: {
+      fullName: registration.fullName,
+      attendanceRecordType: 'organizer-confirmed-historical',
+      previousAttendanceRecordType: registration.attendanceRecordType || 'none',
+      note: evidenceNote,
+    },
+  })
+  const batch = writeBatch(firestore)
+
+  batch.update(regRef, {
+    ...historicalAttendancePayload(evidenceNote, performedBy(user)),
+    attendanceConfirmedAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   })
   batch.set(audit.ref, audit.data)
