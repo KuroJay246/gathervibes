@@ -89,7 +89,8 @@ test('Phase 10 role detection keeps approvedEmails backward compatible', () => {
   assert.equal(resolveAccessRole(accessControl, 'random@example.com'), null)
   assert.equal(resolveAccessRole({ approvedEmails: ['legacy@example.com'] }, 'legacy@example.com'), 'admin')
   assert.equal(listApprovedAccessEntries(accessControl).length, 5)
-  assert.match(roleCapabilitySummary('viewer'), /does not enforce scoped rules yet/)
+  assert.match(roleCapabilitySummary('viewer'), /read-only role/)
+  assert.doesNotMatch(roleCapabilitySummary('viewer'), /does not enforce scoped rules yet/)
 })
 
 test('Phase 10 UI displays roles without weakening Firestore rules', async () => {

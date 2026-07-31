@@ -143,10 +143,10 @@ export function roleCapabilitySummary(role) {
   const normalizedRole = normalizeAccessRole(role) || 'admin'
   if (normalizedRole === 'owner-admin') return 'Protected owner access is pinned to the Firebase UID and cannot be removed through the mutable allowlist.'
   if (ADMIN_ROLES.has(normalizedRole)) return 'Full operations while approved by the private owner or organizer access contract.'
-  if (normalizedRole === 'event-manager') return 'Assigned-event operational role. Rules-level writes remain narrow and explicit; live staff access does not enforce scoped rules yet until deployment approval.'
-  if (normalizedRole === 'scanner' || normalizedRole === 'checkInStaff') return 'Assigned-event check-in lookup and check-in completion only. No ticket/payment/settings access; live staff access does not enforce scoped rules yet until deployment approval.'
-  if (normalizedRole === 'viewer') return 'Assigned-event read-only role where read-only screens are implemented; live staff access does not enforce scoped rules yet until deployment approval.'
-  if (normalizedRole === 'operations-helper') return 'Assigned-event operations ledger visibility without admin settings or registration writes; live staff access does not enforce scoped rules yet until deployment approval.'
+  if (normalizedRole === 'event-manager') return 'Assigned-event operational role. Route gates and Firestore rules keep writes narrow and event-scoped.'
+  if (normalizedRole === 'scanner' || normalizedRole === 'checkInStaff') return 'Assigned-event check-in lookup and check-in completion only. No ticket, payment, settings, reports, or admin shell access.'
+  if (normalizedRole === 'viewer') return 'Assigned-event read-only role where read-only screens are implemented; no organizer write actions.'
+  if (normalizedRole === 'operations-helper') return 'Assigned-event Operations ledger visibility only. Creating, editing, cancelling, settings, and registration writes stay organizer-only.'
   return ACCESS_ROLES.admin.summary
 }
 
