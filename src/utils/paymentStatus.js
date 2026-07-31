@@ -2,11 +2,11 @@ export const PAYMENT_STATUSES = ['paid', 'pending', 'complimentary', 'door', 'do
 
 export const PAYMENT_STATUS_LABELS = {
   paid: 'Paid',
-  pending: 'Pending',
+  pending: 'Unpaid',
   complimentary: 'Complimentary',
   door: 'Door Paid',
   'door-list': 'To Pay at Door',
-  unknown: 'Unknown',
+  unknown: 'Payment Review Needed',
 }
 
 export function normalizePaymentStatus(value) {

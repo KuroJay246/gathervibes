@@ -258,6 +258,8 @@ export function EventReviewPage() {
               <SummaryCard label="Expenses pending" value={formatEventReviewMoney(review.paymentReview.operationsLedger.expensesPending, currency)} />
               <SummaryCard label="Refunds paid" value={formatEventReviewMoney(review.paymentReview.operationsLedger.refundsPaid, currency)} />
               <SummaryCard label="Refunds pending" value={formatEventReviewMoney(review.paymentReview.operationsLedger.refundsPending, currency)} />
+              <SummaryCard label="Reimbursements received" value={formatEventReviewMoney(review.paymentReview.operationsLedger.reimbursementsReceived, currency)} />
+              <SummaryCard label="Reimbursements pending" value={formatEventReviewMoney(review.paymentReview.operationsLedger.reimbursementsPending, currency)} />
               <SummaryCard label="Adjustments" value={formatEventReviewMoney(review.paymentReview.operationsLedger.adjustments, currency)} />
               <SummaryCard label="Cancelled items" value={review.paymentReview.operationsLedger.cancelledItems} />
               <SummaryCard label="Open ledger items" value={review.paymentReview.operationsLedger.openItemCount} />

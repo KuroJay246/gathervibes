@@ -1,3 +1,76 @@
+export const OPERATIONS_ENTRY_EFFECTS = [
+  {
+    entryType: 'income',
+    settledStatuses: ['received'],
+    cashEffect: 'inflow',
+    commitmentEffect: 'none',
+    reportingTreatment: 'Received event-level cash income. Expected or pending income is shown separately and is not counted as received cash.',
+  },
+  {
+    entryType: 'expense',
+    settledStatuses: ['paid'],
+    cashEffect: 'outflow',
+    commitmentEffect: 'pending expense when expected or pending',
+    reportingTreatment: 'Paid expenses reduce Operations ledger difference. Expected or pending expenses are outstanding commitments only.',
+  },
+  {
+    entryType: 'refund',
+    settledStatuses: ['paid'],
+    cashEffect: 'outflow',
+    commitmentEffect: 'pending refund when expected or pending',
+    reportingTreatment: 'Paid refunds are cash outflows. Pending refunds remain outstanding commitments.',
+  },
+  {
+    entryType: 'reimbursement',
+    settledStatuses: ['received'],
+    cashEffect: 'inflow',
+    commitmentEffect: 'pending reimbursement when expected or pending',
+    reportingTreatment: 'Received reimbursements are cash inflows and stay separate from registration payments.',
+  },
+  {
+    entryType: 'adjustment',
+    settledStatuses: ['received', 'paid'],
+    cashEffect: 'directional correction',
+    commitmentEffect: 'none',
+    reportingTreatment: 'Adjustments require a direction. Increase adds to ledger difference; decrease subtracts from ledger difference.',
+  },
+]
+
+const DEFAULT_REPORT_MONEY_FORMATTER = new Intl.NumberFormat('en-BB', {
+  style: 'currency',
+  currency: 'BBD',
+  minimumFractionDigits: 2,
+})
+
+export function operationEffectFor(entryType) {
+  return OPERATIONS_ENTRY_EFFECTS.find((effect) => effect.entryType === entryType) || OPERATIONS_ENTRY_EFFECTS[0]
+}
+
+export function adjustmentDirection(entry = {}) {
+  return entry.adjustmentDirection === 'decrease' ? 'decrease' : 'increase'
+}
+
+export function operationsEntryEffect(entry = {}) {
+  const amount = Number(entry.amount) || 0
+  const status = entry.status || 'pending'
+  const entryType = entry.entryType || 'income'
+  const cancelled = status === 'cancelled'
+  const settled = operationEffectFor(entryType).settledStatuses.includes(status)
+  const pending = !cancelled && (status === 'pending' || status === 'expected')
+  const direction = adjustmentDirection(entry)
+
+  if (cancelled) return { cashAmount: 0, commitmentAmount: 0, bucket: 'cancelled', direction }
+  if (entryType === 'income') return { cashAmount: settled ? amount : 0, commitmentAmount: pending ? amount : 0, bucket: settled ? 'incomeReceived' : 'incomePending', direction }
+  if (entryType === 'expense') return { cashAmount: settled ? -amount : 0, commitmentAmount: pending ? amount : 0, bucket: settled ? 'paidExpenses' : 'outstandingCommitments', direction }
+  if (entryType === 'refund') return { cashAmount: settled ? -amount : 0, commitmentAmount: pending ? amount : 0, bucket: settled ? 'paidRefunds' : 'pendingRefunds', direction }
+  if (entryType === 'reimbursement') return { cashAmount: settled ? amount : 0, commitmentAmount: pending ? amount : 0, bucket: settled ? 'reimbursementsReceived' : 'pendingReimbursements', direction }
+  if (entryType === 'adjustment') {
+    const signed = direction === 'decrease' ? -amount : amount
+    return { cashAmount: settled ? signed : 0, commitmentAmount: 0, bucket: direction === 'decrease' ? 'negativeAdjustments' : 'positiveAdjustments', direction }
+  }
+  return { cashAmount: 0, commitmentAmount: 0, bucket: 'unclassified', direction }
+}
+
 export function buildOperationsTotals(entries = []) {
   return entries.reduce((totals, entry) => {
     if (entry.status === 'cancelled') return totals
@@ -5,13 +78,18 @@ export function buildOperationsTotals(entries = []) {
     if (entry.entryType === 'income') totals.income += amount
     if (entry.entryType === 'expense') totals.expenses += amount
     if (entry.entryType === 'refund') totals.refunds += amount
-    if (entry.entryType === 'adjustment') totals.adjustments += amount
-    totals.net = totals.income + totals.adjustments - totals.expenses - totals.refunds
+    if (entry.entryType === 'reimbursement') totals.reimbursements += amount
+    if (entry.entryType === 'adjustment') {
+      const signedAdjustment = adjustmentDirection(entry) === 'decrease' ? -amount : amount
+      totals.adjustments += signedAdjustment
+    }
+    totals.net = totals.income + totals.reimbursements + totals.adjustments - totals.expenses - totals.refunds
     return totals
   }, {
     income: 0,
     expenses: 0,
     refunds: 0,
+    reimbursements: 0,
     adjustments: 0,
     net: 0,
   })
@@ -40,6 +118,7 @@ export function buildOperationsControlSummary(entries = []) {
       if (entry.entryType === 'income') summary.pendingIncome += amount
       if (entry.entryType === 'expense') summary.pendingExpenses += amount
       if (entry.entryType === 'refund') summary.pendingRefunds += amount
+      if (entry.entryType === 'reimbursement') summary.pendingReimbursements += amount
     }
 
     if (entry.status === 'received' || entry.status === 'paid') {
@@ -54,6 +133,7 @@ export function buildOperationsControlSummary(entries = []) {
     pendingIncome: 0,
     pendingExpenses: 0,
     pendingRefunds: 0,
+    pendingReimbursements: 0,
   })
 }
 
@@ -68,10 +148,17 @@ export function buildOperationsSettlementSummary(entries = []) {
     if (entry.entryType === 'expense' && (entry.status === 'pending' || entry.status === 'expected')) summary.outstandingCommitments += amount
     if (entry.entryType === 'refund' && entry.status === 'paid') summary.paidRefunds += amount
     if (entry.entryType === 'refund' && (entry.status === 'pending' || entry.status === 'expected')) summary.pendingRefunds += amount
-    if (entry.entryType === 'adjustment') summary.adjustments += amount
+    if (entry.entryType === 'reimbursement' && entry.status === 'received') summary.reimbursementsReceived += amount
+    if (entry.entryType === 'reimbursement' && (entry.status === 'pending' || entry.status === 'expected')) summary.pendingReimbursements += amount
+    if (entry.entryType === 'adjustment') {
+      const signedAdjustment = adjustmentDirection(entry) === 'decrease' ? -amount : amount
+      summary.adjustments += signedAdjustment
+      if (signedAdjustment >= 0) summary.positiveAdjustments += signedAdjustment
+      else summary.negativeAdjustments += Math.abs(signedAdjustment)
+    }
     if (entry.category === 'In-kind support' && amount === 0) summary.inKindContributions += 1
 
-    summary.operationsCashPosition = summary.incomeReceived + summary.adjustments - summary.paidExpenses - summary.paidRefunds
+    summary.operationsCashPosition = summary.incomeReceived + summary.reimbursementsReceived + summary.adjustments - summary.paidExpenses - summary.paidRefunds
     return summary
   }, {
     incomeReceived: 0,
@@ -80,7 +167,11 @@ export function buildOperationsSettlementSummary(entries = []) {
     outstandingCommitments: 0,
     paidRefunds: 0,
     pendingRefunds: 0,
+    reimbursementsReceived: 0,
+    pendingReimbursements: 0,
     adjustments: 0,
+    positiveAdjustments: 0,
+    negativeAdjustments: 0,
     operationsCashPosition: 0,
     inKindContributions: 0,
   })
@@ -104,6 +195,7 @@ export function buildOperationsLedgerReport(entries = [], { eventName = 'Selecte
     `Income: ${formatMoneyForReport(totals.income, currency)}`,
     `Expenses: ${formatMoneyForReport(totals.expenses, currency)}`,
     `Refunds: ${formatMoneyForReport(totals.refunds, currency)}`,
+    `Reimbursements: ${formatMoneyForReport(totals.reimbursements, currency)}`,
     `Adjustments: ${formatMoneyForReport(totals.adjustments, currency)}`,
     `Net: ${formatMoneyForReport(totals.net, currency)}`,
     '',
@@ -150,9 +242,7 @@ function labelForReport(value = '') {
 }
 
 function formatMoneyForReport(value, currency = 'BBD') {
-  return new Intl.NumberFormat('en-BB', {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 2,
-  }).format(Number(value) || 0)
+  const amount = Number(value) || 0
+  if (currency === 'BBD') return DEFAULT_REPORT_MONEY_FORMATTER.format(amount)
+  return `${currency} ${amount.toFixed(2)}`
 }

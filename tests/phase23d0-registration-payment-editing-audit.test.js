@@ -157,6 +157,6 @@ test('Phase 23D-0 classification flags invalid Door Paid and derives Partial row
   assert.equal(badDoor.needsFollowUp, true)
   assert.ok(badDoor.warnings.some((warning) => warning.code === 'door-missing-paid-amount'))
   assert.equal(derivedPartial.statusGroup, 'partial')
-  assert.equal(derivedPartial.displayStatus, 'Partial payment')
+  assert.equal(derivedPartial.displayStatus, 'Partially Paid')
   assert.equal(derivedPartial.needsFollowUp, true)
 })

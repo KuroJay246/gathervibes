@@ -572,13 +572,13 @@ export function classifyRegistrationFinance(registration = {}, event = {}, conte
 export function formatPaymentStatusGroup(value = '') {
   const labels = {
     paid: 'Paid',
-    partial: 'Partial payment',
-    pending: 'Pending',
+    partial: 'Partially Paid',
+    pending: 'Unpaid',
     door: 'Door Paid',
     'door-list': 'To Pay at Door',
     complimentary: 'Complimentary',
-    unknown: 'Unknown',
-    'needs-review': 'Needs Review',
+    unknown: 'Payment Review Needed',
+    'needs-review': 'Payment Review Needed',
   }
   return labels[value] || labels.unknown
 }

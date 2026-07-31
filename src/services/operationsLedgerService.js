@@ -12,9 +12,9 @@ import { createAuditLogWrite } from './auditService'
 import { safeAuditChanges } from '../utils/auditUtils'
 import { parseMoney } from '../utils/financeUtils'
 
-export const LEDGER_ENTRY_TYPES = ['income', 'expense', 'adjustment', 'refund']
+export const LEDGER_ENTRY_TYPES = ['income', 'expense', 'refund', 'reimbursement', 'adjustment']
 export const LEDGER_STATUSES = ['expected', 'received', 'paid', 'pending', 'cancelled']
-const AUDITED_OPERATION_FIELDS = ['entryType', 'category', 'label', 'amount', 'paymentMethod', 'paymentReference', 'paidByOrPaidTo', 'date', 'status', 'notes']
+const AUDITED_OPERATION_FIELDS = ['entryType', 'category', 'label', 'amount', 'paymentMethod', 'paymentReference', 'paidByOrPaidTo', 'date', 'status', 'adjustmentDirection', 'notes']
 
 function requireDatabase() {
   if (!db) throw new Error('Firebase is not configured')
@@ -27,6 +27,8 @@ function cleanText(value, fallback = '') {
 
 function normalizeEntry(values = {}, eventId, existing = {}) {
   const amount = parseMoney(values.amount)
+  if (String(values.amount ?? '').trim() && amount === null) throw new Error('Operations amount must be a valid zero-or-greater money value.')
+  if (values.entryType === 'adjustment' && !['increase', 'decrease'].includes(values.adjustmentDirection || 'increase')) throw new Error('Adjustment direction must be increase or decrease.')
   return {
     eventId,
     entryType: LEDGER_ENTRY_TYPES.includes(values.entryType) ? values.entryType : 'income',
@@ -38,6 +40,7 @@ function normalizeEntry(values = {}, eventId, existing = {}) {
     paidByOrPaidTo: cleanText(values.paidByOrPaidTo).slice(0, 180) || null,
     date: cleanText(values.date) || new Date().toISOString().slice(0, 10),
     status: LEDGER_STATUSES.includes(values.status) ? values.status : 'pending',
+    adjustmentDirection: values.entryType === 'adjustment' ? values.adjustmentDirection || existing.adjustmentDirection || 'increase' : null,
     notes: cleanText(values.notes).slice(0, 1000),
     createdBy: existing.createdBy || values.createdBy || null,
   }
