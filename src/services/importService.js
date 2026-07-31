@@ -1,6 +1,7 @@
 import { doc, serverTimestamp, writeBatch } from 'firebase/firestore'
 import { db } from '../lib/firebase.js'
 import { createAuditLogWrite } from './auditService.js'
+import { buildOperationManifest, operationAuditLogId, summarizeBulkOperation } from '../utils/bulkOperation.js'
 
 export {
   parseCSV,
@@ -27,19 +28,38 @@ function importNotes(row = {}) {
   ].filter(Boolean).join('\n')
 }
 
-export async function commitImport(validRows, eventId, user, onProgress) {
+export async function commitImport(validRows, eventId, user, onProgress, options = {}) {
   if (!db) throw new Error('Firebase is not configured')
+  if (!eventId) throw new Error('Select a Working Event before importing registrations.')
+
+  const completedRecordIds = new Set(options.completedRecordIds || [])
+  const rowsToImport = validRows.filter(({ row }) => !completedRecordIds.has(row.registrationId))
+  const allRecordIds = validRows.flatMap(({ row }) => (row.registrationId ? [row.registrationId] : []))
 
   // Each imported registration also writes an audit log whose rule verifies
   // the paired registration create. Keep chunks below Firestore's batch rules
   // document-access ceiling. 50 registrations = 100 writes per chunk.
   const chunkSize = 50
-  for (let i = 0; i < validRows.length; i += chunkSize) {
-    if (onProgress) onProgress(i, validRows.length)
-    const chunk = validRows.slice(i, i + chunkSize)
+  const manifest = buildOperationManifest({
+    operationType: 'registration.import',
+    eventId,
+    user,
+    recordIds: allRecordIds,
+    chunkSize,
+    operationId: options.operationId,
+  })
+  const completedChunks = completedRecordIds.size > 0
+    ? [{ chunkIndex: 'previous', recordIds: [...completedRecordIds] }]
+    : []
+
+  for (let i = 0; i < rowsToImport.length; i += chunkSize) {
+    if (onProgress) onProgress(completedRecordIds.size + i, validRows.length)
+    const chunk = rowsToImport.slice(i, i + chunkSize)
+    const chunkIndex = Math.floor((completedRecordIds.size + i) / chunkSize)
     const batch = writeBatch(db)
 
     for (const { row } of chunk) {
+      if (row.eventId && row.eventId !== eventId) throw new Error('Import row event scope changed before commit.')
       const regRef = doc(db, 'registrations', row.registrationId)
 
       batch.set(regRef, {
@@ -81,19 +101,41 @@ export async function commitImport(validRows, eventId, user, onProgress) {
         targetType: 'registration',
         targetId: regRef.id,
         performedBy: user,
-        details: { fullName: row.fullName, sourceRowId: row.sourceRowId, financeFieldsImported: true },
+        logId: operationAuditLogId(manifest.operationId, chunkIndex, regRef.id),
+        details: {
+          fullName: row.fullName,
+          sourceRowId: row.sourceRowId,
+          financeFieldsImported: true,
+          operationId: manifest.operationId,
+          chunkIndex,
+        },
       })
 
       batch.set(audit.ref, audit.data)
     }
 
     try {
+      if (options.failChunkIndex === chunkIndex) throw new Error('Injected import chunk failure.')
       await batch.commit()
+      completedChunks.push({
+        chunkIndex,
+        recordIds: chunk.map(({ row }) => row.registrationId),
+      })
     } catch (err) {
       if (import.meta.env.DEV) console.error('Chunk commit failed:', err)
-      throw new Error(`Failed to import batch starting at row ${i + 1}. Error: ${err.message}`)
+      const result = summarizeBulkOperation(manifest, completedChunks, {
+        chunkIndex,
+        recordIds: chunk.map(({ row }) => row.registrationId),
+        error: err?.message || String(err),
+      })
+      const error = new Error(`Failed to import batch starting at row ${completedRecordIds.size + i + 1}. ${result.message} Error: ${err.message}`)
+      error.operationResult = result
+      const resultCompletedIds = new Set(result.completedRecordIds)
+      error.retryRows = validRows.filter(({ row }) => !resultCompletedIds.has(row.registrationId))
+      throw error
     }
   }
   
   if (onProgress) onProgress(validRows.length, validRows.length)
+  return summarizeBulkOperation(manifest, completedChunks)
 }

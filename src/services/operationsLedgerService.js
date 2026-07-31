@@ -9,10 +9,12 @@ import {
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { createAuditLogWrite } from './auditService'
+import { safeAuditChanges } from '../utils/auditUtils'
 import { parseMoney } from '../utils/financeUtils'
 
 export const LEDGER_ENTRY_TYPES = ['income', 'expense', 'adjustment', 'refund']
 export const LEDGER_STATUSES = ['expected', 'received', 'paid', 'pending', 'cancelled']
+const AUDITED_OPERATION_FIELDS = ['entryType', 'category', 'label', 'amount', 'paymentMethod', 'paymentReference', 'paidByOrPaidTo', 'date', 'status', 'notes']
 
 function requireDatabase() {
   if (!db) throw new Error('Firebase is not configured')
@@ -73,7 +75,12 @@ export async function createLedgerEntry(values, eventId, user) {
     targetType: 'operation',
     targetId: entryRef.id,
     performedBy: user,
-    details: { label: payload.label, entryType: payload.entryType, amount: payload.amount },
+    details: {
+      label: payload.label,
+      entryType: payload.entryType,
+      amount: payload.amount,
+      changes: safeAuditChanges({}, payload, AUDITED_OPERATION_FIELDS),
+    },
   })
   const batch = writeBatch(firestore)
 
@@ -98,7 +105,12 @@ export async function updateLedgerEntry(entry, values, user) {
     targetType: 'operation',
     targetId: entry.ledgerEntryId,
     performedBy: user,
-    details: { label: payload.label, entryType: payload.entryType, amount: payload.amount },
+    details: {
+      label: payload.label,
+      entryType: payload.entryType,
+      amount: payload.amount,
+      changes: safeAuditChanges(entry, payload, AUDITED_OPERATION_FIELDS),
+    },
   })
   const batch = writeBatch(firestore)
 
@@ -119,7 +131,12 @@ export async function cancelLedgerEntry(entry, user) {
     targetType: 'operation',
     targetId: entry.ledgerEntryId,
     performedBy: user,
-    details: { label: entry.label, entryType: entry.entryType, amount: entry.amount },
+    details: {
+      label: entry.label,
+      entryType: entry.entryType,
+      amount: entry.amount,
+      changes: safeAuditChanges(entry, { ...entry, status: 'cancelled' }, ['status']),
+    },
   })
   const batch = writeBatch(firestore)
 
