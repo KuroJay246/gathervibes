@@ -585,12 +585,12 @@ service cloud.firestore {
         && data.keys().hasOnly([
           'ledgerEntryId', 'eventId', 'entryType', 'category', 'label', 'amount',
           'paymentMethod', 'paymentReference', 'paidByOrPaidTo', 'date', 'status',
-          'notes', 'createdAt', 'updatedAt', 'createdBy'
+          'adjustmentDirection', 'notes', 'createdAt', 'updatedAt', 'createdBy'
         ])
         && data.ledgerEntryId == ledgerEntryId
         && validShortId(data.ledgerEntryId)
         && validShortId(data.eventId)
-        && data.entryType in ['income', 'expense', 'adjustment', 'refund']
+        && data.entryType in ['income', 'expense', 'adjustment', 'refund', 'reimbursement']
         && data.category is string
         && data.category.size() > 0
         && data.category.size() <= 120
@@ -607,6 +607,7 @@ service cloud.firestore {
         && data.date.size() > 0
         && data.date.size() <= 20
         && data.status in ['expected', 'received', 'paid', 'pending', 'cancelled']
+        && (!('adjustmentDirection' in data) || data.adjustmentDirection == null || data.adjustmentDirection in ['increase', 'decrease'])
         && data.notes is string
         && data.notes.size() <= 1000
         && data.createdAt is timestamp

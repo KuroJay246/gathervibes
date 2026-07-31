@@ -190,7 +190,7 @@ test('Phase 22 operations summary separates received and pending ledger values',
   assert.equal(review.paymentReview.operationsLedger.adjustments, 30)
   assert.equal(review.paymentReview.operationsLedger.cancelledItems, 1)
   assert.equal(review.paymentReview.operationsLedger.openItemCount, 3)
-  assert.equal(review.paymentReview.operationsLedger.netPosition, 370)
+  assert.equal(review.paymentReview.operationsLedger.netPosition, 360)
 })
 
 test('Phase 22 event summary keeps registrations and guests distinct and uses personsAttending for attendance', () => {

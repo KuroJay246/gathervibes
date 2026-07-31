@@ -9,6 +9,7 @@ import {
 import {
   buildOperationsControlSummary,
   buildOperationsEntryCounts,
+  buildOperationsSettlementSummary,
   buildOperationsTotals,
 } from './operationsReport.js'
 import { normalizePaymentStatus } from './paymentStatus.js'
@@ -149,30 +150,22 @@ function buildLedgerBreakdown(entries = [], currency = 'BBD') {
   const totals = buildOperationsTotals(entries)
   const counts = buildOperationsEntryCounts(entries)
   const control = buildOperationsControlSummary(entries)
-
-  let receivedIncome = 0
-  let paidExpenses = 0
-  let paidRefunds = 0
-
-  entries.forEach((entry) => {
-    if (entry?.status === 'cancelled') return
-    const amount = Number(entry?.amount) || 0
-    if (entry?.entryType === 'income' && entry?.status === 'received') receivedIncome += amount
-    if (entry?.entryType === 'expense' && entry?.status === 'paid') paidExpenses += amount
-    if (entry?.entryType === 'refund' && entry?.status === 'paid') paidRefunds += amount
-  })
+  const settlement = buildOperationsSettlementSummary(entries)
 
   return {
     currency,
     totals,
     counts,
     control,
-    receivedIncome,
+    receivedIncome: settlement.incomeReceived,
     pendingIncome: control.pendingIncome,
-    paidExpenses,
+    paidExpenses: settlement.paidExpenses,
     pendingExpenses: control.pendingExpenses,
-    paidRefunds,
+    paidRefunds: settlement.paidRefunds,
     pendingRefunds: control.pendingRefunds,
+    reimbursementsReceived: settlement.reimbursementsReceived,
+    pendingReimbursements: settlement.pendingReimbursements,
+    operationsCashPosition: settlement.operationsCashPosition,
   }
 }
 
@@ -429,10 +422,12 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
         expensesPending: ledger.pendingExpenses,
         refundsPaid: ledger.paidRefunds,
         refundsPending: ledger.pendingRefunds,
+        reimbursementsReceived: ledger.reimbursementsReceived,
+        reimbursementsPending: ledger.pendingReimbursements,
         adjustments: ledger.totals.adjustments,
         cancelledItems: ledger.counts.cancelled,
         openItemCount: ledger.control.openEntries,
-        netPosition: ledger.totals.net,
+        netPosition: ledger.operationsCashPosition,
       },
       outstandingCommitments: {
         operationsPendingExpenses: ledger.pendingExpenses,
@@ -480,8 +475,9 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
       operationsIncome: ledger.totals.income,
       operationsExpenses: ledger.totals.expenses,
       operationsRefunds: ledger.totals.refunds,
+      operationsReimbursements: ledger.totals.reimbursements,
       operationsAdjustments: ledger.totals.adjustments,
-      operationsNetPosition: ledger.totals.net,
+      operationsNetPosition: ledger.operationsCashPosition,
       openOperationsItems: ledger.control.openEntries,
       incompleteDataWarnings: missingContactRows.length + finance.prominentDataReviewCount + duplicateContactRows.length,
       attendanceNote: 'Guest attendance is based on the full personsAttending value of each checked-in registration record. Group registrations are not scanned guest-by-guest.',
