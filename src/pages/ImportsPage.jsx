@@ -32,12 +32,18 @@ function isPermissionDeniedImportError(err) {
 }
 
 function buildSafeImportErrorDetails(err, rowCount) {
+  const operationResult = err?.operationResult || null
   return {
     step: 'confirmed-import-batch',
     attemptedRows: rowCount,
     writes: 'registration create plus audit log create',
     code: err?.code || err?.name || 'unknown',
     message: String(err?.message || err || 'Unknown import failure').replace(/\s+/g, ' ').slice(0, 500),
+    operationId: operationResult?.operationId || null,
+    completedRows: operationResult?.completedCount ?? 0,
+    failedRows: operationResult?.failedCount ?? 0,
+    unattemptedRows: operationResult?.unattemptedCount ?? 0,
+    retryableRows: (operationResult?.failedCount ?? 0) + (operationResult?.unattemptedCount ?? 0),
     privacy: 'Guest row values are not included in this diagnostic.',
   }
 }
@@ -380,10 +386,12 @@ export function ImportsPage() {
     setError('')
     setImportErrorDetails(null)
     try {
-      await commitImport(validRows, activeEvent.eventId, user, (current) => setImportProgress(current))
+      const result = await commitImport(validRows, activeEvent.eventId, user, (current) => setImportProgress(current))
       setImportResult({
-        importedCount: validRows.length,
+        importedCount: result.completedCount,
         blockedCount: processedRows.length - validRows.length,
+        operationId: result.operationId,
+        message: result.message,
       })
       setStep(6)
     } catch (err) {
@@ -392,7 +400,7 @@ export function ImportsPage() {
       setError(
         isPermissionDeniedImportError(err)
           ? 'Import failed because your account could not save the confirmed rows. No rows were imported. This usually means the confirmed import payload no longer matches the current workspace rules or required fields.'
-          : 'Import failed before any rows were imported. Check the diagnostic details below and try again.',
+          : err.operationResult?.message || 'Import failed before any rows were imported. Check the diagnostic details below and try again.',
       )
     } finally {
       setImporting(false)

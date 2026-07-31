@@ -55,6 +55,12 @@ function registrationNeedsReview(registration = {}, event = {}) {
   return Boolean(finance.needsFinanceReview || registration.financeReviewRequired || !registration.ticketCode)
 }
 
+function bulkOperationMessage(result, fallback) {
+  if (!result?.message) return fallback
+  if (result.status === 'partial-failure') return `${result.message} Use the current selection to retry remaining unchanged records.`
+  return result.message
+}
+
 function duplicateContactKeys(registrations = []) {
   const emailCounts = new Map()
   const phoneCounts = new Map()
@@ -310,12 +316,12 @@ export function RegistrationsPage() {
     setSaving(true)
     setSuccess('')
     try {
-      await bulkDeleteRegistrations(selected, activeEvent.eventId, user)
+      const result = await bulkDeleteRegistrations(selected, activeEvent.eventId, user)
       clearSelection()
-      setSuccess(`Deleted ${selected.length} selected registration${selected.length === 1 ? '' : 's'}.`)
+      setSuccess(bulkOperationMessage(result, `Deleted ${selected.length} selected registration${selected.length === 1 ? '' : 's'}.`))
     } catch (err) {
       if (import.meta.env.DEV) console.error('Bulk delete error:', err)
-      alert('Failed to delete selected registrations. Check your permissions.')
+      alert(err.operationResult?.message || 'Failed to delete selected registrations. Check your permissions.')
     } finally {
       setSaving(false)
     }
@@ -328,11 +334,11 @@ export function RegistrationsPage() {
     setSaving(true)
     setSuccess('')
     try {
-      await bulkUpdatePaymentStatus(selected, activeEvent.eventId, paymentStatus, user)
-      setSuccess(`Updated ${selected.length} selected registration${selected.length === 1 ? '' : 's'} to ${formatPaymentLabel(paymentStatus)}.`)
+      const result = await bulkUpdatePaymentStatus(selected, activeEvent.eventId, paymentStatus, user, activeEvent)
+      setSuccess(bulkOperationMessage(result, `Updated ${selected.length} selected registration${selected.length === 1 ? '' : 's'} to ${formatPaymentLabel(paymentStatus)}.`))
     } catch (err) {
       if (import.meta.env.DEV) console.error('Bulk status error:', err)
-      alert('Failed to update selected registrations. Check your permissions.')
+      alert(err.operationResult?.message || err.message || 'Failed to update selected registrations. Check your permissions.')
     } finally {
       setSaving(false)
     }
@@ -346,11 +352,11 @@ export function RegistrationsPage() {
     setSaving(true)
     setSuccess('')
     try {
-      await bulkUpdateFinanceFields(selected, activeEvent.eventId, updates, user, activeEvent)
-      setSuccess(`Updated finance fields for ${selected.length} selected registration${selected.length === 1 ? '' : 's'}.`)
+      const result = await bulkUpdateFinanceFields(selected, activeEvent.eventId, updates, user, activeEvent)
+      setSuccess(bulkOperationMessage(result, `Updated finance fields for ${selected.length} selected registration${selected.length === 1 ? '' : 's'}.`))
     } catch (err) {
       if (import.meta.env.DEV) console.error('Bulk finance error:', err)
-      alert('Failed to update selected finance fields. Check your permissions.')
+      alert(err.operationResult?.message || err.message || 'Failed to update selected finance fields. Check your permissions.')
     } finally {
       setSaving(false)
     }

@@ -15,6 +15,14 @@ import { normalizeAttendeeNames } from '../utils/importUtils.js'
 import { financePayload, normalizePaymentMethod } from '../utils/financeUtils.js'
 import { normalizePaymentStatus } from '../utils/paymentStatus.js'
 import { historicalAttendancePayload } from '../utils/attendanceUtils.js'
+import { safeAuditChanges } from '../utils/auditUtils.js'
+import {
+  assertBulkPaymentStatusAllowed,
+  assertEventScopedRecords,
+  buildOperationManifest,
+  operationAuditLogId,
+  summarizeBulkOperation,
+} from '../utils/bulkOperation.js'
 
 function requireDatabase() {
   if (!db) throw new Error('Firebase is not configured')
@@ -220,12 +228,22 @@ export async function deleteRegistration(registration, user) {
 
 export async function bulkDeleteRegistrations(registrations = [], eventId, user) {
   const scoped = registrations.filter((registration) => registration.eventId === eventId)
+  assertEventScopedRecords(registrations, eventId)
   const firestore = requireDatabase()
   const chunkSize = 5
+  const manifest = buildOperationManifest({
+    operationType: 'registration.bulk-delete',
+    eventId,
+    user,
+    recordIds: scoped.map((registration) => registration.registrationId),
+    chunkSize,
+  })
+  const completedChunks = []
 
   for (let i = 0; i < scoped.length; i += chunkSize) {
     const batch = writeBatch(firestore)
     const chunk = scoped.slice(i, i + chunkSize)
+    const chunkIndex = i / chunkSize
 
     chunk.forEach((registration) => {
       const regRef = doc(firestore, 'registrations', registration.registrationId)
@@ -235,36 +253,80 @@ export async function bulkDeleteRegistrations(registrations = [], eventId, user)
         targetType: 'registration',
         targetId: registration.registrationId,
         performedBy: user,
-        details: { fullName: registration.fullName, bulkAction: true },
+        logId: operationAuditLogId(manifest.operationId, chunkIndex, registration.registrationId),
+        details: {
+          fullName: registration.fullName,
+          bulkAction: true,
+          operationId: manifest.operationId,
+          chunkIndex,
+          before: { registrationId: registration.registrationId, eventId: registration.eventId },
+          after: null,
+        },
       })
 
       batch.delete(regRef)
       batch.set(audit.ref, audit.data)
     })
 
-    await batch.commit()
+    try {
+      await batch.commit()
+      completedChunks.push({
+        chunkIndex,
+        recordIds: chunk.map((registration) => registration.registrationId),
+      })
+    } catch (err) {
+      const result = summarizeBulkOperation(manifest, completedChunks, {
+        chunkIndex,
+        recordIds: chunk.map((registration) => registration.registrationId),
+        error: err?.message || String(err),
+      })
+      const error = new Error(result.message)
+      error.operationResult = result
+      throw error
+    }
   }
+
+  return summarizeBulkOperation(manifest, completedChunks)
 }
 
-export async function bulkUpdatePaymentStatus(registrations = [], eventId, paymentStatus, user) {
+export async function bulkUpdatePaymentStatus(registrations = [], eventId, paymentStatus, user, event = {}) {
   const scoped = registrations.filter((registration) => registration.eventId === eventId)
+  assertEventScopedRecords(registrations, eventId)
   const firestore = requireDatabase()
-  const nextStatus = normalizePaymentStatus(paymentStatus)
+  const nextStatus = assertBulkPaymentStatusAllowed(scoped, paymentStatus, event)
   const chunkSize = 5
+  const manifest = buildOperationManifest({
+    operationType: 'registration.bulk-payment-status',
+    eventId,
+    user,
+    recordIds: scoped.map((registration) => registration.registrationId),
+    chunkSize,
+  })
+  const completedChunks = []
 
   for (let i = 0; i < scoped.length; i += chunkSize) {
     const batch = writeBatch(firestore)
     const chunk = scoped.slice(i, i + chunkSize)
+    const chunkIndex = i / chunkSize
 
     chunk.forEach((registration) => {
       const regRef = doc(firestore, 'registrations', registration.registrationId)
+      const after = { ...registration, paymentStatus: nextStatus }
       const audit = createAuditLogWrite({
         eventId,
         action: 'registration.update',
         targetType: 'registration',
         targetId: registration.registrationId,
         performedBy: user,
-        details: { fullName: registration.fullName, paymentStatus: nextStatus, bulkAction: true },
+        logId: operationAuditLogId(manifest.operationId, chunkIndex, registration.registrationId),
+        details: {
+          fullName: registration.fullName,
+          paymentStatus: nextStatus,
+          bulkAction: true,
+          operationId: manifest.operationId,
+          chunkIndex,
+          changes: safeAuditChanges(registration, after, ['paymentStatus']),
+        },
       })
 
       batch.update(regRef, {
@@ -274,18 +336,52 @@ export async function bulkUpdatePaymentStatus(registrations = [], eventId, payme
       batch.set(audit.ref, audit.data)
     })
 
-    await batch.commit()
+    try {
+      await batch.commit()
+      completedChunks.push({
+        chunkIndex,
+        recordIds: chunk.map((registration) => registration.registrationId),
+      })
+    } catch (err) {
+      const result = summarizeBulkOperation(manifest, completedChunks, {
+        chunkIndex,
+        recordIds: chunk.map((registration) => registration.registrationId),
+        error: err?.message || String(err),
+      })
+      const error = new Error(result.message)
+      error.operationResult = result
+      throw error
+    }
   }
+
+  return summarizeBulkOperation(manifest, completedChunks)
 }
 
 export async function bulkUpdateFinanceFields(registrations = [], eventId, updates = {}, user, event = {}) {
   const scoped = registrations.filter((registration) => registration.eventId === eventId)
+  assertEventScopedRecords(registrations, eventId)
+  const proposed = scoped.map((registration) => ({
+    ...registration,
+    ...updates,
+    paymentStatus: updates.paymentStatus ? normalizePaymentStatus(updates.paymentStatus) : registration.paymentStatus,
+    paymentMethod: updates.paymentMethod ? normalizePaymentMethod(updates.paymentMethod) : registration.paymentMethod,
+  }))
+  if (updates.paymentStatus) assertBulkPaymentStatusAllowed(proposed, updates.paymentStatus, event)
   const firestore = requireDatabase()
   const chunkSize = 5
+  const manifest = buildOperationManifest({
+    operationType: 'registration.bulk-finance-update',
+    eventId,
+    user,
+    recordIds: scoped.map((registration) => registration.registrationId),
+    chunkSize,
+  })
+  const completedChunks = []
 
   for (let i = 0; i < scoped.length; i += chunkSize) {
     const batch = writeBatch(firestore)
     const chunk = scoped.slice(i, i + chunkSize)
+    const chunkIndex = i / chunkSize
 
     chunk.forEach((registration) => {
       const regRef = doc(firestore, 'registrations', registration.registrationId)
@@ -304,8 +400,17 @@ export async function bulkUpdateFinanceFields(registrations = [], eventId, updat
         details: {
           fullName: registration.fullName,
           bulkAction: true,
+          operationId: manifest.operationId,
+          chunkIndex,
           updatedFields: Object.keys(updates).filter((key) => updates[key] !== '' && updates[key] !== null && updates[key] !== undefined).join(','),
+          changes: safeAuditChanges(registration, {
+            ...registration,
+            paymentStatus: normalizePaymentStatus(values.paymentStatus || 'unknown'),
+            paymentReference: values.paymentReference?.trim?.() || values.paymentReference || null,
+            ...financePayload(values, event),
+          }, ['paymentStatus', 'paymentReference', 'priceTier', 'ticketPrice', 'amountDue', 'amountPaid', 'balanceDue', 'paymentMethod']),
         },
+        logId: operationAuditLogId(manifest.operationId, chunkIndex, registration.registrationId),
       })
 
       batch.update(regRef, {
@@ -317,6 +422,23 @@ export async function bulkUpdateFinanceFields(registrations = [], eventId, updat
       batch.set(audit.ref, audit.data)
     })
 
-    await batch.commit()
+    try {
+      await batch.commit()
+      completedChunks.push({
+        chunkIndex,
+        recordIds: chunk.map((registration) => registration.registrationId),
+      })
+    } catch (err) {
+      const result = summarizeBulkOperation(manifest, completedChunks, {
+        chunkIndex,
+        recordIds: chunk.map((registration) => registration.registrationId),
+        error: err?.message || String(err),
+      })
+      const error = new Error(result.message)
+      error.operationResult = result
+      throw error
+    }
   }
+
+  return summarizeBulkOperation(manifest, completedChunks)
 }
