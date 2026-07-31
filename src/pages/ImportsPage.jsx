@@ -12,7 +12,13 @@ import { ImportSummary } from '../components/imports/ImportSummary'
 import { ImportTemplatesPanel } from '../components/imports/ImportTemplatesPanel'
 import { EmptyState } from '../components/ui/EmptyState'
 import { InfoHint } from '../components/ui/InfoHint'
-import { IMPORT_SOURCES, getImportSource } from '../utils/importSources'
+import {
+  IMPORT_WORKFLOW_STEPS,
+  getImportRecordType,
+  getImportSource,
+  groupedImportSources,
+  IMPORT_RECORD_TYPES,
+} from '../utils/importSources'
 import { readXlsxWorkbook } from '../utils/xlsxImport'
 import { calculateRegistrationFinance } from '../utils/financeUtils'
 import {
@@ -53,6 +59,7 @@ export function ImportsPage() {
   const { activeEvent } = useActiveEvent()
   const [step, setStep] = useState(1)
   const [sourceType, setSourceType] = useState('google-forms-csv')
+  const [recordType, setRecordType] = useState('guest-registration')
   const [inputType, setInputType] = useState('upload')
   const [csvText, setCsvText] = useState('')
   const [uploadedFileName, setUploadedFileName] = useState('')
@@ -80,9 +87,22 @@ export function ImportsPage() {
   const [importErrorDetails, setImportErrorDetails] = useState(null)
   const [importResult, setImportResult] = useState(null)
   const selectedSource = getImportSource(sourceType)
+  const selectedRecordType = getImportRecordType(recordType)
+  const sourceGroups = groupedImportSources()
   const selectedSheet = workbookSheets.find((sheet) => sheet.id === selectedSheetId)
   const canConfirmSheet = Boolean(selectedSheet?.importable)
   const formsInboxSummary = buildFormInboxSummary(formsInboxResponses)
+  const workflowStepIndex = step === 1
+    ? 2
+    : step === 2
+      ? 3
+      : step === 3
+        ? 5
+        : step === 4
+          ? 7
+          : step === 5
+            ? 8
+            : 9
 
   useEffect(() => {
     resetImportState()
@@ -244,6 +264,10 @@ export function ImportsPage() {
   }
 
   async function handleProceedToPreview() {
+    if (selectedRecordType.writeSupport !== 'supported') {
+      setError(`${selectedRecordType.label} is review-only in this prototype. Automatic writes are not enabled for this record type.`)
+      return
+    }
     if (!existingRegistrationsLoaded) {
       setError('Still loading the current Working Event registrations. Wait a moment so duplicate checks use the latest event data.')
       return
@@ -506,15 +530,34 @@ export function ImportsPage() {
             <h2 className="font-serif text-3xl text-[#2B1723]">Import Center</h2>
             <div className="mt-2 flex items-center gap-2">
               <p className="text-sm text-[#816D62]">
-                For event: <strong>{activeEvent.eventName}</strong>. CSV, pasted table rows, and Excel/XLSX workbooks all use preview before saving.
+                For event: <strong>{activeEvent.eventName}</strong>. Sources are event-scoped, preview before saving is required, and no registration is saved before final confirmation.
               </p>
               <InfoHint label="Import Flow">
-                Flow: Upload/Paste &rarr; Select Sheet &rarr; Header Mapping Preview &rarr; Duplicate Review &rarr; Final Import Preview &rarr; Confirm Import &rarr; Results.
+                Flow: Source &rarr; Record Type &rarr; Upload/Paste &rarr; Template &rarr; Headers &rarr; Mapping &rarr; Validation &rarr; Review &rarr; Confirm &rarr; Result.
               </InfoHint>
             </div>
           </div>
         </div>
       </header>
+
+      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_24px_rgba(43,23,35,0.04)]">
+        <div className="grid gap-3 lg:grid-cols-[0.8fr_1fr] lg:items-center">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Selected import context</p>
+            <p className="mt-1 text-sm font-bold text-[#2B1723]">{selectedSource.label} &rarr; {selectedRecordType.label}</p>
+            <p className="mt-1 text-xs leading-5 text-[#80685B]">
+              {selectedSource.connectionStatus}. {selectedRecordType.helperText}
+            </p>
+          </div>
+          <ol className="grid grid-cols-2 gap-2 text-[10px] font-bold uppercase tracking-wider text-[#80685B] sm:grid-cols-5">
+            {IMPORT_WORKFLOW_STEPS.map((label, index) => (
+              <li key={label} className={`rounded-full px-3 py-2 text-center ${index <= workflowStepIndex ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED]'}`}>
+                {label}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
 
       {error && (
         <div className="rounded-xl bg-[#FFF1F1] p-4 text-sm text-[#A32626]">
@@ -543,31 +586,64 @@ export function ImportsPage() {
       )}
 
       {step === 1 && (
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
           <div className="rounded-2xl bg-white p-5 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
             <h3 className="font-serif text-xl text-[#2B1723]">Choose source</h3>
             <p className="mt-2 text-sm text-[#816D62]">Pick the closest source so the mapping step starts with the right expectations.</p>
-            <div className="mt-5 grid gap-3">
-              {IMPORT_SOURCES.map((source) => (
-                <button
-                  key={source.value}
-                  type="button"
-                  onClick={() => setSourceType(source.value)}
-                  className={`rounded-xl border p-4 text-left transition ${
-                    sourceType === source.value
-                      ? 'border-[#9A5260] bg-[#FFF8F2]'
-                      : 'border-[#F2E8E1] bg-white hover:bg-[#FBF8F5]'
-                  }`}
-                >
-                  <span className="flex items-start gap-3">
-                    <FileSpreadsheet className={`mt-0.5 size-5 shrink-0 ${sourceType === source.value ? 'text-[#9A5260]' : 'text-[#C4B4AA]'}`} />
-                    <span>
-                      <span className="block text-sm font-bold text-[#2B1723]">{source.label}</span>
-                      <span className="mt-1 block text-xs leading-5 text-[#816D62]">{source.helperText}</span>
-                    </span>
-                  </span>
-                </button>
+            <div className="mt-5 space-y-5">
+              {[...sourceGroups.entries()].map(([group, sources]) => (
+                <div key={group}>
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8A3F4B]">{group}</p>
+                  <div className="grid gap-3">
+                    {sources.map((source) => (
+                      <button
+                        key={source.value}
+                        type="button"
+                        onClick={() => setSourceType(source.value)}
+                        className={`rounded-xl border p-4 text-left transition ${
+                          selectedSource.value === source.value
+                            ? 'border-[#9A5260] bg-[#FFF8F2]'
+                            : 'border-[#F2E8E1] bg-white hover:bg-[#FBF8F5]'
+                        }`}
+                      >
+                        <span className="flex items-start gap-3">
+                          <FileSpreadsheet className={`mt-0.5 size-5 shrink-0 ${selectedSource.value === source.value ? 'text-[#9A5260]' : 'text-[#C4B4AA]'}`} />
+                          <span>
+                            <span className="block text-sm font-bold text-[#2B1723]">{source.label}</span>
+                            <span className="mt-1 block text-xs leading-5 text-[#816D62]">{source.helperText}</span>
+                            <span className="mt-2 inline-flex rounded-full bg-[#F7F1ED] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{source.connectionStatus}</span>
+                          </span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
+            </div>
+
+            <div className="mt-8 border-t border-[#F2E8E1] pt-5">
+              <h3 className="font-serif text-xl text-[#2B1723]">Choose record type</h3>
+              <p className="mt-2 text-sm text-[#816D62]">Only Guest Registration writes are enabled here. Other record types are review-only until their real workflows exist.</p>
+              <div className="mt-4 grid gap-2">
+                {IMPORT_RECORD_TYPES.map((candidate) => (
+                  <button
+                    key={candidate.value}
+                    type="button"
+                    onClick={() => setRecordType(candidate.value)}
+                    className={`rounded-xl border px-4 py-3 text-left ${recordType === candidate.value ? 'border-[#9A5260] bg-[#FFF8F2]' : 'border-[#F2E8E1] bg-white hover:bg-[#FBF8F5]'}`}
+                  >
+                    <span className="flex items-center justify-between gap-3">
+                      <span>
+                        <span className="block text-sm font-bold text-[#2B1723]">{candidate.label}</span>
+                        <span className="mt-1 block text-xs leading-5 text-[#816D62]">{candidate.helperText}</span>
+                      </span>
+                      <span className="shrink-0 rounded-full bg-[#F7F1ED] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">
+                        {candidate.writeSupport === 'supported' ? 'Writes supported' : 'Review only'}
+                      </span>
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -578,7 +654,23 @@ export function ImportsPage() {
               <p className="mt-2 text-sm leading-6 text-[#816D62]">{selectedSource.helperText}</p>
             </div>
 
-            {selectedSource.mode === 'xlsx' ? (
+            {selectedSource.mode === 'pdf-fallback' ? (
+              <div className="mt-8 rounded-2xl border border-[#F2D6A3] bg-[#FFF7E8] p-5 text-sm leading-6 text-[#7A5818]">
+                <div className="flex gap-3">
+                  <Info className="mt-0.5 size-5 shrink-0" />
+                  <div>
+                    <p className="font-bold">PDF table import needs a safer source format.</p>
+                    <p className="mt-1">This app does not extract table data directly from PDF files. Export the original spreadsheet to CSV/XLSX, or copy the visible table rows and use Paste Table.</p>
+                    <button type="button" onClick={() => setSourceType('pasted-table')} className="mt-4 rounded-xl bg-[#2B1723] px-5 py-2.5 text-sm font-bold text-white">Use Paste Table Instead</button>
+                  </div>
+                </div>
+              </div>
+            ) : selectedSource.mode === 'response-inbox' ? (
+              <div className="mt-8 rounded-2xl border border-[#EEDFD6] bg-[#FFFDFC] p-5">
+                <p className="text-sm font-bold text-[#2B1723]">Use the Google Forms Response Inbox below.</p>
+                <p className="mt-2 text-sm leading-6 text-[#816D62]">Paste exported response rows, review them, approve safe guest-registration responses, then continue approved rows to mapping. No automatic receiver is deployed from this screen.</p>
+              </div>
+            ) : selectedSource.mode === 'xlsx' ? (
               <div className="mt-8 space-y-5">
                 <div className="relative flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#DFD0C8] bg-[#FBF8F5] transition hover:border-[#9A5260]">
                   <input
@@ -622,7 +714,7 @@ export function ImportsPage() {
                 />
                 <UploadCloud className="size-10 text-[#C4B4AA]" />
                 <p className="mt-4 text-sm font-bold text-[#5D4A52]">Click or drag to upload CSV</p>
-                <p className="mt-1 text-xs text-[#6B564C]">Must include headers</p>
+                <p className="mt-1 text-xs text-[#6B564C]">Must include headers. Tab-separated copied exports are also supported through Paste Table.</p>
               </div>
             ) : (
               <div className="mt-8 flex flex-col">
@@ -631,7 +723,7 @@ export function ImportsPage() {
                   rows={8}
                   value={csvText}
                   onChange={(e) => setCsvText(e.target.value)}
-                  placeholder={'Name, Email, Phone\nJohn Doe, john@example.com, 555-0100'}
+                  placeholder={'Name\tEmail\tPhone\nJohn Doe\tjohn@example.com\t555-0100'}
                   className="w-full rounded-xl border border-[#E5D7CF] p-4 font-mono text-sm focus:border-[#9A5260] focus:outline-none"
                 />
                 <button
@@ -650,13 +742,14 @@ export function ImportsPage() {
 
       {step === 1 && (
         <div className="mt-8">
+          {selectedSource.mode === 'response-inbox' && (
           <section className="mb-8 rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Google Forms Response Inbox</p>
                 <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Review responses before mapping or import</h3>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
-                  Connections, New Responses, Needs Review, Approved, Imported, Wait-Listed, Rejected, Sync History, and Mapping Templates all stay event-scoped. No response becomes a registration automatically.
+                  Connections, New Responses, Needs Review, Approved, Imported, Wait-Listed, Rejected, Sync History, and Mapping Templates all stay event-scoped. No response becomes a registration automatically. Nothing becomes a registration automatically.
                 </p>
               </div>
               <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
@@ -741,6 +834,7 @@ export function ImportsPage() {
               </div>
             )}
           </section>
+          )}
           <ImportTemplatesPanel />
         </div>
       )}
@@ -850,6 +944,7 @@ export function ImportsPage() {
       {step === 3 && (
         <FieldMappingForm
           headers={parsedData.headers}
+          rows={parsedData.rows}
           fieldMap={fieldMap}
           onMapChange={setFieldMap}
           onCancel={reset}
@@ -857,6 +952,8 @@ export function ImportsPage() {
           sheetName={importContext.sourceSheetName}
           onChangeSheet={workbookSheets.length > 0 ? handleChangeSheet : undefined}
           onStartOver={reset}
+          recordTypeLabel={selectedRecordType.label}
+          reviewOnly={selectedRecordType.writeSupport !== 'supported'}
         />
       )}
 

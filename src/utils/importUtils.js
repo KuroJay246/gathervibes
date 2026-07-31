@@ -197,22 +197,74 @@ export function detectHeaderField(normalizedHeader = '', lowerHeader = normalize
   return { field: '', confidence: 'none' }
 }
 
-export function buildHeaderMappingPreview(headers = [], fieldMap = buildInitialFieldMap(headers)) {
+export function buildHeaderMappingPreview(headers = [], fieldMap = buildInitialFieldMap(headers), rows = []) {
+  const mappedIndexes = new Map()
+  Object.entries(fieldMap).forEach(([field, mapping]) => {
+    const indexes = Array.isArray(mapping) ? mapping : [mapping]
+    indexes.filter((index) => index !== undefined).forEach((index) => {
+      mappedIndexes.set(index, [...(mappedIndexes.get(index) || []), field])
+    })
+  })
+  const headerCounts = headers.reduce((counts, header) => {
+    const key = String(header || '').trim().toLowerCase()
+    counts.set(key, (counts.get(key) || 0) + 1)
+    return counts
+  }, new Map())
+
   return headers.map((header, index) => {
-    const mappedField = Object.keys(fieldMap).find((field) => (
-      Array.isArray(fieldMap[field]) ? fieldMap[field].includes(index) : fieldMap[field] === index
-    )) || ''
+    const mappedFields = mappedIndexes.get(index) || []
+    const mappedField = mappedFields[0] || ''
     const normalized = header.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim()
     const detected = detectHeaderField(normalized, header.toLowerCase())
+    const exampleValue = rows.find((row) => String(row?.data?.[index] || '').trim())?.data?.[index] || ''
+    const duplicateHeader = headerCounts.get(String(header || '').trim().toLowerCase()) > 1
+    const conflicting = mappedFields.length > 1
+    const ignored = !mappedField
+    const status = conflicting
+      ? 'Conflicting'
+      : duplicateHeader
+        ? 'Duplicate Header'
+        : ignored
+          ? 'Not Yet Mapped'
+          : 'Mapped'
     return {
       index,
       header,
       detectedField: mappedField || detected.field,
-      confidence: mappedField ? detected.confidence : detected.confidence,
+      confidence: mappedField ? (detected.confidence === 'none' ? 'manual' : detected.confidence) : detected.confidence,
+      exampleValue,
+      status,
+      duplicateHeader,
+      conflicting,
       mapped: Boolean(mappedField),
-      ignored: !mappedField,
+      ignored,
     }
   })
+}
+
+function delimiterScore(line = '', delimiter = ',') {
+  let score = 0
+  let inQuotes = false
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i]
+    const nextChar = line[i + 1]
+    if (char === '"' && inQuotes && nextChar === '"') {
+      i++
+    } else if (char === '"') {
+      inQuotes = !inQuotes
+    } else if (!inQuotes && char === delimiter) {
+      score += 1
+    }
+  }
+  return score
+}
+
+function detectDelimiter(text = '') {
+  const firstLine = String(text).split(/\r?\n/).find((line) => line.trim()) || ''
+  const candidates = [',', '\t', ';']
+  return candidates
+    .map((delimiter) => ({ delimiter, score: delimiterScore(firstLine, delimiter) }))
+    .sort((a, b) => b.score - a.score)[0]?.delimiter || ','
 }
 
 async function sha256(message) {
@@ -225,6 +277,7 @@ async function sha256(message) {
 export function parseCSV(text) {
   if (!text) return { headers: [], rows: [] }
 
+  const delimiter = detectDelimiter(text)
   const rows = []
   let currentRow = []
   let currentCell = ''
@@ -246,7 +299,7 @@ export function parseCSV(text) {
     } else {
       if (char === '"') {
         inQuotes = true
-      } else if (char === ',') {
+      } else if (char === delimiter) {
         currentRow.push(currentCell)
         currentCell = ''
       } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {

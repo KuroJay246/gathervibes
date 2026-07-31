@@ -26,6 +26,7 @@ const REGISTRATION_FIELDS = [
 
 export function FieldMappingForm({
   headers,
+  rows = [],
   fieldMap,
   onMapChange,
   onCancel,
@@ -33,10 +34,15 @@ export function FieldMappingForm({
   sheetName,
   onChangeSheet,
   onStartOver,
+  recordTypeLabel = 'Guest Registration',
+  reviewOnly = false,
 }) {
   const hasAttendeeNames = Array.isArray(fieldMap.attendeeNames) && fieldMap.attendeeNames.length > 0
   const isReady = fieldMap.fullName !== undefined || fieldMap.buyerName !== undefined || hasAttendeeNames
-  const mappingPreview = buildHeaderMappingPreview(headers, fieldMap)
+  const mappingPreview = buildHeaderMappingPreview(headers, fieldMap, rows)
+  const mappedCount = mappingPreview.filter((item) => item.mapped).length
+  const unmappedCount = mappingPreview.filter((item) => item.ignored).length
+  const issueCount = mappingPreview.filter((item) => item.duplicateHeader || item.conflicting).length
   const headerRows = useMemo(() => {
     const seenHeaders = new Map()
     return headers.map((header, index) => {
@@ -60,6 +66,7 @@ export function FieldMappingForm({
         <div>
           <h3 className="font-serif text-xl text-[#2B1723]">Header Mapping Preview</h3>
           {sheetName && <p className="mt-1 text-xs font-bold text-[#1E7345]">Using sheet: {sheetName}</p>}
+          <p className="mt-1 text-xs font-bold text-[#8A3F4B]">Record type: {recordTypeLabel}</p>
         </div>
         {onChangeSheet && (
           <button
@@ -72,8 +79,19 @@ export function FieldMappingForm({
         )}
       </div>
       <p className="mt-2 text-sm text-[#816D62]">
-        Match imported columns to Gather & Savor registration fields. Extra columns can remain ignored safely.
+        Match imported columns to Gather & Savor fields. Extra columns can stay ignored or be preserved in Notes when they matter.
       </p>
+      {reviewOnly && (
+        <p className="mt-3 rounded-xl border border-[#F2D6A3] bg-[#FFF7E8] px-4 py-3 text-sm leading-6 text-[#7A5818]">
+          This record type is review-only in this prototype. You can inspect headers and data quality, but this screen will not write these rows.
+        </p>
+      )}
+
+      <div className="mt-5 grid gap-2 sm:grid-cols-3">
+        <div className="rounded-xl bg-[#EAF6EF] px-4 py-3 text-sm text-[#1E7345]"><strong>{mappedCount}</strong><br />Mapped columns</div>
+        <div className="rounded-xl bg-[#F7F1ED] px-4 py-3 text-sm text-[#6B564C]"><strong>{unmappedCount}</strong><br />Not Yet Mapped</div>
+        <div className="rounded-xl bg-[#FFF4DF] px-4 py-3 text-sm text-[#7A5818]"><strong>{issueCount}</strong><br />Header issues</div>
+      </div>
 
       <div className="mt-6 space-y-4">
         {headerRows.map(({ id, header, index }) => {
@@ -93,7 +111,13 @@ export function FieldMappingForm({
                   <span className="rounded-full bg-[#F7F1ED] px-2 py-0.5 text-[#80685B]">
                     Confidence: {mappingPreview[index]?.confidence || 'none'}
                   </span>
+                  <span className="rounded-full bg-[#F7F1ED] px-2 py-0.5 text-[#80685B]">
+                    Status: {mappingPreview[index]?.status || 'Not Yet Mapped'}
+                  </span>
                 </div>
+                <p className="mt-2 truncate font-sans text-xs font-normal text-[#80685B]">
+                  Example Value: {mappingPreview[index]?.exampleValue || 'blank in sample'}
+                </p>
               </div>
               <ChevronRight className="hidden size-4 text-[#C4B4AA] sm:block" />
               <div className="flex-1">
@@ -117,7 +141,7 @@ export function FieldMappingForm({
                   }}
                   className="w-full rounded-lg border border-[#E5D7CF] bg-[#FBF8F5] px-3 py-2 text-sm text-[#2B1723] focus:border-[#9A5260] focus:outline-none"
                 >
-                  <option value="">-- Skip this column --</option>
+                  <option value="">Ignore this column</option>
                   {REGISTRATION_FIELDS.map(field => (
                     <option 
                       key={field.value} 
@@ -130,6 +154,16 @@ export function FieldMappingForm({
                 </select>
                 {mappedField?.help && (
                   <p className="mt-1 text-[11px] leading-4 text-[#80685B]">{mappedField.help}</p>
+                )}
+                {!mappedKey && (
+                  <button
+                    type="button"
+                    onClick={() => onMapChange({ ...fieldMap, notes: index })}
+                    disabled={fieldMap.notes !== undefined}
+                    className="mt-2 rounded-lg border border-[#E7D6CC] px-3 py-1.5 text-[11px] font-bold text-[#6B564C] hover:bg-[#FBF8F5] disabled:opacity-50"
+                  >
+                    Preserve in Notes
+                  </button>
                 )}
               </div>
             </div>
@@ -169,7 +203,7 @@ export function FieldMappingForm({
           disabled={!isReady}
           className="rounded-xl bg-[#9A5260] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B] hover:shadow-xl hover:shadow-[#9A5260]/30 disabled:opacity-50"
         >
-          Preview Import
+          {reviewOnly ? 'Preview Rows' : 'Preview Import'}
         </button>
       </div>
     </div>
