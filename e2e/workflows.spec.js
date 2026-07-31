@@ -188,7 +188,7 @@ test('pasted-table import completes mapping, previews, confirms, and cleans up',
   const name = 'QA_PHASE23P_IMPORT_Workflow Guest'
   await signInAndSelectEvent(page)
   await page.goto('/imports')
-  await page.getByRole('button', { name: /Pasted table/ }).click()
+  await page.getByRole('button', { name: /^Paste Table/i }).click()
   await page.getByLabel('Paste registration rows').fill([
     'Full Name,Email,Persons Attending,Payment Status,Price Tier,Ticket Price,Amount Due,Amount Paid,Balance Due,Payment Method,Payment Reference,Ticket Code',
     `${name},qa-phase23p-import@example.test,1,Paid,General,45,45,45,0,Card,QA_PHASE23P_IMPORT_PAYMENT,QA23P-IMPORT-001`,
