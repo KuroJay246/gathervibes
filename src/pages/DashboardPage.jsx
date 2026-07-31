@@ -5,6 +5,7 @@ import {
   ClipboardCheck,
   Clock3,
   CreditCard,
+  FileInput,
   MessageSquareText,
   ReceiptText,
   TicketCheck,
@@ -21,7 +22,7 @@ import { formatEventDate, toDateInput, upcomingEvents } from '../utils/dateUtils
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
 import { getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
-import { isApprovedAdmin } from '../utils/accessRoles'
+import { canViewRoute, isApprovedAdmin } from '../utils/accessRoles'
 import { buildEventReadiness } from '../utils/eventReadiness'
 import {
   eventStatusLabel,
@@ -110,11 +111,14 @@ function PriorityItem({ item }) {
   )
 }
 
-function ActionLink({ to, icon: Icon, label }) {
+function ActionLink({ to, icon: Icon, label, detail }) {
   return (
-    <Link to={to} className="flex min-h-12 items-center gap-3 rounded-xl border border-[#EFE2DA] px-4 text-sm font-bold text-[#2B1723] hover:bg-[#FFF8F2]">
-      <Icon className="size-4 text-[#9A5260]" />
-      {label}
+    <Link to={to} className="flex min-h-12 items-center gap-3 rounded-xl border border-[#EFE2DA] px-4 py-3 text-sm font-bold text-[#2B1723] hover:bg-[#FFF8F2]">
+      <Icon className="size-4 shrink-0 text-[#9A5260]" />
+      <span>
+        <span className="block">{label}</span>
+        {detail && <span className="mt-1 block text-xs font-medium leading-5 text-[#80685B]">{detail}</span>}
+      </span>
     </Link>
   )
 }
@@ -143,13 +147,15 @@ const CLOCK_FORMATTER = new Intl.DateTimeFormat('en-BB', {
 })
 
 const PLANNING_ACTIONS = [
-  { to: '/registrations', label: 'Add Registration', icon: Users },
-  { to: '/payments', label: 'Record Payment', icon: CreditCard },
-  { to: '/operations', label: 'Add Expense or Commitment', icon: ReceiptText },
-  { to: '/operations', label: 'Add Supplier or Sponsor', icon: ReceiptText },
-  { to: '/events', label: 'Add Task', icon: CalendarDays },
-  { to: '/communications', label: 'Build Message', icon: MessageSquareText },
-  { to: '/event-review', label: 'Review Event Readiness', icon: ClipboardCheck },
+  { to: '/registrations', label: 'Add Registration', detail: 'Enter or correct a confirmed guest record.', icon: Users },
+  { to: '/payments', label: 'Record Payment', detail: 'Update registration payment evidence and balances.', icon: CreditCard },
+  { to: '/imports', label: 'Open Import Center', detail: 'Preview CSV, pasted rows, or supported spreadsheets.', icon: FileInput },
+  { to: '/operations', label: 'Add Operations Entry', detail: 'Record event expenses, income, reimbursements, or commitments.', icon: ReceiptText },
+  { to: '/tickets', label: 'View Tickets', detail: 'Prepare ticket codes and QR access.', icon: TicketCheck },
+  { to: '/check-in', label: 'Open Check-In', detail: 'Use event-day attendance tools.', icon: ClipboardCheck },
+  { to: '/event-review', label: 'View Reports', detail: 'Review read-only event follow-up and summaries.', icon: ClipboardCheck },
+  { to: '/events', label: 'Edit Event', detail: 'Update event setup, date, venue, capacity, or status.', icon: CalendarDays },
+  { to: '/communications', label: 'Build Message', detail: 'Create and copy manual event messages.', icon: MessageSquareText },
 ]
 
 const EVENT_DAY_ACTIONS = [
@@ -167,6 +173,56 @@ const COMPLETED_ACTIONS = [
 
 function formatClock(value) {
   return CLOCK_FORMATTER.format(value)
+}
+
+function dateFromTimestamp(value) {
+  if (!value) return null
+  if (typeof value.toDate === 'function') return value.toDate()
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
+function buildRecentActivity({ event, registrations = [], operationsEntries = [] }) {
+  const activity = []
+
+  if (event?.updatedAt || event?.createdAt) {
+    activity.push({
+      key: 'event-updated',
+      label: 'Event details updated',
+      source: 'Events',
+      date: dateFromTimestamp(event.updatedAt || event.createdAt),
+      to: '/events',
+    })
+  }
+
+  registrations.slice(0, 6).forEach((registration) => {
+    const date = dateFromTimestamp(registration.updatedAt || registration.createdAt || registration.timestamp)
+    if (!date) return
+    activity.push({
+      key: `registration-${registration.registrationId || registration.id || date.getTime()}`,
+      label: registration.ticketCode ? 'Registration and ticket record updated' : 'Registration record updated',
+      source: 'Guests & Registrations',
+      date,
+      to: '/registrations',
+    })
+  })
+
+  operationsEntries.slice(0, 6).forEach((entry) => {
+    const date = dateFromTimestamp(entry.updatedAt || entry.createdAt)
+    if (!date) return
+    activity.push({
+      key: `operations-${entry.entryId || entry.id || date.getTime()}`,
+      label: 'Operations ledger entry updated',
+      source: 'Operations',
+      date,
+      to: '/operations',
+    })
+  })
+
+  return activity
+    .filter((item) => item.date)
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .slice(0, 5)
 }
 
 export function DashboardPage() {
@@ -226,6 +282,14 @@ export function DashboardPage() {
   const urgentContacts = hydratedEvent.partnerRecords
     .filter((record) => record.phone || record.email)
     .slice(0, 4)
+  const quickActions = useMemo(
+    () => PLANNING_ACTIONS.filter((action) => canViewRoute(access, action.to)),
+    [access],
+  )
+  const recentActivity = useMemo(
+    () => buildRecentActivity({ event: selectedEvent, registrations, operationsEntries }),
+    [operationsEntries, registrations, selectedEvent],
+  )
 
   return (
     <div className="space-y-6">
@@ -364,12 +428,14 @@ export function DashboardPage() {
             <Metric
               label="Payments received"
               value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)}
-              detail={`Projected registration income ${formatCurrency(
-                readiness.planningOverview.budgets.projectedRegistrationIncome,
-                financeSummary.currency,
-              )} · Outstanding registration balance ${formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)}`}
+              detail="Registration payments only"
             />
+            <Metric label="Payments outstanding" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} detail="Registration balances only" />
             <Metric label="Capacity used" value={hydratedEvent?.capacity ? `${metrics.capacityPercent}%` : 'Not set'} detail={capacityLabel} />
+            <Metric label="Tickets issued" value={registrations.filter((registration) => registration.ticketCode).length} detail="Ticket-code records" />
+            <Metric label="Check-Ins" value={metrics.checkedInRegistrations} detail={`${metrics.checkedInPersons} guests checked in`} />
+            <Metric label="Operations expenses recorded" value={formatCurrency(readiness.planningOverview.operationsSettlement.paidExpenses, financeSummary.currency)} detail="Event-level ledger only" />
+            <Metric label="Outstanding commitments" value={formatCurrency(readiness.planningOverview.totalOutstandingCommitments, financeSummary.currency)} detail="Operations commitments only" />
           </section>
 
           <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
@@ -385,12 +451,30 @@ export function DashboardPage() {
               )}
             </Section>
 
-            <Section eyebrow="Quick Actions" title="Common organizer actions">
+          <Section eyebrow="Quick Actions" title="Common organizer actions">
               <div className="grid gap-2">
-              {PLANNING_ACTIONS.map((action) => <ActionLink key={action.label} {...action} />)}
+              {quickActions.slice(0, 7).map((action) => <ActionLink key={action.label} {...action} />)}
               </div>
             </Section>
           </section>
+
+          <Section eyebrow="Recent Activity" title="Latest safe changes">
+            {recentActivity.length === 0 ? (
+              <p className="rounded-2xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm text-[#816D62]">
+                No recent event, registration, or Operations updates are available yet. Activity appears here after existing event-scoped records are created or corrected.
+              </p>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                {recentActivity.map((activity) => (
+                  <Link key={activity.key} to={activity.to} className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 hover:bg-white">
+                    <span className="gsv-status-pill gsv-status-pill-info">{activity.source}</span>
+                    <p className="mt-3 text-sm font-bold text-[#2B1723]">{activity.label}</p>
+                    <p className="mt-2 text-xs text-[#80685B]">{formatEventDate(activity.date, { hour: 'numeric', minute: '2-digit' })}</p>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </Section>
 
           <details className="phase23v-panel">
             <summary className="phase23v-summary">
@@ -413,7 +497,7 @@ export function DashboardPage() {
                   <Metric label="Projected registration income" value={formatCurrency(readiness.planningOverview.budgets.projectedRegistrationIncome, financeSummary.currency)} />
                   <Metric label="Outstanding registration balance" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
                   <Metric label="Paid event expenses" value={formatCurrency(readiness.planningOverview.operationsSettlement.paidExpenses, financeSummary.currency)} />
-                  <Metric label="Projected cash position" value={formatCurrency(readiness.planningOverview.projectedCashPosition, financeSummary.currency)} detail="Planning view, not final profit" />
+                  <Metric label="Outstanding commitments" value={formatCurrency(readiness.planningOverview.totalOutstandingCommitments, financeSummary.currency)} detail="Operations commitments remain separate from registration payments." />
                 </div>
               </section>
             </div>
