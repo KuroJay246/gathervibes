@@ -3,6 +3,8 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router'
 import {
   CalendarDays,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ClipboardCheck,
   CreditCard,
   FileInput,
@@ -30,23 +32,38 @@ import { TutorialProvider } from '../tutorial/TutorialProvider'
 
 const navGroups = [
   {
-    label: 'Daily workspace',
+    label: 'Home',
     items: [
       { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-      { to: '/events', label: 'Events', icon: CalendarDays },
-      { to: '/registrations', label: 'Guests & Registrations', icon: UsersRound },
-      { to: '/payments', label: 'Payments', icon: CreditCard },
-      { to: '/tickets', label: 'Tickets', icon: TicketCheck },
-      { to: '/check-in', label: 'Check-In', icon: ClipboardCheck },
-      { to: '/operations', label: 'Operations', icon: ReceiptText },
-      { to: '/communications', label: 'Message Builder', icon: MessageSquareText },
-      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
     ],
   },
   {
-    label: 'Admin',
+    label: 'Event Management',
     items: [
+      { to: '/events', label: 'Events', icon: CalendarDays },
+      { to: '/registrations', label: 'Guests & Registrations', icon: UsersRound },
+      { to: '/payments', label: 'Registration Payments', icon: CreditCard },
+      { to: '/tickets', label: 'Tickets', icon: TicketCheck },
+      { to: '/check-in', label: 'Check-In', icon: ClipboardCheck },
+    ],
+  },
+  {
+    label: 'Operations',
+    items: [
+      { to: '/operations', label: 'Operations', icon: ReceiptText },
+      { to: '/communications', label: 'Message Builder', icon: MessageSquareText },
+    ],
+  },
+  {
+    label: 'Review and Data',
+    items: [
+      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
       { to: '/imports', label: 'Import Center', icon: FileInput },
+    ],
+  },
+  {
+    label: 'Administration',
+    items: [
       { to: '/settings', label: 'Settings', icon: Settings },
       { to: '/qa', label: 'System QA', icon: ShieldCheck },
     ],
@@ -55,19 +72,29 @@ const navGroups = [
 
 const mobileMoreGroups = [
   {
-    label: 'More workspace',
+    label: 'Event Management',
     items: [
       { to: '/events', label: 'Events', icon: CalendarDays },
-      { to: '/payments', label: 'Payments', icon: CreditCard },
-      { to: '/operations', label: 'Operations', icon: ReceiptText },
-      { to: '/communications', label: 'Message Builder', icon: MessageSquareText },
-      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
+      { to: '/payments', label: 'Registration Payments', icon: CreditCard },
     ],
   },
   {
-    label: 'Admin',
+    label: 'Operations',
     items: [
+      { to: '/operations', label: 'Operations', icon: ReceiptText },
+      { to: '/communications', label: 'Message Builder', icon: MessageSquareText },
+    ],
+  },
+  {
+    label: 'Review and Data',
+    items: [
+      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
       { to: '/imports', label: 'Import Center', icon: FileInput },
+    ],
+  },
+  {
+    label: 'Administration',
+    items: [
       { to: '/settings', label: 'Settings', icon: Settings },
       { to: '/qa', label: 'System QA', icon: ShieldCheck },
     ],
@@ -78,7 +105,7 @@ const pageTitles = {
   '/dashboard': ['Overview', 'Current event status, priorities, and next actions'],
   '/events': ['Events', 'Plan and organize every gathering'],
   '/registrations': ['Guests & Registrations', 'Manage registration records and guest counts'],
-  '/payments': ['Payments', 'Review registration charges, payments, balances, and follow-up'],
+  '/payments': ['Registration Payments', 'Review registration charges, payments, balances, and follow-up'],
   '/payments/reconciliation': ['Reconciliation Preview', 'Read-only payment workbook comparison'],
   '/tickets': ['Tickets', 'Assign ticket codes and prepare QR access'],
   '/check-in': ['Check-In', 'Track event-day attendance'],
@@ -97,7 +124,7 @@ const mobileIconMap = {
   ClipboardCheck,
 }
 
-function SidebarContent({ onNavigate, mobile = false, groups = navGroups }) {
+function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collapsed = false, onToggleCollapsed }) {
   const { user, signOut, currentRoleLabel, access } = useAuth()
   const { activeEvent } = useActiveEvent()
   const adminUser = isApprovedAdmin(access)
@@ -105,27 +132,41 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups }) {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <Link to="/dashboard" onClick={onNavigate} className="block px-6 pb-7 pt-6 focus:outline-none focus:ring-2 focus:ring-[#F5E6C8]/60" aria-label="Go to Overview">
-        <BrandMark light />
-      </Link>
+      <div className={`flex items-center ${collapsed ? 'justify-center px-3' : 'justify-between px-6'} pb-6 pt-6`}>
+        <Link to="/dashboard" onClick={onNavigate} className="block focus:outline-none focus:ring-2 focus:ring-[#F5E6C8]/60" aria-label="Go to Overview">
+          <BrandMark light compact={collapsed} />
+        </Link>
+        {!mobile && (
+          <button
+            type="button"
+            onClick={onToggleCollapsed}
+            className={`${collapsed ? 'absolute right-[-0.9rem] top-7' : ''} hidden rounded-full border border-white/15 bg-white/10 p-2 text-white/70 transition hover:bg-white/15 hover:text-white lg:inline-flex`}
+            aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+            aria-expanded={!collapsed}
+          >
+            {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+          </button>
+        )}
+      </div>
 
-      <div data-tour-id="working-event-selector" className="mx-4 max-w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-3.5">
-        <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.24em] text-[#D7B8BD]">Working Event</p>
+      <div data-tour-id="working-event-selector" className={`${collapsed ? 'mx-3 p-2.5' : 'mx-4 p-3.5'} max-w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06]`}>
+        <p className={`${collapsed ? 'sr-only' : 'mb-2'} text-[9px] font-bold uppercase tracking-[0.24em] text-[#D7B8BD]`}>Working Event</p>
         <Link to={adminUser ? '/events' : '/check-in'} onClick={onNavigate} className="flex w-full min-w-0 items-center justify-between gap-3 text-left">
           <span className="min-w-0 flex-1 overflow-hidden">
-            <span className="block max-w-full truncate text-sm font-medium text-white">{activeEvent?.eventName || 'No event selected'}</span>
-            <span className="mt-0.5 block max-w-full truncate text-[11px] text-white/70">
+            <span className={`${collapsed ? 'sr-only' : 'block'} max-w-full truncate text-sm font-medium text-white`}>{activeEvent?.eventName || 'No event selected'}</span>
+            <span className={`${collapsed ? 'sr-only' : 'mt-0.5 block'} max-w-full truncate text-[11px] text-white/70`}>
               {activeEvent ? `${formatEventDate(activeEvent.eventDate)} · ${activeEvent.status || 'status not set'}` : adminUser ? 'Choose one from Events' : 'Assigned event required'}
             </span>
+            {collapsed && <CalendarDays className="mx-auto size-5 text-white/80" aria-hidden="true" />}
           </span>
-          <ChevronDown className="size-4 shrink-0 text-white/65" aria-hidden="true" />
+          {!collapsed && <ChevronDown className="size-4 shrink-0 text-white/65" aria-hidden="true" />}
         </Link>
       </div>
 
       <nav className="mt-5 min-h-0 flex-1 overflow-y-auto px-3 pb-4" aria-label="Main navigation">
         {groups.map((group) => (
           <div className="mb-5" key={group.label}>
-            <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/65">{group.label}</p>
+            <p className={`${collapsed ? 'sr-only' : 'mb-2 px-3'} text-[9px] font-bold uppercase tracking-[0.22em] text-white/65`}>{group.label}</p>
             <div className="space-y-1">
               {group.items.reduce((links, { to, label, icon: Icon }) => {
                 if (!canViewRoute(access, to)) return links
@@ -134,8 +175,10 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups }) {
                     key={to}
                     to={to}
                     onClick={onNavigate}
+                    title={collapsed ? label : undefined}
+                    aria-label={collapsed ? label : undefined}
                     className={({ isActive }) =>
-                      `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition ${
+                      `group flex items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3'} rounded-xl py-2.5 text-[13px] transition ${
                         isActive
                           ? 'bg-[#7F3E49] text-white shadow-[0_8px_24px_rgba(127,62,73,0.24)]'
                           : 'text-white/70 hover:bg-white/[0.06] hover:text-white'
@@ -143,7 +186,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups }) {
                     }
                   >
                     <Icon className="size-[17px] shrink-0" strokeWidth={1.8} aria-hidden="true" />
-                    <span className="flex-1">{label}</span>
+                    <span className={collapsed ? 'sr-only' : 'flex-1'}>{label}</span>
                   </NavLink>,
                 )
                 return links
@@ -154,19 +197,19 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups }) {
       </nav>
 
       <div className={`shrink-0 border-t border-white/10 p-3 ${mobile ? 'pb-[max(1rem,env(safe-area-inset-bottom))]' : ''}`}>
-        {settingsAllowed && <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.22em] text-white/65">Account</p>}
-        <div className="flex items-center gap-3 rounded-xl bg-black/10 p-2.5">
+        {settingsAllowed && <p className={`${collapsed ? 'sr-only' : 'mb-2 px-3'} text-[9px] font-bold uppercase tracking-[0.22em] text-white/65`}>Account</p>}
+        <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'} rounded-xl bg-black/10 p-2.5`}>
           <div className="grid size-8 shrink-0 place-items-center rounded-full bg-[#F7DDE6] text-xs font-bold uppercase text-[#2B1723]">
             {user?.email?.slice(0, 1) || 'A'}
           </div>
-          <div className="min-w-0 flex-1">
+          <div className={collapsed ? 'sr-only' : 'min-w-0 flex-1'}>
             <p className="truncate text-xs font-medium text-white">{currentRoleLabel || 'Admin'}</p>
             <p className="truncate text-[10px] text-white/70">{user?.email}</p>
           </div>
           <button
             type="button"
             onClick={signOut}
-            className="rounded-lg p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
+            className={`${collapsed ? 'sr-only' : ''} rounded-lg p-2 text-white/70 transition hover:bg-white/10 hover:text-white`}
             aria-label="Sign out"
           >
             <LogOut className="size-4" aria-hidden="true" />
@@ -179,6 +222,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups }) {
 
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const location = useLocation()
   const { currentRoleLabel, access } = useAuth()
   const { activeEvent } = useActiveEvent()
@@ -187,9 +231,12 @@ export function AppShell() {
 
   return (
     <TutorialProvider>
-    <div className="min-h-screen bg-[#FFF8F2] text-[#2B1723]">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[258px] bg-[#2B1723] lg:block">
-        <SidebarContent />
+    <div className="gsv-app-shell">
+      <aside
+        className="fixed inset-y-0 left-0 z-30 hidden bg-[#2B1723] transition-[width] duration-200 lg:block"
+        style={{ width: sidebarCollapsed ? '84px' : '258px' }}
+      >
+        <SidebarContent collapsed={sidebarCollapsed} onToggleCollapsed={() => setSidebarCollapsed((value) => !value)} />
       </aside>
 
       {menuOpen && (
@@ -214,9 +261,9 @@ export function AppShell() {
         </div>
       )}
 
-      <div className="min-w-0 lg:pl-[258px]">
+      <div className="min-w-0 transition-[padding] duration-200 lg:pl-[var(--shell-sidebar-width)]" style={{ '--shell-sidebar-width': sidebarCollapsed ? '84px' : '258px' }}>
         <header className="app-safe-top sticky top-0 z-20 border-b border-[#EEDDD3] bg-[#FFF8F2]/90 px-4 py-3.5 backdrop-blur-xl sm:px-7 sm:py-4 lg:px-10">
-          <div className="mx-auto flex max-w-[1480px] items-center gap-4">
+          <div className="gsv-page-container flex items-center gap-4">
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
@@ -241,7 +288,7 @@ export function AppShell() {
         </header>
 
         <main className="px-3 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-6 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
-          <div className="mx-auto max-w-[1480px] min-w-0 overflow-x-clip">
+          <div className="gsv-page-container">
             <div data-tour-id="working-event-selector" className="mb-5 rounded-2xl border border-[#EEDDD3] bg-white px-4 py-3 shadow-[0_6px_18px_rgba(84,53,67,0.04)]">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">

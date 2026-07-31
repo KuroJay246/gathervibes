@@ -133,11 +133,13 @@ test('registration, ticket, and check-in journey preserves finance distinctions'
   await expect(page.getByText('Already checked in')).toBeVisible()
 
   for (const [path, text] of [
-    ['/dashboard', 'Projected registration income'],
+    ['/dashboard', 'Payments received'],
+    ['/dashboard', 'Registration payments only'],
+    ['/dashboard', 'Payments outstanding'],
     ['/event-review', 'Registration Payments'],
   ]) {
     await page.goto(path)
-    await expect(page.getByText(text).first()).toBeVisible()
+    await expect(page.getByText(text).filter({ visible: true }).first()).toBeVisible()
   }
 
   await page.goto('/payments')

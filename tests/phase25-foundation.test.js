@@ -92,13 +92,15 @@ test('sidebar Working Event box contains long event text safely', async () => {
 test('Overview quick actions prioritize organizer planning and event-day work', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
 
-  for (const route of ['/registrations', '/payments', '/operations', '/events', '/communications', '/event-review']) {
+  for (const route of ['/registrations', '/payments', '/imports', '/operations', '/tickets', '/check-in', '/events', '/communications', '/event-review']) {
     assert.match(dashboard, new RegExp(`to: '${route}'`))
   }
 
-  for (const label of ['Add Registration', 'Record Payment', 'Add Expense or Commitment', 'Add Supplier or Sponsor', 'Add Task', 'Build Message', 'Review Event Readiness']) {
+  for (const label of ['Add Registration', 'Record Payment', 'Open Import Center', 'Add Operations Entry', 'View Tickets', 'Open Check-In', 'View Reports', 'Edit Event', 'Build Message']) {
     assert.match(dashboard, new RegExp(label.replace('/', '\\/')))
   }
+
+  assert.doesNotMatch(dashboard, /Add Task|Add Supplier or Sponsor|Projected cash position/)
 
   for (const label of ['Ticket Lookup', 'Open Check-In', 'Urgent Contacts and Commitments', 'Open Reports']) {
     assert.match(dashboard, new RegExp(label.replace('/', '\\/')))

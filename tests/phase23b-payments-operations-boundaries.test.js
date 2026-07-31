@@ -21,9 +21,9 @@ test('Payments route is organizer-facing while scanner navigation remains isolat
   const paymentsPage = await readFile('src/pages/PaymentsPage.jsx', 'utf8')
 
   assert.match(app, /path="\/payments"/)
-  assert.match(shell, /to: '\/payments', label: 'Payments'/)
+  assert.match(shell, /to: '\/payments', label: 'Registration Payments'/)
   assert.match(shell, /\/registrations[\s\S]*\/payments[\s\S]*\/tickets/)
-  assert.match(shell, /More workspace[\s\S]*\/events[\s\S]*\/payments[\s\S]*\/operations/)
+  assert.match(shell, /Event Management[\s\S]*\/events[\s\S]*\/payments[\s\S]*\/tickets/)
   assert.match(access, /scanner:[\s\S]*'\/scanner'/)
   assert.doesNotMatch(access, /scanner:[\s\S]*'\/payments'/)
   assert.match(paymentsPage, /'unknown', 'Unknown'/)

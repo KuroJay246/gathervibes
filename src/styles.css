@@ -1,9 +1,35 @@
 @import "tailwindcss";
 
 :root {
+  --gsv-color-bg: #fff8f2;
+  --gsv-color-bg-soft: #fbf3eb;
+  --gsv-color-surface: #fffdfb;
+  --gsv-color-surface-raised: #ffffff;
+  --gsv-color-text: #2b1723;
+  --gsv-color-text-secondary: #5f493f;
+  --gsv-color-text-muted: #80685b;
+  --gsv-color-border: #eedfd6;
+  --gsv-color-border-strong: #e1d1c8;
+  --gsv-color-primary: #9a5260;
+  --gsv-color-primary-strong: #7f3e49;
+  --gsv-color-sidebar: #2b1723;
+  --gsv-color-success-bg: #eaf6ef;
+  --gsv-color-success-text: #244b32;
+  --gsv-color-warning-bg: #fff4df;
+  --gsv-color-warning-text: #7a5818;
+  --gsv-color-error-bg: #fff1f1;
+  --gsv-color-error-text: #a32626;
+  --gsv-color-info-bg: #f6f9ff;
+  --gsv-color-info-text: #415f91;
+  --gsv-space-page-x: clamp(1rem, 3vw, 2.5rem);
+  --gsv-content-max: 1480px;
+  --gsv-radius-card: 1.5rem;
+  --gsv-radius-control: 0.875rem;
+  --gsv-shadow-card: 0 8px 24px rgba(84, 53, 67, 0.04);
+  --gsv-control-height: 2.75rem;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #2b1723;
-  background: #fff8f2;
+  color: var(--gsv-color-text);
+  background: var(--gsv-color-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -14,7 +40,7 @@
 }
 
 html {
-  background: #fff8f2;
+  background: var(--gsv-color-bg);
   overflow-x: hidden;
 }
 
@@ -94,6 +120,71 @@ input:focus-visible {
   padding: 0.35rem;
   box-shadow: 0 16px 40px rgba(43, 23, 35, 0.16);
   backdrop-filter: blur(18px);
+}
+
+.gsv-app-shell {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at top left, rgba(247, 221, 230, 0.5), transparent 26rem),
+    linear-gradient(180deg, var(--gsv-color-bg) 0%, var(--gsv-color-bg-soft) 100%);
+  color: var(--gsv-color-text);
+}
+
+.gsv-page-container {
+  width: 100%;
+  max-width: var(--gsv-content-max);
+  min-width: 0;
+  margin-inline: auto;
+  overflow-x: clip;
+}
+
+.gsv-card {
+  min-width: 0;
+  border: 1px solid var(--gsv-color-border);
+  border-radius: var(--gsv-radius-card);
+  background: var(--gsv-color-surface-raised);
+  box-shadow: var(--gsv-shadow-card);
+}
+
+.gsv-section-eyebrow {
+  color: var(--gsv-color-primary);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.gsv-status-pill {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.gsv-status-pill-success {
+  background: var(--gsv-color-success-bg);
+  color: var(--gsv-color-success-text);
+}
+
+.gsv-status-pill-warning {
+  background: var(--gsv-color-warning-bg);
+  color: var(--gsv-color-warning-text);
+}
+
+.gsv-status-pill-error {
+  background: var(--gsv-color-error-bg);
+  color: var(--gsv-color-error-text);
+}
+
+.gsv-status-pill-info {
+  background: var(--gsv-color-info-bg);
+  color: var(--gsv-color-info-text);
 }
 
 .mobile-tab-item {

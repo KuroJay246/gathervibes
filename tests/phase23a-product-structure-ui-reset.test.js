@@ -18,7 +18,7 @@ test('organizer navigation uses product labels while preserving route paths', as
   assert.match(shell, /to: '\/qa', label: 'System QA'/)
   assert.match(shell, /Overview[\s\S]*Guests[\s\S]*Tickets[\s\S]*Check-In[\s\S]*More/)
   const mobileMoreGroups = shell.slice(shell.indexOf('const mobileMoreGroups'), shell.indexOf('const pageTitles'))
-  assert.match(mobileMoreGroups, /More workspace[\s\S]*\/events[\s\S]*\/operations[\s\S]*\/communications[\s\S]*\/event-review[\s\S]*Admin[\s\S]*\/imports[\s\S]*\/settings[\s\S]*\/qa/)
+  assert.match(mobileMoreGroups, /Event Management[\s\S]*\/events[\s\S]*Registration Payments[\s\S]*Operations[\s\S]*\/operations[\s\S]*\/communications[\s\S]*Review and Data[\s\S]*\/event-review[\s\S]*\/imports[\s\S]*Administration[\s\S]*\/settings[\s\S]*\/qa/)
   assert.doesNotMatch(mobileMoreGroups, /\/dashboard|\/registrations|\/tickets|\/check-in/)
   assert.match(app, /path="\/communications"/)
   assert.match(app, /path="\/event-review"/)
@@ -30,12 +30,13 @@ test('organizer navigation uses product labels while preserving route paths', as
 test('Overview removes phase clutter and keeps event-scoped decision sections', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
 
-  for (const text of ['Overview', 'Registration records', 'Guests', 'Payments received', 'Capacity used', 'Needs Attention', 'Quick Actions', 'Planning Progress', 'Upcoming Events']) {
+  for (const text of ['Overview', 'Registration records', 'Guests', 'Payments received', 'Payments outstanding', 'Tickets issued', 'Check-Ins', 'Operations expenses recorded', 'Outstanding commitments', 'Needs Attention', 'Quick Actions', 'Recent Activity', 'Planning Progress', 'Upcoming Events']) {
     assert.match(dashboard, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
   assert.match(dashboard, /Review Event Readiness|to: '\/event-review'/)
   assert.match(dashboard, /id="clear-selected-event"/)
+  assert.doesNotMatch(dashboard, /Projected cash position|Net Income|Profit/)
   assert.doesNotMatch(dashboard, /Phase \d+/)
   assert.doesNotMatch(dashboard, /roadmap|deferred|command center|Quick navigation/i)
 })
