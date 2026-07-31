@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { Copy, Download, FileSpreadsheet, CheckCircle2, Info } from 'lucide-react'
 import { downloadCsv } from '../../utils/exportUtils'
 
-const TEMPLATES = [
+const IMPORT_TEMPLATES = [
   {
     id: 'basic-registration',
-    label: '1. Basic Registration Import',
+    label: 'Basic Registration Import',
     description: 'Use when you only have names and contact details.',
     when: 'Use this for a simple guest list with one row per registration.',
     required: ['Full Name'],
@@ -20,7 +20,7 @@ const TEMPLATES = [
   },
   {
     id: 'buyer-attendees',
-    label: '2. Buyer + Attendees Import',
+    label: 'Buyer + Attendees Import',
     description: 'Use when one person bought tickets for a group.',
     when: 'Use this when the buyer/contact is different from the guest names.',
     required: ['Buyer Name', 'Guest Names'],
@@ -35,7 +35,7 @@ const TEMPLATES = [
   },
   {
     id: 'finance-import',
-    label: '3. Finance Import',
+    label: 'Registration Payment Import',
     description: 'Use when importing paid tickets with balances and payment methods.',
     when: 'Use this when payment amounts are already confirmed outside the app.',
     required: ['Full Name', 'Payment Status'],
@@ -50,7 +50,7 @@ const TEMPLATES = [
   },
   {
     id: 'door-payment',
-    label: '4. Door Payment Import',
+    label: 'Door Payment Import',
     description: 'Use when guests are expected to pay at the door.',
     when: 'Use this for guests who are expected to pay when they arrive.',
     required: ['Full Name', 'Payment Status'],
@@ -65,7 +65,7 @@ const TEMPLATES = [
   },
   {
     id: 'school-group',
-    label: '5. School / Group Import',
+    label: 'School / Group Import',
     description: 'Use when tracking groups, tables, or school affiliations.',
     when: 'Use this when group, table, school, or organization names matter for event operations.',
     required: ['Full Name'],
@@ -80,7 +80,7 @@ const TEMPLATES = [
   },
   {
     id: 'full-admin',
-    label: '6. Full Admin Import Template',
+    label: 'Full Admin Import Template',
     description: 'Includes all supported columns for a comprehensive import.',
     when: 'Use this when an admin has a complete, reviewed spreadsheet.',
     required: ['Full Name'],
@@ -95,7 +95,7 @@ const TEMPLATES = [
   },
   {
     id: 'google-reimport',
-    label: '7. Google Forms Re-import Template',
+    label: 'Google Forms Re-import Template',
     description: 'Use after exporting, cleaning, and downloading a Google Forms or Sheets CSV.',
     when: 'Use this to bring a manually cleaned Google Forms response sheet back into preview.',
     required: ['Full Name or Guest Names'],
@@ -107,6 +107,21 @@ const TEMPLATES = [
     effect: 'Creates new registrations only after preview; it is not a silent sync.',
     headers: ['Full Name', 'Buyer Name', 'Guest Names', 'Group Name', 'Email Address', 'Phone Number', 'Persons Attending', 'Payment Status', 'Payment Method', 'Payment Reference', 'Price Tier', 'Ticket Price', 'Amount Due', 'Amount Paid', 'Balance Due', 'Ticket Code', 'Notes'],
     sampleRow: ['Jamie Forms', 'Jamie Buyer', 'Jamie Forms', '', 'jamie@example.com', '555-0104', 1, 'pending', 'unknown', '', 'General', '', '', '', '', '', 'Cleaned re-import row'],
+  },
+  {
+    id: 'response-inbox-review',
+    label: 'Response Inbox Review Template',
+    description: 'Use when reviewing pasted Google Forms response exports before deciding what can be mapped.',
+    when: 'Use this for response queues, application forms, feedback, or custom review records.',
+    required: ['Timestamp or Response ID'],
+    optional: ['Full Name', 'Email Address', 'Phone Number', 'Status', 'Notes'],
+    exampleUse: 'Reviewing new responses before approving guest-registration rows for mapping.',
+    leaveBlank: 'Leave unsupported destination fields blank until a real workflow exists.',
+    doNotPut: 'Do not paste passwords, Gmail links, private Drive links, or bank/card screenshots.',
+    duplicates: 'Use Response ID, email, phone, and name to find possible duplicate responses.',
+    effect: 'Reviews response rows; only approved guest-registration responses continue into import mapping.',
+    headers: ['Timestamp', 'Response ID', 'Full Name', 'Email Address', 'Phone Number', 'Status', 'Notes'],
+    sampleRow: ['2026-08-01T12:00:00Z', 'response-1', 'Taylor Guest', 'taylor@example.com', '2465550100', 'new', 'Needs review before mapping'],
   },
 ]
 
@@ -150,7 +165,7 @@ export function ImportTemplatesPanel() {
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
-          {TEMPLATES.map((template) => (
+          {IMPORT_TEMPLATES.map((template) => (
             <div key={template.id} className="flex flex-col justify-between rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
               <div>
                 <p className="font-bold text-[#2B1723]">{template.label}</p>
@@ -195,9 +210,9 @@ export function ImportTemplatesPanel() {
         <div className="flex items-start gap-3">
           <Info className="mt-0.5 size-5 shrink-0 text-[#2C7B8B]" />
           <div>
-            <h3 className="font-bold text-[#1F5763]">Google Sheets Workflow</h3>
+            <h3 className="font-bold text-[#1F5763]">Manual Spreadsheet Export Workflow</h3>
             <p className="mt-1 text-sm text-[#245F6B]">
-              To sync Google Sheets data manually, follow these steps:
+              Google Sheets is not connected live. Use this manual export path when the source spreadsheet changes:
             </p>
             <ol className="ml-4 mt-3 list-decimal space-y-2 text-sm text-[#245F6B]">
               <li>Go to the <strong>Registrations</strong> page and click <strong>Export CSV</strong> (use "Google Forms re-import template").</li>
@@ -205,7 +220,7 @@ export function ImportTemplatesPanel() {
               <li>Upload the CSV and choose "Replace current sheet" or "Create new spreadsheet".</li>
               <li>Edit your guest data, update payment statuses, and add new rows directly in Google Sheets.</li>
               <li>When finished, click <strong>File &rarr; Download &rarr; Comma Separated Values (.csv)</strong>.</li>
-              <li>Return to this <strong>Import Center</strong> and upload the new CSV file to sync the changes.</li>
+              <li>Return to this <strong>Import Center</strong> and upload the new CSV file for preview, validation, and explicit confirmation.</li>
             </ol>
           </div>
         </div>

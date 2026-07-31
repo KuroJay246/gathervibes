@@ -10,11 +10,13 @@ test('Import Center source selector covers supported source types', () => {
     IMPORT_SOURCES.map((source) => source.value),
     [
       'google-forms-csv',
-      'google-sheets-csv',
+      'google-sheets-export',
       'xlsx',
+      'custom-csv',
       'pasted-table',
-      'bank-payment-csv',
-      'custom',
+      'copy-rows-from-spreadsheet',
+      'pdf-table',
+      'google-forms-response-inbox',
     ],
   )
 })
@@ -31,7 +33,8 @@ test('Import Center keeps Google Sheets OAuth deferred and enables XLSX parsing'
   const sheets = getImportSource('google-sheets-csv')
   const xlsx = getImportSource('xlsx')
 
-  assert.match(sheets.helperText, /Download your sheet as CSV/)
+  assert.match(sheets.helperText, /Download > CSV/)
+  assert.match(sheets.helperText, /Live Google Sheets sync is not connected/)
   assert.equal(xlsx.mode, 'xlsx')
   assert.match(xlsx.helperText, /Excel workbook/)
 })
