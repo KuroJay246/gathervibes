@@ -6,7 +6,7 @@ import { PartnerCommitmentsPanel } from '../components/operations/PartnerCommitm
 import { useActiveEvent } from '../events/useActiveEvent'
 import { EmptyState } from '../components/ui/EmptyState'
 import { LoadingState } from '../components/ui/LoadingState'
-import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
+import { buildFinanceSummary, formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
 import { subscribeToRegistrations } from '../services/registrationService'
 import {
   LEDGER_ENTRY_TYPES,
@@ -28,7 +28,7 @@ import {
 } from '../utils/operationsReport'
 import { InfoHint } from '../components/ui/InfoHint'
 import { canWriteOperations, isApprovedAdmin } from '../utils/accessRoles'
-import { isCompletedEvent } from '../utils/eventPlanning'
+import { hydrateEventForPlanning, isCompletedEvent } from '../utils/eventPlanning'
 
 const EMPTY_FORM = {
   entryType: 'income',
@@ -79,6 +79,26 @@ function buildFilterScopeLabel(filters = DEFAULT_FILTERS) {
   return parts.length > 0 ? `Current filtered view (${parts.join(' / ')})` : 'Current filtered view (all visible ledger rows)'
 }
 
+function formatDateValue(value) {
+  if (!value) return 'Not recorded'
+  const raw = typeof value?.toDate === 'function' ? value.toDate() : value
+  const date = raw instanceof Date ? raw : new Date(raw)
+  if (Number.isNaN(date.getTime())) return 'Not recorded'
+  return date.toLocaleDateString('en-BB', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+function buildTaskHref({ title, category, notes, priority = 'Normal' }) {
+  const params = new URLSearchParams({
+    title: title.slice(0, 160),
+    category,
+    status: 'Not Started',
+    priority,
+    responsibleLabel: 'Organizer',
+    notes: notes.slice(0, 400),
+  })
+  return `/tasks?${params.toString()}`
+}
+
 export function OperationsPage() {
   const { user, access } = useAuth()
   const { activeEvent } = useActiveEvent()
@@ -88,14 +108,17 @@ export function OperationsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
+  const [activeView, setActiveView] = useState('ledger')
   const [form, setForm] = useState(EMPTY_FORM)
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [selectedDetail, setSelectedDetail] = useState(null)
   const adminUser = isApprovedAdmin(access)
   const currentEvent = resolvedActiveEvent || activeEvent
   const canEditOperations = canWriteOperations(access, currentEvent?.eventId)
   const completedEvent = isCompletedEvent(currentEvent)
+  const planningEvent = useMemo(() => hydrateEventForPlanning(currentEvent || {}), [currentEvent])
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -103,10 +126,12 @@ export function OperationsPage() {
     setRegistrations([])
     setResolvedActiveEvent(activeEvent)
     setFilters(DEFAULT_FILTERS)
+    setActiveView('ledger')
     setForm(EMPTY_FORM)
     setEditing(null)
     setMessage('')
     setError('')
+    setSelectedDetail(null)
     setLoading(Boolean(activeEvent?.eventId))
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [activeEvent])
@@ -179,6 +204,25 @@ export function OperationsPage() {
   const filteredControl = useMemo(() => buildOperationsControlSummary(filteredEntries), [filteredEntries])
   const possibleRegistrationPaymentOverlap = useMemo(() => findPossibleRegistrationPaymentOverlap(entries), [entries])
   const filterScopeLabel = useMemo(() => buildFilterScopeLabel(filters), [filters])
+  const partnerRecords = useMemo(() => planningEvent.partnerRecords || [], [planningEvent])
+  const commitmentRows = useMemo(() => partnerRecords
+    .filter((record) => record.recordType !== 'sponsor' && ((record.agreedAmount || 0) > 0 || (record.amountPaid || 0) > 0 || (record.balance || 0) > 0))
+    .map((record) => ({
+      ...record,
+      commitmentStatus: (record.status === 'Paid' || (record.balance || 0) === 0) ? 'Paid' : record.status === 'Partially Paid' || (record.amountPaid || 0) > 0 ? 'Partially Paid' : record.status,
+      overdue: Boolean(record.dueDate && (record.balance || 0) > 0 && new Date(record.dueDate) < new Date(new Date().toDateString())),
+    })), [partnerRecords])
+  const inKindRows = useMemo(() => partnerRecords
+    .filter((record) => record.recordType === 'sponsor' && record.sponsorType === 'in-kind')
+    .map((record) => ({
+      ...record,
+      estimatedValueResolved: record.estimatedValue || 0,
+    })), [partnerRecords])
+  const partnerRows = useMemo(() => partnerRecords.map((record) => ({
+    ...record,
+    linkedEntryCount: entries.filter((entry) => [entry.paidByOrPaidTo, entry.label, entry.category].some((value) => String(value || '').toLowerCase().includes(String(record.name || record.company || '').toLowerCase()))).length,
+    latestActivity: record.paymentDate || record.followUpDate || record.dueDate || '',
+  })), [entries, partnerRecords])
 
   if (!currentEvent?.eventId) {
     return (
@@ -375,6 +419,189 @@ export function OperationsPage() {
           </div>
         ))}
       </section>
+
+      <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Operations views</p>
+            <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Commitments, partners, and in-kind support</h3>
+            <p className="mt-2 max-w-3xl text-xs leading-5 text-[#816D62]">
+              Review event-level money separately from outstanding commitments, partner records, and non-cash support.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              ['ledger', 'Ledger'],
+              ['commitments', 'Commitments'],
+              ['partners', 'Partners & Suppliers'],
+              ['in-kind', 'In-Kind Support'],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setActiveView(value)}
+                className={`rounded-xl px-4 py-2 text-xs font-bold ${activeView === value ? 'bg-[#2B1723] text-white' : 'border border-[#E7D6CC] text-[#6B564C]'}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {activeView === 'commitments' && (
+          <div className="mt-5 space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
+                <p className="text-sm font-bold text-[#2B1723]">{commitmentRows.length}</p>
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">Commitment records</p>
+              </div>
+              <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
+                <p className="text-sm font-bold text-[#2B1723]">{formatCurrency(commitmentRows.reduce((sum, row) => sum + (row.balance || 0), 0))}</p>
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">Outstanding commitments</p>
+              </div>
+              <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
+                <p className="text-sm font-bold text-[#2B1723]">{commitmentRows.filter((row) => row.commitmentStatus === 'Partially Paid').length}</p>
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">Partially paid</p>
+              </div>
+              <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
+                <p className="text-sm font-bold text-[#2B1723]">{commitmentRows.filter((row) => row.overdue).length}</p>
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">Overdue</p>
+              </div>
+            </div>
+            {commitmentRows.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] p-5 text-sm leading-6 text-[#816D62]">
+                No supplier, vendor, baker, venue, or helper commitments are recorded for this Working Event yet.
+              </div>
+            ) : (
+              commitmentRows.map((row) => (
+                <article key={row.partnerId} className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p className="text-sm font-bold text-[#2B1723]">{row.name}</p>
+                      <p className="mt-1 text-xs leading-5 text-[#816D62]">
+                        {row.company || partnerRows.find((item) => item.partnerId === row.partnerId)?.company || 'Independent'} · {row.service || row.role || 'Commitment'} · {row.commitmentStatus}
+                        {row.overdue ? ' · Overdue' : ''}
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-[#816D62]">
+                        Promised {formatCurrency(row.agreedAmount || 0)} · Paid {formatCurrency(row.amountPaid || 0)} · Balance {formatCurrency(row.balance || 0)}
+                        {row.dueDate ? ` · Due ${formatDateValue(row.dueDate)}` : ''}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button type="button" onClick={() => setSelectedDetail({ type: 'commitment', row })} className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#6B564C]">
+                        View details
+                      </button>
+                      <Link to={buildTaskHref({
+                        title: `Follow up ${row.name} commitment`,
+                        category: 'Suppliers and Partners',
+                        priority: row.overdue || (row.balance || 0) > 0 ? 'High' : 'Normal',
+                        notes: `${row.name}${row.service ? ` · ${row.service}` : ''}${row.balance ? ` · Balance ${formatCurrency(row.balance)}` : ''}`,
+                      })} className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#6B564C]">
+                        Create Follow-Up Task
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
+
+        {activeView === 'partners' && (
+          <div className="mt-5 space-y-3">
+            {partnerRows.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] p-5 text-sm leading-6 text-[#816D62]">
+                No partner or supplier records are recorded for this Working Event yet.
+              </div>
+            ) : (
+              partnerRows.map((row) => (
+                <article key={row.partnerId} className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p className="text-sm font-bold text-[#2B1723]">{row.name}</p>
+                      <p className="mt-1 text-xs leading-5 text-[#816D62]">
+                        {[row.company, row.role || row.service, row.recordType].filter(Boolean).join(' · ')}
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-[#816D62]">
+                        Linked Operations activity: {row.linkedEntryCount} · Outstanding {formatCurrency(row.balance || 0)} · Latest activity {formatDateValue(row.latestActivity)}
+                      </p>
+                    </div>
+                    <button type="button" onClick={() => setSelectedDetail({ type: 'partner', row })} className="w-fit rounded-xl border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#6B564C]">
+                      View details
+                    </button>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
+
+        {activeView === 'in-kind' && (
+          <div className="mt-5 space-y-3">
+            {inKindRows.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] p-5 text-sm leading-6 text-[#816D62]">
+                No in-kind support is recorded for this Working Event yet.
+              </div>
+            ) : (
+              inKindRows.map((row) => (
+                <article key={row.partnerId} className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p className="text-sm font-bold text-[#2B1723]">{row.name}</p>
+                      <p className="mt-1 text-xs leading-5 text-[#816D62]">
+                        {row.itemOrService || row.service || 'In-kind support'} · Estimated value {formatCurrency(row.estimatedValueResolved)}
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-[#816D62]">
+                        Status {row.status} · Quantity {row.quantity || 'Not recorded'} · Follow-up {formatDateValue(row.followUpDate)}
+                      </p>
+                    </div>
+                    <button type="button" onClick={() => setSelectedDetail({ type: 'in-kind', row })} className="w-fit rounded-xl border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#6B564C]">
+                      View details
+                    </button>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
+
+        {activeView === 'ledger' && (
+          <div className="mt-5 rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] px-4 py-3 text-xs leading-5 text-[#816D62]">
+            Ledger view stays below so existing create, edit, cancel, copy, and print controls remain in the normal Operations workflow.
+          </div>
+        )}
+      </section>
+
+      {selectedDetail && (
+        <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">{selectedDetail.type}</p>
+              <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">{selectedDetail.row.name || selectedDetail.row.label}</h3>
+            </div>
+            <button type="button" onClick={() => setSelectedDetail(null)} className="w-fit rounded-xl border border-[#E7D6CC] px-4 py-2 text-xs font-bold text-[#6B564C]">
+              Close details
+            </button>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {Object.entries({
+              Type: labelFor(selectedDetail.row.recordType || selectedDetail.row.entryType || selectedDetail.type),
+              Status: selectedDetail.row.commitmentStatus || selectedDetail.row.status || 'Not recorded',
+              Amount: formatCurrency(selectedDetail.row.amount || selectedDetail.row.agreedAmount || selectedDetail.row.estimatedValueResolved || 0),
+              Balance: formatCurrency(selectedDetail.row.balance || 0),
+              'Payment method': formatPaymentMethod(selectedDetail.row.paymentMethod),
+              Reference: selectedDetail.row.paymentReference || selectedDetail.row.evidence || 'Not recorded',
+              'Follow-up / due': formatDateValue(selectedDetail.row.followUpDate || selectedDetail.row.dueDate || selectedDetail.row.date),
+              Notes: selectedDetail.row.notes || 'Not recorded',
+            }).map(([label, value]) => (
+              <div key={label} className="rounded-xl bg-[#FBF8F5] px-3 py-3">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#80685B]">{label}</p>
+                <p className="mt-1 break-words text-sm font-bold text-[#2B1723]">{value}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <details className="phase23v-panel" data-tour-container="partners-commitments">
         <summary className="phase23v-summary">Partner commitments, sponsors, and supplier contacts</summary>

@@ -143,7 +143,7 @@ test('registration, ticket, and check-in journey preserves finance distinctions'
   }
 
   await page.goto('/payments')
-  await page.getByRole('combobox').selectOption('all')
+  await page.getByLabel('Payment record filter').selectOption('all')
   await expect(page.getByRole('row').filter({ hasText: name })).toBeVisible()
 
   await page.goto('/registrations')

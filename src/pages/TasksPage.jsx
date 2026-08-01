@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CalendarClock, CheckCircle2, Clock3, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { Link } from 'react-router'
+import { useSearchParams } from 'react-router'
 import { AssignedEventGate } from '../components/AssignedEventGate'
 import { EmptyState } from '../components/ui/EmptyState'
 import { LoadingState } from '../components/ui/LoadingState'
@@ -186,6 +187,7 @@ function TaskRow({ task, canManage, onEdit, onStatus, onDelete }) {
 export function TasksPage() {
   const { activeEvent } = useActiveEvent()
   const { user, access } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [tasks, setTasks] = useState([])
   const [filter, setFilter] = useState('All')
   const [loading, setLoading] = useState(true)
@@ -195,6 +197,23 @@ export function TasksPage() {
   const [success, setSuccess] = useState('')
   const canRead = canViewTasks(access, activeEvent?.eventId)
   const canManage = canManageTasks(access, activeEvent?.eventId)
+  const prefilledTask = useMemo(() => {
+    const prefills = {
+      title: searchParams.get('title') || '',
+      category: searchParams.get('category') || '',
+      responsibleLabel: searchParams.get('responsibleLabel') || '',
+      dueDate: searchParams.get('dueDate') || '',
+      followUpDate: searchParams.get('followUpDate') || '',
+      notes: searchParams.get('notes') || '',
+      status: searchParams.get('status') || '',
+      priority: searchParams.get('priority') || '',
+    }
+    if (!Object.values(prefills).some(Boolean)) return null
+    return {
+      ...createEmptyTaskDraft(),
+      ...Object.fromEntries(Object.entries(prefills).filter(([, value]) => value)),
+    }
+  }, [searchParams])
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -227,6 +246,7 @@ export function TasksPage() {
     setSuccess('')
     try {
       await saveTaskDraft(activeEvent, values, user, formTask?.taskId ? formTask : null)
+      if (prefilledTask) setSearchParams(new URLSearchParams(), { replace: true })
       setFormTask(null)
       setSuccess('Task saved.')
     } catch (saveError) {
@@ -291,7 +311,17 @@ export function TasksPage() {
             This account can read tasks for the selected event but cannot create, edit, complete, cancel, or delete them.
           </div>
         )}
-        {formTask && canManage && <TaskForm task={formTask} saving={saving} onCancel={() => setFormTask(null)} onSave={handleSave} />}
+        {(formTask || prefilledTask) && canManage && (
+          <TaskForm
+            task={formTask || prefilledTask}
+            saving={saving}
+            onCancel={() => {
+              setFormTask(null)
+              if (prefilledTask) setSearchParams(new URLSearchParams(), { replace: true })
+            }}
+            onSave={handleSave}
+          />
+        )}
 
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-8" aria-label="Task status summary">
           <TaskMetric label="Open" value={summary.open} active={filter === 'All'} onClick={() => setFilter('All')} />
