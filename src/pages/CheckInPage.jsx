@@ -64,6 +64,16 @@ function registrationDisplayName(registration = {}) {
   return attendeeNamesText(registration) || registration.fullName || registration.buyerName || 'Guest'
 }
 
+function SummaryMetric({ label, value, help }) {
+  return (
+    <article className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
+      <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#80685B]">{label}</p>
+      <p className="mt-2 text-2xl font-bold text-[#2B1723]">{value}</p>
+      {help && <p className="mt-2 text-xs leading-5 text-[#816D62]">{help}</p>}
+    </article>
+  )
+}
+
 function useRegistrations(activeEvent) {
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
@@ -124,6 +134,12 @@ export function CheckInPage() {
     return getDoorListRegistrations(registrations)
   }, [helperView, registrations])
   const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(activeEvent?.eventId), [activeEvent?.eventId])
+  const recentCheckIns = useMemo(() => (
+    [...registrations]
+      .filter((registration) => registration.checkedIn)
+      .sort((left, right) => String(right.checkInTime || '').localeCompare(String(left.checkInTime || '')))
+      .slice(0, 6)
+  ), [registrations])
 
   const matches = useMemo(() => {
     const query = searchQuery.trim().toLowerCase()
@@ -378,11 +394,46 @@ export function CheckInPage() {
           ['Checked-In Registrations', summary.checkedInRegistrations],
           ['Checked-In Guests', summary.checkedInPersons],
         ].map(([label, value]) => (
-          <article key={label} className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
-            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#80685B]">{label}</p>
-            <p className="mt-2 text-2xl font-bold text-[#2B1723]">{value}</p>
-          </article>
+          <SummaryMetric key={label} label={label} value={value} />
         ))}
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <article className="gsv-section-card">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Manual check-in</p>
+          <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Find the next guest fast</h3>
+          <p className="mt-2 text-sm leading-6 text-[#816D62]">
+            Search by guest name, buyer, attendee name, contact details, or ticket code. QR matches still require an organizer confirmation tap before the check-in is saved.
+          </p>
+          <div className="mt-4 gsv-compact-metric-grid">
+            <SummaryMetric label="Expected guests" value={summary.totalPersons} />
+            <SummaryMetric label="Tickets issued" value={summary.ticketAssignedRegistrations} />
+            <SummaryMetric label="Checked in" value={summary.checkedInPersons} />
+            <SummaryMetric label="Remaining" value={summary.remainingPersons} />
+          </div>
+        </article>
+
+        <article className="gsv-section-card">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Recent check-ins</p>
+          <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Latest activity</h3>
+          {recentCheckIns.length === 0 ? (
+            <p className="mt-3 text-sm text-[#816D62]">No check-ins recorded yet for this Working Event.</p>
+          ) : (
+            <ul className="mt-4 space-y-3">
+              {recentCheckIns.map((registration) => (
+                <li key={`recent-${registration.registrationId}`} className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-bold text-[#2B1723]">{registrationDisplayName(registration)}</p>
+                      <p className="mt-1 text-xs text-[#816D62]">{registration.ticketCode || 'No ticket code'} · {formatCheckInTime(registration.checkInTime)}</p>
+                    </div>
+                    <StatusBadge tone="green">Checked in</StatusBadge>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
       </section>
 
       <details className="phase23v-panel">
