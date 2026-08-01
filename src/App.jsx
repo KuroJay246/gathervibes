@@ -11,6 +11,7 @@ function lazyPage(loader, exportName) {
 
 const DashboardPage = lazyPage(() => import('./pages/DashboardPage'), 'DashboardPage')
 const EventsPage = lazyPage(() => import('./pages/EventsPage'), 'EventsPage')
+const TasksPage = lazyPage(() => import('./pages/TasksPage'), 'TasksPage')
 const LoginPage = lazyPage(() => import('./pages/LoginPage'), 'LoginPage')
 const NotFoundPage = lazyPage(() => import('./pages/NotFoundPage'), 'NotFoundPage')
 const SettingsPage = lazyPage(() => import('./pages/SettingsPage'), 'SettingsPage')
@@ -38,6 +39,7 @@ export default function App() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/events" element={<EventsPage />} />
+            <Route path="/tasks" element={<TasksPage />} />
             <Route path="/registrations" element={<RegistrationsPage />} />
             <Route path="/payments" element={<AssignedEventGate purpose="Payments"><PaymentsPage /></AssignedEventGate>} />
             <Route path="/payments/reconciliation" element={<PaymentReconciliationPage />} />

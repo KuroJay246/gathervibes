@@ -31,6 +31,7 @@ import {
   formatPaymentMethod,
 } from '../utils/financeUtils'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
+import { deriveAttendanceRecordType } from '../utils/attendanceUtils'
 
 const TABS = ['All', 'Paid', 'Pending', 'Door Paid', 'To Pay at Door', 'Complimentary', 'Outstanding Balance', 'Missing Ticket Code', 'Needs Review', 'Checked In']
 
@@ -48,6 +49,19 @@ function attendeeNamesText(registration = {}) {
 function personsLabel(registration = {}) {
   const persons = Number(registration.personsAttending) || 1
   return persons > 1 ? `Group of ${persons}` : '1 guest'
+}
+
+function sourceLabel(registration = {}) {
+  if (registration.source === 'csv-import') return 'Import Center'
+  if (registration.source === 'manual') return 'Manual entry'
+  return 'Source not recorded'
+}
+
+function dateLabel(value) {
+  if (!value) return 'Not recorded'
+  const date = typeof value.toDate === 'function' ? value.toDate() : new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Not recorded'
+  return date.toLocaleDateString('en-BB', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 function registrationNeedsReview(registration = {}, event = {}) {
@@ -235,6 +249,13 @@ export function RegistrationsPage() {
     if (effectiveFilters.priceTier && !reg.priceTier?.toLowerCase().includes(effectiveFilters.priceTier.toLowerCase())) return false
     if (effectiveFilters.paymentStatus && !paymentStatusMatches(reg.paymentStatus, effectiveFilters.paymentStatus)) return false
     if (effectiveFilters.paymentMethod && reg.paymentMethod !== effectiveFilters.paymentMethod) return false
+    if (effectiveFilters.source && reg.source !== effectiveFilters.source) return false
+    if (effectiveFilters.ticketState === 'assigned' && reg.ticketStatus !== 'assigned') return false
+    if (effectiveFilters.ticketState === 'missing' && reg.ticketCode) return false
+    if (effectiveFilters.ticketState === 'partial' && reg.ticketStatus !== 'partially-assigned') return false
+    if (effectiveFilters.attendanceState === 'checked-in' && !reg.checkedIn) return false
+    if (effectiveFilters.attendanceState === 'not-checked-in' && reg.checkedIn) return false
+    if (effectiveFilters.attendanceState === 'historical' && deriveAttendanceRecordType(reg) !== 'organizer-confirmed-historical') return false
     if (effectiveFilters.balanceDue) {
       if (!finance.balanceDue || finance.balanceDue <= 0) return false
     }
@@ -452,7 +473,7 @@ export function RegistrationsPage() {
       <section className="flex items-center gap-2 rounded-2xl border border-[#EEDFD6] bg-white p-4 text-xs leading-5 text-[#816D62]">
         <p className="font-semibold text-[#6B564C]">{showingText}</p>
         <InfoHint label="Guest count explanation">
-          Some registrations include multiple guests. That is why the guest count may be higher than the registration count. Finance review means a registration has missing or inconsistent price, payment, or balance details.
+          A registration is the record. Guests are the people represented by persons attending. Payments, tickets, and attendance remain separate workflows and are only summarized here.
         </InfoHint>
       </section>
 
@@ -704,6 +725,7 @@ export function RegistrationsPage() {
                     <th className="px-4 py-3">Guest / Registration</th>
                     <th className="px-4 py-3">Buyer / Contact</th>
                     <th className="px-4 py-3">Guest Count</th>
+                    <th className="px-4 py-3">Source</th>
                     <th className="px-4 py-3">Payment</th>
                     <th className="px-4 py-3">Finance Review</th>
                     <th className="px-4 py-3">Ticket Status</th>
@@ -741,6 +763,11 @@ export function RegistrationsPage() {
                         {reg.phone && <div>{reg.phone}</div>}
                       </td>
                       <td className="px-4 py-3">{reg.personsAttending}</td>
+                      <td className="px-4 py-3 text-xs text-[#5D4A52]">
+                        <div className="font-semibold text-[#2B1723]">{sourceLabel(reg)}</div>
+                        <div>Updated {dateLabel(reg.updatedAt || reg.createdAt || reg.timestamp)}</div>
+                        {reg.sourceRowId && <div>Row {reg.sourceRowId}</div>}
+                      </td>
                       <td className="px-4 py-3">{formatPaymentLabel(reg.paymentStatus)}</td>
                       <td className="px-4 py-3 text-xs text-[#5D4A52]">
                         {(() => {

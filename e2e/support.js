@@ -4,6 +4,7 @@ import { E2E_EMAIL, E2E_EVENT_NAME, E2E_PASSWORD } from '../scripts/e2e/globalSe
 export const organizerRoutes = [
   { path: '/dashboard', heading: 'Overview' },
   { path: '/events', heading: 'Events' },
+  { path: '/tasks', heading: 'Tasks & Deadlines' },
   { path: '/registrations', heading: 'Guests & Registrations' },
   { path: '/payments', heading: 'Payments' },
   { path: '/payments/reconciliation', heading: 'Reconciliation Preview' },

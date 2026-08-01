@@ -7,7 +7,7 @@ const commands = {
   qa: [
     'npm run lint',
     'npm test',
-    'npx -y firebase-tools@14.19.0 emulators:exec --only firestore --project gathervibeshub "node --test tests/firestore-checkin-rules.test.js"',
+    'npx -y firebase-tools@14.19.0 emulators:exec --only firestore --project gathervibeshub "node --test tests/firestore-checkin-rules.test.js tests/task-workflow-rules.test.js"',
     'npm run e2e:smoke',
     'npm run build',
     'npm audit --omit=dev',

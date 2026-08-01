@@ -286,6 +286,14 @@ export function canWriteOperations(access = DEFAULT_ACCESS, eventId = '') {
   return isApprovedAdmin(access)
 }
 
+export function canViewTasks(access = DEFAULT_ACCESS, eventId = '') {
+  return isApprovedAdmin(access) || hasAssignedRole(access, eventId, ['event-manager', 'viewer'])
+}
+
+export function canManageTasks(access = DEFAULT_ACCESS, eventId = '') {
+  return isApprovedAdmin(access) || hasAssignedRole(access, eventId, ['event-manager'])
+}
+
 export function canUseSettings(access = DEFAULT_ACCESS) {
   return isApprovedAdmin(access)
 }
@@ -296,8 +304,8 @@ export function canViewRoute(access = DEFAULT_ACCESS, route = '') {
   const role = normalizeAccessRole(access?.role)
   if (role === 'scanner') return normalizedRoute === '/scanner'
   if (role === 'operations-helper') return normalizedRoute === '/operations'
-  if (role === 'viewer') return normalizedRoute === '/dashboard'
-  if (role === 'event-manager') return ['/dashboard', '/check-in'].includes(normalizedRoute)
+  if (role === 'viewer') return ['/dashboard', '/tasks'].includes(normalizedRoute)
+  if (role === 'event-manager') return ['/dashboard', '/check-in', '/tasks'].includes(normalizedRoute)
   return false
 }
 

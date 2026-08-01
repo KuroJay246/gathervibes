@@ -30,14 +30,15 @@ import {
   updateEvent,
   updateEventPlanningFields,
 } from '../services/eventService'
+import { subscribeToTasks } from '../services/taskService.js'
 import { formatEventDate } from '../utils/dateUtils'
 import {
   buildEventSetupProgress,
-  buildTaskDeadlineSummary,
   eventStatusLabel,
   hydrateEventForPlanning,
   isTestEvent,
 } from '../utils/eventPlanning'
+import { buildTaskWorkflowSummary } from '../utils/taskWorkflow.js'
 
 const statusStyles = {
   draft: 'bg-[#F1ECE8] text-[#725F55]',
@@ -95,10 +96,18 @@ function SetupStageBadge({ event }) {
 }
 
 function DeadlineLine({ event }) {
-  const deadline = buildTaskDeadlineSummary(event?.planningTasks)
+  const deadline = buildTaskWorkflowSummary(event?.tasks || [])
   return (
     <span className={`text-xs font-semibold ${deadline.overdue > 0 ? 'text-[#A32626]' : 'text-[#6D594F]'}`}>
-      {deadline.label}
+      {deadline.overdue > 0
+        ? `${deadline.overdue} overdue`
+        : deadline.dueToday > 0
+          ? `${deadline.dueToday} due today`
+          : deadline.dueSoon > 0
+            ? `${deadline.dueSoon} due soon`
+            : deadline.open > 0
+              ? `${deadline.open} open`
+              : 'No open tasks'}
     </span>
   )
 }
@@ -124,6 +133,7 @@ export function EventsPage() {
   const [deleteError, setDeleteError] = useState('')
   const [success, setSuccess] = useState('')
   const [showTestEvents, setShowTestEvents] = useState(false)
+  const [taskSummaries, setTaskSummaries] = useState({})
   const { user } = useAuth()
   const { activeEvent, setActiveEvent, clearActiveEvent } = useActiveEvent()
   const selectedEvent = useMemo(
@@ -131,8 +141,10 @@ export function EventsPage() {
     [activeEvent, events],
   )
   const visibleEvents = useMemo(
-    () => events.filter((event) => showTestEvents || !isTestEvent(event)),
-    [events, showTestEvents],
+    () => events
+      .filter((event) => showTestEvents || !isTestEvent(event))
+      .map((event) => ({ ...event, tasks: taskSummaries[event.eventId] || [] })),
+    [events, showTestEvents, taskSummaries],
   )
 
   useEffect(() => {
@@ -147,6 +159,15 @@ export function EventsPage() {
       },
     )
   }, [reloadKey])
+
+  useEffect(() => {
+    const unsubscribes = events.map((event) => subscribeToTasks(
+      event.eventId,
+      (tasks) => setTaskSummaries((current) => ({ ...current, [event.eventId]: tasks })),
+      () => {},
+    ))
+    return () => unsubscribes.forEach((unsubscribe) => unsubscribe())
+  }, [events])
 
   useEffect(() => {
     if (!loading && activeEvent && !events.some((event) => event.eventId === activeEvent.eventId)) {
