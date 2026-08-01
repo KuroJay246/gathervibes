@@ -9,6 +9,12 @@ function attendeesText(registration = {}) {
     : ''
 }
 
+function sourceLabel(registration = {}) {
+  if (registration.source === 'csv-import') return 'Import Center'
+  if (registration.source === 'manual') return 'Manual entry'
+  return 'Source not recorded'
+}
+
 export function RegistrationCard({ registration, onEdit, onDelete, highlighted = false }) {
   const attendees = attendeesText(registration)
   const paymentStatus = normalizePaymentStatus(registration.paymentStatus)
@@ -65,6 +71,11 @@ export function RegistrationCard({ registration, onEdit, onDelete, highlighted =
           <span className={finance.balanceDue > 0 ? 'font-bold text-[#A32626]' : 'text-[#1E7345]'}>Balance: {finance.balanceDue === null ? 'Needs review' : formatCurrency(finance.balanceDue)}</span>
           <span>Reference: {registration.paymentReference || 'Not recorded'}</span>
         </div>
+      </div>
+
+      <div className="rounded-xl border border-[#EFE2DA] bg-white p-3 text-xs text-[#5D4A52]">
+        <div className="font-bold text-[#2B1723]">Record Source</div>
+        <div className="mt-1">{sourceLabel(registration)}{registration.sourceRowId ? ` · row ${registration.sourceRowId}` : ''}</div>
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-[#F2E8E1] pt-3">

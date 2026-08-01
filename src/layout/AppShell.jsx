@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardCheck,
+  ClipboardList,
   CreditCard,
   FileInput,
   LayoutDashboard,
@@ -41,6 +42,7 @@ const navGroups = [
     label: 'Event Management',
     items: [
       { to: '/events', label: 'Events', icon: CalendarDays },
+      { to: '/tasks', label: 'Tasks & Deadlines', icon: ClipboardList },
       { to: '/registrations', label: 'Guests & Registrations', icon: UsersRound },
       { to: '/payments', label: 'Registration Payments', icon: CreditCard },
       { to: '/tickets', label: 'Tickets', icon: TicketCheck },
@@ -75,6 +77,7 @@ const mobileMoreGroups = [
     label: 'Event Management',
     items: [
       { to: '/events', label: 'Events', icon: CalendarDays },
+      { to: '/tasks', label: 'Tasks & Deadlines', icon: ClipboardList },
       { to: '/payments', label: 'Registration Payments', icon: CreditCard },
     ],
   },
@@ -104,6 +107,7 @@ const mobileMoreGroups = [
 const pageTitles = {
   '/dashboard': ['Overview', 'Current event status, priorities, and next actions'],
   '/events': ['Events', 'Plan and organize every gathering'],
+  '/tasks': ['Tasks & Deadlines', 'Event-scoped work, blockers, and follow-up dates'],
   '/registrations': ['Guests & Registrations', 'Manage registration records and guest counts'],
   '/payments': ['Registration Payments', 'Review registration charges, payments, balances, and follow-up'],
   '/payments/reconciliation': ['Reconciliation Preview', 'Read-only payment workbook comparison'],

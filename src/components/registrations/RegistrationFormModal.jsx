@@ -132,6 +132,10 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
 
         <div className="flex-1 overflow-y-auto px-5 py-6 sm:px-6">
           <form id="registration-form" onSubmit={handleSubmit} className="space-y-5">
+            <section className="rounded-2xl border border-[#F2E8E1] bg-[#FBF8F5] p-4">
+              <h3 className="font-serif text-lg text-[#2B1723]">Registration and guest identity</h3>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">Use full name for the registration record. Use persons attending and attendee names to describe the guests covered by the registration.</p>
+            </section>
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
                 <label className="event-label">Full Name <span>*</span></label>
@@ -161,6 +165,11 @@ export function RegistrationFormModal({ isOpen, onClose, onSave, initialData, sa
                 />
               </div>
             </div>
+
+            <section className="rounded-2xl border border-[#F2E8E1] bg-[#FBF8F5] p-4">
+              <h3 className="font-serif text-lg text-[#2B1723]">Registration payment fields</h3>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">These fields describe registration charges and received payments. Operations ledger entries stay separate.</p>
+            </section>
 
             <div className="grid gap-5 sm:grid-cols-2">
               <div>

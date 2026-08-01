@@ -124,6 +124,17 @@ service cloud.firestore {
       return hasActiveEventAssignment(eventId, ['operations-helper']);
     }
 
+    function canReadTask(eventId) {
+      return isApprovedAdmin()
+        || isAssignedEventManager(eventId)
+        || isAssignedViewer(eventId);
+    }
+
+    function canManageTask(eventId) {
+      return isApprovedAdmin()
+        || isAssignedEventManager(eventId);
+    }
+
     function validShortId(value) {
       return value is string && value.size() > 0 && value.size() <= 128;
     }
@@ -615,6 +626,87 @@ service cloud.firestore {
         && validPerformedBy(data.createdBy);
     }
 
+    function validTaskStatus(status) {
+      return status in [
+        'Not Started', 'In Progress', 'Waiting on Someone',
+        'Blocked', 'Completed', 'Cancelled'
+      ];
+    }
+
+    function validTaskPriority(priority) {
+      return priority in ['Low', 'Normal', 'High', 'Urgent'];
+    }
+
+    function validTaskCategory(category) {
+      return category in [
+        'Event Setup', 'Venue', 'Guests and Registration', 'Payments',
+        'Suppliers and Partners', 'Marketing', 'Documents',
+        'Equipment and Supplies', 'Event Day', 'Follow-Up', 'Other'
+      ];
+    }
+
+    function validTask(data, eventId, taskId) {
+      return data.keys().hasAll([
+          'taskId', 'eventId', 'eventName', 'isTestEvent', 'title', 'notes',
+          'category', 'dueDate', 'followUpDate', 'priority', 'status',
+          'responsibleType', 'responsibleUserId', 'responsibleLabel',
+          'waitingOn', 'blockerReason', 'createdAt', 'createdBy',
+          'updatedAt', 'updatedBy', 'completedAt', 'cancelledAt'
+        ])
+        && data.keys().hasOnly([
+          'taskId', 'eventId', 'eventName', 'isTestEvent', 'title', 'notes',
+          'category', 'dueDate', 'followUpDate', 'priority', 'status',
+          'responsibleType', 'responsibleUserId', 'responsibleLabel',
+          'waitingOn', 'blockerReason', 'createdAt', 'createdBy',
+          'updatedAt', 'updatedBy', 'completedAt', 'cancelledAt'
+        ])
+        && data.taskId == taskId
+        && validShortId(data.taskId)
+        && data.eventId == eventId
+        && validShortId(data.eventId)
+        && data.eventName is string
+        && data.eventName.size() > 0
+        && data.eventName.size() <= 150
+        && data.isTestEvent is bool
+        && data.title is string
+        && data.title.size() > 0
+        && data.title.size() <= 160
+        && data.notes is string
+        && data.notes.size() <= 2000
+        && validTaskCategory(data.category)
+        && data.dueDate is string
+        && data.dueDate.size() <= 10
+        && data.followUpDate is string
+        && data.followUpDate.size() <= 10
+        && validTaskPriority(data.priority)
+        && validTaskStatus(data.status)
+        && data.responsibleType is string
+        && data.responsibleType.size() > 0
+        && data.responsibleType.size() <= 40
+        && validOptionalString(data.responsibleUserId, 128)
+        && validOptionalString(data.responsibleLabel, 160)
+        && validOptionalString(data.waitingOn, 160)
+        && validOptionalString(data.blockerReason, 500)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && validPerformedBy(data.createdBy)
+        && validPerformedBy(data.updatedBy)
+        && (data.completedAt == null || data.completedAt is timestamp)
+        && (data.cancelledAt == null || data.cancelledAt is timestamp)
+        && (data.status == 'Waiting on Someone' || data.waitingOn == '')
+        && (data.status == 'Blocked' || data.blockerReason == '')
+        && (data.status == 'Completed' || data.completedAt == null)
+        && (data.status == 'Cancelled' || data.cancelledAt == null);
+    }
+
+    function taskIdentityUnchanged(taskId) {
+      return request.resource.data.taskId == taskId
+        && request.resource.data.taskId == resource.data.taskId
+        && request.resource.data.eventId == resource.data.eventId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.createdBy == resource.data.createdBy;
+    }
+
     function isValidOperationAuditLog(data, logId) {
       return data.keys().hasAll([
           'logId', 'eventId', 'action', 'targetType', 'targetId',
@@ -629,6 +721,30 @@ service cloud.firestore {
         && validShortId(data.eventId)
         && data.action in ['operation.create', 'operation.update', 'operation.cancel']
         && data.targetType == 'operation'
+        && validShortId(data.targetId)
+        && validPerformedBy(data.performedBy)
+        && data.timestamp == request.time
+        && data.details is map;
+    }
+
+    function isValidTaskAuditLog(data, logId) {
+      return data.keys().hasAll([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.keys().hasOnly([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.logId == logId
+        && validShortId(data.logId)
+        && validShortId(data.eventId)
+        && data.action in [
+          'task.create', 'task.update', 'task.status', 'task.waiting',
+          'task.blocked', 'task.completed', 'task.reopened',
+          'task.cancelled', 'task.delete'
+        ]
+        && data.targetType == 'task'
         && validShortId(data.targetId)
         && validPerformedBy(data.performedBy)
         && data.timestamp == request.time
@@ -753,6 +869,34 @@ service cloud.firestore {
         && existsAfter(/databases/$(database)/documents/operationsLedger/$(data.targetId))
         && get(/databases/$(database)/documents/operationsLedger/$(data.targetId)).data.eventId == data.eventId
         && getAfter(/databases/$(database)/documents/operationsLedger/$(data.targetId)).data.eventId == data.eventId
+      );
+    }
+
+    function matchesTaskMutation(data) {
+      return (
+        data.targetType == 'task'
+        && (
+          (
+            data.action == 'task.create'
+            && !exists(/databases/$(database)/documents/events/$(data.eventId)/tasks/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/tasks/$(data.targetId))
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/tasks/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action in [
+              'task.update', 'task.status', 'task.waiting', 'task.blocked',
+              'task.completed', 'task.reopened', 'task.cancelled'
+            ]
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/tasks/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/tasks/$(data.targetId))
+            && get(/databases/$(database)/documents/events/$(data.eventId)/tasks/$(data.targetId)).data.eventId == data.eventId
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/tasks/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action == 'task.delete'
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/tasks/$(data.targetId))
+            && !existsAfter(/databases/$(database)/documents/events/$(data.eventId)/tasks/$(data.targetId))
+            && get(/databases/$(database)/documents/events/$(data.eventId)/tasks/$(data.targetId)).data.eventId == data.eventId
+          )
+        )
       );
     }
 
@@ -1001,6 +1145,19 @@ service cloud.firestore {
       allow delete: if isApprovedAdmin();
     }
 
+    match /events/{eventId}/tasks/{taskId} {
+      allow read: if canReadTask(eventId);
+      allow create: if canManageTask(eventId)
+        && validTask(request.resource.data, eventId, taskId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if canManageTask(eventId)
+        && validTask(request.resource.data, eventId, taskId)
+        && taskIdentityUnchanged(taskId)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if canManageTask(eventId);
+    }
+
     match /registrations/{registrationId} {
       allow read: if isApprovedAdmin()
         || isAssignedEventManager(resource.data.eventId)
@@ -1058,6 +1215,15 @@ service cloud.firestore {
               request.resource.data.action in ['operation.create', 'operation.update', 'operation.cancel']
               && isValidOperationAuditLog(request.resource.data, logId)
               && matchesOperationMutation(request.resource.data)
+            )
+            || (
+              request.resource.data.action in [
+                'task.create', 'task.update', 'task.status', 'task.waiting',
+                'task.blocked', 'task.completed', 'task.reopened',
+                'task.cancelled', 'task.delete'
+              ]
+              && isValidTaskAuditLog(request.resource.data, logId)
+              && matchesTaskMutation(request.resource.data)
             )
           )
         ) || (

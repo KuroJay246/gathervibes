@@ -8,6 +8,7 @@ const expectedRoutes = [
   '/login',
   '/dashboard',
   '/events',
+  '/tasks',
   '/registrations',
   '/imports',
   '/payments',
@@ -34,6 +35,7 @@ if (!/<Route index element=\{<Navigate to="\/dashboard" replace \/>}/.test(app))
 const navigationLabels = [
   'Overview',
   'Events',
+  'Tasks & Deadlines',
   'Guests & Registrations',
   'Payments',
   'Tickets',

@@ -18,6 +18,7 @@ import { useAuth } from '../auth/useAuth'
 import { subscribeToEvents } from '../services/eventService'
 import { subscribeToRegistrations } from '../services/registrationService'
 import { subscribeToOperationsLedger } from '../services/operationsLedgerService'
+import { subscribeToTasks } from '../services/taskService.js'
 import { formatEventDate, toDateInput, upcomingEvents } from '../utils/dateUtils'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
 import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
@@ -32,6 +33,7 @@ import {
   isEventDayStatus,
 } from '../utils/eventPlanning'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
+import { buildTaskWorkflowSummary } from '../utils/taskWorkflow.js'
 
 function useEventRegistrations(eventId) {
   const [rows, setRows] = useState([])
@@ -59,6 +61,20 @@ function useEventOperations(eventId) {
   }, [eventId])
 
   return entries
+}
+
+function useEventTasks(eventId) {
+  const [tasks, setTasks] = useState([])
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setTasks([])
+    if (!eventId) return undefined
+    return subscribeToTasks(eventId, setTasks, () => {})
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [eventId])
+
+  return tasks
 }
 
 function sameActiveEventSnapshot(activeEvent, nextEvent) {
@@ -155,6 +171,7 @@ const PLANNING_ACTIONS = [
   { to: '/check-in', label: 'Open Check-In', detail: 'Use event-day attendance tools.', icon: ClipboardCheck },
   { to: '/event-review', label: 'View Reports', detail: 'Review read-only event follow-up and summaries.', icon: ClipboardCheck },
   { to: '/events', label: 'Edit Event', detail: 'Update event setup, date, venue, capacity, or status.', icon: CalendarDays },
+  { to: '/tasks', label: 'Review Tasks', detail: 'Open deadlines, waiting items, and blockers.', icon: Clock3 },
   { to: '/communications', label: 'Build Message', detail: 'Create and copy manual event messages.', icon: MessageSquareText },
 ]
 
@@ -238,6 +255,7 @@ export function DashboardPage() {
   const selectedEvent = activeEvent ? visibleEvents.find((event) => event.eventId === activeEvent.eventId) || activeEvent : null
   const registrations = useEventRegistrations(activeEvent?.eventId)
   const operationsEntries = useEventOperations(activeEvent?.eventId)
+  const tasks = useEventTasks(activeEvent?.eventId)
 
   useEffect(() => {
     if (!adminUser) return undefined
@@ -273,6 +291,7 @@ export function DashboardPage() {
     () => buildEventReadiness(selectedEvent, registrations, operationsEntries),
     [operationsEntries, registrations, selectedEvent],
   )
+  const taskSummary = useMemo(() => buildTaskWorkflowSummary(tasks), [tasks])
   const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(selectedEvent?.eventId), [selectedEvent?.eventId])
   const completedEvent = isCompletedEvent(hydratedEvent)
   const eventDayMode = isEventDayStatus(hydratedEvent)
@@ -389,7 +408,7 @@ export function DashboardPage() {
               <Metric label="Guests" value={metrics.totalPersons} />
               <Metric label="Checked-in registrations" value={metrics.checkedInRegistrations} />
               <Metric label="Checked-in guests" value={metrics.checkedInPersons} />
-              <Metric label="Open event-day tasks" value={readiness.planningOverview.tasks.open} detail={`${readiness.planningOverview.tasks.overdue} overdue`} />
+              <Metric label="Open event-day tasks" value={taskSummary.open} detail={`${taskSummary.overdue} overdue`} />
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-4">
               {EVENT_DAY_ACTIONS.map((action) => <ActionLink key={action.label} {...action} />)}
@@ -451,9 +470,9 @@ export function DashboardPage() {
               )}
             </Section>
 
-          <Section eyebrow="Quick Actions" title="Common organizer actions">
+            <Section eyebrow="Quick Actions" title="Common organizer actions">
               <div className="grid gap-2">
-              {quickActions.slice(0, 7).map((action) => <ActionLink key={action.label} {...action} />)}
+              {quickActions.slice(0, 8).map((action) => <ActionLink key={action.label} {...action} />)}
               </div>
             </Section>
           </section>
@@ -508,9 +527,10 @@ export function DashboardPage() {
             <div className="phase23v-body grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
               <Section eyebrow="Planning Progress" title="How prepared is this event?">
                 <div className="phase23v-metric-grid">
-                  <Metric label="Completed tasks" value={readiness.planningOverview.tasks.completed} />
-                  <Metric label="Overdue tasks" value={readiness.planningOverview.tasks.overdue} />
-                  <Metric label="Upcoming deadlines" value={readiness.planningOverview.tasks.upcoming} />
+                  <Metric label="Completed tasks" value={taskSummary.completed} />
+                  <Metric label="Overdue tasks" value={taskSummary.overdue} />
+                  <Metric label="Upcoming deadlines" value={taskSummary.dueSoon + taskSummary.dueToday} />
+                  <Metric label="Waiting or blocked" value={taskSummary.waiting + taskSummary.blocked} />
                   <Metric label="Readiness items left" value={readiness.planningOverview.readiness.needsAttentionCount} />
                   <Metric label="Supplier and sponsor records" value={readiness.planningOverview.partners.totalRecords} />
                   <Metric label="Confirmed sponsor cash" value={formatCurrency(readiness.planningOverview.partners.confirmedCashSponsors, financeSummary.currency)} />

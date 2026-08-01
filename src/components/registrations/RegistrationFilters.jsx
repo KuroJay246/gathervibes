@@ -133,6 +133,41 @@ export function RegistrationFilters({ filters, onFilterChange, onClearFilters, a
           <option value="unknown">Unknown</option>
         </select>
 
+        <select
+          aria-label="Registration source filter"
+          value={filters.source || ''}
+          onChange={(e) => handleChange('source', e.target.value)}
+          className={selectClasses}
+        >
+          <option value="">Any Source</option>
+          <option value="manual">Manual Entry</option>
+          <option value="csv-import">Import Center</option>
+        </select>
+
+        <select
+          aria-label="Ticket state filter"
+          value={filters.ticketState || ''}
+          onChange={(e) => handleChange('ticketState', e.target.value)}
+          className={selectClasses}
+        >
+          <option value="">Any Ticket State</option>
+          <option value="assigned">Ticket assigned</option>
+          <option value="missing">Missing ticket</option>
+          <option value="partial">Partially assigned</option>
+        </select>
+
+        <select
+          aria-label="Attendance state filter"
+          value={filters.attendanceState || ''}
+          onChange={(e) => handleChange('attendanceState', e.target.value)}
+          className={selectClasses}
+        >
+          <option value="">Any Attendance State</option>
+          <option value="checked-in">Checked in</option>
+          <option value="not-checked-in">Not checked in</option>
+          <option value="historical">Historical attendance recorded</option>
+        </select>
+
         <label className="flex items-center gap-2 text-sm text-[#5D4A52]">
           <input 
             type="checkbox" 
