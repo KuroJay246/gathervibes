@@ -11,7 +11,15 @@ export const FORM_TARGET_TYPES = [
   'custom-review-record',
 ]
 
-export const FORM_CONNECTION_STATUSES = ['draft', 'active', 'paused', 'disabled']
+export const FORM_CONNECTION_STATUSES = ['draft', 'packaged', 'active', 'paused', 'disabled']
+
+export const FORM_CONNECTION_STATUS_LABELS = {
+  draft: 'Manual Response Review',
+  packaged: 'Automatic Receiver Packaged but Not Deployed',
+  active: 'Automatic Receiver Connected',
+  paused: 'Connection Needs Attention',
+  disabled: 'Connection Needs Attention',
+}
 
 export const FORM_RESPONSE_STATUSES = [
   'new',
@@ -26,20 +34,21 @@ export const FORM_RESPONSE_STATUSES = [
 ]
 
 export const FORM_INBOX_COLUMNS = [
-  'Connections',
-  'New Responses',
+  'New',
   'Needs Review',
   'Approved',
+  'Ready to Import',
   'Imported',
+  'Waiting for Information',
   'Wait-Listed',
+  'Duplicates',
   'Rejected',
-  'Sync History',
-  'Mapping Templates',
+  'History',
 ]
 
 export const FORM_REVIEW_ACTIONS = [
+  ['review', 'Review'],
   ['approve', 'Approve'],
-  ['import', 'Import'],
   ['request-information', 'Request Information'],
   ['wait-list', 'Wait-List'],
   ['reject', 'Reject'],
@@ -48,6 +57,7 @@ export const FORM_REVIEW_ACTIONS = [
 ]
 
 const STATUS_BY_ACTION = {
+  review: 'needs-review',
   approve: 'approved',
   import: 'approved',
   'request-information': 'information-requested',
@@ -55,6 +65,25 @@ const STATUS_BY_ACTION = {
   reject: 'rejected',
   'mark-duplicate': 'duplicate',
   'link-existing': 'linked',
+}
+
+export function formConnectionStatusLabel(connection = {}) {
+  return FORM_CONNECTION_STATUS_LABELS[connection.status] || FORM_CONNECTION_STATUS_LABELS.paused
+}
+
+export function formResponseStatusLabel(status = '') {
+  const labels = {
+    new: 'New',
+    'needs-review': 'Needs Review',
+    approved: 'Approved',
+    imported: 'Imported',
+    'wait-listed': 'Wait-Listed',
+    rejected: 'Rejected',
+    duplicate: 'Duplicate',
+    'information-requested': 'Waiting for Information',
+    linked: 'Linked Existing',
+  }
+  return labels[status] || 'Needs Review'
 }
 
 export function buildManualFormConnection(event = {}, overrides = {}) {
@@ -174,5 +203,8 @@ export function buildFormInboxSummary(responses = []) {
     ...initial,
     reviewRequired: responses.filter((response) => ['new', 'needs-review'].includes(response.status)).length,
     convertible: responses.filter((response) => ['approved'].includes(response.status)).length,
+    waitingForInformation: responses.filter((response) => response.status === 'information-requested').length,
+    duplicateCount: responses.filter((response) => response.status === 'duplicate').length,
+    historyCount: responses.filter((response) => ['imported', 'rejected', 'linked'].includes(response.status)).length,
   }
 }

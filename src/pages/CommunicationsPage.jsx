@@ -9,13 +9,17 @@ import { EmptyState } from '../components/ui/EmptyState'
 import {
   COMMUNICATION_SEGMENTS,
   COMMUNICATION_TEMPLATES,
+  MESSAGE_TONE_OPTIONS,
+  MESSAGE_WORKFLOW_STEPS,
   buildCommunicationMessages,
   buildCommunicationsCsvPacket,
   buildCommunicationsExport,
   buildCommunicationsSegmentSummary,
   buildRecipientList,
+  buildMessageSubject,
   extractAvailableGroups,
   filterCommunicationsRegistrations,
+  missingMergeFields,
 } from '../utils/communicationsUtils'
 import { formatCurrency } from '../utils/financeUtils'
 
@@ -97,6 +101,10 @@ export function CommunicationsPage() {
   const recipientList = useMemo(() => buildRecipientList(filteredRegistrations), [filteredRegistrations])
   const csvPacket = useMemo(() => buildCommunicationsCsvPacket(filteredRegistrations, draftContent, activeEvent), [activeEvent, draftContent, filteredRegistrations])
   const firstMessage = messages[0]
+  const selectedTemplateMeta = COMMUNICATION_TEMPLATES.find((item) => item.id === selectedTemplate) || COMMUNICATION_TEMPLATES[0]
+  const firstRegistration = filteredRegistrations[0]
+  const firstSubject = buildMessageSubject(selectedTemplateMeta, firstRegistration, activeEvent)
+  const firstMissingFields = missingMergeFields(draftContent, firstRegistration, activeEvent)
 
   if (!activeEvent?.eventId) {
     return (
@@ -158,9 +166,20 @@ Data context for this segment:
       </header>
 
       <div className="rounded-xl border border-[#EFE2DA] bg-[#FFF8F2] px-4 py-3 text-sm text-[#80685B]">
-        <strong>Copy-only:</strong> This page prepares text for clipboard copy. It does not send email or WhatsApp messages, write delivery logs, or connect to an AI API.
+        <strong>Copy-only:</strong> Message Builder prepares text only. It does not send email or WhatsApp messages.
         <span className="mt-1 block text-xs">Use segments to choose recipients; buyer/contact can be different from attendee names, Door Paid is not the same as To Pay at Door, and historical finance limitations stay out of active reminder audiences.</span>
       </div>
+
+      <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-sm">
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Message workflow</p>
+        <ol className="mt-3 grid gap-2 text-[10px] font-bold uppercase tracking-wider text-[#80685B] sm:grid-cols-4 lg:grid-cols-7">
+          {MESSAGE_WORKFLOW_STEPS.map((label, index) => (
+            <li key={label} className={`rounded-full px-3 py-2 text-center ${index < 6 ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED]'}`}>
+              {label}
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <div className="grid gap-6 lg:grid-cols-12">
         <div className="space-y-6 lg:col-span-4">
@@ -274,7 +293,7 @@ Data context for this segment:
                 <div>
                   <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#80685B]">Select Tone</label>
                   <select aria-label="Drafting tone" value={selectedTone} onChange={(event) => setSelectedTone(event.target.value)} className="w-full rounded-xl border border-[#E5D7CF] bg-[#FBF8F5] py-2 pl-3 pr-8 text-sm">
-                    {['Professional', 'Warm', 'Friendly', 'Urgent but polite', 'Short WhatsApp style', 'Formal email', 'Social media caption', 'Luxury/event brand tone'].map((tone) => (
+                    {MESSAGE_TONE_OPTIONS.map((tone) => (
                       <option key={tone} value={tone}>{tone}</option>
                     ))}
                   </select>
@@ -302,7 +321,13 @@ Data context for this segment:
                 <select aria-label={labMode === 'ai' ? 'Prompt starter' : 'Starter template'} value={selectedTemplate} onChange={(event) => handleTemplateChange(event.target.value)} className="w-full rounded-xl border border-[#E5D7CF] bg-white py-2 pl-3 pr-8 text-sm font-medium">
                   {COMMUNICATION_TEMPLATES.map((template) => <option key={template.id} value={template.id}>{template.label}</option>)}
                 </select>
-                <p className="mt-3 text-xs leading-5 text-[#80685B]">Available templates include payment reminder, balance due, door payment, payment received, ticket/QR reminder, check-in instructions, missing ticket follow-up, event reminder, group reminder, thank-you, post-event, and internal note.</p>
+                <dl className="mt-3 grid gap-2 rounded-xl bg-[#FBF8F5] p-3 text-xs leading-5 text-[#80685B]">
+                  <div><dt className="font-bold text-[#5D4A52]">Purpose</dt><dd>{selectedTemplateMeta.purpose}</dd></div>
+                  <div><dt className="font-bold text-[#5D4A52]">Audience</dt><dd>{selectedTemplateMeta.audience}</dd></div>
+                  <div><dt className="font-bold text-[#5D4A52]">Subject</dt><dd>{firstSubject}</dd></div>
+                  <div><dt className="font-bold text-[#5D4A52]">Version</dt><dd>{selectedTemplateMeta.version}</dd></div>
+                  <div><dt className="font-bold text-[#5D4A52]">Fields</dt><dd>{selectedTemplateMeta.fields?.join(', ') || 'None'}</dd></div>
+                </dl>
               </div>
               <div>
                 <div className="flex justify-between items-end mb-1.5">
@@ -320,7 +345,18 @@ Data context for this segment:
           <Section eyebrow="Preview" title="Message preview and warnings">
             {firstMessage ? (
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_16rem]">
-                <pre className="max-h-72 overflow-auto rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 text-[13px] leading-relaxed whitespace-pre-wrap text-[#2B1723]">{firstMessage.message}</pre>
+                <div className="space-y-3">
+                  <div className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 text-sm text-[#2B1723]">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">Subject</p>
+                    <p className="mt-1 font-bold">{firstSubject}</p>
+                  </div>
+                  {firstMissingFields.length > 0 && (
+                    <div className="rounded-xl border border-[#F2D6A3] bg-[#FFF8EA] p-3 text-xs leading-5 text-[#7A5818]">
+                      Missing merge fields: {firstMissingFields.join(', ')}. Review before copying so raw placeholders are not sent from another tool.
+                    </div>
+                  )}
+                  <pre className="max-h-72 overflow-auto rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 text-[13px] leading-relaxed whitespace-pre-wrap text-[#2B1723]">{firstMessage.message}</pre>
+                </div>
                 <div className="rounded-xl border border-[#EFE2DA] p-4">
                   <p className="text-sm font-bold text-[#2B1723]">{firstMessage.name}</p>
                   <p className="mt-1 break-all text-xs text-[#80685B]">{firstMessage.email || 'No email'} / {firstMessage.phone || 'No phone'}</p>
@@ -342,7 +378,15 @@ Data context for this segment:
             <div className="flex flex-wrap gap-2">
               <button type="button" onClick={() => copyText('one', firstMessage?.message || '')} disabled={!firstMessage} className="inline-flex items-center gap-2 rounded-xl bg-[#2B1723] px-4 py-2 text-xs font-bold text-white disabled:opacity-50">
                 {copiedAction === 'one' ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
-                Copy One Message
+                Copy Message
+              </button>
+              <button type="button" onClick={() => copyText('subject', firstSubject)} disabled={!firstMessage} className="inline-flex items-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C] disabled:opacity-50">
+                {copiedAction === 'subject' ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
+                Copy Subject
+              </button>
+              <button type="button" onClick={() => copyText('both', `Subject: ${firstSubject}\n\n${firstMessage?.message || ''}`)} disabled={!firstMessage} className="inline-flex items-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-xs font-bold text-[#6B564C] disabled:opacity-50">
+                {copiedAction === 'both' ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
+                Copy Both
               </button>
               <button type="button" onClick={() => copyText('all', finalExportText)} disabled={filteredRegistrations.length === 0} className="inline-flex items-center gap-2 rounded-xl bg-[#2B1723] px-4 py-2 text-xs font-bold text-white disabled:opacity-50">
                 {copiedAction === 'all' ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
@@ -357,6 +401,11 @@ Data context for this segment:
                 Copy CSV Packet
               </button>
             </div>
+            {copiedAction && (
+              <p role="status" className="mt-3 rounded-xl bg-[#EAF6EF] px-4 py-2 text-xs font-bold text-[#1E7345]">
+                Copied to clipboard. No message was sent.
+              </p>
+            )}
 
             <pre className="mt-4 max-h-[420px] overflow-auto rounded-xl border border-[#EFE2DA] bg-[#23131C] p-4 font-mono text-[12px] leading-relaxed whitespace-pre-wrap text-[#FFF8F2]">
               {filteredRegistrations.length === 0 ? 'No guests match your segment filters.' : finalExportText}

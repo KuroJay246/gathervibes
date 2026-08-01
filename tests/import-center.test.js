@@ -33,8 +33,8 @@ test('Import Center keeps Google Sheets OAuth deferred and enables XLSX parsing'
   const sheets = getImportSource('google-sheets-csv')
   const xlsx = getImportSource('xlsx')
 
-  assert.match(sheets.helperText, /Download > CSV/)
-  assert.match(sheets.helperText, /Live Google Sheets sync is not connected/)
+  assert.match(sheets.helperText, /Download your Google Sheet as CSV or Excel/)
+  assert.match(sheets.connectionStatus, /not a live Google Sheets connection/)
   assert.equal(xlsx.mode, 'xlsx')
   assert.match(xlsx.helperText, /Excel workbook/)
 })
