@@ -30,6 +30,8 @@ import {
   buildFormResponsesFromParsedRows,
   buildManualFormConnection,
   findFormResponseDuplicateCandidates,
+  formConnectionStatusLabel,
+  formResponseStatusLabel,
 } from '../utils/formResponseInbox'
 
 function isPermissionDeniedImportError(err) {
@@ -92,6 +94,12 @@ export function ImportsPage() {
   const selectedSheet = workbookSheets.find((sheet) => sheet.id === selectedSheetId)
   const canConfirmSheet = Boolean(selectedSheet?.importable)
   const formsInboxSummary = buildFormInboxSummary(formsInboxResponses)
+  const manualFormsConnection = buildManualFormConnection(activeEvent, {
+    targetType: formsInboxTargetType,
+    status: 'draft',
+    connectionName: `${activeEvent?.eventName || 'Selected event'} manual form response review`,
+  })
+  const formsInboxConnectionLabel = formConnectionStatusLabel(manualFormsConnection)
   const workflowStepIndex = step === 1
     ? 2
     : step === 2
@@ -550,11 +558,15 @@ export function ImportsPage() {
             </p>
           </div>
           <ol className="grid grid-cols-2 gap-2 text-[10px] font-bold uppercase tracking-wider text-[#80685B] sm:grid-cols-5">
-            {IMPORT_WORKFLOW_STEPS.map((label, index) => (
-              <li key={label} className={`rounded-full px-3 py-2 text-center ${index <= workflowStepIndex ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED]'}`}>
+            {IMPORT_WORKFLOW_STEPS.map((label, index) => {
+              const stageStatus = index < workflowStepIndex ? 'Completed' : index === workflowStepIndex ? 'Current step' : 'Upcoming'
+              return (
+              <li key={label} className={`rounded-full px-3 py-2 text-center ${index < workflowStepIndex ? 'bg-[#2B1723] text-white' : index === workflowStepIndex ? 'bg-[#FFF8EA] text-[#7A5818]' : 'bg-[#F7F1ED]'}`}>
+                <span className="sr-only">{stageStatus}: </span>
                 {label}
               </li>
-            ))}
+              )
+            })}
           </ol>
         </div>
       </section>
@@ -749,11 +761,11 @@ export function ImportsPage() {
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Google Forms Response Inbox</p>
                 <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Review responses before mapping or import</h3>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
-                  Connections, New Responses, Needs Review, Approved, Imported, Wait-Listed, Rejected, Sync History, and Mapping Templates all stay event-scoped. No response becomes a registration automatically. Nothing becomes a registration automatically.
+                  New, Needs Review, Approved, Ready to Import, Waiting for Information, Duplicates, and History views all stay event-scoped. No response becomes a registration automatically. Nothing becomes a registration automatically.
                 </p>
               </div>
               <span className="w-fit rounded-full bg-[#FFF4DF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">
-                Manual fallback active
+                {formsInboxConnectionLabel}
               </span>
             </div>
 
@@ -806,6 +818,9 @@ export function ImportsPage() {
                   <div className="rounded-xl bg-[#FFF8EA] p-3 text-sm"><strong>{formsInboxSummary.reviewRequired}</strong><br />Require review</div>
                   <div className="rounded-xl bg-[#EAF6EF] p-3 text-sm"><strong>{formsInboxSummary.approved}</strong><br />Approved</div>
                   <div className="rounded-xl bg-[#F7F1ED] p-3 text-sm"><strong>{formsInboxSummary.convertible}</strong><br />Ready for mapping</div>
+                  <div className="rounded-xl bg-[#FFF8EA] p-3 text-sm"><strong>{formsInboxSummary.waitingForInformation}</strong><br />Waiting for information</div>
+                  <div className="rounded-xl bg-[#FFF1F1] p-3 text-sm"><strong>{formsInboxSummary.duplicateCount}</strong><br />Duplicates</div>
+                  <div className="rounded-xl bg-[#F7F1ED] p-3 text-sm"><strong>{formsInboxSummary.historyCount}</strong><br />History</div>
                 </div>
                 {formsInboxResponses.map((response) => (
                   <article key={response.responseId} className="rounded-2xl border border-[#F2E8E1] bg-[#FFFDFC] p-4">
@@ -819,8 +834,17 @@ export function ImportsPage() {
                           Mapped fields: {response.mappedFields} · Missing: {response.missingInformation.join(', ') || 'none'} · Duplicates: {response.duplicateCandidates.join(', ') || 'none'}
                         </p>
                       </div>
-                      <span className="w-fit rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{response.status}</span>
+                      <span className="w-fit rounded-full bg-[#F7F1ED] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{formResponseStatusLabel(response.status)}</span>
                     </div>
+                    <dl className="mt-4 grid gap-3 text-xs leading-5 text-[#6B564C] md:grid-cols-2">
+                      <div className="rounded-xl bg-[#FBF8F5] p-3"><dt className="font-bold text-[#2B1723]">Source</dt><dd>{response.sourceForm}</dd></div>
+                      <div className="rounded-xl bg-[#FBF8F5] p-3"><dt className="font-bold text-[#2B1723]">Respondent</dt><dd>{response.respondentSummary.email || response.respondentSummary.phone || 'No contact mapped'}</dd></div>
+                      <div className="rounded-xl bg-[#FBF8F5] p-3"><dt className="font-bold text-[#2B1723]">Submitted Information</dt><dd>{response.respondentSummary.name}</dd></div>
+                      <div className="rounded-xl bg-[#FBF8F5] p-3"><dt className="font-bold text-[#2B1723]">Mapping</dt><dd>{response.mappedFields} mapped fields; missing {response.missingInformation.join(', ') || 'none'}</dd></div>
+                      <div className="rounded-xl bg-[#FBF8F5] p-3"><dt className="font-bold text-[#2B1723]">Review Status</dt><dd>{formResponseStatusLabel(response.status)}</dd></div>
+                      <div className="rounded-xl bg-[#FBF8F5] p-3"><dt className="font-bold text-[#2B1723]">Duplicate Information</dt><dd>{response.duplicateCandidates.join(', ') || 'No duplicate candidate detected'}</dd></div>
+                      <div className="rounded-xl bg-[#FBF8F5] p-3 md:col-span-2"><dt className="font-bold text-[#2B1723]">Next Action</dt><dd>{response.status === 'approved' ? 'Continue Approved to Mapping when ready.' : 'Review, approve, request information, wait-list, reject, mark duplicate, or link existing.'}</dd></div>
+                    </dl>
                     {response.warnings.length > 0 && <p className="mt-3 rounded-xl bg-[#FFF8EA] p-3 text-xs leading-5 text-[#7A5818]">{response.warnings.join(' ')}</p>}
                     <div className="mt-3 flex flex-wrap gap-2">
                       {FORM_REVIEW_ACTIONS.map(([action, label]) => (
@@ -828,6 +852,9 @@ export function ImportsPage() {
                           {label}
                         </button>
                       ))}
+                      <Link to="/communications?purpose=response-info-request" className="rounded-lg border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#5D4A52] hover:bg-[#FFF8F2]">
+                        Open Message Builder to copy request
+                      </Link>
                     </div>
                   </article>
                 ))}
@@ -1003,6 +1030,24 @@ export function ImportsPage() {
                   {label}
                 </button>
               ))}
+            </div>
+            <p className="mt-4 text-xs leading-5 text-[#816D62]">
+              QR payload remains GSV:TICKET:{'{ticketCode}'}. Importing registrations never changes scanner permissions.
+            </p>
+            <div className="mt-5 rounded-2xl border border-[#F2E8E1] bg-[#FBF8F5] p-4 text-sm text-[#5D4A52]">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Final confirmation summary</p>
+              <dl className="mt-3 grid gap-2 sm:grid-cols-2">
+                <div><dt className="font-bold">Working Event</dt><dd>{activeEvent.eventName}</dd></div>
+                <div><dt className="font-bold">Source</dt><dd>{selectedSource.label}</dd></div>
+                <div><dt className="font-bold">Record Type</dt><dd>{selectedRecordType.label}</dd></div>
+                <div><dt className="font-bold">Origin</dt><dd>{importContext.sourceFileName || uploadedFileName || 'manual input'}</dd></div>
+                <div><dt className="font-bold">Total Rows</dt><dd>{processedRows.length}</dd></div>
+                <div><dt className="font-bold">Ready Rows</dt><dd>{finalRows.length}</dd></div>
+                <div><dt className="font-bold">Skipped Rows</dt><dd>{Math.max(0, processedRows.length - finalRows.length)}</dd></div>
+                <div><dt className="font-bold">Duplicate / Review Rows</dt><dd>{processedRows.filter((row) => !row.isValid || row.duplicateInfo?.isDuplicate).length}</dd></div>
+                <div><dt className="font-bold">Import Destination</dt><dd>{selectedRecordType.writeSupport === 'supported' ? 'Registrations' : 'Review only'}</dd></div>
+                <div><dt className="font-bold">Writes Data</dt><dd>{selectedRecordType.writeSupport === 'supported' ? 'Yes, after final confirmation' : 'No'}</dd></div>
+              </dl>
             </div>
           </section>
           <ImportPreviewTable

@@ -34,7 +34,7 @@ test('Import Center exposes the approved step workflow and source taxonomy', () 
     'Custom CSV',
     'Paste Table',
     'Copy Rows From Spreadsheet',
-    'PDF Table Downloaded From Email',
+    'PDF Table',
     'Google Forms Response Inbox',
   ])
   assert.equal(getImportSource('google-sheets-csv').value, 'google-sheets-export')
@@ -42,7 +42,7 @@ test('Import Center exposes the approved step workflow and source taxonomy', () 
 })
 
 test('record types are explicit and only guest-registration writes from Import Center', () => {
-  assert.equal(IMPORT_RECORD_TYPES.length, 9)
+  assert.equal(IMPORT_RECORD_TYPES.length, 12)
   assert.equal(getImportRecordType('guest-registration').writeSupport, 'supported')
   assert.equal(getImportRecordType('payment-update').writeSupport, 'review-only')
   assert.equal(getImportRecordType('operations-entry').writeSupport, 'review-only')
@@ -91,8 +91,8 @@ test('Response Inbox remains manual review unless an authorized receiver is sepa
 
   assert.equal(connection.status, 'draft')
   assert.equal(connection.connectionName, 'Manual Google Forms response review')
-  assert.ok(FORM_INBOX_COLUMNS.includes('Sync History'))
-  assert.ok(FORM_INBOX_COLUMNS.includes('Mapping Templates'))
+  assert.ok(FORM_INBOX_COLUMNS.includes('Ready to Import'))
+  assert.ok(FORM_INBOX_COLUMNS.includes('History'))
 })
 
 test('Import upgrade preserves package and ticket guardrails', async () => {

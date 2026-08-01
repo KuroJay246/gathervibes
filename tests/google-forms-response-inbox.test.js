@@ -13,6 +13,7 @@ import {
   buildFormResponsesFromParsedRows,
   buildManualFormConnection,
   findFormResponseDuplicateCandidates,
+  formConnectionStatusLabel,
 } from '../src/utils/formResponseInbox.js'
 import { validatePayload, verifySignedRequest } from '../integrations/google-forms/function/googleFormsReceiver.js'
 import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
@@ -31,15 +32,16 @@ test('Google Forms inbox is event agnostic and exposes required workflow columns
     'custom-review-record',
   ])
   assert.deepEqual(FORM_INBOX_COLUMNS, [
-    'Connections',
-    'New Responses',
+    'New',
     'Needs Review',
     'Approved',
+    'Ready to Import',
     'Imported',
+    'Waiting for Information',
     'Wait-Listed',
+    'Duplicates',
     'Rejected',
-    'Sync History',
-    'Mapping Templates',
+    'History',
   ])
   assert.ok(FORM_REVIEW_ACTIONS.some(([, label]) => label === 'Link to Existing Record'))
 })
@@ -51,6 +53,7 @@ test('manual Google Forms responses enter review before mapping or import', () =
   const summary = buildFormInboxSummary(responses)
 
   assert.equal(responses[0].status, 'needs-review')
+  assert.equal(formConnectionStatusLabel(connection), 'Manual Response Review')
   assert.match(responses[0].warnings.join(' '), /automatic delivery is disabled/)
   assert.equal(summary.reviewRequired, 1)
   assert.equal(summary.convertible, 0)

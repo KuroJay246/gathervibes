@@ -185,7 +185,7 @@ test('Phase 11 UI has packet builder and no sending or OAuth implementation', as
   assert.match(page, /Template Library/)
   assert.match(page, /Copy & Use/)
   assert.match(page, /Missing email\/phone/)
-  assert.match(page, /Copy One Message/)
+  assert.match(page, /Copy Message/)
   assert.match(page, /Copy All Messages/)
   assert.match(page, /Copy Recipient List/)
   assert.match(page, /Copy CSV Packet/)

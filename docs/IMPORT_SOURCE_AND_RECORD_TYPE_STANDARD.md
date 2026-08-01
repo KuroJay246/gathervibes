@@ -8,12 +8,12 @@
 - Custom CSV: unusual headers, payment lists, references, and exports.
 - Paste Table: copied rows from CSV or spreadsheets.
 - Copy Rows From Spreadsheet: copied visible spreadsheet rows.
-- PDF Table Downloaded From Email: fallback guidance only; no automatic extraction.
+- PDF Table: readable text-based PDF fallback guidance only; scanned PDFs are not automatically read.
 - Google Forms Response Inbox: manual response review queue.
 
 ## Record Types
 
-Guest Registration is the only Import Center record type that can continue to a confirmed write. Payment Update, Ticket Assignment, Operations Entry, Staff List, Vendor Application, Sponsor Inquiry, Feedback, and Custom Review Record are review-only in this prototype.
+Guest Registration is the only Import Center record type that can continue to a confirmed write. Payment Update, Attendee List, Ticket Assignment, Operations Entry, Volunteer, Baker Application, Vendor Application, Sponsor Inquiry, School Participation, Feedback, and Custom Review Record are review-only in this prototype.
 
 ## Product Truth
 
