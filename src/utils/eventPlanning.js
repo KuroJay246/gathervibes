@@ -233,6 +233,55 @@ export const READINESS_ITEM_CONFIG = [
   },
 ]
 
+export const EVENT_SETUP_STAGE_CONFIG = [
+  {
+    id: 'profile',
+    label: 'Event Profile',
+    description: 'Name, type, date, time, venue, and location are defined.',
+    evaluate: (event) => Boolean(event?.eventName)
+      && Boolean(event?.eventDate)
+      && Boolean(event?.eventType)
+      && Boolean(event?.eventStartTime)
+      && Boolean(event?.venueName)
+      && Boolean(event?.location),
+  },
+  {
+    id: 'registration',
+    label: 'Guests & Tickets',
+    description: 'Capacity, pricing, registration window, and entry rules are ready for guest work.',
+    evaluate: (event) => Number(event?.capacity) > 0
+      && ((Number(event?.ticketPrice) || 0) > 0 || (Array.isArray(event?.priceTiers) && event.priceTiers.length > 0))
+      && Boolean(event?.registrationOpenDate || event?.registrationCloseDate || event?.registrationRequired === false),
+  },
+  {
+    id: 'money',
+    label: 'Money Plan',
+    description: 'Projected registration income or event budget categories have been reviewed.',
+    evaluate: (event) => {
+      const totals = financialPlanTotals(event?.financialPlan)
+      return (Number(totals.projectedRegistrationIncome) || 0) > 0 || (Number(totals.totalBudget) || 0) > 0
+    },
+  },
+  {
+    id: 'operations',
+    label: 'Operations Plan',
+    description: 'Venue access, emergency contact, or event-day timeline is recorded.',
+    evaluate: (event) => Boolean(event?.operationsPlan?.venueAccessTime)
+      || Boolean(event?.operationsPlan?.emergencyContact)
+      || (Array.isArray(event?.operationsPlan?.timeline) && event.operationsPlan.timeline.some((item) => item?.time || item?.label)),
+  },
+  {
+    id: 'readiness',
+    label: 'Ready to Run',
+    description: 'Readiness checks and open planning work are visible before event day.',
+    evaluate: (event) => {
+      const readiness = buildReadinessChecklist(event)
+      const tasks = buildTaskSummary(event?.planningTasks)
+      return readiness.needsAttentionCount === 0 || tasks.total > 0
+    },
+  },
+]
+
 export function normalizeEventStatus(value) {
   const normalized = String(value || '').trim().toLowerCase()
   if (normalized === 'upcoming') return 'planning'
@@ -602,6 +651,75 @@ export function buildTaskSummary(tasks = []) {
     open: Math.max(0, list.length - completed),
     overdue,
     upcoming,
+  }
+}
+
+export function buildEventSetupStages(event = {}) {
+  const hydratedEvent = hydrateEventForPlanning(event)
+  return EVENT_SETUP_STAGE_CONFIG.map((stage) => ({
+    ...stage,
+    complete: Boolean(stage.evaluate(hydratedEvent)),
+  }))
+}
+
+export function buildEventSetupProgress(event = {}) {
+  const stages = buildEventSetupStages(event)
+  const completedCount = stages.filter((stage) => stage.complete).length
+  const nextStage = stages.find((stage) => !stage.complete) || null
+  const totalCount = stages.length
+
+  return {
+    stages,
+    completedCount,
+    totalCount,
+    percentComplete: totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100),
+    label: nextStage ? `${completedCount}/${totalCount} setup stages` : 'Setup complete',
+    nextStage,
+  }
+}
+
+export function buildTaskDeadlineSummary(tasks = [], now = new Date()) {
+  const list = Array.isArray(tasks) ? tasks.map(normalizePlanningTask) : []
+  const today = new Date(now)
+  today.setHours(0, 0, 0, 0)
+  const soonLimit = new Date(today)
+  soonLimit.setDate(soonLimit.getDate() + 7)
+
+  const openTasks = list.filter((task) => task.status !== 'Completed')
+  const withDueDates = openTasks
+    .map((task) => ({ task, dueDate: dateFromValue(task.dueDate) }))
+    .filter(({ dueDate }) => Boolean(dueDate))
+    .map(({ task, dueDate }) => {
+      dueDate.setHours(0, 0, 0, 0)
+      return { task, dueDate }
+    })
+
+  const overdue = withDueDates.filter(({ dueDate }) => dueDate.getTime() < today.getTime())
+  const dueToday = withDueDates.filter(({ dueDate }) => dueDate.getTime() === today.getTime())
+  const dueSoon = withDueDates.filter(({ dueDate }) => dueDate.getTime() > today.getTime() && dueDate.getTime() <= soonLimit.getTime())
+  const noDueDate = openTasks.filter((task) => !task.dueDate)
+  const urgentTasks = [...overdue, ...dueToday, ...dueSoon]
+    .sort((left, right) => left.dueDate.getTime() - right.dueDate.getTime())
+    .map(({ task }) => task)
+
+  return {
+    open: openTasks.length,
+    completed: list.length - openTasks.length,
+    overdue: overdue.length,
+    dueToday: dueToday.length,
+    dueSoon: dueSoon.length,
+    noDueDate: noDueDate.length,
+    nextTask: urgentTasks[0] || openTasks[0] || null,
+    urgentTasks,
+    label: overdue.length > 0
+      ? `${overdue.length} overdue`
+      : dueToday.length > 0
+        ? `${dueToday.length} due today`
+        : dueSoon.length > 0
+          ? `${dueSoon.length} due soon`
+          : openTasks.length > 0
+            ? `${openTasks.length} open`
+            : 'No open tasks',
   }
 }
 

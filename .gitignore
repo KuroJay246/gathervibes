@@ -18,6 +18,7 @@ secrets/
 test_output.txt
 test-results/
 playwright-report/
+output/
 
 test_output.txt
 
