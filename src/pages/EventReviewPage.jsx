@@ -39,6 +39,16 @@ function Section({ eyebrow, title, children }) {
   )
 }
 
+function DetailRow({ label, value, hint }) {
+  return (
+    <div className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">{label}</p>
+      <p className="mt-2 text-lg font-bold text-[#2B1723]">{value}</p>
+      {hint && <p className="mt-2 text-xs leading-5 text-[#816D62]">{hint}</p>}
+    </div>
+  )
+}
+
 function FollowUpItem({ item }) {
   return (
     <article className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
@@ -168,6 +178,14 @@ export function EventReviewPage() {
   if (error) return <ErrorState message={error} onRetry={() => window.location.reload()} />
 
   const currency = review?.paymentReview?.registrationRecords?.currency || 'BBD'
+  const adminReviewItems = [
+    ['Registrations reviewed', review.summary.registrationCount],
+    ['Outstanding registration balances', formatEventReviewMoney(review.paymentReview.registrationRecords.outstandingAmount, currency)],
+    ['Outstanding commitments', formatEventReviewMoney(review.paymentReview.outstandingCommitments.totalOutstandingCommitments, currency)],
+    ['Follow-up items', review.followUp.unresolvedCount],
+    ['Attendance recorded', formatEventReviewMoney ? `${review.summary.checkedInGuests} guests` : review.summary.checkedInGuests],
+    ['Open Operations items', review.summary.openOperationsItems],
+  ]
 
   return (
     <div data-tour-id="reports-workspace" className="space-y-6">
@@ -198,6 +216,43 @@ export function EventReviewPage() {
           </Link>
         </div>
       </section>
+
+      <Section eyebrow="Event Summary" title={review.summary.title}>
+        <div className="gsv-compact-metric-grid">
+          <SummaryCard label="Event status" value={review.summary.eventStatus} />
+          <SummaryCard label="Registration records" value={review.summary.registrationCount} />
+          <SummaryCard label="Total guests" value={review.summary.guestCount} />
+          <SummaryCard label="Tickets assigned" value={`${review.summary.ticketCoverage.assignedCount} (${review.summary.ticketCoverage.assignedPercent}%)`} />
+          <SummaryCard label="Checked-in guests" value={review.summary.checkedInGuests} />
+          <SummaryCard label="Capacity usage" value={review.summary.capacity > 0 ? `${review.summary.capacityUsagePercent}%` : 'Not available'} />
+        </div>
+        <details className="mt-5 rounded-2xl border border-[#EEDFD6] bg-[#FFFDFC]">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-[#6B564C]">Show full report metrics</summary>
+          <div className="border-t border-[#EFE2DA] p-4 phase23v-metric-grid">
+            <SummaryCard label="Capacity" value={review.summary.capacity > 0 ? review.summary.capacity : 'Not set'} />
+            <SummaryCard label="Paid count" value={review.summary.paidCount} />
+            <SummaryCard label="Pending count" value={review.summary.pendingCount} />
+            <SummaryCard label="Partial payment count" value={review.summary.partialPaymentCount} />
+            <SummaryCard label="Complimentary count" value={review.summary.complimentaryCount} />
+            <SummaryCard label="To Pay at Door count" value={review.summary.doorListCount} />
+            <SummaryCard label="Unknown count" value={review.summary.unknownCount} />
+            <SummaryCard label="Tickets missing" value={review.summary.ticketCoverage.missingCount} help={`Paid missing tickets: ${review.summary.ticketCoverage.paidMissingCount}`} />
+            <SummaryCard label="Checked-in registrations" value={review.summary.checkedInRegistrations} />
+            <SummaryCard label="Attendance rate" value={review.summary.guestCount > 0 ? `${review.summary.attendanceRate}%` : 'Not available'} />
+            <SummaryCard label="Incomplete-data warnings" value={review.summary.incompleteDataWarnings} />
+            <SummaryCard label="Operations cash position" value={formatEventReviewMoney(review.summary.operationsNetPosition, currency)} help="Operations cash position excludes registration ticket receipts." />
+          </div>
+        </details>
+      </Section>
+
+      <Section eyebrow="Administrative review" title="Event closeout review">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {adminReviewItems.map(([label, value]) => <DetailRow key={label} label={label} value={value} />)}
+        </div>
+        <div className="mt-5 rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm leading-6 text-[#244B32]">
+          Completed events remain editable elsewhere. This summary is informational only and does not lock the event or save a close state.
+        </div>
+      </Section>
 
       <Section eyebrow="Payment Follow-Up and Finance Review" title="What needs attention now">
         {review.followUp.items.length === 0 ? (
@@ -323,7 +378,7 @@ export function EventReviewPage() {
       </Section>
 
       {evidenceAudit && (
-        <Section eyebrow="Historical Reconciliation" title={evidenceAudit.auditStatus}>
+        <Section eyebrow="In-Kind Support and Historical Reconciliation" title={evidenceAudit.auditStatus}>
           <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
             Historical reconciliation evidence is preserved here for CPB review. It is not part of the daily Registration Payments workflow and it is not an automatic accounting ledger. Final profit cannot be confirmed until bank, 1stPay, baker and supplier evidence is complete.
           </div>
@@ -373,38 +428,8 @@ export function EventReviewPage() {
         </Section>
       )}
 
-      <Section eyebrow={review.summary.eyebrow} title={review.summary.title}>
-        <div className="phase23v-metric-grid">
-          <SummaryCard label="Event status" value={review.summary.eventStatus} />
-          <SummaryCard label="Registration records" value={review.summary.registrationCount} />
-          <SummaryCard label="Total guests" value={review.summary.guestCount} />
-          <SummaryCard label="Capacity usage" value={review.summary.capacity > 0 ? `${review.summary.capacityUsagePercent}%` : 'Not available'} />
-        </div>
-        <details className="mt-5 rounded-2xl border border-[#EEDFD6] bg-[#FFFDFC]">
-          <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-[#6B564C]">Show full report metrics</summary>
-          <div className="border-t border-[#EFE2DA] p-4 phase23v-metric-grid">
-            <SummaryCard label="Capacity" value={review.summary.capacity > 0 ? review.summary.capacity : 'Not set'} />
-            <SummaryCard label="Paid count" value={review.summary.paidCount} />
-            <SummaryCard label="Pending count" value={review.summary.pendingCount} />
-            <SummaryCard label="Partial payment count" value={review.summary.partialPaymentCount} />
-            <SummaryCard label="Complimentary count" value={review.summary.complimentaryCount} />
-            <SummaryCard label="To Pay at Door count" value={review.summary.doorListCount} />
-            <SummaryCard label="Unknown count" value={review.summary.unknownCount} />
-            <SummaryCard label="Tickets assigned" value={`${review.summary.ticketCoverage.assignedCount} (${review.summary.ticketCoverage.assignedPercent}%)`} />
-            <SummaryCard label="Tickets missing" value={review.summary.ticketCoverage.missingCount} help={`Paid missing tickets: ${review.summary.ticketCoverage.paidMissingCount}`} />
-            <SummaryCard label="Checked-in registrations" value={review.summary.checkedInRegistrations} />
-            <SummaryCard label="Checked-in guests" value={review.summary.checkedInGuests} />
-            <SummaryCard label="Attendance rate" value={review.summary.guestCount > 0 ? `${review.summary.attendanceRate}%` : 'Not available'} />
-            <SummaryCard label="Incomplete-data warnings" value={review.summary.incompleteDataWarnings} />
-            <SummaryCard label="Operations income" value={formatEventReviewMoney(review.summary.operationsIncome, currency)} />
-            <SummaryCard label="Operations expenses" value={formatEventReviewMoney(review.summary.operationsExpenses, currency)} />
-            <SummaryCard label="Operations refunds" value={formatEventReviewMoney(review.summary.operationsRefunds, currency)} />
-            <SummaryCard label="Open operations items" value={review.summary.openOperationsItems} />
-            <SummaryCard label="Operations adjustments / cash position" value={`${formatEventReviewMoney(review.summary.operationsAdjustments, currency)} / ${formatEventReviewMoney(review.summary.operationsNetPosition, currency)}`} help="Operations cash position excludes registration ticket receipts." />
-          </div>
-        </details>
-
-        <div className="mt-5 rounded-2xl border border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#715D46]">
+      <Section eyebrow={review.summary.eyebrow} title="Attendance and read-only reporting boundaries">
+        <div className="rounded-2xl border border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#715D46]">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 size-5 shrink-0" />
             <div>

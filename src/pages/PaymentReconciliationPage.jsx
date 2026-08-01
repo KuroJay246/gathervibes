@@ -21,6 +21,21 @@ function Metric({ label, value, help }) {
   )
 }
 
+const DETAIL_SECTION_TONES = {
+  neutral: 'border-[#EFE2DA] bg-[#FBF8F5]',
+  warning: 'border-[#F2D6A3] bg-[#FFF8EA]',
+  success: 'border-[#D9EBD8] bg-[#EAF6EF]',
+}
+
+function DetailSection({ label, value, tone = 'neutral' }) {
+  return (
+    <div className={`rounded-2xl border p-4 ${DETAIL_SECTION_TONES[tone]}`}>
+      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">{label}</p>
+      <p className="mt-2 text-sm leading-6 text-[#2B1723]">{value}</p>
+    </div>
+  )
+}
+
 function GuardrailNotice() {
   return (
     <section className="rounded-2xl border border-[#F2D6A3] bg-[#FFF8EA] p-5 text-sm leading-6 text-[#715D46]">
@@ -231,45 +246,88 @@ function RowLabel({ row }) {
   )
 }
 
-function ReconciliationTable({ preview, filter }) {
+function reconciliationRowKey(row) {
+  return [
+    row.filterKey,
+    row.workbookRecord?.workbookRecordId,
+    row.registrationRecord?.registrationId,
+    row.workbookRecord?.ticketCode,
+    row.workbookRecord?.guestName,
+    row.registrationRecord?.fullName,
+    row.matchBasis,
+  ].filter(Boolean).join('::')
+}
+
+function ReconciliationTable({ preview, filter, onSelect, selectedRowKey }) {
   const rows = preview.rows.filter((row) => filter === 'all' || row.filterKey === filter)
   return (
     <section className="overflow-hidden rounded-[24px] border border-[#EEDFD6] bg-white shadow-[0_8px_24px_rgba(84,53,67,0.04)]">
       <div className="border-b border-[#EEDFD6] bg-[#FBF8F5] p-4">
         <h3 className="font-serif text-2xl text-[#2B1723]">Dry-run classifications</h3>
-        <p className="mt-1 text-sm text-[#816D62]">Strong exact or multi-field matches may produce proposed payment-field updates. Name-only matches stay manual review.</p>
+        <p className="mt-1 text-sm text-[#816D62]">Payment balance and evidence discrepancy stay separate. Strong exact or multi-field matches may produce proposed payment-field updates. Name-only matches stay manual review.</p>
       </div>
       {rows.length === 0 ? (
         <p className="p-6 text-sm text-[#816D62]">No rows match this filter.</p>
       ) : (
-        <div className="overflow-x-auto">
+        <>
+          <div className="grid gap-3 border-b border-[#F2E8E1] bg-[#FFFDFC] p-4 xl:hidden">
+            {rows.map((row, index) => {
+              const key = reconciliationRowKey(row) || `row-${index}`
+              return (
+                <button
+                  key={`card-${key}`}
+                  type="button"
+                  onClick={() => onSelect(row)}
+                  className={`rounded-2xl border p-4 text-left ${selectedRowKey === key ? 'border-[#9A5260] bg-[#FFF8F2]' : 'border-[#EFE2DA] bg-white'}`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <RowLabel row={row} />
+                    <span className="rounded-full bg-[#F7F1ED] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{row.status}</span>
+                  </div>
+                  <p className="mt-3 text-xs text-[#816D62]">Payment status stays separate from reconciliation status.</p>
+                </button>
+              )
+            })}
+          </div>
+          <div className="overflow-x-auto">
           <table className="w-full min-w-[1080px] text-left text-sm">
             <thead className="border-b border-[#F2E8E1] text-xs font-bold uppercase tracking-wider text-[#80685B]">
               <tr>
-                <th className="px-3 py-2">Record</th>
-                <th className="px-3 py-2">Classification</th>
-                <th className="px-3 py-2">Match basis</th>
-                <th className="px-3 py-2">Proposed fields</th>
-                <th className="px-3 py-2">Reason</th>
+                <th className="px-3 py-2">Registration</th>
+                <th className="px-3 py-2">Expected amount</th>
+                <th className="px-3 py-2">Recorded amount</th>
+                <th className="px-3 py-2">Evidence amount</th>
+                <th className="px-3 py-2">Difference</th>
+                <th className="px-3 py-2">Reconciliation status</th>
+                <th className="px-3 py-2">Evidence reference</th>
+                <th className="px-3 py-2">Next action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F2E8E1]">
               {rows.map((row, index) => (
-                <tr key={`${row.filterKey}-${row.workbookRecord?.workbookRecordId || row.registrationRecord?.registrationId || index}`}>
-                  <td className="px-3 py-3"><RowLabel row={row} /></td>
-                  <td className="px-3 py-3">
-                    <span className="rounded-full bg-[#F7F1ED] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{row.status}</span>
-                  </td>
-                  <td className="px-3 py-3 text-xs text-[#816D62]">{row.matchBasis || 'None'}</td>
-                  <td className="px-3 py-3 text-xs text-[#816D62]">
-                    {row.proposedChanges?.length ? row.proposedChanges.map((change) => change.field).join(', ') : 'None'}
-                  </td>
-                  <td className="max-w-[360px] px-3 py-3 text-xs leading-5 text-[#816D62]">{row.reason}</td>
+                (() => {
+                  const rowKey = reconciliationRowKey(row) || `row-${index}`
+                  return (
+                <tr
+                  key={rowKey}
+                  className={selectedRowKey === rowKey ? 'bg-[#FFF8F2]' : ''}
+                >
+                  <td className="px-3 py-3"><button type="button" onClick={() => onSelect(row)} className="text-left"><RowLabel row={row} /></button></td>
+                  <td className="px-3 py-3 text-xs text-[#816D62]">{formatCurrency(row.registrationRecord?.amountDue ?? 0, preview.targetEvent.currency)}</td>
+                  <td className="px-3 py-3 text-xs text-[#816D62]">{formatCurrency(row.registrationRecord?.amountPaid ?? 0, preview.targetEvent.currency)}</td>
+                  <td className="px-3 py-3 text-xs text-[#816D62]">{formatCurrency(row.workbookRecord?.amountPaid ?? 0, preview.targetEvent.currency)}</td>
+                  <td className="px-3 py-3 text-xs text-[#816D62]">{formatCurrency((row.workbookRecord?.amountPaid ?? 0) - (row.registrationRecord?.amountPaid ?? 0), preview.targetEvent.currency)}</td>
+                  <td className="px-3 py-3"><span className="rounded-full bg-[#F7F1ED] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{row.status}</span></td>
+                  <td className="px-3 py-3 text-xs text-[#816D62]">{row.workbookRecord?.paymentReference || 'No evidence reference'}</td>
+                  <td className="max-w-[260px] px-3 py-3 text-xs leading-5 text-[#816D62]">{row.reason}</td>
                 </tr>
+                  )
+                })()
               ))}
             </tbody>
           </table>
         </div>
+        </>
       )}
     </section>
   )
@@ -282,6 +340,8 @@ export function PaymentReconciliationPage() {
   const [error, setError] = useState('')
   const [preview, setPreview] = useState(null)
   const [filter, setFilter] = useState('all')
+  const [selectedRowKey, setSelectedRowKey] = useState('')
+  const [selectedRow, setSelectedRow] = useState(null)
 
   const selectedTarget = activeEvent ? { ...activeEvent, currency: activeEvent.currency || 'BBD' } : null
   const setupReady = Boolean(selectedTarget?.eventId && workbookFile)
@@ -313,6 +373,8 @@ export function PaymentReconciliationPage() {
       })
       setPreview({ ...nextPreview, workbookSheets })
       setFilter('all')
+      setSelectedRow(nextPreview.rows[0] || null)
+      setSelectedRowKey(nextPreview.rows[0] ? `${nextPreview.rows[0].filterKey}-${nextPreview.rows[0].workbookRecord?.workbookRecordId || nextPreview.rows[0].registrationRecord?.registrationId || 0}` : '')
     } catch (err) {
       setError(err?.message || 'Payment reconciliation preview could not load.')
     } finally {
@@ -324,6 +386,14 @@ export function PaymentReconciliationPage() {
     setWorkbookFile(event.target.files?.[0] || null)
     setPreview(null)
     setError('')
+    setSelectedRow(null)
+    setSelectedRowKey('')
+  }
+
+  function handleSelectRow(row) {
+    const key = reconciliationRowKey(row)
+    setSelectedRow(row)
+    setSelectedRowKey(key)
   }
 
   if (loading) return <LoadingState message="Loading payment reconciliation preview..." />
@@ -333,9 +403,9 @@ export function PaymentReconciliationPage() {
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Payments · dry-run only</p>
-          <h2 className="font-serif text-3xl text-[#2B1723]">Payment Reconciliation Preview</h2>
+          <h2 className="font-serif text-3xl text-[#2B1723]">Payment Reconciliation</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
-            Compare a payment workbook to the selected event's registration payment records without changing data.
+            Compare a payment workbook to the selected event's registration payment records without changing data. Missing evidence does not automatically mean unpaid.
           </p>
         </div>
         <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
@@ -368,6 +438,14 @@ export function PaymentReconciliationPage() {
 
       {preview && (
         <>
+          <section className="gsv-section-card">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Reconciliation summary</p>
+            <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Payment balance vs evidence discrepancy</h3>
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
+              <DetailSection label="Payment balance" value="Registration payment fields show what the app currently records as expected, collected, and outstanding for the selected Working Event." />
+              <DetailSection label="Evidence discrepancy" value="Reconciliation statuses describe how well workbook evidence matches those payment records. They do not by themselves change the payment status." tone="warning" />
+            </div>
+          </section>
           {workbookParserNote && (
             <section className="rounded-2xl border border-[#F2D6A3] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
               <div className="flex gap-2">
@@ -392,7 +470,21 @@ export function PaymentReconciliationPage() {
               ))}
             </div>
           </section>
-          <ReconciliationTable preview={preview} filter={filter} />
+          {selectedRow && (
+            <section className="gsv-section-card">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Review details</p>
+              <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Selected reconciliation item</h3>
+              <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                <DetailSection label="Registration" value={selectedRow.registrationRecord?.fullName || selectedRow.workbookRecord?.guestName || 'No matched registration yet'} />
+                <DetailSection label="Recorded payment" value={`${formatCurrency(selectedRow.registrationRecord?.amountPaid ?? 0, preview.targetEvent.currency)} · ${selectedRow.registrationRecord?.paymentStatus || 'unknown'}`} />
+                <DetailSection label="Evidence" value={`${formatCurrency(selectedRow.workbookRecord?.amountPaid ?? 0, preview.targetEvent.currency)} · ${selectedRow.workbookRecord?.paymentReference || 'No evidence reference'}`} />
+                <DetailSection label="Difference" value={formatCurrency((selectedRow.workbookRecord?.amountPaid ?? 0) - (selectedRow.registrationRecord?.amountPaid ?? 0), preview.targetEvent.currency)} tone={selectedRow.filterKey === 'proposed-update' || selectedRow.filterKey === 'no-change' ? 'success' : 'warning'} />
+                <DetailSection label="Reconciliation status" value={selectedRow.status} />
+                <DetailSection label="Notes" value={selectedRow.reason} />
+              </div>
+            </section>
+          )}
+          <ReconciliationTable preview={preview} filter={filter} onSelect={handleSelectRow} selectedRowKey={selectedRowKey} />
           <section className="rounded-2xl border border-[#F2C3C3] bg-[#FFF8F8] p-5 text-sm leading-6 text-[#7E1E1E]">
             <h3 className="font-bold">No apply action is available here</h3>
             <p className="mt-1">Supported updates are previewed only for organizer review. Identity fields, event ID, guest count, ticket codes, check-in fields, and audit history are never proposed here.</p>

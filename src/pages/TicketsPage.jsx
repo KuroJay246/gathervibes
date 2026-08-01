@@ -69,6 +69,16 @@ function attendeeNamesText(registration = {}) {
     : ''
 }
 
+function CompactMetric({ label, value, help }) {
+  return (
+    <article className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
+      <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#80685B]">{label}</p>
+      <p className="mt-2 text-2xl font-bold text-[#2B1723]">{value}</p>
+      {help && <p className="mt-2 text-xs leading-5 text-[#816D62]">{help}</p>}
+    </article>
+  )
+}
+
 function ticketNeedsReview(registration = {}, event = {}) {
   const finance = calculateRegistrationFinance(registration, event)
   return finance.needsFinanceReview || registration.financeReviewRequired || !registration.ticketCode
@@ -125,6 +135,7 @@ export function TicketsPage() {
   const [message, setMessage] = useState('')
   const [actionError, setActionError] = useState('')
   const [showPrintableQrs, setShowPrintableQrs] = useState(false)
+  const [selectedRegistrationId, setSelectedRegistrationId] = useState('')
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -135,6 +146,7 @@ export function TicketsPage() {
     setMessage('')
     setActionError('')
     setShowPrintableQrs(false)
+    setSelectedRegistrationId('')
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [activeEvent?.eventId])
 
@@ -179,6 +191,22 @@ export function TicketsPage() {
     () => filteredRegistrations.filter((registration) => registration.ticketStatus === 'assigned' && registration.ticketCode),
     [filteredRegistrations],
   )
+  const selectedRegistration = filteredRegistrations.find((registration) => registration.registrationId === selectedRegistrationId)
+    || filteredRegistrations[0]
+    || null
+  const ticketMetrics = useMemo(() => {
+    const allAssigned = registrations.filter((registration) => registration.ticketStatus === 'assigned' && registration.ticketCode)
+    const checkedInAssigned = allAssigned.filter((registration) => registration.checkedIn)
+    const needsReview = registrations.filter((registration) => ticketNeedsReview(registration, activeEvent))
+    return {
+      registrations: registrations.length,
+      ticketsIssued: allAssigned.length,
+      ticketsNotIssued: registrations.length - allAssigned.length,
+      checkedInTickets: checkedInAssigned.length,
+      unusedTickets: Math.max(0, allAssigned.length - checkedInAssigned.length),
+      reviewNeeded: needsReview.length,
+    }
+  }, [activeEvent, registrations])
 
   if (!activeEvent?.eventId) {
     return (
@@ -327,6 +355,15 @@ export function TicketsPage() {
         </div>
       </header>
 
+      <section aria-label="Ticket summary" className="gsv-compact-metric-grid">
+        <CompactMetric label="Registrations" value={ticketMetrics.registrations} />
+        <CompactMetric label="Tickets Issued" value={ticketMetrics.ticketsIssued} />
+        <CompactMetric label="Tickets Not Yet Issued" value={ticketMetrics.ticketsNotIssued} />
+        <CompactMetric label="Checked-In Tickets" value={ticketMetrics.checkedInTickets} />
+        <CompactMetric label="Unused Tickets" value={ticketMetrics.unusedTickets} />
+        <CompactMetric label="Ticket Records Needing Review" value={ticketMetrics.reviewNeeded} />
+      </section>
+
       <section className="flex items-center gap-2 rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
         <p><strong>Advanced ticket filters:</strong> use these to find assigned tickets, missing codes, payment states, check-in state, and review-needed rows.</p>
         <InfoHint label="QR Payload Info">
@@ -448,49 +485,108 @@ export function TicketsPage() {
         <EmptyState icon={TicketCheck} title="No ticket records found" description="Try another filter or search term." />
       ) : (
         <>
+          {selectedRegistration && (
+            <section className="gsv-section-card">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Ticket details</p>
+                  <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">{selectedRegistration.fullName}</h3>
+                  <p className="mt-2 text-sm text-[#816D62]">
+                    {selectedRegistration.buyerName || 'No buyer name'} · {selectedRegistration.email || selectedRegistration.phone || 'No contact'}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <TicketBadge tone={selectedRegistration.ticketStatus === 'assigned' ? 'green' : 'blush'}>
+                    {selectedRegistration.ticketStatus === 'assigned' ? 'Ticket issued' : 'Ticket not issued'}
+                  </TicketBadge>
+                  <TicketBadge tone={selectedRegistration.checkedIn ? 'green' : 'neutral'}>
+                    {selectedRegistration.checkedIn ? 'Checked in' : 'Not checked in'}
+                  </TicketBadge>
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-4 lg:grid-cols-4">
+                <div className="rounded-2xl bg-[#FBF8F5] p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Ticket</p>
+                  <p className="mt-2 font-mono text-lg font-bold text-[#2B1723]">{selectedRegistration.ticketCode || 'Not assigned'}</p>
+                  <p className="mt-2 text-xs text-[#816D62]">Event: {activeEvent.eventName}</p>
+                </div>
+                <div className="rounded-2xl bg-[#FBF8F5] p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Guest</p>
+                  <p className="mt-2 text-sm font-semibold text-[#2B1723]">{selectedRegistration.fullName}</p>
+                  <p className="mt-2 text-xs text-[#816D62]">Guests covered: {selectedRegistration.personsAttending || 1}</p>
+                  {attendeeNamesText(selectedRegistration) && <p className="mt-2 text-xs text-[#816D62]">Attendees: {attendeeNamesText(selectedRegistration)}</p>}
+                </div>
+                <div className="rounded-2xl bg-[#FBF8F5] p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Attendance</p>
+                  <p className="mt-2 text-sm font-semibold text-[#2B1723]">{selectedRegistration.checkedIn ? 'Checked in' : 'Not checked in'}</p>
+                  <p className="mt-2 text-xs text-[#816D62]">Use Check-In to record attendance for this Working Event.</p>
+                </div>
+                <div className="rounded-2xl bg-[#FBF8F5] p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Actions</p>
+                  <div className="mt-3 flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowPrintableQrs(true)}
+                      className="rounded-xl border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]"
+                    >
+                      View ticket QR
+                    </button>
+                    <Link to="/check-in" className="rounded-xl bg-[#2B1723] px-3 py-2 text-center text-xs font-bold text-white hover:bg-[#3B2430]">
+                      Open Check-In
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
           <div className="hidden overflow-hidden rounded-2xl border border-[#EEDFD6] bg-white shadow-[0_4px_16px_rgba(43,23,35,0.03)] xl:block">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-[#F2E8E1] bg-[#FBF8F5] text-xs font-bold uppercase tracking-wider text-[#80685B]">
-                  <th className="px-4 py-3">Guest / Registration</th>
-                  <th className="px-4 py-3">Buyer / Contact</th>
-                  <th className="px-4 py-3">Payment</th>
-                  <th className="px-4 py-3">Ticket</th>
-                  <th className="px-4 py-3">Check-in</th>
+                  <th className="px-4 py-3">Registrant / attendee</th>
+                  <th className="px-4 py-3">Guests</th>
+                  <th className="px-4 py-3">Ticket code</th>
+                  <th className="px-4 py-3">Ticket status</th>
+                  <th className="px-4 py-3">Attendance</th>
+                  <th className="px-4 py-3">Source / payment</th>
                   <th className="px-4 py-3 text-right">Assignment</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F2E8E1]">
                 {filteredRegistrations.map((registration) => (
-                  <tr key={registration.registrationId}>
+                  <tr
+                    key={registration.registrationId}
+                    className={selectedRegistration?.registrationId === registration.registrationId ? 'bg-[#FFF8F2]' : ''}
+                  >
                     <td className="px-4 py-3">
-                      <div className="font-medium text-[#2B1723]">{registration.fullName}</div>
-                      {Number(registration.personsAttending) > 1 && <div className="mt-1"><TicketBadge tone="neutral">Group of {registration.personsAttending}</TicketBadge></div>}
+                      <button type="button" onClick={() => setSelectedRegistrationId(registration.registrationId)} className="text-left">
+                        <div className="font-medium text-[#2B1723]">{registration.fullName}</div>
+                      </button>
                       {registration.buyerName && <div className="text-xs font-semibold text-[#80685B]">Buyer / Contact: {registration.buyerName}</div>}
                       {attendeeNamesText(registration) && <div className="max-w-xs text-xs text-[#5D4A52]">Guests: {attendeeNamesText(registration)}</div>}
-                      {registration.groupName && <div className="text-xs text-[#816D62]">{registration.groupName}</div>}
                     </td>
-                    <td className="px-4 py-3 text-[#5D4A52]">
-                      {registration.email && <div>{registration.email}</div>}
-                      {registration.phone && <div>{registration.phone}</div>}
+                    <td className="px-4 py-3 text-[#5D4A52]">{registration.personsAttending || 1}</td>
+                    <td className="px-4 py-3 font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'Not assigned'}</td>
+                    <td className="px-4 py-3">
+                      <TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>
+                        {titleCase(registration.ticketStatus || 'no-ticket-assigned')}
+                      </TicketBadge>
                     </td>
+                    <td className="px-4 py-3"><TicketBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Not checked in'}</TicketBadge></td>
                     <td className="px-4 py-3">
                       {(() => {
                         const finance = calculateRegistrationFinance(registration, activeEvent)
                         return (
                           <div className="space-y-1">
+                            {registration.groupName && <div className="text-xs text-[#816D62]">{registration.groupName}</div>}
                             <TicketBadge tone={normalizePaymentStatus(registration.paymentStatus) === 'paid' ? 'green' : normalizePaymentStatus(registration.paymentStatus) === 'pending' || normalizePaymentStatus(registration.paymentStatus) === 'door' ? 'gold' : 'neutral'}>{formatPaymentLabel(registration.paymentStatus)}</TicketBadge>
-                            {finance.paymentStatus === 'door' && <TicketBadge tone="gold">Door payment</TicketBadge>}
                             {finance.balanceDue > 0 && <div className="text-xs font-bold text-[#A32626]">Balance {formatCurrency(finance.balanceDue)}</div>}
                           </div>
                         )
                       })()}
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="font-mono text-sm font-bold text-[#2B1723]">{registration.ticketCode || 'Missing ticket code'}</div>
-                      <div className="mt-1"><TicketBadge tone={registration.ticketStatus === 'assigned' ? 'green' : 'blush'}>{titleCase(registration.ticketStatus || 'no-ticket-assigned')}</TicketBadge></div>
-                    </td>
-                    <td className="px-4 py-3"><TicketBadge tone={registration.checkedIn ? 'green' : 'neutral'}>{registration.checkedIn ? 'Checked in' : 'Not checked in'}</TicketBadge></td>
                     <td className="px-4 py-3 text-right">{renderActions(registration)}</td>
                   </tr>
                 ))}
@@ -529,6 +625,18 @@ export function TicketsPage() {
                     const finance = calculateRegistrationFinance(registration, activeEvent)
                     return finance.balanceDue > 0 ? <TicketBadge tone="gold">Balance {formatCurrency(finance.balanceDue)}</TicketBadge> : null
                   })()}
+                </div>
+                <div className="mt-4 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRegistrationId(registration.registrationId)}
+                    className="flex-1 rounded-xl border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]"
+                  >
+                    View Ticket
+                  </button>
+                  <Link to="/check-in" className="flex-1 rounded-xl bg-[#2B1723] px-3 py-2 text-center text-xs font-bold text-white hover:bg-[#3B2430]">
+                    Check-In
+                  </Link>
                 </div>
                 <div className="mt-4">{renderActions(registration)}</div>
               </article>
