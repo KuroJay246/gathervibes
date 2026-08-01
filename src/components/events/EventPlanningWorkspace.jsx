@@ -5,6 +5,8 @@ import { formatEventDate } from '../../utils/dateUtils'
 import {
   buildOrganizerOverview,
   buildReadinessChecklist,
+  buildEventSetupProgress,
+  buildTaskDeadlineSummary,
   createEmptyTask,
   eventStatusDescription,
   eventStatusLabel,
@@ -58,6 +60,8 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
   const hydratedEvent = useMemo(() => hydrateEventForPlanning(event), [event])
   const overview = useMemo(() => buildOrganizerOverview(hydratedEvent), [hydratedEvent])
   const readiness = useMemo(() => buildReadinessChecklist(hydratedEvent), [hydratedEvent])
+  const setupProgress = useMemo(() => buildEventSetupProgress(hydratedEvent), [hydratedEvent])
+  const deadlineSummary = useMemo(() => buildTaskDeadlineSummary(hydratedEvent.planningTasks), [hydratedEvent.planningTasks])
   const [taskForm, setTaskForm] = useState(createEmptyTask())
   const [taskErrors, setTaskErrors] = useState({})
   const [savingTask, setSavingTask] = useState(false)
@@ -198,6 +202,52 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
         <SummaryCard label="Budgeted expenses" value={formatCurrency(overview.budgets.totalBudget)} />
         <SummaryCard label="Tasks completed" value={`${overview.tasks.completed} / ${overview.tasks.total || 0}`} detail={`${overview.tasks.overdue} overdue`} />
         <SummaryCard label="Outstanding commitments" value={formatCurrency(overview.totalOutstandingCommitments)} detail={`${overview.partners.totalRecords} partner records`} />
+      </section>
+
+      <section className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
+        <article className="gsv-section-card sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Guided setup</p>
+              <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Event setup stage</h3>
+              <p className="mt-2 text-xs leading-5 text-[#816D62]">
+                Follow the stages from event profile through readiness without changing the existing event record or routes.
+              </p>
+            </div>
+            <span className="inline-flex w-fit rounded-full bg-[#FCEEF1] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8A3F4B]">
+              {setupProgress.label}
+            </span>
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-5">
+            {setupProgress.stages.map((stage, index) => (
+              <div key={stage.id} className={`rounded-2xl border p-4 ${stage.complete ? 'border-[#CFE8D8] bg-[#F2FAF5]' : 'border-[#EEDFD6] bg-[#FFF8F2]'}`}>
+                <div className="flex items-center gap-2">
+                  <span className={`grid size-7 place-items-center rounded-full text-[10px] font-bold ${stage.complete ? 'bg-[#1E7345] text-white' : 'bg-[#F7E7EA] text-[#8A3F4B]'}`}>
+                    {stage.complete ? <CheckCircle2 className="size-3.5" /> : index + 1}
+                  </span>
+                  <p className="text-xs font-bold text-[#2B1723]">{stage.label}</p>
+                </div>
+                <p className="mt-3 text-[11px] leading-5 text-[#816D62]">{stage.description}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="gsv-section-card sm:p-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Deadlines</p>
+          <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Task deadline focus</h3>
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <SummaryCard label="Open tasks" value={deadlineSummary.open} />
+            <SummaryCard label="Overdue" value={deadlineSummary.overdue} />
+            <SummaryCard label="Due today" value={deadlineSummary.dueToday} />
+            <SummaryCard label="Due soon" value={deadlineSummary.dueSoon} detail="Next 7 days" />
+          </div>
+          <div className="mt-4 rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
+            {deadlineSummary.nextTask
+              ? `Next focus: ${deadlineSummary.nextTask.title} (${deadlineSummary.nextTask.dueDate || 'no due date'}).`
+              : 'No open planning-task deadline is waiting on this event.'}
+          </div>
+        </article>
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
