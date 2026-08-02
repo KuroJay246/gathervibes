@@ -30,7 +30,7 @@ test('[tutorial-v3] guided orientation covers 20 anchored lessons plus welcome a
     'event-basics',
     'event-category',
     'event-capabilities',
-    'event-planning',
+    'tasks',
     'registrations',
     'add-registration',
     'registration-filters',
@@ -38,7 +38,7 @@ test('[tutorial-v3] guided orientation covers 20 anchored lessons plus welcome a
     'tickets',
     'check-in',
     'operations',
-    'partners',
+    'reconciliation',
     'communications',
     'reports',
     'imports',
@@ -75,7 +75,8 @@ test('[tutorial-v3] exact targets replace broad workspace targets for action ste
   assert.equal(targets['registration-filters'], TUTORIAL_TARGETS.registrationFilters)
   assert.equal(targets.payments, TUTORIAL_TARGETS.paymentsSummary)
   assert.equal(targets['check-in'], TUTORIAL_TARGETS.checkInSearch)
-  assert.equal(targets.partners, TUTORIAL_TARGETS.partnersSponsors)
+  assert.equal(targets.tasks, TUTORIAL_TARGETS.tasksWorkspace)
+  assert.equal(targets.reconciliation, TUTORIAL_TARGETS.reconciliationWorkspace)
 })
 
 test('[tutorial-v3] state machine exposes explicit legal states', () => {
@@ -126,7 +127,8 @@ test('[tutorial-v3] Back and Next transitions are first-class reducer operations
 test('[tutorial-v3] route and target registries are semantic and not text-selector based', () => {
   assert.ok(TUTORIAL_ROUTE_TARGETS.dashboard.includes(TUTORIAL_TARGETS.workingEventSelector))
   assert.ok(TUTORIAL_ROUTE_TARGETS.registrations.includes(TUTORIAL_TARGETS.registrationFilters))
-  assert.ok(TUTORIAL_ROUTE_TARGETS.operations.includes(TUTORIAL_TARGETS.partnersSponsors))
+  assert.ok(TUTORIAL_ROUTE_TARGETS.tasks.includes(TUTORIAL_TARGETS.tasksWorkspace))
+  assert.ok(TUTORIAL_ROUTE_TARGETS.reconciliation.includes(TUTORIAL_TARGETS.reconciliationWorkspace))
   assert.ok(TUTORIAL_ROUTE_TARGETS['system-qa'].includes(TUTORIAL_TARGETS.systemQa))
 })
 
@@ -194,7 +196,7 @@ test('[tutorial-v3] hidden containers open automatically', async () => {
   assert.match(controller, /tutorial:event-form-step/)
   assert.match(controller, /HTMLDetailsElement/)
   assert.ok(guidedTutorialSteps.some((step) => step.prepare?.type === 'open-event-form'))
-  assert.ok(guidedTutorialSteps.some((step) => step.prepare?.type === 'open-details'))
+  assert.ok(guidedTutorialSteps.some((step) => step.prepare?.type === 'close-event-form'))
 })
 
 test('[tutorial-v3] legacy runtime files are removed from AppShell imports', async () => {

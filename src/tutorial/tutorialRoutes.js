@@ -1,8 +1,10 @@
 export const TUTORIAL_ROUTE_DEFINITIONS = {
   dashboard: { routeId: 'dashboard', pathname: '/dashboard', label: 'Overview' },
   events: { routeId: 'events', pathname: '/events', label: 'Events' },
+  tasks: { routeId: 'tasks', pathname: '/tasks', label: 'Tasks & Deadlines' },
   registrations: { routeId: 'registrations', pathname: '/registrations', label: 'Guests & Registrations' },
   payments: { routeId: 'payments', pathname: '/payments', label: 'Payments' },
+  reconciliation: { routeId: 'reconciliation', pathname: '/payments/reconciliation', label: 'Reconciliation Preview' },
   tickets: { routeId: 'tickets', pathname: '/tickets', label: 'Tickets' },
   checkIn: { routeId: 'check-in', pathname: '/check-in', label: 'Check-In' },
   operations: { routeId: 'operations', pathname: '/operations', label: 'Operations' },

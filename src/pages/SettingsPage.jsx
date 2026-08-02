@@ -5,7 +5,7 @@ import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
 import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeUtils'
-import { listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
+import { ACCESS_ROLES, listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
 import { PROTECTED_OWNER_EMAIL } from '../config/protectedOwner'
 import { TARGET_UIDS } from '../tutorial/tutorialSteps'
 
@@ -14,9 +14,59 @@ const SETTINGS_TABS = [
   ['workspace', 'Workspace'],
   ['defaults', 'Event Defaults'],
   ['access', 'Organizer Access'],
+  ['help', 'Tutorial & Help'],
+  ['integrations', 'Integrations'],
   ['event-day', 'Tickets & Check-In'],
   ['data', 'Data & Messages'],
   ['advanced', 'Advanced'],
+]
+
+const INTEGRATION_ROWS = [
+  {
+    label: 'Google Forms receiver',
+    status: 'Packaged but Not Deployed',
+    description: 'The signed receiver package exists, but production intake still uses manual Response Inbox review unless the receiver is separately deployed and configured.',
+    action: 'No organizer action required for normal manual intake.',
+  },
+  {
+    label: 'Google Sheets',
+    status: 'Manual Workflow',
+    description: 'Download a Sheet as CSV or Excel, then upload the downloaded file in Import Center.',
+    action: 'No live Google Sheets sync or OAuth connection is active.',
+  },
+  {
+    label: 'Gmail',
+    status: 'Disconnected',
+    description: 'Message Builder prepares text only and does not send email.',
+    action: 'Use your normal email tool after copying message text.',
+  },
+  {
+    label: 'Message Builder',
+    status: 'Manual Workflow',
+    description: 'Create, preview, and copy messages for external sending.',
+    action: 'No delivery status is tracked in the app.',
+  },
+  {
+    label: 'PDF',
+    status: 'Text-table fallback only',
+    description: 'Readable text-based PDF tables may be used where supported.',
+    action: 'Scanned PDFs and OCR are not supported.',
+  },
+  {
+    label: 'Online payments',
+    status: 'Not Connected',
+    description: 'Registration payment records are tracked manually inside the event workspace.',
+    action: 'No payment gateway is connected.',
+  },
+]
+
+const ROLE_SUMMARY_ROWS = [
+  ['Protected Owner', ACCESS_ROLES['owner-admin'].summary],
+  ['Approved Organizer', ACCESS_ROLES.admin.summary],
+  ['Event Manager', ACCESS_ROLES['event-manager'].summary],
+  ['Viewer', ACCESS_ROLES.viewer.summary],
+  ['Scanner', ACCESS_ROLES.scanner.summary],
+  ['Operations Helper', ACCESS_ROLES['operations-helper'].summary],
 ]
 
 function SettingsSection({ eyebrow, title, description, children }) {
@@ -46,6 +96,24 @@ function SettingRow({ label, value, description, scope, timing = 'Active now' })
   )
 }
 
+function MetricTile({ label, value, description }) {
+  return (
+    <div className="min-w-0 rounded-2xl border border-[#EFE2DA] bg-[#FFFDFB] p-4">
+      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#8A3F4B]">{label}</p>
+      <p className="mt-2 break-words text-xl font-bold text-[#2B1723]">{value}</p>
+      <p className="mt-1 text-xs leading-5 text-[#6B564C]">{description}</p>
+    </div>
+  )
+}
+
+function StatusPill({ children }) {
+  return (
+    <span className="inline-flex rounded-full bg-[#F7F1ED] px-2.5 py-1 text-[10px] font-bold uppercase text-[#5A443B]">
+      {children}
+    </span>
+  )
+}
+
 function ProfileAvatar({ user }) {
   if (user?.photoURL) return <img src={user.photoURL} alt="" className="size-16 rounded-full object-cover" referrerPolicy="no-referrer" />
   return <div className="grid size-16 place-items-center rounded-full bg-[#F7DDE6] text-xl font-bold uppercase text-[#2B1723]">{user?.displayName?.slice(0, 1) || user?.email?.slice(0, 1) || 'A'}</div>
@@ -59,6 +127,10 @@ export function SettingsPage() {
   const tabRefs = useRef([])
   const approvedEntries = listApprovedAccessEntries(accessControl || {})
   const secondaryOrganizerCount = approvedEntries.filter((entry) => !entry.protectedOwner).length
+  const protectedOwnerCount = approvedEntries.some((entry) => entry.protectedOwner) ? 1 : 0
+  const approvedOrganizerCount = approvedEntries.filter((entry) => !entry.protectedOwner).length
+  const staffProfileCount = 'Managed in staffProfiles'
+  const eventAssignmentCount = 'Managed per event'
   const requestedTab = searchParams.get('tab') || 'account'
   const activeTab = SETTINGS_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'account'
 
@@ -151,18 +223,79 @@ export function SettingsPage() {
     access: (
       <SettingsSection
         eyebrow="Organizer Access"
-        title="Protected owner and approved organizers"
-        description="Access is controlled outside this page. This summary cannot add, remove, disable, or change anyone's role."
+        title="Account and access summary"
+        description="Protected owner and approved organizers remain separate from staff profiles and event assignments. Access is controlled outside this page. This page cannot add, remove, disable, or change anyone's role."
       >
-        <div className="rounded-2xl border border-[#CFE4D7] bg-[#F2FAF5] p-5">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <MetricTile label="Protected Owner" value={protectedOwnerCount} description="Pinned by verified Firebase UID, not by mutable organizer settings." />
+          <MetricTile label="Approved Organizers" value={approvedOrganizerCount} description="Accounts listed in approved organizer access, excluding the protected owner." />
+          <MetricTile label="Staff Profiles" value={staffProfileCount} description="Active staff sign in through staffProfiles and do not become approved organizers." />
+          <MetricTile label="Event Assignments" value={eventAssignmentCount} description="Staff permissions are assigned per event and role." />
+        </div>
+        <div className="mt-5 rounded-2xl border border-[#CFE4D7] bg-[#F2FAF5] p-5">
           <p className="text-sm font-bold text-[#174E31]">Protected Owner</p>
           <p className="mt-1 break-words text-sm text-[#315F45]">{PROTECTED_OWNER_EMAIL}</p>
           <p className="mt-3 text-xs leading-5 text-[#315F45]">Permanent owner access is pinned to the verified Firebase account and cannot be removed or disabled in organizer settings.</p>
         </div>
         <div className="mt-4 rounded-2xl border border-[#EFE2DA] p-4 sm:p-5">
-          <SettingRow label="Secondary organizers" value={`${secondaryOrganizerCount} approved`} scope="App-wide" description="Approved organizers receive only the role and event access configured for their account." />
-          <SettingRow label="Staff and scanner helpers" value="Assigned-event access only" scope="Event-specific" description="Helper access does not grant Settings or full organizer access." />
+          <SettingRow label="Approved organizer records" value={`${secondaryOrganizerCount} secondary approved organizers`} scope="App-wide" description="Secondary organizers are approved accounts that remain separate from staff profile count and event assignment count." />
+          <SettingRow label="Staff profiles" value="Assigned-event access only" scope="Staff profile source" description="Staff profiles identify helpers such as scanners, event managers, viewers, and Operations helpers." />
+          <SettingRow label="Event assignments" value="Per-event roles" scope="Event assignment source" description="Assignments connect a staff profile to one event and one role. Helper access does not grant Settings or full organizer access." />
           <SettingRow label="Access changes" value="Managed by a release administrator" scope="App-wide" description="Contact the protected owner when an organizer or staff assignment must change." timing="No editable control here" />
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {ROLE_SUMMARY_ROWS.map(([label, summary]) => (
+            <article key={label} className="rounded-2xl border border-[#EFE2DA] p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-bold text-[#2B1723]">{label}</p>
+                <StatusPill>Role</StatusPill>
+              </div>
+              <p className="mt-2 text-xs leading-5 text-[#6B564C]">{summary}</p>
+            </article>
+          ))}
+        </div>
+      </SettingsSection>
+    ),
+    help: (
+      <SettingsSection
+        eyebrow="Tutorial and Help"
+        title="Replay guided help"
+        description="Use this area when an organizer needs the current product walkthrough again. The tutorial teaches the current app and does not create business records."
+      >
+        <div className="rounded-2xl border border-[#EFE2DA] p-4 sm:p-5">
+          <SettingRow label="Guided tutorial" value={user && TARGET_UIDS.includes(user.uid) ? 'Available for this account' : 'Available to approved tutorial accounts'} scope="Onboarding" description="Replay starts the Tutorial V3 walkthrough from the beginning without deleting event data." timing="Manual replay" />
+          <SettingRow label="Safe practice" value="No business writes required" scope="Tutorial" description="Write-heavy lessons demonstrate where controls live and do not require creating payments, tickets, imports, check-ins, or Operations entries." />
+        </div>
+        {user && TARGET_UIDS.includes(user.uid) ? (
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('replay-tutorial'))}
+            className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white"
+          >
+            Show Welcome Tour Again
+          </button>
+        ) : (
+          <p className="mt-5 rounded-2xl border border-[#EFE2DA] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#6B564C]">This signed-in account is not configured for the guided tutorial replay control.</p>
+        )}
+      </SettingsSection>
+    ),
+    integrations: (
+      <SettingsSection
+        eyebrow="Integrations"
+        title="Connection status"
+        description="These statuses describe what currently works. Disconnected optional integrations are not setup errors unless you choose to add them later."
+      >
+        <div className="grid gap-3 lg:grid-cols-2">
+          {INTEGRATION_ROWS.map((item) => (
+            <article key={item.label} className="min-w-0 rounded-2xl border border-[#EFE2DA] p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <p className="text-sm font-bold text-[#2B1723]">{item.label}</p>
+                <StatusPill>{item.status}</StatusPill>
+              </div>
+              <p className="mt-2 text-xs leading-5 text-[#6B564C]">{item.description}</p>
+              <p className="mt-2 text-xs font-semibold leading-5 text-[#5A443B]">{item.action}</p>
+            </article>
+          ))}
         </div>
       </SettingsSection>
     ),
@@ -207,8 +340,8 @@ export function SettingsPage() {
     advanced: (
       <SettingsSection
         eyebrow="Advanced"
-        title="System information"
-        description="Read-only technical information for release troubleshooting. No credentials or private attendee data are shown."
+        title="Advanced and administration"
+        description="Read-only technical information and administrator-only paths are separated from routine settings. No credentials or private attendee data are shown."
       >
         <div className="rounded-2xl border border-[#EFE2DA] p-4 sm:p-5">
           <SettingRow label="Application connection" value={isFirebaseConfigured ? 'Configured' : 'Needs attention'} scope="App-wide" description="The organizer workspace can load its Firebase configuration." timing={isFirebaseConfigured ? 'Active now' : 'Not active'} />
@@ -217,10 +350,14 @@ export function SettingsPage() {
           <SettingRow label="Search indexing" value="Blocked" scope="App-wide" description="Private organizer pages are not intended for search engines." />
           <SettingRow label="Offline data caching" value="Disabled" scope="App-wide" description="Private event responses are not stored by the service worker." />
         </div>
+        <div className="mt-5 rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4">
+          <p className="text-sm font-bold text-[#5F4A2A]">Administrative caution</p>
+          <p className="mt-2 text-xs leading-5 text-[#715D46]">No destructive Settings control is exposed here. Event deletes, bulk registration actions, imports, check-ins, and Operations changes remain in their own workflows with confirmations and audit logs.</p>
+        </div>
         <Link to="/qa" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Open System QA</Link>
       </SettingsSection>
     ),
-  }), [activeEvent?.eventName, currentRole, currentRoleLabel, scannerLinkCopied, secondaryOrganizerCount, signOut, user])
+  }), [activeEvent?.eventName, approvedOrganizerCount, currentRole, currentRoleLabel, protectedOwnerCount, scannerLinkCopied, secondaryOrganizerCount, signOut, user])
 
   return (
     <div data-tour-id="settings-workspace" className="min-w-0 space-y-6">

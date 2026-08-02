@@ -3,18 +3,18 @@ import { PROTECTED_OWNER_EMAIL, isProtectedOwnerUser } from '../config/protected
 export const ACCESS_ROLES = {
   'owner-admin': {
     id: 'owner-admin',
-    label: 'Owner/Admin',
-    summary: 'Full owner/admin access enforced by protected owner UID or approved organizer records.',
+    label: 'Protected Owner',
+    summary: 'Full approved-organizer functionality plus owner protections pinned to the protected Firebase UID.',
   },
   owner: {
     id: 'owner',
-    label: 'Owner',
-    summary: 'Full workspace access and future admin access management.',
+    label: 'Approved Organizer',
+    summary: 'Normal organizer-level management while the account remains approved.',
   },
   admin: {
     id: 'admin',
-    label: 'Admin',
-    summary: 'Full event operations, imports, registrations, tickets, finance, QA, and settings.',
+    label: 'Approved Organizer',
+    summary: 'Normal organizer-level management for events, guests, registration payments, tickets, Operations, imports, reports, messages, settings, and System QA.',
   },
   checkInStaff: {
     id: 'checkInStaff',
@@ -24,7 +24,7 @@ export const ACCESS_ROLES = {
   'event-manager': {
     id: 'event-manager',
     label: 'Event Manager',
-    summary: 'Assigned-event operational access. Firestore rules must enforce the event boundary.',
+    summary: 'Assigned-event task and check-in workflow access only where route gates and Firestore rules allow it. Route gates and Firestore rules keep writes narrow and event-scoped.',
   },
   scanner: {
     id: 'scanner',
@@ -34,12 +34,12 @@ export const ACCESS_ROLES = {
   viewer: {
     id: 'viewer',
     label: 'Viewer',
-    summary: 'Assigned-event read-only access where a read-only surface is implemented.',
+    summary: 'Read-only assigned-event behavior where read-only surfaces are implemented.',
   },
   'operations-helper': {
     id: 'operations-helper',
     label: 'Operations Helper',
-    summary: 'Assigned-event operations ledger visibility without admin settings or registration writes.',
+    summary: 'Assigned-event Operations ledger visibility only. No Settings, registration writes, ticket writes, or admin shell access.',
   },
 }
 
@@ -142,8 +142,8 @@ export function listApprovedAccessEntries(accessControl = {}) {
 export function roleCapabilitySummary(role) {
   const normalizedRole = normalizeAccessRole(role) || 'admin'
   if (normalizedRole === 'owner-admin') return 'Protected owner access is pinned to the Firebase UID and cannot be removed through the mutable allowlist.'
-  if (ADMIN_ROLES.has(normalizedRole)) return 'Full operations while approved by the private owner or organizer access contract.'
-  if (normalizedRole === 'event-manager') return 'Assigned-event operational role. Route gates and Firestore rules keep writes narrow and event-scoped.'
+  if (ADMIN_ROLES.has(normalizedRole)) return 'Approved organizer access supports normal organizer-level management while the account remains approved.'
+  if (normalizedRole === 'event-manager') return 'Assigned-event role for limited task and check-in workflows. Route gates and Firestore rules keep writes narrow and event-scoped. It does not grant Settings, imports, payments, tickets, Reports, or full organizer access.'
   if (normalizedRole === 'scanner' || normalizedRole === 'checkInStaff') return 'Assigned-event check-in lookup and check-in completion only. No ticket, payment, settings, reports, or admin shell access.'
   if (normalizedRole === 'viewer') return 'Assigned-event read-only role where read-only screens are implemented; no organizer write actions.'
   if (normalizedRole === 'operations-helper') return 'Assigned-event Operations ledger visibility only. Creating, editing, cancelling, settings, and registration writes stay organizer-only.'
