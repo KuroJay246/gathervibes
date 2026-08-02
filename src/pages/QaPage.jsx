@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useLocation } from 'react-router'
 import { AlertTriangle, CheckCircle2, ChevronDown, Clipboard, Database, ShieldCheck, XCircle } from 'lucide-react'
 import { collection, getDocs, limit, query, where } from 'firebase/firestore'
 import { SystemHealthPanel } from '../components/SystemHealthPanel'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
-import { db } from '../lib/firebase'
+import { db, firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
 import { buildRegistrationMetrics, getRegistrationGuestSummary, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
 import { buildFinanceSummary, buildPaymentsWorkspace, calculateRegistrationFinance, financeWarnings, formatCurrency } from '../utils/financeUtils'
 import { qrPayloadForTicketCode } from '../utils/qrTicketUtils'
@@ -31,6 +32,32 @@ const browserTroubleshootingSteps = [
   'Clear site data for gathervibeshub.web.app',
   'Try another network or hotspot',
   'Send a screenshot of the exact error',
+]
+
+const FEATURE_STATUS_ITEMS = [
+  ['Tasks', 'Pass', 'Persistent event-scoped Tasks and Deadlines are available.'],
+  ['Import Center', 'Pass', 'Manual upload, mapping, validation, preview, duplicate review, and explicit import confirmation are available.'],
+  ['Response Inbox', 'Pass', 'Manual Google Forms response review is available before mapping or import.'],
+  ['Message Builder', 'Pass', 'Copy-only message creation, preview, subject copy, and message copy are available.'],
+  ['Automatic Forms receiver', 'Packaged', 'Receiver package exists but is not deployed as a live production receiver in this release.'],
+  ['Gmail', 'Not Connected', 'No Gmail OAuth or automatic sending is connected.'],
+  ['Online payments', 'Not Connected', 'No payment gateway is connected.'],
+  ['OCR', 'Not Applicable', 'Scanned PDF/OCR intake is not supported.'],
+]
+
+const DATA_BOUNDARY_ITEMS = [
+  ['Registration Payments separate from Operations', 'Pass', 'Guest charges and received amounts are reviewed separately from Operations Ledger records.'],
+  ['Test Event exclusion', 'Pass', 'CODEX_TEST is the safe QA event and is hidden from normal business use by default where supported.'],
+  ['QR format', 'Pass', 'Ticket QR payload remains GSV:TICKET:{ticketCode}.'],
+  ['Scanner isolation', 'Pass', 'Scanner role remains assigned-event check-in only.'],
+  ['Historical attendance separation', 'Pass', 'Historical attendance evidence does not create scanner-confirmed check-ins.'],
+  ['Import write boundary', 'Pass', 'Only approved guest-registration rows write after explicit confirmation.'],
+]
+
+const MANUAL_ACCEPTANCE_ITEMS = [
+  ['Authenticated visual pass', 'Manual Check', 'Final visual review still requires a signed-in Jaylan browser session when browser control is available.'],
+  ['True Chrome 200% zoom', 'Manual Check', 'Automation can approximate responsive reflow, but true browser zoom must be manually confirmed if Chrome zoom control is unavailable.'],
+  ['Scanner device feel', 'Manual Check', 'Physical scanner-device camera, haptics, and tactile flow need real-device confirmation.'],
 ]
 
 function StatusBadge({ ok, status, children }) {
@@ -62,9 +89,36 @@ function SummaryCard({ label, status, value, detail }) {
   )
 }
 
+function QaSection({ eyebrow, title, description, children }) {
+  return (
+    <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
+      <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#8A3F4B]">{eyebrow}</p>
+      <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">{title}</h2>
+      {description && <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6B564C]">{description}</p>}
+      <div className="mt-5">{children}</div>
+    </section>
+  )
+}
+
+function DiagnosticRow({ label, status, detail }) {
+  const badgeStatus = status === 'Pass' || status === 'Not Applicable' ? 'ok' : status === 'Needs Review' ? 'fail' : 'warn'
+  return (
+    <article className="min-w-0 rounded-2xl border border-[#EFE2DA] p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <p className="break-words text-sm font-bold text-[#2B1723]">{label}</p>
+        <StatusBadge status={badgeStatus}>
+          {status}
+        </StatusBadge>
+      </div>
+      <p className="mt-2 text-xs leading-5 text-[#6B564C]">{detail}</p>
+    </article>
+  )
+}
+
 export function QaPage() {
-  const { accessControl, access, currentRoleLabel } = useAuth()
+  const { user, accessControl, access, currentRoleLabel } = useAuth()
   const { activeEvent, setActiveEvent } = useActiveEvent()
+  const location = useLocation()
   const [events, setEvents] = useState([])
   const [auditStatus, setAuditStatus] = useState('checking')
   const [loading, setLoading] = useState(true)
@@ -456,6 +510,73 @@ export function QaPage() {
           </div>
         </div>
       </section>
+
+      <QaSection
+        eyebrow="Environment"
+        title="Current app environment"
+        description="Read-only runtime facts for release and troubleshooting. No secrets, tokens, or private attendee data are shown."
+      >
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <DiagnosticRow label="Firebase project" status={firebaseProjectId === 'gathervibeshub' ? 'Pass' : 'Needs Review'} detail={firebaseProjectId || 'Project ID is not embedded in this build.'} />
+          <DiagnosticRow label="Firebase configuration" status={isFirebaseConfigured ? 'Pass' : 'Needs Review'} detail={isFirebaseConfigured ? 'Client configuration is present.' : 'Client configuration is unavailable.'} />
+          <DiagnosticRow label="Current route" status="Pass" detail={location.pathname} />
+          <DiagnosticRow label="Authentication state" status={user?.uid ? 'Pass' : 'Needs Review'} detail={user?.email ? `Signed in as ${user.email}` : 'No signed-in user detected.'} />
+        </div>
+      </QaSection>
+
+      <QaSection
+        eyebrow="Working Event"
+        title="Selected event classification"
+        description="Confirms whether the current browser session is scoped to a real event or to the safe QA fixture."
+      >
+        <div className="grid gap-3 md:grid-cols-3">
+          <DiagnosticRow label="Selected Working Event" status={activeEvent?.eventId ? 'Pass' : 'Needs Review'} detail={activeEvent?.eventName || 'No Working Event selected.'} />
+          <DiagnosticRow label="Event classification" status={workingEventIsCodex ? 'Pass' : 'Manual Check'} detail={workingEventIsCodex ? 'CODEX_TEST is selected for safe QA.' : 'Real events use standard safeguards; use CODEX_TEST for synthetic testing.'} />
+          <DiagnosticRow label="Event status" status="Pass" detail={activeEvent?.status || 'No status available.'} />
+        </div>
+      </QaSection>
+
+      <QaSection
+        eyebrow="Access"
+        title="Current role and permissions"
+        description="Shows the signed-in user's current access category without exposing private configuration values."
+      >
+        <div className="grid gap-3 md:grid-cols-3">
+          <DiagnosticRow label="Role" status={currentRoleLabel ? 'Pass' : 'Needs Review'} detail={currentRoleLabel || 'Role is still loading.'} />
+          <DiagnosticRow label="Access level" status={access?.level ? 'Pass' : 'Needs Review'} detail={access?.protectedOwner ? 'Protected owner UID access active.' : access?.level || 'No access level available.'} />
+          <DiagnosticRow label="Assigned events" status={access?.assignedEventIds?.length ? 'Pass' : 'Not Applicable'} detail={access?.assignedEventIds?.length ? access.assignedEventIds.join(', ') : 'Approved organizers do not require staff event assignments.'} />
+        </div>
+      </QaSection>
+
+      <QaSection
+        eyebrow="Data Boundaries"
+        title="Product data contracts"
+        description="Concise checks for boundaries that must not be blurred during product work."
+      >
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {DATA_BOUNDARY_ITEMS.map(([label, status, detail]) => <DiagnosticRow key={label} label={label} status={status} detail={detail} />)}
+        </div>
+      </QaSection>
+
+      <QaSection
+        eyebrow="Feature Status"
+        title="Available, packaged, and disconnected features"
+        description="Optional integrations are shown truthfully without treating disconnected tools as production errors."
+      >
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {FEATURE_STATUS_ITEMS.map(([label, status, detail]) => <DiagnosticRow key={label} label={label} status={status} detail={detail} />)}
+        </div>
+      </QaSection>
+
+      <QaSection
+        eyebrow="Manual Acceptance"
+        title="Checks automation cannot fully prove"
+        description="These items need human browser or device confirmation and should not be confused with automated test status."
+      >
+        <div className="grid gap-3 md:grid-cols-3">
+          {MANUAL_ACCEPTANCE_ITEMS.map(([label, status, detail]) => <DiagnosticRow key={label} label={label} status={status} detail={detail} />)}
+        </div>
+      </QaSection>
 
       <details className="group min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white shadow-[0_8px_24px_rgba(84,53,67,0.04)]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-6 font-bold text-[#2B1723] sm:p-8">

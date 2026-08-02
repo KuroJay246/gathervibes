@@ -31,7 +31,7 @@ test('Phase 23O recognizes protected owner by Firebase UID without mutable allow
 
   assert.equal(owner.level, 'admin')
   assert.equal(owner.role, 'owner-admin')
-  assert.equal(owner.roleLabel, 'Owner/Admin')
+  assert.equal(owner.roleLabel, 'Protected Owner')
   assert.equal(owner.protectedOwner, true)
   assert.deepEqual(owner.assignedEventIds, [])
   assert.equal(isProtectedOwnerUser({ uid: PROTECTED_OWNER_UID }), true)
