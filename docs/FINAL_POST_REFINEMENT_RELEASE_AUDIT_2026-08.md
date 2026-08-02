@@ -101,4 +101,3 @@ Real events use the same safeguards: authentication, approved organizer authoriz
 Final classification: `FINAL RELEASE AUDIT PASS WITH MANUAL LIMITATIONS`.
 
 Feature development is safe to resume after this audit branch is reviewed. The next recommended development phase is a paired feature phase for `codex/document-register-and-contacts-foundation`.
-

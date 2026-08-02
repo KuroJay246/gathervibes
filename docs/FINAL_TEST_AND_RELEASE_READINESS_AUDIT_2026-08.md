@@ -76,4 +76,3 @@ No deployment was performed. Authenticated production-browser visual/console rev
 Production readiness classification: `Stable for continued real use with manual visual/console acceptance limitation`.
 
 Feature development is safe to resume from reviewed `main` after this audit branch is reviewed.
-

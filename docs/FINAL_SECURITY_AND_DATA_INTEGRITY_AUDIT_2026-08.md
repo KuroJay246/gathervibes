@@ -70,4 +70,3 @@ Conclusion: Jaylan retains Firestore/admin permission through an immutable UID-b
 - Scanner has no payments/settings/tasks/reports access.
 - QR payload remains `GSV:TICKET:{ticketCode}`.
 - Firestore rules and indexes were inspected but not modified.
-

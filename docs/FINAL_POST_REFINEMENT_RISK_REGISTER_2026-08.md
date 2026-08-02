@@ -40,4 +40,3 @@ No P0 or P1 release blockers were found. The product is stable enough for contin
 | QR payload privacy concern | Resolved. Payload remains `GSV:TICKET:{ticketCode}`. |
 | Access workflow activation risk | Still disabled by design. |
 | Scanner permission expansion risk | Controlled. Scanner route and rules remain scoped. |
-

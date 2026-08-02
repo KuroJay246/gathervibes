@@ -62,4 +62,3 @@ Write paths were inspected through service modules: event, registration, ticket,
 - True Chrome 200% zoom review.
 - Full human Tutorial V3 walkthrough in production.
 - Optional scanner real-device camera/haptics check.
-
