@@ -1,0 +1,57 @@
+{
+  "releaseCommit": "0758679fcbea270cbcd51fd7084fd805f9e5db90",
+  "auditBranch": "codex/final-post-refinement-release-audit",
+  "repositoryCounts": {
+    "trackedFiles": 376,
+    "sourceFiles": 122,
+    "testAndE2eFiles": 78,
+    "scripts": 16,
+    "docsBeforeAuditArtifacts": 70
+  },
+  "routeCount": 16,
+  "navigationLabelCount": 13,
+  "writePathCount": 15,
+  "tests": {
+    "total": 558,
+    "passing": 512,
+    "skipped": 46,
+    "failed": 0,
+    "e2eFull": "10/10 passed",
+    "e2eSmoke": "1/1 passed",
+    "productQaSequential": "passed twice"
+  },
+  "findings": {
+    "P0": 0,
+    "P1": 0,
+    "P2": 3,
+    "P3": 6
+  },
+  "capabilityCounts": {
+    "Fully Operational": 24,
+    "Operational With Limitations": 6,
+    "Manual Workflow": 3,
+    "Packaged but Undeployed": 1,
+    "Disconnected": 2,
+    "Unsupported": 3
+  },
+  "classifications": {
+    "security": "Stable for continued real use",
+    "dataIntegrity": "Stable with normal organizer safeguards",
+    "accessibility": "Automated checks pass; true 200 percent zoom remains manual acceptance",
+    "responsive": "Automated responsive E2E passes; authenticated production visual review remains manual acceptance",
+    "tutorial": "Covered by source/tests/E2E; production human walkthrough remains manual acceptance",
+    "releaseReadiness": "FINAL RELEASE AUDIT PASS WITH MANUAL LIMITATIONS"
+  },
+  "protectedOwner": {
+    "email": "jaylanspencer99@gmail.com",
+    "uid": "WcDU2jmbopdAgDlMMWvD3TkqqbC3",
+    "classification": "UID-pinned protected owner independent of mutable approvedEmails"
+  },
+  "manualLimitations": [
+    "Authenticated production-browser route and console review",
+    "True Chrome 200 percent zoom review",
+    "Full human Tutorial V3 production walkthrough",
+    "Optional scanner real-device camera and haptics check"
+  ],
+  "recommendedNextBranch": "codex/document-register-and-contacts-foundation"
+}
