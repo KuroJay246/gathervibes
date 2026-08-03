@@ -1001,6 +1001,191 @@ service cloud.firestore {
         && request.resource.data.createdBy == resource.data.createdBy;
     }
 
+    function validRunOfShowStatus(status) {
+      return status in ['Planned', 'Confirmed', 'In Progress', 'Completed', 'Delayed', 'Cancelled'];
+    }
+
+    function validArrivalStatus(status) {
+      return status in ['Expected', 'Arrived', 'Delayed', 'Cancelled / Not Required'];
+    }
+
+    function validRunOfShowCategory(category) {
+      return category in [
+        'Setup', 'Staff Arrival', 'Supplier Arrival', 'Registration / Doors Open',
+        'Guest Arrival', 'Activity', 'Programme', 'Presentation', 'Performance',
+        'Food / Beverage Service', 'Break', 'Transition', 'Announcement',
+        'Photo / Media', 'Safety Check', 'Closing', 'Breakdown',
+        'Collection / Pickup', 'Other'
+      ];
+    }
+
+    function validRunOfShowItem(data, eventId, itemId) {
+      return data.keys().hasAll([
+          'itemId', 'eventId', 'eventName', 'title', 'category', 'date',
+          'startTime', 'endTime', 'sequence', 'location', 'status',
+          'description', 'notes', 'responsibleStaffUid', 'responsibleContactId',
+          'responsibleOrganizationId', 'responsibleLabel', 'expectedArrivalTime',
+          'arrivalStatus', 'arrivalNote', 'linkedTaskId', 'linkedDocumentIds',
+          'linkedResourceIds', 'dependencyItemIds', 'delayReason',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'itemId', 'eventId', 'eventName', 'title', 'category', 'date',
+          'startTime', 'endTime', 'sequence', 'location', 'status',
+          'description', 'notes', 'responsibleStaffUid', 'responsibleContactId',
+          'responsibleOrganizationId', 'responsibleLabel', 'expectedArrivalTime',
+          'arrivalStatus', 'arrivalNote', 'linkedTaskId', 'linkedDocumentIds',
+          'linkedResourceIds', 'dependencyItemIds', 'delayReason',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.itemId == itemId
+        && validShortId(data.itemId)
+        && data.eventId == eventId
+        && validShortId(data.eventId)
+        && data.eventName is string
+        && data.eventName.size() > 0
+        && data.eventName.size() <= 180
+        && data.title is string
+        && data.title.size() > 0
+        && data.title.size() <= 180
+        && data.description is string
+        && data.description.size() <= 2000
+        && data.notes is string
+        && data.notes.size() <= 2000
+        && validRunOfShowCategory(data.category)
+        && validOptionalDateOnly(data.date)
+        && data.date != ''
+        && data.startTime is string
+        && data.startTime.matches('^\\d{2}:\\d{2}$')
+        && data.endTime is string
+        && (data.endTime == '' || data.endTime.matches('^\\d{2}:\\d{2}$'))
+        && (data.endTime == '' || data.startTime <= data.endTime)
+        && data.sequence is number
+        && data.sequence >= 0
+        && data.sequence <= 100000
+        && validOptionalString(data.location, 180)
+        && validOptionalString(data.responsibleStaffUid, 128)
+        && validOptionalString(data.responsibleContactId, 128)
+        && validOptionalString(data.responsibleOrganizationId, 128)
+        && validOptionalString(data.responsibleLabel, 180)
+        && validRunOfShowStatus(data.status)
+        && validArrivalStatus(data.arrivalStatus)
+        && data.expectedArrivalTime is string
+        && (data.expectedArrivalTime == '' || data.expectedArrivalTime.matches('^\\d{2}:\\d{2}$'))
+        && data.arrivalNote is string
+        && data.arrivalNote.size() <= 1000
+        && data.dependencyItemIds is list
+        && data.dependencyItemIds.size() <= 50
+        && validOptionalString(data.linkedTaskId, 128)
+        && data.linkedDocumentIds is list
+        && data.linkedDocumentIds.size() <= 50
+        && data.linkedResourceIds is list
+        && data.linkedResourceIds.size() <= 50
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && validPerformedBy(data.createdBy)
+        && validPerformedBy(data.updatedBy)
+        && data.delayReason is string
+        && data.delayReason.size() <= 1000
+        && (data.status == 'Delayed' || data.delayReason == '');
+    }
+
+    function runOfShowIdentityUnchanged(itemId) {
+      return request.resource.data.itemId == itemId
+        && request.resource.data.itemId == resource.data.itemId
+        && request.resource.data.eventId == resource.data.eventId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.createdBy == resource.data.createdBy;
+    }
+
+    function validResourceStatus(status) {
+      return status in ['Needed', 'Requested', 'Ordered / Reserved', 'Confirmed', 'Received', 'Packed', 'On Site', 'Returned', 'Cancelled'];
+    }
+
+    function validResourceCategory(category) {
+      return category in ['Equipment', 'Supplies', 'Signage', 'Furniture', 'Decor', 'Food / Beverage', 'Technology', 'Safety', 'Documents / Print', 'Packaging', 'Transport', 'Other'];
+    }
+
+    function validResourceSourceType(sourceType) {
+      return sourceType in ['Owned', 'Purchased', 'Rented', 'Borrowed', 'Supplier Provided', 'Venue Provided', 'Sponsor / Partner Provided'];
+    }
+
+    function validResourceQuantity(value) {
+      return value is number && value >= 0 && value <= 100000;
+    }
+
+    function validEventResource(data, eventId, resourceId) {
+      return data.keys().hasAll([
+          'resourceId', 'eventId', 'eventName', 'name', 'category', 'sourceType',
+          'status', 'quantityNeeded', 'quantityConfirmed', 'unit', 'shortage',
+          'location', 'supplierContactId', 'supplierOrganizationId', 'supplierLabel',
+          'packingRequired', 'pickupRequired', 'returnRequired', 'pickupDueDate',
+          'returnDueDate', 'notes', 'linkedTaskId',
+          'linkedDocumentIds', 'linkedOperationId', 'linkedCommitmentId',
+          'linkedRunOfShowItemIds',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'resourceId', 'eventId', 'eventName', 'name', 'category', 'sourceType',
+          'status', 'quantityNeeded', 'quantityConfirmed', 'unit', 'shortage',
+          'location', 'supplierContactId', 'supplierOrganizationId', 'supplierLabel',
+          'packingRequired', 'pickupRequired', 'returnRequired', 'pickupDueDate',
+          'returnDueDate', 'notes', 'linkedTaskId',
+          'linkedDocumentIds', 'linkedOperationId', 'linkedCommitmentId',
+          'linkedRunOfShowItemIds',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.resourceId == resourceId
+        && validShortId(data.resourceId)
+        && data.eventId == eventId
+        && validShortId(data.eventId)
+        && data.eventName is string
+        && data.eventName.size() > 0
+        && data.eventName.size() <= 180
+        && data.name is string
+        && data.name.size() > 0
+        && data.name.size() <= 180
+        && validResourceCategory(data.category)
+        && validResourceSourceType(data.sourceType)
+        && validResourceStatus(data.status)
+        && validResourceQuantity(data.quantityNeeded)
+        && validResourceQuantity(data.quantityConfirmed)
+        && data.quantityConfirmed <= data.quantityNeeded
+        && data.shortage is number
+        && data.shortage == data.quantityNeeded - data.quantityConfirmed
+        && validOptionalString(data.unit, 40)
+        && validOptionalString(data.location, 180)
+        && validOptionalString(data.supplierContactId, 128)
+        && validOptionalString(data.supplierOrganizationId, 128)
+        && validOptionalString(data.supplierLabel, 180)
+        && validOptionalString(data.linkedTaskId, 128)
+        && data.linkedDocumentIds is list
+        && data.linkedDocumentIds.size() <= 50
+        && validOptionalString(data.linkedOperationId, 128)
+        && validOptionalString(data.linkedCommitmentId, 128)
+        && data.linkedRunOfShowItemIds is list
+        && data.linkedRunOfShowItemIds.size() <= 50
+        && data.packingRequired is bool
+        && data.pickupRequired is bool
+        && data.returnRequired is bool
+        && validOptionalDateOnly(data.pickupDueDate)
+        && validOptionalDateOnly(data.returnDueDate)
+        && data.notes is string
+        && data.notes.size() <= 2000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && validPerformedBy(data.createdBy)
+        && validPerformedBy(data.updatedBy);
+    }
+
+    function eventResourceIdentityUnchanged(resourceId) {
+      return request.resource.data.resourceId == resourceId
+        && request.resource.data.resourceId == resource.data.resourceId
+        && request.resource.data.eventId == resource.data.eventId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.createdBy == resource.data.createdBy;
+    }
+
     function isValidOperationAuditLog(data, logId) {
       return data.keys().hasAll([
           'logId', 'eventId', 'action', 'targetType', 'targetId',
@@ -1082,6 +1267,53 @@ service cloud.firestore {
           'task.cancelled', 'task.delete'
         ]
         && data.targetType == 'task'
+        && validShortId(data.targetId)
+        && validPerformedBy(data.performedBy)
+        && data.timestamp == request.time
+        && data.details is map;
+    }
+
+    function isValidRunOfShowAuditLog(data, logId) {
+      return data.keys().hasAll([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.keys().hasOnly([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.logId == logId
+        && validShortId(data.logId)
+        && validShortId(data.eventId)
+        && data.action in [
+          'run-of-show.create', 'run-of-show.update',
+          'run-of-show.delayed', 'run-of-show.status',
+          'run-of-show.delete'
+        ]
+        && data.targetType == 'runOfShow'
+        && validShortId(data.targetId)
+        && validPerformedBy(data.performedBy)
+        && data.timestamp == request.time
+        && data.details is map;
+    }
+
+    function isValidResourceAuditLog(data, logId) {
+      return data.keys().hasAll([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.keys().hasOnly([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.logId == logId
+        && validShortId(data.logId)
+        && validShortId(data.eventId)
+        && data.action in [
+          'resource.create', 'resource.update',
+          'resource.status', 'resource.delete'
+        ]
+        && data.targetType == 'resource'
         && validShortId(data.targetId)
         && validPerformedBy(data.performedBy)
         && data.timestamp == request.time
@@ -1255,6 +1487,52 @@ service cloud.firestore {
             && exists(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId))
             && !existsAfter(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId))
             && get(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId)).data.eventId == data.eventId
+          )
+        );
+    }
+
+    function matchesRunOfShowMutation(data) {
+      return data.targetType == 'runOfShow'
+        && (
+          (
+            data.action == 'run-of-show.create'
+            && !exists(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action in ['run-of-show.update', 'run-of-show.delayed', 'run-of-show.status']
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && get(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action == 'run-of-show.delete'
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && !existsAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && get(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
+          )
+        );
+    }
+
+    function matchesResourceMutation(data) {
+      return data.targetType == 'resource'
+        && (
+          (
+            data.action == 'resource.create'
+            && !exists(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action in ['resource.update', 'resource.status']
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && get(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action == 'resource.delete'
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && !existsAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && get(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
           )
         );
     }
@@ -1631,7 +1909,18 @@ service cloud.firestore {
                             ]
                             ? isValidContactAuditLog(request.resource.data, logId)
                               && matchesContactMutation(request.resource.data)
-                            : false
+                            : request.resource.data.action in [
+                                'run-of-show.create', 'run-of-show.update',
+                                'run-of-show.delayed', 'run-of-show.status',
+                                'run-of-show.delete'
+                              ]
+                              ? isValidRunOfShowAuditLog(request.resource.data, logId)
+                              : request.resource.data.action in [
+                                  'resource.create', 'resource.update',
+                                  'resource.status', 'resource.delete'
+                                ]
+                                ? isValidResourceAuditLog(request.resource.data, logId)
+                                : false
           )
         ) || (
           isAssignedScanner(request.resource.data.eventId)
@@ -1675,6 +1964,32 @@ service cloud.firestore {
       allow update: if (isApprovedAdmin() || isAssignedEventManager(eventId))
         && validDocumentRecord(request.resource.data, eventId, documentId)
         && documentIdentityUnchanged(documentId)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isApprovedAdmin();
+    }
+
+    match /events/{eventId}/runOfShow/{itemId} {
+      allow read: if canReadTask(eventId);
+      allow create: if isApprovedAdmin()
+        && validRunOfShowItem(request.resource.data, eventId, itemId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isApprovedAdmin()
+        && validRunOfShowItem(request.resource.data, eventId, itemId)
+        && runOfShowIdentityUnchanged(itemId)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isApprovedAdmin();
+    }
+
+    match /events/{eventId}/resources/{resourceId} {
+      allow read: if canReadTask(eventId);
+      allow create: if isApprovedAdmin()
+        && validEventResource(request.resource.data, eventId, resourceId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isApprovedAdmin()
+        && validEventResource(request.resource.data, eventId, resourceId)
+        && eventResourceIdentityUnchanged(resourceId)
         && request.resource.data.updatedAt == request.time;
       allow delete: if isApprovedAdmin();
     }

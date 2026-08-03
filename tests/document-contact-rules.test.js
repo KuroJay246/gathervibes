@@ -26,7 +26,8 @@ const emulatorHost = process.env.FIRESTORE_EMULATOR_HOST
 let emulatorAvailable = false
 
 async function isFirestoreEmulatorAvailable() {
-  const [host, port] = (emulatorHost || '127.0.0.1:8080').split(':')
+  if (!emulatorHost) return false
+  const [host, port] = emulatorHost.split(':')
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 750)
   try {

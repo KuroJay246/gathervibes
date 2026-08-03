@@ -10,6 +10,7 @@ import {
   FileText,
   MessageSquareText,
   ReceiptText,
+  ScrollText,
   TicketCheck,
   Users,
   X,
@@ -20,6 +21,8 @@ import { useAuth } from '../auth/useAuth'
 import { subscribeToEvents } from '../services/eventService'
 import { subscribeToRegistrations } from '../services/registrationService'
 import { subscribeToOperationsLedger } from '../services/operationsLedgerService'
+import { subscribeToEventResources } from '../services/eventResourceService.js'
+import { subscribeToRunOfShow } from '../services/runOfShowService.js'
 import { subscribeToTasks } from '../services/taskService.js'
 import { formatEventDate, toDateInput, upcomingEvents } from '../utils/dateUtils'
 import { buildRegistrationMetrics } from '../utils/registrationMetrics'
@@ -77,6 +80,34 @@ function useEventTasks(eventId) {
   }, [eventId])
 
   return tasks
+}
+
+function useRunOfShowItems(eventId) {
+  const [items, setItems] = useState([])
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setItems([])
+    if (!eventId) return undefined
+    return subscribeToRunOfShow(eventId, setItems, () => {})
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [eventId])
+
+  return items
+}
+
+function useEventResources(eventId) {
+  const [items, setItems] = useState([])
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setItems([])
+    if (!eventId) return undefined
+    return subscribeToEventResources(eventId, setItems, () => {})
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [eventId])
+
+  return items
 }
 
 function sameActiveEventSnapshot(activeEvent, nextEvent) {
@@ -169,6 +200,8 @@ const PLANNING_ACTIONS = [
   { to: '/payments', label: 'Record Payment', detail: 'Update registration payment evidence and balances.', icon: CreditCard },
   { to: '/imports', label: 'Open Import Center', detail: 'Preview CSV, pasted rows, or supported spreadsheets.', icon: FileInput },
   { to: '/operations', label: 'Add Operations Entry', detail: 'Record event expenses, income, reimbursements, or commitments.', icon: ReceiptText },
+  { to: '/run-of-show', label: 'Build Run of Show', detail: 'Sequence setup, arrivals, programme steps, and breakdown.', icon: ScrollText },
+  { to: '/resources', label: 'Track Resources', detail: 'Manage equipment, supplies, packing, pickup, and returns.', icon: Building2 },
   { to: '/documents', label: 'Add Document Reference', detail: 'Track agreements, receipts, permits, and evidence links.', icon: FileText },
   { to: '/contacts', label: 'Open Contacts', detail: 'Find reusable suppliers, partners, venues, and helpers.', icon: Building2 },
   { to: '/tickets', label: 'View Tickets', detail: 'Prepare ticket codes and QR access.', icon: TicketCheck },
@@ -182,6 +215,8 @@ const PLANNING_ACTIONS = [
 const EVENT_DAY_ACTIONS = [
   { to: '/tickets', label: 'Ticket Lookup', icon: TicketCheck },
   { to: '/check-in', label: 'Open Check-In', icon: ClipboardCheck },
+  { to: '/run-of-show', label: 'Run of Show', icon: ScrollText },
+  { to: '/resources', label: 'Resources', icon: Building2 },
   { to: '/operations', label: 'Urgent Contacts and Commitments', icon: ReceiptText },
   { to: '/event-review', label: 'Open Reports', icon: CreditCard },
 ]
@@ -260,6 +295,8 @@ export function DashboardPage() {
   const registrations = useEventRegistrations(activeEvent?.eventId)
   const operationsEntries = useEventOperations(activeEvent?.eventId)
   const tasks = useEventTasks(activeEvent?.eventId)
+  const runOfShowItems = useRunOfShowItems(activeEvent?.eventId)
+  const resources = useEventResources(activeEvent?.eventId)
 
   useEffect(() => {
     if (!adminUser) return undefined
@@ -292,8 +329,8 @@ export function DashboardPage() {
   const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedEvent), [registrations, selectedEvent])
   const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedEvent), [registrations, selectedEvent])
   const readiness = useMemo(
-    () => buildEventReadiness(selectedEvent, registrations, operationsEntries),
-    [operationsEntries, registrations, selectedEvent],
+    () => buildEventReadiness(selectedEvent, registrations, operationsEntries, runOfShowItems, resources),
+    [operationsEntries, registrations, resources, runOfShowItems, selectedEvent],
   )
   const taskSummary = useMemo(() => buildTaskWorkflowSummary(tasks), [tasks])
   const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(selectedEvent?.eventId), [selectedEvent?.eventId])
@@ -413,6 +450,8 @@ export function DashboardPage() {
               <Metric label="Checked-in registrations" value={metrics.checkedInRegistrations} />
               <Metric label="Checked-in guests" value={metrics.checkedInPersons} />
               <Metric label="Open event-day tasks" value={taskSummary.open} detail={`${taskSummary.overdue} overdue`} />
+              <Metric label="Run of Show items" value={readiness.runOfShowSummary.total} detail={`${readiness.runOfShowSummary.delayed} delayed`} />
+              <Metric label="Resources" value={readiness.resourceSummary.total} detail={`${readiness.resourceSummary.shortages} shortage`} />
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-4">
               {EVENT_DAY_ACTIONS.map((action) => <ActionLink key={action.label} {...action} />)}
@@ -457,6 +496,8 @@ export function DashboardPage() {
             <Metric label="Capacity used" value={hydratedEvent?.capacity ? `${metrics.capacityPercent}%` : 'Not set'} detail={capacityLabel} />
             <Metric label="Tickets issued" value={registrations.filter((registration) => registration.ticketCode).length} detail="Ticket-code records" />
             <Metric label="Check-Ins" value={metrics.checkedInRegistrations} detail={`${metrics.checkedInPersons} guests checked in`} />
+            <Metric label="Run of Show" value={readiness.runOfShowSummary.total} detail={`${readiness.runOfShowSummary.delayed} delayed`} />
+            <Metric label="Resources" value={readiness.resourceSummary.total} detail={`${readiness.resourceSummary.shortages} shortage`} />
             <Metric label="Operations expenses recorded" value={formatCurrency(readiness.planningOverview.operationsSettlement.paidExpenses, financeSummary.currency)} detail="Event-level ledger only" />
             <Metric label="Outstanding commitments" value={formatCurrency(readiness.planningOverview.totalOutstandingCommitments, financeSummary.currency)} detail="Operations commitments only" />
           </section>
