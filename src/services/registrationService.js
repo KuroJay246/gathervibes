@@ -6,8 +6,6 @@ import {
   orderBy,
   query,
   serverTimestamp,
-  setDoc,
-  updateDoc,
   where,
   writeBatch,
 } from 'firebase/firestore'
@@ -165,14 +163,17 @@ export async function updateRegistration(registrationId, eventId, values, user, 
     performedBy: user,
     details: { fullName: values.fullName?.trim(), registrationUpdated: true },
   })
-  await updateDoc(regRef, {
+  const batch = writeBatch(firestore)
+
+  batch.update(regRef, {
     ...registrationPayload(values, eventId, event),
     ...existingTicketFields(existingRegistration),
     ...existingCheckInFields(existingRegistration),
     ...existingAttendanceFields(existingRegistration),
     updatedAt: serverTimestamp(),
   })
-  await setDoc(audit.ref, audit.data)
+  batch.set(audit.ref, audit.data)
+  await batch.commit()
 }
 
 export async function recordHistoricalAttendance(registration, user, note = '') {
