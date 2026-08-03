@@ -62,6 +62,19 @@ service cloud.firestore {
     //   admin-managed assigned-event role document. Staff can read only their own
     //   active assignments. Rules use this path to enforce assigned-event access.
     //
+    // events/{eventId}/documents/{documentId}
+    //   event-scoped document/link/evidence reference metadata only. No file
+    //   upload, Storage path, external document body, or private credential
+    //   content is stored.
+    //
+    // contacts/{contactId}, organizations/{organizationId}
+    //   organizer-managed reusable business contact directory. These records
+    //   contain contact PII and are not exposed to scanner or public users.
+    //
+    // events/{eventId}/contactLinks/{linkId}
+    //   event-scoped relationship between a reusable contact/organization and
+    //   a Working Event. This does not grant application access.
+    //
     // accessRequests/{requestId}
     //   future requester-submitted access workflow document. Prototype only in
     //   repository review: not deployed, no live UI writes, admin review only.
@@ -155,6 +168,18 @@ service cloud.firestore {
       return value == null || value in [
         'firstpay', 'bank-transfer', 'cash', 'door', 'card', 'complimentary', 'unknown'
       ];
+    }
+
+    function validOptionalDateOnly(value) {
+      return value == null || value == '' || (value is string && value.matches('^\\d{4}-\\d{2}-\\d{2}$'));
+    }
+
+    function validOptionalHttpUrl(value) {
+      return value == null || value == '' || (
+        value is string
+        && value.size() <= 1000
+        && (value.matches('^https://.*') || value.matches('^http://.*'))
+      );
     }
 
     function validLedgerMoney(value) {
@@ -596,7 +621,8 @@ service cloud.firestore {
         && data.keys().hasOnly([
           'ledgerEntryId', 'eventId', 'entryType', 'category', 'label', 'amount',
           'paymentMethod', 'paymentReference', 'paidByOrPaidTo', 'date', 'status',
-          'adjustmentDirection', 'notes', 'createdAt', 'updatedAt', 'createdBy'
+          'adjustmentDirection', 'notes', 'linkedContactId', 'linkedOrganizationId',
+          'linkedDocumentId', 'createdAt', 'updatedAt', 'createdBy'
         ])
         && data.ledgerEntryId == ledgerEntryId
         && validShortId(data.ledgerEntryId)
@@ -614,6 +640,9 @@ service cloud.firestore {
         && data.paymentMethod.size() <= 80
         && validOptionalString(data.paymentReference, 180)
         && validOptionalString(data.paidByOrPaidTo, 180)
+        && (!('linkedContactId' in data) || validOptionalString(data.linkedContactId, 128))
+        && (!('linkedOrganizationId' in data) || validOptionalString(data.linkedOrganizationId, 128))
+        && (!('linkedDocumentId' in data) || validOptionalString(data.linkedDocumentId, 128))
         && data.date is string
         && data.date.size() > 0
         && data.date.size() <= 20
@@ -624,6 +653,246 @@ service cloud.firestore {
         && data.createdAt is timestamp
         && data.updatedAt is timestamp
         && validPerformedBy(data.createdBy);
+    }
+
+    function validDocumentCategory(category) {
+      return category in [
+        'Venue', 'Agreement / Contract', 'Finance', 'Quotation', 'Receipt',
+        'Invoice', 'Supplier', 'Sponsor / Partner', 'Registration', 'Safety',
+        'Permit / Licence', 'Insurance', 'Marketing', 'Event Day',
+        'Programme / Schedule', 'Learning / Workshop Material', 'Policy',
+        'Report', 'Other'
+      ];
+    }
+
+    function validDocumentStatus(status) {
+      return status in [
+        'Needed', 'Requested', 'Received', 'Draft', 'Under Review',
+        'Approved', 'Current', 'Expired', 'Replaced', 'Not Required'
+      ];
+    }
+
+    function validDocumentType(type) {
+      return type in [
+        'External Link', 'Google Drive', 'Google Docs', 'Google Sheets',
+        'Website', 'Reference Location', 'Other'
+      ];
+    }
+
+    function validDocumentRecord(data, eventId, documentId) {
+      return data.keys().hasAll([
+          'documentId', 'eventId', 'eventName', 'title', 'category',
+          'description', 'status', 'required', 'url', 'documentType',
+          'provider', 'storageLocation', 'linkedContactId',
+          'linkedOrganizationId', 'linkedTaskId', 'linkedOperationId',
+          'linkedCommitmentId', 'dueDate', 'expiryDate', 'versionLabel',
+          'notes', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'documentId', 'eventId', 'eventName', 'title', 'category',
+          'description', 'status', 'required', 'url', 'documentType',
+          'provider', 'storageLocation', 'linkedContactId',
+          'linkedOrganizationId', 'linkedTaskId', 'linkedOperationId',
+          'linkedCommitmentId', 'dueDate', 'expiryDate', 'versionLabel',
+          'notes', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.documentId == documentId
+        && validShortId(data.documentId)
+        && data.eventId == eventId
+        && validShortId(data.eventId)
+        && data.eventName is string
+        && data.eventName.size() > 0
+        && data.eventName.size() <= 180
+        && data.title is string
+        && data.title.size() > 0
+        && data.title.size() <= 180
+        && validDocumentCategory(data.category)
+        && data.description is string
+        && data.description.size() <= 2000
+        && validDocumentStatus(data.status)
+        && data.required is bool
+        && validOptionalHttpUrl(data.url)
+        && validDocumentType(data.documentType)
+        && validOptionalString(data.provider, 120)
+        && validOptionalString(data.storageLocation, 240)
+        && validOptionalString(data.linkedContactId, 128)
+        && validOptionalString(data.linkedOrganizationId, 128)
+        && validOptionalString(data.linkedTaskId, 128)
+        && validOptionalString(data.linkedOperationId, 128)
+        && validOptionalString(data.linkedCommitmentId, 128)
+        && validOptionalDateOnly(data.dueDate)
+        && validOptionalDateOnly(data.expiryDate)
+        && validOptionalString(data.versionLabel, 80)
+        && data.notes is string
+        && data.notes.size() <= 2000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && validPerformedBy(data.createdBy)
+        && validPerformedBy(data.updatedBy);
+    }
+
+    function documentIdentityUnchanged(documentId) {
+      return request.resource.data.documentId == documentId
+        && request.resource.data.documentId == resource.data.documentId
+        && request.resource.data.eventId == resource.data.eventId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.createdBy == resource.data.createdBy;
+    }
+
+    function validContactCategory(category) {
+      return category in [
+        'Venue', 'Supplier', 'Vendor', 'Sponsor', 'Partner',
+        'Restaurant / Caterer', 'Facilitator', 'Photographer', 'Decorator',
+        'Printer', 'Entertainment', 'Technical', 'Transport',
+        'Corporate Client', 'Cultural Partner', 'Government / Institution',
+        'Helper / Staff Contact', 'Other'
+      ];
+    }
+
+    function validContactStatus(status) {
+      return status in ['Active', 'Inactive', 'Do Not Use'];
+    }
+
+    function validContactRecord(data, contactId) {
+      return data.keys().hasAll([
+          'contactId', 'displayName', 'firstName', 'lastName',
+          'organizationId', 'roleTitle', 'category', 'email', 'phone',
+          'phoneNormalized', 'preferredContactMethod', 'location',
+          'website', 'socialLink', 'status', 'notes', 'searchText',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'contactId', 'displayName', 'firstName', 'lastName',
+          'organizationId', 'roleTitle', 'category', 'email', 'phone',
+          'phoneNormalized', 'preferredContactMethod', 'location',
+          'website', 'socialLink', 'status', 'notes', 'searchText',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.contactId == contactId
+        && validShortId(data.contactId)
+        && data.displayName is string
+        && data.displayName.size() > 0
+        && data.displayName.size() <= 180
+        && validOptionalString(data.firstName, 90)
+        && validOptionalString(data.lastName, 90)
+        && validOptionalString(data.organizationId, 128)
+        && validOptionalString(data.roleTitle, 120)
+        && validContactCategory(data.category)
+        && validOptionalString(data.email, 320)
+        && validOptionalString(data.phone, 64)
+        && validOptionalString(data.phoneNormalized, 64)
+        && validOptionalString(data.preferredContactMethod, 80)
+        && validOptionalString(data.location, 240)
+        && validOptionalHttpUrl(data.website)
+        && validOptionalHttpUrl(data.socialLink)
+        && validContactStatus(data.status)
+        && data.notes is string
+        && data.notes.size() <= 2000
+        && data.searchText is string
+        && data.searchText.size() <= 1000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && validPerformedBy(data.createdBy)
+        && validPerformedBy(data.updatedBy);
+    }
+
+    function contactIdentityUnchanged(contactId) {
+      return request.resource.data.contactId == contactId
+        && request.resource.data.contactId == resource.data.contactId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.createdBy == resource.data.createdBy;
+    }
+
+    function validOrganizationRecord(data, organizationId) {
+      return data.keys().hasAll([
+          'organizationId', 'name', 'category', 'primaryContactId',
+          'email', 'phone', 'phoneNormalized', 'website', 'socialLink',
+          'location', 'status', 'notes', 'searchText',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'organizationId', 'name', 'category', 'primaryContactId',
+          'email', 'phone', 'phoneNormalized', 'website', 'socialLink',
+          'location', 'status', 'notes', 'searchText',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.organizationId == organizationId
+        && validShortId(data.organizationId)
+        && data.name is string
+        && data.name.size() > 0
+        && data.name.size() <= 180
+        && validContactCategory(data.category)
+        && validOptionalString(data.primaryContactId, 128)
+        && validOptionalString(data.email, 320)
+        && validOptionalString(data.phone, 64)
+        && validOptionalString(data.phoneNormalized, 64)
+        && validOptionalHttpUrl(data.website)
+        && validOptionalHttpUrl(data.socialLink)
+        && validOptionalString(data.location, 240)
+        && validContactStatus(data.status)
+        && data.notes is string
+        && data.notes.size() <= 2000
+        && data.searchText is string
+        && data.searchText.size() <= 1000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && validPerformedBy(data.createdBy)
+        && validPerformedBy(data.updatedBy);
+    }
+
+    function organizationIdentityUnchanged(organizationId) {
+      return request.resource.data.organizationId == organizationId
+        && request.resource.data.organizationId == resource.data.organizationId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.createdBy == resource.data.createdBy;
+    }
+
+    function validRelationshipType(type) {
+      return type in [
+        'Venue contact', 'Supplier', 'Sponsor', 'Facilitator',
+        'Corporate client', 'Helper', 'Partner', 'Other'
+      ];
+    }
+
+    function validEventContactLink(data, eventId, linkId) {
+      return data.keys().hasAll([
+          'linkId', 'eventId', 'eventName', 'contactId', 'organizationId',
+          'relationshipType', 'roleForEvent', 'status', 'primaryForEvent',
+          'notes', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'linkId', 'eventId', 'eventName', 'contactId', 'organizationId',
+          'relationshipType', 'roleForEvent', 'status', 'primaryForEvent',
+          'notes', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.linkId == linkId
+        && validShortId(data.linkId)
+        && data.eventId == eventId
+        && validShortId(data.eventId)
+        && data.eventName is string
+        && data.eventName.size() > 0
+        && data.eventName.size() <= 180
+        && validOptionalString(data.contactId, 128)
+        && validOptionalString(data.organizationId, 128)
+        && (data.contactId != '' || data.organizationId != '')
+        && validRelationshipType(data.relationshipType)
+        && validOptionalString(data.roleForEvent, 120)
+        && validContactStatus(data.status)
+        && data.primaryForEvent is bool
+        && data.notes is string
+        && data.notes.size() <= 1000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && validPerformedBy(data.createdBy)
+        && validPerformedBy(data.updatedBy);
+    }
+
+    function eventContactLinkIdentityUnchanged(linkId) {
+      return request.resource.data.linkId == linkId
+        && request.resource.data.linkId == resource.data.linkId
+        && request.resource.data.eventId == resource.data.eventId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.createdBy == resource.data.createdBy;
     }
 
     function validTaskStatus(status) {
@@ -721,6 +990,49 @@ service cloud.firestore {
         && validShortId(data.eventId)
         && data.action in ['operation.create', 'operation.update', 'operation.cancel']
         && data.targetType == 'operation'
+        && validShortId(data.targetId)
+        && validPerformedBy(data.performedBy)
+        && data.timestamp == request.time
+        && data.details is map;
+    }
+
+    function isValidDocumentAuditLog(data, logId) {
+      return data.keys().hasAll([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.keys().hasOnly([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.logId == logId
+        && validShortId(data.logId)
+        && validShortId(data.eventId)
+        && data.action in ['document.create', 'document.update', 'document.status', 'document.delete']
+        && data.targetType == 'document'
+        && validShortId(data.targetId)
+        && validPerformedBy(data.performedBy)
+        && data.timestamp == request.time
+        && data.details is map;
+    }
+
+    function isValidContactAuditLog(data, logId) {
+      return data.keys().hasAll([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.keys().hasOnly([
+          'logId', 'eventId', 'action', 'targetType', 'targetId',
+          'performedBy', 'timestamp', 'details'
+        ])
+        && data.logId == logId
+        && validShortId(data.logId)
+        && (data.eventId == 'global' || validShortId(data.eventId))
+        && data.action in [
+          'contact.create', 'contact.update', 'organization.create',
+          'organization.update', 'contact-link.create', 'contact-link.update'
+        ]
+        && data.targetType in ['contact', 'organization', 'contactLink']
         && validShortId(data.targetId)
         && validPerformedBy(data.performedBy)
         && data.timestamp == request.time
@@ -897,6 +1209,66 @@ service cloud.firestore {
             && get(/databases/$(database)/documents/events/$(data.eventId)/tasks/$(data.targetId)).data.eventId == data.eventId
           )
         )
+      );
+    }
+
+    function matchesDocumentMutation(data) {
+      return data.targetType == 'document'
+        && (
+          (
+            data.action == 'document.create'
+            && !exists(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId))
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action in ['document.update', 'document.status']
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId))
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action == 'document.delete'
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId))
+            && !existsAfter(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId))
+            && get(/databases/$(database)/documents/events/$(data.eventId)/documents/$(data.targetId)).data.eventId == data.eventId
+          )
+        );
+    }
+
+    function matchesContactMutation(data) {
+      return (
+        data.action == 'contact.create'
+        && data.targetType == 'contact'
+        && data.eventId == 'global'
+        && !exists(/databases/$(database)/documents/contacts/$(data.targetId))
+        && existsAfter(/databases/$(database)/documents/contacts/$(data.targetId))
+      ) || (
+        data.action == 'contact.update'
+        && data.targetType == 'contact'
+        && data.eventId == 'global'
+        && exists(/databases/$(database)/documents/contacts/$(data.targetId))
+        && existsAfter(/databases/$(database)/documents/contacts/$(data.targetId))
+      ) || (
+        data.action == 'organization.create'
+        && data.targetType == 'organization'
+        && data.eventId == 'global'
+        && !exists(/databases/$(database)/documents/organizations/$(data.targetId))
+        && existsAfter(/databases/$(database)/documents/organizations/$(data.targetId))
+      ) || (
+        data.action == 'organization.update'
+        && data.targetType == 'organization'
+        && data.eventId == 'global'
+        && exists(/databases/$(database)/documents/organizations/$(data.targetId))
+        && existsAfter(/databases/$(database)/documents/organizations/$(data.targetId))
+      ) || (
+        data.action == 'contact-link.create'
+        && data.targetType == 'contactLink'
+        && !exists(/databases/$(database)/documents/events/$(data.eventId)/contactLinks/$(data.targetId))
+        && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/contactLinks/$(data.targetId))
+      ) || (
+        data.action == 'contact-link.update'
+        && data.targetType == 'contactLink'
+        && exists(/databases/$(database)/documents/events/$(data.eventId)/contactLinks/$(data.targetId))
+        && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/contactLinks/$(data.targetId))
       );
     }
 
@@ -1187,44 +1559,42 @@ service cloud.firestore {
       allow create: if (
           isApprovedAdmin()
           && (
-            (
-              request.resource.data.action in ['event.create', 'event.update', 'event.delete']
-              && isValidEventAuditLog(request.resource.data, logId)
-              && matchesEventMutation(request.resource.data)
-            )
-            || (
-              request.resource.data.action in ['ticket.assign', 'ticket.unassign', 'ticket.regenerate']
-              && isValidRegistrationAuditLog(request.resource.data, logId)
-              && matchesTicketMutation(request.resource.data)
-            )
-            || (
-              request.resource.data.action in [
-                'registration.create', 'registration.update', 'registration.delete',
-                'registration.import', 'registration.finance-update', 'registration.attendance-update',
-                'checkin.complete', 'checkin.undo'
-              ]
-              && isValidRegistrationAuditLog(request.resource.data, logId)
-              && matchesRegistrationMutation(request.resource.data)
-            )
-            || (
-              request.resource.data.action == 'checkin.duplicate-attempt'
-              && isValidRegistrationAuditLog(request.resource.data, logId)
-              && matchesDuplicateCheckInAttempt(request.resource.data)
-            )
-            || (
-              request.resource.data.action in ['operation.create', 'operation.update', 'operation.cancel']
-              && isValidOperationAuditLog(request.resource.data, logId)
-              && matchesOperationMutation(request.resource.data)
-            )
-            || (
-              request.resource.data.action in [
-                'task.create', 'task.update', 'task.status', 'task.waiting',
-                'task.blocked', 'task.completed', 'task.reopened',
-                'task.cancelled', 'task.delete'
-              ]
-              && isValidTaskAuditLog(request.resource.data, logId)
-              && matchesTaskMutation(request.resource.data)
-            )
+            request.resource.data.action in ['event.create', 'event.update', 'event.delete']
+              ? isValidEventAuditLog(request.resource.data, logId)
+                && matchesEventMutation(request.resource.data)
+              : request.resource.data.action in ['ticket.assign', 'ticket.unassign', 'ticket.regenerate']
+                ? isValidRegistrationAuditLog(request.resource.data, logId)
+                  && matchesTicketMutation(request.resource.data)
+                : request.resource.data.action in [
+                    'registration.create', 'registration.update', 'registration.delete',
+                    'registration.import', 'registration.finance-update', 'registration.attendance-update',
+                    'checkin.complete', 'checkin.undo'
+                  ]
+                  ? isValidRegistrationAuditLog(request.resource.data, logId)
+                    && matchesRegistrationMutation(request.resource.data)
+                  : request.resource.data.action == 'checkin.duplicate-attempt'
+                    ? isValidRegistrationAuditLog(request.resource.data, logId)
+                      && matchesDuplicateCheckInAttempt(request.resource.data)
+                    : request.resource.data.action in ['operation.create', 'operation.update', 'operation.cancel']
+                      ? isValidOperationAuditLog(request.resource.data, logId)
+                        && matchesOperationMutation(request.resource.data)
+                      : request.resource.data.action in [
+                          'task.create', 'task.update', 'task.status', 'task.waiting',
+                          'task.blocked', 'task.completed', 'task.reopened',
+                          'task.cancelled', 'task.delete'
+                        ]
+                        ? isValidTaskAuditLog(request.resource.data, logId)
+                          && matchesTaskMutation(request.resource.data)
+                        : request.resource.data.action in ['document.create', 'document.update', 'document.status', 'document.delete']
+                          ? isValidDocumentAuditLog(request.resource.data, logId)
+                            && matchesDocumentMutation(request.resource.data)
+                          : request.resource.data.action in [
+                              'contact.create', 'contact.update', 'organization.create',
+                              'organization.update', 'contact-link.create', 'contact-link.update'
+                            ]
+                            ? isValidContactAuditLog(request.resource.data, logId)
+                              && matchesContactMutation(request.resource.data)
+                            : false
           )
         ) || (
           isAssignedScanner(request.resource.data.eventId)
@@ -1255,6 +1625,63 @@ service cloud.firestore {
         && operationIdentityUnchanged(ledgerEntryId)
         && request.resource.data.updatedAt == request.time;
       allow delete: if false;
+    }
+
+    match /events/{eventId}/documents/{documentId} {
+      allow read: if isApprovedAdmin()
+        || isAssignedEventManager(eventId)
+        || isAssignedViewer(eventId);
+      allow create: if (isApprovedAdmin() || isAssignedEventManager(eventId))
+        && validDocumentRecord(request.resource.data, eventId, documentId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if (isApprovedAdmin() || isAssignedEventManager(eventId))
+        && validDocumentRecord(request.resource.data, eventId, documentId)
+        && documentIdentityUnchanged(documentId)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isApprovedAdmin();
+    }
+
+    match /contacts/{contactId} {
+      allow read: if isApprovedAdmin();
+      allow create: if isApprovedAdmin()
+        && validContactRecord(request.resource.data, contactId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isApprovedAdmin()
+        && validContactRecord(request.resource.data, contactId)
+        && contactIdentityUnchanged(contactId)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    match /organizations/{organizationId} {
+      allow read: if isApprovedAdmin();
+      allow create: if isApprovedAdmin()
+        && validOrganizationRecord(request.resource.data, organizationId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isApprovedAdmin()
+        && validOrganizationRecord(request.resource.data, organizationId)
+        && organizationIdentityUnchanged(organizationId)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    match /events/{eventId}/contactLinks/{linkId} {
+      allow read: if isApprovedAdmin()
+        || isAssignedEventManager(eventId)
+        || isAssignedViewer(eventId)
+        || isAssignedOperationsHelper(eventId);
+      allow create: if (isApprovedAdmin() || isAssignedEventManager(eventId))
+        && validEventContactLink(request.resource.data, eventId, linkId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if (isApprovedAdmin() || isAssignedEventManager(eventId))
+        && validEventContactLink(request.resource.data, eventId, linkId)
+        && eventContactLinkIdentityUnchanged(linkId)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isApprovedAdmin();
     }
 
     match /accessRequests/{requestId} {
