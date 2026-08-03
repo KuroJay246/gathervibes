@@ -89,3 +89,30 @@ test('Firestore rules continue to centralize owner access without widening publi
   assert.doesNotMatch(rules, /allow read, write: if true/)
   assert.doesNotMatch(rules, /allow (read|write|create|update|delete|list|get): if request\.auth != null/)
 })
+
+test('registration edits remain atomic with append-only audit evidence', async () => {
+  const service = await source('src/services/registrationService.js')
+  const updateStart = service.indexOf('export async function updateRegistration')
+  const attendanceStart = service.indexOf('export async function recordHistoricalAttendance')
+  const updateRegistration = service.slice(updateStart, attendanceStart)
+
+  assert.match(updateRegistration, /const batch = writeBatch\(firestore\)/)
+  assert.match(updateRegistration, /batch\.update\(regRef,\s+\{/)
+  assert.match(updateRegistration, /batch\.set\(audit\.ref,\s+audit\.data\)/)
+  assert.match(updateRegistration, /await batch\.commit\(\)/)
+  assert.doesNotMatch(updateRegistration, /await updateDoc\(/)
+  assert.doesNotMatch(updateRegistration, /await setDoc\(/)
+})
+
+test('production owner write root cause documents deployment and manual verification boundaries', async () => {
+  const rootCause = await source('docs/FIRESTORE_PRODUCTION_OWNER_WRITE_ROOT_CAUSE_2026-08.md')
+
+  assert.match(rootCause, /permission-denied/)
+  assert.match(rootCause, /Firestore server authorization depends on the deployed Firestore ruleset/)
+  assert.match(rootCause, /updateRegistration` used a split write/)
+  assert.match(rootCause, /npx firebase-tools deploy --only firestore:rules --project gathervibeshub/)
+  assert.match(rootCause, /PASS WITH REQUIRED MANUAL OWNER WRITE VERIFICATION/)
+  assert.match(rootCause, /CODEX_TEST Live Verification Event/)
+  assert.match(rootCause, /QR payload remains `GSV:TICKET:\{ticketCode\}`/)
+  assert.match(rootCause, /approvedEmails` is not changed/)
+})
