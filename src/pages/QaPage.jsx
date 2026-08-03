@@ -217,6 +217,9 @@ export function QaPage() {
         return finance.paymentStatus === 'complimentary' && finance.amountDue > 0
       })
       const missingPaidReference = rows.filter((row) => calculateRegistrationFinance(row, activeEvent).paymentStatus === 'paid' && !row.paymentReference)
+      const attendanceEvidenceKeys = ['attendanceRecordType', 'attendanceConfirmedAt', 'attendanceConfirmedBy', 'attendanceEvidenceNote']
+      const legacyRegistrationRows = rows.filter((row) => attendanceEvidenceKeys.some((key) => !(key in row)))
+      const currentRegistrationRows = rows.filter((row) => attendanceEvidenceKeys.every((key) => key in row))
 
       setQaChecks([
         { label: 'Working Event selected', status: activeEvent.eventId ? 'pass' : 'fail', detail: activeEvent.eventName },
@@ -245,6 +248,8 @@ export function QaPage() {
         { label: 'Paid status with outstanding balance', status: paidOutstanding.length ? 'fail' : 'pass', detail: `${paidOutstanding.length} rows` },
         { label: 'Complimentary with amount due', status: complimentaryDue.length ? 'warning' : 'pass', detail: `${complimentaryDue.length} rows` },
         { label: 'Missing payment reference for paid rows', status: missingPaidReference.length ? 'warning' : 'pass', detail: `${missingPaidReference.length} rows` },
+        { label: 'Legacy registration compatibility', status: legacyRegistrationRows.length ? 'warning' : 'pass', detail: `${legacyRegistrationRows.length} old-format rows, ${currentRegistrationRows.length} current-format rows. Old-format rows may lack attendance evidence fields but normal registration edits preserve ticket, payment, and attendance state.` },
+        { label: 'Registration schema version', status: legacyRegistrationRows.length ? 'warning' : 'pass', detail: legacyRegistrationRows.length ? 'Selected event contains legacy records compatible with normal detail edits after this hotfix.' : 'Selected event registration records include current attendance evidence fields.' },
         { label: 'Checked-in count', status: 'pass', detail: formatRegistrationGuestSummary(metrics.checkedInRegistrations, metrics.checkedInPersons) },
         { label: 'auditLogs reachable', status: auditStatus === 'ok' ? 'pass' : 'warning', detail: auditStatus },
         { label: 'QR payload privacy', status: hasPrivateQrData ? 'fail' : 'pass', detail: qrPrivateData },
