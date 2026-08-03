@@ -12,6 +12,8 @@ import {
   isEventDayStatus,
   isPlanningEvent,
 } from './eventPlanning.js'
+import { buildResourceSummary } from './eventResources.js'
+import { buildRunOfShowSummary } from './runOfShow.js'
 
 function countDuplicateContactRows(registrations = []) {
   const emailCounts = new Map()
@@ -60,7 +62,7 @@ function buildCategory(key, label, status, summary) {
   }
 }
 
-export function buildEventReadiness(event = null, registrations = [], operationsEntries = []) {
+export function buildEventReadiness(event = null, registrations = [], operationsEntries = [], runOfShowItems = [], resources = []) {
   if (!event?.eventId) {
     return {
       hasEvent: false,
@@ -82,6 +84,8 @@ export function buildEventReadiness(event = null, registrations = [], operations
   const operationsTotals = buildOperationsTotals(operationsEntries)
   const operationsCounts = buildOperationsEntryCounts(operationsEntries)
   const operationsSummary = buildOperationsControlSummary(operationsEntries)
+  const runOfShowSummary = buildRunOfShowSummary(runOfShowItems)
+  const resourceSummary = buildResourceSummary(resources)
   const financeContext = buildFinanceClassificationContext(rows, hydratedEvent)
   const planningOverview = buildOrganizerOverview(hydratedEvent, rows, operationsEntries)
   const completedEvent = isCompletedEvent(hydratedEvent)
@@ -243,6 +247,44 @@ export function buildEventReadiness(event = null, registrations = [], operations
       linkLabel: 'Open Operations',
     })
   }
+  if (!completedEvent && runOfShowSummary.total === 0) {
+    actionItems.push({
+      key: 'run-of-show-missing',
+      label: 'Build Run of Show',
+      statusLabel: 'Review',
+      summary: 'No event-day timeline items are saved yet. Add setup, arrivals, programme steps, and breakdown items.',
+      to: '/run-of-show',
+      linkLabel: 'Open Run of Show',
+    })
+  } else if (!completedEvent && runOfShowSummary.delayed > 0) {
+    actionItems.push({
+      key: 'run-of-show-delayed',
+      label: 'Delayed timeline items',
+      statusLabel: 'Needs attention',
+      summary: `${runOfShowSummary.delayed} Run of Show item${runOfShowSummary.delayed === 1 ? '' : 's'} are marked delayed.`,
+      to: '/run-of-show',
+      linkLabel: 'Open Run of Show',
+    })
+  }
+  if (!completedEvent && resourceSummary.total === 0) {
+    actionItems.push({
+      key: 'resources-missing',
+      label: 'Add resources',
+      statusLabel: 'Review',
+      summary: 'No equipment or supplies are saved yet. Add items that need packing, pickup, delivery, or return tracking.',
+      to: '/resources',
+      linkLabel: 'Open Resources',
+    })
+  } else if (!completedEvent && resourceSummary.shortages > 0) {
+    actionItems.push({
+      key: 'resource-shortage',
+      label: 'Resource shortage',
+      statusLabel: 'Needs attention',
+      summary: `${resourceSummary.shortages} resource item${resourceSummary.shortages === 1 ? '' : 's'} still need confirmed quantities.`,
+      to: '/resources',
+      linkLabel: 'Open Resources',
+    })
+  }
   if (!completedEvent && pendingPayments > 0) {
     actionItems.push({
       key: 'pending-payments',
@@ -321,6 +363,8 @@ export function buildEventReadiness(event = null, registrations = [], operations
     operationsTotals,
     operationsCounts,
     operationsSummary,
+    runOfShowSummary,
+    resourceSummary,
     planningOverview,
     counts: {
       pendingPayments,

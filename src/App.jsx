@@ -26,6 +26,8 @@ const PaymentsPage = lazyPage(() => import('./pages/PaymentsPage'), 'PaymentsPag
 const PaymentReconciliationPage = lazyPage(() => import('./pages/PaymentReconciliationPage'), 'PaymentReconciliationPage')
 const DocumentsPage = lazyPage(() => import('./pages/DocumentsPage'), 'DocumentsPage')
 const ContactsPage = lazyPage(() => import('./pages/ContactsPage'), 'ContactsPage')
+const RunOfShowPage = lazyPage(() => import('./pages/RunOfShowPage'), 'RunOfShowPage')
+const ResourcesPage = lazyPage(() => import('./pages/ResourcesPage'), 'ResourcesPage')
 const ScannerPage = lazyPage(() => import('./pages/ScannerPage'), 'ScannerPage')
 const EventReviewPage = lazyPage(() => import('./pages/EventReviewPage'), 'EventReviewPage')
 
@@ -49,6 +51,8 @@ export default function App() {
             <Route path="/tickets" element={<TicketsPage />} />
             <Route path="/check-in" element={<AssignedEventGate purpose="Check-In"><CheckInPage /></AssignedEventGate>} />
             <Route path="/operations" element={<AssignedEventGate purpose="Operations"><OperationsPage /></AssignedEventGate>} />
+            <Route path="/run-of-show" element={<AssignedEventGate purpose="Run of Show"><RunOfShowPage /></AssignedEventGate>} />
+            <Route path="/resources" element={<AssignedEventGate purpose="Resources"><ResourcesPage /></AssignedEventGate>} />
             <Route path="/documents" element={<DocumentsPage />} />
             <Route path="/contacts" element={<ContactsPage />} />
             <Route path="/event-review" element={<EventReviewPage />} />
