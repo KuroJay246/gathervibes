@@ -70,6 +70,15 @@ function importedRegistration(overrides = {}) {
   }
 }
 
+function reviewedRegistration(overrides = {}) {
+  return importedRegistration({
+    financeReviewRequired: false,
+    paymentEvidenceClass: 'Payment Organizer Confirmed',
+    needsFollowUp: false,
+    ...overrides,
+  })
+}
+
 async function seed(env, registration = importedRegistration()) {
   await env.withSecurityRulesDisabled(async (context) => {
     const db = context.firestore()
@@ -187,6 +196,23 @@ function existingAuditData(overrides = {}) {
     timestamp: Timestamp.fromMillis(1710000300000),
     details: {
       fullName: 'CODEX_TEST Guest One',
+      registrationUpdated: true,
+    },
+    ...overrides,
+  }
+}
+
+function registrationUpdateAuditData(overrides = {}) {
+  return {
+    logId: 'audit-registration-update-1',
+    eventId,
+    action: 'registration.update',
+    targetType: 'registration',
+    targetId: registrationId,
+    performedBy: adminEmail,
+    timestamp: serverTimestamp(),
+    details: {
+      fullName: 'CODEX_TEST Guest One Edited',
       registrationUpdated: true,
     },
     ...overrides,
@@ -367,6 +393,84 @@ test('Firestore rules allow protected owner UID when email is absent from mutabl
 
     await assertSucceeds(getDoc(doc(db, 'settings', 'accessControl')))
     await assertSucceeds(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules allow approved admin registration detail update with append-only audit', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+    const registrationRef = doc(db, 'registrations', registrationId)
+    const batch = writeBatch(db)
+
+    batch.update(registrationRef, {
+      fullName: 'CODEX_TEST Guest One Edited',
+      notes: 'Organizer corrected registration details',
+      updatedAt: serverTimestamp(),
+    })
+    batch.set(doc(db, 'auditLogs', 'audit-registration-update-1'), registrationUpdateAuditData())
+
+    await assertSucceeds(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules allow normal edits to reviewed production-shaped registrations', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, reviewedRegistration())
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+
+    await assertSucceeds(updateDoc(doc(db, 'registrations', registrationId), {
+      phone: '2465550199',
+      notes: 'Organizer corrected contact details',
+      updatedAt: serverTimestamp(),
+    }))
+    await assertSucceeds(setDoc(doc(db, 'auditLogs', 'audit-registration-update-reviewed-1'), registrationUpdateAuditData({
+      logId: 'audit-registration-update-reviewed-1',
+      details: {
+        fullName: 'CODEX_TEST Guest One',
+        registrationUpdated: true,
+      },
+    })))
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules allow production-shaped registration edit without audit batch coupling', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, reviewedRegistration())
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+
+    await assertSucceeds(updateDoc(doc(db, 'registrations', registrationId), {
+      phone: '2465550198',
+      notes: 'Organizer corrected contact details',
+      updatedAt: serverTimestamp(),
+    }))
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules allow routine registration audit create for reviewed production-shaped registrations', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, reviewedRegistration())
+    const db = env.authenticatedContext('admin-user', { email: adminEmail }).firestore()
+
+    await assertSucceeds(setDoc(doc(db, 'auditLogs', 'audit-registration-update-reviewed-2'), registrationUpdateAuditData({
+      logId: 'audit-registration-update-reviewed-2',
+      details: {
+        fullName: 'CODEX_TEST Guest One',
+        registrationUpdated: true,
+      },
+    })))
   } finally {
     await env.cleanup()
   }

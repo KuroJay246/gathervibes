@@ -516,6 +516,8 @@ service cloud.firestore {
           'buyerName', 'attendeeNames',
           'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
           'priceTier', 'ticketPrice', 'amountDue', 'amountPaid', 'balanceDue', 'paymentMethod',
+          'paymentEvidenceClass', 'financeReviewRequired', 'needsFollowUp',
+          'financeReview', 'outstandingStatus', 'complimentary',
           'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy',
           'notes', 'checkedIn', 'checkInTime', 'checkedInBy', 'source', 'sourceRowId', 'timestamp',
           'attendanceRecordType', 'attendanceConfirmedAt', 'attendanceConfirmedBy', 'attendanceEvidenceNote',
@@ -542,6 +544,12 @@ service cloud.firestore {
         && (!('amountPaid' in data) || validOptionalMoney(data.amountPaid))
         && (!('balanceDue' in data) || validOptionalMoney(data.balanceDue))
         && (!('paymentMethod' in data) || validOptionalPaymentMethod(data.paymentMethod))
+        && (!('paymentEvidenceClass' in data) || validOptionalString(data.paymentEvidenceClass, 120))
+        && (!('financeReviewRequired' in data) || data.financeReviewRequired is bool)
+        && (!('needsFollowUp' in data) || data.needsFollowUp is bool)
+        && (!('financeReview' in data) || validOptionalString(data.financeReview, 120))
+        && (!('outstandingStatus' in data) || validOptionalString(data.outstandingStatus, 120))
+        && (!('complimentary' in data) || data.complimentary is bool)
         && validOptionalString(data.paymentReference, 250)
         && data.ticketStatus in ['no-ticket-assigned', 'partially-assigned', 'assigned']
         && validOptionalString(data.ticketCode, 32)
@@ -608,6 +616,23 @@ service cloud.firestore {
         && data.targetType == 'registration'
         && validShortId(data.targetId)
         && validPerformedBy(data.performedBy)
+        && data.timestamp == request.time
+        && data.details is map;
+    }
+
+    function isRoutineRegistrationAuditLog(data, logId) {
+      return data.logId == logId
+        && data.eventId is string
+        && data.eventId.size() > 0
+        && data.eventId.size() <= 128
+        && data.action in ['registration.update', 'registration.finance-update', 'registration.attendance-update']
+        && data.targetType == 'registration'
+        && data.targetId is string
+        && data.targetId.size() > 0
+        && data.targetId.size() <= 128
+        && data.performedBy is string
+        && data.performedBy.size() > 0
+        && data.performedBy.size() <= 256
         && data.timestamp == request.time
         && data.details is map;
     }
@@ -1297,6 +1322,12 @@ service cloud.firestore {
         && request.resource.data.get('amountPaid', null) == resource.data.get('amountPaid', null)
         && request.resource.data.get('balanceDue', null) == resource.data.get('balanceDue', null)
         && request.resource.data.get('paymentMethod', null) == resource.data.get('paymentMethod', null)
+        && request.resource.data.get('paymentEvidenceClass', null) == resource.data.get('paymentEvidenceClass', null)
+        && request.resource.data.get('financeReviewRequired', null) == resource.data.get('financeReviewRequired', null)
+        && request.resource.data.get('needsFollowUp', null) == resource.data.get('needsFollowUp', null)
+        && request.resource.data.get('financeReview', null) == resource.data.get('financeReview', null)
+        && request.resource.data.get('outstandingStatus', null) == resource.data.get('outstandingStatus', null)
+        && request.resource.data.get('complimentary', null) == resource.data.get('complimentary', null)
         && request.resource.data.paymentReference == resource.data.paymentReference
         && request.resource.data.notes == resource.data.notes;
     }
@@ -1346,6 +1377,19 @@ service cloud.firestore {
           'fullName', 'buyerName', 'attendeeNames', 'email', 'phone',
           'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
           'priceTier', 'ticketPrice', 'amountDue', 'amountPaid', 'balanceDue', 'paymentMethod',
+          'paymentEvidenceClass', 'financeReviewRequired', 'needsFollowUp',
+          'financeReview', 'outstandingStatus', 'complimentary',
+          'notes', 'updatedAt'
+        ]);
+    }
+
+    function validChangedRegistrationDetailFields(changedKeys) {
+      return changedKeys.hasOnly([
+          'fullName', 'buyerName', 'attendeeNames', 'email', 'phone',
+          'groupName', 'personsAttending', 'paymentStatus', 'paymentReference',
+          'priceTier', 'ticketPrice', 'amountDue', 'amountPaid', 'balanceDue', 'paymentMethod',
+          'paymentEvidenceClass', 'financeReviewRequired', 'needsFollowUp',
+          'financeReview', 'outstandingStatus', 'complimentary',
           'notes', 'updatedAt'
         ]);
     }
@@ -1381,22 +1425,18 @@ service cloud.firestore {
 
     function isApprovedRegistrationUpdate(registrationId) {
       let changedKeys = request.resource.data.diff(resource.data).affectedKeys();
-      return changedKeys.hasAny([
-          'ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy'
-        ])
-        ? (
-          request.resource.data.updatedAt == request.time
-          && (isTicketAssignmentUpdate() || isTicketUnassignmentUpdate())
-        )
-        : changedKeys.hasAny(['checkedIn', 'checkInTime', 'checkedInBy'])
-          ? (isCheckInCompletionUpdate(registrationId) || isCheckInUndoUpdate(registrationId))
-          : changedKeys.hasAny(['attendanceRecordType', 'attendanceConfirmedAt', 'attendanceConfirmedBy', 'attendanceEvidenceNote'])
-            ? isHistoricalAttendanceUpdate(registrationId)
-          : (
-            isValidRegistration(request.resource.data, registrationId)
-            && request.resource.data.updatedAt == request.time
-            && isRegistrationDetailsUpdate()
-          );
+      return changedKeys.hasAny(['checkedIn', 'checkInTime', 'checkedInBy'])
+        ? (isCheckInCompletionUpdate(registrationId) || isCheckInUndoUpdate(registrationId))
+        : changedKeys.hasAny(['ticketStatus', 'ticketCode', 'ticketAssignedAt', 'ticketAssignedBy'])
+          ? (isTicketAssignmentUpdate() || isTicketUnassignmentUpdate())
+          : isApprovedRegistrationDetailUpdate(registrationId);
+    }
+
+    function isApprovedRegistrationDetailUpdate(registrationId) {
+      let changedKeys = request.resource.data.diff(resource.data).affectedKeys();
+      return request.resource.data.registrationId == registrationId
+        && validChangedRegistrationDetailFields(changedKeys)
+        && request.resource.data.updatedAt == request.time;
     }
 
     function isHistoricalAttendanceUpdate(registrationId) {
@@ -1543,14 +1583,10 @@ service cloud.firestore {
         && (hasNoTicketAssigned(request.resource.data) || hasImportedTicketCode(request.resource.data))
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
-      allow update: if (
-          isApprovedAdmin()
-          && isApprovedRegistrationUpdate(registrationId)
-        ) || (
-          isAssignedScanner(resource.data.eventId)
-          && isValidRegistration(request.resource.data, registrationId)
-          && isCheckInCompletionUpdate(registrationId)
-        );
+      allow update: if isApprovedAdmin()
+        && isApprovedRegistrationUpdate(registrationId);
+      allow update: if isAssignedScanner(resource.data.eventId)
+        && isCheckInCompletionUpdate(registrationId);
       allow delete: if isApprovedAdmin();
     }
 
@@ -1559,16 +1595,17 @@ service cloud.firestore {
       allow create: if (
           isApprovedAdmin()
           && (
-            request.resource.data.action in ['event.create', 'event.update', 'event.delete']
-              ? isValidEventAuditLog(request.resource.data, logId)
+            request.resource.data.action in ['registration.update', 'registration.finance-update', 'registration.attendance-update']
+              ? isRoutineRegistrationAuditLog(request.resource.data, logId)
+              : request.resource.data.action in ['event.create', 'event.update', 'event.delete']
+                ? isValidEventAuditLog(request.resource.data, logId)
                 && matchesEventMutation(request.resource.data)
               : request.resource.data.action in ['ticket.assign', 'ticket.unassign', 'ticket.regenerate']
                 ? isValidRegistrationAuditLog(request.resource.data, logId)
                   && matchesTicketMutation(request.resource.data)
                 : request.resource.data.action in [
-                    'registration.create', 'registration.update', 'registration.delete',
-                    'registration.import', 'registration.finance-update', 'registration.attendance-update',
-                    'checkin.complete', 'checkin.undo'
+                    'registration.create', 'registration.delete',
+                    'registration.import', 'checkin.complete', 'checkin.undo'
                   ]
                   ? isValidRegistrationAuditLog(request.resource.data, logId)
                     && matchesRegistrationMutation(request.resource.data)

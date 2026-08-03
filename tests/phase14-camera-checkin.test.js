@@ -76,6 +76,28 @@ test('QrScannerPanel accepts resumeTrigger prop', async () => {
   assert.match(src, /resumeTrigger/)
 })
 
+test('QrScannerPanel only accepts decoded QR values after explicit Scan QR arming', async () => {
+  const src = await readFile('src/components/checkin/QrScannerPanel.jsx', 'utf8')
+
+  assert.match(src, /scanArmed/)
+  assert.match(src, /scanArmedRef/)
+  assert.match(src, /if \(!scanArmedRef\.current\) return/)
+  assert.match(src, /setScanArmed\(false\)[\s\S]*resolveTicket\(decodedText, 'scan'\)/)
+  assert.match(src, /Scan QR/)
+  assert.match(src, /Cancel Scan/)
+})
+
+test('QrScannerPanel keeps manual fallback collapsed until the operator chooses it', async () => {
+  const src = await readFile('src/components/checkin/QrScannerPanel.jsx', 'utf8')
+
+  assert.match(src, /manualLookupOpen/)
+  assert.match(src, /Use Manual Ticket Lookup/)
+  assert.match(src, /function openManualLookup/)
+  assert.match(src, /manualInputRef\.current\?\.focus\(\)/)
+  assert.doesNotMatch(src, /autoFocus/)
+  assert.doesNotMatch(src, /useEffect\(\(\) => \{[\s\S]{0,220}manualInputRef\.current\?\.focus\(\)/)
+})
+
 // ─── 3. Event-Day Mobile UX ───────────────────────────────────────────────────
 
 test('CheckInPage has sticky header for mobile event-day use', async () => {
