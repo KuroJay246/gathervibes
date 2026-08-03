@@ -2,6 +2,11 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { escapeCsv } from '../src/utils/exportUtils.js'
+import {
+  findRegistrationByQrTicketCode,
+  parseQrTicketCode,
+  qrPayloadForTicketCode,
+} from '../src/utils/qrTicketUtils.js'
 
 // ─── 1. Immediate Audit Fixes ─────────────────────────────────────────────────
 
@@ -81,10 +86,51 @@ test('QrScannerPanel only accepts decoded QR values after explicit Scan QR armin
 
   assert.match(src, /scanArmed/)
   assert.match(src, /scanArmedRef/)
-  assert.match(src, /if \(!scanArmedRef\.current\) return/)
-  assert.match(src, /setScanArmed\(false\)[\s\S]*resolveTicket\(decodedText, 'scan'\)/)
+  assert.match(src, /if \(!scanArmedRef\.current \|\| scanProcessingRef\.current\) return/)
+  assert.match(src, /setScannerArmed\(false\)[\s\S]*setScannerProcessing\(true\)[\s\S]*resolveTicket\(decodedText, 'scan'\)/)
+  assert.match(src, /finally \{[\s\S]*setScannerProcessing\(false\)/)
   assert.match(src, /Scan QR/)
   assert.match(src, /Cancel Scan/)
+})
+
+test('QrScannerPanel camera decoder uses refs for current data and callback state', async () => {
+  const src = await readFile('src/components/checkin/QrScannerPanel.jsx', 'utf8')
+
+  assert.match(src, /registrationsRef/)
+  assert.match(src, /callbacksRef/)
+  assert.match(src, /continuousScanRef/)
+  assert.match(src, /scanProcessingRef/)
+  assert.match(src, /registrationsRef\.current = registrations/)
+  assert.match(src, /callbacksRef\.current = \{ onMatch, onMissing, onInvalid \}/)
+  assert.match(src, /continuousScanRef\.current = continuousScan/)
+  assert.match(src, /findRegistrationByQrTicketCode\(registrationsRef\.current, parsed\.ticketCode\)/)
+})
+
+test('manual fallback and camera decoded payload resolve the same ticket fixture', () => {
+  const fixtureCode = 'ABC123'
+  const registrations = [
+    { registrationId: 'fixture-registration', fullName: 'Fixture Guest', ticketCode: fixtureCode, checkedIn: false },
+  ]
+
+  const manualParsed = parseQrTicketCode(fixtureCode)
+  const cameraPayload = qrPayloadForTicketCode(fixtureCode)
+  const cameraParsed = parseQrTicketCode(cameraPayload)
+
+  assert.equal(cameraPayload, `GSV:TICKET:${fixtureCode}`)
+  assert.equal(manualParsed.ticketCode, fixtureCode)
+  assert.equal(cameraParsed.ticketCode, fixtureCode)
+  assert.deepEqual(
+    findRegistrationByQrTicketCode(registrations, fixtureCode),
+    findRegistrationByQrTicketCode(registrations, cameraPayload),
+  )
+})
+
+test('QR parser extracts ticket code without private payload data', () => {
+  const parsed = parseQrTicketCode('GSV:TICKET:ABC123')
+
+  assert.equal(parsed.ticketCode, 'ABC123')
+  assert.equal(parsed.error, '')
+  assert.doesNotMatch(qrPayloadForTicketCode('ABC123'), /guest|email|phone|paid|amount|@/i)
 })
 
 test('QrScannerPanel keeps manual fallback collapsed until the operator chooses it', async () => {
