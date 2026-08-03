@@ -458,6 +458,61 @@ test('Firestore rules allow production-shaped registration edit without audit ba
   }
 })
 
+test('Firestore rules allow legacy registration detail edits when attendance fields remain absent', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, importedRegistration())
+    const db = env.authenticatedContext(protectedOwnerUid, { email: protectedOwnerEmail }).firestore()
+    const batch = writeBatch(db)
+
+    batch.update(doc(db, 'registrations', registrationId), {
+      phone: '2465550177',
+      notes: 'Organizer corrected legacy contact details',
+      updatedAt: serverTimestamp(),
+    })
+    batch.set(doc(db, 'auditLogs', 'audit-legacy-registration-update-1'), registrationUpdateAuditData({
+      logId: 'audit-legacy-registration-update-1',
+      details: {
+        fullName: 'CODEX_TEST Guest One',
+        registrationUpdated: true,
+      },
+    }))
+
+    await assertSucceeds(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject normal detail edits that add attendance evidence fields', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env, importedRegistration())
+    const db = env.authenticatedContext(protectedOwnerUid, { email: protectedOwnerEmail }).firestore()
+    const batch = writeBatch(db)
+
+    batch.update(doc(db, 'registrations', registrationId), {
+      phone: '2465550178',
+      attendanceRecordType: 'none',
+      attendanceConfirmedAt: null,
+      attendanceConfirmedBy: null,
+      attendanceEvidenceNote: '',
+      updatedAt: serverTimestamp(),
+    })
+    batch.set(doc(db, 'auditLogs', 'audit-legacy-registration-update-2'), registrationUpdateAuditData({
+      logId: 'audit-legacy-registration-update-2',
+      details: {
+        fullName: 'CODEX_TEST Guest One',
+        registrationUpdated: true,
+      },
+    }))
+
+    await assertFails(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
 test('Firestore rules allow routine registration audit create for reviewed production-shaped registrations', { skip: !emulatorHost }, async () => {
   const env = await createTestEnv()
   try {

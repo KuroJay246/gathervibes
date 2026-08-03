@@ -72,32 +72,6 @@ function registrationAttendanceDefaults() {
   }
 }
 
-function existingTicketFields(registration = {}) {
-  return {
-    ticketStatus: registration.ticketStatus || 'no-ticket-assigned',
-    ticketCode: registration.ticketCode || null,
-    ticketAssignedAt: registration.ticketAssignedAt || null,
-    ticketAssignedBy: registration.ticketAssignedBy || null,
-  }
-}
-
-function existingCheckInFields(registration = {}) {
-  return {
-    checkedIn: Boolean(registration.checkedIn),
-    checkInTime: registration.checkInTime || null,
-    checkedInBy: registration.checkedInBy || null,
-  }
-}
-
-function existingAttendanceFields(registration = {}) {
-  return {
-    attendanceRecordType: registration.attendanceRecordType || 'none',
-    attendanceConfirmedAt: registration.attendanceConfirmedAt || null,
-    attendanceConfirmedBy: registration.attendanceConfirmedBy || null,
-    attendanceEvidenceNote: registration.attendanceEvidenceNote || '',
-  }
-}
-
 function performedBy(user) {
   return user?.email || user?.uid || 'unknown-admin'
 }
@@ -152,7 +126,7 @@ export async function createRegistration(values, eventId, user, event = {}) {
   return regRef.id
 }
 
-export async function updateRegistration(registrationId, eventId, values, user, existingRegistration = {}, event = {}) {
+export async function updateRegistration(registrationId, eventId, values, user, _existingRegistration = {}, event = {}) {
   const firestore = requireDatabase()
   const regRef = doc(firestore, 'registrations', registrationId)
   const audit = createAuditLogWrite({
@@ -167,9 +141,6 @@ export async function updateRegistration(registrationId, eventId, values, user, 
 
   batch.update(regRef, {
     ...registrationPayload(values, eventId, event),
-    ...existingTicketFields(existingRegistration),
-    ...existingCheckInFields(existingRegistration),
-    ...existingAttendanceFields(existingRegistration),
     updatedAt: serverTimestamp(),
   })
   batch.set(audit.ref, audit.data)

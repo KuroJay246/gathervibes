@@ -116,3 +116,18 @@ test('production owner write root cause documents deployment and manual verifica
   assert.match(rootCause, /QR payload remains `GSV:TICKET:\{ticketCode\}`/)
   assert.match(rootCause, /approvedEmails` is not changed/)
 })
+
+test('legacy registration compatibility hotfix documents the exact old schema rejection', async () => {
+  const doc = await source('docs/LEGACY_RECORD_EDIT_COMPATIBILITY_HOTFIX_2026-08.md')
+  const qaPage = await source('src/pages/QaPage.jsx')
+
+  assert.match(doc, /attendanceRecordType, attendanceConfirmedAt, attendanceConfirmedBy, attendanceEvidenceNote/)
+  assert.match(doc, /validChangedRegistrationDetailFields\(changedKeys\)/)
+  assert.match(doc, /No Firestore Rules change is required/)
+  assert.match(doc, /No production migration is required/)
+  assert.match(doc, /CPB was not read/)
+  assert.match(doc, /QR payload remains `GSV:TICKET:\{ticketCode\}`/)
+  assert.match(qaPage, /Legacy registration compatibility/)
+  assert.match(qaPage, /Registration schema version/)
+  assert.match(qaPage, /attendanceEvidenceKeys/)
+})

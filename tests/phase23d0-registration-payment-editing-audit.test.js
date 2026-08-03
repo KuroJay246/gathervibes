@@ -148,6 +148,8 @@ test('Phase 23D-0 registration update writes remain registration plus audit only
   assert.match(updateRegistration, /batch\.update\(regRef/)
   assert.match(updateRegistration, /batch\.set\(audit\.ref, audit\.data\)/)
   assert.match(updateRegistration, /await batch\.commit\(\)/)
+  assert.doesNotMatch(updateRegistration, /existingTicketFields|existingCheckInFields|existingAttendanceFields/)
+  assert.doesNotMatch(updateRegistration, /ticketStatus|ticketCode|ticketAssignedAt|ticketAssignedBy|checkedIn|checkInTime|checkedInBy|attendanceRecordType|attendanceConfirmedAt|attendanceConfirmedBy|attendanceEvidenceNote/)
   assert.doesNotMatch(service, /operationsLedger|createLedgerEntry|collection\(firestore, 'operations'/)
   assert.match(form, /validPaymentStatuses\.map/)
   assert.match(paymentsPage, /Payment Follow-Up/)
