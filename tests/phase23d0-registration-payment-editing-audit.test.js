@@ -141,8 +141,8 @@ test('Phase 23D-0 registration update writes remain registration plus audit only
   const form = await readFile('src/components/registrations/RegistrationFormModal.jsx', 'utf8')
   const paymentsPage = await readFile('src/pages/PaymentsPage.jsx', 'utf8')
 
-  assert.match(service, /batch\.update\(regRef/)
-  assert.match(service, /batch\.set\(audit\.ref, audit\.data\)/)
+  assert.match(service, /await updateDoc\(regRef/)
+  assert.match(service, /await setDoc\(audit\.ref, audit\.data\)/)
   assert.doesNotMatch(service, /operationsLedger|createLedgerEntry|collection\(firestore, 'operations'/)
   assert.match(form, /validPaymentStatuses\.map/)
   assert.match(paymentsPage, /Payment Follow-Up/)

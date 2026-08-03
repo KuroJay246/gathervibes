@@ -8,9 +8,12 @@ const HAPTIC_PREF_KEY = 'gsv-scanner-haptic-enabled'
 export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, resumeTrigger }) {
   const [manualValue, setManualValue] = useState('')
   const [scanning, setScanning] = useState(false)
+  const [scanArmed, setScanArmed] = useState(false)
+  const [manualLookupOpen, setManualLookupOpen] = useState(false)
   const [scannerError, setScannerError] = useState('')
   const [scannerNote, setScannerNote] = useState('')
   const scannerRef = useRef(null)
+  const scanArmedRef = useRef(false)
   const reactId = useId()
   const regionId = `ticket-qr-reader-${reactId.replace(/:/g, '')}`
 
@@ -32,6 +35,10 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
     }
   })
   const manualInputRef = useRef(null)
+
+  useEffect(() => {
+    scanArmedRef.current = scanArmed
+  }, [scanArmed])
 
   useEffect(() => () => {
     const scanner = scannerRef.current
@@ -111,6 +118,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
   async function stopScanner() {
     const scanner = scannerRef.current
     scannerRef.current = null
+    setScanArmed(false)
     setTorchSupported(false)
     setTorchOn(false)
     if (!scanner) {
@@ -135,13 +143,14 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
 
   const startScanner = useCallback(async () => {
     setScannerError('')
-    setScannerNote('Scanning... Point the camera at one ticket QR code.')
+    setScannerNote('Camera ready. Position the ticket, then press Scan QR.')
     setScanning(true)
+    setScanArmed(false)
 
     if (scannerRef.current) {
       await stopScanner()
       setScanning(true)
-      setScannerNote('Scanning... Point the camera at one ticket QR code.')
+      setScannerNote('Camera ready. Position the ticket, then press Scan QR.')
     }
 
     try {
@@ -152,8 +161,10 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 240, height: 240 } },
         async (decodedText) => {
-          await stopScanner()
+          if (!scanArmedRef.current) return
+          setScanArmed(false)
           resolveTicket(decodedText, 'scan')
+          if (!continuousScan) await stopScanner()
         },
       )
       setScanning(true)
@@ -175,6 +186,26 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
   // regionId and stopScanner/resolveTicket are stable within a render cycle
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [regionId])
+
+  function armScan() {
+    if (!scanning) {
+      setScannerError('Start the camera before scanning a QR code.')
+      return
+    }
+    setScannerError('')
+    setScannerNote('Scanning... Hold one ticket QR code inside the frame.')
+    setScanArmed(true)
+  }
+
+  function cancelScan() {
+    setScanArmed(false)
+    setScannerNote(scanning ? 'Scan cancelled. Position the ticket, then press Scan QR.' : '')
+  }
+
+  function openManualLookup() {
+    setManualLookupOpen(true)
+    window.requestAnimationFrame(() => manualInputRef.current?.focus())
+  }
 
   async function toggleTorch() {
     const scanner = scannerRef.current
@@ -198,10 +229,13 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
     if (continuousScan && resumeTrigger !== previousTrigger.current && !scanning) {
       previousTrigger.current = resumeTrigger
       startScanner()
+    } else if (continuousScan && resumeTrigger !== previousTrigger.current && scanning) {
+      previousTrigger.current = resumeTrigger
+      setScanArmed(true)
+      setScannerNote('Continuous mode ready. Hold the next ticket QR code inside the frame.')
     } else {
       previousTrigger.current = resumeTrigger
     }
-    manualInputRef.current?.focus()
   }, [resumeTrigger, continuousScan, scanning, startScanner])
 
   function handleSoundToggle() {
@@ -231,11 +265,12 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Scan QR</p>
           <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Ticket lookup</h3>
           <p className="mt-1 text-xs leading-5 text-[#816D62]">
-            QR lookup only selects the guest. Check-in still requires confirmation.
+            QR lookup only selects the guest. Press Scan QR when the ticket is positioned. Check-in still requires confirmation.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {scanning && <span className="rounded-full bg-[#E5F3EC] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">Scanning...</span>}
+          {scanArmed && <span className="rounded-full bg-[#E5F3EC] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1E7345]">Scanning...</span>}
+          {scanning && !scanArmed && <span className="rounded-full bg-[#F6EEE8] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">Camera ready</span>}
           <ScanLine className="size-8 text-[#9A5260]" />
         </div>
       </div>
@@ -255,12 +290,21 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
             </button>
             <button
               type="button"
-              onClick={stopScanner}
-              disabled={!scanning}
+              onClick={armScan}
+              disabled={!scanning || scanArmed}
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[#2B1723] px-4 text-xs font-bold text-white hover:bg-[#3B2430] disabled:opacity-50"
+            >
+              <ScanLine className="size-4" />
+              {scanArmed ? 'Scanning...' : 'Scan QR'}
+            </button>
+            <button
+              type="button"
+              onClick={scanArmed ? cancelScan : stopScanner}
+              disabled={!scanning && !scanArmed}
               className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5] disabled:opacity-50"
             >
               <Square className="size-4" />
-              Stop
+              {scanArmed ? 'Cancel Scan' : 'Stop'}
             </button>
           </div>
           <div className="flex items-center justify-between text-xs font-semibold text-[#80685B]">
@@ -287,27 +331,53 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
         </div>
 
         <div className="space-y-3">
-          <label htmlFor="manual-ticket-code" className="event-label">Manual ticket fallback</label>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <div className="relative flex-1">
-              <Keyboard className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
-              <input
-                id="manual-ticket-code"
-                ref={manualInputRef}
-                value={manualValue}
-                onChange={(event) => setManualValue(event.target.value.toUpperCase())}
-                placeholder="TICKET-001 or GSV:TICKET:TICKET-001"
-                className="min-h-11 w-full rounded-xl border border-[#E5D7CF] bg-white py-3 pl-9 pr-3 text-sm font-semibold text-[#2B1723] focus:border-[#9A5260] focus:outline-none focus:ring-2 focus:ring-[#9A5260]/20"
-              />
+          <div className="rounded-xl border border-[#E7D6CC] bg-[#FFFDFC] p-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="event-label">Manual ticket fallback</p>
+                <p className="mt-1 text-xs leading-5 text-[#816D62]">Use this only when camera scanning is unavailable.</p>
+              </div>
+              {!manualLookupOpen && (
+                <button
+                  type="button"
+                  onClick={openManualLookup}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]"
+                >
+                  <Keyboard className="size-4" />
+                  Use Manual Ticket Lookup
+                </button>
+              )}
             </div>
+          </div>
+          {manualLookupOpen && (
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <div className="relative flex-1">
+                <Keyboard className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
+                <input
+                  id="manual-ticket-code"
+                  ref={manualInputRef}
+                  value={manualValue}
+                  onChange={(event) => setManualValue(event.target.value.toUpperCase())}
+                  placeholder="TICKET-001 or GSV:TICKET:TICKET-001"
+                  className="min-h-11 w-full rounded-xl border border-[#E5D7CF] bg-white py-3 pl-9 pr-3 text-sm font-semibold text-[#2B1723] focus:border-[#9A5260] focus:outline-none focus:ring-2 focus:ring-[#9A5260]/20"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => resolveTicket(manualValue, 'manual')}
+                className="rounded-xl bg-[#2B1723] px-4 py-3 text-xs font-bold text-white hover:bg-[#3B2430]"
+              >
+                Find ticket
+              </button>
             <button
               type="button"
-              onClick={() => resolveTicket(manualValue, 'manual')}
-              className="rounded-xl bg-[#2B1723] px-4 py-3 text-xs font-bold text-white hover:bg-[#3B2430]"
+              onClick={() => setManualLookupOpen(false)}
+              className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-3 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5]"
             >
-              Find ticket
+              Close
             </button>
-          </div>
+            </div>
+          )}
           <p className="text-xs leading-5 text-[#816D62]">
             Accepted formats include raw ticket codes and the GSV:TICKET: prefix used by generated QR codes.
           </p>
