@@ -21,7 +21,7 @@ Settings and System QA were refined as the final organizer-experience closeout s
 
 ## Tutorial
 
-- Preserved 20 anchored lessons.
+- Preserved the then-current 20 anchored lessons. Later event-day guidance expanded Tutorial V3 to 23 anchored lessons.
 - Retargeted the flow to include Tasks & Deadlines and Reconciliation Preview.
 - Preserved zero-business-write tutorial behavior.
 

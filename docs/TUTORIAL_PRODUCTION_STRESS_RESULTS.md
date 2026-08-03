@@ -25,7 +25,7 @@ Local emulator browser stress passed. Final production browser stress remains pe
 ### Local Emulator Browser Results
 
 - Focused tutorial replay stress: passed in Chromium.
-- Full guided sequence: passed across all 19 steps.
+- Full guided sequence: passed across all 19 steps at the time of that production stress run. Later current-product tutorial releases may contain more steps.
 - Next -> Back -> Next retracing: passed.
 - Refresh after mid-tour progress: passed.
 - Replay after completed state: passed and restarted at the first step.

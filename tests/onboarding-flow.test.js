@@ -21,8 +21,8 @@ test('[tutorial-v3] version is new and does not reuse v2 completion', () => {
   assert.notEqual(TUTORIAL_VERSION, 'interactive-product-tour-v2')
 })
 
-test('[tutorial-v3] guided orientation covers 20 anchored lessons plus welcome and completion', () => {
-  assert.equal(guidedTutorialSteps.length, 20)
+test('[tutorial-v3] guided orientation covers 23 anchored lessons plus welcome and completion', () => {
+  assert.equal(guidedTutorialSteps.length, 23)
   assert.deepEqual(guidedTutorialSteps.map((step) => step.id), [
     'working-event',
     'overview',
@@ -38,6 +38,9 @@ test('[tutorial-v3] guided orientation covers 20 anchored lessons plus welcome a
     'tickets',
     'check-in',
     'operations',
+    'run-of-show',
+    'resources',
+    'event-readiness',
     'reconciliation',
     'communications',
     'reports',
@@ -76,6 +79,9 @@ test('[tutorial-v3] exact targets replace broad workspace targets for action ste
   assert.equal(targets.payments, TUTORIAL_TARGETS.paymentsSummary)
   assert.equal(targets['check-in'], TUTORIAL_TARGETS.checkInSearch)
   assert.equal(targets.tasks, TUTORIAL_TARGETS.tasksWorkspace)
+  assert.equal(targets['run-of-show'], TUTORIAL_TARGETS.runOfShowWorkspace)
+  assert.equal(targets.resources, TUTORIAL_TARGETS.resourcesWorkspace)
+  assert.equal(targets['event-readiness'], TUTORIAL_TARGETS.eventReadinessSummary)
   assert.equal(targets.reconciliation, TUTORIAL_TARGETS.reconciliationWorkspace)
 })
 
@@ -128,6 +134,9 @@ test('[tutorial-v3] route and target registries are semantic and not text-select
   assert.ok(TUTORIAL_ROUTE_TARGETS.dashboard.includes(TUTORIAL_TARGETS.workingEventSelector))
   assert.ok(TUTORIAL_ROUTE_TARGETS.registrations.includes(TUTORIAL_TARGETS.registrationFilters))
   assert.ok(TUTORIAL_ROUTE_TARGETS.tasks.includes(TUTORIAL_TARGETS.tasksWorkspace))
+  assert.ok(TUTORIAL_ROUTE_TARGETS['run-of-show'].includes(TUTORIAL_TARGETS.runOfShowWorkspace))
+  assert.ok(TUTORIAL_ROUTE_TARGETS.resources.includes(TUTORIAL_TARGETS.resourcesWorkspace))
+  assert.ok(TUTORIAL_ROUTE_TARGETS.dashboardReadiness.includes(TUTORIAL_TARGETS.eventReadinessSummary))
   assert.ok(TUTORIAL_ROUTE_TARGETS.reconciliation.includes(TUTORIAL_TARGETS.reconciliationWorkspace))
   assert.ok(TUTORIAL_ROUTE_TARGETS['system-qa'].includes(TUTORIAL_TARGETS.systemQa))
 })
@@ -167,6 +176,20 @@ test('[tutorial-v3] normal guided tour writes no business records', async () => 
   assert.doesNotMatch(source, /addDoc\(|commitImport\(|completeCheckIn\(|saveTicketAssignment\(|recordHistoricalAttendance\(/)
   assert.doesNotMatch(await readFile('src/tutorial/tutorialStorage.js', 'utf8'), /'events'|"events"|'registrations'|"registrations"|'tickets'|"tickets"|'auditLogs'|"auditLogs"/)
   assert.match(source, /staffProfiles/)
+})
+
+test('[tutorial-v3] current event-day workflows explain boundaries and readiness truthfully', () => {
+  const runOfShow = guidedTutorialSteps.find((step) => step.id === 'run-of-show')
+  const resources = guidedTutorialSteps.find((step) => step.id === 'resources')
+  const readiness = guidedTutorialSteps.find((step) => step.id === 'event-readiness')
+
+  assert.match(runOfShow.what, /private operational sequence/)
+  assert.match(runOfShow.next, /dependencies/)
+  assert.match(resources.what, /equipment, supplies/)
+  assert.match(resources.next, /relationships only/)
+  assert.match(readiness.what, /Ready, Needs Attention, or At Risk/)
+  assert.match(readiness.why, /hidden score/)
+  assert.match(readiness.next, /recalculates/)
 })
 
 test('[tutorial-v3] practice missions are non-writing by default and CPB isolated', () => {
@@ -243,9 +266,9 @@ test('[tutorial-v3] controller uses AbortController-backed transitions without f
   assert.doesNotMatch(controller, /setTimeout\(.*100/)
 })
 
-test('[tutorial-v3] Firestore rules allow v3 20-step guided boundary', async () => {
+test('[tutorial-v3] Firestore rules allow v3 23-step guided boundary', async () => {
   const rules = await readFile('firestore.rules', 'utf8')
   assert.match(rules, /staffProfiles\/\{uid\}\/preferences\/onboarding/)
-  assert.match(rules, /lastStep.*<= 20/)
+  assert.match(rules, /lastStep.*<= 23/)
   assert.match(rules, /lastStep.*>= 0/)
 })

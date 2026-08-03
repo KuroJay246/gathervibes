@@ -13,7 +13,7 @@ The new tutorial version does not treat prior `interactive-product-tour-v2` comp
 - `TutorialController.js` creates transition IDs, owns cancellation, and waits for route/target readiness.
 - `tutorialRoutes.js` defines the explicit supported tutorial routes.
 - `tutorialRegistry.js` defines semantic target IDs and route-to-target requirements.
-- `tutorialSteps.js` defines the 19-step guided orientation.
+- `tutorialSteps.js` defines the current guided orientation steps.
 - `tutorialStorage.js` reads and writes only `staffProfiles/{uid}/preferences/onboarding`.
 - `TutorialOverlay.jsx`, `TutorialSpotlight.jsx`, `TutorialTooltip.jsx`, `TutorialArrow.jsx`, `TutorialProgress.jsx`, and `TutorialCompletion.jsx` render the single document-body overlay.
 - `tutorialDiagnostics.js` produces safe diagnostics without private registration/payment contents.

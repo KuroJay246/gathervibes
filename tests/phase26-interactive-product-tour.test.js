@@ -3,8 +3,8 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { guidedTutorialSteps } from '../src/tutorial/tutorialSteps.js'
 
-test('tutorial v3 preserves organizer route paths and expands coverage to 20 anchored lessons', () => {
-  assert.equal(guidedTutorialSteps.length, 20)
+test('tutorial v3 preserves organizer route paths and expands coverage to 23 anchored lessons', () => {
+  assert.equal(guidedTutorialSteps.length, 23)
   assert.deepEqual(guidedTutorialSteps.map((step) => step.pathname), [
     '/dashboard',
     '/dashboard',
@@ -20,6 +20,9 @@ test('tutorial v3 preserves organizer route paths and expands coverage to 20 anc
     '/tickets',
     '/check-in',
     '/operations',
+    '/run-of-show',
+    '/resources',
+    '/dashboard',
     '/payments/reconciliation',
     '/communications',
     '/event-review',
@@ -45,6 +48,9 @@ test('tutorial v3 uses stable semantic targets already present on organizer page
     ['src/pages/TicketsPage.jsx', 'tickets-workspace'],
     ['src/pages/CheckInPage.jsx', 'checkin-search-field'],
     ['src/pages/OperationsPage.jsx', 'operations-workspace'],
+    ['src/pages/RunOfShowPage.jsx', 'run-of-show-workspace'],
+    ['src/pages/ResourcesPage.jsx', 'resources-workspace'],
+    ['src/pages/DashboardPage.jsx', 'event-readiness-summary'],
     ['src/pages/PaymentReconciliationPage.jsx', 'reconciliation-workspace'],
     ['src/pages/CommunicationsPage.jsx', 'message-builder-workspace'],
     ['src/pages/EventReviewPage.jsx', 'reports-workspace'],

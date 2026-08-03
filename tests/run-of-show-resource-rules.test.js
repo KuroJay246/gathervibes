@@ -240,6 +240,29 @@ rulesTest('[run-resource-rules] approved admin can create run item and resource 
   }
 })
 
+rulesTest('[run-resource-rules] approved admin can mark a run item arrived with append-only audit', async () => {
+  const testEnv = await createTestEnv()
+  try {
+    await seedBaseData(testEnv)
+    await testEnv.withSecurityRulesDisabled(async (env) => {
+      await setDoc(doc(env.firestore(), 'events', EVENT_ID, 'runOfShow', 'run-1'), runItem())
+    })
+    const db = testEnv.authenticatedContext(ADMIN_UID, { email: ADMIN_EMAIL }).firestore()
+    const batch = writeBatch(db)
+    batch.update(doc(db, 'events', EVENT_ID, 'runOfShow', 'run-1'), {
+      arrivalStatus: 'Arrived',
+      actualArrivalTime: '12:50',
+      updatedAt: serverTimestamp(),
+      updatedBy: ADMIN_EMAIL,
+    })
+    batch.set(doc(db, 'auditLogs', 'audit-run-arrival-1'), audit('audit-run-arrival-1', EVENT_ID, 'run-of-show.arrival', 'runOfShow', 'run-1', ADMIN_EMAIL, { title: 'Supplier arrival' }))
+
+    await assertSucceeds(batch.commit())
+  } finally {
+    await testEnv.cleanup()
+  }
+})
+
 rulesTest('[run-resource-rules] event manager cannot create organizer-only run/resource records in this foundation', async () => {
   const testEnv = await createTestEnv()
   try {
