@@ -5,6 +5,7 @@ import { collection, getDocs, limit, query, where } from 'firebase/firestore'
 import { SystemHealthPanel } from '../components/SystemHealthPanel'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
+import { PROTECTED_OWNER_UID } from '../config/protectedOwner'
 import { db, firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
 import { buildRegistrationMetrics, getRegistrationGuestSummary, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
 import { buildFinanceSummary, buildPaymentsWorkspace, calculateRegistrationFinance, financeWarnings, formatCurrency } from '../utils/financeUtils'
@@ -128,6 +129,9 @@ export function QaPage() {
   const [lastRunAt, setLastRunAt] = useState('')
   const prefix = useMemo(() => buildQaTestPrefix(), [])
   const sampleCsv = useMemo(() => buildQaSampleCsv(prefix), [prefix])
+  const signedInUid = user?.uid || ''
+  const protectedOwnerUidMatches = signedInUid === PROTECTED_OWNER_UID
+  const protectedOwnerAccessActive = Boolean(access?.protectedOwner && protectedOwnerUidMatches)
   const codexEvents = events.filter((event) => event.eventId === CODEX_TEST_EVENT_ID || event.eventName === CODEX_TEST_EVENT_NAME)
   const codexTestEvent = useMemo(() => findCodexTestEvent(events), [events])
   const workingEventIsCodex = isCodexTestWorkingEvent(activeEvent)
@@ -246,6 +250,9 @@ export function QaPage() {
         { label: 'QR payload privacy', status: hasPrivateQrData ? 'fail' : 'pass', detail: qrPrivateData },
         { label: 'Current user role detected', status: currentRoleLabel ? 'pass' : 'warning', detail: currentRoleLabel || 'Role pending accessControl load' },
         { label: 'Approved admin detected', status: access?.level === 'admin' ? 'pass' : 'fail', detail: access?.protectedOwner ? 'Protected owner UID access active' : 'Protected page loaded with approved organizer access' },
+        { label: 'Protected owner UID match', status: protectedOwnerUidMatches ? 'pass' : 'warning', detail: protectedOwnerUidMatches ? 'Signed-in Firebase UID matches the protected owner record' : 'If Jaylan is signed in, compare this page with Firebase Auth UID before changing permissions' },
+        { label: 'Protected owner app detection', status: protectedOwnerAccessActive ? 'pass' : 'warning', detail: protectedOwnerAccessActive ? 'App access resolved through immutable protected owner UID' : 'Standard organizer access may still be valid, but protected-owner bypass is not active in this session' },
+        { label: 'Protected owner write verification procedure', status: 'warning', detail: 'Manual CODEX_TEST owner write check is required after permission-denied fixes; use only test data and confirm append-only audit logs.' },
         { label: 'Protected owner or allowlist check', status: access?.protectedOwner || accessControl?.approvedEmails?.length > 0 ? 'pass' : 'fail', detail: access?.protectedOwner ? 'Protected owner does not depend on mutable approvedEmails' : `${accessControl?.approvedEmails?.length || 0} emails approved` },
         { label: 'No public access warning', status: 'pass', detail: 'App remains private and allowlist-only.' },
         { label: 'Staff role boundary', status: 'pass', detail: 'Scanner/check-in-only access remains assigned-event-only. Admin routes and settings stay unavailable to scanner roles.' },
@@ -545,6 +552,21 @@ export function QaPage() {
           <DiagnosticRow label="Role" status={currentRoleLabel ? 'Pass' : 'Needs Review'} detail={currentRoleLabel || 'Role is still loading.'} />
           <DiagnosticRow label="Access level" status={access?.level ? 'Pass' : 'Needs Review'} detail={access?.protectedOwner ? 'Protected owner UID access active.' : access?.level || 'No access level available.'} />
           <DiagnosticRow label="Assigned events" status={access?.assignedEventIds?.length ? 'Pass' : 'Not Applicable'} detail={access?.assignedEventIds?.length ? access.assignedEventIds.join(', ') : 'Approved organizers do not require staff event assignments.'} />
+        </div>
+        <div className="mt-4 rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4">
+          <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#7A5818]">Protected Owner Authorization</p>
+          <p className="mt-2 text-sm leading-6 text-[#5F4A2A]">
+            Jaylan's organizer access is pinned to the Firebase UID, not to editable approvedEmails. This bypass covers access and role checks only; normal validation, confirmations, and append-only audit logs still apply.
+          </p>
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <DiagnosticRow label="Signed-in UID" status={signedInUid ? 'Pass' : 'Needs Review'} detail={signedInUid || 'No signed-in user detected.'} />
+            <DiagnosticRow label="Expected protected UID" status="Pass" detail={PROTECTED_OWNER_UID} />
+            <DiagnosticRow label="UID match" status={protectedOwnerUidMatches ? 'Pass' : 'Needs Review'} detail={protectedOwnerUidMatches ? 'This browser session matches the protected owner.' : 'This session is not using the protected owner UID.'} />
+            <DiagnosticRow label="App owner detection" status={protectedOwnerAccessActive ? 'Pass' : 'Manual Check'} detail={protectedOwnerAccessActive ? 'Protected-owner access resolved in app state.' : 'Use CODEX_TEST to manually verify writes before release sign-off.'} />
+          </div>
+          <p className="mt-3 text-xs font-semibold leading-5 text-[#6B564C]">
+            Manual CODEX_TEST Owner Write Check: create or update a safe QA registration, confirm the write succeeds, confirm an append-only audit log is created, then remove only temporary business records while leaving audit logs intact.
+          </p>
         </div>
       </QaSection>
 

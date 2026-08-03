@@ -14,6 +14,10 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
   const [scannerNote, setScannerNote] = useState('')
   const scannerRef = useRef(null)
   const scanArmedRef = useRef(false)
+  const scanProcessingRef = useRef(false)
+  const registrationsRef = useRef(registrations)
+  const callbacksRef = useRef({ onMatch, onMissing, onInvalid })
+  const continuousScanRef = useRef(false)
   const reactId = useId()
   const regionId = `ticket-qr-reader-${reactId.replace(/:/g, '')}`
 
@@ -40,6 +44,27 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
     scanArmedRef.current = scanArmed
   }, [scanArmed])
 
+  useEffect(() => {
+    registrationsRef.current = registrations
+  }, [registrations])
+
+  useEffect(() => {
+    callbacksRef.current = { onMatch, onMissing, onInvalid }
+  }, [onMatch, onMissing, onInvalid])
+
+  useEffect(() => {
+    continuousScanRef.current = continuousScan
+  }, [continuousScan])
+
+  function setScannerArmed(value) {
+    scanArmedRef.current = value
+    setScanArmed(value)
+  }
+
+  function setScannerProcessing(value) {
+    scanProcessingRef.current = value
+  }
+
   useEffect(() => () => {
     const scanner = scannerRef.current
     scannerRef.current = null
@@ -56,7 +81,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
     }
   }, [])
 
-  function playTone(type = 'success') {
+  const playTone = useCallback((type = 'success') => {
     if (!soundEnabled) return
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
@@ -72,16 +97,16 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
     } catch {
       // Ignore audio failure
     }
-  }
+  }, [soundEnabled])
 
-  function triggerHaptic(type = 'success') {
+  const triggerHaptic = useCallback((type = 'success') => {
     if (!hapticEnabled) return
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
       navigator.vibrate(type === 'duplicate' ? [120, 80, 120] : type === 'error' ? [200, 120, 200] : [140])
     }
-  }
+  }, [hapticEnabled])
 
-  function resolveTicket(value, source = 'manual') {
+  const resolveTicket = useCallback((value, source = 'manual') => {
     const parsed = parseQrTicketCode(value)
     setScannerNote('')
     setScannerError('')
@@ -90,18 +115,18 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
       setScannerError(parsed.error)
       playTone('error')
       triggerHaptic('error')
-      onInvalid?.(parsed.error)
-      return
+      callbacksRef.current.onInvalid?.(parsed.error)
+      return { status: 'invalid', ticketCode: '', error: parsed.error }
     }
 
-    const match = findRegistrationByQrTicketCode(registrations, parsed.ticketCode)
+    const match = findRegistrationByQrTicketCode(registrationsRef.current, parsed.ticketCode)
     if (!match) {
       const message = `No matching ticket code: ${parsed.ticketCode} was found for the selected Working Event.`
       setScannerError(message)
       playTone('error')
       triggerHaptic('error')
-      onMissing?.(parsed.ticketCode)
-      return
+      callbacksRef.current.onMissing?.(parsed.ticketCode)
+      return { status: 'missing', ticketCode: parsed.ticketCode, error: message }
     }
 
     playTone(match.checkedIn ? 'duplicate' : 'success')
@@ -112,13 +137,15 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
       : source === 'scan'
         ? `${match.fullName} matched from QR. Review the guest card before check-in.`
         : `${match.fullName} matched from manual ticket lookup. Review the guest card before check-in.`)
-    onMatch(match, parsed.ticketCode)
-  }
+    callbacksRef.current.onMatch?.(match, parsed.ticketCode)
+    return { status: 'match', ticketCode: parsed.ticketCode, registrationId: match.registrationId }
+  }, [playTone, triggerHaptic])
 
   async function stopScanner() {
     const scanner = scannerRef.current
     scannerRef.current = null
-    setScanArmed(false)
+    setScannerArmed(false)
+    setScannerProcessing(false)
     setTorchSupported(false)
     setTorchOn(false)
     if (!scanner) {
@@ -145,7 +172,8 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
     setScannerError('')
     setScannerNote('Camera ready. Position the ticket, then press Scan QR.')
     setScanning(true)
-    setScanArmed(false)
+    setScannerArmed(false)
+    setScannerProcessing(false)
 
     if (scannerRef.current) {
       await stopScanner()
@@ -160,11 +188,22 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
       await scanner.start(
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 240, height: 240 } },
-        async (decodedText) => {
-          if (!scanArmedRef.current) return
-          setScanArmed(false)
-          resolveTicket(decodedText, 'scan')
-          if (!continuousScan) await stopScanner()
+        (decodedText) => {
+          if (!scanArmedRef.current || scanProcessingRef.current) return
+          setScannerArmed(false)
+          setScannerProcessing(true)
+          try {
+            const result = resolveTicket(decodedText, 'scan')
+            if (import.meta.env.DEV) {
+              console.debug('QR decode handled', {
+                status: result.status,
+                ticketCodeLength: result.ticketCode?.length || 0,
+                continuousScan: continuousScanRef.current,
+              })
+            }
+          } finally {
+            setScannerProcessing(false)
+          }
         },
       )
       setScanning(true)
@@ -192,13 +231,14 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
       setScannerError('Start the camera before scanning a QR code.')
       return
     }
+    if (scanProcessingRef.current) return
     setScannerError('')
     setScannerNote('Scanning... Hold one ticket QR code inside the frame.')
-    setScanArmed(true)
+    setScannerArmed(true)
   }
 
   function cancelScan() {
-    setScanArmed(false)
+    setScannerArmed(false)
     setScannerNote(scanning ? 'Scan cancelled. Position the ticket, then press Scan QR.' : '')
   }
 
@@ -231,7 +271,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
       startScanner()
     } else if (continuousScan && resumeTrigger !== previousTrigger.current && scanning) {
       previousTrigger.current = resumeTrigger
-      setScanArmed(true)
+      setScannerArmed(true)
       setScannerNote('Continuous mode ready. Hold the next ticket QR code inside the frame.')
     } else {
       previousTrigger.current = resumeTrigger
@@ -364,7 +404,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
               </div>
               <button
                 type="button"
-                onClick={() => resolveTicket(manualValue, 'manual')}
+              onClick={() => resolveTicket(manualValue, 'manual')}
                 className="rounded-xl bg-[#2B1723] px-4 py-3 text-xs font-bold text-white hover:bg-[#3B2430]"
               >
                 Find ticket
