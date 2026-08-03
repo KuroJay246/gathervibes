@@ -33,6 +33,7 @@ const AUDIT_FIELDS = [
   'linkedOperationId',
   'linkedCommitmentId',
   'linkedRunOfShowItemIds',
+  'criticalForEvent',
 ]
 
 function requireDatabase() {

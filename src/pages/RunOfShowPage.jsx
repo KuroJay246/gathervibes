@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
+import { collection, onSnapshot } from 'firebase/firestore'
 import { AlertTriangle, CheckCircle2, Clock3, PackageCheck, Plus, UserRoundCheck } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
+import { db } from '../lib/firebase'
+import { RelationshipSelector } from '../components/RelationshipSelector'
 import {
   ARRIVAL_STATUSES,
   RUN_OF_SHOW_CATEGORIES,
@@ -23,16 +26,60 @@ import {
   updateRunOfShowStatus,
 } from '../services/runOfShowService'
 import { subscribeToEventResources } from '../services/eventResourceService'
+import { subscribeToContacts, subscribeToOrganizations } from '../services/contactService'
+import { subscribeToDocuments } from '../services/documentService'
+import { subscribeToTasks } from '../services/taskService'
 
-function joinList(values = []) {
-  return Array.isArray(values) ? values.join(', ') : ''
+function option(id, label, detail = '') {
+  return { id, label: detail ? `${label} - ${detail}` : label }
 }
 
-function splitList(value = '') {
-  return String(value || '').split(',').map((entry) => entry.trim()).filter(Boolean)
+function staffOptions(profiles = []) {
+  return profiles.map((profile) => option(profile.uid, profile.displayName || profile.email || profile.uid, profile.defaultRole || 'Staff'))
 }
 
-function RunOfShowForm({ event, item, onSave, onCancel }) {
+function contactOptions(contacts = []) {
+  return contacts.map((contact) => option(contact.contactId, contact.displayName || `${contact.firstName || ''} ${contact.lastName || ''}`.trim() || contact.contactId, contact.category || contact.roleTitle || 'Contact'))
+}
+
+function organizationOptions(organizations = []) {
+  return organizations.map((organization) => option(organization.organizationId, organization.name || organization.organizationId, organization.category || 'Organization'))
+}
+
+function documentOptions(documents = []) {
+  return documents.map((documentRecord) => option(documentRecord.documentId, documentRecord.title || documentRecord.documentId, documentRecord.category || documentRecord.status || 'Document'))
+}
+
+function taskOptions(tasks = []) {
+  return tasks.map((task) => option(task.taskId, task.title || task.taskId, task.status || 'Task'))
+}
+
+function resourceOptions(resources = []) {
+  return resources.map((resource) => option(resource.resourceId, resource.name || resource.resourceId, resource.status || 'Resource'))
+}
+
+function runItemOptions(items = [], currentItemId = '') {
+  return items.filter((entry) => entry.itemId !== currentItemId).map((entry) => option(entry.itemId, `${entry.startTime} ${entry.title}`, entry.status))
+}
+
+function TimelineList({ title, items, emptyText }) {
+  return (
+    <div className="rounded-3xl border border-[#E7D6CC] bg-white p-5">
+      <h3 className="font-serif text-xl text-[#2B1723]">{title}</h3>
+      <div className="mt-3 space-y-2">
+        {items.length === 0 && <p className="text-sm text-[#6B564C]">{emptyText}</p>}
+        {items.map((item) => (
+          <div key={item.itemId} className="flex items-center justify-between gap-3 rounded-2xl bg-[#FFF8F2] px-3 py-2 text-sm">
+            <span className="min-w-0 truncate font-semibold text-[#2B1723]">{item.startTime} {item.title}</span>
+            <span className="shrink-0 rounded-full bg-white px-2 py-1 text-xs font-bold text-[#6B564C]">{item.status}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function RunOfShowForm({ event, item, resources, items, contacts, organizations, documents, tasks, staffProfiles, onSave, onCancel }) {
   const [values, setValues] = useState(createEmptyRunOfShowItem(item || { date: event?.eventDate || '' }))
   const [error, setError] = useState('')
 
@@ -72,12 +119,17 @@ function RunOfShowForm({ event, item, onSave, onCancel }) {
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Status<select value={values.status} onChange={(e) => updateField('status', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{RUN_OF_SHOW_STATUSES.map((status) => <option key={status}>{status}</option>)}</select></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Location<input value={values.location} onChange={(e) => updateField('location', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Responsible label<input value={values.responsibleLabel} onChange={(e) => updateField('responsibleLabel', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Responsible contact ID<input value={values.responsibleContactId} onChange={(e) => updateField('responsibleContactId', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Responsible organization ID<input value={values.responsibleOrganizationId} onChange={(e) => updateField('responsibleOrganizationId', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <RelationshipSelector label="Responsible staff" value={values.responsibleStaffUid} onChange={(next) => updateField('responsibleStaffUid', next)} options={staffOptions(staffProfiles)} placeholder="Select staff profile" emptyText="No staff profiles available." />
+        <RelationshipSelector label="Responsible contact" value={values.responsibleContactId} onChange={(next) => updateField('responsibleContactId', next)} options={contactOptions(contacts)} placeholder="Select contact" emptyText="No contacts available." />
+        <RelationshipSelector label="Responsible organization" value={values.responsibleOrganizationId} onChange={(next) => updateField('responsibleOrganizationId', next)} options={organizationOptions(organizations)} placeholder="Select organization" emptyText="No organizations available." />
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Expected arrival<input type="time" value={values.expectedArrivalTime} onChange={(e) => updateField('expectedArrivalTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Actual arrival<input type="time" value={values.actualArrivalTime} onChange={(e) => updateField('actualArrivalTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Arrival status<select value={values.arrivalStatus} onChange={(e) => updateField('arrivalStatus', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{ARRIVAL_STATUSES.map((status) => <option key={status}>{status}</option>)}</select></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Depends on item IDs<input value={joinList(values.dependencyItemIds)} onChange={(e) => updateField('dependencyItemIds', splitList(e.target.value))} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Linked resource IDs<input value={joinList(values.linkedResourceIds)} onChange={(e) => updateField('linkedResourceIds', splitList(e.target.value))} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <RelationshipSelector label="Depends on timeline items" values={values.dependencyItemIds} onChange={(next) => updateField('dependencyItemIds', next)} multiple options={runItemOptions(items, item?.itemId)} placeholder="Add dependency" emptyText="No other timeline items available." />
+        <RelationshipSelector label="Linked resources" values={values.linkedResourceIds} onChange={(next) => updateField('linkedResourceIds', next)} multiple options={resourceOptions(resources)} placeholder="Add resource link" emptyText="No resources available." />
+        <RelationshipSelector label="Linked task" value={values.linkedTaskId} onChange={(next) => updateField('linkedTaskId', next)} options={taskOptions(tasks)} placeholder="Select task" emptyText="No tasks available." />
+        <RelationshipSelector label="Linked documents" values={values.linkedDocumentIds} onChange={(next) => updateField('linkedDocumentIds', next)} multiple options={documentOptions(documents)} placeholder="Add document link" emptyText="No documents available." />
+        <label className="flex min-h-11 items-center gap-2 rounded-xl border border-[#E7D6CC] px-3 text-sm font-semibold text-[#2B1723]"><input type="checkbox" checked={values.criticalForEvent} onChange={(e) => updateField('criticalForEvent', e.target.checked)} /> Critical for event-day readiness</label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723] md:col-span-2">Notes<textarea value={values.notes} onChange={(e) => updateField('notes', e.target.value)} className="min-h-24 rounded-xl border border-[#E7D6CC] px-3 py-2" /></label>
       </div>
       <button type="submit" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Save timeline item</button>
@@ -91,12 +143,28 @@ export function RunOfShowPage() {
   const navigate = useNavigate()
   const [items, setItems] = useState([])
   const [resources, setResources] = useState([])
+  const [contacts, setContacts] = useState([])
+  const [organizations, setOrganizations] = useState([])
+  const [documents, setDocuments] = useState([])
+  const [tasks, setTasks] = useState([])
+  const [staffProfiles, setStaffProfiles] = useState([])
   const [editing, setEditing] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => subscribeToRunOfShow(activeEvent?.eventId, setItems, (err) => setError(err.message)), [activeEvent?.eventId])
   useEffect(() => subscribeToEventResources(activeEvent?.eventId, setResources, () => {}), [activeEvent?.eventId])
+  useEffect(() => subscribeToContacts(setContacts, () => {}), [])
+  useEffect(() => subscribeToOrganizations(setOrganizations, () => {}), [])
+  useEffect(() => subscribeToDocuments(activeEvent?.eventId, setDocuments, () => {}), [activeEvent?.eventId])
+  useEffect(() => subscribeToTasks(activeEvent?.eventId, setTasks, () => {}), [activeEvent?.eventId])
+  useEffect(() => {
+    if (!db) return () => {}
+    return onSnapshot(collection(db, 'staffProfiles'), (snapshot) => {
+      const rows = snapshot.docs.map((profile) => ({ ...profile.data(), uid: profile.data().uid || profile.id }))
+      setStaffProfiles(rows)
+    }, () => {})
+  }, [])
 
   if (!activeEvent?.eventId) return <section className="rounded-3xl border border-[#E7D6CC] bg-white p-6"><h2 className="font-serif text-2xl">Select a Working Event</h2><p className="mt-2 text-sm text-[#6B564C]">Run of Show is scoped to one event.</p></section>
 
@@ -146,7 +214,13 @@ export function RunOfShowPage() {
         </div>
       </section>
 
-      {showForm && <RunOfShowForm key={editing?.itemId || `new-${activeEvent?.eventId || ''}`} event={activeEvent} item={editing} onSave={save} onCancel={() => { setShowForm(false); setEditing(null) }} />}
+      <section className="grid gap-4 xl:grid-cols-3">
+        <TimelineList title="Upcoming" items={timelineState.upcoming.slice(0, 5)} emptyText="No upcoming items by clock time." />
+        <TimelineList title="Delayed" items={timelineState.delayed} emptyText="No delayed timeline items." />
+        <TimelineList title="Recently Completed" items={timelineState.recentlyCompleted} emptyText="No completed items yet." />
+      </section>
+
+      {showForm && <RunOfShowForm key={editing?.itemId || `new-${activeEvent?.eventId || ''}`} event={activeEvent} item={editing} resources={resources} items={items} contacts={contacts} organizations={organizations} documents={documents} tasks={tasks} staffProfiles={staffProfiles} onSave={save} onCancel={() => { setShowForm(false); setEditing(null) }} />}
 
       <section className="space-y-3">
         {items.length === 0 && <div className="rounded-3xl border border-dashed border-[#D9C7BC] bg-white p-6 text-sm text-[#6B564C]">No Run of Show items yet. Add setup, arrivals, programme, service, closing, and breakdown items when the event plan becomes real.</div>}
@@ -160,15 +234,17 @@ export function RunOfShowPage() {
                     <span className="rounded-full bg-[#F5E6C8] px-3 py-1 text-xs font-bold text-[#5A443B]">{item.startTime}{item.endTime ? `-${item.endTime}` : ''}</span>
                     <span className="rounded-full bg-[#F7DDE6] px-3 py-1 text-xs font-bold text-[#8A3F4B]">{item.status}</span>
                     <span className="rounded-full bg-[#EEF4EA] px-3 py-1 text-xs font-bold text-[#4F7A57]">{item.category}</span>
+                    {item.criticalForEvent && <span className="rounded-full bg-[#FFF1F1] px-3 py-1 text-xs font-bold text-[#8A1F1F]">Critical</span>}
                   </div>
                   <h3 className="mt-3 text-lg font-bold text-[#2B1723]">{item.title}</h3>
                   <p className="mt-1 text-sm text-[#6B564C]">{item.location || 'Location not set'} · {item.responsibleLabel || item.responsibleContactId || item.responsibleOrganizationId || 'Responsibility not assigned'}</p>
-                  {item.expectedArrivalTime && <p className="mt-2 flex items-center gap-2 text-sm text-[#6B564C]"><UserRoundCheck className="size-4" /> Arrival {item.expectedArrivalTime}: {item.arrivalStatus}</p>}
+                  {item.expectedArrivalTime && <p className="mt-2 flex items-center gap-2 text-sm text-[#6B564C]"><UserRoundCheck className="size-4" /> Expected {item.expectedArrivalTime}: {item.arrivalStatus}{item.actualArrivalTime ? ` at ${item.actualArrivalTime}` : ''}</p>}
                   {item.linkedResourceIds.length > 0 && <p className="mt-2 flex items-center gap-2 text-sm text-[#6B564C]"><PackageCheck className="size-4" /> Linked resources: {item.linkedResourceIds.join(', ')}</p>}
                   {blockers.length > 0 && <p className="mt-2 flex items-center gap-2 rounded-xl bg-[#FFF6E8] px-3 py-2 text-sm font-semibold text-[#7A4B16]"><AlertTriangle className="size-4" /> Blocked by {blockers.map((entry) => entry.title).join(', ')}</p>}
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {['Confirmed', 'In Progress', 'Completed', 'Delayed'].map((status) => <button key={status} type="button" onClick={() => updateRunOfShowStatus(activeEvent, item, status, user, status === 'Delayed' ? { delayReason: item.delayReason || 'Marked delayed by organizer.' } : {})} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">{status}</button>)}
+                  {item.expectedArrivalTime && item.arrivalStatus !== 'Arrived' && <button type="button" onClick={() => updateRunOfShowItem(activeEvent, item, { arrivalStatus: 'Arrived', actualArrivalTime: new Date().toTimeString().slice(0, 5) }, user, 'run-of-show.arrival')} className="min-h-10 rounded-xl border border-[#D7E6CF] px-3 text-xs font-bold text-[#4F7A57]">Mark arrived</button>}
                   <button type="button" onClick={() => { setEditing(item); setShowForm(true) }} className="min-h-10 rounded-xl bg-[#2B1723] px-3 text-xs font-bold text-white">Edit</button>
                   <button type="button" onClick={() => createTask(item)} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">Create task</button>
                   <button type="button" onClick={() => deleteRunOfShowItem(activeEvent, item, user)} className="min-h-10 rounded-xl border border-[#F3C6C6] px-3 text-xs font-bold text-[#8A1F1F]">Delete</button>

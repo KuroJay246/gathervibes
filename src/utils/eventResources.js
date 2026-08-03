@@ -63,6 +63,7 @@ export function createEmptyResource(prefill = {}) {
     linkedOperationId: '',
     linkedCommitmentId: '',
     linkedRunOfShowItemIds: [],
+    criticalForEvent: false,
     ...prefill,
   }
 }
@@ -97,6 +98,7 @@ export function normalizeEventResource(values = {}, event = {}, existing = {}) {
     linkedOperationId: cleanText(values.linkedOperationId, 128),
     linkedCommitmentId: cleanText(values.linkedCommitmentId, 128),
     linkedRunOfShowItemIds: cleanList(values.linkedRunOfShowItemIds || existing.linkedRunOfShowItemIds),
+    criticalForEvent: Boolean(values.criticalForEvent),
     createdAt: existing.createdAt || values.createdAt || null,
     createdBy: cleanText(existing.createdBy || values.createdBy, 256),
     updatedAt: values.updatedAt || existing.updatedAt || null,
@@ -119,8 +121,11 @@ export function buildResourceSummary(resources = [], today = new Date()) {
   return {
     total: rows.length,
     shortages: rows.filter((resource) => resource.shortage > 0 && resource.status !== 'Cancelled').length,
+    criticalShortages: rows.filter((resource) => resource.criticalForEvent && resource.shortage > 0 && resource.status !== 'Cancelled').length,
+    needed: rows.filter((resource) => resource.status === 'Needed').length,
     confirmed: rows.filter((resource) => ['Confirmed', 'Received', 'Packed', 'On Site', 'Returned'].includes(resource.status)).length,
     packed: rows.filter((resource) => resource.status === 'Packed').length,
+    packingIncomplete: rows.filter((resource) => resource.packingRequired && !['Packed', 'On Site', 'Returned', 'Cancelled'].includes(resource.status)).length,
     onSite: rows.filter((resource) => resource.status === 'On Site').length,
     pickupDue: rows.filter((resource) => resource.pickupRequired && resource.pickupDueDate && resource.pickupDueDate <= todayText && !['On Site', 'Returned', 'Cancelled'].includes(resource.status)).length,
     returnOverdue: rows.filter((resource) => resource.returnRequired && resource.returnDueDate && resource.returnDueDate < todayText && resource.status !== 'Returned' && resource.status !== 'Cancelled').length,

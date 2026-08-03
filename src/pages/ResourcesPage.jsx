@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { AlertTriangle, ClipboardList, PackageCheck, Plus, Truck } from 'lucide-react'
+import { RelationshipSelector } from '../components/RelationshipSelector'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import {
@@ -20,16 +21,40 @@ import {
   updateEventResourceStatus,
 } from '../services/eventResourceService'
 import { subscribeToRunOfShow } from '../services/runOfShowService'
+import { subscribeToContacts, subscribeToOrganizations } from '../services/contactService'
+import { subscribeToDocuments } from '../services/documentService'
+import { subscribeToOperationsLedger } from '../services/operationsLedgerService'
+import { subscribeToTasks } from '../services/taskService'
 
-function joinList(values = []) {
-  return Array.isArray(values) ? values.join(', ') : ''
+function option(id, label, detail = '') {
+  return { id, label: detail ? `${label} - ${detail}` : label }
 }
 
-function splitList(value = '') {
-  return String(value || '').split(',').map((entry) => entry.trim()).filter(Boolean)
+function contactOptions(contacts = []) {
+  return contacts.map((contact) => option(contact.contactId, contact.displayName || `${contact.firstName || ''} ${contact.lastName || ''}`.trim() || contact.contactId, contact.category || contact.roleTitle || 'Contact'))
 }
 
-function ResourceForm({ resource, onSave, onCancel }) {
+function organizationOptions(organizations = []) {
+  return organizations.map((organization) => option(organization.organizationId, organization.name || organization.organizationId, organization.category || 'Organization'))
+}
+
+function documentOptions(documents = []) {
+  return documents.map((documentRecord) => option(documentRecord.documentId, documentRecord.title || documentRecord.documentId, documentRecord.category || documentRecord.status || 'Document'))
+}
+
+function taskOptions(tasks = []) {
+  return tasks.map((task) => option(task.taskId, task.title || task.taskId, task.status || 'Task'))
+}
+
+function operationOptions(operations = []) {
+  return operations.map((entry) => option(entry.ledgerEntryId, entry.label || entry.ledgerEntryId, `${entry.entryType || 'operation'} ${entry.status || ''}`.trim()))
+}
+
+function runItemOptions(items = []) {
+  return items.map((item) => option(item.itemId, `${item.startTime} ${item.title}`, item.status))
+}
+
+function ResourceForm({ resource, runItems, contacts, organizations, documents, tasks, operationsEntries, onSave, onCancel }) {
   const [values, setValues] = useState(createEmptyResource(resource))
   const [error, setError] = useState('')
 
@@ -70,15 +95,19 @@ function ResourceForm({ resource, onSave, onCancel }) {
         </div>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Location<input value={values.location} onChange={(e) => updateField('location', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Supplier label<input value={values.supplierLabel} onChange={(e) => updateField('supplierLabel', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Supplier contact ID<input value={values.supplierContactId} onChange={(e) => updateField('supplierContactId', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Supplier organization ID<input value={values.supplierOrganizationId} onChange={(e) => updateField('supplierOrganizationId', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <RelationshipSelector label="Supplier contact" value={values.supplierContactId} onChange={(next) => updateField('supplierContactId', next)} options={contactOptions(contacts)} placeholder="Select supplier contact" emptyText="No contacts available." />
+        <RelationshipSelector label="Supplier organization" value={values.supplierOrganizationId} onChange={(next) => updateField('supplierOrganizationId', next)} options={organizationOptions(organizations)} placeholder="Select supplier organization" emptyText="No organizations available." />
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Pickup due<input type="date" value={values.pickupDueDate} onChange={(e) => updateField('pickupDueDate', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Return due<input type="date" value={values.returnDueDate} onChange={(e) => updateField('returnDueDate', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Linked Run of Show IDs<input value={joinList(values.linkedRunOfShowItemIds)} onChange={(e) => updateField('linkedRunOfShowItemIds', splitList(e.target.value))} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Linked document IDs<input value={joinList(values.linkedDocumentIds)} onChange={(e) => updateField('linkedDocumentIds', splitList(e.target.value))} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <RelationshipSelector label="Linked Run of Show items" values={values.linkedRunOfShowItemIds} onChange={(next) => updateField('linkedRunOfShowItemIds', next)} multiple options={runItemOptions(runItems)} placeholder="Add timeline link" emptyText="No Run of Show items available." />
+        <RelationshipSelector label="Linked documents" values={values.linkedDocumentIds} onChange={(next) => updateField('linkedDocumentIds', next)} multiple options={documentOptions(documents)} placeholder="Add document link" emptyText="No documents available." />
+        <RelationshipSelector label="Linked task" value={values.linkedTaskId} onChange={(next) => updateField('linkedTaskId', next)} options={taskOptions(tasks)} placeholder="Select task" emptyText="No tasks available." />
+        <RelationshipSelector label="Linked Operations entry" value={values.linkedOperationId} onChange={(next) => updateField('linkedOperationId', next)} options={operationOptions(operationsEntries)} placeholder="Select Operations entry" emptyText="No Operations entries available." />
+        <RelationshipSelector label="Linked commitment" value={values.linkedCommitmentId} onChange={(next) => updateField('linkedCommitmentId', next)} options={operationOptions(operationsEntries)} placeholder="Select commitment" emptyText="No commitments available." />
         <label className="flex min-h-11 items-center gap-2 rounded-xl border border-[#E7D6CC] px-3 text-sm font-semibold text-[#2B1723]"><input type="checkbox" checked={values.packingRequired} onChange={(e) => updateField('packingRequired', e.target.checked)} /> Packing required</label>
         <label className="flex min-h-11 items-center gap-2 rounded-xl border border-[#E7D6CC] px-3 text-sm font-semibold text-[#2B1723]"><input type="checkbox" checked={values.pickupRequired} onChange={(e) => updateField('pickupRequired', e.target.checked)} /> Pickup required</label>
         <label className="flex min-h-11 items-center gap-2 rounded-xl border border-[#E7D6CC] px-3 text-sm font-semibold text-[#2B1723]"><input type="checkbox" checked={values.returnRequired} onChange={(e) => updateField('returnRequired', e.target.checked)} /> Return required</label>
+        <label className="flex min-h-11 items-center gap-2 rounded-xl border border-[#E7D6CC] px-3 text-sm font-semibold text-[#2B1723]"><input type="checkbox" checked={values.criticalForEvent} onChange={(e) => updateField('criticalForEvent', e.target.checked)} /> Critical for event-day readiness</label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723] md:col-span-2">Notes<textarea value={values.notes} onChange={(e) => updateField('notes', e.target.value)} className="min-h-24 rounded-xl border border-[#E7D6CC] px-3 py-2" /></label>
       </div>
       <button type="submit" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Save resource</button>
@@ -92,12 +121,22 @@ export function ResourcesPage() {
   const navigate = useNavigate()
   const [resources, setResources] = useState([])
   const [runItems, setRunItems] = useState([])
+  const [contacts, setContacts] = useState([])
+  const [organizations, setOrganizations] = useState([])
+  const [documents, setDocuments] = useState([])
+  const [tasks, setTasks] = useState([])
+  const [operationsEntries, setOperationsEntries] = useState([])
   const [editing, setEditing] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => subscribeToEventResources(activeEvent?.eventId, setResources, (err) => setError(err.message)), [activeEvent?.eventId])
   useEffect(() => subscribeToRunOfShow(activeEvent?.eventId, setRunItems, () => {}), [activeEvent?.eventId])
+  useEffect(() => subscribeToContacts(setContacts, () => {}), [])
+  useEffect(() => subscribeToOrganizations(setOrganizations, () => {}), [])
+  useEffect(() => subscribeToDocuments(activeEvent?.eventId, setDocuments, () => {}), [activeEvent?.eventId])
+  useEffect(() => subscribeToTasks(activeEvent?.eventId, setTasks, () => {}), [activeEvent?.eventId])
+  useEffect(() => subscribeToOperationsLedger(activeEvent?.eventId, setOperationsEntries, () => {}), [activeEvent?.eventId])
 
   if (!activeEvent?.eventId) return <section className="rounded-3xl border border-[#E7D6CC] bg-white p-6"><h2 className="font-serif text-2xl">Select a Working Event</h2><p className="mt-2 text-sm text-[#6B564C]">Resources are scoped to one event.</p></section>
 
@@ -135,7 +174,7 @@ export function ResourcesPage() {
         </div>
       </section>
 
-      {showForm && <ResourceForm key={editing?.resourceId || `new-${activeEvent?.eventId || ''}`} resource={editing} onSave={save} onCancel={() => { setShowForm(false); setEditing(null) }} />}
+      {showForm && <ResourceForm key={editing?.resourceId || `new-${activeEvent?.eventId || ''}`} resource={editing} runItems={runItems} contacts={contacts} organizations={organizations} documents={documents} tasks={tasks} operationsEntries={operationsEntries} onSave={save} onCancel={() => { setShowForm(false); setEditing(null) }} />}
 
       <section className="grid gap-3">
         {resources.length === 0 && <div className="rounded-3xl border border-dashed border-[#D9C7BC] bg-white p-6 text-sm text-[#6B564C]">No resources yet. Add equipment, supplies, documents/print, safety, packing, pickup, or return needs when the plan becomes real.</div>}
@@ -147,6 +186,7 @@ export function ResourcesPage() {
                   <span className="rounded-full bg-[#F5E6C8] px-3 py-1 text-xs font-bold text-[#5A443B]">{resource.category}</span>
                   <span className="rounded-full bg-[#F7DDE6] px-3 py-1 text-xs font-bold text-[#8A3F4B]">{resource.status}</span>
                   <span className="rounded-full bg-[#EEF4EA] px-3 py-1 text-xs font-bold text-[#4F7A57]">{resource.sourceType}</span>
+                  {resource.criticalForEvent && <span className="rounded-full bg-[#FFF1F1] px-3 py-1 text-xs font-bold text-[#8A1F1F]">Critical</span>}
                 </div>
                 <h3 className="mt-3 text-lg font-bold text-[#2B1723]">{resource.name}</h3>
                 <p className="mt-1 text-sm text-[#6B564C]">{resource.quantityConfirmed} of {resource.quantityNeeded} {resource.unit || 'needed'} confirmed · {resource.location || 'Location not set'}</p>
@@ -156,7 +196,7 @@ export function ResourcesPage() {
                 {(resource.packingRequired || resource.pickupRequired || resource.returnRequired) && <p className="mt-2 flex items-center gap-2 text-sm text-[#6B564C]"><PackageCheck className="size-4" /> {resource.packingRequired ? 'Pack. ' : ''}{resource.pickupRequired ? `Pickup ${resource.pickupDueDate || 'due date not set'}. ` : ''}{resource.returnRequired ? `Return ${resource.returnDueDate || 'due date not set'}.` : ''}</p>}
               </div>
               <div className="flex flex-wrap gap-2">
-                {['Confirmed', 'Received', 'Packed', 'On Site', 'Returned'].map((status) => <button key={status} type="button" onClick={() => updateEventResourceStatus(activeEvent, resource, status, user)} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">{status}</button>)}
+                {['Requested', 'Ordered / Reserved', 'Confirmed', 'Received', 'Packed', 'On Site', 'Returned'].map((status) => <button key={status} type="button" onClick={() => updateEventResourceStatus(activeEvent, resource, status, user)} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">{status}</button>)}
                 <button type="button" onClick={() => { setEditing(resource); setShowForm(true) }} className="min-h-10 rounded-xl bg-[#2B1723] px-3 text-xs font-bold text-white">Edit</button>
                 <button type="button" onClick={() => createTask(resource)} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">Create task</button>
                 <button type="button" onClick={() => deleteEventResource(activeEvent, resource, user)} className="min-h-10 rounded-xl border border-[#F3C6C6] px-3 text-xs font-bold text-[#8A1F1F]">Delete</button>

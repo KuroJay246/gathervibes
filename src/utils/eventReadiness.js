@@ -12,8 +12,8 @@ import {
   isEventDayStatus,
   isPlanningEvent,
 } from './eventPlanning.js'
-import { buildResourceSummary } from './eventResources.js'
-import { buildRunOfShowSummary } from './runOfShow.js'
+import { buildResourceSummary, normalizeEventResource } from './eventResources.js'
+import { buildRunOfShowSummary, normalizeRunOfShowItem, unresolvedDependencies } from './runOfShow.js'
 
 function countDuplicateContactRows(registrations = []) {
   const emailCounts = new Map()
@@ -62,6 +62,112 @@ function buildCategory(key, label, status, summary) {
   }
 }
 
+function readinessSeverity(reasons = []) {
+  if (reasons.some((reason) => reason.severity === 'at-risk')) return 'At Risk'
+  if (reasons.some((reason) => reason.severity === 'needs-attention')) return 'Needs Attention'
+  return 'Ready'
+}
+
+function buildEventDayWarnings(runOfShowItems = [], resources = [], now = new Date()) {
+  const runItems = Array.isArray(runOfShowItems) ? runOfShowItems.map(normalizeRunOfShowItem) : []
+  const resourceRows = Array.isArray(resources) ? resources.map(normalizeEventResource) : []
+  const todayText = now.toISOString().slice(0, 10)
+  const reasons = []
+
+  const criticalDelayed = runItems.filter((item) => item.criticalForEvent && item.status === 'Delayed')
+  if (criticalDelayed.length > 0) {
+    reasons.push({
+      key: 'critical-run-of-show-delayed',
+      severity: 'at-risk',
+      label: 'Critical timeline item delayed',
+      summary: `${criticalDelayed.length} critical Run of Show item${criticalDelayed.length === 1 ? '' : 's'} are delayed.`,
+      to: '/run-of-show',
+    })
+  }
+
+  const blocked = runItems.filter((item) => unresolvedDependencies(item, runItems).length > 0)
+  if (blocked.length > 0) {
+    reasons.push({
+      key: 'unresolved-run-of-show-dependencies',
+      severity: 'at-risk',
+      label: 'Timeline dependency unresolved',
+      summary: `${blocked.length} Run of Show item${blocked.length === 1 ? '' : 's'} depend on unfinished earlier work.`,
+      to: '/run-of-show',
+    })
+  }
+
+  const delayedArrivals = runItems.filter((item) => item.arrivalStatus === 'Delayed')
+  if (delayedArrivals.length > 0) {
+    reasons.push({
+      key: 'supplier-arrivals-delayed',
+      severity: delayedArrivals.some((item) => item.criticalForEvent) ? 'at-risk' : 'needs-attention',
+      label: 'Supplier arrival delayed',
+      summary: `${delayedArrivals.length} supplier or staff arrival${delayedArrivals.length === 1 ? '' : 's'} are delayed.`,
+      to: '/run-of-show',
+    })
+  }
+
+  const criticalShortages = resourceRows.filter((resource) => resource.criticalForEvent && resource.shortage > 0 && resource.status !== 'Cancelled')
+  if (criticalShortages.length > 0) {
+    reasons.push({
+      key: 'critical-resource-shortage',
+      severity: 'at-risk',
+      label: 'Critical resource shortage',
+      summary: `${criticalShortages.length} critical resource${criticalShortages.length === 1 ? '' : 's'} have unconfirmed quantity.`,
+      to: '/resources',
+    })
+  }
+
+  const neededResources = resourceRows.filter((resource) => resource.status === 'Needed')
+  if (neededResources.length > 0) {
+    reasons.push({
+      key: 'resources-still-needed',
+      severity: 'needs-attention',
+      label: 'Resources still needed',
+      summary: `${neededResources.length} resource${neededResources.length === 1 ? '' : 's'} have not been requested or confirmed.`,
+      to: '/resources',
+    })
+  }
+
+  const pickupDue = resourceRows.filter((resource) => resource.pickupRequired && resource.pickupDueDate && resource.pickupDueDate <= todayText && !['On Site', 'Returned', 'Cancelled'].includes(resource.status))
+  if (pickupDue.length > 0) {
+    reasons.push({
+      key: 'resource-pickup-due',
+      severity: 'needs-attention',
+      label: 'Pickup due',
+      summary: `${pickupDue.length} resource pickup${pickupDue.length === 1 ? '' : 's'} are due or overdue.`,
+      to: '/resources',
+    })
+  }
+
+  const returnOverdue = resourceRows.filter((resource) => resource.returnRequired && resource.returnDueDate && resource.returnDueDate < todayText && resource.status !== 'Returned' && resource.status !== 'Cancelled')
+  if (returnOverdue.length > 0) {
+    reasons.push({
+      key: 'resource-return-overdue',
+      severity: 'needs-attention',
+      label: 'Return overdue',
+      summary: `${returnOverdue.length} resource return${returnOverdue.length === 1 ? '' : 's'} are overdue.`,
+      to: '/resources',
+    })
+  }
+
+  const packingIncomplete = resourceRows.filter((resource) => resource.packingRequired && !['Packed', 'On Site', 'Returned', 'Cancelled'].includes(resource.status))
+  if (packingIncomplete.length > 0) {
+    reasons.push({
+      key: 'resource-packing-incomplete',
+      severity: 'needs-attention',
+      label: 'Packing incomplete',
+      summary: `${packingIncomplete.length} resource${packingIncomplete.length === 1 ? '' : 's'} still need packing confirmation.`,
+      to: '/resources',
+    })
+  }
+
+  return {
+    status: readinessSeverity(reasons),
+    reasons,
+  }
+}
+
 export function buildEventReadiness(event = null, registrations = [], operationsEntries = [], runOfShowItems = [], resources = []) {
   if (!event?.eventId) {
     return {
@@ -75,6 +181,7 @@ export function buildEventReadiness(event = null, registrations = [], operations
       operationsTotals: buildOperationsTotals([]),
       operationsCounts: buildOperationsEntryCounts([]),
       operationsSummary: buildOperationsControlSummary([]),
+      eventDayReadiness: { status: 'Review', reasons: [] },
     }
   }
 
@@ -86,6 +193,7 @@ export function buildEventReadiness(event = null, registrations = [], operations
   const operationsSummary = buildOperationsControlSummary(operationsEntries)
   const runOfShowSummary = buildRunOfShowSummary(runOfShowItems)
   const resourceSummary = buildResourceSummary(resources)
+  const eventDayReadiness = buildEventDayWarnings(runOfShowItems, resources)
   const financeContext = buildFinanceClassificationContext(rows, hydratedEvent)
   const planningOverview = buildOrganizerOverview(hydratedEvent, rows, operationsEntries)
   const completedEvent = isCompletedEvent(hydratedEvent)
@@ -285,6 +393,18 @@ export function buildEventReadiness(event = null, registrations = [], operations
       linkLabel: 'Open Resources',
     })
   }
+  eventDayReadiness.reasons.forEach((reason) => {
+    if (!completedEvent && !actionItems.some((item) => item.key === reason.key)) {
+      actionItems.push({
+        key: reason.key,
+        label: reason.label,
+        statusLabel: reason.severity === 'at-risk' ? 'At Risk' : 'Needs attention',
+        summary: reason.summary,
+        to: reason.to,
+        linkLabel: reason.to === '/run-of-show' ? 'Open Run of Show' : 'Open Resources',
+      })
+    }
+  })
   if (!completedEvent && pendingPayments > 0) {
     actionItems.push({
       key: 'pending-payments',
@@ -365,6 +485,7 @@ export function buildEventReadiness(event = null, registrations = [], operations
     operationsSummary,
     runOfShowSummary,
     resourceSummary,
+    eventDayReadiness,
     planningOverview,
     counts: {
       pendingPayments,
