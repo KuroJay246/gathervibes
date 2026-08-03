@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   CalendarDays,
+  Building2,
   CheckCircle2,
   ClipboardCheck,
   Clock3,
   CreditCard,
   FileInput,
+  FileText,
   MessageSquareText,
   ReceiptText,
   TicketCheck,
@@ -167,6 +169,8 @@ const PLANNING_ACTIONS = [
   { to: '/payments', label: 'Record Payment', detail: 'Update registration payment evidence and balances.', icon: CreditCard },
   { to: '/imports', label: 'Open Import Center', detail: 'Preview CSV, pasted rows, or supported spreadsheets.', icon: FileInput },
   { to: '/operations', label: 'Add Operations Entry', detail: 'Record event expenses, income, reimbursements, or commitments.', icon: ReceiptText },
+  { to: '/documents', label: 'Add Document Reference', detail: 'Track agreements, receipts, permits, and evidence links.', icon: FileText },
+  { to: '/contacts', label: 'Open Contacts', detail: 'Find reusable suppliers, partners, venues, and helpers.', icon: Building2 },
   { to: '/tickets', label: 'View Tickets', detail: 'Prepare ticket codes and QR access.', icon: TicketCheck },
   { to: '/check-in', label: 'Open Check-In', detail: 'Use event-day attendance tools.', icon: ClipboardCheck },
   { to: '/event-review', label: 'View Reports', detail: 'Review read-only event follow-up and summaries.', icon: ClipboardCheck },

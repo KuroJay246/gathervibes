@@ -24,6 +24,8 @@ const CommunicationsPage = lazyPage(() => import('./pages/CommunicationsPage'), 
 const OperationsPage = lazyPage(() => import('./pages/OperationsPage'), 'OperationsPage')
 const PaymentsPage = lazyPage(() => import('./pages/PaymentsPage'), 'PaymentsPage')
 const PaymentReconciliationPage = lazyPage(() => import('./pages/PaymentReconciliationPage'), 'PaymentReconciliationPage')
+const DocumentsPage = lazyPage(() => import('./pages/DocumentsPage'), 'DocumentsPage')
+const ContactsPage = lazyPage(() => import('./pages/ContactsPage'), 'ContactsPage')
 const ScannerPage = lazyPage(() => import('./pages/ScannerPage'), 'ScannerPage')
 const EventReviewPage = lazyPage(() => import('./pages/EventReviewPage'), 'EventReviewPage')
 
@@ -47,6 +49,8 @@ export default function App() {
             <Route path="/tickets" element={<TicketsPage />} />
             <Route path="/check-in" element={<AssignedEventGate purpose="Check-In"><CheckInPage /></AssignedEventGate>} />
             <Route path="/operations" element={<AssignedEventGate purpose="Operations"><OperationsPage /></AssignedEventGate>} />
+            <Route path="/documents" element={<DocumentsPage />} />
+            <Route path="/contacts" element={<ContactsPage />} />
             <Route path="/event-review" element={<EventReviewPage />} />
             <Route path="/qa" element={<QaPage />} />
             <Route path="/communications" element={<CommunicationsPage />} />

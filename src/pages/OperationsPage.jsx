@@ -39,6 +39,9 @@ const EMPTY_FORM = {
   paymentMethod: 'unknown',
   paymentReference: '',
   paidByOrPaidTo: '',
+  linkedContactId: '',
+  linkedOrganizationId: '',
+  linkedDocumentId: '',
   date: new Date().toISOString().slice(0, 10),
   status: 'pending',
   notes: '',
@@ -254,6 +257,9 @@ export function OperationsPage() {
       paymentMethod: entry.paymentMethod || 'unknown',
       paymentReference: entry.paymentReference || '',
       paidByOrPaidTo: entry.paidByOrPaidTo || '',
+      linkedContactId: entry.linkedContactId || '',
+      linkedOrganizationId: entry.linkedOrganizationId || '',
+      linkedDocumentId: entry.linkedDocumentId || '',
       date: entry.date || new Date().toISOString().slice(0, 10),
       status: entry.status || 'pending',
       notes: entry.notes || '',
@@ -677,6 +683,21 @@ export function OperationsPage() {
               <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Paid By / Paid To</span>
               <input value={form.paidByOrPaidTo} onChange={(event) => setForm((current) => ({ ...current, paidByOrPaidTo: event.target.value }))} placeholder="Who paid you, or who you paid" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
               <FieldHelp>Record who paid or who received the payment.</FieldHelp>
+            </label>
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Linked Contact ID</span>
+              <input value={form.linkedContactId} onChange={(event) => setForm((current) => ({ ...current, linkedContactId: event.target.value }))} placeholder="Optional reusable contact ID" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
+              <FieldHelp>Optional metadata link to a reusable contact. Free-text Paid By / Paid To stays supported.</FieldHelp>
+            </label>
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Linked Organization ID</span>
+              <input value={form.linkedOrganizationId} onChange={(event) => setForm((current) => ({ ...current, linkedOrganizationId: event.target.value }))} placeholder="Optional organization ID" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
+              <FieldHelp>Optional metadata link to a reusable organization. Historical supplier names are not migrated automatically.</FieldHelp>
+            </label>
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Linked Document ID</span>
+              <input value={form.linkedDocumentId} onChange={(event) => setForm((current) => ({ ...current, linkedDocumentId: event.target.value }))} placeholder="Optional receipt, invoice, or agreement reference ID" className="mt-1 w-full rounded-xl border border-[#E5D7CF] px-3 py-2 text-sm" />
+              <FieldHelp>Use this to connect receipts, invoices, quotations, or sponsorship agreements from Documents.</FieldHelp>
             </label>
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wider text-[#80685B]">Date</span>

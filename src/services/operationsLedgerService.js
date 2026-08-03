@@ -14,7 +14,7 @@ import { parseMoney } from '../utils/financeUtils'
 
 export const LEDGER_ENTRY_TYPES = ['income', 'expense', 'refund', 'reimbursement', 'adjustment']
 export const LEDGER_STATUSES = ['expected', 'received', 'paid', 'pending', 'cancelled']
-const AUDITED_OPERATION_FIELDS = ['entryType', 'category', 'label', 'amount', 'paymentMethod', 'paymentReference', 'paidByOrPaidTo', 'date', 'status', 'adjustmentDirection', 'notes']
+const AUDITED_OPERATION_FIELDS = ['entryType', 'category', 'label', 'amount', 'paymentMethod', 'paymentReference', 'paidByOrPaidTo', 'date', 'status', 'adjustmentDirection', 'notes', 'linkedContactId', 'linkedOrganizationId', 'linkedDocumentId']
 
 function requireDatabase() {
   if (!db) throw new Error('Firebase is not configured')
@@ -38,6 +38,9 @@ function normalizeEntry(values = {}, eventId, existing = {}) {
     paymentMethod: cleanText(values.paymentMethod || 'unknown').slice(0, 80),
     paymentReference: cleanText(values.paymentReference).slice(0, 180) || null,
     paidByOrPaidTo: cleanText(values.paidByOrPaidTo).slice(0, 180) || null,
+    linkedContactId: cleanText(values.linkedContactId).slice(0, 128) || null,
+    linkedOrganizationId: cleanText(values.linkedOrganizationId).slice(0, 128) || null,
+    linkedDocumentId: cleanText(values.linkedDocumentId).slice(0, 128) || null,
     date: cleanText(values.date) || new Date().toISOString().slice(0, 10),
     status: LEDGER_STATUSES.includes(values.status) ? values.status : 'pending',
     adjustmentDirection: values.entryType === 'adjustment' ? values.adjustmentDirection || existing.adjustmentDirection || 'increase' : null,

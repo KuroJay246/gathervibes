@@ -304,8 +304,8 @@ export function canViewRoute(access = DEFAULT_ACCESS, route = '') {
   const role = normalizeAccessRole(access?.role)
   if (role === 'scanner') return normalizedRoute === '/scanner'
   if (role === 'operations-helper') return normalizedRoute === '/operations'
-  if (role === 'viewer') return ['/dashboard', '/tasks'].includes(normalizedRoute)
-  if (role === 'event-manager') return ['/dashboard', '/check-in', '/tasks'].includes(normalizedRoute)
+  if (role === 'viewer') return ['/dashboard', '/tasks', '/documents'].includes(normalizedRoute)
+  if (role === 'event-manager') return ['/dashboard', '/check-in', '/tasks', '/documents'].includes(normalizedRoute)
   return false
 }
 

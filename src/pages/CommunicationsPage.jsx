@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { CheckCircle2, Copy, MessageSquareText, Search } from 'lucide-react'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { subscribeToRegistrations } from '../services/registrationService'
@@ -45,6 +45,7 @@ function Section({ eyebrow, title, children }) {
 
 export function CommunicationsPage() {
   const { activeEvent } = useActiveEvent()
+  const [searchParams] = useSearchParams()
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -62,6 +63,13 @@ export function CommunicationsPage() {
   const [copiedAction, setCopiedAction] = useState('')
   const [labMode, setLabMode] = useState('standard') // 'standard' or 'prompt'
   const [selectedTone, setSelectedTone] = useState('Professional')
+  const messageContext = useMemo(() => ({
+    type: searchParams.get('context') || '',
+    recipientName: searchParams.get('recipientName') || searchParams.get('recipientLabel') || '',
+    recipientEmail: searchParams.get('recipientEmail') || '',
+    recipientPhone: searchParams.get('recipientPhone') || '',
+    subject: searchParams.get('subject') || '',
+  }), [searchParams])
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -169,6 +177,16 @@ Data context for this segment:
         <strong>Copy-only:</strong> Message Builder prepares text only. It does not send email or WhatsApp messages.
         <span className="mt-1 block text-xs">Use segments to choose recipients; buyer/contact can be different from attendee names, Door Paid is not the same as To Pay at Door, and historical finance limitations stay out of active reminder audiences.</span>
       </div>
+
+      {messageContext.type && (
+        <div className="rounded-xl border border-[#D9E4F7] bg-[#F6F9FF] px-4 py-3 text-sm text-[#415F91]">
+          <strong>Context loaded:</strong> {messageContext.type === 'document' ? 'Document follow-up' : 'Contact message'}.
+          <span className="mt-1 block break-words text-xs">
+            {messageContext.recipientName || 'No recipient name provided'}{messageContext.recipientEmail ? ` · ${messageContext.recipientEmail}` : ''}{messageContext.recipientPhone ? ` · ${messageContext.recipientPhone}` : ''}{messageContext.subject ? ` · ${messageContext.subject}` : ''}
+          </span>
+          <span className="mt-1 block text-xs">This context only helps you prepare copy. No message is sent automatically.</span>
+        </div>
+      )}
 
       <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-sm">
         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Message workflow</p>
