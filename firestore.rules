@@ -1491,52 +1491,6 @@ service cloud.firestore {
         );
     }
 
-    function matchesRunOfShowMutation(data) {
-      return data.targetType == 'runOfShow'
-        && (
-          (
-            data.action == 'run-of-show.create'
-            && !exists(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
-            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
-            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
-          ) || (
-            data.action in ['run-of-show.update', 'run-of-show.delayed', 'run-of-show.status']
-            && exists(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
-            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
-            && get(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
-            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
-          ) || (
-            data.action == 'run-of-show.delete'
-            && exists(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
-            && !existsAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
-            && get(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
-          )
-        );
-    }
-
-    function matchesResourceMutation(data) {
-      return data.targetType == 'resource'
-        && (
-          (
-            data.action == 'resource.create'
-            && !exists(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
-            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
-            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
-          ) || (
-            data.action in ['resource.update', 'resource.status']
-            && exists(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
-            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
-            && get(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
-            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
-          ) || (
-            data.action == 'resource.delete'
-            && exists(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
-            && !existsAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
-            && get(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
-          )
-        );
-    }
-
     function matchesContactMutation(data) {
       return (
         data.action == 'contact.create'
