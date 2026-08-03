@@ -503,17 +503,22 @@ export function DashboardPage() {
           </section>
 
           <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-            <Section eyebrow="Needs Attention" title="What should I do next?">
-              {readiness.actionItems.length === 0 ? (
-                <p className="rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
-                  No urgent planning blockers are currently visible for this event.
+            <div data-tour-id="event-readiness-summary">
+              <Section eyebrow="Needs Attention" title="What should I do next?">
+                <p className="mb-4 rounded-2xl border border-[#EFE2DA] bg-[#FFF8F2] p-3 text-sm leading-6 text-[#6B564C]">
+                  Event Readiness is derived from visible records such as registration follow-up, ticket gaps, Operations review, Run of Show delays, and Resource shortages. It is not a hidden score or a guarantee that nothing can go wrong.
                 </p>
-              ) : (
-                <div className="space-y-3">
-                  {readiness.actionItems.slice(0, 6).map((item) => <PriorityItem key={item.key} item={item} />)}
-                </div>
-              )}
-            </Section>
+                {readiness.actionItems.length === 0 ? (
+                  <p className="rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
+                    No urgent planning blockers are currently visible for this event.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {readiness.actionItems.slice(0, 6).map((item) => <PriorityItem key={item.key} item={item} />)}
+                  </div>
+                )}
+              </Section>
+            </div>
 
             <Section eyebrow="Quick Actions" title="Common organizer actions">
               <div className="grid gap-2">
