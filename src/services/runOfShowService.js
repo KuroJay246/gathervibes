@@ -25,6 +25,7 @@ const AUDIT_FIELDS = [
   'responsibleOrganizationId',
   'responsibleLabel',
   'expectedArrivalTime',
+  'actualArrivalTime',
   'arrivalStatus',
   'arrivalNote',
   'linkedTaskId',
@@ -32,6 +33,7 @@ const AUDIT_FIELDS = [
   'linkedResourceIds',
   'dependencyItemIds',
   'delayReason',
+  'criticalForEvent',
 ]
 
 function requireDatabase() {

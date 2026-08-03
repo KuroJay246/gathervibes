@@ -57,6 +57,7 @@ export function createEmptyRunOfShowItem(prefill = {}) {
     responsibleOrganizationId: '',
     responsibleLabel: '',
     expectedArrivalTime: '',
+    actualArrivalTime: '',
     arrivalStatus: 'Expected',
     arrivalNote: '',
     linkedTaskId: '',
@@ -64,6 +65,7 @@ export function createEmptyRunOfShowItem(prefill = {}) {
     linkedResourceIds: [],
     dependencyItemIds: [],
     delayReason: '',
+    criticalForEvent: false,
     ...prefill,
   }
 }
@@ -91,6 +93,7 @@ export function normalizeRunOfShowItem(values = {}, event = {}, existing = {}) {
     responsibleOrganizationId: cleanText(values.responsibleOrganizationId, 128),
     responsibleLabel: cleanText(values.responsibleLabel, 180),
     expectedArrivalTime: cleanText(values.expectedArrivalTime, 5),
+    actualArrivalTime: cleanText(values.actualArrivalTime, 5),
     arrivalStatus: ARRIVAL_STATUSES.includes(values.arrivalStatus) ? values.arrivalStatus : 'Expected',
     arrivalNote: cleanText(values.arrivalNote, 1000),
     linkedTaskId: cleanText(values.linkedTaskId, 128),
@@ -98,6 +101,7 @@ export function normalizeRunOfShowItem(values = {}, event = {}, existing = {}) {
     linkedResourceIds: cleanList(values.linkedResourceIds || existing.linkedResourceIds),
     dependencyItemIds: cleanList(values.dependencyItemIds || existing.dependencyItemIds),
     delayReason: status === 'Delayed' ? cleanText(values.delayReason, 1000) : '',
+    criticalForEvent: Boolean(values.criticalForEvent),
     createdAt: existing.createdAt || values.createdAt || null,
     createdBy: cleanText(existing.createdBy || values.createdBy, 256),
     updatedAt: values.updatedAt || existing.updatedAt || null,
@@ -112,6 +116,7 @@ export function validateRunOfShowItem(values = {}) {
   if (!item.date) errors.push('Date is required.')
   if (!/^\d{2}:\d{2}$/.test(item.startTime)) errors.push('Start time is required.')
   if (item.endTime && !/^\d{2}:\d{2}$/.test(item.endTime)) errors.push('End time must use HH:MM.')
+  if (item.actualArrivalTime && !/^\d{2}:\d{2}$/.test(item.actualArrivalTime)) errors.push('Actual arrival must use HH:MM.')
   if (item.endTime && item.endTime < item.startTime) errors.push('End time cannot be before start time.')
   return errors
 }
@@ -137,6 +142,7 @@ export function buildTimelineState(items = [], now = new Date()) {
     upcoming,
     delayed: sorted.filter((item) => item.status === 'Delayed'),
     completed: sorted.filter((item) => item.status === 'Completed'),
+    recentlyCompleted: sorted.filter((item) => item.status === 'Completed').slice(-5).reverse(),
   }
 }
 
@@ -171,8 +177,10 @@ export function buildRunOfShowSummary(items = []) {
     inProgress: rows.filter((item) => item.status === 'In Progress').length,
     completed: rows.filter((item) => item.status === 'Completed').length,
     delayed: rows.filter((item) => item.status === 'Delayed').length,
+    criticalDelayed: rows.filter((item) => item.criticalForEvent && item.status === 'Delayed').length,
     cancelled: rows.filter((item) => item.status === 'Cancelled').length,
     supplierArrivalsExpected: rows.filter((item) => item.expectedArrivalTime && item.arrivalStatus === 'Expected').length,
     supplierArrivalsDelayed: rows.filter((item) => item.arrivalStatus === 'Delayed').length,
+    criticalSupplierArrivalsDelayed: rows.filter((item) => item.criticalForEvent && item.arrivalStatus === 'Delayed').length,
   }
 }

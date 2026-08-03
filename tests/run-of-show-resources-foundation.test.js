@@ -63,13 +63,17 @@ test('Run of Show supports event-day sequencing, dependencies, arrivals, and tas
     startTime: '13:00',
     endTime: '13:30',
     responsibleContactId: 'legacy-contact-1',
+    actualArrivalTime: '13:05',
     linkedDocumentIds: ['legacy-doc-1'],
     linkedResourceIds: ['resource-1'],
+    criticalForEvent: true,
   })
   const normalized = normalizeRunOfShowItem(item)
 
   assert.equal(validateRunOfShowItem(normalized).length, 0)
   assert.equal(normalized.responsibleContactId, 'legacy-contact-1')
+  assert.equal(normalized.actualArrivalTime, '13:05')
+  assert.equal(normalized.criticalForEvent, true)
   assert.deepEqual(normalized.linkedDocumentIds, ['legacy-doc-1'])
 
   const delayed = normalizeRunOfShowItem({ ...normalized, itemId: 'ros-1', status: 'Delayed', dependencyItemIds: ['missing-item'] })
@@ -80,8 +84,10 @@ test('Run of Show supports event-day sequencing, dependencies, arrivals, and tas
   assert.equal(sorted[0].itemId, 'ros-1')
   assert.equal(summary.total, 2)
   assert.equal(summary.delayed, 1)
+  assert.equal(summary.criticalDelayed, 1)
   assert.equal(unresolvedDependencies(delayed, sorted).length, 0)
   assert.equal(buildTimelineState(sorted, new Date('2026-09-01T15:00:00')).next.itemId, 'ros-2')
+  assert.deepEqual(buildTimelineState(sorted, new Date('2026-09-01T15:00:00')).recentlyCompleted, [])
   assert.match(runOfShowTaskPrefill(delayed).title, /Follow up:/)
 })
 
@@ -100,10 +106,12 @@ test('Resources support quantities, packing lifecycle, old links, and task prefi
     quantityConfirmed: 6,
     linkedDocumentIds: ['legacy-doc-2'],
     linkedRunOfShowItemIds: ['ros-setup'],
+    packingRequired: true,
     pickupRequired: true,
     pickupDueDate: '2026-08-05',
     returnRequired: true,
     returnDueDate: '2026-08-05',
+    criticalForEvent: true,
   }))
   const validation = validateEventResource(resource)
   const summary = buildResourceSummary([resource, normalizeEventResource({ ...resource, resourceId: 'resource-2', quantityNeeded: 2, quantityConfirmed: 2, status: 'On Site' })], new Date('2026-08-06T12:00:00'))
@@ -111,6 +119,9 @@ test('Resources support quantities, packing lifecycle, old links, and task prefi
   assert.equal(validation.length, 0)
   assert.equal(summary.total, 2)
   assert.equal(summary.shortages, 1)
+  assert.equal(summary.criticalShortages, 1)
+  assert.equal(summary.needed, 1)
+  assert.equal(summary.packingIncomplete, 1)
   assert.equal(summary.pickupDue, 1)
   assert.match(resourceTaskPrefill(resource).title, /Resource follow-up/)
 })
@@ -136,13 +147,56 @@ test('Overview readiness includes event-scoped Run of Show and Resources without
     amountDue: 200,
     paymentStatus: 'partial',
   }
-  const readiness = buildEventReadiness(event, [registration], [], [], [])
+  const readiness = buildEventReadiness(event, [registration], [], [
+    normalizeRunOfShowItem({
+      itemId: 'critical-arrival',
+      eventId: 'event-1',
+      eventName: 'Event One',
+      title: 'Supplier arrival',
+      category: 'Supplier Arrival',
+      date: '2026-09-01',
+      startTime: '11:00',
+      status: 'Delayed',
+      arrivalStatus: 'Delayed',
+      criticalForEvent: true,
+    }),
+  ], [
+    normalizeEventResource({
+      resourceId: 'critical-resource',
+      eventId: 'event-1',
+      eventName: 'Event One',
+      name: 'Tent',
+      quantityNeeded: 1,
+      quantityConfirmed: 0,
+      status: 'Needed',
+      criticalForEvent: true,
+    }),
+  ])
 
   assert.ok(readiness.actionItems.some((item) => item.to === '/run-of-show'))
   assert.ok(readiness.actionItems.some((item) => item.to === '/resources'))
+  assert.equal(readiness.eventDayReadiness.status, 'At Risk')
+  assert.ok(readiness.eventDayReadiness.reasons.some((item) => item.key === 'critical-run-of-show-delayed'))
+  assert.ok(readiness.eventDayReadiness.reasons.some((item) => item.key === 'critical-resource-shortage'))
   assert.equal(readiness.metrics.totalRegistrations, 1)
   assert.equal(readiness.metrics.totalPersons, 2)
   assert.equal(readiness.operationsTotals.income, 0)
+})
+
+test('Run of Show and Resources forms use practical relationship selectors instead of manual ID entry', async () => {
+  const [runOfShowPage, resourcesPage] = await Promise.all([
+    readFile('src/pages/RunOfShowPage.jsx', 'utf8'),
+    readFile('src/pages/ResourcesPage.jsx', 'utf8'),
+  ])
+
+  for (const text of ['Responsible staff', 'Responsible contact', 'Responsible organization', 'Linked task', 'Linked documents', 'Critical for event-day readiness']) {
+    assert.match(runOfShowPage, new RegExp(text))
+  }
+  for (const text of ['Supplier contact', 'Supplier organization', 'Linked Operations entry', 'Linked commitment', 'Requested', 'Ordered / Reserved']) {
+    assert.match(resourcesPage, new RegExp(text))
+  }
+  assert.doesNotMatch(runOfShowPage, /Responsible contact ID/)
+  assert.doesNotMatch(resourcesPage, /Supplier contact ID/)
 })
 
 test('Guardrail source checks remain explicit', async () => {

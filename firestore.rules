@@ -1025,18 +1025,18 @@ service cloud.firestore {
           'startTime', 'endTime', 'sequence', 'location', 'status',
           'description', 'notes', 'responsibleStaffUid', 'responsibleContactId',
           'responsibleOrganizationId', 'responsibleLabel', 'expectedArrivalTime',
-          'arrivalStatus', 'arrivalNote', 'linkedTaskId', 'linkedDocumentIds',
+          'actualArrivalTime', 'arrivalStatus', 'arrivalNote', 'linkedTaskId', 'linkedDocumentIds',
           'linkedResourceIds', 'dependencyItemIds', 'delayReason',
-          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+          'criticalForEvent', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
         ])
         && data.keys().hasOnly([
           'itemId', 'eventId', 'eventName', 'title', 'category', 'date',
           'startTime', 'endTime', 'sequence', 'location', 'status',
           'description', 'notes', 'responsibleStaffUid', 'responsibleContactId',
           'responsibleOrganizationId', 'responsibleLabel', 'expectedArrivalTime',
-          'arrivalStatus', 'arrivalNote', 'linkedTaskId', 'linkedDocumentIds',
+          'actualArrivalTime', 'arrivalStatus', 'arrivalNote', 'linkedTaskId', 'linkedDocumentIds',
           'linkedResourceIds', 'dependencyItemIds', 'delayReason',
-          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+          'criticalForEvent', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
         ])
         && data.itemId == itemId
         && validShortId(data.itemId)
@@ -1072,6 +1072,8 @@ service cloud.firestore {
         && validArrivalStatus(data.arrivalStatus)
         && data.expectedArrivalTime is string
         && (data.expectedArrivalTime == '' || data.expectedArrivalTime.matches('^\\d{2}:\\d{2}$'))
+        && data.actualArrivalTime is string
+        && (data.actualArrivalTime == '' || data.actualArrivalTime.matches('^\\d{2}:\\d{2}$'))
         && data.arrivalNote is string
         && data.arrivalNote.size() <= 1000
         && data.dependencyItemIds is list
@@ -1085,6 +1087,7 @@ service cloud.firestore {
         && data.updatedAt is timestamp
         && validPerformedBy(data.createdBy)
         && validPerformedBy(data.updatedBy)
+        && data.criticalForEvent is bool
         && data.delayReason is string
         && data.delayReason.size() <= 1000
         && (data.status == 'Delayed' || data.delayReason == '');
@@ -1122,7 +1125,7 @@ service cloud.firestore {
           'packingRequired', 'pickupRequired', 'returnRequired', 'pickupDueDate',
           'returnDueDate', 'notes', 'linkedTaskId',
           'linkedDocumentIds', 'linkedOperationId', 'linkedCommitmentId',
-          'linkedRunOfShowItemIds',
+          'linkedRunOfShowItemIds', 'criticalForEvent',
           'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
         ])
         && data.keys().hasOnly([
@@ -1132,7 +1135,7 @@ service cloud.firestore {
           'packingRequired', 'pickupRequired', 'returnRequired', 'pickupDueDate',
           'returnDueDate', 'notes', 'linkedTaskId',
           'linkedDocumentIds', 'linkedOperationId', 'linkedCommitmentId',
-          'linkedRunOfShowItemIds',
+          'linkedRunOfShowItemIds', 'criticalForEvent',
           'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
         ])
         && data.resourceId == resourceId
@@ -1165,6 +1168,7 @@ service cloud.firestore {
         && validOptionalString(data.linkedCommitmentId, 128)
         && data.linkedRunOfShowItemIds is list
         && data.linkedRunOfShowItemIds.size() <= 50
+        && data.criticalForEvent is bool
         && data.packingRequired is bool
         && data.pickupRequired is bool
         && data.returnRequired is bool
@@ -1288,7 +1292,7 @@ service cloud.firestore {
         && data.action in [
           'run-of-show.create', 'run-of-show.update',
           'run-of-show.delayed', 'run-of-show.status',
-          'run-of-show.delete'
+          'run-of-show.arrival', 'run-of-show.delete'
         ]
         && data.targetType == 'runOfShow'
         && validShortId(data.targetId)
