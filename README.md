@@ -1,6 +1,6 @@
 # Gather & Savor Event Hub
 
-The current product, workflow, authorization, QA, monitoring, and release reference is [`docs/PRODUCT_GUIDE.md`](./docs/PRODUCT_GUIDE.md). Historical phase records are preserved in [`docs/HISTORICAL_ARCHIVE_INDEX.md`](./docs/HISTORICAL_ARCHIVE_INDEX.md); the older cumulative engineering handoff remains in [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md).
+The current product, workflow, authorization, QA, monitoring, and release reference is [`docs/GSV_MASTER_SYSTEM_REFERENCE.md`](./docs/GSV_MASTER_SYSTEM_REFERENCE.md), with organizer detail in [`docs/PRODUCT_GUIDE.md`](./docs/PRODUCT_GUIDE.md). Repository inventory and maintenance policy live in [`docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md`](./docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md). Historical phase records are interpreted through [`docs/HISTORICAL_ARCHIVE_INDEX.md`](./docs/HISTORICAL_ARCHIVE_INDEX.md); the older cumulative engineering handoff remains in [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md) because tests and future agents reference its exact path.
 
 Private event-operations dashboard for **Gather & Savor Vibes**. This is an admin-only workspace—not a public attendee app. Guests continue using Instagram, Linktree, Google Forms, and Google Sheets.
 
@@ -8,6 +8,8 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 
 ## Current product docs
 
+- [`docs/GSV_MASTER_SYSTEM_REFERENCE.md`](./docs/GSV_MASTER_SYSTEM_REFERENCE.md)
+- [`docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md`](./docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md)
 - [`docs/PRODUCT_GUIDE.md`](./docs/PRODUCT_GUIDE.md)
 - [`docs/ROUTE_MAP.md`](./docs/ROUTE_MAP.md)
 - [`docs/ORGANIZER_QUICK_START.md`](./docs/ORGANIZER_QUICK_START.md)
@@ -24,10 +26,17 @@ This private admin app intentionally uses `noindex` and does not publish `sitema
 
 ## Current workspace summary
 
-- Use `Overview`, `Events`, `Guests & Registrations`, `Payments`, `Tickets`, `Check-In`, `Operations`, `Message Builder`, `Reports`, `Settings`, and `System QA` as the current organizer-facing structure.
+- Use the current grouped organizer structure: Plan; Guests & Attendance; Event Day; Money & Follow-Up; Tools; System.
+- Current organizer labels include `Overview`, `Events`, `Tasks & Deadlines`, `Contacts & Organizations`, `Documents`, `Guests & Registrations`, `Tickets`, `Check-In`, `Run of Show`, `Equipment & Supplies`, `Registration Payments`, `Operations & Commitments`, `Reports`, `Reconciliation Preview`, `Import Center & Response Inbox`, `Message Builder`, `Settings`, and `System QA`.
 - Start a new real event from `Events` with `Plan a New Event`, then keep that event selected as the Working Event.
-- Use `CODEX_TEST Live Verification Event` for walkthroughs, QA, and destructive demos.
-- Keep CPB production data read-only during routine QA and rehearsal.
+- Use `CODEX_DEMO - Full System Walkthrough` (`codex_demo_full_system_walkthrough`) for walkthroughs, QA, training, and reversible synthetic write checks.
+- Treat `CODEX_TEST Live Verification Event` as a retired historical QA fixture. It may remain in archived docs and compatibility tests, but active instructions should not recreate or use it for new production QA.
+- Treat Cake Piknik Barbados as a normal completed real event protected by the same safeguards as every other real event. Do not use CPB for synthetic QA writes.
+- Update canonical documentation instead of creating a new standalone Markdown report by default; create new docs only for permanent standards, immutable evidence, compliance needs, tooling dependencies, or content that cannot reasonably fit canonical docs.
+
+## Current-truth note for historical sections below
+
+Older phase closeout sections are retained because they are historical evidence and because existing tests reference exact wording. When they mention `CODEX_TEST` as the QA fixture or describe CPB as protected/read-only, read that as historical context. The current standard is CODEX_DEMO for synthetic QA and standard real-event safeguards for CPB.
 
 ## Implementation status
 

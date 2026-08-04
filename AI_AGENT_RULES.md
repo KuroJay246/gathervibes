@@ -2,7 +2,20 @@
 
 Before any future AI/Codex phase, read this file first, then read `PROJECT_HANDOFF.md`, then read `README.md`.
 
-This project previously had a real stale-knowledge bug: Phase 17C-B deployed staff/scanner Firestore rules and created scanner staff documents, but scanner login was still blocked by the old approvedEmails-only client auth gate. Future AI/Codex work must treat related app flow, docs, tests, rules, and UI copy as one connected surface.
+This project previously had real stale-knowledge bugs: staff/scanner rules were once deployed while the client still used an approvedEmails-only gate, and later docs still described retired CODEX_TEST/CPB-specific behavior after CODEX_DEMO and standard real-event safeguards became current. Future AI/Codex work must treat related app flow, docs, tests, rules, data, and UI copy as one connected surface.
+
+## Current canonical truth
+
+- Current production Firebase project: `gathervibeshub`.
+- Current production URL: `https://gathervibeshub.web.app`.
+- Current local URL: `http://localhost:4173`.
+- Protected Owner UID: `WcDU2jmbopdAgDlMMWvD3TkqqbC3`.
+- Protected Owner email: `jaylanspencer99@gmail.com`.
+- Current synthetic QA/training event: `CODEX_DEMO - Full System Walkthrough`.
+- Current synthetic QA/training event ID: `codex_demo_full_system_walkthrough`.
+- Retired historical QA event: `CODEX_TEST Live Verification Event` / `xPfa0b3KZyLSDnAD2uGI`.
+- Real event safety: CPB is a normal completed real event and uses the same safeguards as every other real event. Do not use CPB for synthetic QA writes.
+- Canonical docs: `docs/GSV_MASTER_SYSTEM_REFERENCE.md`, `docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md`, `docs/PRODUCT_GUIDE.md`, and `docs/ROUTE_MAP.md`.
 
 ## Required startup checks for every future AI/Codex phase
 
@@ -31,7 +44,7 @@ This project previously had a real stale-knowledge bug: Phase 17C-B deployed sta
 12. Treat `approvedEmails` as admin-level access only.
 13. Treat staff/scanner access as `staffProfiles/{uid}` plus `events/{eventId}/staffAssignments/{uid}`.
 14. Protect CPB as production data.
-15. Use `CODEX_TEST` only for QA and smoke testing.
+15. Use `CODEX_DEMO` only for new synthetic QA, demos, training, and reversible write testing.
 16. Preserve QR payload exactly as `GSV:TICKET:{ticketCode}`.
 17. Keep `xlsx` absent and `read-excel-file` active.
 18. Run `npm run lint`, `npm test`, `npm run build`, `npm audit --omit=dev`, and `npx -y firebase-tools@latest deploy --only firestore:rules --dry-run --project gathervibeshub` when relevant to the change.
@@ -69,7 +82,7 @@ If chat decisions and repo docs contradict each other, stop and reconcile them b
 - Scanner/check-in-only users remain check-in only. Do not give the normal scanner role Undo Check-In or Check Out.
 - Approved admins may use existing admin-only undo/check-out paths where already implemented.
 - A future lead-scanner undo permission may be planned later, but it is not implemented now.
-- `CODEX_TEST` is the only scanner smoke event.
+- `CODEX_DEMO` is the current scanner smoke and synthetic QA event. Older CODEX_TEST references are historical unless a compatibility test explicitly uses that name.
 - CPB must not be used for QA.
 - Firestore indexes must not be deployed unless explicitly requested.
 - Native app, Cloud Functions, Storage, payment gateway, and public portal work remain out of scope unless explicitly requested.

@@ -1,0 +1,2388 @@
+{
+  "summary": {
+    "generatedAt": "2026-08-04T22:35:49.677Z",
+    "totalDocuments": 137
+  },
+  "documents": [
+    {
+      "path": ".firebase/rules-review.md",
+      "title": "Firestore rules review (untracked)",
+      "purpose": "generated",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "AI_AGENT_RULES.md",
+      "title": "AI Agent Rules",
+      "purpose": "Operational AI-agent rules expected at repository root.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+        "PHASE_17D_PLAN.md",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js",
+        "tests/phase17r-release-stabilizer.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "AI_AGENT_RULES.md"
+    },
+    {
+      "path": "AUDIT_PHASE_14_15_HANDOFF.md",
+      "title": "Gather & Savor Event Hub — System Audit After Phase 13A",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "dist/robots.txt",
+      "title": "robots.txt",
+      "purpose": "generated",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase15a-security-headers.test.js",
+        "tests/phase15a-security-headers.test.js",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/APP_WIDE_CPB_LANGUAGE_AUDIT_2026-07.md",
+      "title": "App-Wide CPB and Generic Product Language Audit",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/AUDIT_LOG_BUSINESS_WRITE_STANDARD.md",
+      "title": "Audit Log Business Write Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/AUDIT_LOG_BUSINESS_WRITE_STANDARD.md"
+    },
+    {
+      "path": "docs/BAKER_PAYMENT_GUIDE.md",
+      "title": "Baker Payment Guide",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/BULK_OPERATION_RECOVERY_MODEL.md",
+      "title": "Bulk Operation Recovery Model",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/CODEX_DEMO_FULL_SYSTEM_WALKTHROUGH_STANDARD.md",
+      "title": "CODEX_DEMO Full System Walkthrough Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/CODEX_DEMO_FULL_SYSTEM_WALKTHROUGH_STANDARD.md"
+    },
+    {
+      "path": "docs/CODEX_TEST_RETIREMENT_RESULT_2026-08.md",
+      "title": "CODEX_TEST Retirement Result - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/CONTACTS_AND_ORGANIZATIONS_FOUNDATION_RESULT_2026-08.md",
+      "title": "Contacts and Organizations Foundation Result - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/CONTACT_AND_EVENT_RELATIONSHIP_STANDARD.md",
+      "title": "Contact and Event Relationship Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/CONTACT_AND_EVENT_RELATIONSHIP_STANDARD.md"
+    },
+    {
+      "path": "docs/CPB_HISTORICAL_ATTENDANCE_DRY_RUN.md",
+      "title": "CPB Historical Attendance Dry Run",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/DEPLOYMENT_GUIDE.md",
+      "title": "Deployment Guide",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/DEPLOYMENT_GUIDE.md"
+    },
+    {
+      "path": "docs/DOCUMENT_REFERENCE_DATA_STANDARD.md",
+      "title": "Document Reference Data Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/DOCUMENT_REFERENCE_DATA_STANDARD.md"
+    },
+    {
+      "path": "docs/DOCUMENT_REGISTER_FOUNDATION_RESULT_2026-08.md",
+      "title": "Document Register Foundation Result - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/EQUIPMENT_AND_SUPPLIES_WORKFLOW_STANDARD.md",
+      "title": "Equipment and Supplies Workflow Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/EQUIPMENT_AND_SUPPLIES_WORKFLOW_STANDARD.md"
+    },
+    {
+      "path": "docs/EVENT_DAY_GUIDE.md",
+      "title": "Event Day Guide",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/EVENT_DAY_RUN_OF_SHOW_STANDARD.md",
+      "title": "Event-Day Run of Show Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/EVENT_DAY_RUN_OF_SHOW_STANDARD.md"
+    },
+    {
+      "path": "docs/EVENT_DAY_TICKET_AND_CHECKIN_STANDARD.md",
+      "title": "Event-Day Ticket and Check-In Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/EVENT_LIFECYCLE_GUIDE.md",
+      "title": "Event Lifecycle Guide",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/EVENT_READINESS_STANDARD_2026-08.md",
+      "title": "Event Readiness Standard - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/EVENT_REPORT_AND_RECONCILIATION_STANDARD.md",
+      "title": "Event Report and Reconciliation Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/EVENT_RESOURCE_FOUNDATION_RESULT_2026-08.md",
+      "title": "Event Resource Foundation Result - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/EVENT_SETUP_STAGE_STANDARD.md",
+      "title": "Event Setup Stage Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase2-guided-event-setup-task-deadline.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/EVENT_TASK_AND_DEADLINE_STANDARD.md",
+      "title": "Event Task and Deadline Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/phase2-guided-event-setup-task-deadline.test.js"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/EVENT_TASK_AND_DEADLINE_STANDARD.md"
+    },
+    {
+      "path": "docs/FINAL_ACCESSIBILITY_AND_RESPONSIVE_ACCEPTANCE_2026-08.md",
+      "title": "Final Accessibility and Responsive Acceptance",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/FINAL_MANUAL_BROWSER_ACCEPTANCE_CHECKLIST_2026-08.md",
+      "title": "Final Manual Browser Acceptance Checklist",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/FINANCE_EVIDENCE_GUIDE.md",
+      "title": "Finance Evidence Guide",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/FINANCIAL_SOURCE_AND_CALCULATION_MAP_2026-08.md",
+      "title": "Financial Source and Calculation Map 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/FINANCIAL_WORKFLOW_DATA_INTEGRITY_RESULT_2026-08.md",
+      "title": "Financial Workflow Data Integrity Result 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/FIRESTORE_PRODUCTION_OWNER_WRITE_ROOT_CAUSE_2026-08.md",
+      "title": "Firestore Production Owner Write Root Cause - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/protected-owner-authorization-matrix.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/FULL_ORGANIZER_INTERFACE_COMPREHENSION_AUDIT_2026-08.md",
+      "title": "Full Organizer Interface Comprehension Audit",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/FULL_PRODUCTION_ORGANIZER_USABILITY_ACCEPTANCE_2026-08.md",
+      "title": "Full Production Organizer Usability Acceptance - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/FULL_STACK_PRODUCT_REALITY_AUDIT_2026-07.md",
+      "title": "Gather & Savor Full-Stack Product Reality Audit",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/GATHER_SAVOR_VISUAL_SYSTEM_STANDARD.md",
+      "title": "Gather & Savor Visual System Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/ORGANIZER_SHELL_AND_OVERVIEW_RESULT_2026-08.md"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/GOOGLE_FORMS_RESPONSE_INBOX_WORKFLOW.md",
+      "title": "Google Forms Response Inbox Workflow",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+      "title": "Gather & Savor Master System Reference",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "AI_AGENT_RULES.md",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+      "title": "Gather & Savor Repository Maintenance Manifest",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "AI_AGENT_RULES.md",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md"
+    },
+    {
+      "path": "docs/GUESTS_AND_REGISTRATIONS_REFINEMENT_PLAN_2026-08.md",
+      "title": "Guests and Registrations Refinement Plan - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/GUIDED_EVENT_SETUP_AND_TASKS_PLAN_2026-08.md",
+      "title": "Guided Event Setup and Tasks Plan - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase2-guided-event-setup-task-deadline.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/GUIDED_EVENT_SETUP_RESULT_2026-08.md",
+      "title": "Guided Event Setup Result - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase2-guided-event-setup-task-deadline.test.js"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "title": "Historical Archive Index",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/IMMEDIATE_STABILIZATION_IMPLEMENTATION_PLAN_2026-07.md",
+      "title": "Immediate Stabilization Implementation Plan - 2026-07",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/IMMEDIATE_STABILIZATION_IMPLEMENTATION_RESULT_2026-08.md",
+      "title": "Immediate Stabilization Implementation Result - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/IMPORT_AND_RESPONSE_INTAKE_REFINEMENT_RESULT_2026-08.md",
+      "title": "Import and Response Intake Refinement Result - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/IMPORT_CENTER_DAILY_WORKFLOW_STANDARD.md",
+      "title": "Import Center Daily Workflow Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/IMPORT_CENTER_UPGRADE_PLAN_2026-08.md",
+      "title": "Import Center Upgrade Plan 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/IMPORT_CENTER_UPGRADE_RESULT_2026-08.md",
+      "title": "Import Center Upgrade Result 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/IMPORT_INTAKE_AND_MESSAGE_REFINEMENT_PLAN_2026-08.md",
+      "title": "Import Intake and Message Refinement Plan - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/IMPORT_SOURCE_AND_RECORD_TYPE_STANDARD.md",
+      "title": "Import Source And Record Type Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/IMPORT_TEMPLATE_AND_HEADER_MAPPING_STANDARD.md",
+      "title": "Import Template And Header Mapping Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/KNOWN_LIMITATIONS.md",
+      "title": "Known Limitations",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/LEGACY_RECORD_EDIT_COMPATIBILITY_HOTFIX_2026-08.md",
+      "title": "Legacy Record Edit Compatibility Hotfix - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/protected-owner-authorization-matrix.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/MESSAGE_BUILDER_COPY_ONLY_STANDARD.md",
+      "title": "Message Builder Copy-Only Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/MESSAGE_BUILDER_COPY_ONLY_STANDARD.md"
+    },
+    {
+      "path": "docs/MESSAGE_BUILDER_REFINEMENT_RESULT_2026-08.md",
+      "title": "Message Builder Refinement Result - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/NEW_EVENT_SETUP_GUIDE.md",
+      "title": "New Event Setup Guide",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/OPERATIONS_GUIDE.md",
+      "title": "Operations Guide",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/OPERATIONS_LEDGER_ENTRY_STANDARD.md",
+      "title": "Operations Ledger Entry Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/OPERATIONS_LEDGER_ENTRY_STANDARD.md"
+    },
+    {
+      "path": "docs/OPERATIONS_PARTNER_AND_COMMITMENT_REFINEMENT_RESULT_2026-08.md",
+      "title": "Operations Partner and Commitment Refinement Result",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/OPERATIONS_PRESENTATION_AND_COMMITMENT_STANDARD.md",
+      "title": "Operations Presentation and Commitment Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/ORGANIZER_ACTION_HIERARCHY_STANDARD.md",
+      "title": "Organizer Action Hierarchy Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/ORGANIZER_COMPREHENSION_AND_USABILITY_AUDIT_2026-08.md",
+      "title": "Organizer Comprehension and Usability Audit",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/ORGANIZER_PAGE_EXPLANATION_STANDARD.md",
+      "title": "Organizer Page Explanation Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/ORGANIZER_QUICK_START.md",
+      "title": "Organizer Quick Start",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/ORGANIZER_SHELL_AND_OVERVIEW_REFINEMENT_PLAN_2026-08.md",
+      "title": "Organizer Shell and Overview Refinement Plan",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/ORGANIZER_SHELL_AND_OVERVIEW_RESULT_2026-08.md"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/ORGANIZER_SHELL_AND_OVERVIEW_RESULT_2026-08.md",
+      "title": "Organizer Shell and Overview Refinement Result",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/ORGANIZER_STATUS_AND_TERMINOLOGY_STANDARD.md",
+      "title": "Organizer Status and Terminology Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/ORGANIZER_UNDERSTANDABILITY_AND_USABILITY_STANDARD.md",
+      "title": "Organizer Understandability and Usability Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/ORGANIZER_UNDERSTANDABILITY_AND_USABILITY_STANDARD.md"
+    },
+    {
+      "path": "docs/PDF_TABLE_IMPORT_LIMITATIONS.md",
+      "title": "PDF Table Import Limitations",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/PRODUCT_GUIDE.md",
+      "title": "Gather & Savor Event Hub Product Guide",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "AI_AGENT_RULES.md",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/PRODUCT_GUIDE.md"
+    },
+    {
+      "path": "docs/PRODUCT_QA_EMULATOR_RUNNER_STANDARD.md",
+      "title": "Product QA Emulator Runner Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/PROTECTED_OWNER_APPLICATION_ACCESS_STANDARD.md",
+      "title": "Protected Owner Application Access Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/PROTECTED_OWNER_APPLICATION_ACCESS_STANDARD.md"
+    },
+    {
+      "path": "docs/PROTECTED_OWNER_AUTHORIZATION_MATRIX_2026-08.md",
+      "title": "Protected Owner Authorization Matrix - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/protected-owner-authorization-matrix.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/PROTECTED_OWNER_SUPER_ADMIN_AND_MAINTENANCE_STANDARD.md",
+      "title": "Protected Owner Super Admin and Maintenance Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/PROTECTED_OWNER_SUPER_ADMIN_AND_MAINTENANCE_STANDARD.md"
+    },
+    {
+      "path": "docs/PROTOTYPE_DEMO_GUIDE.md",
+      "title": "Organizer Rehearsal Guide",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/PROTOTYPE_DEMO_GUIDE.md"
+    },
+    {
+      "path": "docs/QA_GUIDE.md",
+      "title": "QA Guide",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/QA_GUIDE.md"
+    },
+    {
+      "path": "docs/REGISTRATION_PAYMENTS_AND_OPERATIONS_REFINEMENT_PLAN_2026-08.md",
+      "title": "Registration Payments and Operations Refinement Plan",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/REGISTRATION_PAYMENT_FOLLOW_UP_REFINEMENT_RESULT_2026-08.md",
+      "title": "Registration Payment Follow-Up Refinement Result",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/REGISTRATION_PAYMENT_REVIEW_AND_ACTION_STANDARD.md",
+      "title": "Registration Payment Review and Action Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/REGISTRATION_PAYMENT_REVIEW_AND_ACTION_STANDARD.md"
+    },
+    {
+      "path": "docs/REGISTRATION_PAYMENT_STATUS_STANDARD.md",
+      "title": "Registration Payment Status Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/REGISTRATION_PAYMENT_STATUS_STANDARD.md"
+    },
+    {
+      "path": "docs/REPORTS_AND_RECONCILIATION_REFINEMENT_RESULT_2026-08.md",
+      "title": "Reports and Reconciliation Refinement Result",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/RESPONSE_INBOX_REVIEW_STANDARD.md",
+      "title": "Response Inbox Review Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/ROUTE_MAP.md",
+      "title": "Gather & Savor Event Hub Route Map",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "AI_AGENT_RULES.md",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/ROUTE_MAP.md"
+    },
+    {
+      "path": "docs/RUN_OF_SHOW_FOUNDATION_RESULT_2026-08.md",
+      "title": "Run of Show Foundation Result - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/RUN_OF_SHOW_RESOURCES_EXISTING_DATA_COMPATIBILITY_2026-08.md",
+      "title": "Run of Show and Resources Existing Data Compatibility - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/RUN_OF_SHOW_RESOURCE_COMPLETION_AUDIT_2026-08.md",
+      "title": "Run of Show and Event Resources Completion Audit - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/SETTINGS_AND_ACCESS_PRESENTATION_STANDARD.md",
+      "title": "Settings and Access Presentation Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/SETTINGS_AND_SYSTEM_QA_REFINEMENT_RESULT_2026-08.md",
+      "title": "Settings and System QA Refinement Result",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/SETTINGS_SYSTEM_QA_TUTORIAL_FINAL_REFINEMENT_PLAN_2026-08.md",
+      "title": "Settings, System QA, and Tutorial Final Refinement Plan",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/SYSTEM_QA_PRESENTATION_STANDARD.md",
+      "title": "System QA Presentation Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/SYSTEM_QA_PRESENTATION_STANDARD.md"
+    },
+    {
+      "path": "docs/TASK_STATUS_AND_PRIORITY_STANDARD.md",
+      "title": "Task Status and Priority Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase2-guided-event-setup-task-deadline.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/TICKETS_AND_CHECKIN_REFINEMENT_RESULT_2026-08.md",
+      "title": "Tickets and Check-In Refinement Result",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/TICKETS_CHECKIN_REPORTS_REFINEMENT_PLAN_2026-08.md",
+      "title": "Tickets, Check-In, Reports, and Reconciliation Refinement Plan",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/TUTORIAL_AND_IN_APP_GUIDANCE_MAINTENANCE_STANDARD.md",
+      "title": "Tutorial and In-App Guidance Maintenance Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "active",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/TUTORIAL_AND_IN_APP_GUIDANCE_MAINTENANCE_STANDARD.md"
+    },
+    {
+      "path": "docs/TUTORIAL_LEGACY_FAILURE_AUDIT_2026-07.md",
+      "title": "Tutorial Legacy Failure Audit - 2026-07",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/TUTORIAL_PRODUCTION_STRESS_RESULTS.md",
+      "title": "Tutorial V3 Production Stress Results",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/TUTORIAL_STEP_BY_STEP_TARGET_AUDIT_2026-07.md",
+      "title": "Tutorial V3 Step-by-Step Target Audit",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/TUTORIAL_V3_ARCHITECTURE.md",
+      "title": "Tutorial V3 Architecture",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/TUTORIAL_V3_CURRENT_PRODUCT_GAP_AUDIT_2026-08.md",
+      "title": "Tutorial V3 Current Product Gap Audit - 2026-08",
+      "purpose": "Project documentation or operating standard.",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "docs/TUTORIAL_V3_FINAL_STANDARD_2026-08.md",
+      "title": "Tutorial V3 Final Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/VISUAL_LAYOUT_INFORMATION_ARCHITECTURE_REVIEW_2026-07.md",
+      "title": "Visual Layout and Information Architecture Review",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "docs/WORKING_EVENT_OVERVIEW_STANDARD.md",
+      "title": "Working Event Overview Standard",
+      "purpose": "Project documentation or operating standard.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/ORGANIZER_SHELL_AND_OVERVIEW_RESULT_2026-08.md"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "integrations/google-forms/REMOVE.md",
+      "title": "Remove Google Forms Integration",
+      "purpose": "active documentation",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "integrations/google-forms/SETUP.md",
+      "title": "Google Forms Response Inbox Setup",
+      "purpose": "active documentation",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "integrations/google-forms/TESTING.md",
+      "title": "Google Forms Integration Testing",
+      "purpose": "active documentation",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "PHASE_14B_REVIEW_FIX_HANDOFF.md",
+      "title": "Phase 14B Review Fix Handoff",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md",
+      "title": "Phase 17D-D Access Workflow Readiness",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_17D_PLAN.md",
+      "title": "Phase 17D Plan",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md",
+      "title": "Phase 17E-A — Access Workflow Rules + Data Model Review",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "PROJECT_HANDOFF.md",
+        "README.md"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_17E_E_ACCESS_WORKFLOW_DEPLOYMENT_READINESS.md",
+      "title": "Phase 17E-E — Access Workflow Deployment Readiness",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "tests/phase17e-b-access-request-rules.test.js",
+        "tests/phase17e-cde-ui-readiness-ci.test.js"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_17F_A_ACCESS_WORKFLOW_IMPLEMENTATION_PLAN.md",
+      "title": "Phase 17F-A - Access Workflow Implementation Plan",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "tests/phase17f-access-workflow-continuation.test.js"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_17F_C_ACCESS_WORKFLOW_SMOKE_CHECKLIST.md",
+      "title": "Phase 17F-C - Access Workflow Smoke Checklist",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "tests/phase17f-access-workflow-continuation.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_17G_A_LIVE_WORKFLOW_GO_NO_GO_RULES_APPROVAL.md",
+      "title": "Phase 17G-A — Live Workflow Go/No-Go Review + Rules Deployment Approval Package",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "tests/phase17f-access-workflow-continuation.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md",
+      "title": "Phase 17G-B - Firestore Rules Deployment Approval + Dry-Run Final Review",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "tests/phase17e-b-access-request-rules.test.js",
+        "tests/phase17f-access-workflow-continuation.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_17R_RELEASE_STABILIZER_AUTOFIX.md",
+      "title": "Phase 17R — Release Stabilizer / Auto-Fixer / QA Corrector",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_18_CORE_APP_READINESS.md",
+      "title": "Phase 18 — Core App Readiness",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_19_OPERATIONS_PRODUCTIVITY.md",
+      "title": "Phase 19 — Operations + Productivity",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_20_DASHBOARD_OPERATIONS_REAL_USE.md",
+      "title": "Phase 20 Dashboard + Operations Real Use",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase20-real-use.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_21_EVENT_COMMAND_CENTER_OPTIONS.md",
+      "title": "Phase 21 Event Command Center Options",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase21-command-center.test.js"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_22A_AUTH_RELIABILITY_LOCAL_REVIEW_FIX.md",
+      "title": "Phase 22A - Auth Reliability Local Review Fix",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_22_ORGANIZER_EVENT_REVIEW.md",
+      "title": "Phase 22 — Organizer Event Review",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_23A_PRODUCT_STRUCTURE_UI_RESET.md",
+      "title": "Phase 23A Product Structure and Organizer UI Reset",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_23B_PAYMENTS_OPERATIONS_BOUNDARIES.md",
+      "title": "Phase 23B - Registration Payments and Operations Financial Boundaries",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_23C_CPB_PAYMENT_RECONCILIATION_DRY_RUN.md",
+      "title": "Phase 23C - CPB Payment Reconciliation Dry Run",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_23D0_REGISTRATION_PAYMENT_EDITING_AUDIT.md",
+      "title": "Phase 23D-0 Registration Payment Editing Audit",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_23E_NEW_CPB_MANIFEST_REGENERATION.md",
+      "title": "Phase 23E New CPB Manifest Regeneration",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_23F_CPB_MANIFEST_APPROVAL_PACKAGE.md",
+      "title": "Phase 23F - CPB Manifest Approval Package",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_23G_LOCKED_APPLY_ENGINE_CODEX_REHEARSAL.md",
+      "title": "Phase 23G - Locked Apply Engine and CODEX_TEST Rehearsal",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_23J_CPB_PRODUCTION_APPLY.md",
+      "title": "Phase 23J - CPB Production Apply",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_23LA_AUDIT_LOG_APPEND_ONLY_INTEGRITY.md",
+      "title": "Phase 23L-A Audit Log Append-Only Integrity Review",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md",
+      "title": "Phase 23N Subsets 1-4 Production Apply",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "tests/phase23n-financial-evidence-reconciliation.test.js",
+        "tests/phase23o-protected-owner-access.test.js"
+      ],
+      "contradictions": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PHASE_23_TASK_WORKFLOW_AND_REGISTRATION_REFINEMENT.md",
+      "title": "Phase 23 - Task Workflow and Registration Experience Refinement",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "PROJECT_HANDOFF.md",
+      "title": "Gather & Savor Event Hub — Complete Implementation Handoff",
+      "purpose": "Operational project handoff expected at repository root.",
+      "status": "active",
+      "referencedBy": [
+        "AI_AGENT_RULES.md",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js",
+        "tests/phase17e-b-access-request-rules.test.js",
+        "tests/phase17f-access-workflow-continuation.test.js",
+        "tests/phase17r-release-stabilizer.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "PROJECT_HANDOFF.md"
+    },
+    {
+      "path": "public/robots.txt",
+      "title": "robots.txt",
+      "purpose": "Public static asset copied into the production build.",
+      "status": "review-required",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase15a-security-headers.test.js",
+        "tests/phase15a-security-headers.test.js",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js"
+      ],
+      "contradictions": [],
+      "staleFacts": [],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/GSV_MASTER_SYSTEM_REFERENCE.md"
+    },
+    {
+      "path": "QA_REPORT_2026-06-23_live-test-run.md",
+      "title": "Gather & Savor Event Hub Live QA Test Run",
+      "purpose": "active documentation",
+      "status": "historical",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "docs/HISTORICAL_ARCHIVE_INDEX.md"
+    },
+    {
+      "path": "README.md",
+      "title": "Gather & Savor Event Hub",
+      "purpose": "Primary project overview and entrypoint for maintainers.",
+      "status": "active",
+      "referencedBy": [
+        "AI_AGENT_RULES.md",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+        "PROJECT_HANDOFF.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase15a-security-headers.test.js",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js",
+        "tests/phase17e-b-access-request-rules.test.js",
+        "tests/phase17f-access-workflow-continuation.test.js",
+        "tests/phase17r-release-stabilizer.test.js"
+      ],
+      "contradictions": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "staleFacts": [
+        "References retired CODEX_TEST wording; verify context.",
+        "Contains phase/history wording; keep active only if operationally necessary."
+      ],
+      "actionTaken": "Inventoried during full repository audit.",
+      "canonicalReplacement": "README.md"
+    }
+  ]
+}

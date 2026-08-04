@@ -1,6 +1,8 @@
 # Historical Archive Index
 
-This index preserves implementation history without making phase reports the primary product documentation. Current behavior is documented in [PRODUCT_GUIDE.md](./PRODUCT_GUIDE.md), [ROUTE_MAP.md](./ROUTE_MAP.md), and [PROTOTYPE_DEMO_GUIDE.md](./PROTOTYPE_DEMO_GUIDE.md).
+This index preserves implementation history without making phase reports the primary product documentation. Current behavior is documented in [GSV_MASTER_SYSTEM_REFERENCE.md](./GSV_MASTER_SYSTEM_REFERENCE.md), [GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md](./GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md), [PRODUCT_GUIDE.md](./PRODUCT_GUIDE.md), [ROUTE_MAP.md](./ROUTE_MAP.md), and [PROTOTYPE_DEMO_GUIDE.md](./PROTOTYPE_DEMO_GUIDE.md).
+
+Historical files may mention `CODEX_TEST`, older phase names, obsolete deployment states, or CPB-specific review gates. Those mentions are evidence of the historical state at the time. Current synthetic QA uses CODEX_DEMO, and CPB is a normal completed real event protected by standard real-event safeguards.
 
 ## Product and release history
 
