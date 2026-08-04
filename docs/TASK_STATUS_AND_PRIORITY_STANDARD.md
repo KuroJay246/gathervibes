@@ -17,5 +17,5 @@
 - Status and priority are organizer planning fields only.
 - Completing a task must not check in a guest, mark a registration paid, create an Operations entry, or change a ticket.
 - Reopening a task must not reverse any business record.
-- CODEX_TEST remains the safe event for synthetic workflow checks.
+- CODEX_DEMO remains the safe event for synthetic workflow checks.
 - Real events, including CPB, use standard authentication, authorization, validation, confirmation, and append-only audit safeguards.

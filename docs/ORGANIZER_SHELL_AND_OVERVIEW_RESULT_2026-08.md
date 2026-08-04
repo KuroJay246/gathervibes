@@ -88,7 +88,7 @@ Added `--gsv-*` design tokens for background, surfaces, text, borders, status co
 ## Guardrails Preserved
 
 - CPB was not modified.
-- CODEX_TEST remains the QA/test event.
+- CODEX_DEMO remains the QA/test event.
 - QR payload remains `GSV:TICKET:{ticketCode}`.
 - Firestore rules were not changed.
 - Firestore indexes were not changed.

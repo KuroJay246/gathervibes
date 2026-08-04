@@ -38,7 +38,7 @@ Out of scope:
 
 - No CPB production writes.
 - No Anica account use.
-- CODEX_TEST remains the QA/test event.
+- CODEX_DEMO remains the QA/test event.
 - QR payload remains `GSV:TICKET:{ticketCode}`.
 - Firestore rules and indexes remain unchanged.
 - Dependencies remain unchanged.

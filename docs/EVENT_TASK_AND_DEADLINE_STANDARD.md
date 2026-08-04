@@ -18,7 +18,7 @@ Event tasks record organizer work needed to prepare, run, or close out an event.
 - Tasks must not alter registration finance totals.
 - Tasks must not alter Operations ledger totals.
 - Tasks must not alter tickets or check-ins.
-- CODEX_TEST may be used for QA task checks.
+- CODEX_DEMO may be used for QA task checks.
 - CPB must use the same task safeguards as every other real event.
 
 ## Organizer Wording

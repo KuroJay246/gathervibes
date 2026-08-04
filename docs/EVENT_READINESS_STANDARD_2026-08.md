@@ -18,7 +18,7 @@ Overview should summarize whether the selected Working Event is ready for organi
 - Registration payments and Operations remain separate.
 - Run of Show does not automatically create tasks.
 - Resources do not automatically create Operations Ledger entries.
-- CODEX_TEST remains the only QA/test classification.
+- CODEX_DEMO is the only special QA/test classification and remains excluded from real-event totals by default.
 - Real completed events remain editable through normal safeguards.
 
 ## Deferred

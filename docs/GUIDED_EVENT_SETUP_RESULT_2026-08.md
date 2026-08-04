@@ -14,7 +14,7 @@ Phase 2 adds organizer-facing guidance to the existing Events workflow. Events n
 
 - Desktop and mobile event rows show the next setup stage or Setup Complete.
 - Desktop and mobile event rows show task deadline state: overdue, due today, due soon, open, or no open tasks.
-- CODEX_TEST remains hidden from normal event lists by default unless Show Test Events is used.
+- CODEX_DEMO remains hidden from normal event lists by default unless Show Test Events is used.
 
 ## Event Planning Workspace
 
@@ -35,4 +35,4 @@ Phase 2 adds organizer-facing guidance to the existing Events workflow. Events n
 - Dependencies unchanged.
 - Scanner and organizer access boundaries unchanged.
 - CPB remains a normal real event under standard safeguards.
-- CODEX_TEST remains the safe QA event.
+- CODEX_DEMO remains the safe QA event.

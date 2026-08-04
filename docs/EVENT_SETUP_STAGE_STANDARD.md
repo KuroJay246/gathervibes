@@ -16,5 +16,5 @@ Event setup stages describe the organizer's progress through the existing event 
 
 - A completed event is still editable by approved organizers.
 - CPB uses the same standard safeguards as every real event.
-- CODEX_TEST is the only special QA/test event and should remain available for synthetic testing.
+- CODEX_DEMO is the only special QA/test event and should remain available for synthetic testing.
 - Stage labels must not imply that money, attendance, or ticket records were changed automatically.

@@ -45,7 +45,7 @@ No role expansion was added. Scanner, viewer, manager, and protected-owner bound
 - Operations Ledger calculations are unchanged.
 - Linked IDs do not grant access to linked records.
 - Append-only audit logs remain required for service writes.
-- CODEX_TEST remains the only special QA/test event.
+- CODEX_DEMO remains the only special QA/test event.
 - Cake Piknik Barbados was not read, selected, edited, or modified.
 
 ## Tests Added Or Extended

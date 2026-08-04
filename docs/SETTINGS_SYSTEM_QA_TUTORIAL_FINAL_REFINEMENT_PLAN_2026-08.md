@@ -20,7 +20,7 @@ Settings still needed to answer organizer questions in plain language: who has a
 
 - QR payload remains `GSV:TICKET:{ticketCode}`.
 - CPB was not used for QA writes.
-- CODEX_TEST remains the safe QA fixture.
+- CODEX_DEMO remains the safe QA fixture.
 - Firestore Rules and indexes are unchanged.
 - Scanner access remains assigned-event check-in only.
 - Message Builder remains copy-only.

@@ -10,7 +10,7 @@ The Events page already creates and edits events, and each event already stores 
 - Keep planning tasks on the existing event document as `planningTasks`.
 - Keep readiness, budget planning, and operations planning on the existing event document.
 - Add organizer-facing setup-stage and deadline summaries.
-- Use CODEX_TEST for QA and synthetic verification only.
+- Use CODEX_DEMO for QA and synthetic verification only.
 
 ## Non-Scope
 
@@ -34,5 +34,5 @@ The Events page already creates and edits events, and each event already stores 
 - QR payload remains `GSV:TICKET:{ticketCode}`.
 - Registration finance and Operations ledger formulas unchanged.
 - Scanner access boundaries unchanged.
-- CODEX_TEST remains the only special QA/test event.
+- CODEX_DEMO remains the only special QA/test event.
 - CPB is not used for write testing.

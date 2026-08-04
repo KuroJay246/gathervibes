@@ -48,5 +48,5 @@ Purpose: record where organizer-visible financial figures come from after the fi
 - Registration Payments and Operations Ledger are separate sources.
 - Planned figures are forecasts and never actual cash.
 - Missing documentary evidence is not proof that money is outstanding.
-- CODEX_TEST remains the QA/test event; real business reports should use normal event filtering.
+- CODEX_DEMO remains the QA/test event; real business reports should use normal event filtering.
 - QR payload remains `GSV:TICKET:{ticketCode}`.

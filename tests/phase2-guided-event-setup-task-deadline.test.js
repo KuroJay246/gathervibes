@@ -102,7 +102,8 @@ test('Phase 2 standards and result documents exist without making CPB special', 
   const statusStandard = await readFile('docs/TASK_STATUS_AND_PRIORITY_STANDARD.md', 'utf8')
 
   for (const documentText of [plan, result, setupStandard, taskStandard, statusStandard]) {
-    assert.match(documentText, /CODEX_TEST/)
+    assert.match(documentText, /CODEX_DEMO/)
+    assert.doesNotMatch(documentText, /CODEX_TEST/)
     assert.doesNotMatch(documentText, /CPB-specific|zero-write|hardcoded totals/)
   }
 
