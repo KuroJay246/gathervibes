@@ -29,7 +29,7 @@ test('access workflow remains disabled in organizer Settings', async () => {
 })
 
 test('Phase 17E-E readiness artifact preserves deployment gates and rollback boundaries', async () => {
-  const readiness = await readFile('PHASE_17E_E_ACCESS_WORKFLOW_DEPLOYMENT_READINESS.md', 'utf8')
+  const readiness = await readFile('docs/archive/phases/PHASE_17E_E_ACCESS_WORKFLOW_DEPLOYMENT_READINESS.md', 'utf8')
 
   assert.match(readiness, /Status: active readiness artifact only/)
   assert.match(readiness, /Phase 17E-E is deployment-readiness and rollback planning only\./)

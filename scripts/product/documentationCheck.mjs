@@ -41,7 +41,7 @@ const requiredGuideTerms = [
 ]
 
 const missing = requiredGuideTerms.filter((term) => !guide.includes(term))
-if (!archive.includes('Current behavior is documented') || !archive.includes('CPB reconciliation history')) {
+if (!archive.includes('Current behavior is documented') || !archive.includes('historical files are not current operating instructions')) {
   missing.push('historical archive index sections')
 }
 if (!routeMap.includes('Organizer routes') || !routeMap.includes('Working Event rules')) {
@@ -80,13 +80,13 @@ if (!deploymentGuide.includes('Before merge') || !deploymentGuide.includes('Prod
 if (!knownLimitations.includes('Known Limitations') || !knownLimitations.includes('Message Builder is copy-only')) {
   missing.push('known limitations sections')
 }
-if (!masterReference.includes('Current System Truth') || !masterReference.includes('CODEX_DEMO - Full System Walkthrough')) {
+if (!masterReference.includes('Gather & Savor Master System Reference') || !masterReference.includes('CODEX_DEMO - Full System Walkthrough')) {
   missing.push('master system reference')
 }
-if (!maintenanceManifest.includes('Repository Maintenance Manifest') || !maintenanceManifest.includes('gsv-file-inventory.json')) {
+if (!maintenanceManifest.includes('Gather & Savor Repository And Maintenance Manifest') || !maintenanceManifest.includes('gsv-file-inventory.json')) {
   missing.push('repository maintenance manifest')
 }
-if (!readme.includes('Current product docs') || !readme.includes('Current workspace summary')) {
+if (!readme.includes('Current Truth') || !readme.includes('Start Here')) {
   missing.push('README current docs summary')
 }
 if (missing.length) {

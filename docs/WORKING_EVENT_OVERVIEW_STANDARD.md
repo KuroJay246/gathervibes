@@ -66,6 +66,6 @@ Empty states should say what is unavailable and what the organizer can do next:
 
 - No new collections for Overview activity.
 - No production writes during review.
-- No CPB-specific behavior.
+- No special per-real-event behavior.
 - CODEX_DEMO remains the special QA/test event.
 - QR payload remains `GSV:TICKET:{ticketCode}`.

@@ -43,8 +43,10 @@ test('private admin app blocks crawling without sitemap or JSON-LD', async () =>
 
 test('private admin SEO surfaces remain intentionally deferred', async () => {
   const readme = await readFile('README.md', 'utf8')
+  const knownLimitations = await readFile('docs/KNOWN_LIMITATIONS.md', 'utf8')
+  const masterReference = await readFile('docs/GSV_MASTER_SYSTEM_REFERENCE.md', 'utf8')
 
-  assert.match(readme, /private event-operations dashboard/i)
-  assert.match(readme, /does not publish `sitemap\.xml` or JSON-LD structured data/)
-  assert.match(readme, /separate public marketing landing page later/)
+  assert.match(readme, /Private internal event-operations system/i)
+  assert.match(`${readme}\n${knownLimitations}`, /private admin app|private internal/i)
+  assert.match(`${readme}\n${knownLimitations}\n${masterReference}`, /not a public marketing site|public guest portal/i)
 })

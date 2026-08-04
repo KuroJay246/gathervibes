@@ -69,7 +69,7 @@ test('demo editability guidance points to account, selected event, and System QA
 })
 
 test('organizer usability standards and demo maintenance docs exist', async () => {
-  const audit = await source('docs/ORGANIZER_COMPREHENSION_AND_USABILITY_AUDIT_2026-08.md')
+  const audit = await source('docs/archive/audits/ORGANIZER_COMPREHENSION_AND_USABILITY_AUDIT_2026-08.md')
   const understandability = await source('docs/ORGANIZER_UNDERSTANDABILITY_AND_USABILITY_STANDARD.md')
   const terminology = await source('docs/ORGANIZER_STATUS_AND_TERMINOLOGY_STANDARD.md')
   const explanation = await source('docs/ORGANIZER_PAGE_EXPLANATION_STANDARD.md')

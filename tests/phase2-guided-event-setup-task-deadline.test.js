@@ -95,8 +95,8 @@ test('Events and planning workspace present guided setup and deadlines on existi
 })
 
 test('Phase 2 standards and result documents exist without making CPB special', async () => {
-  const plan = await readFile('docs/GUIDED_EVENT_SETUP_AND_TASKS_PLAN_2026-08.md', 'utf8')
-  const result = await readFile('docs/GUIDED_EVENT_SETUP_RESULT_2026-08.md', 'utf8')
+  const plan = await readFile('docs/archive/phases/GUIDED_EVENT_SETUP_AND_TASKS_PLAN_2026-08.md', 'utf8')
+  const result = await readFile('docs/archive/releases/GUIDED_EVENT_SETUP_RESULT_2026-08.md', 'utf8')
   const setupStandard = await readFile('docs/EVENT_SETUP_STAGE_STANDARD.md', 'utf8')
   const taskStandard = await readFile('docs/EVENT_TASK_AND_DEADLINE_STANDARD.md', 'utf8')
   const statusStandard = await readFile('docs/TASK_STATUS_AND_PRIORITY_STANDARD.md', 'utf8')
