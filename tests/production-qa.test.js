@@ -28,6 +28,7 @@ test('QA helper creates stable CODEX_DEMO prefixes and fake sample CSV rows', ()
 
 test('QA helper recognizes only the CODEX_DEMO Working Event', () => {
   assert.equal(isCodexDemoWorkingEvent({ eventId: CODEX_DEMO_EVENT_ID, eventName: 'Anything' }), true)
+  assert.equal(isCodexDemoWorkingEvent({ id: CODEX_DEMO_EVENT_ID, eventName: 'Anything' }), true)
   assert.equal(isCodexDemoWorkingEvent({ eventId: 'other', eventName: CODEX_DEMO_EVENT_NAME }), true)
   assert.equal(isCodexDemoWorkingEvent({ eventId: 'real-event-id', eventName: 'Cake Piknik Barbados' }), false)
 })

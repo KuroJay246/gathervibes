@@ -103,9 +103,15 @@ export function buildQaSampleCsv(prefix = buildQaTestPrefix()) {
 }
 
 export function isCodexDemoWorkingEvent(activeEvent) {
-  return activeEvent?.eventId === CODEX_DEMO_EVENT_ID || activeEvent?.eventName === CODEX_DEMO_EVENT_NAME || activeEvent?.isTestEvent === true || activeEvent?.eventClassification === 'test'
+  const eventKey = activeEvent?.eventId || activeEvent?.id
+
+  return eventKey === CODEX_DEMO_EVENT_ID || activeEvent?.eventName === CODEX_DEMO_EVENT_NAME || activeEvent?.isTestEvent === true || activeEvent?.eventClassification === 'test'
 }
 
 export function findCodexDemoEvent(events = []) {
-  return events.find((event) => event?.eventId === CODEX_DEMO_EVENT_ID || event?.eventName === CODEX_DEMO_EVENT_NAME || event?.isTestEvent === true || event?.eventClassification === 'test') || null
+  return events.find((event) => {
+    const eventKey = event?.eventId || event?.id
+
+    return eventKey === CODEX_DEMO_EVENT_ID || event?.eventName === CODEX_DEMO_EVENT_NAME || event?.isTestEvent === true || event?.eventClassification === 'test'
+  }) || null
 }
