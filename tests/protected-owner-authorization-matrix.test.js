@@ -3,7 +3,13 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
 import { PROTECTED_OWNER_EMAIL, PROTECTED_OWNER_UID } from '../src/config/protectedOwner.js'
-import { getUserAccessLevel } from '../src/utils/accessRoles.js'
+import {
+  ORGANIZER_ROUTE_CAPABILITIES,
+  canManageTasks,
+  canViewRoute,
+  getUserAccessLevel,
+  ownerCapabilityMatrix,
+} from '../src/utils/accessRoles.js'
 
 async function source(path) {
   return readFile(path, 'utf8')
@@ -64,6 +70,40 @@ test('protected owner remains UID-based and independent of approvedEmails or sta
   assert.equal(access.role, 'owner-admin')
   assert.equal(access.protectedOwner, true)
   assert.deepEqual(access.assignedEventIds, [])
+  assert.equal(canManageTasks(access, 'codex_demo_full_system_walkthrough'), true)
+})
+
+test('protected owner receives every current organizer route and manage capability from one contract', () => {
+  const access = getUserAccessLevel(
+    { uid: PROTECTED_OWNER_UID, email: 'unlisted-owner-session@example.com' },
+    { approvedEmails: [], rolesByEmail: {} },
+    { uid: 'someone-else', status: 'inactive', defaultRole: 'viewer' },
+    [],
+    [],
+  )
+  const matrix = ownerCapabilityMatrix(access, 'codex_demo_full_system_walkthrough')
+
+  assert.equal(ORGANIZER_ROUTE_CAPABILITIES.length >= 17, true)
+  for (const item of matrix) {
+    assert.equal(canViewRoute(access, item.route), true, `${item.route} should be viewable by protected owner`)
+    assert.equal(item.routeAllowed, true, `${item.route} route gate should pass`)
+    assert.equal(item.manageAllowed, true, `${item.route} manage gate should pass`)
+    assert.equal(item.gate, 'protected-owner-uid')
+  }
+})
+
+test('lower roles do not inherit protected-owner route and task management capabilities', () => {
+  const scanner = getUserAccessLevel(
+    { uid: 'scanner-uid', email: 'scanner@example.com' },
+    { approvedEmails: [], rolesByEmail: {} },
+    { uid: 'scanner-uid', email: 'scanner@example.com', status: 'active', defaultRole: 'scanner' },
+    [{ uid: 'scanner-uid', eventId: 'codex_demo_full_system_walkthrough', role: 'scanner', status: 'active' }],
+    [],
+  )
+
+  assert.equal(canViewRoute(scanner, '/settings'), false)
+  assert.equal(canViewRoute(scanner, '/tasks'), false)
+  assert.equal(canManageTasks(scanner, 'codex_demo_full_system_walkthrough'), false)
 })
 
 test('System QA exposes protected-owner diagnostics and manual CODEX_DEMO write verification', async () => {
@@ -71,6 +111,8 @@ test('System QA exposes protected-owner diagnostics and manual CODEX_DEMO write 
 
   assert.match(qaPage, /PROTECTED_OWNER_UID/)
   assert.match(qaPage, /Protected Owner Authorization/)
+  assert.match(qaPage, /Owner capability check/)
+  assert.match(qaPage, /owner-access blocker/)
   assert.match(qaPage, /Signed-in UID/)
   assert.match(qaPage, /Expected protected UID/)
   assert.match(qaPage, /UID match/)
@@ -78,6 +120,17 @@ test('System QA exposes protected-owner diagnostics and manual CODEX_DEMO write 
   assert.match(qaPage, /Manual CODEX_DEMO Owner Write Check/)
   assert.match(qaPage, /bypass covers access and role checks only/)
   assert.match(qaPage, /append-only audit logs still apply/)
+})
+
+test('Tasks and shared error UI do not mislabel task failures as Events failures', async () => {
+  const tasksPage = await source('src/pages/TasksPage.jsx')
+  const errorState = await source('src/components/ui/ErrorState.jsx')
+
+  assert.match(tasksPage, /Tasks could not be loaded/)
+  assert.match(tasksPage, /task-record validation/)
+  assert.doesNotMatch(tasksPage, /Your account can read this event, but it is not allowed to manage tasks for it/)
+  assert.match(errorState, /title = 'This page could not be loaded'/)
+  assert.doesNotMatch(errorState, />Events could not be loaded</)
 })
 
 test('Firestore rules continue to centralize owner access without widening public writes', async () => {

@@ -327,7 +327,7 @@ export function EventsPage() {
       )}
 
       {loading && <LoadingState message="Gathering your events…" />}
-      {!loading && loadError && <ErrorState message={loadError} onRetry={retryEvents} />}
+      {!loading && loadError && <ErrorState title="Events could not be loaded" message={loadError} onRetry={retryEvents} />}
       {!loading && !loadError && events.length === 0 && <EmptyState onCreate={openCreate} />}
       {!loading && !loadError && events.length > 0 && visibleEvents.length === 0 && (
         <section className="rounded-[24px] border border-dashed border-[#D8C3B6] bg-white/70 px-6 py-10 text-center shadow-[0_8px_24px_rgba(84,53,67,0.04)]">

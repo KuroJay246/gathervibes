@@ -11,6 +11,7 @@ import { buildRegistrationMetrics, getRegistrationGuestSummary, formatRegistrati
 import { buildFinanceSummary, buildPaymentsWorkspace, calculateRegistrationFinance, financeWarnings, formatCurrency } from '../utils/financeUtils'
 import { qrPayloadForTicketCode } from '../utils/qrTicketUtils'
 import { COMMUNICATION_SEGMENTS, COMMUNICATION_TEMPLATES, buildCommunicationsSegmentSummary } from '../utils/communicationsUtils'
+import { ownerCapabilityMatrix } from '../utils/accessRoles'
 import {
   CODEX_DEMO_EVENT_ID,
   CODEX_DEMO_EVENT_NAME,
@@ -132,6 +133,8 @@ export function QaPage() {
   const signedInUid = user?.uid || ''
   const protectedOwnerUidMatches = signedInUid === PROTECTED_OWNER_UID
   const protectedOwnerAccessActive = Boolean(access?.protectedOwner && protectedOwnerUidMatches)
+  const ownerCapabilities = useMemo(() => ownerCapabilityMatrix(access, activeEvent?.eventId), [access, activeEvent?.eventId])
+  const blockingOwnerCapabilityFailures = ownerCapabilities.filter((item) => protectedOwnerAccessActive && (!item.routeAllowed || !item.manageAllowed))
   const codexEvents = events.filter((event) => event.eventId === CODEX_DEMO_EVENT_ID || event.eventName === CODEX_DEMO_EVENT_NAME || event.isTestEvent === true || event.eventClassification === 'test')
   const codexDemoEvent = useMemo(() => findCodexDemoEvent(events), [events])
   const workingEventIsCodex = isCodexDemoWorkingEvent(activeEvent)
@@ -346,7 +349,7 @@ export function QaPage() {
 
   const failedChecks = qaChecks.filter((check) => check.status === 'fail').length
   const warningChecks = qaChecks.filter((check) => check.status === 'warning').length
-  const overallStatus = loading || qaChecks.length === 0 ? 'warn' : failedChecks > 0 ? 'fail' : 'ok'
+  const overallStatus = blockingOwnerCapabilityFailures.length > 0 ? 'fail' : loading || qaChecks.length === 0 ? 'warn' : failedChecks > 0 ? 'fail' : 'ok'
   const organizerChecklist = useMemo(() => organizerReadinessChecklist.map((item) => {
     const defaultStatus = qaChecks.length === 0 ? 'ready-with-limitation' : failedChecks > 0 ? 'not-ready' : 'ready'
 
@@ -362,7 +365,7 @@ export function QaPage() {
               : item.detail,
         }
       case 'eventCreation':
-        return { ...item, status: access?.level === 'admin' ? 'ready' : 'not-ready' }
+        return { ...item, status: blockingOwnerCapabilityFailures.length ? 'not-ready' : access?.level === 'admin' ? 'ready' : 'not-ready' }
       case 'registrationWorkflow':
       case 'paymentWorkflow':
       case 'ticketWorkflow':
@@ -408,7 +411,7 @@ export function QaPage() {
       default:
         return { ...item, status: 'ready-with-limitation' }
     }
-  }), [access?.level, access?.protectedOwner, codexEvents.length, failedChecks, qaChecks.length, workingEventIsCodex])
+  }), [access?.level, access?.protectedOwner, blockingOwnerCapabilityFailures.length, codexEvents.length, failedChecks, qaChecks.length, workingEventIsCodex])
   const organizerSummary = [
     {
       label: 'Overall Status',
@@ -436,9 +439,9 @@ export function QaPage() {
     },
     {
       label: 'Core Workflows',
-      status: qaChecks.length === 0 ? 'warn' : failedChecks > 0 ? 'fail' : 'ok',
-      value: qaChecks.length === 0 ? 'Checks not run yet' : `${qaChecks.length - failedChecks} of ${qaChecks.length} checks have no blocking failure`,
-      detail: 'Run the read-only checks below to review registrations, payments, tickets, attendance, and Operations boundaries.',
+      status: blockingOwnerCapabilityFailures.length ? 'fail' : qaChecks.length === 0 ? 'warn' : failedChecks > 0 ? 'fail' : 'ok',
+      value: blockingOwnerCapabilityFailures.length ? `${blockingOwnerCapabilityFailures.length} owner-access blocker(s)` : qaChecks.length === 0 ? 'Checks not run yet' : `${qaChecks.length - failedChecks} of ${qaChecks.length} checks have no blocking failure`,
+      detail: blockingOwnerCapabilityFailures.length ? 'Protected Owner route or manage capability is blocked in app state.' : 'Run the read-only checks below to review registrations, payments, tickets, attendance, and Operations boundaries.',
     },
     {
       label: 'Data Integrity',
@@ -454,9 +457,9 @@ export function QaPage() {
     },
     {
       label: 'Known Issues',
-      status: failedChecks > 0 ? 'fail' : warningChecks > 0 || qaChecks.length === 0 ? 'warn' : 'ok',
-      value: qaChecks.length === 0 ? 'Run checks for this event' : failedChecks > 0 ? `${failedChecks} blocking checks` : `${warningChecks} items to review`,
-      detail: 'Open Technical Details for the exact findings and safe test guidance.',
+      status: blockingOwnerCapabilityFailures.length || failedChecks > 0 ? 'fail' : warningChecks > 0 || qaChecks.length === 0 ? 'warn' : 'ok',
+      value: blockingOwnerCapabilityFailures.length ? `${blockingOwnerCapabilityFailures.length} owner-access blockers` : qaChecks.length === 0 ? 'Run checks for this event' : failedChecks > 0 ? `${failedChecks} blocking checks` : `${warningChecks} items to review`,
+      detail: blockingOwnerCapabilityFailures.length ? 'Owner access blockers must be fixed before release.' : 'Open Technical Details for the exact findings and safe test guidance.',
     },
   ]
   const releaseDetails = [
@@ -572,6 +575,30 @@ export function QaPage() {
           <p className="mt-3 text-xs font-semibold leading-5 text-[#6B564C]">
             Manual CODEX_DEMO Owner Write Check: create or update a safe QA registration, confirm the write succeeds, confirm an append-only audit log is created, then remove only accidental temporary business records outside the permanent demo dataset while leaving audit logs intact.
           </p>
+          <div className="mt-4 rounded-2xl border border-[#EFE2DA] bg-white p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#7A5818]">Owner capability check</p>
+                <p className="mt-1 text-xs leading-5 text-[#6B564C]">
+                  Read-only app-state check for route and manage gates. Firestore schema validation, event scope, and append-only audit requirements still apply.
+                </p>
+              </div>
+              <StatusBadge status={blockingOwnerCapabilityFailures.length ? 'fail' : 'ok'}>
+                {blockingOwnerCapabilityFailures.length ? `${blockingOwnerCapabilityFailures.length} blocked` : '0 blockers'}
+              </StatusBadge>
+            </div>
+            <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+              {ownerCapabilities.map((item) => (
+                <div key={item.route} className="rounded-xl border border-[#EFE2DA] p-3">
+                  <p className="text-xs font-bold text-[#2B1723]">{item.label}</p>
+                  <p className="mt-1 text-[11px] text-[#6B564C]">{item.route} · {item.gate}</p>
+                  <p className="mt-2 text-[11px] font-bold text-[#17623A]">
+                    Route {item.routeAllowed ? 'ready' : 'blocked'} · Manage {item.manageAllowed ? 'ready' : 'blocked'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </QaSection>
 
