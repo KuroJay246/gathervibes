@@ -22,6 +22,7 @@ Required update steps for each new write path:
 5. Confirm the write creates or preserves the required append-only audit evidence.
 6. Confirm System QA remains able to show the current UID, expected protected UID, UID match, and app owner detection state.
 7. Run lint, tests, build, dependency audit, `git diff --check`, and relevant emulator/e2e checks before commit.
+8. Confirm legacy or partial records are normalized safely before a strict rules-validated write.
 
 Do not add a second owner bypass in page code or service code. The app should resolve owner access through `isProtectedOwnerUser`, `getUserAccessLevel`, and Firestore rules `isProtectedOwner()` inside `isApprovedAdmin()`.
 
@@ -33,7 +34,7 @@ Do not add a second owner bypass in page code or service code. The app should re
 | Event staff assignments | Settings and event access internals | `events/{eventId}/staffAssignments/{uid}` | Create, update, delete staff assignments where UI exposes it | Valid assignment role/status, event scoping, scanner boundaries |
 | Tasks | Event planning task workflow | `events/{eventId}/tasks/{taskId}` | Create, update, delete tasks | Valid task schema, assigned manager rules remain narrower than owner/admin |
 | Run of Show | `/run-of-show`, `runOfShowService` | `events/{eventId}/runOfShow/{itemId}` | Create, update, status-change, delay, arrival confirmation, delete event-day timeline items | Valid event-scoped timeline schema, valid time order, linked IDs do not grant access, critical markers do not bypass validation, append-only audit required, assigned staff and scanner access denied in this foundation |
-| Event Resources | `/resources`, `eventResourceService` | `events/{eventId}/resources/{resourceId}` | Create, update, status-change, delete equipment and supplies records | Valid event-scoped resource schema, quantity validation, shortages derived from confirmed quantity, linked IDs do not grant access, critical markers do not bypass validation, append-only audit required, assigned staff and scanner access denied in this foundation |
+| Event Resources | `/resources`, `eventResourceService` | `events/{eventId}/resources/{resourceId}` | Create, update, status-change, delete equipment and supplies records | Valid event-scoped resource schema, quantity validation, shortages derived from confirmed quantity, linked IDs do not grant access, critical markers do not bypass validation, append-only audit required, assigned staff and scanner access denied in this foundation. Resource create attribution must match the writer; Resource update attribution keeps `createdBy` immutable and requires current `updatedBy`. Legacy Resource records are normalized on edit and unsupported stale fields are deleted in the same audited update so stale fields do not bypass or block strict validation. |
 | Registrations | `/registrations`, Import Center | `registrations/{registrationId}` | Create, update, delete, import approved rows, correct payment and attendance fields | Valid registration schema, payment formulas, duplicate detection, ticket validation, audit logs |
 | Tickets | `/tickets`, check-in services | `tickets/{documentId}` | Issue and update tickets through audited services | QR payload remains `GSV:TICKET:{ticketCode}`, no private payload data |
 | Check-In | `/check-in`, `/scanner` boundary | `checkIn/{documentId}` | Organizer/admin attendance corrections where implemented | Scanner remains assigned-event-only; normal scanner Undo Check-In and Check Out remain restricted |
@@ -57,6 +58,7 @@ The protected-owner fixture must not depend on `approvedEmails`, a staff profile
 - Protected owner can read access control even when not in `approvedEmails`.
 - Protected owner can perform representative organizer writes.
 - Protected owner is still rejected for invalid schemas.
+- Protected owner can update old or partial Resource records only after the app normalizes them into the current strict schema.
 - Audit logs remain append-only.
 - Scanner and viewer permissions are not expanded.
 - QR payload remains `GSV:TICKET:{ticketCode}`.
@@ -73,6 +75,8 @@ System QA must keep a protected-owner diagnostics section showing:
 - manual CODEX_DEMO owner write verification procedure.
 
 This diagnostic section is for troubleshooting only. It must not expose secrets, tokens, cookies, private keys, or private attendee data.
+
+System QA follow-up counts are review signals. Expected demo follow-up records must not be reported as stale blocking failures when the protected-owner diagnostics and event access checks pass.
 
 ## Production Verification Procedure
 

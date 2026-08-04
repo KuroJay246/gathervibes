@@ -8,16 +8,21 @@ import {
 } from '@firebase/rules-unit-testing'
 import {
   collection,
+  deleteField,
   doc,
   getDocs,
   serverTimestamp,
   setDoc,
+  Timestamp,
+  updateDoc,
   writeBatch,
 } from 'firebase/firestore'
 
 const EVENT_ID = 'run-resource-event'
 const ADMIN_UID = 'run-resource-admin'
 const ADMIN_EMAIL = 'run-resource-admin@example.com'
+const PROTECTED_OWNER_UID = 'WcDU2jmbopdAgDlMMWvD3TkqqbC3'
+const PROTECTED_OWNER_EMAIL = 'jaylanspencer99@gmail.com'
 const MANAGER_UID = 'run-resource-manager'
 const MANAGER_EMAIL = 'run-resource-manager@example.com'
 const VIEWER_UID = 'run-resource-viewer'
@@ -309,6 +314,118 @@ rulesTest('[run-resource-rules] invalid event scope, invalid timing, quantity ov
     await assertFails(setDoc(doc(db, 'events', EVENT_ID, 'runOfShow', 'run-1'), runItem({ endTime: '12:00' })))
     await assertFails(setDoc(doc(db, 'events', EVENT_ID, 'resources', 'resource-1'), resourceItem({ quantityConfirmed: 11, shortage: -1 })))
     await assertFails(setDoc(doc(db, 'events', EVENT_ID, 'resources', 'resource-1'), { ...resourceItem(), unexpected: true }))
+    await assertFails(setDoc(doc(db, 'events', EVENT_ID, 'resources', 'resource-forged'), resourceItem({ resourceId: 'resource-forged', createdBy: VIEWER_EMAIL })))
+  } finally {
+    await testEnv.cleanup()
+  }
+})
+
+rulesTest('[run-resource-rules] legacy resource partial updates are rejected because stale fields remain in request.resource.data', async () => {
+  const testEnv = await createTestEnv()
+  try {
+    await seedBaseData(testEnv)
+    const createdAt = Timestamp.fromDate(new Date('2026-08-01T12:00:00.000Z'))
+    await testEnv.withSecurityRulesDisabled(async (env) => {
+      await setDoc(doc(env.firestore(), 'events', EVENT_ID, 'resources', 'resource-1'), {
+        ...resourceItem({
+          category: 'Equipment',
+          status: 'Needed',
+          createdAt,
+          updatedAt: createdAt,
+        }),
+        legacyResourceStage: 'Partial',
+      })
+    })
+    const db = testEnv.authenticatedContext(PROTECTED_OWNER_UID, { email: PROTECTED_OWNER_EMAIL }).firestore()
+    const partialUpdatePayload = resourceItem({
+      status: 'Requested',
+      updatedAt: serverTimestamp(),
+      updatedBy: PROTECTED_OWNER_EMAIL,
+    })
+    delete partialUpdatePayload.createdAt
+    delete partialUpdatePayload.createdBy
+
+    await assertFails(updateDoc(doc(db, 'events', EVENT_ID, 'resources', 'resource-1'), {
+      ...partialUpdatePayload,
+    }))
+  } finally {
+    await testEnv.cleanup()
+  }
+})
+
+rulesTest('[run-resource-rules] protected owner can update a current resource without approvedEmails membership', async () => {
+  const testEnv = await createTestEnv()
+  try {
+    await seedBaseData(testEnv)
+    await testEnv.withSecurityRulesDisabled(async (env) => {
+      await setDoc(doc(env.firestore(), 'events', EVENT_ID, 'resources', 'resource-1'), resourceItem())
+    })
+    const db = testEnv.authenticatedContext(PROTECTED_OWNER_UID, { email: PROTECTED_OWNER_EMAIL }).firestore()
+    const batch = writeBatch(db)
+    batch.update(doc(db, 'events', EVENT_ID, 'resources', 'resource-1'), {
+      status: 'Requested',
+      updatedAt: serverTimestamp(),
+      updatedBy: PROTECTED_OWNER_EMAIL,
+    })
+    batch.set(doc(db, 'auditLogs', 'audit-resource-status-owner-current'), audit(
+      'audit-resource-status-owner-current',
+      EVENT_ID,
+      'resource.status',
+      'resource',
+      'resource-1',
+      PROTECTED_OWNER_EMAIL,
+      { resourceName: 'Folding tables', action: 'status', changes: { status: { before: 'Needed', after: 'Requested' } } },
+    ))
+
+    await assertSucceeds(batch.commit())
+  } finally {
+    await testEnv.cleanup()
+  }
+})
+
+rulesTest('[run-resource-rules] protected owner can replace-normalize a legacy resource status with append-only audit', async () => {
+  const testEnv = await createTestEnv()
+  try {
+    await seedBaseData(testEnv)
+    const createdAt = Timestamp.fromDate(new Date('2026-08-01T12:00:00.000Z'))
+    await testEnv.withSecurityRulesDisabled(async (env) => {
+      await setDoc(doc(env.firestore(), 'events', EVENT_ID, 'resources', 'resource-1'), {
+        ...resourceItem({
+          category: 'Equipment',
+          status: 'Needed',
+          sourceType: 'Owned',
+          createdAt,
+          updatedAt: createdAt,
+        }),
+        legacyResourceStage: 'Partial',
+      })
+    })
+    const db = testEnv.authenticatedContext(PROTECTED_OWNER_UID, { email: PROTECTED_OWNER_EMAIL }).firestore()
+    const batch = writeBatch(db)
+    const normalizedUpdatePayload = resourceItem({
+      category: 'Other',
+      sourceType: 'Owned',
+      status: 'Requested',
+      updatedAt: serverTimestamp(),
+      updatedBy: PROTECTED_OWNER_EMAIL,
+    })
+    delete normalizedUpdatePayload.createdAt
+    delete normalizedUpdatePayload.createdBy
+    batch.update(doc(db, 'events', EVENT_ID, 'resources', 'resource-1'), {
+      ...normalizedUpdatePayload,
+      legacyResourceStage: deleteField(),
+    })
+    batch.set(doc(db, 'auditLogs', 'audit-resource-status-owner-1'), audit(
+      'audit-resource-status-owner-1',
+      EVENT_ID,
+      'resource.status',
+      'resource',
+      'resource-1',
+      PROTECTED_OWNER_EMAIL,
+      { resourceName: 'Folding tables', action: 'status', changes: { status: { before: 'Needed', after: 'Requested' } } },
+    ))
+
+    await assertSucceeds(batch.commit())
   } finally {
     await testEnv.cleanup()
   }
