@@ -1,27 +1,35 @@
 # Historical Archive Index
 
-This index preserves implementation history without making phase reports the primary product documentation. Current behavior is documented in [PRODUCT_GUIDE.md](./PRODUCT_GUIDE.md), [ROUTE_MAP.md](./ROUTE_MAP.md), and [PROTOTYPE_DEMO_GUIDE.md](./PROTOTYPE_DEMO_GUIDE.md).
+This repository keeps historical evidence, but historical files are not current operating instructions. Current behavior is documented in:
 
-## Product and release history
+- [GSV_MASTER_SYSTEM_REFERENCE.md](./GSV_MASTER_SYSTEM_REFERENCE.md)
+- [GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md](./GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md)
+- [PRODUCT_GUIDE.md](./PRODUCT_GUIDE.md)
+- [ROUTE_MAP.md](./ROUTE_MAP.md)
+- [PROTOTYPE_DEMO_GUIDE.md](./PROTOTYPE_DEMO_GUIDE.md)
 
-- `PROJECT_HANDOFF.md`: cumulative historical engineering handoff.
-- `PHASE_17R_RELEASE_STABILIZER_AUTOFIX.md` through `PHASE_23B_PAYMENTS_OPERATIONS_BOUNDARIES.md`: product stabilization, event workflows, and finance-boundary history.
-- `PHASE_22_ORGANIZER_EVENT_REVIEW.md`: organizer report design history.
-- `PHASE_23A_PRODUCT_STRUCTURE_UI_RESET.md`: current product navigation naming foundation.
+## Archive Structure
 
-## Access and security history
+- `docs/archive/phases/`: phase plans, phase results, release-alignment notes, and implementation history.
+- `docs/archive/releases/`: release results, refinement results, hotfix results, and completed feature-result documents.
+- `docs/archive/audits/`: audits, dry runs, acceptance evidence, compatibility reviews, root-cause reports, and QA reports.
+- `docs/archive/legacy/`: previous root-level entrypoints that were preserved before being shortened.
 
-- `PHASE_17D_PLAN.md` and `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md`: staff-access planning.
-- `PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md` through `PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md`: access-request and Firestore rules review history.
-- `PHASE_23LA_AUDIT_LOG_APPEND_ONLY_INTEGRITY.md`: audit-log integrity review.
+## Interpretation Rules
 
-## CPB reconciliation history
+- Historical files may mention retired `CODEX_TEST`, old phase names, obsolete deploy states, CPB-specific gates, or old workflow names.
+- Those mentions are preserved for evidence only.
+- Current synthetic QA uses `CODEX_DEMO - Full System Walkthrough`.
+- CPB is a normal completed real event and must not receive synthetic QA writes.
+- If a historical file conflicts with current docs, current docs win.
 
-- `PHASE_14B_REVIEW_FIX_HANDOFF.md` and `AUDIT_PHASE_14_15_HANDOFF.md`: initial payment-audit review.
-- `PHASE_23C_CPB_PAYMENT_RECONCILIATION_DRY_RUN.md` through `PHASE_23J_CPB_PRODUCTION_APPLY.md`: reconciliation, manifest, rehearsal, and controlled apply history.
-- `PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md`: approved Operations, sponsorship, and audit subsets; registration/attendance subsets remained locked.
+## Root Files Kept Active
 
-## QA history
+- `README.md`: concise repository entrypoint.
+- `AI_AGENT_RULES.md`: operational AI-agent rules.
+- `PROJECT_HANDOFF.md`: concise current handoff.
 
-- `QA_REPORT_2026-06-23_live-test-run.md`: historical live QA snapshot.
-- Local screenshots, browser state, private reports, financial workbooks, generated output, and raw logs are evidence artifacts and are intentionally excluded from Git.
+## Preserved Legacy Root Content
+
+- [legacy README](./archive/legacy/README_HISTORICAL_2026-08.md)
+- [legacy PROJECT_HANDOFF](./archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md)

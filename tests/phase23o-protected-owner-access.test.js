@@ -100,7 +100,7 @@ test('Phase 23O guardrails preserve QR privacy, CODEX_DEMO isolation, and standa
   const events = await source('src/pages/EventsPage.jsx')
   const operations = await source('src/pages/OperationsPage.jsx')
   const reports = await source('src/pages/EventReviewPage.jsx')
-  const phase23n = await source('PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md')
+  const phase23n = await source('docs/archive/phases/PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md')
   const paymentAuditEngine = await source('src/services/cpbAuditBackfill.js')
 
   assert.equal(qrPayloadForTicketCode('QA23O-001'), 'GSV:TICKET:QA23O-001')

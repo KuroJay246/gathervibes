@@ -47,11 +47,11 @@ test('Phase 17R preserves CPB, approvedEmails, and QR payload guardrails', async
 
   assert.equal(qrPayloadForTicketCode('CT-001'), 'GSV:TICKET:CT-001')
   assert.doesNotMatch(qrPayloadForTicketCode('CT-001'), /guest|paid|amount|@|phone/i)
-  assert.match(aiRules, /Treat `approvedEmails` as admin-level access only\./)
-  assert.match(aiRules, /Protect CPB as production data\./)
-  assert.match(readme, /CPB remains untouched/)
-  assert.match(handoff, /`approvedEmails` remains unchanged and admin-only/)
-  assert.match(handoff, /CPB remains untouched/)
+  assert.match(aiRules, /`approvedEmails` is admin-level access only\./)
+  assert.match(aiRules, /Do not use CPB for QA, synthetic imports, scanner rehearsal, or fake payment\/attendance writes\./)
+  assert.match(readme, /CPB is a normal completed real event protected by standard safeguards/)
+  assert.match(handoff, /CPB is a normal completed real event/)
+  assert.match(handoff, /Do not use CPB for synthetic QA/)
 })
 
 test('Phase 17R clears stale dashboard event scope and syncs selected Working Event snapshots', async () => {

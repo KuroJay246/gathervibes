@@ -39,7 +39,7 @@ test('Phase 21 preserves QR, dependency, access, and private-data guardrails', a
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'))
   const packageLock = await readFile('package-lock.json', 'utf8')
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
-  const options = await readFile('PHASE_21_EVENT_COMMAND_CENTER_OPTIONS.md', 'utf8')
+  const options = await readFile('docs/archive/phases/PHASE_21_EVENT_COMMAND_CENTER_OPTIONS.md', 'utf8')
 
   assert.equal(qrPayloadForTicketCode('PH21-001'), 'GSV:TICKET:PH21-001')
   assert.equal(packageJson.dependencies.xlsx, undefined)

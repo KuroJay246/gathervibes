@@ -1,0 +1,84 @@
+{
+  "generatedAt": "2026-08-04T23:54:47.546Z",
+  "bytesReclaimed": 5910218,
+  "entries": [
+    {
+      "path": "dist",
+      "action": "removed",
+      "size": 2449257,
+      "reason": "generated/recreatable local output or obsolete untracked audit scratch",
+      "recoverability": "recreate with validation/audit command",
+      "tracked": false
+    },
+    {
+      "path": "test-results",
+      "action": "removed",
+      "size": 45,
+      "reason": "generated/recreatable local output or obsolete untracked audit scratch",
+      "recoverability": "recreate with validation/audit command",
+      "tracked": false
+    },
+    {
+      "path": ".firebase",
+      "action": "removed",
+      "size": 9387,
+      "reason": "generated/recreatable local output or obsolete untracked audit scratch",
+      "recoverability": "recreate with validation/audit command",
+      "tracked": false
+    },
+    {
+      "path": "firestore-debug.log",
+      "action": "removed",
+      "size": 432932,
+      "reason": "generated/recreatable local output or obsolete untracked audit scratch",
+      "recoverability": "recreate with validation/audit command",
+      "tracked": false
+    },
+    {
+      "path": "audit/gsv-markdown-verification.json",
+      "action": "removed",
+      "size": 131153,
+      "reason": "generated/recreatable local output or obsolete untracked audit scratch",
+      "recoverability": "recreate with validation/audit command",
+      "tracked": false
+    },
+    {
+      "path": "dist",
+      "action": "removed",
+      "size": 2448293,
+      "reason": "post-validation generated/recreatable output cleanup",
+      "recoverability": "recreate by validation commands",
+      "tracked": false
+    },
+    {
+      "path": "test-results",
+      "action": "removed",
+      "size": 45,
+      "reason": "post-validation generated/recreatable output cleanup",
+      "recoverability": "recreate by validation commands",
+      "tracked": false
+    },
+    {
+      "path": "firestore-debug.log",
+      "action": "removed",
+      "size": 439106,
+      "reason": "post-validation generated/recreatable output cleanup",
+      "recoverability": "recreate by validation commands",
+      "tracked": false
+    }
+  ],
+  "manualReview": [
+    {
+      "path": "output",
+      "action": "kept",
+      "reason": "may contain unique acceptance or bug evidence",
+      "recommendation": "manual review only"
+    },
+    {
+      "path": "Cake_Piknik_Payment_Audit.xlsx",
+      "action": "kept",
+      "reason": "untracked production spreadsheet evidence, not safe automatic cleanup",
+      "recommendation": "manual review only"
+    }
+  ]
+}

@@ -45,7 +45,7 @@ test('Phase 20 keeps import preview-first, xlsx absent, read-excel-file active, 
 })
 
 test('Phase 20 operational handoff guide stays practical and preserves CPB and CODEX_TEST guardrails', async () => {
-  const guide = await readFile('PHASE_20_DASHBOARD_OPERATIONS_REAL_USE.md', 'utf8')
+  const guide = await readFile('docs/archive/phases/PHASE_20_DASHBOARD_OPERATIONS_REAL_USE.md', 'utf8')
 
   assert.match(guide, /What is ready now/)
   assert.match(guide, /How to choose a Working Event/)

@@ -31,9 +31,9 @@ Use the existing evidence classes to describe support quality without changing p
 - Control Exception
 - Needs External Evidence
 
-## CPB-specific safeguards
+## Real-event evidence safeguards
 
-- Patron totals remain locked unless exact new evidence proves a correction.
+- Patron totals for any real event require exact evidence before correction.
 - Operations corrections require a before snapshot, drift check, narrow field scope, and append-only audit evidence.
 - Private workbook rows, receipts, and other sensitive source material stay outside Git.
 - Named reconciliation working notes should stay in private release evidence, not in public repository docs.

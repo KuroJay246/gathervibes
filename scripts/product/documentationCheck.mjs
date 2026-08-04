@@ -15,6 +15,8 @@ const financeGuide = await readFile('docs/FINANCE_EVIDENCE_GUIDE.md', 'utf8')
 const qaGuide = await readFile('docs/QA_GUIDE.md', 'utf8')
 const deploymentGuide = await readFile('docs/DEPLOYMENT_GUIDE.md', 'utf8')
 const knownLimitations = await readFile('docs/KNOWN_LIMITATIONS.md', 'utf8')
+const masterReference = await readFile('docs/GSV_MASTER_SYSTEM_REFERENCE.md', 'utf8')
+const maintenanceManifest = await readFile('docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md', 'utf8')
 const readme = await readFile('README.md', 'utf8')
 const requiredGuideTerms = [
   'Product overview',
@@ -39,13 +41,13 @@ const requiredGuideTerms = [
 ]
 
 const missing = requiredGuideTerms.filter((term) => !guide.includes(term))
-if (!archive.includes('Current behavior is documented') || !archive.includes('CPB reconciliation history')) {
+if (!archive.includes('Current behavior is documented') || !archive.includes('historical files are not current operating instructions')) {
   missing.push('historical archive index sections')
 }
 if (!routeMap.includes('Organizer routes') || !routeMap.includes('Working Event rules')) {
   missing.push('route map guide sections')
 }
-if (!prototypeGuide.includes('Select the safe QA event') || !prototypeGuide.includes('QA_PHASE23T_')) {
+if (!prototypeGuide.includes('Select the safe demo event') || !prototypeGuide.includes('QA_DEMO_')) {
   missing.push('organizer rehearsal guide sections')
 }
 if (!organizerQuickStart.includes('Start here') || !organizerQuickStart.includes('Working Event')) {
@@ -78,7 +80,13 @@ if (!deploymentGuide.includes('Before merge') || !deploymentGuide.includes('Prod
 if (!knownLimitations.includes('Known Limitations') || !knownLimitations.includes('Message Builder is copy-only')) {
   missing.push('known limitations sections')
 }
-if (!readme.includes('Current product docs') || !readme.includes('Current workspace summary')) {
+if (!masterReference.includes('Gather & Savor Master System Reference') || !masterReference.includes('CODEX_DEMO - Full System Walkthrough')) {
+  missing.push('master system reference')
+}
+if (!maintenanceManifest.includes('Gather & Savor Repository And Maintenance Manifest') || !maintenanceManifest.includes('gsv-file-inventory.json')) {
+  missing.push('repository maintenance manifest')
+}
+if (!readme.includes('Current Truth') || !readme.includes('Start Here')) {
   missing.push('README current docs summary')
 }
 if (missing.length) {

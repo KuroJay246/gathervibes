@@ -1,75 +1,77 @@
 # AI Agent Rules
 
-Before any future AI/Codex phase, read this file first, then read `PROJECT_HANDOFF.md`, then read `README.md`.
+Read this file first for every Gather & Savor task, then read `PROJECT_HANDOFF.md`, `README.md`, `docs/GSV_MASTER_SYSTEM_REFERENCE.md`, and `docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md`.
 
-This project previously had a real stale-knowledge bug: Phase 17C-B deployed staff/scanner Firestore rules and created scanner staff documents, but scanner login was still blocked by the old approvedEmails-only client auth gate. Future AI/Codex work must treat related app flow, docs, tests, rules, and UI copy as one connected surface.
+## Current Canonical Truth
 
-## Required startup checks for every future AI/Codex phase
+- Firebase project: `gathervibeshub`.
+- Production URL: `https://gathervibeshub.web.app`.
+- Local URL: `http://localhost:4173`.
+- Protected Owner UID: `WcDU2jmbopdAgDlMMWvD3TkqqbC3`.
+- Protected Owner email: `jaylanspencer99@gmail.com`.
+- Current synthetic QA/training event: `CODEX_DEMO - Full System Walkthrough`.
+- CODEX_DEMO event ID: `codex_demo_full_system_walkthrough`.
+- Retired historical QA event: `CODEX_TEST Live Verification Event` / `xPfa0b3KZyLSDnAD2uGI`.
+- CPB event ID: `zhaPxi31cpqLAW0cuS20`.
+- CPB is a normal completed real event. It is not a synthetic QA target and must not receive synthetic writes.
+- QR payload must remain `GSV:TICKET:{ticketCode}`.
+- `xlsx` must remain absent. `read-excel-file` remains the XLSX parser.
 
-1. Read `AI_AGENT_RULES.md` first.
-2. Read `PROJECT_HANDOFF.md`.
-3. Read `README.md`.
-4. Identify the current phase, active branch, deploy status, and live safety status before making changes.
-5. Identify whether Firestore rules are already deployed, dry-run only, or unchanged.
-6. Identify whether Hosting is already deployed or still pending.
-7. Check whether the requested change affects any of these surfaces:
-   - `AuthProvider`
-   - `ProtectedRoute`
-   - app routes
-   - `accessRoles`
-   - Settings page
-   - QA page
-   - runtime health
-   - `README.md`
-   - `PROJECT_HANDOFF.md`
-   - Firestore rules
-   - tests
-8. Search for stale, contradictory, or historical wording before handoff.
-9. Update all affected docs, UI copy, runtime status, and tests together when behavior changes.
-10. Preserve historical closeout notes, but clearly label historical facts so they are not confused with current live behavior.
-11. Never solve staff/scanner/helper access by adding staff/scanner/helper emails to `approvedEmails`.
-12. Treat `approvedEmails` as admin-level access only.
-13. Treat staff/scanner access as `staffProfiles/{uid}` plus `events/{eventId}/staffAssignments/{uid}`.
-14. Protect CPB as production data.
-15. Use `CODEX_TEST` only for QA and smoke testing.
-16. Preserve QR payload exactly as `GSV:TICKET:{ticketCode}`.
-17. Keep `xlsx` absent and `read-excel-file` active.
-18. Run `npm run lint`, `npm test`, `npm run build`, `npm audit --omit=dev`, and `npx -y firebase-tools@latest deploy --only firestore:rules --dry-run --project gathervibeshub` when relevant to the change.
-19. State clearly what changed, what did not change, what was deployed, and what remains blocked.
-20. Stop if current docs, rules, app behavior, and tests contradict each other.
+## Required Startup Checks
 
-## Chat-to-Codex handoff update rule
+1. Confirm branch, HEAD, `origin/main`, and working-tree status.
+2. Read the current task prompt and current repository docs before coding.
+3. Identify whether the request affects runtime source, Firestore Rules, indexes, data, Auth, deployments, tests, docs, or production records.
+4. Search for stale active documentation if behavior changes.
+5. Update source, tests, docs, and product QA together when behavior changes.
+6. Stop if the prompt, source, rules, tests, and active docs contradict each other.
 
-Before every future AI/Codex phase, the AI must use the latest ChatGPT conversation update together with `AI_AGENT_RULES.md`, `PROJECT_HANDOFF.md`, `README.md`, and any active phase plan documents.
+## Security And Data Rules
 
-The AI must not rely only on older repository docs if the current chat contains newer organizer decisions, manual smoke results, safety instructions, branch status, deployment status, or closeout approvals.
+- Do not weaken Firestore Rules.
+- Do not expose secrets, cookies, tokens, service-account keys, or private credentials.
+- Do not modify Jaylan's Firebase Auth account.
+- Do not use Anica's account.
+- Do not change payment, ticket, check-in, scanner, or role semantics unless explicitly requested.
+- Do not deploy Firebase targets that were not intentionally changed and validated.
+- Do not force-push or rewrite Git history.
+- Do not delete unmerged branches or external evidence automatically.
 
-Every handoff must clearly include:
+## Access Rules
 
-- current phase
-- active branch
-- latest commit
-- merge status
-- deploy status
-- manual smoke status
-- organizer approvals or blockers
-- what changed
-- what did not change
-- what remains forbidden
-- what docs/status pages/tests must be updated
+- Protected Owner access is UID-based and independent of mutable staff assignments or allowlists.
+- `approvedEmails` is admin-level access only.
+- Staff/scanner access is based on `staffProfiles/{uid}` plus `events/{eventId}/staffAssignments/{uid}`.
+- Normal scanner users remain assigned-event-only and do not receive Undo Check-In or Check Out.
+- Future lead-scanner behavior is not active unless explicitly implemented and validated.
 
-If chat decisions and repo docs contradict each other, stop and reconcile them before coding.
+## Synthetic QA Rules
 
-## Current standing rules to preserve
+- Use `CODEX_DEMO` for new synthetic QA, demos, tutorials, import rehearsal, and reversible write testing.
+- Do not recreate retired `CODEX_TEST`.
+- Historical archived files and compatibility tests may mention CODEX_TEST as evidence only.
+- Do not use CPB for QA, synthetic imports, scanner rehearsal, or fake payment/attendance writes.
 
-- Phase 17C-B is closed after Firestore rules deployment in B2, the scanner auth-gate fix in B3, organizer scanner smoke PASS, and admin after-smoke PASS.
-- Phase 17D-B is scanner-only polish work. It must not broaden access, rewrite Firestore rules dynamically, implement Access & Roles workflows, or implement lead-scanner permissions.
-- Phase 17D-C is read-only/admin UI foundation only. It must not add write mutations for staffProfiles, staffAssignments, approvedEmails, or auditLogs.
-- Phase 17C-B3 fixed the scanner login gate by allowing active staff profile plus active assignment access after approved-admin lookup.
-- Scanner/check-in-only users remain check-in only. Do not give the normal scanner role Undo Check-In or Check Out.
-- Approved admins may use existing admin-only undo/check-out paths where already implemented.
-- A future lead-scanner undo permission may be planned later, but it is not implemented now.
-- `CODEX_TEST` is the only scanner smoke event.
-- CPB must not be used for QA.
-- Firestore indexes must not be deployed unless explicitly requested.
-- Native app, Cloud Functions, Storage, payment gateway, and public portal work remain out of scope unless explicitly requested.
+## Permanent Forward Compatibility
+
+Whenever a change affects schemas, fields, statuses, calculations, validators, Firestore Rules, service write shapes, imports, reports, audit behavior, role behavior, tickets, check-in, Operations, Tasks, event configuration, or other persistent behavior:
+
+- Support older legitimate records, not just newly created demo records.
+- Check create, read, update, report, import, export, audit, and downstream workflows.
+- Prefer backward-compatible reading, safe defaulting, normalization on edit, or documented legacy tolerance over broad production migrations.
+- Do not bulk-modify real production data without explicit approval after inspection, classification, dry run, and testing.
+- Add tests for new records, old records, imported old records, partially populated records, and completed-event records where relevant.
+
+## Handoff Rule
+
+Every handoff must state:
+
+- current branch and commit;
+- merge/deploy status;
+- validation status;
+- manual smoke status if performed;
+- what changed;
+- what did not change;
+- remaining blockers;
+- docs/tests that were updated;
+- Firebase targets deployed or explicitly not deployed.

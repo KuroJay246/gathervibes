@@ -1,0 +1,556 @@
+# Gather & Savor Event Hub
+
+The current product, workflow, authorization, QA, monitoring, and release reference is [`docs/GSV_MASTER_SYSTEM_REFERENCE.md`](./docs/GSV_MASTER_SYSTEM_REFERENCE.md), with organizer detail in [`docs/PRODUCT_GUIDE.md`](./docs/PRODUCT_GUIDE.md). Repository inventory and maintenance policy live in [`docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md`](./docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md). Historical phase records are interpreted through [`docs/HISTORICAL_ARCHIVE_INDEX.md`](./docs/HISTORICAL_ARCHIVE_INDEX.md); the older cumulative engineering handoff remains in [`PROJECT_HANDOFF.md`](./PROJECT_HANDOFF.md) because tests and future agents reference its exact path.
+
+Private event-operations dashboard for **Gather & Savor Vibes**. This is an admin-only workspace—not a public attendee app. Guests continue using Instagram, Linktree, Google Forms, and Google Sheets.
+
+This private admin app intentionally uses `noindex` and does not publish `sitemap.xml` or JSON-LD structured data. Public SEO should be handled by a separate public marketing landing page later.
+
+## Current product docs
+
+- [`docs/GSV_MASTER_SYSTEM_REFERENCE.md`](./docs/GSV_MASTER_SYSTEM_REFERENCE.md)
+- [`docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md`](./docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md)
+- [`docs/PRODUCT_GUIDE.md`](./docs/PRODUCT_GUIDE.md)
+- [`docs/ROUTE_MAP.md`](./docs/ROUTE_MAP.md)
+- [`docs/ORGANIZER_QUICK_START.md`](./docs/ORGANIZER_QUICK_START.md)
+- [`docs/NEW_EVENT_SETUP_GUIDE.md`](./docs/NEW_EVENT_SETUP_GUIDE.md)
+- [`docs/EVENT_LIFECYCLE_GUIDE.md`](./docs/EVENT_LIFECYCLE_GUIDE.md)
+- [`docs/EVENT_DAY_GUIDE.md`](./docs/EVENT_DAY_GUIDE.md)
+- [`docs/PROTOTYPE_DEMO_GUIDE.md`](./docs/PROTOTYPE_DEMO_GUIDE.md)
+- [`docs/OPERATIONS_GUIDE.md`](./docs/OPERATIONS_GUIDE.md)
+- [`docs/BAKER_PAYMENT_GUIDE.md`](./docs/BAKER_PAYMENT_GUIDE.md)
+- [`docs/FINANCE_EVIDENCE_GUIDE.md`](./docs/FINANCE_EVIDENCE_GUIDE.md)
+- [`docs/QA_GUIDE.md`](./docs/QA_GUIDE.md)
+- [`docs/DEPLOYMENT_GUIDE.md`](./docs/DEPLOYMENT_GUIDE.md)
+- [`docs/KNOWN_LIMITATIONS.md`](./docs/KNOWN_LIMITATIONS.md)
+
+## Current workspace summary
+
+- Use the current grouped organizer structure: Plan; Guests & Attendance; Event Day; Money & Follow-Up; Tools; System.
+- Current organizer labels include `Overview`, `Events`, `Tasks & Deadlines`, `Contacts & Organizations`, `Documents`, `Guests & Registrations`, `Tickets`, `Check-In`, `Run of Show`, `Equipment & Supplies`, `Registration Payments`, `Operations & Commitments`, `Reports`, `Reconciliation Preview`, `Import Center & Response Inbox`, `Message Builder`, `Settings`, and `System QA`.
+- Start a new real event from `Events` with `Plan a New Event`, then keep that event selected as the Working Event.
+- Use `CODEX_DEMO - Full System Walkthrough` (`codex_demo_full_system_walkthrough`) for walkthroughs, QA, training, and reversible synthetic write checks.
+- Treat `CODEX_TEST Live Verification Event` as a retired historical QA fixture. It may remain in archived docs and compatibility tests, but active instructions should not recreate or use it for new production QA.
+- Treat Cake Piknik Barbados as a normal completed real event protected by the same safeguards as every other real event. Do not use CPB for synthetic QA writes.
+- Update canonical documentation instead of creating a new standalone Markdown report by default; create new docs only for permanent standards, immutable evidence, compliance needs, tooling dependencies, or content that cannot reasonably fit canonical docs.
+
+## Current-truth note for historical sections below
+
+Older phase closeout sections are retained because they are historical evidence and because existing tests reference exact wording. When they mention `CODEX_TEST` as the QA fixture or describe CPB as protected/read-only, read that as historical context. The current standard is CODEX_DEMO for synthetic QA and standard real-event safeguards for CPB.
+
+## Implementation status
+
+- [x] **Phase 1**: Auth and base app shell
+- [x] **Phase 2**: Event management
+- [x] **Phase 2.5**: Google sign-in, email/password backup, mobile-first PWA foundation
+- [x] **Phase 3**: Registrations and CSV imports
+- [x] **Phase 3.1 recovery**: Google auth restored, production security confirmed, adaptive imports, price tier schema, dashboard countdown and selected-event UX (PR #3 merged to `main`)
+- [x] **Phase 3.2**: Import Center cleanup with source selector
+- [x] **Phase 4.5 foundation**: Ticket assignment and search-based door check-in
+- [x] **Phase 5**: Production QA Hardening with private QA Center and read-only fixture verification
+- [x] **Phase 11**: Communications Pro copy-only tools
+- [x] **Phase 13A**: AI Draft Lab prompt builder (draft-only; no real AI API)
+- [x] **Phase 14B**: CPB Payment Audit UI Cleanup / Operations Review Fixes
+- [x] **Phase 15A**: Hosting Security Headers + Private Indexing
+- [x] **Phase 15B**: XLSX Dependency Security Review + Roadmap/Access/Ops Update — closed, merged, and deployed
+- [x] **Phase 16**: Live Browser Loading Diagnostics + Ticket/Check-In QA Hardening — closed, merged, and deployed
+- [x] **Phase 17A**: Visibility, Counts, Backlog Reorganization, and Staff Access Planning — closed, merged, and deployed
+- [x] **Phase 17B**: Staff / Worker Roles Foundation — closed, merged, and Hosting-deployed; Firestore rules prototype merged for review and not deployed at Phase 17B closeout
+- [x] **Phase 17C-A**: Firestore Rules Review + Deployment Readiness — closed, merged, and Hosting-deployed; rules dry-run validated and not deployed at Phase 17C-A closeout
+- [x] **Phase 17C-B**: Firestore Rules Deployment Approval + Live Scanner/Staff Smoke + Scanner-Only PWA Mode — closed, merged, Firestore rules deployed in B2, Hosting-deployed, organizer scanner smoke passed, admin after-smoke passed
+- [x] **Phase 17D-A**: Access & Roles Planning + Scanner Day-of Polish Blueprint — closed, merged, planning-only blueprint approved; no permission, rules, or workflow changes are live
+- [x] **Phase 17D-C**: Access & Roles Read-Only/Admin UI Foundation — closed, merged, organizer admin review PASS, organizer scanner review PASS, read-only only
+- [x] **Phase 17D-D**: Access workflow/rules-readiness planning only — closed, merged, planning-only
+- [x] **Phase 17G-B**: Firestore Rules Deployment Approval + Dry-Run Final Review only — closed after organizer review PASS; merged-ready; no Firestore rules or index deploy
+- [x] **Phase 17G-B2**: Firestore Rules Real Deploy + Immediate Smoke — closed; Firestore rules deployed/live, Firestore indexes not deployed, admin smoke passed, scanner smoke passed, embedded/in-app auth redirect fix completed
+
+Phase 17G-B2 is now closed on branch `codex/phase-17g-b2-firestore-rules-real-deploy-immediate-smoke` from base/main tip `24d66e9bb49db2d3fe4f1722439dafe3bbd626c7`. Firestore rules were deployed to project `gathervibeshub`, Firestore indexes were not deployed, backend `accessRequests/{requestId}` rules are now live, and Hosting was redeployed after a login redirect compatibility fix for the embedded/in-app browser. Approved admin Google sign-in completes in the in-app browser, admin smoke passed for `/dashboard`, `/settings`, `/qa`, `/registrations`, `/tickets`, and `/check-in`, admin route sanity confirmed the admin is not locked into `/scanner`, and scanner smoke passed on the live `/scanner` route with assigned-event-only CODEX_TEST visibility and no CPB visibility or admin navigation. Access Requests remains read-only, requester submit remains disabled/not live, no approval/decline/revoke workflow is live, no staff assignment editing is live, no lead-scanner workflow is live, `approvedEmails` remains unchanged and admin-only, CPB remains untouched, QR payload remains `GSV:TICKET:{ticketCode}`, `xlsx` remains absent, and `read-excel-file` remains active.
+
+Phase 17G-B is now closed, merged-ready, and organizer accepted on branch `codex/phase-17g-b-firestore-rules-deployment-final-review` at commit `c998700d7882c3c5feaa52f59e9f21fd57c72b10` as Firestore Rules Deployment Approval + Dry-Run Final Review only. Organizer review PASS is recorded. `PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md` is the preserved accepted artifact for this branch. The organizer accepted the git-history-based deployed-rules comparison, the last deployed rules baseline `dc62cade23313eb0ab6a3b06d5318c379b8a4cbb`, the current undeployed `accessRequests/{requestId}` rules prototype delta, the line-by-line `firestore.rules` review, the GO / HOLD / NO-GO matrix, the dry-run command pack, and the rollback warning. The organizer also explicitly confirmed understanding that deploying the current repository `firestore.rules` would make backend `accessRequests/{requestId}` rules live for compliant authenticated clients while the current requester form, Access Requests admin UI, and `src/services/accessRequestContract.js` would remain disabled/non-live and would not create `staffProfiles` or `staffAssignments` by themselves. No Firestore rules were deployed, no Firestore indexes were deployed, no live requester workflow exists, no live approval workflow exists, no live decline workflow exists, no live revoke workflow exists, no live staff assignment editing exists, no lead-scanner workflow exists, `accessRequestContract` remains disabled/not live, requester submit remains disabled/not live, Access Requests admin UI remains read-only, no permissions were broadened, `approvedEmails` remains unchanged and admin-only, scanner remains assigned-event-only with no undo/check-out, admin undo remains admin-only where already implemented, CPB remains untouched, CODEX_TEST remains QA/smoke only, QR payload remains `GSV:TICKET:{ticketCode}`, `xlsx` remains absent, and `read-excel-file` remains active. The next recommended gate after organizer review is Phase 17G-B2: Explicit Firestore Rules Deploy Authorization + Real Deploy + Immediate Smoke only.
+
+Phase 17G-A is now closed, merged-ready, and organizer accepted on branch `codex/phase-17g-a-live-workflow-go-no-go-rules-approval-package` at commit `e098315c29e5b085bdbd11218ce6b5211d2c9832` as a Live Workflow Go/No-Go Review + Rules Deployment Approval Package only. Organizer review PASS is recorded. `PHASE_17G_A_LIVE_WORKFLOW_GO_NO_GO_RULES_APPROVAL.md` is preserved as the accepted artifact, including accepted sections 5-8 and 15-18. The organizer accepted the rules deployment checklist, index deployment checklist, live workflow go/no-go checklist, rollback plan, no-go triggers, and required organizer approvals, and explicitly confirmed understanding that deploying the current repository `firestore.rules` would make backend `accessRequests/{requestId}` rules live for compliant authenticated clients while the current requester form, Access Requests admin UI, and `src/services/accessRequestContract.js` would still remain disabled/non-live. No Firestore rules were deployed, no Firestore indexes were deployed, no live requester workflow exists, no live approval/decline/revoke workflow exists, no live staff assignment editing exists, no lead-scanner workflow exists, no permissions were broadened, `approvedEmails` remains unchanged and admin-only, scanner remains assigned-event-only with no undo/check-out, admin undo remains admin-only where implemented, CPB remains untouched, CODEX_TEST remains QA/smoke only, QR payload remains `GSV:TICKET:{ticketCode}`, `xlsx` remains absent, and `read-excel-file` remains active.
+
+Phase 17E-C is now closed, merged-ready, and organizer accepted on branch `codex/phase-17e-cde-access-requests-ui-readiness-ci`. Starting branch/head before 17F was `ca93b260e4b8c9d3e80041f095029dde79bf6794`, and the latest implementation/planning commit is `98e2a0cd21503899c0fc0e38e50646a9ac2f283e`. Phase 17E-C preserved the Access Requests read-only/admin UI foundation only: admin-visible model/status surface for future `accessRequests/{requestId}` records, review-state guidance, disabled admin action markers, and explicit no-write boundaries. No live approval, decline, revoke, staff-profile creation, or event assignment workflow is enabled.
+
+Phase 17E-D is now closed, merged-ready, and organizer accepted on branch `codex/phase-17e-cde-access-requests-ui-readiness-ci` as the requester access-request form UX prototype only. The requester form preview remains disabled, admin-visible only, non-public, and submits nothing. No Firestore write, service call, public route, Cloud Function, or sending workflow is enabled.
+
+Phase 17E-E is now closed, merged-ready, and organizer accepted on branch `codex/phase-17e-cde-access-requests-ui-readiness-ci` as the access workflow deployment readiness package and rollback plan only. `PHASE_17E_E_ACCESS_WORKFLOW_DEPLOYMENT_READINESS.md` is preserved as the artifact. Firestore rules remain undeployed and Firestore indexes remain undeployed in this batch.
+
+Phase 17F-A is now closed, merged-ready, and organizer accepted on branch `codex/phase-17e-cde-access-requests-ui-readiness-ci` as the Access Workflow Implementation Plan only. `PHASE_17F_A_ACCESS_WORKFLOW_IMPLEMENTATION_PLAN.md` is preserved as the artifact for future approval, decline, revoke, staff-profile, and staff-assignment sequencing together with audit actions and security boundaries.
+
+Phase 17F-B is now closed, merged-ready, and organizer accepted on branch `codex/phase-17e-cde-access-requests-ui-readiness-ci` as the disabled Access Request service contract only. `src/services/accessRequestContract.js` is preserved and remains disabled/not live, not wired into the live UI, and free of Firestore import/write paths.
+
+Phase 17F-C is now closed, merged-ready, and organizer accepted on branch `codex/phase-17e-cde-access-requests-ui-readiness-ci` as the Access Workflow manual smoke checklist only. `PHASE_17F_C_ACCESS_WORKFLOW_SMOKE_CHECKLIST.md` is preserved for admin, scanner, and requester-preview smoke plus rollback and append-only audit checks.
+
+Phase 17E-B is now closed, merged-ready, and accepted by organizer review PASS on branch `codex/phase-17e-b-access-request-rules-prototype-tests` at commit `dc108e18a5c5efd9cd3c283daeaeed1d440a45d9` as Access Request Rules Prototype + Tests, dry-run only. The `accessRequests/{requestId}` prototype shape is accepted, including requester self-create/self-read, admin-only list/review updates, accepted statuses `pending`, `approved`, `declined`, and `revoked`, and review metadata boundary checks. Requesters cannot self-approve, cannot self-revoke, cannot create `staffProfiles`, cannot create `staffAssignments`, and cannot modify `approvedEmails`. No live approval workflow, revoke workflow, staff assignment editing workflow, lead-scanner permission, Firestore rules deploy, or Firestore indexes deploy is included in this phase; no permissions were broadened; `approvedEmails` remains unchanged and admin-only; scanner remains assigned-event-only with no undo/check-out; admin undo remains admin-only where implemented; CPB remains untouched; CODEX_TEST remains QA/smoke only; QR payload remains `GSV:TICKET:{ticketCode}`; `xlsx` remains absent; and `read-excel-file` remains active.
+
+Phase 17E-A is now closed, merged-ready, and accepted by organizer artifact review PASS as Access Workflow Rules + Data Model Review only. Branch `codex/phase-17e-a-access-workflow-rules-data-model-review` at commit `cb0047f310f1bbf61515088328e7f65410d20400` preserved `PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md` as the accepted artifact. It did not implement a live approval workflow, revoke workflow, staff assignment editing workflow, or lead-scanner permission; it did not broaden permissions; `approvedEmails` remained unchanged and admin-only; scanner remained assigned-event-only with no undo/check-out; admin undo remained admin-only where implemented; CPB remained untouched; CODEX_TEST remained QA/smoke only; QR payload remained `GSV:TICKET:{ticketCode}`; `xlsx` remained absent; `read-excel-file` remained active; and Firestore rules/indexes were not deployed.
+
+Daily QA preflight was investigated before this batch. The scheduled failures on July 2, 2026 at 12:20:36 UTC and earlier were not caused by the GitHub Actions Node 20 deprecation warning; the failing step was the built-auth smoke check still expecting the old `Sign up with Google` text on commit `1e48154527e4700bfbed92a2b5148d17a45182c5`. The latest current-head run, `28875120502`, succeeded for branch commit `ca93b260e4b8c9d3e80041f095029dde79bf6794` on July 7, 2026 after the workflow fix was updated to scan all built `dist/assets/*.js` bundles for the current login copy: `Continue with Google`, `Sign in with email`, and `Sign in securely`. If GitHub still shows an older failure badge for this branch, treat it as stale older-run UI confusion unless the current head fails again.
+
+Organizer review PASS is recorded for this closeout. Settings opens, the Access Requests section remains read-only, requester submit remains disabled/not live, no public requester route exists, no Firestore write occurs from the form, the disabled contract is not wired into the live UI, and no Firestore write path exists in `src/services/accessRequestContract.js`. No live approval workflow, no live decline workflow, no live revoke workflow, no live staff assignment editing, and no lead-scanner workflow exist. No permissions were broadened. `approvedEmails` remains unchanged and admin-only, Access Requests admin UI remains read-only, scanner remains assigned-event-only with no undo/check-out, admin undo remains admin-only where implemented, CPB remains untouched, CODEX_TEST remains QA/smoke only, QR payload remains `GSV:TICKET:{ticketCode}`, `xlsx` remains absent, `read-excel-file` remains active, and Firestore rules/indexes were not deployed.
+
+Phase 17D-B is closed, merged-ready, and Hosting-deployed after organizer scanner smoke PASS and admin after-smoke PASS. Branch commit `d3b65aab0e4d7401013e463af4bb92e4de69b892` completed scanner day-of polish only: clearer success/duplicate/pending/no-ticket states, faster next-guest flow, mobile touch/readability improvements, optional browser-only sound/haptic feedback, and explicit no-offline-writes guidance. Scanner remains assigned-event-only with no undo/check-out, admin undo remains admin-only where implemented, no permissions were broadened, no Access & Roles workflow or lead-scanner permission was implemented, CPB remained untouched, `approvedEmails` remained unchanged, QR payload remains `GSV:TICKET:{ticketCode}`, `xlsx` remains absent, `read-excel-file` remains active, and Firestore rules/indexes were not deployed in 17D-B.
+
+Phase 17D-C is now closed, merged, and Hosting-review-deployed after organizer admin review PASS and organizer scanner review PASS. Branch implementation commit `b7e1fc1b0a454ec11570ebac81fecd84f8af2b9a` delivered the Access & Roles read-only/admin UI foundation only: Admin Access Boundary, Staff Profiles Model, Event Assignments Model, Role Capability Matrix, Scanner Mode, Security Notes, and disabled future workflow controls marked not live. It does not add any write mutation for staffProfiles, staffAssignments, approvedEmails, or auditLogs. Phase 17D-D is now closed, merged, and planning-only. Its readiness artifact `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md` is preserved. The permanent Chat-to-Codex handoff rule was added in commit `1a1f43d336f7101af603b086b287e5bd9ace2595`. No approval workflow, revoke workflow, staff assignment editing, lead-scanner permission, Firestore rules deploy, or Firestore indexes deploy are live in this closeout.
+
+Organizer manual review PASS is preserved for this closeout. Admin review PASS: admin login works; Settings opens; Access & Roles is visible to admin and remains read-only; Admin Access Boundary, Staff Profiles Model, Event Assignments Model, Role Capability Matrix, Scanner Mode guidance, and Security Notes are clear; Approve access, Revoke access, Assign event, Edit role, and Lead scanner are marked Not Live / disabled; no staff profile write action, no staff assignment write action, and no approvedEmails edit action are available; no error screen appears. Scanner review PASS: scanner login works; scanner lands on `/scanner`; no admin nav; no Settings access; no Access & Roles access; only CODEX_TEST is available; CPB is not visible or accessed; no Undo Check-In / Check Out button is available.
+
+Phase 3.2 completed the **Import Center** rename and source-specific guidance for Google Forms CSV, Google Sheets CSV, Excel/XLSX workbooks, pasted table rows, bank/payment CSVs, and custom files; it was later deployed. Phase 4.5 completed controlled ticket assignment and search-based door check-in; it was later deployed. Phase 5 adds a private `/qa` center for safe production smoke testing against CODEX_TEST only. Phase 16 focused on live browser loading diagnostics and CODEX_TEST ticket/check-in QA hardening, then closed after merge and deployment. Phase 17C-B closed the scanner/staff live-access rollout after reviewed Firestore rules deployment, scanner smoke pass, and admin after-smoke pass. Phase 17D-A then closed as the approved planning-only blueprint for Access & Roles design and scanner day-of polish, with no new permissions or approval workflow made live. QR camera scanning, Communications Pro, AI Draft Lab, Event Operations, and Phase 15A security headers are live. Real AI API integration, Google Sheets OAuth, Gmail/Outlook OAuth, automatic email/WhatsApp sending, Cloud Functions, Storage, public attendee/baker/school portals, payment gateway integration, public sitemap/JSON-LD for this private admin app, and native app store builds remain deferred.
+
+## Phase 16 closed status
+
+- Live Hosting routes `/`, `/login`, and `/dashboard` should return the private admin app shell through the SPA rewrite.
+- Phase 15A headers remain intentionally narrow: frame/object/base/form protections plus noindex and camera permission for same-origin QR scanning. They do not define `script-src`, `style-src`, or `connect-src`.
+- The service worker performs install/activate lifecycle only and has no fetch handler or private-data cache.
+- The root app has a safe loading error fallback with organizer-friendly refresh/incognito guidance.
+- QA Center includes Phase 16 manual checks for live browser loading, approved second-account login, CODEX_TEST ticket search, QR camera lookup, manual ticket-code fallback, check-in, duplicate blocking, append-only audit logs, and CPB protection.
+- Phase 16 is closed, merged, and deployed.
+
+## Clean account engineering standard
+
+All future features must support clean/new approved account state, no selected Working Event, stale or empty localStorage, null or missing event config, null or missing currency with `BBD` fallback, null or missing ticket prefix with `GSV` fallback, null or missing `priceTiers` with `[]` fallback, and all protected routes rendering without the AppErrorBoundary fallback.
+
+## Phase 17A closed status
+
+Phase 17A is closed, merged, and deployed. It was a correction and planning phase for backlog visibility, registration/guest count wording, clean-account standards, and future staff access planning. It did not add staff/scanner Firestore access, broaden rules, modify CPB, create CPB registrations, delete audit logs, change QR payloads, or add dependencies.
+
+Backlog/status visibility must appear in this order wherever roadmap content is shown:
+
+1. Closed / shipped phases
+2. Current active phase
+3. Next recommended phase
+4. High-priority operational backlog
+5. Access / staff / worker permissions backlog
+6. Event Operations backlog
+7. QA / reliability backlog
+8. Deferred integrations
+9. Public portals / native app / future long-term ideas
+10. Explicitly not implemented / out of scope
+
+Registration/guest count standard: registrations are registration records; guests are the sum of `personsAttending` across those records. If no Working Event is selected, protected routes must show a no-selected-event state rather than stale counts.
+
+## Phase 17B closed status
+
+Phase 17B closed the staff-role foundation and UI/access planning. The Firestore rules prototype was merged for review and remained undeployed at Phase 17B closeout. Real staff/scanner access requires Phase 17C with explicit Firestore rules deployment approval and a live staff smoke test.
+
+The planned data model is `staffProfiles/{uid}` plus `events/{eventId}/staffAssignments/{uid}` so Firestore rules can enforce assigned-event access after approval. Roles are owner/admin, event manager, scanner/check-in-only, viewer/read-only, and operations helper. Scanner/check-in-only users should only search and check in for assigned events; they should not have Events CRUD, registration delete, import apply, finance/operations ledger edits, settings/accessControl edits, auditLog delete/update, or broad CPB access unless explicitly assigned.
+
+Approved-admin access through `settings/accessControl.approvedEmails` remains the current live owner/admin enforcement boundary. Staff/scanner accounts must not be added to `approvedEmails`; live staff/scanner access is not active until Phase 17C reviews and deploys Firestore rules with organizer approval.
+
+## Phase 17C-A closed status
+
+Phase 17C-A is closed, merged, and Hosting-deployed. It reviewed, documented, and tested the merged Phase 17B staff-role rules prototype before any live rules deployment. At Phase 17C-A closeout, Firestore rules were reviewed and dry-run validated, but Firestore rules and Firestore indexes were not deployed.
+
+Admin access remains controlled by `settings/accessControl.approvedEmails`, which is admin-level access only. Do not add staff/scanner/helper accounts to `approvedEmails`. Phase 17C-B2 deployed reviewed Firestore rules and created the CODEX_TEST scanner staff documents, and Phase 17C-B later closed after organizer scanner smoke and admin after-smoke confirmation passed.
+
+Before any future AI/Codex phase, read `AI_AGENT_RULES.md`, `PROJECT_HANDOFF.md`, and `README.md`, then use the latest ChatGPT conversation update together with those repository docs and any active phase plan documents. Future changes must check the full app flow, related docs, tests, rules, and UI copy so stale project knowledge does not conflict with current behavior. If current chat decisions and repository docs disagree, stop and reconcile them before coding or handoff.
+
+## Phase 17C-B closed status
+
+Phase 17C-B is closed, merged, Firestore-rules-deployed in B2, and Hosting-deployed. It delivered the private `/scanner` route and scanner-only flow, admin-only scanner undo, scanner shortcuts, admin logo-to-dashboard navigation, Settings tab navigation, scanner staff docs for CODEX_TEST, the scanner login auth-gate fix in B3, organizer scanner smoke PASS, and organizer admin after-smoke PASS.
+
+Phase 17C-B2 passed preflight, verified rollback readiness, verified `TEST_SCANNER_EMAIL` (`ojah13635@gmail.com`) as Firebase Auth UID `5WN4oTTesCYO14tX6HlUE6W5LM72`, confirmed the scanner Auth user exists and remains outside `approvedEmails`, created/verified `staffProfiles/{uid}` and `events/xPfa0b3KZyLSDnAD2uGI/staffAssignments/{uid}`, confirmed no CPB assignment exists, and deployed Firestore rules only. Firestore indexes were not deployed. Staff/scanner/helper accounts must not be added to `approvedEmails`; approvedEmails remains admin-level access only.
+
+Phase 17C-B3 fixed the scanner login auth gate after the scanner signed in but was blocked by the approvedEmails-only message. approvedEmails is admin-level access only. Staff/scanner users must remain outside approvedEmails and must be admitted through active staffProfiles/{uid} plus active events/{eventId}/staffAssignments/{uid}. AuthProvider/ProtectedRoute must check both paths: approved admin first, then staff profile/assignment access before showing a not-approved message. Do not solve scanner login by adding the scanner to approvedEmails.
+
+Organizer-provided PASS is now the recorded closeout result. Scanner login works, no approvedEmails error appears, scanner lands on `/scanner`, no admin nav is shown, only CODEX_TEST is available, CPB is not visible or accessed, check-in works, duplicate check-in blocks, and the normal scanner role has no Undo Check-In button. Approved admin login works, Dashboard/Settings/QA/Registrations/Tickets/Check-In/Scanner open, CODEX_TEST reflects the scanner check-in, CPB is not selected, and no error screen appears.
+
+Phase 17C-B use remains CODEX_TEST-only for scanner smoke and QA. CPB must not be selected, assigned, read as scanner, or used for QA. Scanner/check-in-only access remains check-in only and must not receive Undo Check-In or Check Out. Approved admins may use the existing admin-only undo/check-out path where already implemented. Native app work remains deferred; the current practical direction is a private PWA-style scanner shortcut/mode. Admin AppShell brand navigation returns approved admins to `/dashboard`; the isolated `/scanner` page does not gain admin-home logo navigation. Settings now uses category tabs with deep links such as `/settings?tab=access`. `AI_AGENT_RULES.md` is required reading for future AI/Codex phases.
+
+## Phase 17D-A closed status
+
+Phase 17D-A is closed, merged, and approved as a planning-only blueprint. It created the implementation blueprint for an Access & Roles Management Center, Settings approval-flow planning, scanner day-of polish, sound/haptic feedback planning, scanner success/error UI planning, event-day helper ergonomics, and future lead-scanner role planning. Organizer review is recorded as PASS. It did not implement a live approval workflow, did not change Firestore rules, did not broaden permissions, did not create or revoke staff users, and did not change the scanner/check-in-only no-undo boundary.
+
+`PHASE_17D_PLAN.md` is the preserved planning artifact for this phase. The organizer reviewed and approved the blueprint. `approvedEmails` remains admin-level access only. Staff/scanner access remains `staffProfiles/{uid}` plus `events/{eventId}/staffAssignments/{uid}`. Scanner/check-in-only remains assigned-event-only check-in access with no undo/check-out. Admin undo remains admin-only where already implemented. CODEX_TEST remains the only safe QA/smoke event, CPB remains protected production data, QR payload remains `GSV:TICKET:{ticketCode}`, Firestore rules were not deployed in 17D-A, Firestore indexes were not deployed in 17D-A, `xlsx` remains absent, and `read-excel-file` remains active.
+
+No live approval/revoke workflow exists yet, no live staff assignment editing exists yet, and no live lead-scanner permission exists yet. Phase 17D-C is closed and merged after organizer admin/scanner review PASS, and Phase 17D-D readiness planning is closed and merged as planning-only in `PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md`. Phase 17E-A is now closed after organizer artifact review PASS, and its accepted review artifact is `PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md`. Phase 17E-B is now closed after organizer prototype review PASS as a dry-run-only `accessRequests/{requestId}` rules prototype; Firestore rules remain undeployed and the workflow is not live.
+
+## Phase 15B status
+
+- `xlsx` was removed after audit because runtime XLSX import now uses the already-installed `read-excel-file/browser` parser.
+- XLSX import remains active with sheet selection, row normalization, preview, mapping, and confirm-before-write safety.
+- `npm audit --omit=dev` is expected to report no production vulnerabilities after `xlsx` removal.
+- Staff/scanner roles must not be added to `approvedEmails`. Phase 17B uses staff profile and assigned-event rule design for future scoped access; rules deployment requires separate approval.
+- Event Operations Ledger is active and separate from ticket sales. Future operations modules such as tasks, supplies, vendors/suppliers, sponsors, school tracking, baker/vendor tracking, budget/expense reporting, reimbursements, and event-day run sheets are planned but not active.
+- Phase 15B is closed, merged, and deployed.
+
+## Production and QA status
+
+- PR #3 (`cursor/review-phase3-1-google-auth` -> `main`) is merged.
+- Latest Phase 17C-B2 rules deploy targeted project `gathervibeshub` with Firestore rules only; Firestore indexes were not deployed. Phase 17C-B later closed after organizer scanner smoke confirmation and admin after-smoke confirmation passed.
+- `CODEX_TEST Live Verification Event` is intentionally kept as the permanent QA / smoke-test event.
+- CODEX_TEST event ID: `xPfa0b3KZyLSDnAD2uGI`.
+- CPB is real production data and must not be used for QA. CPB event ID: `zhaPxi31cpqLAW0cuS20`.
+- The CODEX_TEST event may be used for safe app testing, but not for real guests.
+- Do not delete the CODEX_TEST event unless the organizer explicitly says so.
+- Do not create a new daily test event; reuse CODEX_TEST for smoke testing.
+- Do not delete `auditLogs` globally. Test data should be clearly prefixed with `CODEX_TEST` or `CODEX_DAILY`.
+- Daily QA runs in GitHub Actions via `.github/workflows/daily-qa.yml`.
+- Daily QA is read-only by default: `npm ci`, lint, tests, build, built auth UI smoke, and live HTTP smoke checks.
+- Any future write smoke test must be opt-in only with `QA_WRITE_SMOKE=true`.
+- Write smoke tests, if enabled later, must use only CODEX_TEST, create/delete only their own `CODEX_DAILY` registration, and must leave audit logs append-only.
+- `/qa` is the private QA Center. It shows CODEX_TEST status, CPB warnings, current Working Event status, audit log status, System Health, a manual QA checklist, and a copyable CODEX_TEST sample CSV.
+- The QA Center helper does not write to Firestore. Production QA writes remain manual through the app and must use CODEX_TEST only.
+- Read-only fixture verification: `npm run admin:verify-production-fixtures`.
+
+## Phase 3 feature summary
+
+- Registrations CRUD scoped to the active event
+- CSV file upload and pasted CSV import
+- Field mapping with auto-detection of common headers
+- Import preview before any Firestore write
+- Row validation with valid, warning, and blocked states
+- Duplicate detection by email+timestamp, phone+timestamp, and source row ID
+- Privacy-safe deterministic registration IDs for imports (`imp_` + SHA-256 prefix)
+- Append-only registration audit logs in the same batch as mutations
+- Search and payment-status filters
+- Responsive mobile cards and desktop table
+
+## Phase 3.1 Option B additions
+
+- Production security verified: allowlist enforced, no debug bypasses
+- Price tier schema: optional `priceTiers` array (Early Bird, General, Door, Tier 1–3, Complimentary)
+- Backward-compatible with `ticketPrice` scalar (existing events unaffected)
+- Firestore rules updated to strictly validate optional `priceTiers` list entries (max 7 tiers)
+- Dashboard enhanced: live local date/time, upcoming events list, countdowns per event
+- Dashboard: "Active Event" renamed to **Working Event / Selected Event** throughout
+- Dashboard: explanation text clarifying selected event is workspace-only
+- Dashboard: clear and change selected event controls
+- Dashboard: registration metrics (total, paid, pending, complimentary) for selected event
+- Dashboard: capacity progress bar
+- Dashboard: price tier summary chips for selected event
+- Excel/XLSX: implemented with `read-excel-file/browser`, sheet selection, and preview-before-write safety
+- Google Sheets OAuth: remains deferred
+
+## Phase 3.2 Import Center
+
+- `/imports` is renamed **Import Center** in navigation, dashboard links, and page headings.
+- Source selector supports Google Forms CSV, Google Sheets CSV, Excel/XLSX, pasted table text, bank/payment CSV, and custom files.
+- Google Forms and Google Sheets remain CSV-export workflows; no Google Sheets OAuth is added.
+- Pasted table/CSV text continues through the same map → preview → confirm import flow.
+- CSV upload still requires headers and still previews before Firestore writes.
+- Bank/payment CSV and custom file sources use the same safe mapping workflow.
+- XLSX upload is active. Workbooks are read with `read-excel-file/browser`, multiple sheets show a selector, formulas are not executed, and rows still go through map -> preview -> confirm before Firestore writes.
+
+## Phase 4.5 Ticketing and Door Check-In
+
+- `/tickets` is live for approved admins with a selected Working Event.
+- Tickets page lists selected-event registrations with name, contact, payment status, ticket status, and ticket code.
+- Admins can manually assign a `GSV-XXXXXX` code, generate a readable privacy-safe code, regenerate with confirmation, and clear/unassign with confirmation.
+- Ticket code uniqueness is enforced in the selected-event UI/service before writes.
+- Ticket writes create append-only registration audit logs: `ticket.assign`, `ticket.unassign`, `ticket.regenerate`.
+- `/check-in` is live for approved admins with a selected Working Event.
+- Check-In supports fast search by name, email, phone, or ticket code, large mobile-first guest cards, payment/ticket/check-in status, and reset for the next guest.
+- Check-in moves `checkedIn` from `false` to `true`, sets `checkInTime`, and writes `checkedInBy`.
+- Duplicate check-in is blocked; an explicit duplicate-attempt audit can be recorded.
+- Undo check-in is available for approved admins where implemented in the UI, requires confirmation, and writes `checkin.undo` in the same batch as the `checkedIn: false` update.
+- QR camera lookup is active as a private-admin input method; search by ticket code remains the fallback.
+
+
+## Stack
+
+- React 19 + Vite
+- JavaScript
+- Tailwind CSS 4
+- Firebase Authentication (Google primary, email/password backup) and Cloud Firestore
+- Firebase Hosting
+
+## Local setup
+
+Requirements: Node.js 20.19+ or 22.12+ and a Firebase project you control.
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Open the existing [`gathervibeshub` Firebase project](https://console.firebase.google.com/project/gathervibeshub/overview) (project number `9444350727`).
+
+3. The Firebase Web App is already registered. **Authentication → Sign-in method → Google** and **Email/Password** are enabled.
+
+4. Create trusted staff accounts under **Authentication → Users**. There is deliberately no public sign-up flow.
+
+5. The default Cloud Firestore database already exists; deploy the included rules after any reviewed changes.
+
+6. Copy `.env.example` to `.env.local` and add the Web App configuration values:
+
+   ```powershell
+   Copy-Item .env.example .env.local
+   ```
+
+7. In the Firestore console, create the document `settings/accessControl` with this field:
+
+   ```text
+   approvedEmails: ["owner@example.com", "trusted.staff@example.com"]
+   ```
+
+   Use an array of lowercase email strings that exactly match the Firebase Authentication accounts. The security rules prevent client applications from modifying this allowlist.
+
+8. Start the app:
+
+   ```bash
+   npm run dev
+   ```
+
+The app shows an explicit configuration notice and disables sign-in if Firebase environment variables are missing. It does not use fallback credentials or a fake authentication mode.
+
+## Automatic Firebase admin setup
+
+Preferred method:
+
+1. Login to Firebase CLI:
+   `npx firebase-tools login`
+
+2. Set project:
+   `npx firebase-tools use gathervibeshub`
+
+3. Set admin emails locally:
+   - **PowerShell:** `$env:ADMIN_EMAILS="your-lowercase-google-email@gmail.com"`
+   - **Command Prompt:** `set ADMIN_EMAILS=your-lowercase-google-email@gmail.com`
+   - **macOS/Linux:** `export ADMIN_EMAILS="your-lowercase-google-email@gmail.com"`
+
+4. Run:
+   `npm run admin:ensure-access`
+
+5. Verify:
+   `npm run admin:verify-firebase`
+
+6. Verify production QA fixtures without writes:
+   `npm run admin:verify-production-fixtures`
+
+7. Deploy rules/indexes:
+   `npm run firebase:deploy-rules`
+
+8. Deploy hosting:
+   `npm run firebase:deploy-hosting`
+
+If Firebase Admin SDK credentials are missing, use a service account JSON stored OUTSIDE the repository and referenced only with `GOOGLE_APPLICATION_CREDENTIALS`. For example:
+- **PowerShell:** `$env:GOOGLE_APPLICATION_CREDENTIALS="C:\secure-keys\gathervibeshub-admin.json"`
+- **macOS/Linux:** `export GOOGLE_APPLICATION_CREDENTIALS="/secure-keys/gathervibeshub-admin.json"`
+
+Never paste private keys into code and never commit a service account JSON.
+
+## Troubleshooting Google sign-in
+
+If you experience issues with Google sign-in (e.g., "This account is not approved"), verify the following in the Firebase Console:
+
+**Firebase Authentication:**
+- Google provider is enabled.
+- Email/password provider remains enabled.
+- The Google email used for login exists as an Authentication user after the first sign-in attempt.
+
+**Firebase Authentication authorized domains:**
+- `localhost`
+- `gathervibeshub.firebaseapp.com`
+- `gathervibeshub.web.app`
+
+**Firestore:**
+- Collection: `settings`
+- Document: `accessControl`
+- Field: `approvedEmails`
+- Type: `array`
+- Value: The **exact lowercase** Google email used to sign in.
+
+## Routes
+
+| Route | Status | Purpose |
+|---|---|---|
+| `/login` | Complete | Google sign-in with email/password backup |
+| `/dashboard` | Complete | Workspace and active-event summary |
+| `/events` | Complete | Firestore event CRUD and active-event selection |
+| `/registrations` | Phase 3 | Registration CRUD for the active event |
+| `/imports` | Live/private-admin | Import Center source selector, CSV/XLSX upload, pasted table rows, mapping, preview, and import |
+| `/tickets` | Live/private-admin | Ticket-code assignment, generation, regeneration, and unassignment |
+| `/check-in` | Live/private-admin | Search-based door check-in and duplicate prevention |
+| `/qa` | Live/private-admin | Private QA Center for CODEX_TEST fixture status, sample CSV, checklist, and read-only health guidance |
+| `/communications` | Live/private-admin | Communications Pro copy-only message preparation and CSV/contact packets; no automatic sending |
+| `/operations` | Live/private-admin | Event Operations Ledger for private-admin operational entries separate from ticket sales |
+| `/ai-writing` | Redirected/deferred | AI Draft Lab prompt-builder tools live inside Communications; no real AI API |
+| `/settings` | Complete | Firebase and data-model status |
+
+## Security rules
+
+`firestore.rules` denies public access and permits only authenticated users whose email appears in `settings/accessControl.approvedEmails`. The allowlist document cannot be written by client code. Audit log documents are append-only from the client. Registrations are strictly schema-validated, including ticket/check-in metadata. Ticket assignment and check-in transitions are limited to approved admins; communications, AI drafts, public attendee flows, and unknown collections remain closed.
+
+Deploy rules after reviewing the project ID and allowlist document:
+
+```bash
+npx firebase-tools login
+npx firebase-tools use gathervibeshub
+npx firebase-tools deploy --only firestore:rules --project gathervibeshub
+```
+
+Do not deploy the database with temporary public rules. Firebase web configuration values are identifiers, not secrets; authorization is enforced by Authentication and Firestore Security Rules.
+
+## Build and deploy
+
+```bash
+npm run lint
+npm test
+npm run build
+npx firebase-tools deploy --only hosting
+```
+
+`firebase.json` sends all Hosting routes to `index.html`, allowing React Router URLs to work on refresh.
+
+The current production build is deployed at [gathervibeshub.web.app](https://gathervibeshub.web.app) from `main`.
+
+## Mobile/PWA foundation
+
+Phase 2.5 adds an installable mobile-web foundation named **Gather & Savor Hub** (`G&S Hub`). It includes a manifest, branded app icons, Apple touch icon metadata, standalone display mode, iPhone safe-area spacing, mobile navigation, and larger touch targets. The service worker performs lifecycle setup only: it has no fetch handler and does not cache Firestore or other private admin data.
+
+This remains a private web application. It is not a public attendee app and is not a native App Store or Play Store application.
+
+## Project structure
+
+```text
+src/
+  auth/              Firebase session context and route guard
+  components/
+    events/          Event form and confirmation dialogs
+    imports/         CSV field mapping, preview, and summary
+    registrations/   Registration form, cards, and delete dialog
+    ui/              Shared loading, error, and empty states
+  events/            Active-event context with local persistence
+  layout/            Responsive protected admin shell
+  lib/               Firebase initialization
+  pages/             Login, dashboard, events, registrations, imports, tickets, check-in, settings
+  services/          Firestore event, registration, import, ticket/check-in, and audit operations
+  utils/             Event, registration, import, ticket, and date utilities
+tests/
+  event-utils.test.js
+  phase25-foundation.test.js
+  registration-utils.test.js
+  csv-parser.test.js
+```
+
+## Phase 1 acceptance checklist
+
+- [x] React + Vite project
+- [x] Tailwind theme and responsive luxury admin layout
+- [x] All planned top-level routes registered
+- [x] Firebase initialization via environment variables
+- [x] Google login with mobile redirect support and clear loading/error states
+- [x] Email/password login retained as backup
+- [x] Protected routes with return-to-requested-page behavior
+- [x] No public Firestore access in the rules draft
+- [x] Approved-admin email allowlist
+- [x] Firebase Hosting SPA configuration
+- [x] No Cloud Functions, Storage usage, or later-phase fake behavior
+
+## Phase 2 acceptance checklist
+
+- [x] Create and edit events with validated fields
+- [x] Delete events only after explicit confirmation
+- [x] Real-time Firestore event list
+- [x] Active-event selection persisted in local storage
+- [x] Loading, error, empty, and success states
+- [x] Atomic audit entries for event create, update, and delete
+- [x] Responsive table and mobile event cards
+- [x] No registrations, tickets, imports, or AI behavior added
+
+Event mutations and their audit records use a single Firestore batch. A failed audit write therefore prevents the associated event mutation from committing.
+
+## Phase 2.5 acceptance checklist
+
+- [x] Google provider integration with full-page redirect handling
+- [x] Firestore allowlist verification before protected routes receive a user
+- [x] Email/password backup preserved
+- [x] PWA manifest and branded 192/512 PNG icons
+- [x] Apple touch icon and standalone mobile metadata
+- [x] Safe-area support and mobile bottom navigation
+- [x] No offline Firestore writes, push notifications, or private-data caching
+
+## Phase 3 acceptance checklist
+
+- [x] Registrations CRUD scoped to the active event
+- [x] CSV upload and pasted CSV import
+- [x] Field mapping with preview before Firestore writes
+- [x] Duplicate detection (email+timestamp, phone+timestamp, sourceRowId)
+- [x] Privacy-safe deterministic import registration IDs
+- [x] Append-only registration audit logs in the same batch as mutations
+- [x] Search and payment-status filters
+- [x] Loading, error, empty, saving, and success states
+- [x] Responsive mobile cards and desktop table
+- [x] Firestore rules for registrations with check-in fields locked
+- [x] Tickets, check-in, communications, and AI remained phase-boundary only during Phase 3
+- [x] Google Sheets OAuth remains deferred
+- [x] No Cloud Functions, Storage, public registration, or attendee accounts
+
+## Phase 3.1 Option B acceptance checklist
+
+- [x] Production security verified — allowlist enforced, no debug bypasses
+- [x] Price tier schema in validators, EventFormModal, eventService, Firestore rules
+- [x] Named tiers: Early Bird, General, Door, Tier 1, Tier 2, Tier 3, Complimentary
+- [x] Backward-compatible with ticketPrice scalar
+- [x] Tier price ≥ 0, tier name required, tier status validated
+- [x] Max 7 tiers and tier fields enforced client-side and in Firestore rules
+- [x] Dashboard: live local date/time clock
+- [x] Dashboard: upcoming events list from Firestore with countdown badges
+- [x] Dashboard: Working Event / Selected Event rename and explanation
+- [x] Dashboard: clear selected event button
+- [x] Dashboard: change selected event from upcoming list
+- [x] Dashboard: registration metrics for selected event
+- [x] Dashboard: capacity progress bar
+- [x] Dashboard: price tier summary chips
+- [x] Excel/XLSX: implemented with sheet selection and preview-first import
+- [x] 52/52 tests passing
+- [x] Lint: 0 errors
+- [x] Build: clean
+
+## Phase 3.2 / Phase 4.5 acceptance checklist
+
+- [x] Import page renamed Import Center
+- [x] Import source selector exists with helper text for all requested source types
+- [x] CSV upload and pasted import still use mapping, preview, and confirmation
+- [x] XLSX upload implemented with maintained parser dependency
+- [x] Google Sheets OAuth remains deferred
+- [x] `/tickets` route is live
+- [x] Ticket assignment, generation, regeneration, and unassignment implemented
+- [x] Ticket code search implemented
+- [x] `/check-in` route is live
+- [x] Check-in false → true implemented
+- [x] Duplicate check-in blocked
+- [x] Ticket/check-in mutations write registration audit logs
+- [x] Firestore rules updated for ticket/check-in metadata and audit actions
+- [x] Service worker safety unchanged
+- [x] Tests: 65/65 passing
+- [x] Lint: 0 errors
+- [x] Build: clean
+- [x] Firestore rules dry-run compile passed for `gathervibeshub`
+- [x] Historical deployment approval completed; `/imports`, `/tickets`, and `/check-in` are now live private-admin routes
+
+Registration and import mutations share one Firestore batch with their audit records. Import chunking respects the 500-write limit (249 rows per chunk: registration + audit log per row).
+
+## Verification
+
+```bash
+npm run lint
+npm test
+npm run build
+```
+
+Tests cover event validation, PWA/service worker safety, registration validation, payment status normalization, ticket status validation, ticket code generation and validation, ticket transitions, check-in duplicate blocking, check-in warnings, Import Center source definitions, CSV parsing (quoted commas, newlines, escaped quotes), XLSX row normalization, field mapping, duplicate detection helpers, stable registration ID generation, runtime health helpers, admin search helpers, and missing email/phone blocking for import.
+
+## Welcome Celebration and Walkthrough
+
+A personalized first-time welcome celebration and 13-step guided app walkthrough are implemented for the target organizer.
+
+### Experience
+- **First-time Celebration**: A modal with a celebratory confetti animation, personalized greeting, and a "Created by Jaylan Maynard" badge.
+- **Walkthrough**: A 13-step guided tour covering all major features (Overview, Events, Guests, Payments, Tickets, Check-In, Operations, Tasks, Communications, Reports, Import Center, Settings/Help).
+- **Skip for Now**: Closes the experience without marking it complete. It won't reopen in the same browser session but will reappear on the next login until finished.
+- **Completion**: Writes `onboardingCompleted: true` and the date to the user's staff profile. A final success screen provides "Plan a New Event" or "Go to Overview" links.
+- **Replay**: A "Show Welcome Tour Again" button in Settings -> Account allows target organizers to view the experience again without resetting their original completion timestamp.
+
+### State and Persistence
+- **Location**: Onboarding state is saved in `staffProfiles/{uid}`.
+- **Versioning**: Controlled by `onboardingVersion` (currently `mother-launch-v1`).
+- **Target Configuration**: Hardcoded by Firebase UIDs in `src/components/onboarding/useOnboarding.js` to ensure only the specified target organizer and the test account receive the tour. No other accounts will see it.
+- **Firestore Rules**: Organizers can update their *own* onboarding fields (`onboardingVersion`, `onboardingStartedAt`, `onboardingCompleted`, `onboardingCompletedAt`, `onboardingSkippedAt`, `onboardingLastStep`, `onboardingReplayRequestedAt`) but cannot modify their `defaultRole`, `status`, or `email`. Cross-user edits remain blocked.
+
+### Testing and Troubleshooting
+- **Safe Testing**: Test the tour with the approved developer account. Completing it on the test account does not affect the actual target organizer's profile.
+- **Troubleshooting**: If state fails to save (e.g., due to permissions), the app logs the error but does not lock the organizer out of the hub. Use the Replay button in Settings to verify rendering.

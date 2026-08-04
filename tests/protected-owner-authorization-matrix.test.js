@@ -190,7 +190,7 @@ test('System QA classifies CODEX_DEMO paid outstanding rows as follow-up, not bl
 })
 
 test('production owner write root cause documents deployment and manual verification boundaries', async () => {
-  const rootCause = await source('docs/FIRESTORE_PRODUCTION_OWNER_WRITE_ROOT_CAUSE_2026-08.md')
+  const rootCause = await source('docs/archive/audits/FIRESTORE_PRODUCTION_OWNER_WRITE_ROOT_CAUSE_2026-08.md')
 
   assert.match(rootCause, /permission-denied/)
   assert.match(rootCause, /Firestore server authorization depends on the deployed Firestore ruleset/)
@@ -203,7 +203,7 @@ test('production owner write root cause documents deployment and manual verifica
 })
 
 test('legacy registration compatibility hotfix documents the exact old schema rejection', async () => {
-  const doc = await source('docs/LEGACY_RECORD_EDIT_COMPATIBILITY_HOTFIX_2026-08.md')
+  const doc = await source('docs/archive/releases/LEGACY_RECORD_EDIT_COMPATIBILITY_HOTFIX_2026-08.md')
   const qaPage = await source('src/pages/QaPage.jsx')
 
   assert.match(doc, /attendanceRecordType, attendanceConfirmedAt, attendanceConfirmedBy, attendanceEvidenceNote/)

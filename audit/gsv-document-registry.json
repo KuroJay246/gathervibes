@@ -1,0 +1,2402 @@
+{
+  "summary": {
+    "generatedAt": "2026-08-04T23:54:51.406Z",
+    "totalDocuments": 136
+  },
+  "documents": [
+    {
+      "path": "AI_AGENT_RULES.md",
+      "title": "AI Agent Rules",
+      "classification": "ACTIVE AUTHORITATIVE",
+      "purpose": "Current AI-agent operating rules.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/archive/phases/PHASE_17D_PLAN.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js",
+        "tests/phase17r-release-stabilizer.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "AI_AGENT_RULES.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/archive/audits/APP_WIDE_CPB_LANGUAGE_AUDIT_2026-07.md",
+      "title": "App-Wide CPB and Generic Product Language Audit",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/APP_WIDE_CPB_LANGUAGE_AUDIT_2026-07.md"
+    },
+    {
+      "path": "docs/archive/audits/AUDIT_PHASE_14_15_HANDOFF.md",
+      "title": "Gather & Savor Event Hub — System Audit After Phase 13A",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/AUDIT_PHASE_14_15_HANDOFF.md"
+    },
+    {
+      "path": "docs/archive/audits/CPB_HISTORICAL_ATTENDANCE_DRY_RUN.md",
+      "title": "CPB Historical Attendance Dry Run",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/CPB_HISTORICAL_ATTENDANCE_DRY_RUN.md"
+    },
+    {
+      "path": "docs/archive/audits/FINAL_ACCESSIBILITY_AND_RESPONSIVE_ACCEPTANCE_2026-08.md",
+      "title": "Final Accessibility and Responsive Acceptance",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/FINAL_ACCESSIBILITY_AND_RESPONSIVE_ACCEPTANCE_2026-08.md"
+    },
+    {
+      "path": "docs/archive/audits/FINAL_MANUAL_BROWSER_ACCEPTANCE_CHECKLIST_2026-08.md",
+      "title": "Final Manual Browser Acceptance Checklist",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/FINAL_MANUAL_BROWSER_ACCEPTANCE_CHECKLIST_2026-08.md"
+    },
+    {
+      "path": "docs/archive/audits/FIRESTORE_PRODUCTION_OWNER_WRITE_ROOT_CAUSE_2026-08.md",
+      "title": "Firestore Production Owner Write Root Cause - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/protected-owner-authorization-matrix.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/FIRESTORE_PRODUCTION_OWNER_WRITE_ROOT_CAUSE_2026-08.md"
+    },
+    {
+      "path": "docs/archive/audits/FULL_ORGANIZER_INTERFACE_COMPREHENSION_AUDIT_2026-08.md",
+      "title": "Full Organizer Interface Comprehension Audit",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/FULL_ORGANIZER_INTERFACE_COMPREHENSION_AUDIT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/audits/FULL_PRODUCTION_ORGANIZER_USABILITY_ACCEPTANCE_2026-08.md",
+      "title": "Full Production Organizer Usability Acceptance - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/FULL_PRODUCTION_ORGANIZER_USABILITY_ACCEPTANCE_2026-08.md"
+    },
+    {
+      "path": "docs/archive/audits/FULL_STACK_PRODUCT_REALITY_AUDIT_2026-07.md",
+      "title": "Gather & Savor Full-Stack Product Reality Audit",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/FULL_STACK_PRODUCT_REALITY_AUDIT_2026-07.md"
+    },
+    {
+      "path": "docs/archive/audits/ORGANIZER_COMPREHENSION_AND_USABILITY_AUDIT_2026-08.md",
+      "title": "Organizer Comprehension and Usability Audit",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/ORGANIZER_COMPREHENSION_AND_USABILITY_AUDIT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/audits/QA_REPORT_2026-06-23_live-test-run.md",
+      "title": "Gather & Savor Event Hub Live QA Test Run",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/QA_REPORT_2026-06-23_live-test-run.md"
+    },
+    {
+      "path": "docs/archive/audits/RUN_OF_SHOW_RESOURCE_COMPLETION_AUDIT_2026-08.md",
+      "title": "Run of Show and Event Resources Completion Audit - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/RUN_OF_SHOW_RESOURCE_COMPLETION_AUDIT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/audits/TUTORIAL_LEGACY_FAILURE_AUDIT_2026-07.md",
+      "title": "Tutorial Legacy Failure Audit - 2026-07",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/TUTORIAL_LEGACY_FAILURE_AUDIT_2026-07.md"
+    },
+    {
+      "path": "docs/archive/audits/TUTORIAL_STEP_BY_STEP_TARGET_AUDIT_2026-07.md",
+      "title": "Tutorial V3 Step-by-Step Target Audit",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/TUTORIAL_STEP_BY_STEP_TARGET_AUDIT_2026-07.md"
+    },
+    {
+      "path": "docs/archive/audits/TUTORIAL_V3_CURRENT_PRODUCT_GAP_AUDIT_2026-08.md",
+      "title": "Tutorial V3 Current Product Gap Audit - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/TUTORIAL_V3_CURRENT_PRODUCT_GAP_AUDIT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/audits/VISUAL_LAYOUT_INFORMATION_ARCHITECTURE_REVIEW_2026-07.md",
+      "title": "Visual Layout and Information Architecture Review",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/audits/VISUAL_LAYOUT_INFORMATION_ARCHITECTURE_REVIEW_2026-07.md"
+    },
+    {
+      "path": "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+      "title": "Gather & Savor Event Hub — Complete Implementation Handoff",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "PROJECT_HANDOFF.md",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js",
+        "tests/phase17e-b-access-request-rules.test.js",
+        "tests/phase17f-access-workflow-continuation.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md"
+    },
+    {
+      "path": "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+      "title": "Gather & Savor Event Hub",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js",
+        "tests/phase17e-b-access-request-rules.test.js",
+        "tests/phase17f-access-workflow-continuation.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/legacy/README_HISTORICAL_2026-08.md"
+    },
+    {
+      "path": "docs/archive/phases/GUIDED_EVENT_SETUP_AND_TASKS_PLAN_2026-08.md",
+      "title": "Guided Event Setup and Tasks Plan - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase2-guided-event-setup-task-deadline.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/GUIDED_EVENT_SETUP_AND_TASKS_PLAN_2026-08.md"
+    },
+    {
+      "path": "docs/archive/phases/IMMEDIATE_STABILIZATION_IMPLEMENTATION_PLAN_2026-07.md",
+      "title": "Immediate Stabilization Implementation Plan - 2026-07",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/IMMEDIATE_STABILIZATION_IMPLEMENTATION_PLAN_2026-07.md"
+    },
+    {
+      "path": "docs/archive/phases/IMPORT_CENTER_UPGRADE_PLAN_2026-08.md",
+      "title": "Import Center Upgrade Plan 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/IMPORT_CENTER_UPGRADE_PLAN_2026-08.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_14B_REVIEW_FIX_HANDOFF.md",
+      "title": "Phase 14B Review Fix Handoff",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_14B_REVIEW_FIX_HANDOFF.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md",
+      "title": "Phase 17D-D Access Workflow Readiness",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_17D_PLAN.md",
+      "title": "Phase 17D Plan",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_17D_PLAN.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md",
+      "title": "Phase 17E-A — Access Workflow Rules + Data Model Review",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_17E_A_ACCESS_RULES_DATA_MODEL_REVIEW.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_17E_E_ACCESS_WORKFLOW_DEPLOYMENT_READINESS.md",
+      "title": "Phase 17E-E — Access Workflow Deployment Readiness",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "tests/phase17e-b-access-request-rules.test.js",
+        "tests/phase17e-cde-ui-readiness-ci.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_17E_E_ACCESS_WORKFLOW_DEPLOYMENT_READINESS.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_17F_A_ACCESS_WORKFLOW_IMPLEMENTATION_PLAN.md",
+      "title": "Phase 17F-A - Access Workflow Implementation Plan",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "tests/phase17f-access-workflow-continuation.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_17F_A_ACCESS_WORKFLOW_IMPLEMENTATION_PLAN.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_17F_C_ACCESS_WORKFLOW_SMOKE_CHECKLIST.md",
+      "title": "Phase 17F-C - Access Workflow Smoke Checklist",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "tests/phase17f-access-workflow-continuation.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_17F_C_ACCESS_WORKFLOW_SMOKE_CHECKLIST.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_17G_A_LIVE_WORKFLOW_GO_NO_GO_RULES_APPROVAL.md",
+      "title": "Phase 17G-A — Live Workflow Go/No-Go Review + Rules Deployment Approval Package",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "tests/phase17f-access-workflow-continuation.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_17G_A_LIVE_WORKFLOW_GO_NO_GO_RULES_APPROVAL.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md",
+      "title": "Phase 17G-B - Firestore Rules Deployment Approval + Dry-Run Final Review",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "tests/phase17e-b-access-request-rules.test.js",
+        "tests/phase17f-access-workflow-continuation.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_17R_RELEASE_STABILIZER_AUTOFIX.md",
+      "title": "Phase 17R — Release Stabilizer / Auto-Fixer / QA Corrector",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_17R_RELEASE_STABILIZER_AUTOFIX.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_18_CORE_APP_READINESS.md",
+      "title": "Phase 18 — Core App Readiness",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_18_CORE_APP_READINESS.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_19_OPERATIONS_PRODUCTIVITY.md",
+      "title": "Phase 19 — Operations + Productivity",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_19_OPERATIONS_PRODUCTIVITY.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_20_DASHBOARD_OPERATIONS_REAL_USE.md",
+      "title": "Phase 20 Dashboard + Operations Real Use",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase20-real-use.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_20_DASHBOARD_OPERATIONS_REAL_USE.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_21_EVENT_COMMAND_CENTER_OPTIONS.md",
+      "title": "Phase 21 Event Command Center Options",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase21-command-center.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_21_EVENT_COMMAND_CENTER_OPTIONS.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_22A_AUTH_RELIABILITY_LOCAL_REVIEW_FIX.md",
+      "title": "Phase 22A - Auth Reliability Local Review Fix",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_22A_AUTH_RELIABILITY_LOCAL_REVIEW_FIX.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_22_ORGANIZER_EVENT_REVIEW.md",
+      "title": "Phase 22 — Organizer Event Review",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_22_ORGANIZER_EVENT_REVIEW.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_23A_PRODUCT_STRUCTURE_UI_RESET.md",
+      "title": "Phase 23A Product Structure and Organizer UI Reset",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_23A_PRODUCT_STRUCTURE_UI_RESET.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_23B_PAYMENTS_OPERATIONS_BOUNDARIES.md",
+      "title": "Phase 23B - Registration Payments and Operations Financial Boundaries",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_23B_PAYMENTS_OPERATIONS_BOUNDARIES.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_23C_CPB_PAYMENT_RECONCILIATION_DRY_RUN.md",
+      "title": "Phase 23C - CPB Payment Reconciliation Dry Run",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_23C_CPB_PAYMENT_RECONCILIATION_DRY_RUN.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_23D0_REGISTRATION_PAYMENT_EDITING_AUDIT.md",
+      "title": "Phase 23D-0 Registration Payment Editing Audit",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_23D0_REGISTRATION_PAYMENT_EDITING_AUDIT.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_23E_NEW_CPB_MANIFEST_REGENERATION.md",
+      "title": "Phase 23E New CPB Manifest Regeneration",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_23E_NEW_CPB_MANIFEST_REGENERATION.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_23F_CPB_MANIFEST_APPROVAL_PACKAGE.md",
+      "title": "Phase 23F - CPB Manifest Approval Package",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_23F_CPB_MANIFEST_APPROVAL_PACKAGE.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_23G_LOCKED_APPLY_ENGINE_CODEX_REHEARSAL.md",
+      "title": "Phase 23G - Locked Apply Engine and CODEX_TEST Rehearsal",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_23G_LOCKED_APPLY_ENGINE_CODEX_REHEARSAL.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_23J_CPB_PRODUCTION_APPLY.md",
+      "title": "Phase 23J - CPB Production Apply",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_23J_CPB_PRODUCTION_APPLY.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_23LA_AUDIT_LOG_APPEND_ONLY_INTEGRITY.md",
+      "title": "Phase 23L-A Audit Log Append-Only Integrity Review",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_23LA_AUDIT_LOG_APPEND_ONLY_INTEGRITY.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md",
+      "title": "Phase 23N Subsets 1-4 Production Apply",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase23n-financial-evidence-reconciliation.test.js",
+        "tests/phase23o-protected-owner-access.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md"
+    },
+    {
+      "path": "docs/archive/phases/PHASE_23_TASK_WORKFLOW_AND_REGISTRATION_REFINEMENT.md",
+      "title": "Phase 23 - Task Workflow and Registration Experience Refinement",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/phases/PHASE_23_TASK_WORKFLOW_AND_REGISTRATION_REFINEMENT.md"
+    },
+    {
+      "path": "docs/archive/releases/CODEX_TEST_RETIREMENT_RESULT_2026-08.md",
+      "title": "CODEX_TEST Retirement Result - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/CODEX_TEST_RETIREMENT_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/CONTACTS_AND_ORGANIZATIONS_FOUNDATION_RESULT_2026-08.md",
+      "title": "Contacts and Organizations Foundation Result - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/CONTACTS_AND_ORGANIZATIONS_FOUNDATION_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/DOCUMENT_REGISTER_FOUNDATION_RESULT_2026-08.md",
+      "title": "Document Register Foundation Result - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/DOCUMENT_REGISTER_FOUNDATION_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/EVENT_RESOURCE_FOUNDATION_RESULT_2026-08.md",
+      "title": "Event Resource Foundation Result - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/EVENT_RESOURCE_FOUNDATION_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/FINANCIAL_WORKFLOW_DATA_INTEGRITY_RESULT_2026-08.md",
+      "title": "Financial Workflow Data Integrity Result 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/FINANCIAL_WORKFLOW_DATA_INTEGRITY_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/GUESTS_AND_REGISTRATIONS_REFINEMENT_PLAN_2026-08.md",
+      "title": "Guests and Registrations Refinement Plan - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/GUESTS_AND_REGISTRATIONS_REFINEMENT_PLAN_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/GUIDED_EVENT_SETUP_RESULT_2026-08.md",
+      "title": "Guided Event Setup Result - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/phase2-guided-event-setup-task-deadline.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/GUIDED_EVENT_SETUP_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/IMMEDIATE_STABILIZATION_IMPLEMENTATION_RESULT_2026-08.md",
+      "title": "Immediate Stabilization Implementation Result - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/IMMEDIATE_STABILIZATION_IMPLEMENTATION_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/IMPORT_AND_RESPONSE_INTAKE_REFINEMENT_RESULT_2026-08.md",
+      "title": "Import and Response Intake Refinement Result - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/IMPORT_AND_RESPONSE_INTAKE_REFINEMENT_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/IMPORT_CENTER_UPGRADE_RESULT_2026-08.md",
+      "title": "Import Center Upgrade Result 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/IMPORT_CENTER_UPGRADE_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/IMPORT_INTAKE_AND_MESSAGE_REFINEMENT_PLAN_2026-08.md",
+      "title": "Import Intake and Message Refinement Plan - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/IMPORT_INTAKE_AND_MESSAGE_REFINEMENT_PLAN_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/LEGACY_RECORD_EDIT_COMPATIBILITY_HOTFIX_2026-08.md",
+      "title": "Legacy Record Edit Compatibility Hotfix - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "tests/protected-owner-authorization-matrix.test.js"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/LEGACY_RECORD_EDIT_COMPATIBILITY_HOTFIX_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/MESSAGE_BUILDER_REFINEMENT_RESULT_2026-08.md",
+      "title": "Message Builder Refinement Result - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/MESSAGE_BUILDER_REFINEMENT_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/OPERATIONS_PARTNER_AND_COMMITMENT_REFINEMENT_RESULT_2026-08.md",
+      "title": "Operations Partner and Commitment Refinement Result",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/OPERATIONS_PARTNER_AND_COMMITMENT_REFINEMENT_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/ORGANIZER_SHELL_AND_OVERVIEW_REFINEMENT_PLAN_2026-08.md",
+      "title": "Organizer Shell and Overview Refinement Plan",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/releases/ORGANIZER_SHELL_AND_OVERVIEW_RESULT_2026-08.md"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/ORGANIZER_SHELL_AND_OVERVIEW_REFINEMENT_PLAN_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/ORGANIZER_SHELL_AND_OVERVIEW_RESULT_2026-08.md",
+      "title": "Organizer Shell and Overview Refinement Result",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/ORGANIZER_SHELL_AND_OVERVIEW_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/REGISTRATION_PAYMENTS_AND_OPERATIONS_REFINEMENT_PLAN_2026-08.md",
+      "title": "Registration Payments and Operations Refinement Plan",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/REGISTRATION_PAYMENTS_AND_OPERATIONS_REFINEMENT_PLAN_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/REGISTRATION_PAYMENT_FOLLOW_UP_REFINEMENT_RESULT_2026-08.md",
+      "title": "Registration Payment Follow-Up Refinement Result",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/REGISTRATION_PAYMENT_FOLLOW_UP_REFINEMENT_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/REPORTS_AND_RECONCILIATION_REFINEMENT_RESULT_2026-08.md",
+      "title": "Reports and Reconciliation Refinement Result",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/REPORTS_AND_RECONCILIATION_REFINEMENT_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/RUN_OF_SHOW_FOUNDATION_RESULT_2026-08.md",
+      "title": "Run of Show Foundation Result - 2026-08",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/RUN_OF_SHOW_FOUNDATION_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/SETTINGS_AND_SYSTEM_QA_REFINEMENT_RESULT_2026-08.md",
+      "title": "Settings and System QA Refinement Result",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/SETTINGS_AND_SYSTEM_QA_REFINEMENT_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/SETTINGS_SYSTEM_QA_TUTORIAL_FINAL_REFINEMENT_PLAN_2026-08.md",
+      "title": "Settings, System QA, and Tutorial Final Refinement Plan",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/SETTINGS_SYSTEM_QA_TUTORIAL_FINAL_REFINEMENT_PLAN_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/TICKETS_AND_CHECKIN_REFINEMENT_RESULT_2026-08.md",
+      "title": "Tickets and Check-In Refinement Result",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/TICKETS_AND_CHECKIN_REFINEMENT_RESULT_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/TICKETS_CHECKIN_REPORTS_REFINEMENT_PLAN_2026-08.md",
+      "title": "Tickets, Check-In, Reports, and Reconciliation Refinement Plan",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/TICKETS_CHECKIN_REPORTS_REFINEMENT_PLAN_2026-08.md"
+    },
+    {
+      "path": "docs/archive/releases/TUTORIAL_PRODUCTION_STRESS_RESULTS.md",
+      "title": "Tutorial V3 Production Stress Results",
+      "classification": "ARCHIVED",
+      "purpose": "Archived historical evidence; not current operating instruction.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Moved or retained under docs/archive as historical evidence.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": "docs/archive/releases/TUTORIAL_PRODUCTION_STRESS_RESULTS.md"
+    },
+    {
+      "path": "docs/AUDIT_LOG_BUSINESS_WRITE_STANDARD.md",
+      "title": "Audit Log Business Write Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/AUDIT_LOG_BUSINESS_WRITE_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/BAKER_PAYMENT_GUIDE.md",
+      "title": "Baker Payment Guide",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/PRODUCT_GUIDE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/BAKER_PAYMENT_GUIDE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/BULK_OPERATION_RECOVERY_MODEL.md",
+      "title": "Bulk Operation Recovery Model",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/BULK_OPERATION_RECOVERY_MODEL.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/CODEX_DEMO_FULL_SYSTEM_WALKTHROUGH_STANDARD.md",
+      "title": "CODEX_DEMO Full System Walkthrough Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/CODEX_DEMO_FULL_SYSTEM_WALKTHROUGH_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/CONTACT_AND_EVENT_RELATIONSHIP_STANDARD.md",
+      "title": "Contact and Event Relationship Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/CONTACT_AND_EVENT_RELATIONSHIP_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/DEPLOYMENT_GUIDE.md",
+      "title": "Deployment Guide",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/PRODUCT_GUIDE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/DEPLOYMENT_GUIDE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/DOCUMENT_REFERENCE_DATA_STANDARD.md",
+      "title": "Document Reference Data Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/DOCUMENT_REFERENCE_DATA_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/EQUIPMENT_AND_SUPPLIES_WORKFLOW_STANDARD.md",
+      "title": "Equipment and Supplies Workflow Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/EQUIPMENT_AND_SUPPLIES_WORKFLOW_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/EVENT_DAY_GUIDE.md",
+      "title": "Event Day Guide",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/PRODUCT_GUIDE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/EVENT_DAY_GUIDE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/EVENT_DAY_RUN_OF_SHOW_STANDARD.md",
+      "title": "Event-Day Run of Show Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/EVENT_DAY_RUN_OF_SHOW_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/EVENT_DAY_TICKET_AND_CHECKIN_STANDARD.md",
+      "title": "Event-Day Ticket and Check-In Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/EVENT_DAY_TICKET_AND_CHECKIN_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/EVENT_LIFECYCLE_GUIDE.md",
+      "title": "Event Lifecycle Guide",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/PRODUCT_GUIDE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/EVENT_LIFECYCLE_GUIDE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/EVENT_READINESS_STANDARD_2026-08.md",
+      "title": "Event Readiness Standard - 2026-08",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/EVENT_READINESS_STANDARD_2026-08.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/EVENT_REPORT_AND_RECONCILIATION_STANDARD.md",
+      "title": "Event Report and Reconciliation Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/EVENT_REPORT_AND_RECONCILIATION_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/EVENT_SETUP_STAGE_STANDARD.md",
+      "title": "Event Setup Stage Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/phase2-guided-event-setup-task-deadline.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/EVENT_SETUP_STAGE_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/EVENT_TASK_AND_DEADLINE_STANDARD.md",
+      "title": "Event Task and Deadline Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/phase2-guided-event-setup-task-deadline.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/EVENT_TASK_AND_DEADLINE_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/FINANCE_EVIDENCE_GUIDE.md",
+      "title": "Finance Evidence Guide",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/PRODUCT_GUIDE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/FINANCE_EVIDENCE_GUIDE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/FINANCIAL_SOURCE_AND_CALCULATION_MAP_2026-08.md",
+      "title": "Financial Source and Calculation Map 2026-08",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/FINANCIAL_SOURCE_AND_CALCULATION_MAP_2026-08.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/GATHER_SAVOR_VISUAL_SYSTEM_STANDARD.md",
+      "title": "Gather & Savor Visual System Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/releases/ORGANIZER_SHELL_AND_OVERVIEW_RESULT_2026-08.md",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/GATHER_SAVOR_VISUAL_SYSTEM_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/GOOGLE_FORMS_RESPONSE_INBOX_WORKFLOW.md",
+      "title": "Google Forms Response Inbox Workflow",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/GOOGLE_FORMS_RESPONSE_INBOX_WORKFLOW.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+      "title": "Gather & Savor Master System Reference",
+      "classification": "ACTIVE AUTHORITATIVE",
+      "purpose": "Canonical current product, route, access, and Firebase reference.",
+      "referencedBy": [
+        "AI_AGENT_RULES.md",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase15a-security-headers.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+      "title": "Gather & Savor Repository And Maintenance Manifest",
+      "classification": "ACTIVE AUTHORITATIVE",
+      "purpose": "Canonical repository shape, cleanup, audit, and maintenance reference.",
+      "referencedBy": [
+        "AI_AGENT_RULES.md",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "title": "Historical Archive Index",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "Index and interpretation rules for archived historical evidence.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+        "docs/PRODUCT_GUIDE.md",
+        "PROJECT_HANDOFF.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase15b-xlsx-roadmap-access-ops.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/IMPORT_CENTER_DAILY_WORKFLOW_STANDARD.md",
+      "title": "Import Center Daily Workflow Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/IMPORT_CENTER_DAILY_WORKFLOW_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/IMPORT_SOURCE_AND_RECORD_TYPE_STANDARD.md",
+      "title": "Import Source And Record Type Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/IMPORT_SOURCE_AND_RECORD_TYPE_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/IMPORT_TEMPLATE_AND_HEADER_MAPPING_STANDARD.md",
+      "title": "Import Template And Header Mapping Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/IMPORT_TEMPLATE_AND_HEADER_MAPPING_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/KNOWN_LIMITATIONS.md",
+      "title": "Known Limitations",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/PRODUCT_GUIDE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase15a-security-headers.test.js",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/KNOWN_LIMITATIONS.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/MESSAGE_BUILDER_COPY_ONLY_STANDARD.md",
+      "title": "Message Builder Copy-Only Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/MESSAGE_BUILDER_COPY_ONLY_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/NEW_EVENT_SETUP_GUIDE.md",
+      "title": "New Event Setup Guide",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/PRODUCT_GUIDE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/NEW_EVENT_SETUP_GUIDE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/OPERATIONS_GUIDE.md",
+      "title": "Operations Guide",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/PRODUCT_GUIDE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/OPERATIONS_GUIDE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/OPERATIONS_LEDGER_ENTRY_STANDARD.md",
+      "title": "Operations Ledger Entry Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/OPERATIONS_LEDGER_ENTRY_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/OPERATIONS_PRESENTATION_AND_COMMITMENT_STANDARD.md",
+      "title": "Operations Presentation and Commitment Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/OPERATIONS_PRESENTATION_AND_COMMITMENT_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/ORGANIZER_ACTION_HIERARCHY_STANDARD.md",
+      "title": "Organizer Action Hierarchy Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/ORGANIZER_ACTION_HIERARCHY_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/ORGANIZER_PAGE_EXPLANATION_STANDARD.md",
+      "title": "Organizer Page Explanation Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/ORGANIZER_PAGE_EXPLANATION_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/ORGANIZER_QUICK_START.md",
+      "title": "Organizer Quick Start",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/PRODUCT_GUIDE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/ORGANIZER_QUICK_START.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/ORGANIZER_STATUS_AND_TERMINOLOGY_STANDARD.md",
+      "title": "Organizer Status and Terminology Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/ORGANIZER_STATUS_AND_TERMINOLOGY_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/ORGANIZER_UNDERSTANDABILITY_AND_USABILITY_STANDARD.md",
+      "title": "Organizer Understandability and Usability Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/ORGANIZER_UNDERSTANDABILITY_AND_USABILITY_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/PDF_TABLE_IMPORT_LIMITATIONS.md",
+      "title": "PDF Table Import Limitations",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/PDF_TABLE_IMPORT_LIMITATIONS.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/PRODUCT_GUIDE.md",
+      "title": "Gather & Savor Event Hub Product Guide",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/PRODUCT_GUIDE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/PRODUCT_QA_EMULATOR_RUNNER_STANDARD.md",
+      "title": "Product QA Emulator Runner Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/PRODUCT_QA_EMULATOR_RUNNER_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/PROTECTED_OWNER_APPLICATION_ACCESS_STANDARD.md",
+      "title": "Protected Owner Application Access Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/PROTECTED_OWNER_APPLICATION_ACCESS_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/PROTECTED_OWNER_AUTHORIZATION_MATRIX_2026-08.md",
+      "title": "Protected Owner Authorization Matrix - 2026-08",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/protected-owner-authorization-matrix.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/PROTECTED_OWNER_AUTHORIZATION_MATRIX_2026-08.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/PROTECTED_OWNER_SUPER_ADMIN_AND_MAINTENANCE_STANDARD.md",
+      "title": "Protected Owner Super Admin and Maintenance Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/PROTECTED_OWNER_SUPER_ADMIN_AND_MAINTENANCE_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/PROTOTYPE_DEMO_GUIDE.md",
+      "title": "Organizer Rehearsal Guide",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "docs/PRODUCT_GUIDE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/PROTOTYPE_DEMO_GUIDE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/QA_GUIDE.md",
+      "title": "QA Guide",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/PRODUCT_GUIDE.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/QA_GUIDE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/REGISTRATION_PAYMENT_REVIEW_AND_ACTION_STANDARD.md",
+      "title": "Registration Payment Review and Action Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/REGISTRATION_PAYMENT_REVIEW_AND_ACTION_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/REGISTRATION_PAYMENT_STATUS_STANDARD.md",
+      "title": "Registration Payment Status Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/REGISTRATION_PAYMENT_STATUS_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/RESPONSE_INBOX_REVIEW_STANDARD.md",
+      "title": "Response Inbox Review Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/RESPONSE_INBOX_REVIEW_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/ROUTE_MAP.md",
+      "title": "Gather & Savor Event Hub Route Map",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "docs/PRODUCT_GUIDE.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase23s-prototype-readiness.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/ROUTE_MAP.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/RUN_OF_SHOW_RESOURCES_EXISTING_DATA_COMPATIBILITY_2026-08.md",
+      "title": "Run of Show and Resources Existing Data Compatibility - 2026-08",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/RUN_OF_SHOW_RESOURCES_EXISTING_DATA_COMPATIBILITY_2026-08.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/SETTINGS_AND_ACCESS_PRESENTATION_STANDARD.md",
+      "title": "Settings and Access Presentation Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/SETTINGS_AND_ACCESS_PRESENTATION_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/SYSTEM_QA_PRESENTATION_STANDARD.md",
+      "title": "System QA Presentation Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/SYSTEM_QA_PRESENTATION_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/TASK_STATUS_AND_PRIORITY_STANDARD.md",
+      "title": "Task Status and Priority Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/phase2-guided-event-setup-task-deadline.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/TASK_STATUS_AND_PRIORITY_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/TUTORIAL_AND_IN_APP_GUIDANCE_MAINTENANCE_STANDARD.md",
+      "title": "Tutorial and In-App Guidance Maintenance Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/organizer-usability-understandability.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/TUTORIAL_AND_IN_APP_GUIDANCE_MAINTENANCE_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/TUTORIAL_V3_ARCHITECTURE.md",
+      "title": "Tutorial V3 Architecture",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/TUTORIAL_V3_ARCHITECTURE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/TUTORIAL_V3_FINAL_STANDARD_2026-08.md",
+      "title": "Tutorial V3 Final Standard",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/TUTORIAL_V3_FINAL_STANDARD_2026-08.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "docs/WORKING_EVENT_OVERVIEW_STANDARD.md",
+      "title": "Working Event Overview Standard",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "purpose": "active documentation",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/releases/ORGANIZER_SHELL_AND_OVERVIEW_RESULT_2026-08.md",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "docs/WORKING_EVENT_OVERVIEW_STANDARD.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "integrations/google-forms/REMOVE.md",
+      "title": "Remove Google Forms Integration",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "Integration source or deployment plan; do not activate without approval.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "integrations/google-forms/REMOVE.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "integrations/google-forms/SETUP.md",
+      "title": "Google Forms Response Inbox Setup",
+      "classification": "ACTIVE OPERATIONAL",
+      "purpose": "Integration source or deployment plan; do not activate without approval.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "scripts/audit/generateRepositoryAudit.mjs"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "integrations/google-forms/SETUP.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "integrations/google-forms/TESTING.md",
+      "title": "Google Forms Integration Testing",
+      "classification": "DUPLICATE",
+      "purpose": "Integration source or deployment plan; do not activate without approval.",
+      "referencedBy": [
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json"
+      ],
+      "current": false,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Manual review required before deletion or archive.",
+      "canonicalSource": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "PROJECT_HANDOFF.md",
+      "title": "Gather & Savor Current Project Handoff",
+      "classification": "ACTIVE AUTHORITATIVE",
+      "purpose": "Current coding-agent handoff and guardrails.",
+      "referencedBy": [
+        "AI_AGENT_RULES.md",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "README.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "tests/phase17r-release-stabilizer.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "PROJECT_HANDOFF.md",
+      "archivedLocation": null
+    },
+    {
+      "path": "README.md",
+      "title": "Gather & Savor Event Hub",
+      "classification": "ACTIVE AUTHORITATIVE",
+      "purpose": "Primary repository entrypoint and current project summary.",
+      "referencedBy": [
+        "AI_AGENT_RULES.md",
+        "audit/gsv-document-registry.json",
+        "audit/gsv-file-inventory.json",
+        "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
+        "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+        "docs/HISTORICAL_ARCHIVE_INDEX.md",
+        "PROJECT_HANDOFF.md",
+        "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
+        "tests/phase15a-security-headers.test.js",
+        "tests/phase17r-release-stabilizer.test.js"
+      ],
+      "current": true,
+      "staleFacts": [],
+      "contradictions": [],
+      "action": "Retained as active current documentation.",
+      "canonicalSource": "README.md",
+      "archivedLocation": null
+    }
+  ]
+}

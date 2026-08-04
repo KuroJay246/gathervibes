@@ -32,8 +32,9 @@ test('XLSX imports still use preview-first sheet parsing workflow', async () => 
 
 test('Settings removes the roadmap archive while documentation retains release history', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
-  const readme = await readFile('README.md', 'utf8')
-  const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
+  const archive = await readFile('docs/HISTORICAL_ARCHIVE_INDEX.md', 'utf8')
+  const legacyReadme = await readFile('docs/archive/legacy/README_HISTORICAL_2026-08.md', 'utf8')
+  const legacyHandoff = await readFile('docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md', 'utf8')
 
   for (const text of ['Settings', 'Event Defaults', 'Currency', 'Ticket prefix', 'Organizer Access', 'Tickets & Check-In', 'Message Builder', 'Advanced']) {
     assert.match(settings, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
@@ -51,10 +52,11 @@ test('Settings removes the roadmap archive while documentation retains release h
     assert.doesNotMatch(settings, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
-  assert.match(`${readme}\n${handoff}`, /Access Request Rules Prototype \+ Tests/)
-  assert.match(`${readme}\n${handoff}`, /Deferred integrations/)
-  assert.match(readme, /Phase 15B status/)
-  assert.match(handoff, /Phase 17B staff access model/)
+  assert.match(archive, /historical files are not current operating instructions/i)
+  assert.match(`${legacyReadme}\n${legacyHandoff}`, /Access Request Rules Prototype \+ Tests/)
+  assert.match(`${legacyReadme}\n${legacyHandoff}`, /Deferred integrations/)
+  assert.match(legacyReadme, /Phase 15B status/)
+  assert.match(legacyHandoff, /Phase 17B staff access model/)
 })
 
 test('private access status reflects disabled workflow boundaries without roadmap copy', async () => {
@@ -90,17 +92,19 @@ test('private access status reflects disabled workflow boundaries without roadma
 
 test('Phase 17D planning docs and readiness docs exist and preserve current live safety boundaries', async () => {
   const aiRules = await readFile('AI_AGENT_RULES.md', 'utf8')
-  const readme = await readFile('README.md', 'utf8')
-  const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
-  const plan = await readFile('PHASE_17D_PLAN.md', 'utf8')
-  const readiness = await readFile('PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md', 'utf8')
+  const legacyReadme = await readFile('docs/archive/legacy/README_HISTORICAL_2026-08.md', 'utf8')
+  const legacyHandoff = await readFile('docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md', 'utf8')
+  const plan = await readFile('docs/archive/phases/PHASE_17D_PLAN.md', 'utf8')
+  const readiness = await readFile('docs/archive/phases/PHASE_17D_D_ACCESS_WORKFLOW_READINESS.md', 'utf8')
 
-  assert.match(aiRules, /Phase 17D-B is scanner-only polish work/)
-  assert.match(aiRules, /Phase 17D-C is read-only\/admin UI foundation only/)
-  assert.match(readme, /Phase 17D-A closed status/)
-  assert.match(handoff, /Phase 17D-A: Access & Roles Planning \+ Scanner Day-of Polish Blueprint/)
-  assert.match(readme, /Organizer review is recorded as PASS/)
-  assert.match(handoff, /Organizer review is recorded as PASS/)
+  assert.match(aiRules, /Staff\/scanner access is based on `staffProfiles\/\{uid\}` plus `events\/\{eventId\}\/staffAssignments\/\{uid\}`/)
+  assert.match(aiRules, /Future lead-scanner behavior is not active unless explicitly implemented and validated/)
+  assert.match(`${legacyReadme}\n${legacyHandoff}`, /Phase 17D-B .*scanner day-of polish/)
+  assert.match(`${legacyReadme}\n${legacyHandoff}`, /Phase 17D-C .*read-only\/admin UI foundation/)
+  assert.match(legacyReadme, /Phase 17D-A closed status/)
+  assert.match(legacyHandoff, /Phase 17D-A: Access & Roles Planning \+ Scanner Day-of Polish Blueprint/)
+  assert.match(legacyReadme, /Organizer review is recorded as PASS/)
+  assert.match(legacyHandoff, /Organizer review is recorded as PASS/)
   assert.match(plan, /Role capability matrix/)
   assert.match(plan, /lead-scanner role planning only/i)
   assert.match(plan, /Settings must not rewrite Firestore rules dynamically/i)

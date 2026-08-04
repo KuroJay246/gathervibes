@@ -157,7 +157,7 @@ test('Phase 23N-B corrective tasks do not alter totals', () => {
 })
 
 test('Phase 23N-B applied proposal-count reporting is internally consistent', async () => {
-  const report = await readFile('PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md', 'utf8')
+  const report = await readFile('docs/archive/phases/PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md', 'utf8')
 
   assert.match(report, /Approved proposal count: 21/)
   assert.match(report, /Applied proposal count: 21/)
@@ -171,7 +171,7 @@ test('Phase 23N-B applied proposal-count reporting is internally consistent', as
 test('Phase 23N-B Subsets 5 and 6 remain locked in UI and report', async () => {
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
   const reportsPage = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
-  const report = await readFile('PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md', 'utf8')
+  const report = await readFile('docs/archive/phases/PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md', 'utf8')
 
   assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
   assert.match(reportsPage, /Final profit cannot be confirmed/)

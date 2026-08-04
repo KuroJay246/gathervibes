@@ -19,8 +19,8 @@ import {
 } from '../src/services/accessRequestContract.js'
 
 test('Phase 17F-A plan and 17F-C checklist stay planning-only and preserve guardrails', async () => {
-  const plan = await readFile('PHASE_17F_A_ACCESS_WORKFLOW_IMPLEMENTATION_PLAN.md', 'utf8')
-  const checklist = await readFile('PHASE_17F_C_ACCESS_WORKFLOW_SMOKE_CHECKLIST.md', 'utf8')
+  const plan = await readFile('docs/archive/phases/PHASE_17F_A_ACCESS_WORKFLOW_IMPLEMENTATION_PLAN.md', 'utf8')
+  const checklist = await readFile('docs/archive/phases/PHASE_17F_C_ACCESS_WORKFLOW_SMOKE_CHECKLIST.md', 'utf8')
 
   assert.match(plan, /Status: active planning artifact only/)
   assert.match(plan, /future approval workflow sequence/i)
@@ -74,9 +74,9 @@ test('17F status stays in docs while UI keeps access workflows disabled', async 
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const health = await readFile('src/utils/runtimeHealth.js', 'utf8')
-  const readme = await readFile('README.md', 'utf8')
-  const handoff = await readFile('PROJECT_HANDOFF.md', 'utf8')
-  const phase17gB = await readFile('PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md', 'utf8')
+  const readme = await readFile('docs/archive/legacy/README_HISTORICAL_2026-08.md', 'utf8')
+  const handoff = await readFile('docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md', 'utf8')
+  const phase17gB = await readFile('docs/archive/phases/PHASE_17G_B_FIRESTORE_RULES_DEPLOYMENT_FINAL_REVIEW.md', 'utf8')
 
   assert.match(settings, /Access is controlled outside this page/)
   assert.match(settings, /cannot add, remove, disable, or change anyone's role/)
@@ -98,7 +98,7 @@ test('17F status stays in docs while UI keeps access workflows disabled', async 
 })
 
 test('Phase 17G-A approval package stays non-live and documents the rules deployment boundary', async () => {
-  const artifact = await readFile('PHASE_17G_A_LIVE_WORKFLOW_GO_NO_GO_RULES_APPROVAL.md', 'utf8')
+  const artifact = await readFile('docs/archive/phases/PHASE_17G_A_LIVE_WORKFLOW_GO_NO_GO_RULES_APPROVAL.md', 'utf8')
   const contract = await readFile('src/services/accessRequestContract.js', 'utf8')
   const rules = await readFile('firestore.rules', 'utf8')
 
