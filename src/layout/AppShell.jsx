@@ -39,42 +39,48 @@ import { pageGuidance } from '../utils/pageGuidance'
 
 const navGroups = [
   {
-    label: 'Home',
+    label: 'Plan',
     items: [
       { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+      { to: '/events', label: 'Events', icon: CalendarDays },
+      { to: '/tasks', label: 'Tasks & Deadlines', icon: ClipboardList },
+      { to: '/contacts', label: 'Contacts & Organizations', icon: Building2 },
+      { to: '/documents', label: 'Documents', icon: FileText },
     ],
   },
   {
-    label: 'Event Management',
+    label: 'Guests & Attendance',
     items: [
-      { to: '/events', label: 'Events', icon: CalendarDays },
-      { to: '/tasks', label: 'Tasks & Deadlines', icon: ClipboardList },
       { to: '/registrations', label: 'Guests & Registrations', icon: UsersRound },
-      { to: '/payments', label: 'Registration Payments', icon: CreditCard },
       { to: '/tickets', label: 'Tickets', icon: TicketCheck },
       { to: '/check-in', label: 'Check-In', icon: ClipboardCheck },
     ],
   },
   {
-    label: 'Operations',
+    label: 'Event Day',
     items: [
-      { to: '/operations', label: 'Operations', icon: ReceiptText },
       { to: '/run-of-show', label: 'Run of Show', icon: ScrollText },
-      { to: '/resources', label: 'Resources', icon: Boxes },
-      { to: '/documents', label: 'Documents', icon: FileText },
-      { to: '/contacts', label: 'Contacts & Partners', icon: Building2 },
+      { to: '/resources', label: 'Equipment & Supplies', icon: Boxes },
+    ],
+  },
+  {
+    label: 'Money & Follow-Up',
+    items: [
+      { to: '/payments', label: 'Registration Payments', icon: CreditCard },
+      { to: '/operations', label: 'Operations & Commitments', icon: ReceiptText },
+      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
+      { to: '/payments/reconciliation', label: 'Reconciliation Preview', icon: ReceiptText },
+    ],
+  },
+  {
+    label: 'Tools',
+    items: [
+      { to: '/imports', label: 'Import Center & Response Inbox', icon: FileInput },
       { to: '/communications', label: 'Message Builder', icon: MessageSquareText },
     ],
   },
   {
-    label: 'Review and Data',
-    items: [
-      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
-      { to: '/imports', label: 'Import Center', icon: FileInput },
-    ],
-  },
-  {
-    label: 'Administration',
+    label: 'System',
     items: [
       { to: '/settings', label: 'Settings', icon: Settings },
       { to: '/qa', label: 'System QA', icon: ShieldCheck },
@@ -84,33 +90,39 @@ const navGroups = [
 
 const mobileMoreGroups = [
   {
-    label: 'Event Management',
+    label: 'Plan',
     items: [
       { to: '/events', label: 'Events', icon: CalendarDays },
       { to: '/tasks', label: 'Tasks & Deadlines', icon: ClipboardList },
-      { to: '/payments', label: 'Registration Payments', icon: CreditCard },
+      { to: '/contacts', label: 'Contacts & Organizations', icon: Building2 },
+      { to: '/documents', label: 'Documents', icon: FileText },
     ],
   },
   {
-    label: 'Operations',
+    label: 'Event Day',
     items: [
-      { to: '/operations', label: 'Operations', icon: ReceiptText },
       { to: '/run-of-show', label: 'Run of Show', icon: ScrollText },
-      { to: '/resources', label: 'Resources', icon: Boxes },
-      { to: '/documents', label: 'Documents', icon: FileText },
-      { to: '/contacts', label: 'Contacts & Partners', icon: Building2 },
+      { to: '/resources', label: 'Equipment & Supplies', icon: Boxes },
+    ],
+  },
+  {
+    label: 'Money & Follow-Up',
+    items: [
+      { to: '/payments', label: 'Registration Payments', icon: CreditCard },
+      { to: '/operations', label: 'Operations & Commitments', icon: ReceiptText },
+      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
+      { to: '/payments/reconciliation', label: 'Reconciliation Preview', icon: ReceiptText },
+    ],
+  },
+  {
+    label: 'Tools',
+    items: [
+      { to: '/imports', label: 'Import Center', icon: FileInput },
       { to: '/communications', label: 'Message Builder', icon: MessageSquareText },
     ],
   },
   {
-    label: 'Review and Data',
-    items: [
-      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
-      { to: '/imports', label: 'Import Center', icon: FileInput },
-    ],
-  },
-  {
-    label: 'Administration',
+    label: 'System',
     items: [
       { to: '/settings', label: 'Settings', icon: Settings },
       { to: '/qa', label: 'System QA', icon: ShieldCheck },
@@ -129,9 +141,9 @@ const pageTitles = {
   '/check-in': ['Check-In', 'Track event-day attendance'],
   '/operations': ['Operations', 'Track event-level money and obligations'],
   '/run-of-show': ['Run of Show', 'Event-day sequence, supplier arrivals, dependencies, and Now/Next'],
-  '/resources': ['Resources', 'Equipment, supplies, packing, pickup, and return tracking'],
+  '/resources': ['Equipment & Supplies', 'Equipment, supplies, packing, pickup, and return tracking'],
   '/documents': ['Documents', 'Event document references, links, and evidence'],
-  '/contacts': ['Contacts & Partners', 'Reusable people, businesses, and event relationships'],
+  '/contacts': ['Contacts & Organizations', 'Reusable people, businesses, and event relationships'],
   '/event-review': ['Reports', 'Read-only follow-up, payments, operations, and summary'],
   '/imports': ['Import Center', 'Bring in CSV exports and pasted table rows safely'],
   '/qa': ['System QA', 'System health, data checks, and safe test guidance'],
@@ -346,9 +358,16 @@ export function AppShell() {
                     <h2 className="sr-only">How to use this page</h2>
                     <p className="mt-1 text-sm leading-6 text-[#4F3B33]">{guidance.purpose}</p>
                   </div>
-                  <p className="rounded-xl bg-white px-3 py-2 text-xs font-semibold leading-5 text-[#6B564C] ring-1 ring-[#E7D6CC] md:max-w-sm">
-                    {guidance.boundary}
-                  </p>
+                  <div className="grid gap-2 sm:grid-cols-2 md:max-w-xl">
+                    <p className="rounded-xl bg-white px-3 py-2 text-xs font-semibold leading-5 text-[#2B1723] ring-1 ring-[#E7D6CC]">
+                      <span className="block text-[9px] uppercase tracking-[0.16em] text-[#8A3F4B]">Primary action</span>
+                      {guidance.primaryAction}
+                    </p>
+                    <p className="rounded-xl bg-white px-3 py-2 text-xs font-semibold leading-5 text-[#6B564C] ring-1 ring-[#E7D6CC]">
+                      <span className="block text-[9px] uppercase tracking-[0.16em] text-[#8A3F4B]">Automatic boundary</span>
+                      {guidance.boundary}
+                    </p>
+                  </div>
                 </div>
               </section>
             )}

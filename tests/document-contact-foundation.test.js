@@ -74,8 +74,9 @@ test('Contacts route supports reusable contacts, organizations, event relationsh
   const duplicates = findContactDuplicateCandidates({ email: 'sky@example.com', phone: '(246) 555-0101', name: 'Sky Mall' }, contacts, organizations)
 
   assert.match(app, /path="\/contacts"/)
-  assert.match(shell, /to: '\/contacts', label: 'Contacts & Partners'/)
+  assert.match(shell, /to: '\/contacts', label: 'Contacts & Organizations'/)
   assert.match(page, /These records do not grant app access/)
+  assert.match(page, /does not give app access and does not change Tasks, Documents, Run of Show, or money records/)
   assert.match(page, /Possible Existing Contact/)
   assert.match(page, /does not auto-merge/)
   assert.ok(CONTACT_CATEGORIES.includes('Government / Institution'))

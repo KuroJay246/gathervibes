@@ -9,7 +9,7 @@ export const TUTORIAL_ROUTE_DEFINITIONS = {
   checkIn: { routeId: 'check-in', pathname: '/check-in', label: 'Check-In' },
   operations: { routeId: 'operations', pathname: '/operations', label: 'Operations' },
   runOfShow: { routeId: 'run-of-show', pathname: '/run-of-show', label: 'Run of Show' },
-  resources: { routeId: 'resources', pathname: '/resources', label: 'Resources' },
+  resources: { routeId: 'resources', pathname: '/resources', label: 'Equipment & Supplies' },
   dashboardReadiness: { routeId: 'dashboard-readiness', pathname: '/dashboard', label: 'Event Readiness' },
   communications: { routeId: 'communications', pathname: '/communications', label: 'Message Builder' },
   reports: { routeId: 'reports', pathname: '/event-review', label: 'Reports' },

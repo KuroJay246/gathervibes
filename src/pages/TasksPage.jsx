@@ -83,7 +83,15 @@ function TaskForm({ task, onCancel, onSave, saving }) {
         </button>
       </div>
 
+      <div className="mt-5 rounded-2xl border border-[#EEDFD6] bg-[#FFF8F2] px-4 py-3 text-xs leading-5 text-[#6B564C]">
+        <strong className="text-[#2B1723]">Status help:</strong> Not Started means work has not begun. In Progress means someone is working on it. Waiting on Someone means another person must respond. Blocked means the task cannot move forward until the blocker is fixed. Completed and Cancelled are set manually.
+      </div>
+
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <div className="lg:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Basic information</p>
+          <p className="mt-1 text-xs text-[#80685B]">Required: task title. Everything else helps prioritize or assign the work.</p>
+        </div>
         <label className="lg:col-span-2">
           <span className="text-xs font-bold text-[#5A443B]">Task title</span>
           <input value={draft.title} onChange={(event) => updateField('title', event.target.value)} required maxLength={160} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" />
@@ -106,6 +114,10 @@ function TaskForm({ task, onCancel, onSave, saving }) {
             {TASK_PRIORITY_OPTIONS.map((option) => <option key={option}>{option}</option>)}
           </select>
         </label>
+        <div className="lg:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Responsibility and timing</p>
+          <p className="mt-1 text-xs text-[#80685B]">Use these fields to show who owns the task and when the organizer should check it again.</p>
+        </div>
         <label>
           <span className="text-xs font-bold text-[#5A443B]">Responsible person or team</span>
           <input value={draft.responsibleLabel} onChange={(event) => updateField('responsibleLabel', event.target.value)} maxLength={160} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" />
@@ -130,6 +142,10 @@ function TaskForm({ task, onCancel, onSave, saving }) {
             <input value={draft.blockerReason} onChange={(event) => updateField('blockerReason', event.target.value)} maxLength={500} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" />
           </label>
         )}
+        <div className="lg:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Notes</p>
+          <p className="mt-1 text-xs text-[#80685B]">Use notes for context. Saving this task does not automatically change linked resources, documents, money, tickets, or attendance.</p>
+        </div>
         <label className="lg:col-span-2">
           <span className="text-xs font-bold text-[#5A443B]">Notes</span>
           <textarea value={draft.notes} onChange={(event) => updateField('notes', event.target.value)} maxLength={2000} rows={4} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" />

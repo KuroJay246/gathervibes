@@ -65,6 +65,10 @@ function DocumentForm({ draft, onCancel, onSave, saving }) {
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <div className="lg:col-span-2 rounded-2xl bg-[#FFF8F2] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Basic information</p>
+          <p className="mt-1 text-xs leading-5 text-[#80685B]">Required: document title. Category, status, type, and required state help the organizer decide what still needs follow-up.</p>
+        </div>
         <Field label="Title" span="lg:col-span-2">
           <input value={form.title} onChange={(event) => setField('title', event.target.value)} required maxLength={180} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" />
         </Field>
@@ -89,6 +93,10 @@ function DocumentForm({ draft, onCancel, onSave, saving }) {
             <option value="no">No</option>
           </select>
         </Field>
+        <div className="lg:col-span-2 rounded-2xl bg-[#FFF8F2] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Where is the document?</p>
+          <p className="mt-1 text-xs leading-5 text-[#80685B]">Use a URL or location note to point to the external source. Gather & Savor does not upload, copy, scan, or delete the file.</p>
+        </div>
         <Field label="External URL" span="lg:col-span-2">
           <input value={form.url} onChange={(event) => setField('url', event.target.value)} placeholder="https://drive.google.com/..." className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" />
           {urlInvalid && <span className="mt-1 block text-xs font-semibold text-[#A32626]">Enter a valid http or https URL, or leave this blank.</span>}
@@ -99,6 +107,10 @@ function DocumentForm({ draft, onCancel, onSave, saving }) {
         <Field label="External location">
           <input value={form.storageLocation} onChange={(event) => setField('storageLocation', event.target.value)} maxLength={240} placeholder="Drive folder, binder, email thread reference..." className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" />
         </Field>
+        <div className="lg:col-span-2 rounded-2xl bg-[#FFF8F2] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Linked records</p>
+          <p className="mt-1 text-xs leading-5 text-[#80685B]">Links provide context only. They do not change contact access, complete a task, update money, or alter any external document.</p>
+        </div>
         <Field label="Linked contact ID">
           <input value={form.linkedContactId} onChange={(event) => setField('linkedContactId', event.target.value)} maxLength={128} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" />
         </Field>
@@ -111,6 +123,10 @@ function DocumentForm({ draft, onCancel, onSave, saving }) {
         <Field label="Linked Operations entry ID">
           <input value={form.linkedOperationId} onChange={(event) => setField('linkedOperationId', event.target.value)} maxLength={128} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" />
         </Field>
+        <div className="lg:col-span-2 rounded-2xl bg-[#FFF8F2] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Dates and notes</p>
+          <p className="mt-1 text-xs leading-5 text-[#80685B]">Use due, expiry, version, description, and notes to keep follow-up visible without changing any related record automatically.</p>
+        </div>
         <Field label="Due date">
           <input type="date" value={form.dueDate} onChange={(event) => setField('dueDate', event.target.value)} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" />
         </Field>
@@ -292,7 +308,7 @@ export function DocumentsPage() {
               Track external document references for <strong>{activeEvent?.eventName || 'the selected Working Event'}</strong>. This stores metadata and links only; no files are uploaded here.
             </p>
           </div>
-          {canEdit && <button type="button" onClick={() => setFormDocument(createEmptyDocumentDraft())} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#9A5260] px-5 text-xs font-bold text-white shadow-lg shadow-[#9A5260]/20"><Plus className="size-4" /> Add Document Reference</button>}
+          {canEdit && <button type="button" onClick={() => setFormDocument(createEmptyDocumentDraft())} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#9A5260] px-5 text-xs font-bold text-white shadow-lg shadow-[#9A5260]/20"><Plus className="size-4" /> Add Document</button>}
         </header>
 
         {success && <div role="status" className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{success}</div>}

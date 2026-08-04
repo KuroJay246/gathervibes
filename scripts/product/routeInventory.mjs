@@ -44,7 +44,7 @@ const navigationLabels = [
   'Check-In',
   'Operations',
   'Documents',
-  'Contacts & Partners',
+  'Contacts & Organizations',
   'Message Builder',
   'Reports',
   'Import Center',

@@ -202,7 +202,7 @@ const PLANNING_ACTIONS = [
   { to: '/operations', label: 'Add Operations Entry', detail: 'Record event expenses, income, reimbursements, or commitments.', icon: ReceiptText },
   { to: '/run-of-show', label: 'Build Run of Show', detail: 'Sequence setup, arrivals, programme steps, and breakdown.', icon: ScrollText },
   { to: '/resources', label: 'Track Resources', detail: 'Manage equipment, supplies, packing, pickup, and returns.', icon: Building2 },
-  { to: '/documents', label: 'Add Document Reference', detail: 'Track agreements, receipts, permits, and evidence links.', icon: FileText },
+  { to: '/documents', label: 'Add Document', detail: 'Track agreements, receipts, permits, and evidence links.', icon: FileText },
   { to: '/contacts', label: 'Open Contacts', detail: 'Find reusable suppliers, partners, venues, and helpers.', icon: Building2 },
   { to: '/tickets', label: 'View Tickets', detail: 'Prepare ticket codes and QR access.', icon: TicketCheck },
   { to: '/check-in', label: 'Open Check-In', detail: 'Use event-day attendance tools.', icon: ClipboardCheck },
