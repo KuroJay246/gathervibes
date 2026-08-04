@@ -85,7 +85,7 @@ test('private access status reflects disabled workflow boundaries without roadma
   assert.equal(healthItems.find((item) => item.label === 'Staff role boundary').status, 'ok')
   assert.match(healthItems.find((item) => item.label === 'Protected owner and approved organizers').detail, /Protected owner UID plus secondary approved organizers/)
   assert.match(healthItems.find((item) => item.label === 'Firestore role enforcement').detail, /Rules enforce private admin access/)
-  assert.match(healthItems.find((item) => item.label === 'Daily QA workflow').detail, /CODEX_TEST checks/)
+  assert.match(healthItems.find((item) => item.label === 'Daily QA workflow').detail, /CODEX_DEMO checks/)
 })
 
 test('Phase 17D planning docs and readiness docs exist and preserve current live safety boundaries', async () => {

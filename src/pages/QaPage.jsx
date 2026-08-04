@@ -12,14 +12,14 @@ import { buildFinanceSummary, buildPaymentsWorkspace, calculateRegistrationFinan
 import { qrPayloadForTicketCode } from '../utils/qrTicketUtils'
 import { COMMUNICATION_SEGMENTS, COMMUNICATION_TEMPLATES, buildCommunicationsSegmentSummary } from '../utils/communicationsUtils'
 import {
-  CODEX_TEST_EVENT_ID,
-  CODEX_TEST_EVENT_NAME,
+  CODEX_DEMO_EVENT_ID,
+  CODEX_DEMO_EVENT_NAME,
   organizerReadinessChecklist,
-  QA_PHASE23T_PREFIX,
+  QA_DEMO_PREFIX,
   buildQaSampleCsv,
   buildQaTestPrefix,
-  findCodexTestEvent,
-  isCodexTestWorkingEvent,
+  findCodexDemoEvent,
+  isCodexDemoWorkingEvent,
   qaChecklist,
 } from '../utils/qaHelper'
 
@@ -48,7 +48,7 @@ const FEATURE_STATUS_ITEMS = [
 
 const DATA_BOUNDARY_ITEMS = [
   ['Registration Payments separate from Operations', 'Pass', 'Guest charges and received amounts are reviewed separately from Operations Ledger records.'],
-  ['Test Event exclusion', 'Pass', 'CODEX_TEST is the safe QA event and is hidden from normal business use by default where supported.'],
+  ['Demo/Test Event exclusion', 'Pass', 'CODEX_DEMO is the safe synthetic demo and QA event and is hidden from normal business use by default where supported.'],
   ['QR format', 'Pass', 'Ticket QR payload remains GSV:TICKET:{ticketCode}.'],
   ['Scanner isolation', 'Pass', 'Scanner role remains assigned-event check-in only.'],
   ['Historical attendance separation', 'Pass', 'Historical attendance evidence does not create scanner-confirmed check-ins.'],
@@ -132,9 +132,9 @@ export function QaPage() {
   const signedInUid = user?.uid || ''
   const protectedOwnerUidMatches = signedInUid === PROTECTED_OWNER_UID
   const protectedOwnerAccessActive = Boolean(access?.protectedOwner && protectedOwnerUidMatches)
-  const codexEvents = events.filter((event) => event.eventId === CODEX_TEST_EVENT_ID || event.eventName === CODEX_TEST_EVENT_NAME)
-  const codexTestEvent = useMemo(() => findCodexTestEvent(events), [events])
-  const workingEventIsCodex = isCodexTestWorkingEvent(activeEvent)
+  const codexEvents = events.filter((event) => event.eventId === CODEX_DEMO_EVENT_ID || event.eventName === CODEX_DEMO_EVENT_NAME || event.isTestEvent === true || event.eventClassification === 'test')
+  const codexDemoEvent = useMemo(() => findCodexDemoEvent(events), [events])
+  const workingEventIsCodex = isCodexDemoWorkingEvent(activeEvent)
 
   useEffect(() => {
     let active = true
@@ -257,7 +257,7 @@ export function QaPage() {
         { label: 'Approved admin detected', status: access?.level === 'admin' ? 'pass' : 'fail', detail: access?.protectedOwner ? 'Protected owner UID access active' : 'Protected page loaded with approved organizer access' },
         { label: 'Protected owner UID match', status: protectedOwnerUidMatches ? 'pass' : 'warning', detail: protectedOwnerUidMatches ? 'Signed-in Firebase UID matches the protected owner record' : 'If Jaylan is signed in, compare this page with Firebase Auth UID before changing permissions' },
         { label: 'Protected owner app detection', status: protectedOwnerAccessActive ? 'pass' : 'warning', detail: protectedOwnerAccessActive ? 'App access resolved through immutable protected owner UID' : 'Standard organizer access may still be valid, but protected-owner bypass is not active in this session' },
-        { label: 'Protected owner write verification procedure', status: 'warning', detail: 'Manual CODEX_TEST owner write check is required after permission-denied fixes; use only test data and confirm append-only audit logs.' },
+        { label: 'Protected owner write verification procedure', status: 'warning', detail: 'Manual CODEX_DEMO owner write check is required after permission-denied fixes; use only test data and confirm append-only audit logs.' },
         { label: 'Protected owner or allowlist check', status: access?.protectedOwner || accessControl?.approvedEmails?.length > 0 ? 'pass' : 'fail', detail: access?.protectedOwner ? 'Protected owner does not depend on mutable approvedEmails' : `${accessControl?.approvedEmails?.length || 0} emails approved` },
         { label: 'No public access warning', status: 'pass', detail: 'App remains private and allowlist-only.' },
         { label: 'Staff role boundary', status: 'pass', detail: 'Scanner/check-in-only access remains assigned-event-only. Admin routes and settings stay unavailable to scanner roles.' },
@@ -270,7 +270,7 @@ export function QaPage() {
         { label: 'Missing ticket count', status: communicationsSummary.missingTicket ? 'warning' : 'pass', detail: `${communicationsSummary.missingTicket} rows` },
         { label: 'Outstanding balance segment', status: communicationsSummary.outstandingBalance ? 'warning' : 'pass', detail: `${communicationsSummary.outstandingBalance} rows` },
         { label: 'No external message sending enabled', status: 'pass', detail: 'Message Builder is copy-only.' },
-        { label: 'Import readiness', status: workingEventIsCodex ? 'pass' : 'warning', detail: workingEventIsCodex ? 'CODEX_TEST selected' : 'Use CODEX_TEST for QA imports' },
+        { label: 'Import readiness', status: workingEventIsCodex ? 'pass' : 'warning', detail: workingEventIsCodex ? 'CODEX_DEMO selected' : 'Use CODEX_DEMO for QA imports' },
         { label: 'Standard import tools only', status: 'pass', detail: 'Import Center contains normal organizer import sources.' },
         { label: 'Legacy recovery tools absent', status: 'pass', detail: 'Historical one-off recovery code is not reachable from the organizer interface.' },
         { label: 'Registration search overlap fixed', status: 'pass', detail: 'Search and filters sit above wrapped category tabs.' },
@@ -303,7 +303,7 @@ export function QaPage() {
         { label: 'Copy AI Prompt works', status: 'pass', detail: 'Verified' },
         { label: 'no AI API key exists', status: 'pass', detail: 'Copy-only prompt generation' },
         { label: 'no Google Sheets OAuth exists', status: 'pass', detail: 'Manual workflow helper active' },
-        { label: 'Product boundaries reviewed', status: 'pass', detail: 'Private admin app, CODEX_TEST QA, event operations, access, and external integrations remain separated.' },
+        { label: 'Product boundaries reviewed', status: 'pass', detail: 'Private admin app, CODEX_DEMO QA, event operations, access, and external integrations remain separated.' },
         { label: 'Clean account route standard', status: 'pass', detail: 'No selected Working Event, empty localStorage, null config, BBD/GSV defaults, and no AppErrorBoundary fallback remain required.' },
         { label: 'Staff rules deploy status', status: 'pass', detail: 'Backend access boundaries are active; Firestore indexes were not deployed by this UI reset.' },
       ])
@@ -376,8 +376,8 @@ export function QaPage() {
           ...item,
           status: workingEventIsCodex ? 'ready' : 'ready-with-limitation',
           detail: workingEventIsCodex
-            ? 'CODEX_TEST is selected for preview-first QA imports.'
-            : 'Select CODEX_TEST before importing any QA data.',
+            ? 'CODEX_DEMO is selected for preview-first QA imports.'
+            : 'Select CODEX_DEMO before importing any QA data.',
         }
       case 'responsiveDesign':
         return {
@@ -396,7 +396,7 @@ export function QaPage() {
           ...item,
           status: codexEvents.length === 1 ? 'ready' : 'not-ready',
           detail: codexEvents.length === 1
-            ? 'CODEX_TEST is available for organizer rehearsal.'
+            ? 'CODEX_DEMO is available for organizer rehearsal.'
             : 'The QA fixture must exist exactly once before synthetic QA.',
         }
       case 'productionDeployment':
@@ -432,7 +432,7 @@ export function QaPage() {
       label: 'Current Event',
       status: activeEvent?.eventId ? 'ok' : 'warn',
       value: activeEvent?.eventName || 'No event selected',
-      detail: workingEventIsCodex ? 'Safe test event selected.' : 'Use CODEX_TEST before running any synthetic QA workflow.',
+      detail: workingEventIsCodex ? 'Safe demo/test event selected.' : 'Use CODEX_DEMO before running any synthetic QA workflow.',
     },
     {
       label: 'Core Workflows',
@@ -493,23 +493,23 @@ export function QaPage() {
         </div>
 
         <div className="mt-6 rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#5F4A2A]">
-          Use <strong>{CODEX_TEST_EVENT_NAME}</strong> for test registrations, imports, tickets, or check-ins. Real events use the same standard safeguards and should not be used for synthetic QA writes.
+          Use <strong>{CODEX_DEMO_EVENT_NAME}</strong> for test registrations, imports, tickets, or check-ins. Real events use the same standard safeguards and should not be used for synthetic QA writes.
         </div>
 
         <div className="mt-4 rounded-2xl border border-[#D8C5A8] bg-[#FFFCF6] p-5">
           <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#7A5818]">Safe Organizer QA Mode</p>
           <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">{workingEventIsCodex ? 'Safe QA event selected' : 'Open the safe QA event'}</h3>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[#715D46]">
-            Use CODEX_TEST for organizer walkthroughs, prefix temporary QA business records with <strong>{QA_PHASE23T_PREFIX}_</strong>, delete those temporary business records after the review, and keep audit logs untouched.
+            Use CODEX_DEMO for organizer walkthroughs, prefix temporary QA business records with <strong>{QA_DEMO_PREFIX}_</strong>, delete only accidental temporary records outside the permanent demo dataset after review, and keep audit logs untouched.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {codexTestEvent && !workingEventIsCodex && (
+            {codexDemoEvent && !workingEventIsCodex && (
               <button
                 type="button"
-                onClick={() => setActiveEvent(codexTestEvent)}
+                onClick={() => setActiveEvent(codexDemoEvent)}
                 className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#7A5818] px-4 text-xs font-bold text-white"
               >
-                Use CODEX_TEST
+                Use CODEX_DEMO
               </button>
             )}
             <button
@@ -543,7 +543,7 @@ export function QaPage() {
       >
         <div className="grid gap-3 md:grid-cols-3">
           <DiagnosticRow label="Selected Working Event" status={activeEvent?.eventId ? 'Pass' : 'Needs Review'} detail={activeEvent?.eventName || 'No Working Event selected.'} />
-          <DiagnosticRow label="Event classification" status={workingEventIsCodex ? 'Pass' : 'Manual Check'} detail={workingEventIsCodex ? 'CODEX_TEST is selected for safe QA.' : 'Real events use standard safeguards; use CODEX_TEST for synthetic testing.'} />
+          <DiagnosticRow label="Event classification" status={workingEventIsCodex ? 'Pass' : 'Manual Check'} detail={workingEventIsCodex ? 'CODEX_DEMO is selected for safe QA.' : 'Real events use standard safeguards; use CODEX_DEMO for synthetic testing.'} />
           <DiagnosticRow label="Event status" status="Pass" detail={activeEvent?.status || 'No status available.'} />
         </div>
       </QaSection>
@@ -567,10 +567,10 @@ export function QaPage() {
             <DiagnosticRow label="Signed-in UID" status={signedInUid ? 'Pass' : 'Needs Review'} detail={signedInUid || 'No signed-in user detected.'} />
             <DiagnosticRow label="Expected protected UID" status="Pass" detail={PROTECTED_OWNER_UID} />
             <DiagnosticRow label="UID match" status={protectedOwnerUidMatches ? 'Pass' : 'Needs Review'} detail={protectedOwnerUidMatches ? 'This browser session matches the protected owner.' : 'This session is not using the protected owner UID.'} />
-            <DiagnosticRow label="App owner detection" status={protectedOwnerAccessActive ? 'Pass' : 'Manual Check'} detail={protectedOwnerAccessActive ? 'Protected-owner access resolved in app state.' : 'Use CODEX_TEST to manually verify writes before release sign-off.'} />
+            <DiagnosticRow label="App owner detection" status={protectedOwnerAccessActive ? 'Pass' : 'Manual Check'} detail={protectedOwnerAccessActive ? 'Protected-owner access resolved in app state.' : 'Use CODEX_DEMO to manually verify writes before release sign-off.'} />
           </div>
           <p className="mt-3 text-xs font-semibold leading-5 text-[#6B564C]">
-            Manual CODEX_TEST Owner Write Check: create or update a safe QA registration, confirm the write succeeds, confirm an append-only audit log is created, then remove only temporary business records while leaving audit logs intact.
+            Manual CODEX_DEMO Owner Write Check: create or update a safe QA registration, confirm the write succeeds, confirm an append-only audit log is created, then remove only accidental temporary business records outside the permanent demo dataset while leaving audit logs intact.
           </p>
         </div>
       </QaSection>
@@ -668,13 +668,13 @@ export function QaPage() {
           <div className="rounded-2xl border border-[#EFE2DA] p-4">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6B564C]">Current Working Event</p>
             <p className="mt-2 truncate text-sm font-bold text-[#2B1723]">{activeEvent?.eventName || 'None selected'}</p>
-            <p className="mt-1 text-xs text-[#6B564C]">{activeEvent ? 'Selected in this browser session.' : 'Select CODEX_TEST before QA writes'}</p>
+            <p className="mt-1 text-xs text-[#6B564C]">{activeEvent ? 'Selected in this browser session.' : 'Select CODEX_DEMO before QA writes'}</p>
             <div className="mt-3">
-              <StatusBadge ok={workingEventIsCodex}>{workingEventIsCodex ? 'Using CODEX_TEST' : 'Not CODEX_TEST'}</StatusBadge>
+              <StatusBadge ok={workingEventIsCodex}>{workingEventIsCodex ? 'Using CODEX_DEMO' : 'Not CODEX_DEMO'}</StatusBadge>
             </div>
           </div>
           <div className="rounded-2xl border border-[#EFE2DA] p-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6B564C]">CODEX_TEST status</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6B564C]">CODEX_DEMO status</p>
             <p className="mt-2 text-sm font-bold text-[#2B1723]">{codexEvents.length === 1 ? 'Exactly one fixture found' : `${codexEvents.length} fixtures found`}</p>
             <p className="mt-1 text-xs text-[#6B564C]">Read-only events collection check.</p>
           </div>
@@ -738,7 +738,7 @@ export function QaPage() {
           <ShieldCheck className="size-6 text-[#9A5260]" aria-hidden="true" />
         </div>
         <p className="mt-3 text-sm leading-6 text-[#7B665C]">
-          Use this prefix only with CODEX_TEST. This helper only generates text to copy into the Import Center.
+          Use this prefix only with CODEX_DEMO. This helper only generates text to copy into the Import Center.
         </p>
         <code className="mt-4 block rounded-xl border border-[#EFE2DA] bg-[#FFF8F2] px-3 py-2 text-xs font-bold text-[#2B1723]">{prefix}</code>
         <div className="mt-5 flex items-center justify-between gap-3">
@@ -754,7 +754,7 @@ export function QaPage() {
         </div>
         <pre className="mt-3 max-h-72 overflow-auto rounded-2xl border border-[#EFE2DA] bg-[#23131C] p-4 text-[11px] leading-5 text-[#FFF8F2]">{sampleCsv}</pre>
         <p className="mt-4 text-xs leading-5 text-[#80685B]">
-          Do not paste this into any real event. First select CODEX_TEST as the Working Event, then use Import Center preview before saving.
+          Do not paste this into any real event. First select CODEX_DEMO as the Working Event, then use Import Center preview before saving.
         </p>
         </div>
       </details>
@@ -771,7 +771,7 @@ export function QaPage() {
         <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Manual smoke checklist</p>
         <h3 className="mt-2 font-serif text-2xl">Staff access readiness</h3>
         <p className="mt-3 text-sm leading-6 text-[#7B665C]">
-          Use CODEX_TEST only. This checklist is manual guidance and does not change event records by itself.
+          Use CODEX_DEMO only. This checklist is manual guidance and does not change event records by itself.
         </p>
         <div className="mt-5 grid gap-3">
           {qaChecklist.map((item) => (

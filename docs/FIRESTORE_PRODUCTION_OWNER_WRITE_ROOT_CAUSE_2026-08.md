@@ -74,11 +74,11 @@ Do not deploy Firestore indexes, Functions, Storage, Auth configuration, or broa
 
 ## Manual Owner Write Verification
 
-A full production pass requires an authenticated Jaylan session and a safe `CODEX_TEST Live Verification Event` write after rules deployment:
+A full production pass requires an authenticated Jaylan session and a safe `CODEX_DEMO - Full System Walkthrough` write after rules deployment:
 
 1. Open System QA and confirm signed-in UID matches `WcDU2jmbopdAgDlMMWvD3TkqqbC3`.
-2. Select `CODEX_TEST Live Verification Event`.
-3. Edit one safe CODEX_TEST registration field or create a temporary CODEX_TEST-only business record through the normal UI.
+2. Select `CODEX_DEMO - Full System Walkthrough`.
+3. Edit one safe CODEX_DEMO registration field or create a temporary CODEX_DEMO-only business record through the normal UI.
 4. Confirm the save succeeds.
 5. Confirm an append-only audit log was created.
 6. Do not select or modify Cake Piknik Barbados during this verification.

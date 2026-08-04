@@ -66,7 +66,7 @@ test('protected owner remains UID-based and independent of approvedEmails or sta
   assert.deepEqual(access.assignedEventIds, [])
 })
 
-test('System QA exposes protected-owner diagnostics and manual CODEX_TEST write verification', async () => {
+test('System QA exposes protected-owner diagnostics and manual CODEX_DEMO write verification', async () => {
   const qaPage = await source('src/pages/QaPage.jsx')
 
   assert.match(qaPage, /PROTECTED_OWNER_UID/)
@@ -75,7 +75,7 @@ test('System QA exposes protected-owner diagnostics and manual CODEX_TEST write 
   assert.match(qaPage, /Expected protected UID/)
   assert.match(qaPage, /UID match/)
   assert.match(qaPage, /App owner detection/)
-  assert.match(qaPage, /Manual CODEX_TEST Owner Write Check/)
+  assert.match(qaPage, /Manual CODEX_DEMO Owner Write Check/)
   assert.match(qaPage, /bypass covers access and role checks only/)
   assert.match(qaPage, /append-only audit logs still apply/)
 })
@@ -112,7 +112,7 @@ test('production owner write root cause documents deployment and manual verifica
   assert.match(rootCause, /updateRegistration` used a split write/)
   assert.match(rootCause, /npx firebase-tools deploy --only firestore:rules --project gathervibeshub/)
   assert.match(rootCause, /PASS WITH REQUIRED MANUAL OWNER WRITE VERIFICATION/)
-  assert.match(rootCause, /CODEX_TEST Live Verification Event/)
+  assert.match(rootCause, /CODEX_DEMO - Full System Walkthrough/)
   assert.match(rootCause, /QR payload remains `GSV:TICKET:\{ticketCode\}`/)
   assert.match(rootCause, /approvedEmails` is not changed/)
 })

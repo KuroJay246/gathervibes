@@ -31,13 +31,14 @@ import {
   resolveAccessRole,
   roleLabel,
 } from '../utils/accessRoles'
+import { CODEX_DEMO_EVENT_ID } from '../utils/demoEvent'
 
 const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({ prompt: 'select_account' })
 
 const FIREBASE_APP_HOST = 'gathervibeshub.firebaseapp.com'
 const WEB_APP_HOST = 'gathervibeshub.web.app'
-const STAFF_ASSIGNMENT_EVENT_IDS = ['xPfa0b3KZyLSDnAD2uGI']
+const STAFF_ASSIGNMENT_EVENT_IDS = [CODEX_DEMO_EVENT_ID]
 const AUTH_STORAGE_ERROR_CODE = 'auth/persistence-failed'
 
 let persistenceInitializationPromise = null

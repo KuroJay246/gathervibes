@@ -42,5 +42,5 @@ test('Phase 17E-E readiness artifact preserves deployment gates and rollback bou
   assert.match(readiness, /If CPB is exposed/)
   assert.match(readiness, /`approvedEmails` must remain admin-only\./)
   assert.match(readiness, /Do not use CPB for QA\./)
-  assert.match(readiness, /Use CODEX_TEST only/)
+  assert.match(readiness, /Use CODEX_DEMO only/)
 })

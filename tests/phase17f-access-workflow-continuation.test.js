@@ -33,7 +33,7 @@ test('Phase 17F-A plan and 17F-C checklist stay planning-only and preserve guard
   assert.match(plan, /Firestore rules are not deployed in Phase 17F-A\./)
   assert.match(plan, /Firestore indexes are not deployed in Phase 17F-A\./)
   assert.match(plan, /Real events use the same standard safeguards/)
-  assert.match(plan, /CODEX_TEST only/i)
+  assert.match(plan, /CODEX_DEMO only/i)
 
   assert.match(checklist, /Status: active manual checklist only/)
   assert.match(checklist, /It does not make approval, decline, revoke, staff assignment editing, or lead-scanner workflow live\./)
@@ -82,7 +82,7 @@ test('17F status stays in docs while UI keeps access workflows disabled', async 
   assert.match(settings, /cannot add, remove, disable, or change anyone's role/)
   assert.match(settings, /Assigned-event access only/)
   assert.match(qa, /Daily QA workflow/)
-  assert.match(health, /CODEX_TEST checks/)
+  assert.match(health, /CODEX_DEMO checks/)
   assert.match(health, /Rules enforce private admin access/)
   assert.match(readme, /Phase 17F-A is now closed, merged-ready, and organizer accepted on branch `codex\/phase-17e-cde-access-requests-ui-readiness-ci` as the Access Workflow Implementation Plan only\./)
   assert.match(readme, /Phase 17F-C is now closed, merged-ready, and organizer accepted on branch `codex\/phase-17e-cde-access-requests-ui-readiness-ci` as the Access Workflow manual smoke checklist only\./)

@@ -66,4 +66,4 @@ For baker payments:
 
 ## QA rehearsal rule
 
-Use CODEX_TEST for destructive QA and organizer rehearsal. Do not create temporary Operations entries in CPB.
+Use CODEX_DEMO for synthetic QA and organizer rehearsal. Do not create temporary Operations entries in any real event.

@@ -27,7 +27,7 @@
     "e2e:webkit": "npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub \"playwright test --project=webkit\"",
     "admin:ensure-access": "node scripts/admin/ensureAccessControl.mjs",
     "admin:verify-firebase": "node scripts/admin/verifyFirebaseSetup.mjs",
-    "admin:ensure-codex-test-event": "node scripts/admin/ensureCodexTestEvent.mjs",
+    "admin:replace-codex-test-with-demo": "node scripts/admin/replaceCodexTestWithDemoEvent.mjs",
     "admin:verify-production-fixtures": "node scripts/admin/verifyProductionFixtures.mjs",
     "admin:verify-production-counts": "node scripts/admin/verifyProductionCounts.mjs",
     "firebase:deploy-rules": "npx firebase-tools deploy --only firestore:rules,firestore:indexes --project gathervibeshub",

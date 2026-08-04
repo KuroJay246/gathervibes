@@ -1,6 +1,6 @@
 # Final Manual Browser Acceptance Checklist
 
-Use Jaylan's approved organizer session and CODEX_TEST unless a check is explicitly read-only.
+Use Jaylan's approved organizer session and CODEX_DEMO unless a check is explicitly read-only.
 
 - Authenticated visual review of `/imports`: source chooser, record type, template presentation, mapping, validation, preview, Response Inbox, manual Google Sheets export, honest PDF fallback.
 - Authenticated visual review of `/communications`: event context, purpose, recipient context, preview, Copy Message, Copy Subject, copy-only notice, no Send or Delivered state.

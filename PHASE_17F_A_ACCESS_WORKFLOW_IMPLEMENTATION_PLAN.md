@@ -30,7 +30,7 @@ It does not implement:
 - Phase 17E-D remains disabled requester-form preview only.
 - Phase 17E-E remains deployment-readiness and rollback planning only.
 - Real events use the same standard safeguards and are unavailable for synthetic QA.
-- CODEX_TEST remains the only safe smoke and rehearsal event.
+- CODEX_DEMO remains the only safe synthetic smoke and rehearsal event.
 - QR payload remains `GSV:TICKET:{ticketCode}`.
 - `xlsx` remains absent and `read-excel-file` remains active.
 
@@ -118,9 +118,9 @@ Firestore indexes are not deployed in Phase 17F-A.
 
 Real events use the same standard safeguards. Do not target a real event for access workflow rehearsal, assignment tests, or QA smoke.
 
-## 14. CODEX_TEST-only smoke statement
+## 14. CODEX_DEMO-only smoke statement
 
-Any future manual rehearsal tied to this workflow must stay on CODEX_TEST only until a separately approved live phase says otherwise.
+Any future manual rehearsal tied to this workflow must stay on CODEX_DEMO only until a separately approved live phase says otherwise.
 
 ## 15. approvedEmails admin-only statement
 

@@ -332,7 +332,7 @@ export function EventsPage() {
       {!loading && !loadError && events.length > 0 && visibleEvents.length === 0 && (
         <section className="rounded-[24px] border border-dashed border-[#D8C3B6] bg-white/70 px-6 py-10 text-center shadow-[0_8px_24px_rgba(84,53,67,0.04)]">
           <h3 className="font-serif text-2xl text-[#2B1723]">Only test events are hidden</h3>
-          <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-[#80685B]">Normal event lists hide CODEX_TEST so real event totals and workflows stay clean. Show test events when you need QA or synthetic testing.</p>
+          <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-[#80685B]">Normal event lists hide CODEX_DEMO so real event totals and workflows stay clean. Show test events when you need QA, training, or synthetic testing.</p>
           <button type="button" onClick={() => setShowTestEvents(true)} className="mt-6 rounded-2xl bg-[#2B1723] px-5 py-3 text-sm font-bold text-white shadow-[0_18px_28px_rgba(43,23,35,0.18)] hover:bg-[#3B2232]">Show Test Events</button>
         </section>
       )}

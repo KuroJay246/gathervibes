@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 
 import {
   APPLY_SUPPORTED_FIELDS,
-  CODEX_TEST_EVENT_ID,
+  CODEX_DEMO_REHEARSAL_EVENT_ID,
   PHASE_23G_MANIFEST_SHA256,
   PHASE_23J_MANIFEST_SHA256,
   assertPhase23gApplyLock,
@@ -14,9 +14,9 @@ import {
   expectedRealEventApprovalPhrase,
 } from '../src/utils/manifestApplyEngine.js'
 
-test('Phase 23G apply lock allows CODEX_TEST rehearsal only with exact manifest approval phrase', () => {
+test('Phase 23G apply lock allows CODEX_DEMO rehearsal only with exact manifest approval phrase', () => {
   assert.equal(assertPhase23gApplyLock({
-    targetEventId: CODEX_TEST_EVENT_ID,
+    targetEventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
     manifestSha256: PHASE_23G_MANIFEST_SHA256,
     approvalPhrase: expectedPhase23gApprovalPhrase(),
     rehearsalOnly: true,
@@ -27,10 +27,10 @@ test('Phase 23G apply lock allows CODEX_TEST rehearsal only with exact manifest 
     manifestSha256: PHASE_23G_MANIFEST_SHA256,
     approvalPhrase: expectedPhase23gApprovalPhrase(),
     rehearsalOnly: true,
-  }), /locked to CODEX_TEST/)
+  }), /locked to CODEX_DEMO/)
 
   assert.throws(() => assertPhase23gApplyLock({
-    targetEventId: CODEX_TEST_EVENT_ID,
+    targetEventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
     manifestSha256: '2A98AB506F1846294944DA49A57CD2E898F6B5D97E4E03C412FD89683C92C409',
     approvalPhrase: expectedPhase23gApprovalPhrase(),
     rehearsalOnly: true,
@@ -39,10 +39,10 @@ test('Phase 23G apply lock allows CODEX_TEST rehearsal only with exact manifest 
 
 test('Phase 23G apply plan supports only registration finance fields and audit metadata', () => {
   const plan = buildRegistrationApplyPlan({
-    targetEventId: CODEX_TEST_EVENT_ID,
+    targetEventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
     registration: {
       registrationId: 'qa-reg',
-      eventId: CODEX_TEST_EVENT_ID,
+      eventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
       amountPaid: 0,
       balanceDue: 25,
       paymentStatus: 'pending',
@@ -62,14 +62,14 @@ test('Phase 23G apply plan supports only registration finance fields and audit m
 
 test('Phase 23G apply plan rejects unsupported fields and scope drift', () => {
   assert.throws(() => buildRegistrationApplyPlan({
-    targetEventId: CODEX_TEST_EVENT_ID,
+    targetEventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
     registration: { registrationId: 'qa-reg', eventId: 'real-event-id' },
     proposal: { changedFields: ['amountPaid'], proposedValues: { amountPaid: 25 } },
   }), /event scope mismatch/)
 
   assert.throws(() => buildRegistrationApplyPlan({
-    targetEventId: CODEX_TEST_EVENT_ID,
-    registration: { registrationId: 'qa-reg', eventId: CODEX_TEST_EVENT_ID },
+    targetEventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
+    registration: { registrationId: 'qa-reg', eventId: CODEX_DEMO_REHEARSAL_EVENT_ID },
     proposal: { changedFields: ['checkedIn'], proposedValues: { checkedIn: true } },
   }), /Unsupported proposal fields/)
 
@@ -87,7 +87,7 @@ test('real-event production apply approval is not CPB-specific and requires exac
   }), { approved: true, dryRun: false })
 
   assert.throws(() => assertRealEventProductionApplyApproval({
-    targetEventId: CODEX_TEST_EVENT_ID,
+    targetEventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
     manifestSha256: PHASE_23J_MANIFEST_SHA256,
     approvalPhrase: expectedRealEventApprovalPhrase({ targetEventId: 'real-event-id' }),
     proposalCount: 1,
@@ -108,9 +108,9 @@ test('real-event production apply approval is not CPB-specific and requires exac
   }), /positive proposal count/)
 })
 
-test('Phase 23G rehearsal script is CODEX_TEST-only and does not write Operations, tickets, or check-ins', () => {
+test('Phase 23G rehearsal script is CODEX_DEMO-only and does not write Operations, tickets, or check-ins', () => {
   const script = readFileSync('scripts/admin/runCodexApplyRehearsal.mjs', 'utf8')
-  assert.match(script, /CODEX_TEST_EVENT_ID/)
+  assert.match(script, /CODEX_DEMO_REHEARSAL_EVENT_ID/)
   assert.match(script, /realEventDenied/)
   assert.doesNotMatch(script, /CPB_EVENT_ID|cpbDenied|cpbWrites/)
   assert.doesNotMatch(script, /operationsLedger/)

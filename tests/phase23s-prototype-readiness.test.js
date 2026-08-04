@@ -15,9 +15,9 @@ test('Phase 23T keeps organizer navigation and QA actions product-facing', async
   assert.match(shell, /System QA/)
   assert.match(dashboard, /Plan a New Event|Choose or create an event/)
   assert.doesNotMatch(events, /Use CODEX_TEST/)
-  assert.match(qa, /Use CODEX_TEST/)
+  assert.match(qa, /Use CODEX_DEMO/)
   assert.match(qa, /Readiness checklist/)
-  assert.match(qa, /QA_PHASE23T_/)
+  assert.match(qa, /QA_DEMO_/)
   assert.doesNotMatch(qa, /Prototype Status|Run Demo Checks|Open Demo Event/)
 })
 
@@ -52,8 +52,8 @@ test('Phase 23T current-product docs exist for organizer rehearsal, QA, deployme
 
   assert.match(productGuide, /Current companion docs/)
   assert.match(routeMap, /Organizer routes/)
-  assert.match(prototypeGuide, /CODEX_TEST/)
-  assert.match(prototypeGuide, /QA_PHASE23T_/)
+  assert.match(prototypeGuide, /CODEX_DEMO/)
+  assert.match(prototypeGuide, /QA_DEMO_/)
   assert.match(operationsGuide, /What Operations is for/)
   assert.match(financeGuide, /Baker settlement review/)
   assert.match(qaGuide, /Safe QA event/)

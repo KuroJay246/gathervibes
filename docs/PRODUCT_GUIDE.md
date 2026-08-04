@@ -6,7 +6,7 @@ Gather & Savor Event Hub is a private React and Firebase workspace for event org
 
 The organizer-ready MVP goal is simple: the organizer should be able to sign in, create the next real event, and manage it through the normal interface without developer tools, Firebase knowledge, or phase-history context.
 
-All daily work is scoped to the selected Working Event. `CODEX_TEST` is the permanent synthetic QA event and is hidden from normal event lists by default. Real events use the same standard safeguards whether active, upcoming, or completed.
+All daily work is scoped to the selected Working Event. `CODEX_DEMO - Full System Walkthrough` is the permanent synthetic demo and QA event and is hidden from normal event lists by default. Real events use the same standard safeguards whether active, upcoming, or completed.
 
 ## Current companion docs
 
@@ -15,7 +15,7 @@ All daily work is scoped to the selected Working Event. `CODEX_TEST` is the perm
 - [New Event Setup Guide](./NEW_EVENT_SETUP_GUIDE.md): the five-step event planner workflow
 - [Event Lifecycle Guide](./EVENT_LIFECYCLE_GUIDE.md): event statuses, what they mean, and what to do next
 - [Event Day Guide](./EVENT_DAY_GUIDE.md): the day-of-event workflow
-- [Organizer Rehearsal Guide](./PROTOTYPE_DEMO_GUIDE.md): organizer rehearsal path using CODEX_TEST
+- [Organizer Rehearsal Guide](./PROTOTYPE_DEMO_GUIDE.md): organizer rehearsal path using CODEX_DEMO
 - [Operations Guide](./OPERATIONS_GUIDE.md): event-level money boundaries
 - [Baker Payment Guide](./BAKER_PAYMENT_GUIDE.md): baker commitments and payment-closeout boundaries
 - [Finance Evidence Guide](./FINANCE_EVIDENCE_GUIDE.md): evidence handling and real-event correction rules
