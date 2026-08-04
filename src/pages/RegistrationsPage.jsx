@@ -32,6 +32,7 @@ import {
 } from '../utils/financeUtils'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 import { deriveAttendanceRecordType } from '../utils/attendanceUtils'
+import { organizerSaveErrorMessage } from '../utils/organizerErrors'
 
 const TABS = ['All', 'Paid', 'Pending', 'Door Paid', 'To Pay at Door', 'Complimentary', 'Outstanding Balance', 'Missing Ticket Code', 'Needs Review', 'Checked In']
 
@@ -398,7 +399,7 @@ export function RegistrationsPage() {
       setEditingRegistration(null)
     } catch (err) {
       if (import.meta.env.DEV) console.error('Save error:', err)
-      alert('Failed to save registration. Check your permissions.')
+      alert(organizerSaveErrorMessage(err, 'registration'))
     } finally {
       setSaving(false)
     }

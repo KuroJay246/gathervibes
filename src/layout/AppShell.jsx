@@ -34,6 +34,8 @@ import { canUseSettings, canViewRoute, isApprovedAdmin } from '../utils/accessRo
 import { ProductFooter } from '../components/ProductFooter'
 import { mobilePrimaryNavigationForAccess } from '../utils/navigation'
 import { TutorialProvider } from '../tutorial/TutorialProvider'
+import { isTestEvent } from '../utils/eventPlanning'
+import { pageGuidance } from '../utils/pageGuidance'
 
 const navGroups = [
   {
@@ -149,6 +151,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
   const { activeEvent } = useActiveEvent()
   const adminUser = isApprovedAdmin(access)
   const settingsAllowed = canUseSettings(access)
+  const demoEventSelected = activeEvent && isTestEvent(activeEvent)
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -177,6 +180,11 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
             <span className={`${collapsed ? 'sr-only' : 'mt-0.5 block'} max-w-full truncate text-[11px] text-white/70`}>
               {activeEvent ? `${formatEventDate(activeEvent.eventDate)} · ${activeEvent.status || 'status not set'}` : adminUser ? 'Choose one from Events' : 'Assigned event required'}
             </span>
+            {demoEventSelected && !collapsed && (
+              <span className="mt-2 inline-flex rounded-full bg-[#FFF4DF] px-2 py-1 text-[8px] font-bold uppercase tracking-[0.16em] text-[#7A5818]">
+                Demo / training
+              </span>
+            )}
             {collapsed && <CalendarDays className="mx-auto size-5 text-white/80" aria-hidden="true" />}
           </span>
           {!collapsed && <ChevronDown className="size-4 shrink-0 text-white/65" aria-hidden="true" />}
@@ -247,7 +255,9 @@ export function AppShell() {
   const { currentRoleLabel, access } = useAuth()
   const { activeEvent } = useActiveEvent()
   const [title, subtitle] = pageTitles[location.pathname] || ['Event Hub', 'Gather & Savor Vibes']
+  const guidance = pageGuidance[location.pathname]
   const adminUser = isApprovedAdmin(access)
+  const demoEventSelected = activeEvent && isTestEvent(activeEvent)
 
   return (
     <TutorialProvider>
@@ -317,12 +327,31 @@ export function AppShell() {
                   <p className="mt-0.5 text-xs text-[#5F493F]">
                     {activeEvent ? `${formatEventDate(activeEvent.eventDate)} · ${activeEvent.status || 'status not set'}` : 'Choose an event before using event-scoped pages.'}
                   </p>
+                  {demoEventSelected && (
+                    <p className="mt-2 inline-flex rounded-full bg-[#FFF4DF] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.16em] text-[#7A5818]">
+                      Demo / training event: example data only
+                    </p>
+                  )}
                 </div>
                 <Link to="/events" className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#6B564C] hover:bg-[#FFF8F2]">
                   Change event
                 </Link>
               </div>
             </div>
+            {guidance && (
+              <section data-tour-id="page-purpose" className="mb-5 rounded-2xl border border-[#EEDDD3] bg-[#FFFCFA] px-4 py-3 shadow-[0_6px_18px_rgba(84,53,67,0.03)]">
+                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#8A3F4B]">{guidance.label}</p>
+                    <h2 className="sr-only">How to use this page</h2>
+                    <p className="mt-1 text-sm leading-6 text-[#4F3B33]">{guidance.purpose}</p>
+                  </div>
+                  <p className="rounded-xl bg-white px-3 py-2 text-xs font-semibold leading-5 text-[#6B564C] ring-1 ring-[#E7D6CC] md:max-w-sm">
+                    {guidance.boundary}
+                  </p>
+                </div>
+              </section>
+            )}
             <Outlet />
             <ProductFooter />
           </div>

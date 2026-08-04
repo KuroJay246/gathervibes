@@ -51,3 +51,17 @@ Guidance must account for older legitimate records. Do not imply older records n
 
 Tutorial targets must use stable semantic targets such as `data-tour-id`. Avoid selectors based on generated classes, row order, CSS position, or volatile text.
 
+## Page-Purpose Standard
+
+Tutorial and in-app guidance must stay aligned with the shell page-purpose strip. When a route is added or renamed, update the route title, page-purpose guidance, tutorial targets, route map, and the relevant tests in the same release.
+
+## Demo Editability Check
+
+When a user reports that the demo is locked, first confirm:
+
+- the signed-in account is the protected owner or an approved organizer;
+- `CODEX_DEMO - Full System Walkthrough` is visible after `Show Test Events`;
+- CODEX_DEMO is selected as the Working Event;
+- a harmless reversible CODEX_DEMO edit saves and persists after reload;
+- the edit is reverted after verification.
+
