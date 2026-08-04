@@ -1,9 +1,9 @@
 import { dateFromValue, toDateInput } from './dateUtils.js'
 import { buildFinanceSummary, formatCurrency, parseMoney } from './financeUtils.js'
 import { buildOperationsSettlementSummary } from './operationsReport.js'
+import { CODEX_DEMO_EVENT_ID, CODEX_DEMO_EVENT_NAME } from './demoEvent.js'
 
-export const CODEX_TEST_EVENT_ID = 'xPfa0b3KZyLSDnAD2uGI'
-export const CODEX_TEST_EVENT_NAME = 'CODEX_TEST Live Verification Event'
+export { CODEX_DEMO_EVENT_ID, CODEX_DEMO_EVENT_NAME }
 
 export const EVENT_TYPE_OPTIONS = [
   { value: 'birthday', label: 'Birthday' },
@@ -331,9 +331,10 @@ export function eventStatusDescription(value) {
 export function isTestEvent(event = null) {
   if (!event) return false
   return Boolean(event.isTestEvent)
-    || event.eventId === CODEX_TEST_EVENT_ID
-    || event.id === CODEX_TEST_EVENT_ID
-    || event.eventName === CODEX_TEST_EVENT_NAME
+    || event.eventClassification === 'test'
+    || event.eventId === CODEX_DEMO_EVENT_ID
+    || event.id === CODEX_DEMO_EVENT_ID
+    || event.eventName === CODEX_DEMO_EVENT_NAME
 }
 
 export function isCompletedEvent(event = null) {

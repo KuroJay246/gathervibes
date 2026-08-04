@@ -19,18 +19,18 @@ import { getRegistrationGuestSummary } from '../src/utils/registrationMetrics.js
 import { getTicketPrefix } from '../src/utils/ticketUtils.js'
 import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
 
-const CODEX_TEST_EVENT_ID = 'xPfa0b3KZyLSDnAD2uGI'
+const CODEX_DEMO_EVENT_ID = 'codex_demo_full_system_walkthrough'
 const CPB_EVENT_ID = 'zhaPxi31cpqLAW0cuS20'
 const scannerUser = { uid: 'scanner-uid', email: 'scanner@example.com' }
 const adminUser = { uid: 'admin-uid', email: 'admin@example.com' }
 
-function staffAccess(role = 'scanner', eventId = CODEX_TEST_EVENT_ID) {
+function staffAccess(role = 'scanner', eventId = CODEX_DEMO_EVENT_ID) {
   return getUserAccessLevel(
     scannerUser,
     null,
     { uid: scannerUser.uid, email: scannerUser.email, status: 'active', defaultRole: role },
     [{ uid: scannerUser.uid, email: scannerUser.email, eventId, role, status: 'active' }],
-    [{ eventId, eventName: eventId === CODEX_TEST_EVENT_ID ? 'CODEX_TEST Live Verification Event' : 'CPB' }],
+    [{ eventId, eventName: eventId === CODEX_DEMO_EVENT_ID ? 'CODEX_DEMO - Full System Walkthrough' : 'CPB' }],
   )
 }
 
@@ -53,16 +53,16 @@ test('Phase 17C-B scanner nav excludes admin routes and admin keeps existing acc
   }
 
   assert.equal(canUseSettings(scanner), false)
-  assert.equal(canAssignTickets(scanner, CODEX_TEST_EVENT_ID), false)
-  assert.equal(canUseOperations(scanner, CODEX_TEST_EVENT_ID), false)
+  assert.equal(canAssignTickets(scanner, CODEX_DEMO_EVENT_ID), false)
+  assert.equal(canUseOperations(scanner, CODEX_DEMO_EVENT_ID), false)
 })
 
-test('Phase 17C-B scanner can check in only assigned CODEX_TEST and not CPB', () => {
-  const scanner = staffAccess('scanner', CODEX_TEST_EVENT_ID)
+test('Phase 17C-B scanner can check in only assigned CODEX_DEMO and not CPB', () => {
+  const scanner = staffAccess('scanner', CODEX_DEMO_EVENT_ID)
 
-  assert.equal(isAssignedStaff(scanner, CODEX_TEST_EVENT_ID), true)
-  assert.equal(canReadRegistrations(scanner, CODEX_TEST_EVENT_ID), true)
-  assert.equal(canCheckIn(scanner, CODEX_TEST_EVENT_ID), true)
+  assert.equal(isAssignedStaff(scanner, CODEX_DEMO_EVENT_ID), true)
+  assert.equal(canReadRegistrations(scanner, CODEX_DEMO_EVENT_ID), true)
+  assert.equal(canCheckIn(scanner, CODEX_DEMO_EVENT_ID), true)
   assert.equal(isAssignedStaff(scanner, CPB_EVENT_ID), false)
   assert.equal(canReadRegistrations(scanner, CPB_EVENT_ID), false)
   assert.equal(canCheckIn(scanner, CPB_EVENT_ID), false)
@@ -79,7 +79,7 @@ test('Phase 17C-B no-assignment scanner state is safe', () => {
   assert.equal(scanner.level, 'none')
   assert.deepEqual(scanner.assignedEventIds, [])
   assert.equal(canViewRoute(scanner, '/scanner'), false)
-  assert.equal(canCheckIn(scanner, CODEX_TEST_EVENT_ID), false)
+  assert.equal(canCheckIn(scanner, CODEX_DEMO_EVENT_ID), false)
   assert.equal(canCheckIn(scanner, CPB_EVENT_ID), false)
 })
 
@@ -88,15 +88,15 @@ test('Phase 17C-B3 staff auth path admits active scanner without approvedEmails'
     scannerUser,
     { approvedEmails: ['admin@example.com'] },
     { uid: scannerUser.uid, email: scannerUser.email, status: 'active', defaultRole: 'scanner' },
-    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_TEST_EVENT_ID, role: 'scanner', status: 'active' }],
-    [{ eventId: CODEX_TEST_EVENT_ID, eventName: 'CODEX_TEST Live Verification Event' }],
+    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_DEMO_EVENT_ID, role: 'scanner', status: 'active' }],
+    [{ eventId: CODEX_DEMO_EVENT_ID, eventName: 'CODEX_DEMO - Full System Walkthrough' }],
   )
 
   assert.equal(scanner.level, 'staff')
   assert.equal(defaultRouteForAccess(scanner), '/scanner')
   assert.equal(canViewRoute(scanner, '/scanner'), true)
   assert.equal(canViewRoute(scanner, '/dashboard'), false)
-  assert.equal(canCheckIn(scanner, CODEX_TEST_EVENT_ID), true)
+  assert.equal(canCheckIn(scanner, CODEX_DEMO_EVENT_ID), true)
 })
 
 test('Phase 17C-B3 inactive staff profile and inactive assignments are denied', () => {
@@ -104,22 +104,22 @@ test('Phase 17C-B3 inactive staff profile and inactive assignments are denied', 
     scannerUser,
     null,
     { uid: scannerUser.uid, email: scannerUser.email, status: 'inactive', defaultRole: 'scanner' },
-    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_TEST_EVENT_ID, role: 'scanner', status: 'active' }],
-    [{ eventId: CODEX_TEST_EVENT_ID, eventName: 'CODEX_TEST Live Verification Event' }],
+    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_DEMO_EVENT_ID, role: 'scanner', status: 'active' }],
+    [{ eventId: CODEX_DEMO_EVENT_ID, eventName: 'CODEX_DEMO - Full System Walkthrough' }],
   )
   const inactiveAssignment = getUserAccessLevel(
     scannerUser,
     null,
     { uid: scannerUser.uid, email: scannerUser.email, status: 'active', defaultRole: 'scanner' },
-    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_TEST_EVENT_ID, role: 'scanner', status: 'inactive' }],
-    [{ eventId: CODEX_TEST_EVENT_ID, eventName: 'CODEX_TEST Live Verification Event' }],
+    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_DEMO_EVENT_ID, role: 'scanner', status: 'inactive' }],
+    [{ eventId: CODEX_DEMO_EVENT_ID, eventName: 'CODEX_DEMO - Full System Walkthrough' }],
   )
   const revokedAssignment = getUserAccessLevel(
     scannerUser,
     null,
     { uid: scannerUser.uid, email: scannerUser.email, status: 'active', defaultRole: 'scanner' },
-    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_TEST_EVENT_ID, role: 'scanner', status: 'revoked' }],
-    [{ eventId: CODEX_TEST_EVENT_ID, eventName: 'CODEX_TEST Live Verification Event' }],
+    [{ uid: scannerUser.uid, email: scannerUser.email, eventId: CODEX_DEMO_EVENT_ID, role: 'scanner', status: 'revoked' }],
+    [{ eventId: CODEX_DEMO_EVENT_ID, eventName: 'CODEX_DEMO - Full System Walkthrough' }],
   )
 
   assert.equal(inactiveProfile.level, 'none')
@@ -249,7 +249,7 @@ test('Phase 17C-B3 AuthProvider checks staff path before not-approved error', as
   const loginPage = await readFile('src/pages/LoginPage.jsx', 'utf8')
   const rules = await readFile('firestore.rules', 'utf8')
 
-  assert.match(authProvider, /STAFF_ASSIGNMENT_EVENT_IDS = \['xPfa0b3KZyLSDnAD2uGI'\]/)
+  assert.match(authProvider, /STAFF_ASSIGNMENT_EVENT_IDS = \[CODEX_DEMO_EVENT_ID\]/)
   assert.match(authProvider, /getDoc\(doc\(db, 'staffProfiles', nextUser\.uid\)\)/)
   assert.match(authProvider, /getDoc\(doc\(db, 'events', eventId, 'staffAssignments', nextUser\.uid\)\)/)
   assert.doesNotMatch(authProvider, /collectionGroup\(db, 'staffAssignments'\)/)

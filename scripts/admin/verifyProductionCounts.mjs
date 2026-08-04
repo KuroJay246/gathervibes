@@ -4,7 +4,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { buildRegistrationMetrics } from '../../src/utils/registrationMetrics.js';
 
 const projectId = 'gathervibeshub';
-const codexTestEventId = 'xPfa0b3KZyLSDnAD2uGI';
+const codexDemoEventId = 'codex_demo_full_system_walkthrough';
 
 function summarizeEvent(doc) {
   const data = doc.data();
@@ -20,7 +20,7 @@ function summarizeEvent(doc) {
 }
 
 function isTestEvent(event) {
-  return event.eventId === codexTestEventId || event.isTestEvent === true || event.eventClassification === 'test';
+  return event.eventId === codexDemoEventId || event.isTestEvent === true || event.eventClassification === 'test';
 }
 
 async function main() {
@@ -72,7 +72,7 @@ async function main() {
     };
   });
 
-  const codex = result.find((event) => event.eventId === codexTestEventId);
+  const codex = result.find((event) => event.eventId === codexDemoEventId);
   const realEvents = result.filter((event) => !event.isTestEvent);
   const testEvents = result.filter((event) => event.isTestEvent);
 
@@ -83,20 +83,20 @@ async function main() {
     testEventCount: testEvents.length,
     realEvents,
     testEvents,
-    codexTestExists: Boolean(codex),
+    codexDemoExists: Boolean(codex),
   }, null, 2));
 
   if (!codex) {
-    console.error('Error: CODEX_TEST event is missing.');
+    console.error('Error: CODEX_DEMO event is missing.');
     process.exit(1);
   }
 
   if (codex.isTestEvent !== true) {
-    console.error('Error: CODEX_TEST event is not classified as a Test Event.');
+    console.error('Error: CODEX_DEMO event is not classified as a Test Event.');
     process.exit(1);
   }
 
-  console.log('Verified production counts read-only. CODEX_TEST exists, is classified as a Test Event, and is separated from real-event totals.');
+  console.log('Verified production counts read-only. CODEX_DEMO exists, is classified as a Test Event, and is separated from real-event totals.');
 }
 
 main().catch((error) => {

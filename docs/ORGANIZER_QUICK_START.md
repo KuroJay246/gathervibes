@@ -39,4 +39,4 @@ If the wrong event is selected, change it in `Events` or use the event switcher 
 
 ## Safe QA reminder
 
-Use `CODEX_TEST Live Verification Event` for rehearsal and destructive QA. Real events use the same standard safeguards and should not be used for synthetic QA.
+Use `CODEX_DEMO - Full System Walkthrough` for rehearsal and synthetic QA. Real events use the same standard safeguards and should not be used for synthetic QA.

@@ -15,7 +15,7 @@
 | `/scanner` | Scanner | Assigned-event scanner workflow for event-day staff. | Separate from organizer navigation. |
 | `/operations` | Operations | Track event-level income, expenses, commitments, refunds, adjustments, and in-kind support. | Separate from registration payments. |
 | `/communications` | Message Builder | Create, personalize, and copy event messages. | Copy-only; nothing is sent automatically. |
-| `/imports` | Import Center | Import CSV, pasted tables, and XLSX with preview-first review. | Use CODEX_TEST for destructive QA and rehearsal. |
+| `/imports` | Import Center | Import CSV, pasted tables, and XLSX with preview-first review. | Use CODEX_DEMO for synthetic QA and rehearsal. |
 | `/event-review` | Reports | Review follow-up, registration payments, Operations, and event summary. | Read-only. |
 | `/settings` | Settings | Review workspace defaults, access summary, and practical event settings. | No roadmap archive. |
 | `/qa` | System QA | Review system status, safe QA guidance, release evidence, and checklist items. | Technical but organizer-readable. |
@@ -23,6 +23,6 @@
 ## Working Event rules
 
 - Event-scoped routes use the selected Working Event.
-- CODEX_TEST is the safe QA event.
+- CODEX_DEMO is the safe synthetic QA and demo event.
 - Real events share the same standard safeguards and must not be used for synthetic QA.
 - Clearing the Working Event should show clean empty states rather than stale data.

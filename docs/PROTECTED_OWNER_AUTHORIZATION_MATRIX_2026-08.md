@@ -60,7 +60,7 @@ The protected-owner fixture must not depend on `approvedEmails`, a staff profile
 - Audit logs remain append-only.
 - Scanner and viewer permissions are not expanded.
 - QR payload remains `GSV:TICKET:{ticketCode}`.
-- CODEX_TEST remains the only special QA/test event.
+- CODEX_DEMO remains the only special QA/test event.
 
 ## System QA Requirement
 
@@ -70,7 +70,7 @@ System QA must keep a protected-owner diagnostics section showing:
 - expected protected UID;
 - UID match;
 - app owner detection;
-- manual CODEX_TEST owner write verification procedure.
+- manual CODEX_DEMO owner write verification procedure.
 
 This diagnostic section is for troubleshooting only. It must not expose secrets, tokens, cookies, private keys, or private attendee data.
 
@@ -80,7 +80,7 @@ When a production permission-denied issue is being fixed, automated tests are no
 
 1. Sign in as Jaylan.
 2. Open System QA and confirm UID match and app owner detection.
-3. Select `CODEX_TEST Live Verification Event`.
+3. Select `CODEX_DEMO - Full System Walkthrough`.
 4. Perform one safe, reversible business-record write through the affected workflow.
 5. Confirm the write succeeds.
 6. Confirm the append-only audit log exists.

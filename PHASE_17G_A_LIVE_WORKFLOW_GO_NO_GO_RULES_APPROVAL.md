@@ -153,7 +153,7 @@ Default answer: no index deploy unless separately approved.
 
 ## 12. CODEX_TEST-only rehearsal rules
 
-- Use CODEX_TEST only for any future access-workflow rehearsal.
+- Use CODEX_DEMO only for any future access-workflow rehearsal.
 - Do not create a separate rehearsal event without explicit organizer approval.
 - Do not assign requester or scanner rehearsal to CPB.
 - Keep scanner rehearsal assigned-event-only.

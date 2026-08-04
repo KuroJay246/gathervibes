@@ -9,7 +9,7 @@ Phase 17F-C is a manual checklist only. It does not make approval, decline, revo
 
 ## 2. CODEX_TEST-only rules
 
-- Use CODEX_TEST only for any future rehearsal tied to access workflow.
+- Use CODEX_DEMO only for any future rehearsal tied to access workflow.
 - Do not create a separate event for access workflow smoke without explicit organizer approval.
 - Keep scanner smoke assigned-event-only.
 

@@ -40,7 +40,7 @@ export const ACCESS_REQUEST_SECURITY_BOUNDARIES = Object.freeze([
   'requesters cannot create staffProfiles',
   'requesters cannot create staffAssignments',
   'auditLogs remain append-only',
-  'synthetic QA remains scoped to CODEX_TEST only',
+  'synthetic QA remains scoped to CODEX_DEMO only',
   'no Firestore rules deploy in this phase',
   'no Firestore index deploy in this phase',
 ])

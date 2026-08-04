@@ -1,7 +1,8 @@
-export const CODEX_TEST_EVENT_ID = 'xPfa0b3KZyLSDnAD2uGI'
-export const CODEX_TEST_EVENT_NAME = 'CODEX_TEST Live Verification Event'
-export const CODEX_TEST_NOTES = 'Permanent QA fixture. Do not use for real guests. Do not delete unless the organizer explicitly approves.'
-export const QA_PHASE23T_PREFIX = 'QA_PHASE23T'
+import { CODEX_DEMO_EVENT_ID, CODEX_DEMO_EVENT_NAME, CODEX_DEMO_NOTES } from './demoEvent.js'
+
+export { CODEX_DEMO_EVENT_ID, CODEX_DEMO_EVENT_NAME }
+
+export const QA_DEMO_PREFIX = 'QA_DEMO'
 
 export const organizerReadinessChecklist = [
   { key: 'authentication', label: 'Authentication', detail: 'Approved organizer access and protected-owner boundaries remain required.' },
@@ -16,7 +17,7 @@ export const organizerReadinessChecklist = [
   { key: 'imports', label: 'Import', detail: 'Use preview-first CSV, pasted table, and XLSX imports.' },
   { key: 'responsiveDesign', label: 'Responsive Design', detail: 'Primary organizer workflows remain usable on desktop, tablet, and mobile.' },
   { key: 'accessibility', label: 'Accessibility', detail: 'Keyboard, labels, focus treatment, and readable layout need a release check before sign-off.' },
-  { key: 'dataSafety', label: 'Data Safety', detail: 'Real events use the same authentication, validation, confirmation, and append-only audit safeguards. QA work stays in CODEX_TEST.' },
+  { key: 'dataSafety', label: 'Data Safety', detail: 'Real events use the same authentication, validation, confirmation, and append-only audit safeguards. QA work stays in CODEX_DEMO.' },
   { key: 'productionDeployment', label: 'Production Deployment', detail: 'Release status stays separate from local organizer readiness work until validation and smoke pass.' },
 ]
 
@@ -27,12 +28,12 @@ export const qaChecklist = [
   'Confirm login works with the approved second Google account',
   'Confirm clean account routes load with no selected Working Event',
   'Confirm no AppErrorBoundary fallback appears on Overview, Events, Guests & Registrations, Imports, Tickets, Check-In, System QA, Settings, Operations, Reports, or Message Builder',
-  'Confirm CODEX_TEST is selected as the Working Event before write testing',
+  'Confirm CODEX_DEMO is selected as the Working Event before write testing',
   'Start QA at https://gathervibeshub.web.app/login',
   'Confirm ticket search works by ticket code, guest name, buyer/contact, email, phone, and group when present',
   'Confirm QR camera lookup works and camera permission is not blocked',
   'Confirm manual ticket-code fallback works when camera scanning is unavailable',
-  'Test check-in permission with one CODEX_TEST guest',
+  'Test check-in permission with one CODEX_DEMO guest',
   'Confirm the checked-in guest appears in the Checked In list',
   'Confirm checked-in persons count increases using personsAttending',
   'Confirm total registrations matches the number of form entries',
@@ -46,7 +47,7 @@ export const qaChecklist = [
   'Confirm a Ticket Code can be manually entered or edited',
   'Confirm the next event-style ticket code can be generated',
   'Confirm an imported ticket code is preserved through preview and import',
-  'Create, edit, and delete one manual CODEX_TEST registration',
+  'Create, edit, and delete one manual CODEX_DEMO registration',
   'Import a small CSV only after preview confirms the rows',
   'Import an XLSX workbook only after preview confirms the rows',
   'Confirm finance totals: expected, collected, outstanding, door, and complimentary',
@@ -63,8 +64,8 @@ export const qaChecklist = [
   'Confirm Operations form helper text explains type, category, label, amount, method, reference, paid by/to, status, and Unknown',
   'Confirm current user role appears in Settings and System Health',
   'Confirm approved-admin allowlist remains active and no public access is enabled',
-  'Confirm product boundaries remain clear: private admin app, CODEX_TEST QA, access, operations, and external integrations',
-  'Confirm scanner smoke safety is preserved: CODEX_TEST for QA, assigned-event access only, no scanner undo',
+  'Confirm product boundaries remain clear: private admin app, CODEX_DEMO QA, access, operations, and external integrations',
+  'Confirm scanner smoke safety is preserved: CODEX_DEMO for QA, assigned-event access only, no scanner undo',
   'Confirm Access Summary stays admin-only and does not claim live approval, revoke, assign, edit, or lead-scanner features',
   'Confirm scanner success, duplicate, pending-payment, and no-ticket messaging is clear on /scanner',
   'Confirm scanner next guest flow clears safely and returns focus to manual lookup where practical',
@@ -88,7 +89,7 @@ export function buildQaTestPrefix(date = new Date()) {
   const hour = pad(date.getHours())
   const minute = pad(date.getMinutes())
 
-  return `${QA_PHASE23T_PREFIX}_${year}${month}${day}_${hour}${minute}`
+  return `${QA_DEMO_PREFIX}_${year}${month}${day}_${hour}${minute}`
 }
 
 export function buildQaSampleCsv(prefix = buildQaTestPrefix()) {
@@ -101,10 +102,10 @@ export function buildQaSampleCsv(prefix = buildQaTestPrefix()) {
   ].join('\n')
 }
 
-export function isCodexTestWorkingEvent(activeEvent) {
-  return activeEvent?.eventId === CODEX_TEST_EVENT_ID || activeEvent?.eventName === CODEX_TEST_EVENT_NAME
+export function isCodexDemoWorkingEvent(activeEvent) {
+  return activeEvent?.eventId === CODEX_DEMO_EVENT_ID || activeEvent?.eventName === CODEX_DEMO_EVENT_NAME || activeEvent?.isTestEvent === true || activeEvent?.eventClassification === 'test'
 }
 
-export function findCodexTestEvent(events = []) {
-  return events.find((event) => event?.eventId === CODEX_TEST_EVENT_ID || event?.eventName === CODEX_TEST_EVENT_NAME) || null
+export function findCodexDemoEvent(events = []) {
+  return events.find((event) => event?.eventId === CODEX_DEMO_EVENT_ID || event?.eventName === CODEX_DEMO_EVENT_NAME || event?.isTestEvent === true || event?.eventClassification === 'test') || null
 }

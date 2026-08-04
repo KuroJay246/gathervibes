@@ -38,5 +38,5 @@ After deployment:
 2. Open the live site with an approved organizer session.
 3. Review the primary organizer routes.
 4. Confirm authentication restore or normal sign-in works.
-5. Confirm CODEX_TEST remains the safe QA event.
+5. Confirm CODEX_DEMO remains the safe synthetic QA and demo event.
 6. Confirm CPB patron totals and approved Operations totals remain unchanged unless a separate approved write package was applied.

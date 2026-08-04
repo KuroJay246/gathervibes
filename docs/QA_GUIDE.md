@@ -2,9 +2,9 @@
 
 ## Safe QA event
 
-- Use `CODEX_TEST Live Verification Event` for destructive QA and organizer rehearsal.
+- Use `CODEX_DEMO - Full System Walkthrough` for synthetic QA, organizer rehearsal, and demo/training walkthroughs.
 - Real events use the same standard safeguards and must not be used for synthetic QA.
-- Prefix temporary QA business records with `QA_PHASE23T_`.
+- Prefix temporary QA business records with `QA_DEMO_`.
 
 ## Local validation
 

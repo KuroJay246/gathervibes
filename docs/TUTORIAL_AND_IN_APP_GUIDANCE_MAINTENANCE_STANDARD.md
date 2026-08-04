@@ -41,6 +41,7 @@ Tutorial and in-page guidance must explain:
 - Message Builder creates copyable text. It does not send messages automatically.
 - Documents records references and tracking information. It does not upload or store files unless a future approved feature adds that.
 - Relationships remain relationships. Linking a Task does not complete it, linking Operations does not change amounts, assigning a Contact does not grant access, and linking a Commitment does not mark it paid.
+- Synthetic tutorial, rehearsal, and QA guidance must point to `CODEX_DEMO - Full System Walkthrough`, not retired `CODEX_TEST` or any real event.
 
 ## Existing Data
 

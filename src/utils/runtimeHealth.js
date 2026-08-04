@@ -61,7 +61,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Daily QA workflow',
       status: 'warn',
-      detail: 'Use current production smoke results and CODEX_TEST checks as the source of truth.',
+      detail: 'Use current production smoke results and CODEX_DEMO checks as the source of truth.',
     },
     {
       label: 'Events read',
@@ -116,7 +116,7 @@ export function buildRuntimeHealthItems({
     {
       label: 'Product boundaries',
       status: 'ok',
-      detail: 'Private admin app, CODEX_TEST QA, operations, access, and external integrations remain separated.',
+      detail: 'Private admin app, CODEX_DEMO QA, operations, access, and external integrations remain separated.',
     },
     {
       label: 'Message Builder safety',

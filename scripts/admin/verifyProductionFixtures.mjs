@@ -3,8 +3,10 @@ import { initializeApp, applicationDefault } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
 const projectId = 'gathervibeshub';
-const codexTestEventId = 'xPfa0b3KZyLSDnAD2uGI';
-const codexTestEventName = 'CODEX_TEST Live Verification Event';
+const retiredCodexTestEventId = 'xPfa0b3KZyLSDnAD2uGI';
+const retiredCodexTestEventName = 'CODEX_TEST Live Verification Event';
+const codexDemoEventId = 'codex_demo_full_system_walkthrough';
+const codexDemoEventName = 'CODEX_DEMO - Full System Walkthrough';
 
 function eventSummary(doc) {
   const data = doc.data();
@@ -37,16 +39,21 @@ async function main() {
   const db = getFirestore(app);
   const eventsSnapshot = await db.collection('events').get();
   const events = eventsSnapshot.docs.map(eventSummary);
-  const codexMatches = events.filter((event) => (
-    event.docId === codexTestEventId
-    || event.eventId === codexTestEventId
-    || event.eventName === codexTestEventName
+  const demoMatches = events.filter((event) => (
+    event.docId === codexDemoEventId
+    || event.eventId === codexDemoEventId
+    || event.eventName === codexDemoEventName
+  ));
+  const retiredMatches = events.filter((event) => (
+    event.docId === retiredCodexTestEventId
+    || event.eventId === retiredCodexTestEventId
+    || event.eventName === retiredCodexTestEventName
   ));
   const auditSample = await db.collection('auditLogs').limit(1).get();
 
   const result = {
     eventCount: events.length,
-    codexTestMatches: codexMatches.map(({ docId, eventId, eventName, status, eventType, isTestEvent, eventClassification }) => ({
+    codexDemoMatches: demoMatches.map(({ docId, eventId, eventName, status, eventType, isTestEvent, eventClassification }) => ({
       docId,
       eventId,
       eventName,
@@ -55,24 +62,30 @@ async function main() {
       isTestEvent,
       eventClassification,
     })),
+    retiredCodexTestMatches: retiredMatches.length,
     auditLogsExist: !auditSample.empty,
   };
 
   console.log(JSON.stringify(result, null, 2));
 
-  if (codexMatches.length !== 1) {
-    console.error(`Error: Expected exactly one CODEX_TEST fixture, found ${codexMatches.length}.`);
+  if (demoMatches.length !== 1) {
+    console.error(`Error: Expected exactly one CODEX_DEMO fixture, found ${demoMatches.length}.`);
     process.exit(1);
   }
 
-  const codex = codexMatches[0];
-  if (codex.docId !== codexTestEventId || codex.eventId !== codexTestEventId || codex.eventName !== codexTestEventName) {
-    console.error('Error: CODEX_TEST fixture ID or name does not match the approved production fixture.');
+  if (retiredMatches.length !== 0) {
+    console.error(`Error: Retired CODEX_TEST fixture is still present (${retiredMatches.length}).`);
     process.exit(1);
   }
 
-  if (codex.isTestEvent !== true && codex.eventClassification !== 'test') {
-    console.error('Error: CODEX_TEST fixture is not marked as a Test Event.');
+  const codex = demoMatches[0];
+  if (codex.docId !== codexDemoEventId || codex.eventId !== codexDemoEventId || codex.eventName !== codexDemoEventName) {
+    console.error('Error: CODEX_DEMO fixture ID or name does not match the approved production fixture.');
+    process.exit(1);
+  }
+
+  if (codex.isTestEvent !== true || codex.eventClassification !== 'test') {
+    console.error('Error: CODEX_DEMO fixture is not marked as a Test Event.');
     process.exit(1);
   }
 
@@ -81,7 +94,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log('Verified production fixtures: CODEX_TEST exists exactly once, is marked as a Test Event, and auditLogs exist.');
+  console.log('Verified production fixtures: CODEX_DEMO exists exactly once, retired CODEX_TEST is absent, the demo is marked as a Test Event, and auditLogs exist.');
 }
 
 main().catch((error) => {

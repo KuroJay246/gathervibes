@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Use this guide to rehearse the organizer workflow safely without touching CPB production data.
+Use this guide to rehearse the organizer workflow safely with the permanent synthetic demo event. Real events, including CPB, are not used for synthetic training writes.
 
 ## Sign in
 
@@ -10,11 +10,11 @@ Use this guide to rehearse the organizer workflow safely without touching CPB pr
 2. Confirm the app opens to the organizer workspace.
 3. If the session is stale, sign out and sign in again before the rehearsal starts.
 
-## Select the safe QA event
+## Select the safe demo event
 
 1. Open `Overview`, `Events`, or `System QA`.
-2. Use the clearly labelled `Use CODEX_TEST` action.
-3. Confirm `CODEX_TEST Live Verification Event` is the selected Working Event before creating or editing anything.
+2. Use the clearly labelled `Use CODEX_DEMO` action.
+3. Confirm `CODEX_DEMO - Full System Walkthrough` is the selected Working Event before creating or editing anything.
 
 ## Rehearsal workflow order
 
@@ -31,15 +31,16 @@ Use this guide to rehearse the organizer workflow safely without touching CPB pr
 
 ## QA data prefix
 
-- Prefix temporary QA business records with `QA_PHASE23T_`.
+- Prefix temporary QA business records with `QA_DEMO_`.
 - Use the prefix for manual registrations, imports, payment references, and Operations notes created only for the walkthrough.
-- Do not use the prefix in CPB.
+- Do not use the prefix in any real event.
 
 ## Cleanup
 
-1. Delete the temporary QA registrations, tickets, and Operations entries created for the walkthrough.
-2. Keep audit logs intact. Cleanup removes business records, not audit history.
-3. Clear or change the Working Event after the rehearsal if needed.
+1. Leave the permanent `CODEX_DEMO` walkthrough records intact.
+2. Delete only accidental temporary records created outside the approved demo dataset.
+3. Keep audit logs intact. Cleanup removes accidental business records, not audit history.
+4. Clear or change the Working Event after the rehearsal if needed.
 
 ## Do not edit in CPB
 

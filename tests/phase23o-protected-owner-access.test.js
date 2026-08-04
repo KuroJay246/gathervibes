@@ -17,7 +17,7 @@ import {
 } from '../src/config/protectedOwner.js'
 import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
 
-const CODEX_TEST_EVENT_ID = 'xPfa0b3KZyLSDnAD2uGI'
+const CODEX_DEMO_EVENT_ID = 'codex_demo_full_system_walkthrough'
 
 async function source(path) {
   return readFile(path, 'utf8')
@@ -92,9 +92,10 @@ test('Phase 23O Firestore rules grant owner UID first without widening signed-in
   assert.doesNotMatch(rules, /allow (read|write|create|update|delete|list|get): if request\.auth != null/)
 })
 
-test('Phase 23O guardrails preserve QR privacy, CODEX_TEST isolation, and standard real-event safeguards', async () => {
+test('Phase 23O guardrails preserve QR privacy, CODEX_DEMO isolation, and standard real-event safeguards', async () => {
   const qaPage = await source('src/pages/QaPage.jsx')
   const qaHelper = await source('src/utils/qaHelper.js')
+  const demoEvent = await source('src/utils/demoEvent.js')
   const dashboard = await source('src/pages/DashboardPage.jsx')
   const events = await source('src/pages/EventsPage.jsx')
   const operations = await source('src/pages/OperationsPage.jsx')
@@ -103,7 +104,8 @@ test('Phase 23O guardrails preserve QR privacy, CODEX_TEST isolation, and standa
   const paymentAuditEngine = await source('src/services/cpbAuditBackfill.js')
 
   assert.equal(qrPayloadForTicketCode('QA23O-001'), 'GSV:TICKET:QA23O-001')
-  assert.match(qaHelper, new RegExp(CODEX_TEST_EVENT_ID))
+  assert.match(demoEvent, new RegExp(CODEX_DEMO_EVENT_ID))
+  assert.match(qaHelper, /CODEX_DEMO/)
   assert.doesNotMatch(qaHelper, /zhaPxi31cpqLAW0cuS20|CPB remains protected/)
   assert.match(qaPage, /Real events use the same standard safeguards/)
   assert.match(qaPage, /Legacy one-off write controls unavailable/)

@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 import {
-  CODEX_TEST_EVENT_ID,
+  CODEX_DEMO_REHEARSAL_EVENT_ID,
   PHASE_23G_MANIFEST_SHA256,
   assertPhase23gApplyLock,
   buildRegistrationApplyPlan,
@@ -12,7 +12,7 @@ import {
 } from '../../src/utils/manifestApplyEngine.js'
 
 const projectId = 'gathervibeshub'
-const outputRoot = 'C:\\Users\\Jaylan\\Desktop\\GSV_CODEX_TEST_Apply_Rehearsal'
+const outputRoot = 'C:\\Users\\Jaylan\\Desktop\\GSV_CODEX_DEMO_Apply_Rehearsal'
 const runId = `PH23G_CODEX_REHEARSAL_${new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14)}`
 const registrationId = runId
 const approvalPhrase = expectedPhase23gApprovalPhrase()
@@ -21,7 +21,7 @@ async function firebaseCliToken() {
   const auth = await import(pathToFileURL('C:\\Users\\Jaylan\\AppData\\Roaming\\npm\\node_modules\\firebase-tools\\lib\\auth.js').href)
   const accounts = auth.getAllAccounts()
   const account = accounts.find((item) => item.user?.email)
-  if (!account?.tokens?.refresh_token) throw new Error('Firebase CLI login is required for CODEX_TEST rehearsal.')
+  if (!account?.tokens?.refresh_token) throw new Error('Firebase CLI login is required for CODEX_DEMO rehearsal.')
   const token = await auth.getAccessToken(account.tokens.refresh_token, [])
   return token.access_token
 }
@@ -83,7 +83,7 @@ function auditDoc(action, targetId, details = {}) {
     name: docName('auditLogs', auditId),
     fields: documentFields({
       logId: auditId,
-      eventId: CODEX_TEST_EVENT_ID,
+      eventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
       action,
       targetType: 'registration',
       targetId,
@@ -96,7 +96,7 @@ function auditDoc(action, targetId, details = {}) {
 
 async function main() {
   assertPhase23gApplyLock({
-    targetEventId: CODEX_TEST_EVENT_ID,
+    targetEventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
     manifestSha256: PHASE_23G_MANIFEST_SHA256,
     approvalPhrase,
     rehearsalOnly: true,
@@ -120,7 +120,7 @@ async function main() {
 
   const initialRegistration = {
     registrationId,
-    eventId: CODEX_TEST_EVENT_ID,
+    eventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
     fullName: runId,
     buyerName: runId,
     attendeeNames: runId,
@@ -139,7 +139,7 @@ async function main() {
     ticketCode: null,
     checkedIn: false,
     source: 'phase23g-rehearsal',
-    notes: 'Synthetic CODEX_TEST apply rehearsal record. Safe to delete.',
+    notes: 'Synthetic CODEX_DEMO apply rehearsal record. Safe to delete.',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
@@ -155,12 +155,12 @@ async function main() {
       priceTier: 'Rehearsal Paid',
     },
   }
-  const plan = buildRegistrationApplyPlan({ registration: initialRegistration, proposal, targetEventId: CODEX_TEST_EVENT_ID })
+  const plan = buildRegistrationApplyPlan({ registration: initialRegistration, proposal, targetEventId: CODEX_DEMO_REHEARSAL_EVENT_ID })
 
   await writeFile(join(outputRoot, `${runId}_backup.json`), JSON.stringify({
     runId,
     registrationId,
-    targetEventId: CODEX_TEST_EVENT_ID,
+    targetEventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
     before: null,
     syntheticRegistration: initialRegistration,
     plan,
@@ -188,7 +188,7 @@ async function main() {
   ], token)
 
   const updated = firestoreDocument(await firestoreGet('registrations', registrationId, token))
-  const updateVerified = updated?.eventId === CODEX_TEST_EVENT_ID
+  const updateVerified = updated?.eventId === CODEX_DEMO_REHEARSAL_EVENT_ID
     && updated.paymentStatus === 'paid'
     && updated.amountPaid === 25
     && updated.balanceDue === 0
@@ -205,7 +205,7 @@ async function main() {
     runId,
     manifestSha256: PHASE_23G_MANIFEST_SHA256,
     approvalPhrase,
-    targetEventId: CODEX_TEST_EVENT_ID,
+    targetEventId: CODEX_DEMO_REHEARSAL_EVENT_ID,
     realEventDenied,
     createdSyntheticRegistration: true,
     updateVerified,

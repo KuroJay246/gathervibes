@@ -28,7 +28,7 @@ It does not implement:
 - Phase 17E-C is read-only/admin-visible only.
 - Phase 17E-D is disabled requester-form preview only.
 - CPB remains untouched and unavailable for QA.
-- CODEX_TEST remains the only safe QA/smoke event.
+- CODEX_DEMO remains the only safe synthetic QA/smoke event.
 - QR payload remains `GSV:TICKET:{ticketCode}`.
 - `xlsx` remains absent and `read-excel-file` remains active.
 
@@ -64,7 +64,7 @@ It does not implement:
 - Revert only rules if the failure is rules-specific.
 - Re-run rules dry-run after rollback selection.
 - Re-check admin login, scanner login, and route isolation after rollback.
-- Confirm CPB is still protected and scanner access is still CODEX_TEST-only where applicable.
+- Confirm CPB is still protected and scanner access is still CODEX_DEMO-only where applicable.
 
 ## 6. Index review checklist
 
@@ -195,7 +195,7 @@ No-go if any of the following occurs:
 
 - `approvedEmails` must remain admin-only.
 - Do not use CPB for QA.
-- Use CODEX_TEST only for workflow rehearsal and smoke.
+- Use CODEX_DEMO only for workflow rehearsal and smoke.
 - No live workflow exists until a separate approved phase says otherwise.
 - Firestore rules are not deployed in 17E-E.
 - Firestore indexes are not deployed in 17E-E.
