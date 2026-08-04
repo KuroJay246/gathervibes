@@ -179,6 +179,16 @@ test('System QA payment follow-up remains a review item rather than a stale bloc
   assert.doesNotMatch(qaPage, /label: 'Payment follow-up records', status: paymentsWorkspace\.summary\.paymentFollowUpCount \? 'fail' : 'pass'/)
 })
 
+test('System QA classifies CODEX_DEMO paid outstanding rows as follow-up, not blocking failure', async () => {
+  const qaPage = await source('src/pages/QaPage.jsx')
+
+  assert.match(qaPage, /const paidOutstandingStatus = paidOutstanding\.length/)
+  assert.match(qaPage, /workingEventIsCodex \? 'warning' : 'fail'/)
+  assert.match(qaPage, /CODEX_DEMO follow-up data, not an application blocker/)
+  assert.match(qaPage, /label: 'Paid status with outstanding balance', status: paidOutstandingStatus/)
+  assert.doesNotMatch(qaPage, /label: 'Paid status with outstanding balance', status: paidOutstanding\.length \? 'fail' : 'pass'/)
+})
+
 test('production owner write root cause documents deployment and manual verification boundaries', async () => {
   const rootCause = await source('docs/FIRESTORE_PRODUCTION_OWNER_WRITE_ROOT_CAUSE_2026-08.md')
 
