@@ -36,4 +36,6 @@ Real events, including Cake Piknik Barbados, are not used for synthetic QA. Real
 - Delete only accidental temporary demo records outside the approved dataset.
 - Keep audit logs append-only.
 - Update System QA, current docs, and tests when demo fixture identity changes.
+- If an organizer cannot edit CODEX_DEMO, verify the account, Working Event selection, and System QA protected-owner status before changing source or rules.
+- A reversible CODEX_DEMO write check must be restored to its original value before release closeout.
 

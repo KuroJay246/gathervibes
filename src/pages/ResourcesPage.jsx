@@ -25,6 +25,7 @@ import { subscribeToContacts, subscribeToOrganizations } from '../services/conta
 import { subscribeToDocuments } from '../services/documentService'
 import { subscribeToOperationsLedger } from '../services/operationsLedgerService'
 import { subscribeToTasks } from '../services/taskService'
+import { organizerSaveErrorMessage } from '../utils/organizerErrors'
 
 function option(id, label, detail = '') {
   return { id, label: detail ? `${label} - ${detail}` : label }
@@ -144,10 +145,36 @@ export function ResourcesPage() {
   const runItemNames = new Map(runItems.map((item) => [item.itemId, item.title]))
 
   async function save(values) {
-    if (editing?.resourceId) await updateEventResource(activeEvent, editing, values, user)
-    else await createEventResource(activeEvent, values, user)
-    setEditing(null)
-    setShowForm(false)
+    try {
+      if (editing?.resourceId) await updateEventResource(activeEvent, editing, values, user)
+      else await createEventResource(activeEvent, values, user)
+      setEditing(null)
+      setShowForm(false)
+      setError('')
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Resource save error:', err)
+      setError(organizerSaveErrorMessage(err, 'resource'))
+    }
+  }
+
+  async function updateStatus(resource, status) {
+    try {
+      await updateEventResourceStatus(activeEvent, resource, status, user)
+      setError('')
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Resource status error:', err)
+      setError(organizerSaveErrorMessage(err, 'resource status'))
+    }
+  }
+
+  async function removeResource(resource) {
+    try {
+      await deleteEventResource(activeEvent, resource, user)
+      setError('')
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Resource delete error:', err)
+      setError(organizerSaveErrorMessage(err, 'resource'))
+    }
   }
 
   function createTask(resource) {
@@ -196,10 +223,10 @@ export function ResourcesPage() {
                 {(resource.packingRequired || resource.pickupRequired || resource.returnRequired) && <p className="mt-2 flex items-center gap-2 text-sm text-[#6B564C]"><PackageCheck className="size-4" /> {resource.packingRequired ? 'Pack. ' : ''}{resource.pickupRequired ? `Pickup ${resource.pickupDueDate || 'due date not set'}. ` : ''}{resource.returnRequired ? `Return ${resource.returnDueDate || 'due date not set'}.` : ''}</p>}
               </div>
               <div className="flex flex-wrap gap-2">
-                {['Requested', 'Ordered / Reserved', 'Confirmed', 'Received', 'Packed', 'On Site', 'Returned'].map((status) => <button key={status} type="button" onClick={() => updateEventResourceStatus(activeEvent, resource, status, user)} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">{status}</button>)}
+                {['Requested', 'Ordered / Reserved', 'Confirmed', 'Received', 'Packed', 'On Site', 'Returned'].map((status) => <button key={status} type="button" onClick={() => updateStatus(resource, status)} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">{status}</button>)}
                 <button type="button" onClick={() => { setEditing(resource); setShowForm(true) }} className="min-h-10 rounded-xl bg-[#2B1723] px-3 text-xs font-bold text-white">Edit</button>
                 <button type="button" onClick={() => createTask(resource)} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">Create task</button>
-                <button type="button" onClick={() => deleteEventResource(activeEvent, resource, user)} className="min-h-10 rounded-xl border border-[#F3C6C6] px-3 text-xs font-bold text-[#8A1F1F]">Delete</button>
+                <button type="button" onClick={() => removeResource(resource)} className="min-h-10 rounded-xl border border-[#F3C6C6] px-3 text-xs font-bold text-[#8A1F1F]">Delete</button>
               </div>
             </div>
           </article>
