@@ -60,12 +60,19 @@ function ContactForm({ draft, organizations, contacts, onCancel, onSave, saving 
         </div>
         <button type="button" onClick={onCancel} className="rounded-xl p-2 text-[#80685B] hover:bg-[#FFF8F2]" aria-label="Close contact form"><X className="size-5" /></button>
       </div>
+      <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] p-3 text-xs leading-5 text-[#80685B]">
+        Contacts are reusable planning records. They do not grant app access, assign staff roles, or change linked event work automatically.
+      </div>
       {hasDuplicates && (
         <div role="status" className="mt-4 rounded-xl border border-[#F2D6A3] bg-[#FFF8EA] p-3 text-xs leading-5 text-[#7A5818]">
           Possible Existing Contact: {duplicates.contacts.map((item) => item.displayName).join(', ') || duplicates.organizations.map((item) => item.name).join(', ')}. Review before creating; the app does not auto-merge.
         </div>
       )}
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <div className="lg:col-span-2 rounded-2xl bg-[#FFF8F2] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Basic information</p>
+          <p className="mt-1 text-xs leading-5 text-[#80685B]">Required: display name. Category and status describe the contact record only.</p>
+        </div>
         <Field label="Display name" span="lg:col-span-2"><input value={form.displayName} onChange={(event) => setField('displayName', event.target.value)} required maxLength={180} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="First name"><input value={form.firstName} onChange={(event) => setField('firstName', event.target.value)} maxLength={90} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="Last name"><input value={form.lastName} onChange={(event) => setField('lastName', event.target.value)} maxLength={90} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
@@ -73,12 +80,20 @@ function ContactForm({ draft, organizations, contacts, onCancel, onSave, saving 
         <Field label="Role/title"><input value={form.roleTitle} onChange={(event) => setField('roleTitle', event.target.value)} maxLength={120} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="Category"><select value={form.category} onChange={(event) => setField('category', event.target.value)} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm">{CONTACT_CATEGORIES.map((option) => <option key={option}>{option}</option>)}</select></Field>
         <Field label="Status"><select value={form.status} onChange={(event) => setField('status', event.target.value)} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm">{CONTACT_STATUSES.map((option) => <option key={option}>{option}</option>)}</select></Field>
+        <div className="lg:col-span-2 rounded-2xl bg-[#FFF8F2] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Contact details</p>
+          <p className="mt-1 text-xs leading-5 text-[#80685B]">Email, phone, website, and social fields support planning follow-up. Message Builder can use them as context, but no message is sent automatically.</p>
+        </div>
         <Field label="Email"><input type="email" value={form.email} onChange={(event) => setField('email', event.target.value)} maxLength={320} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="Phone"><input value={form.phone} onChange={(event) => setField('phone', event.target.value)} maxLength={64} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="Preferred contact method"><input value={form.preferredContactMethod} onChange={(event) => setField('preferredContactMethod', event.target.value)} maxLength={80} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="Location"><input value={form.location} onChange={(event) => setField('location', event.target.value)} maxLength={240} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="Website"><input value={form.website} onChange={(event) => setField('website', event.target.value)} maxLength={500} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="Social link"><input value={form.socialLink} onChange={(event) => setField('socialLink', event.target.value)} maxLength={500} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
+        <div className="lg:col-span-2 rounded-2xl bg-[#FFF8F2] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Notes</p>
+          <p className="mt-1 text-xs leading-5 text-[#80685B]">Keep organizer context here. Notes do not change Tasks, Documents, Run of Show, Operations, or access permissions.</p>
+        </div>
         <Field label="Notes" span="lg:col-span-2"><textarea value={form.notes} onChange={(event) => setField('notes', event.target.value)} maxLength={2000} rows={3} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
       </div>
       <div className="mt-5 flex flex-wrap justify-end gap-2">
@@ -106,16 +121,31 @@ function OrganizationForm({ draft, contacts, organizations, onCancel, onSave, sa
   return (
     <form onSubmit={submit} className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)]">
       <div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">{form.organizationId ? 'Edit organization' : 'New organization'}</p><h2 className="mt-1 font-serif text-2xl text-[#2B1723]">{form.organizationId ? 'Update organization' : 'Add organization'}</h2></div><button type="button" onClick={onCancel} className="rounded-xl p-2 text-[#80685B] hover:bg-[#FFF8F2]" aria-label="Close organization form"><X className="size-5" /></button></div>
+      <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] p-3 text-xs leading-5 text-[#80685B]">
+        Organizations are reusable planning records. Selecting a primary contact does not grant app access or assign that person to event work.
+      </div>
       {duplicates.organizations.length > 0 && <div role="status" className="mt-4 rounded-xl border border-[#F2D6A3] bg-[#FFF8EA] p-3 text-xs leading-5 text-[#7A5818]">Possible Existing Contact: {duplicates.organizations.map((item) => item.name).join(', ')}. Review before creating; the app does not auto-merge.</div>}
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <div className="lg:col-span-2 rounded-2xl bg-[#FFF8F2] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Basic information</p>
+          <p className="mt-1 text-xs leading-5 text-[#80685B]">Required: organization name. Category and status describe the organization record only.</p>
+        </div>
         <Field label="Organization name" span="lg:col-span-2"><input value={form.name} onChange={(event) => setField('name', event.target.value)} required maxLength={180} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="Category"><select value={form.category} onChange={(event) => setField('category', event.target.value)} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm">{CONTACT_CATEGORIES.map((option) => <option key={option}>{option}</option>)}</select></Field>
         <Field label="Primary contact"><select value={form.primaryContactId} onChange={(event) => setField('primaryContactId', event.target.value)} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm"><option value="">No primary contact</option>{contacts.map((contact) => <option key={contact.contactId} value={contact.contactId}>{contact.displayName}</option>)}</select></Field>
+        <div className="lg:col-span-2 rounded-2xl bg-[#FFF8F2] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Contact details</p>
+          <p className="mt-1 text-xs leading-5 text-[#80685B]">Use these fields for planning references. They do not create a portal, vendor account, payment record, or delivery status.</p>
+        </div>
         <Field label="Email"><input type="email" value={form.email} onChange={(event) => setField('email', event.target.value)} maxLength={320} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="Phone"><input value={form.phone} onChange={(event) => setField('phone', event.target.value)} maxLength={64} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="Website"><input value={form.website} onChange={(event) => setField('website', event.target.value)} maxLength={500} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
         <Field label="Status"><select value={form.status} onChange={(event) => setField('status', event.target.value)} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm">{CONTACT_STATUSES.map((option) => <option key={option}>{option}</option>)}</select></Field>
         <Field label="Location"><input value={form.location} onChange={(event) => setField('location', event.target.value)} maxLength={240} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
+        <div className="lg:col-span-2 rounded-2xl bg-[#FFF8F2] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Notes</p>
+          <p className="mt-1 text-xs leading-5 text-[#80685B]">Notes are organizer context only. They do not change Tasks, Documents, Run of Show, Operations, or access permissions.</p>
+        </div>
         <Field label="Notes" span="lg:col-span-2"><textarea value={form.notes} onChange={(event) => setField('notes', event.target.value)} maxLength={2000} rows={3} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm" /></Field>
       </div>
       <div className="mt-5 flex flex-wrap justify-end gap-2"><button type="button" onClick={onCancel} className="rounded-xl border border-[#E7D6CC] px-4 py-2 text-xs font-bold text-[#6B564C]">Cancel</button><button type="submit" disabled={saving || !form.name.trim()} className="rounded-xl bg-[#9A5260] px-5 py-2 text-xs font-bold text-white disabled:opacity-50">{saving ? 'Saving...' : duplicates.organizations.length ? 'Create New Anyway' : 'Save organization'}</button></div>
@@ -137,6 +167,9 @@ function RelationshipForm({ contacts, organizations, activeEvent, onCancel, onSa
   return (
     <form onSubmit={submit} className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)]">
       <div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Event relationship</p><h2 className="mt-1 font-serif text-2xl text-[#2B1723]">Link contact to {activeEvent?.eventName}</h2></div><button type="button" onClick={onCancel} className="rounded-xl p-2 text-[#80685B] hover:bg-[#FFF8F2]" aria-label="Close relationship form"><X className="size-5" /></button></div>
+      <div className="mt-4 rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] p-3 text-xs leading-5 text-[#80685B]">
+        A relationship connects this person or organization to the Working Event. It does not give app access and does not change Tasks, Documents, Run of Show, or money records.
+      </div>
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <Field label="Contact"><select value={form.contactId} onChange={(event) => setField('contactId', event.target.value)} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm"><option value="">No person</option>{contacts.map((contact) => <option key={contact.contactId} value={contact.contactId}>{contact.displayName}</option>)}</select></Field>
         <Field label="Organization"><select value={form.organizationId} onChange={(event) => setField('organizationId', event.target.value)} className="mt-1 w-full rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm"><option value="">No organization</option>{organizations.map((org) => <option key={org.organizationId} value={org.organizationId}>{org.name}</option>)}</select></Field>
@@ -264,8 +297,8 @@ export function ContactsPage() {
       <header className="flex flex-col gap-4 rounded-[28px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7 xl:flex-row xl:items-center xl:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Reusable contacts</p>
-          <h2 className="mt-2 font-serif text-3xl text-[#2B1723]">Contacts & Partners</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">Keep supplier, venue, partner, sponsor, and helper details reusable across events. These records do not grant app access.</p>
+          <h2 className="mt-2 font-serif text-3xl text-[#2B1723]">Contacts & Organizations</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">Keep supplier, venue, organization, sponsor, and helper details reusable across events. These records do not grant app access.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => { setEditing(null); setFormType('contact') }} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#9A5260] px-5 text-xs font-bold text-white"><Plus className="size-4" /> Add Contact</button>

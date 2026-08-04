@@ -22,8 +22,8 @@ test('Payments route is organizer-facing while scanner navigation remains isolat
 
   assert.match(app, /path="\/payments"/)
   assert.match(shell, /to: '\/payments', label: 'Registration Payments'/)
-  assert.match(shell, /\/registrations[\s\S]*\/payments[\s\S]*\/tickets/)
-  assert.match(shell, /Event Management[\s\S]*\/events[\s\S]*\/payments[\s\S]*\/tickets/)
+  assert.match(shell, /Guests & Attendance[\s\S]*\/registrations[\s\S]*\/tickets[\s\S]*\/check-in/)
+  assert.match(shell, /Money & Follow-Up[\s\S]*\/payments[\s\S]*\/operations[\s\S]*\/event-review/)
   assert.match(access, /scanner:[\s\S]*'\/scanner'/)
   assert.doesNotMatch(access, /scanner:[\s\S]*'\/payments'/)
   assert.match(paymentsPage, /'unknown', 'Unknown'/)

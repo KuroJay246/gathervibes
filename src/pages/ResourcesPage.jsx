@@ -85,21 +85,41 @@ function ResourceForm({ resource, runItems, contacts, organizations, documents, 
       </div>
       {error && <p className="mt-3 rounded-xl border border-[#F3C6C6] bg-[#FFF1F1] px-3 py-2 text-sm font-semibold text-[#8A1F1F]">{error}</p>}
       <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <div className="md:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Basic information</p>
+          <p className="mt-1 text-xs text-[#80685B]">Required: resource name. Use category and source to explain what the event needs and where it is coming from.</p>
+        </div>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Name<input value={values.name} onChange={(e) => updateField('name', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Category<select value={values.category} onChange={(e) => updateField('category', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{RESOURCE_CATEGORIES.map((category) => <option key={category}>{category}</option>)}</select></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Source<select value={values.sourceType} onChange={(e) => updateField('sourceType', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{RESOURCE_SOURCE_TYPES.map((sourceType) => <option key={sourceType}>{sourceType}</option>)}</select></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Status<select value={values.status} onChange={(e) => updateField('status', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{RESOURCE_STATUSES.map((status) => <option key={status}>{status}</option>)}</select></label>
+        <div className="md:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Quantity and location</p>
+          <p className="mt-1 text-xs text-[#80685B]">Shortage is based on needed minus confirmed. The app does not order or pay for anything automatically.</p>
+        </div>
         <div className="grid grid-cols-3 gap-3">
           <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Needed<input type="number" min="0" value={values.quantityNeeded} onChange={(e) => updateField('quantityNeeded', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
           <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Confirmed<input type="number" min="0" value={values.quantityConfirmed} onChange={(e) => updateField('quantityConfirmed', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
           <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Unit<input value={values.unit} onChange={(e) => updateField('unit', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         </div>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Location<input value={values.location} onChange={(e) => updateField('location', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <div className="md:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Supplier or owner</p>
+          <p className="mt-1 text-xs text-[#80685B]">Assign who is providing it. Linking a supplier contact or organization does not give that person app access.</p>
+        </div>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Supplier label<input value={values.supplierLabel} onChange={(e) => updateField('supplierLabel', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <RelationshipSelector label="Supplier contact" value={values.supplierContactId} onChange={(next) => updateField('supplierContactId', next)} options={contactOptions(contacts)} placeholder="Select supplier contact" emptyText="No contacts available." />
         <RelationshipSelector label="Supplier organization" value={values.supplierOrganizationId} onChange={(next) => updateField('supplierOrganizationId', next)} options={organizationOptions(organizations)} placeholder="Select supplier organization" emptyText="No organizations available." />
+        <div className="md:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Pickup, packing, and return</p>
+          <p className="mt-1 text-xs text-[#80685B]">Use these fields when the item must be collected, packed, brought on site, or returned after the event.</p>
+        </div>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Pickup due<input type="date" value={values.pickupDueDate} onChange={(e) => updateField('pickupDueDate', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Return due<input type="date" value={values.returnDueDate} onChange={(e) => updateField('returnDueDate', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <div className="md:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Linked records</p>
+          <p className="mt-1 text-xs text-[#80685B]">Links show context only. Linking an Operations entry does not change an amount, and linking a Task does not complete it.</p>
+        </div>
         <RelationshipSelector label="Linked Run of Show items" values={values.linkedRunOfShowItemIds} onChange={(next) => updateField('linkedRunOfShowItemIds', next)} multiple options={runItemOptions(runItems)} placeholder="Add timeline link" emptyText="No Run of Show items available." />
         <RelationshipSelector label="Linked documents" values={values.linkedDocumentIds} onChange={(next) => updateField('linkedDocumentIds', next)} multiple options={documentOptions(documents)} placeholder="Add document link" emptyText="No documents available." />
         <RelationshipSelector label="Linked task" value={values.linkedTaskId} onChange={(next) => updateField('linkedTaskId', next)} options={taskOptions(tasks)} placeholder="Select task" emptyText="No tasks available." />

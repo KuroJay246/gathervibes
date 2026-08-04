@@ -109,6 +109,10 @@ function RunOfShowForm({ event, item, resources, items, contacts, organizations,
       </div>
       {error && <p className="mt-3 rounded-xl border border-[#F3C6C6] bg-[#FFF1F1] px-3 py-2 text-sm font-semibold text-[#8A1F1F]">{error}</p>}
       <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <div className="md:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">What happens and when</p>
+          <p className="mt-1 text-xs text-[#80685B]">Required: title, date, and time. Status is changed manually by the organizer or event-day team.</p>
+        </div>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Title<input value={values.title} onChange={(e) => updateField('title', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Category<select value={values.category} onChange={(e) => updateField('category', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{RUN_OF_SHOW_CATEGORIES.map((category) => <option key={category}>{category}</option>)}</select></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Date<input type="date" value={values.date} onChange={(e) => updateField('date', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
@@ -118,13 +122,25 @@ function RunOfShowForm({ event, item, resources, items, contacts, organizations,
         </div>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Status<select value={values.status} onChange={(e) => updateField('status', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{RUN_OF_SHOW_STATUSES.map((status) => <option key={status}>{status}</option>)}</select></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Location<input value={values.location} onChange={(e) => updateField('location', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <div className="md:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Who is responsible?</p>
+          <p className="mt-1 text-xs text-[#80685B]">Choose a staff profile, contact, organization, or type a plain-language label. Assigning a contact does not give app access.</p>
+        </div>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Responsible label<input value={values.responsibleLabel} onChange={(e) => updateField('responsibleLabel', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <RelationshipSelector label="Responsible staff" value={values.responsibleStaffUid} onChange={(next) => updateField('responsibleStaffUid', next)} options={staffOptions(staffProfiles)} placeholder="Select staff profile" emptyText="No staff profiles available." />
         <RelationshipSelector label="Responsible contact" value={values.responsibleContactId} onChange={(next) => updateField('responsibleContactId', next)} options={contactOptions(contacts)} placeholder="Select contact" emptyText="No contacts available." />
         <RelationshipSelector label="Responsible organization" value={values.responsibleOrganizationId} onChange={(next) => updateField('responsibleOrganizationId', next)} options={organizationOptions(organizations)} placeholder="Select organization" emptyText="No organizations available." />
+        <div className="md:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Arrival and follow-up</p>
+          <p className="mt-1 text-xs text-[#80685B]">Use arrival fields for suppliers, staff, or items that must arrive before this timeline item can happen.</p>
+        </div>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Expected arrival<input type="time" value={values.expectedArrivalTime} onChange={(e) => updateField('expectedArrivalTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Actual arrival<input type="time" value={values.actualArrivalTime} onChange={(e) => updateField('actualArrivalTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Arrival status<select value={values.arrivalStatus} onChange={(e) => updateField('arrivalStatus', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{ARRIVAL_STATUSES.map((status) => <option key={status}>{status}</option>)}</select></label>
+        <div className="md:col-span-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Linked records</p>
+          <p className="mt-1 text-xs text-[#80685B]">Links help you jump to related work. Linking a Task, Resource, or Document does not complete it or change its status.</p>
+        </div>
         <RelationshipSelector label="Depends on timeline items" values={values.dependencyItemIds} onChange={(next) => updateField('dependencyItemIds', next)} multiple options={runItemOptions(items, item?.itemId)} placeholder="Add dependency" emptyText="No other timeline items available." />
         <RelationshipSelector label="Linked resources" values={values.linkedResourceIds} onChange={(next) => updateField('linkedResourceIds', next)} multiple options={resourceOptions(resources)} placeholder="Add resource link" emptyText="No resources available." />
         <RelationshipSelector label="Linked task" value={values.linkedTaskId} onChange={(next) => updateField('linkedTaskId', next)} options={taskOptions(tasks)} placeholder="Select task" emptyText="No tasks available." />

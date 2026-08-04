@@ -34,7 +34,7 @@ test('Phase Run of Show and Resources routes are preserved and scanner navigatio
   const appShell = await readFile('src/layout/AppShell.jsx', 'utf8')
 
   assert.match(appShell, /label: 'Run of Show'/)
-  assert.match(appShell, /label: 'Resources'/)
+  assert.match(appShell, /label: 'Equipment & Supplies'/)
   assert.match(appShell, /to: '\/run-of-show'/)
   assert.match(appShell, /to: '\/resources'/)
   assert.ok(MOBILE_PRIMARY_NAV_ITEMS.some((item) => item.to === '/check-in'))

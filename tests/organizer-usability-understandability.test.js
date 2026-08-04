@@ -35,9 +35,12 @@ test('organizer shell explains every major route without changing route paths', 
 
   for (const route of requiredRoutes) {
     assert.ok(pageGuidance[route], `missing shell guidance for ${route}`)
+    assert.ok(pageGuidance[route].primaryAction, `missing primary action for ${route}`)
   }
 
   assert.match(shell, /data-tour-id="page-purpose"/)
+  assert.match(shell, /Primary action/)
+  assert.match(shell, /Automatic boundary/)
   assert.match(pageGuidance['/events'].purpose, /Completed real events remain editable by approved organizers/)
   assert.match(pageGuidance['/communications'].boundary, /Messages are not sent automatically/)
   assert.match(pageGuidance['/tickets'].boundary, /QR payload remains GSV:TICKET:\{ticketCode\}/)

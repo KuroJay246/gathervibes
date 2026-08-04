@@ -9,7 +9,7 @@ test('organizer shell uses grouped navigation without changing route paths or ro
   const app = await readFile('src/App.jsx', 'utf8')
   const navigation = await readFile('src/utils/navigation.js', 'utf8')
 
-  for (const group of ['Home', 'Event Management', 'Operations', 'Review and Data', 'Administration']) {
+  for (const group of ['Plan', 'Guests & Attendance', 'Event Day', 'Money & Follow-Up', 'Tools', 'System']) {
     assert.match(shell, new RegExp(`label: '${group}'`))
   }
 
@@ -18,6 +18,8 @@ test('organizer shell uses grouped navigation without changing route paths or ro
   }
 
   assert.match(shell, /Registration Payments/)
+  assert.match(shell, /Primary action/)
+  assert.match(shell, /Automatic boundary/)
   assert.match(shell, /canViewRoute\(access, to\)/)
   assert.match(shell, /aria-label=\{collapsed \? label : undefined\}/)
   assert.match(shell, /aria-label=\{collapsed \? 'Expand navigation' : 'Collapse navigation'\}/)
