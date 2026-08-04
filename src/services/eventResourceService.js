@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteField,
   doc,
   onSnapshot,
   serverTimestamp,
@@ -36,6 +37,17 @@ const AUDIT_FIELDS = [
   'criticalForEvent',
 ]
 
+const RESOURCE_DOCUMENT_FIELDS = new Set([
+  ...AUDIT_FIELDS,
+  'resourceId',
+  'eventId',
+  'eventName',
+  'createdAt',
+  'createdBy',
+  'updatedAt',
+  'updatedBy',
+])
+
 function requireDatabase() {
   if (!db) throw new Error('Firebase is not configured')
   return db
@@ -47,6 +59,15 @@ function performedBy(user) {
 
 function stripUndefined(value) {
   return Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== undefined))
+}
+
+function legacyFieldDeletes(existingResource = {}) {
+  const unsupportedFields = Array.isArray(existingResource.__unsupportedResourceFields)
+    ? existingResource.__unsupportedResourceFields
+    : []
+  return Object.fromEntries(unsupportedFields
+    .filter((field) => typeof field === 'string' && field && !field.startsWith('__') && !RESOURCE_DOCUMENT_FIELDS.has(field))
+    .map((field) => [field, deleteField()]))
 }
 
 function resourcesCollection(eventId) {
@@ -70,10 +91,16 @@ export function subscribeToEventResources(eventId, onResources, onError) {
   return onSnapshot(
     resourcesCollection(eventId),
     (snapshot) => {
-      const rows = snapshot.docs.map((resourceDocument) => normalizeEventResource({
-        ...resourceDocument.data(),
-        resourceId: resourceDocument.data().resourceId || resourceDocument.id,
-      }))
+      const rows = snapshot.docs.map((resourceDocument) => {
+        const data = resourceDocument.data()
+        return {
+          ...normalizeEventResource({
+            ...data,
+            resourceId: data.resourceId || resourceDocument.id,
+          }),
+          __unsupportedResourceFields: Object.keys(data).filter((field) => !RESOURCE_DOCUMENT_FIELDS.has(field)),
+        }
+      })
       rows.sort((left, right) => String(left.category).localeCompare(String(right.category)) || String(left.name).localeCompare(String(right.name)))
       onResources(rows)
     },
@@ -110,10 +137,11 @@ export async function updateEventResource(event, existingResource, values, user,
   const existing = normalizeEventResource(existingResource, event)
   const payload = stripUndefined({
     ...normalizeEventResource({ ...existing, ...values }, event, existing),
-    createdAt: existingResource.createdAt,
     updatedAt: serverTimestamp(),
     updatedBy: performedBy(user),
   })
+  delete payload.createdAt
+  delete payload.createdBy
   const audit = createAuditLogWrite({
     eventId: event.eventId,
     action,
@@ -123,7 +151,10 @@ export async function updateEventResource(event, existingResource, values, user,
     details: auditDetails(existing, { ...existing, ...payload }, action.replace('resource.', '')),
   })
   const batch = writeBatch(firestore)
-  batch.update(resourceRef(event.eventId, existing.resourceId), payload)
+  batch.update(resourceRef(event.eventId, existing.resourceId), {
+    ...payload,
+    ...legacyFieldDeletes(existingResource),
+  })
   batch.set(audit.ref, audit.data)
   await batch.commit()
 }

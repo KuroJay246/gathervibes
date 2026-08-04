@@ -104,6 +104,28 @@ test('registration edits remain atomic with append-only audit evidence', async (
   assert.doesNotMatch(updateRegistration, /await setDoc\(/)
 })
 
+test('resource status edits normalize and remove legacy fields with append-only audit evidence', async () => {
+  const service = await source('src/services/eventResourceService.js')
+  const updateStart = service.indexOf('export async function updateEventResource')
+  const deleteStart = service.indexOf('export async function deleteEventResource')
+  const updateResource = service.slice(updateStart, deleteStart)
+
+  assert.match(updateResource, /const batch = writeBatch\(firestore\)/)
+  assert.match(updateResource, /legacyFieldDeletes\(existingResource\)/)
+  assert.match(updateResource, /batch\.update\(resourceRef\(event\.eventId, existing\.resourceId\), \{/)
+  assert.match(updateResource, /batch\.set\(audit\.ref,\s+audit\.data\)/)
+  assert.match(updateResource, /await batch\.commit\(\)/)
+  assert.doesNotMatch(updateResource, /batch\.set\(resourceRef\(event\.eventId, existing\.resourceId\), payload\)/)
+  assert.match(service, /__unsupportedResourceFields/)
+})
+
+test('System QA payment follow-up remains a review item rather than a stale blocking failure', async () => {
+  const qaPage = await source('src/pages/QaPage.jsx')
+
+  assert.match(qaPage, /label: 'Payment follow-up records', status: paymentsWorkspace\.summary\.paymentFollowUpCount \? 'warning' : 'pass'/)
+  assert.doesNotMatch(qaPage, /label: 'Payment follow-up records', status: paymentsWorkspace\.summary\.paymentFollowUpCount \? 'fail' : 'pass'/)
+})
+
 test('production owner write root cause documents deployment and manual verification boundaries', async () => {
   const rootCause = await source('docs/FIRESTORE_PRODUCTION_OWNER_WRITE_ROOT_CAUSE_2026-08.md')
 
