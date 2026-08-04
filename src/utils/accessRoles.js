@@ -1,5 +1,25 @@
 import { PROTECTED_OWNER_EMAIL, isProtectedOwnerUser } from '../config/protectedOwner.js'
 
+export const ORGANIZER_ROUTE_CAPABILITIES = Object.freeze([
+  { route: '/dashboard', capability: 'viewOverview', label: 'View Overview' },
+  { route: '/events', capability: 'manageEvents', label: 'Manage Events' },
+  { route: '/tasks', capability: 'manageTasks', label: 'Manage Tasks' },
+  { route: '/registrations', capability: 'manageRegistrations', label: 'Manage Registrations' },
+  { route: '/payments', capability: 'manageRegistrationPayments', label: 'Manage Registration Payments' },
+  { route: '/tickets', capability: 'manageTickets', label: 'Manage Tickets' },
+  { route: '/check-in', capability: 'performOwnerCheckIn', label: 'Owner Check-In Actions' },
+  { route: '/operations', capability: 'manageOperations', label: 'Manage Operations' },
+  { route: '/run-of-show', capability: 'manageRunOfShow', label: 'Manage Run of Show' },
+  { route: '/resources', capability: 'manageResources', label: 'Manage Resources' },
+  { route: '/documents', capability: 'manageDocuments', label: 'Manage Documents' },
+  { route: '/contacts', capability: 'manageContactsAndOrganizations', label: 'Manage Contacts and Organizations' },
+  { route: '/event-review', capability: 'viewReports', label: 'View Reports' },
+  { route: '/imports', capability: 'useImportCenter', label: 'Use Import Center' },
+  { route: '/communications', capability: 'useMessageBuilder', label: 'Use Message Builder' },
+  { route: '/settings', capability: 'useSettings', label: 'Use Settings' },
+  { route: '/qa', capability: 'useSystemQa', label: 'Use System QA' },
+])
+
 export const ACCESS_ROLES = {
   'owner-admin': {
     id: 'owner-admin',
@@ -73,6 +93,7 @@ const ROLE_ALIASES = {
 
 const ADMIN_ROLES = new Set(['owner-admin', 'owner', 'admin'])
 const ASSIGNED_STAFF_ROLES = new Set(['event-manager', 'scanner', 'viewer', 'operations-helper'])
+const OWNER_CAPABILITY_FLAGS = Object.freeze(Object.fromEntries(ORGANIZER_ROUTE_CAPABILITIES.map(({ capability }) => [capability, true])))
 const DEFAULT_ACCESS = Object.freeze({
   level: 'none',
   role: null,
@@ -80,6 +101,8 @@ const DEFAULT_ACCESS = Object.freeze({
   assignedEventIds: [],
   assignmentsByEvent: {},
   assignedEvents: [],
+  protectedOwner: false,
+  capabilities: {},
 })
 
 export function normalizeAccessEmail(email) {
@@ -190,6 +213,7 @@ export function getUserAccessLevel(user, accessControl = {}, staffProfile = null
       assignmentsByEvent: {},
       assignedEvents: [],
       protectedOwner: true,
+      capabilities: OWNER_CAPABILITY_FLAGS,
     }
   }
 
@@ -204,6 +228,8 @@ export function getUserAccessLevel(user, accessControl = {}, staffProfile = null
       assignedEventIds: [],
       assignmentsByEvent: {},
       assignedEvents: [],
+      protectedOwner: false,
+      capabilities: normalizedAdminRole === 'owner-admin' ? OWNER_CAPABILITY_FLAGS : {},
     }
   }
 
@@ -233,6 +259,8 @@ export function getUserAccessLevel(user, accessControl = {}, staffProfile = null
     assignedEventIds: activeAssignments.map((assignment) => assignment.eventId),
     assignmentsByEvent,
     assignedEvents: safeAssignedEvents,
+    protectedOwner: false,
+    capabilities: {},
   }
 }
 
@@ -299,6 +327,7 @@ export function canUseSettings(access = DEFAULT_ACCESS) {
 }
 
 export function canViewRoute(access = DEFAULT_ACCESS, route = '') {
+  if (access?.protectedOwner) return true
   if (isApprovedAdmin(access)) return true
   const normalizedRoute = route === '/' ? '/dashboard' : route
   const role = normalizeAccessRole(access?.role)
@@ -307,6 +336,24 @@ export function canViewRoute(access = DEFAULT_ACCESS, route = '') {
   if (role === 'viewer') return ['/dashboard', '/tasks', '/documents'].includes(normalizedRoute)
   if (role === 'event-manager') return ['/dashboard', '/check-in', '/tasks', '/documents'].includes(normalizedRoute)
   return false
+}
+
+export function ownerCapabilityMatrix(access = DEFAULT_ACCESS, eventId = '') {
+  return ORGANIZER_ROUTE_CAPABILITIES.map((item) => {
+    const routeAllowed = canViewRoute(access, item.route)
+    const manageAllowed = item.route === '/tasks'
+      ? canManageTasks(access, eventId)
+      : item.route === '/events'
+        ? canManageEvent(access, eventId)
+        : routeAllowed && isApprovedAdmin(access)
+    return {
+      ...item,
+      routeAllowed,
+      manageAllowed,
+      protectedOwner: Boolean(access?.protectedOwner),
+      gate: access?.protectedOwner ? 'protected-owner-uid' : 'role-or-assignment',
+    }
+  })
 }
 
 export function defaultRouteForAccess(access = DEFAULT_ACCESS) {

@@ -1,24 +1,30 @@
 # Organizer Status and Terminology Standard
 
-## Product Terms
+Use organizer-language labels instead of implementation labels.
 
-- Overview: current event summary and attention list.
-- Guests & Registrations: registration records and the guests represented by them.
-- Registration Payments: registration charges, payment evidence, balances, and follow-up.
-- Tickets: ticket assignment and QR preparation.
-- Check-In: event-day attendance.
-- Operations: event-level money and obligations.
-- Message Builder: copy-only message creation.
-- Reports: read-only review and follow-up reporting.
-- Settings: practical workspace defaults.
-- System QA: diagnostics, safety checks, and synthetic test guidance.
+## Tasks
 
-## Status Rules
+- Not Started: work exists but has not begun.
+- In Progress: work is actively moving.
+- Waiting on Someone: progress depends on another person or supplier.
+- Blocked: a specific blocker prevents progress.
+- Completed: work is done.
+- Cancelled: work is no longer needed; history remains.
 
-- Completed events remain editable by approved organizers.
-- CODEX_DEMO is a Test Event and is hidden from normal event lists by default.
-- Real events use standard safeguards and are not synthetic QA fixtures.
-- A registration is not the same as a guest; `personsAttending` controls guest count.
-- Registration payments and Operations Ledger records are separate financial surfaces.
-- Message Builder never claims automatic sending, live AI generation, OAuth, or delivery tracking.
+Completing a task does not automatically update Resources, Documents, Operations, Registration Payments, Tickets, Check-In, or Reports.
 
+## Resources
+
+Resource status tracks equipment and supplies only. It does not change Operations, registration payments, task status, or attendance.
+
+## Registration Payments
+
+Registration payments and Operations Ledger records are separate. Registration payment status belongs to guest/registration finance.
+
+## Operations
+
+Operations tracks event-level money and obligations such as sponsor income, vendor payments, expenses, refunds, reimbursements, and adjustments.
+
+## Reports
+
+Reports are read-only. They explain current selected-event data and do not create, reconcile, save, or delete records.

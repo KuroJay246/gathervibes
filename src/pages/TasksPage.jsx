@@ -24,7 +24,7 @@ import { canManageTasks, canViewTasks } from '../utils/accessRoles.js'
 import { deleteTask, saveTaskDraft, subscribeToTasks, updateTaskStatus } from '../services/taskService.js'
 
 function friendlyFirebaseError(error) {
-  if (error?.code === 'permission-denied') return 'Your account can read this event, but it is not allowed to manage tasks for it.'
+  if (error?.code === 'permission-denied') return 'Tasks were blocked by Firestore authorization or task-record validation. If System QA shows Protected Owner = PASS, run the owner capability check and inspect the task record for older unsupported fields.'
   if (error?.code === 'unauthenticated') return 'Your session expired. Sign in again to continue.'
   return error?.message || 'Tasks are unavailable. Try again.'
 }
@@ -305,7 +305,7 @@ export function TasksPage() {
         </header>
 
         {success && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{success}</div>}
-        {error && <ErrorState message={error} />}
+        {error && <ErrorState title="Tasks could not be loaded" message={error} />}
         {!canManage && canRead && (
           <div className="rounded-2xl border border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm text-[#6B564C]">
             This account can read tasks for the selected event but cannot create, edit, complete, cancel, or delete them.
