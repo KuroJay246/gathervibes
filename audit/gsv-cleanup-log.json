@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-04T23:54:47.546Z",
-  "bytesReclaimed": 5910218,
+  "generatedAt": "2026-08-05T01:46:18.792Z",
+  "bytesReclaimed": 8794520,
   "entries": [
     {
       "path": "dist",
@@ -65,20 +65,128 @@
       "reason": "post-validation generated/recreatable output cleanup",
       "recoverability": "recreate by validation commands",
       "tracked": false
+    },
+    {
+      "path": "dist",
+      "action": "removed",
+      "size": 2448293,
+      "reason": "post-validation generated/recreatable output cleanup",
+      "recoverability": "recreate with npm run build",
+      "tracked": false
+    },
+    {
+      "path": "test-results",
+      "action": "removed",
+      "size": 45,
+      "reason": "post-validation generated/recreatable Playwright metadata cleanup",
+      "recoverability": "recreate with e2e commands",
+      "tracked": false
+    },
+    {
+      "path": ".firebase",
+      "action": "already absent",
+      "size": 0,
+      "reason": "generated hosting cache candidate checked",
+      "recoverability": "recreate with Firebase commands",
+      "tracked": false
+    },
+    {
+      "path": "firestore-debug.log",
+      "action": "removed",
+      "size": 435964,
+      "reason": "post-validation generated/recreatable emulator debug log cleanup",
+      "recoverability": "recreate with emulator commands",
+      "tracked": false
+    },
+    {
+      "path": "playwright-report",
+      "action": "already absent",
+      "size": 0,
+      "reason": "generated report candidate checked",
+      "recoverability": "recreate with Playwright commands",
+      "tracked": false
+    },
+    {
+      "path": "coverage",
+      "action": "already absent",
+      "size": 0,
+      "reason": "generated coverage candidate checked",
+      "recoverability": "recreate with coverage command if enabled",
+      "tracked": false
     }
   ],
   "manualReview": [
     {
       "path": "output",
       "action": "kept",
-      "reason": "may contain unique acceptance or bug evidence",
+      "reason": "tracked current useful evidence",
       "recommendation": "manual review only"
     },
     {
       "path": "Cake_Piknik_Payment_Audit.xlsx",
       "action": "kept",
-      "reason": "untracked production spreadsheet evidence, not safe automatic cleanup",
-      "recommendation": "manual review only"
+      "reason": "private production financial evidence",
+      "recommendation": "keep private and uncommitted"
+    },
+    {
+      "path": "C:/Users/Jaylan/Downloads/gathervibeshub-firebase-adminsdk-fbsvc-7667cf534c.json",
+      "action": "excluded",
+      "reason": "active service-account key pending owner action",
+      "recommendation": "owner revoke/rotate decision outside repository"
     }
-  ]
+  ],
+  "finalCloseoutCleanup": {
+    "generatedAt": "2026-08-05T01:46:18.792Z",
+    "bytesReclaimed": 2884302,
+    "entries": [
+      {
+        "path": "dist",
+        "action": "removed",
+        "size": 2448293,
+        "reason": "post-validation generated/recreatable output cleanup",
+        "recoverability": "recreate with npm run build",
+        "tracked": false
+      },
+      {
+        "path": "test-results",
+        "action": "removed",
+        "size": 45,
+        "reason": "post-validation generated/recreatable Playwright metadata cleanup",
+        "recoverability": "recreate with e2e commands",
+        "tracked": false
+      },
+      {
+        "path": ".firebase",
+        "action": "already absent",
+        "size": 0,
+        "reason": "generated hosting cache candidate checked",
+        "recoverability": "recreate with Firebase commands",
+        "tracked": false
+      },
+      {
+        "path": "firestore-debug.log",
+        "action": "removed",
+        "size": 435964,
+        "reason": "post-validation generated/recreatable emulator debug log cleanup",
+        "recoverability": "recreate with emulator commands",
+        "tracked": false
+      },
+      {
+        "path": "playwright-report",
+        "action": "already absent",
+        "size": 0,
+        "reason": "generated report candidate checked",
+        "recoverability": "recreate with Playwright commands",
+        "tracked": false
+      },
+      {
+        "path": "coverage",
+        "action": "already absent",
+        "size": 0,
+        "reason": "generated coverage candidate checked",
+        "recoverability": "recreate with coverage command if enabled",
+        "tracked": false
+      }
+    ]
+  }
 }
