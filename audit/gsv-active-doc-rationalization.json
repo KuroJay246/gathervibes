@@ -1,0 +1,443 @@
+{
+  "generatedAt": "2026-08-05T01:02:00.432Z",
+  "activeDocCount": 62,
+  "mergedDocCount": 0,
+  "archivedDocCount": 0,
+  "decisionSummary": "No active docs were merged or archived during this run. The active set is broad but each retained file is either canonical, a specialized test-backed standard, an operator guide, or isolated disconnected-integration documentation. Historical material remains under docs/archive.",
+  "entries": [
+    {
+      "path": "AI_AGENT_RULES.md",
+      "classification": "ACTIVE AUTHORITATIVE",
+      "domain": "canonical-reference",
+      "decision": "retained-active",
+      "rationale": "Canonical entrypoint or source-of-truth file used during maintenance and handoff."
+    },
+    {
+      "path": "docs/AUDIT_LOG_BUSINESS_WRITE_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/BAKER_PAYMENT_GUIDE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/BULK_OPERATION_RECOVERY_MODEL.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operational-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/CODEX_DEMO_FULL_SYSTEM_WALKTHROUGH_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/CONTACT_AND_EVENT_RELATIONSHIP_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/DEPLOYMENT_GUIDE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/DOCUMENT_REFERENCE_DATA_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/EQUIPMENT_AND_SUPPLIES_WORKFLOW_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/EVENT_DAY_GUIDE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/EVENT_DAY_RUN_OF_SHOW_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/EVENT_DAY_TICKET_AND_CHECKIN_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/EVENT_LIFECYCLE_GUIDE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/EVENT_READINESS_STANDARD_2026-08.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/EVENT_REPORT_AND_RECONCILIATION_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/EVENT_SETUP_STAGE_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/EVENT_TASK_AND_DEADLINE_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/FINANCE_EVIDENCE_GUIDE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/FINANCIAL_SOURCE_AND_CALCULATION_MAP_2026-08.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operational-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/GATHER_SAVOR_VISUAL_SYSTEM_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/GOOGLE_FORMS_RESPONSE_INBOX_WORKFLOW.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operational-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+      "classification": "ACTIVE AUTHORITATIVE",
+      "domain": "canonical-reference",
+      "decision": "retained-active",
+      "rationale": "Canonical entrypoint or source-of-truth file used during maintenance and handoff."
+    },
+    {
+      "path": "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
+      "classification": "ACTIVE AUTHORITATIVE",
+      "domain": "canonical-reference",
+      "decision": "retained-active",
+      "rationale": "Canonical entrypoint or source-of-truth file used during maintenance and handoff."
+    },
+    {
+      "path": "docs/HISTORICAL_ARCHIVE_INDEX.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/IMPORT_CENTER_DAILY_WORKFLOW_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/IMPORT_SOURCE_AND_RECORD_TYPE_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/IMPORT_TEMPLATE_AND_HEADER_MAPPING_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/KNOWN_LIMITATIONS.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/MESSAGE_BUILDER_COPY_ONLY_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/NEW_EVENT_SETUP_GUIDE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/OPERATIONS_GUIDE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/OPERATIONS_LEDGER_ENTRY_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/OPERATIONS_PRESENTATION_AND_COMMITMENT_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/ORGANIZER_ACTION_HIERARCHY_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/ORGANIZER_PAGE_EXPLANATION_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/ORGANIZER_QUICK_START.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operational-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/ORGANIZER_STATUS_AND_TERMINOLOGY_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/ORGANIZER_UNDERSTANDABILITY_AND_USABILITY_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/PDF_TABLE_IMPORT_LIMITATIONS.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operational-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/PRODUCT_GUIDE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/PRODUCT_QA_EMULATOR_RUNNER_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/PROTECTED_OWNER_APPLICATION_ACCESS_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/PROTECTED_OWNER_AUTHORIZATION_MATRIX_2026-08.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/PROTECTED_OWNER_SUPER_ADMIN_AND_MAINTENANCE_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/PROTOTYPE_DEMO_GUIDE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/QA_GUIDE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/REGISTRATION_PAYMENT_REVIEW_AND_ACTION_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/REGISTRATION_PAYMENT_STATUS_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/RESPONSE_INBOX_REVIEW_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/ROUTE_MAP.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operator-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/RUN_OF_SHOW_RESOURCES_EXISTING_DATA_COMPATIBILITY_2026-08.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operational-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/SETTINGS_AND_ACCESS_PRESENTATION_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/SYSTEM_QA_PRESENTATION_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/TASK_STATUS_AND_PRIORITY_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/TUTORIAL_AND_IN_APP_GUIDANCE_MAINTENANCE_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/TUTORIAL_V3_ARCHITECTURE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "operational-guide",
+      "decision": "retained-active",
+      "rationale": "Current operator guide with distinct audience or workflow."
+    },
+    {
+      "path": "docs/TUTORIAL_V3_FINAL_STANDARD_2026-08.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "docs/WORKING_EVENT_OVERVIEW_STANDARD.md",
+      "classification": "ACTIVE SPECIALIZED STANDARD",
+      "domain": "test-backed-standard",
+      "decision": "retained-active",
+      "rationale": "Specialized current invariant with product or guardrail tests; keep separate to avoid hiding enforcement detail."
+    },
+    {
+      "path": "integrations/google-forms/REMOVE.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "disconnected-integration-note",
+      "decision": "retained-active",
+      "rationale": "Integration is not live; setup/removal notes remain isolated from organizer product docs."
+    },
+    {
+      "path": "integrations/google-forms/SETUP.md",
+      "classification": "ACTIVE OPERATIONAL",
+      "domain": "disconnected-integration-note",
+      "decision": "retained-active",
+      "rationale": "Integration is not live; setup/removal notes remain isolated from organizer product docs."
+    },
+    {
+      "path": "PROJECT_HANDOFF.md",
+      "classification": "ACTIVE AUTHORITATIVE",
+      "domain": "canonical-reference",
+      "decision": "retained-active",
+      "rationale": "Canonical entrypoint or source-of-truth file used during maintenance and handoff."
+    },
+    {
+      "path": "README.md",
+      "classification": "ACTIVE AUTHORITATIVE",
+      "domain": "canonical-reference",
+      "decision": "retained-active",
+      "rationale": "Canonical entrypoint or source-of-truth file used during maintenance and handoff."
+    }
+  ]
+}

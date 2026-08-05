@@ -1,6 +1,6 @@
 {
   "summary": {
-    "generatedAt": "2026-08-04T23:54:51.406Z",
+    "generatedAt": "2026-08-05T01:14:32.878Z",
     "totalDocuments": 136
   },
   "documents": [
@@ -10,6 +10,7 @@
       "classification": "ACTIVE AUTHORITATIVE",
       "purpose": "Current AI-agent operating rules.",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
@@ -20,6 +21,7 @@
         "PROJECT_HANDOFF.md",
         "README.md",
         "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
         "tests/phase15b-xlsx-roadmap-access-ops.test.js",
         "tests/phase17r-release-stabilizer.test.js"
       ],
@@ -165,6 +167,7 @@
       "classification": "ARCHIVED",
       "purpose": "Archived historical evidence; not current operating instruction.",
       "referencedBy": [
+        "audit/gsv-credential-security-review.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json"
       ],
@@ -294,6 +297,7 @@
       "classification": "ARCHIVED",
       "purpose": "Archived historical evidence; not current operating instruction.",
       "referencedBy": [
+        "audit/gsv-credential-security-review.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/HISTORICAL_ARCHIVE_INDEX.md",
@@ -315,6 +319,7 @@
       "classification": "ARCHIVED",
       "purpose": "Archived historical evidence; not current operating instruction.",
       "referencedBy": [
+        "audit/gsv-credential-security-review.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/HISTORICAL_ARCHIVE_INDEX.md",
@@ -1248,6 +1253,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1265,6 +1271,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
@@ -1285,6 +1292,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1302,6 +1310,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs",
@@ -1320,6 +1329,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1337,9 +1347,12 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
         "docs/PRODUCT_GUIDE.md",
         "scripts/audit/generateRepositoryAudit.mjs",
         "scripts/product/documentationCheck.mjs",
@@ -1358,6 +1371,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1375,6 +1389,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1392,6 +1407,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
@@ -1412,6 +1428,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1429,6 +1446,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1446,6 +1464,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
@@ -1466,8 +1485,10 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
         "scripts/audit/generateRepositoryAudit.mjs"
       ],
       "current": true,
@@ -1483,6 +1504,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1500,6 +1522,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs",
@@ -1518,6 +1541,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs",
@@ -1536,6 +1560,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
@@ -1557,6 +1582,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1574,6 +1600,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/releases/ORGANIZER_SHELL_AND_OVERVIEW_RESULT_2026-08.md",
@@ -1592,8 +1619,10 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
         "scripts/audit/generateRepositoryAudit.mjs"
       ],
       "current": true,
@@ -1610,6 +1639,7 @@
       "purpose": "Canonical current product, route, access, and Firebase reference.",
       "referencedBy": [
         "AI_AGENT_RULES.md",
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
@@ -1636,10 +1666,12 @@
       "purpose": "Canonical repository shape, cleanup, audit, and maintenance reference.",
       "referencedBy": [
         "AI_AGENT_RULES.md",
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
         "docs/HISTORICAL_ARCHIVE_INDEX.md",
         "PROJECT_HANDOFF.md",
         "README.md",
@@ -1659,6 +1691,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "Index and interpretation rules for archived historical evidence.",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
@@ -1683,8 +1716,10 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
         "scripts/audit/generateRepositoryAudit.mjs"
       ],
       "current": true,
@@ -1700,6 +1735,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1717,6 +1753,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1734,9 +1771,11 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
         "docs/PRODUCT_GUIDE.md",
         "scripts/audit/generateRepositoryAudit.mjs",
         "scripts/product/documentationCheck.mjs",
@@ -1756,8 +1795,10 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
         "scripts/audit/generateRepositoryAudit.mjs"
       ],
       "current": true,
@@ -1773,6 +1814,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
@@ -1793,6 +1835,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
@@ -1814,6 +1857,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1831,6 +1875,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1848,6 +1893,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs",
@@ -1866,6 +1912,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs",
@@ -1884,6 +1931,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
@@ -1904,6 +1952,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs",
@@ -1922,6 +1971,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs",
@@ -1940,6 +1990,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1957,9 +2008,11 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
         "docs/HISTORICAL_ARCHIVE_INDEX.md",
         "README.md",
         "scripts/audit/generateRepositoryAudit.mjs",
@@ -1979,6 +2032,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -1996,8 +2050,10 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
         "scripts/audit/generateRepositoryAudit.mjs"
       ],
       "current": true,
@@ -2013,8 +2069,10 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
         "scripts/audit/generateRepositoryAudit.mjs",
         "tests/protected-owner-authorization-matrix.test.js"
       ],
@@ -2031,8 +2089,10 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
         "scripts/audit/generateRepositoryAudit.mjs"
       ],
       "current": true,
@@ -2048,6 +2108,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
@@ -2070,9 +2131,12 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
         "docs/PRODUCT_GUIDE.md",
         "scripts/audit/generateRepositoryAudit.mjs",
         "scripts/product/documentationCheck.mjs",
@@ -2091,6 +2155,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -2108,6 +2173,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -2125,6 +2191,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -2142,9 +2209,11 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/README_HISTORICAL_2026-08.md",
+        "docs/GSV_REPOSITORY_AND_MAINTENANCE_MANIFEST.md",
         "docs/HISTORICAL_ARCHIVE_INDEX.md",
         "docs/PRODUCT_GUIDE.md",
         "README.md",
@@ -2165,6 +2234,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -2182,6 +2252,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -2199,6 +2270,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -2216,6 +2288,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs",
@@ -2234,6 +2307,7 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs",
@@ -2252,6 +2326,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -2269,6 +2344,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -2286,9 +2362,11 @@
       "classification": "ACTIVE SPECIALIZED STANDARD",
       "purpose": "active documentation",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/releases/ORGANIZER_SHELL_AND_OVERVIEW_RESULT_2026-08.md",
+        "docs/GSV_MASTER_SYSTEM_REFERENCE.md",
         "scripts/audit/generateRepositoryAudit.mjs"
       ],
       "current": true,
@@ -2304,6 +2382,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "Integration source or deployment plan; do not activate without approval.",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -2321,6 +2400,7 @@
       "classification": "ACTIVE OPERATIONAL",
       "purpose": "Integration source or deployment plan; do not activate without approval.",
       "referencedBy": [
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "scripts/audit/generateRepositoryAudit.mjs"
@@ -2355,6 +2435,7 @@
       "purpose": "Current coding-agent handoff and guardrails.",
       "referencedBy": [
         "AI_AGENT_RULES.md",
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
@@ -2363,6 +2444,7 @@
         "docs/HISTORICAL_ARCHIVE_INDEX.md",
         "README.md",
         "scripts/audit/generateRepositoryAudit.mjs",
+        "scripts/product/documentationCheck.mjs",
         "tests/phase17r-release-stabilizer.test.js"
       ],
       "current": true,
@@ -2379,6 +2461,7 @@
       "purpose": "Primary repository entrypoint and current project summary.",
       "referencedBy": [
         "AI_AGENT_RULES.md",
+        "audit/gsv-active-doc-rationalization.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/archive/legacy/PROJECT_HANDOFF_HISTORICAL_2026-08.md",
