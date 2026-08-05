@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T00:54:12.430Z",
+  "generatedAt": "2026-08-05T01:46:18.792Z",
   "branch": "codex/final-gsv-repository-maintenance-and-knowledge-hardening",
   "head": "ca8fdef53b02687e905d375cf33ae4a296abfcf4",
   "originMain": "ca8fdef53b02687e905d375cf33ae4a296abfcf4",
@@ -246,5 +246,22 @@
         "C:\\Users\\Jaylan\\Downloads\\gathervibeshub-firebase-adminsdk-fbsvc-7667cf534c.json"
       ]
     }
-  ]
+  ],
+  "repository": {
+    "path": "C:\\Users\\Jaylan\\Documents\\gathetr",
+    "branch": "codex/final-gsv-maintenance-closeout",
+    "head": "dda6c2856d0c17ccd3062d7a8ea41a96d1005270",
+    "originMain": "dda6c2856d0c17ccd3062d7a8ea41a96d1005270"
+  },
+  "finalCloseoutReview": {
+    "groupCount": 11,
+    "oldRepositoryArchiveGroups": 6,
+    "currentRepositoryGroups": 1,
+    "activeWorktreeGroups": 1,
+    "uniqueCodeArchiveGroups": 0,
+    "credentialRiskGroups": 8,
+    "privateEvidenceGroups": 0,
+    "safeDeleteGroups": 0,
+    "decision": "No external group met the strict safe-delete standard during final closeout; uncertain, credential-risk, worktree, current-repository, and evidence-bearing material remains excluded."
+  }
 }

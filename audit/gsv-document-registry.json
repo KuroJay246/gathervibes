@@ -1,6 +1,6 @@
 {
   "summary": {
-    "generatedAt": "2026-08-05T01:15:16.863Z",
+    "generatedAt": "2026-08-05T01:46:27.549Z",
     "totalDocuments": 136
   },
   "documents": [
@@ -167,7 +167,6 @@
       "classification": "ARCHIVED",
       "purpose": "Archived historical evidence; not current operating instruction.",
       "referencedBy": [
-        "audit/gsv-credential-security-review.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json"
       ],
@@ -297,7 +296,6 @@
       "classification": "ARCHIVED",
       "purpose": "Archived historical evidence; not current operating instruction.",
       "referencedBy": [
-        "audit/gsv-credential-security-review.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/HISTORICAL_ARCHIVE_INDEX.md",
@@ -319,7 +317,6 @@
       "classification": "ARCHIVED",
       "purpose": "Archived historical evidence; not current operating instruction.",
       "referencedBy": [
-        "audit/gsv-credential-security-review.json",
         "audit/gsv-document-registry.json",
         "audit/gsv-file-inventory.json",
         "docs/HISTORICAL_ARCHIVE_INDEX.md",
