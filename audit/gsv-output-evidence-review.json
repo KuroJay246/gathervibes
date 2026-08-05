@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-08-05T00:54:27.833Z",
+  "outputPath": "C:\\Users\\Jaylan\\Documents\\gathetr\\output",
+  "exists": true,
+  "groupCount": 2,
+  "totalSize": 7027889,
+  "currentUsefulEvidence": 0,
+  "historicalEvidence": 0,
+  "obsoleteStaged": 0,
+  "groups": [
+    {
+      "path": "output/organizer-experience",
+      "type": "directory",
+      "fileCount": 59,
+      "size": 6762554,
+      "classification": "UNKNOWN",
+      "recommendation": "keep in repository output until manually reviewed"
+    },
+    {
+      "path": "output/security-stability-and-visual-reality",
+      "type": "directory",
+      "fileCount": 1,
+      "size": 265335,
+      "classification": "UNKNOWN",
+      "recommendation": "keep in repository output until manually reviewed"
+    }
+  ]
+}

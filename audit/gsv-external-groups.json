@@ -1,0 +1,250 @@
+{
+  "generatedAt": "2026-08-05T00:54:12.430Z",
+  "branch": "codex/final-gsv-repository-maintenance-and-knowledge-hardening",
+  "head": "ca8fdef53b02687e905d375cf33ae4a296abfcf4",
+  "originMain": "ca8fdef53b02687e905d375cf33ae4a296abfcf4",
+  "rawPathCount": 25471,
+  "groupCount": 11,
+  "groups": [
+    {
+      "rootPath": "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass3",
+      "type": "OLD REPOSITORY ARCHIVE",
+      "fileCount": 23494,
+      "totalSize": 325037971,
+      "gitRepository": true,
+      "worktree": false,
+      "branch": "codex/release-train-17r-18-19-pass3",
+      "head": "ae30f30c2ef5e81783c6e47061c6b0814971708e",
+      "uniqueCommits": "no",
+      "uniqueSource": "unknown",
+      "uniqueEvidence": "unknown",
+      "containsCredentials": "yes",
+      "safeDeletionCandidate": false,
+      "reason": "Retain/manual review due worktree/evidence/credential/unique-source uncertainty.",
+      "samplePaths": [
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass3\\vite.config.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass3\\firebase.json",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass3\\eslint.config.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass3\\.git",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass3\\.firebaserc"
+      ]
+    },
+    {
+      "rootPath": "C:\\Users\\Jaylan\\Documents\\gathetr",
+      "type": "CURRENT PRIMARY REPOSITORY",
+      "fileCount": 1129,
+      "totalSize": 121784128,
+      "gitRepository": true,
+      "worktree": true,
+      "branch": "codex/final-gsv-repository-maintenance-and-knowledge-hardening",
+      "head": "ca8fdef53b02687e905d375cf33ae4a296abfcf4",
+      "uniqueCommits": "no",
+      "uniqueSource": "unknown",
+      "uniqueEvidence": "unknown",
+      "containsCredentials": "yes",
+      "safeDeletionCandidate": false,
+      "reason": "Retain/manual review due worktree/evidence/credential/unique-source uncertainty.",
+      "samplePaths": [
+        "C:\\Users\\Jaylan\\Documents\\gathetr\\vite.config.js",
+        "C:\\Users\\Jaylan\\Documents\\gathetr\\tests\\task-workflow-rules.test.js",
+        "C:\\Users\\Jaylan\\Documents\\gathetr\\tests\\settings-systemqa-tutorial-final-refinement.test.js",
+        "C:\\Users\\Jaylan\\Documents\\gathetr\\tests\\search-health.test.js",
+        "C:\\Users\\Jaylan\\Documents\\gathetr\\tests\\run-of-show-resources-foundation.test.js"
+      ]
+    },
+    {
+      "rootPath": "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass2",
+      "type": "OLD REPOSITORY ARCHIVE",
+      "fileCount": 171,
+      "totalSize": 3534569,
+      "gitRepository": true,
+      "worktree": false,
+      "branch": "codex/release-train-17r-18-19-pass2",
+      "head": "66b36da3e1871faa23afd8d8922e3eeff4e666b9",
+      "uniqueCommits": "no",
+      "uniqueSource": "unknown",
+      "uniqueEvidence": "unknown",
+      "containsCredentials": "yes",
+      "safeDeletionCandidate": false,
+      "reason": "Retain/manual review due worktree/evidence/credential/unique-source uncertainty.",
+      "samplePaths": [
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass2\\vite.config.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass2\\tests\\search-health.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass2\\tests\\registration-utils.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass2\\tests\\registration-metrics.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-pass2\\tests\\production-qa.test.js"
+      ]
+    },
+    {
+      "rootPath": "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-integration",
+      "type": "OLD REPOSITORY ARCHIVE",
+      "fileCount": 171,
+      "totalSize": 3531248,
+      "gitRepository": true,
+      "worktree": false,
+      "branch": "codex/release-train-17r-18-19-integration",
+      "head": "126218b022954156caaae8cc07cd43d77770f869",
+      "uniqueCommits": "no",
+      "uniqueSource": "unknown",
+      "uniqueEvidence": "unknown",
+      "containsCredentials": "yes",
+      "safeDeletionCandidate": false,
+      "reason": "Retain/manual review due worktree/evidence/credential/unique-source uncertainty.",
+      "samplePaths": [
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-integration\\vite.config.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-integration\\tests\\search-health.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-integration\\tests\\registration-utils.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-integration\\tests\\registration-metrics.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-integration\\tests\\production-qa.test.js"
+      ]
+    },
+    {
+      "rootPath": "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-19",
+      "type": "OLD REPOSITORY ARCHIVE",
+      "fileCount": 167,
+      "totalSize": 3521115,
+      "gitRepository": true,
+      "worktree": false,
+      "branch": "codex/phase-19-operations-productivity",
+      "head": "2e6d361b1c2a236a1c2094fdddc0d0c881516638",
+      "uniqueCommits": "no",
+      "uniqueSource": "unknown",
+      "uniqueEvidence": "unknown",
+      "containsCredentials": "yes",
+      "safeDeletionCandidate": false,
+      "reason": "Retain/manual review due worktree/evidence/credential/unique-source uncertainty.",
+      "samplePaths": [
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-19\\vite.config.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-19\\tests\\search-health.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-19\\tests\\registration-utils.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-19\\tests\\registration-metrics.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-19\\tests\\production-qa.test.js"
+      ]
+    },
+    {
+      "rootPath": "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-18",
+      "type": "OLD REPOSITORY ARCHIVE",
+      "fileCount": 166,
+      "totalSize": 3512979,
+      "gitRepository": true,
+      "worktree": false,
+      "branch": "codex/phase-18-core-app-readiness",
+      "head": "8278380d953235e49be30e734b81d5d6cc637b9f",
+      "uniqueCommits": "no",
+      "uniqueSource": "unknown",
+      "uniqueEvidence": "unknown",
+      "containsCredentials": "yes",
+      "safeDeletionCandidate": false,
+      "reason": "Retain/manual review due worktree/evidence/credential/unique-source uncertainty.",
+      "samplePaths": [
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-18\\vite.config.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-18\\tests\\search-health.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-18\\tests\\registration-utils.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-18\\tests\\registration-metrics.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-18\\tests\\production-qa.test.js"
+      ]
+    },
+    {
+      "rootPath": "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-17r",
+      "type": "OLD REPOSITORY ARCHIVE",
+      "fileCount": 166,
+      "totalSize": 3514281,
+      "gitRepository": true,
+      "worktree": false,
+      "branch": "codex/phase-17r-release-stabilizer-autofix",
+      "head": "4fc877b2d25ed04489a29a3fc2266291bc7ba572",
+      "uniqueCommits": "no",
+      "uniqueSource": "unknown",
+      "uniqueEvidence": "unknown",
+      "containsCredentials": "yes",
+      "safeDeletionCandidate": false,
+      "reason": "Retain/manual review due worktree/evidence/credential/unique-source uncertainty.",
+      "samplePaths": [
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-17r\\vite.config.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-17r\\tests\\search-health.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-17r\\tests\\registration-utils.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-17r\\tests\\registration-metrics.test.js",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_Repo_Archives\\repo-cleanup-20260716-151218\\gathetr-17r\\tests\\production-qa.test.js"
+      ]
+    },
+    {
+      "rootPath": "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_CODEX_TEST_Apply_Rehearsal",
+      "type": "CODEX_TEST HISTORICAL EVIDENCE",
+      "fileCount": 4,
+      "totalSize": 6058,
+      "gitRepository": false,
+      "worktree": false,
+      "branch": null,
+      "head": null,
+      "uniqueCommits": "unknown",
+      "uniqueSource": "unknown",
+      "uniqueEvidence": "yes",
+      "containsCredentials": "no",
+      "safeDeletionCandidate": false,
+      "reason": "Retain/manual review due worktree/evidence/credential/unique-source uncertainty.",
+      "samplePaths": [
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_CODEX_TEST_Apply_Rehearsal\\PH23G_CODEX_REHEARSAL_20260716194517_result.json",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_CODEX_TEST_Apply_Rehearsal\\PH23G_CODEX_REHEARSAL_20260716194517_backup.json",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_CODEX_TEST_Apply_Rehearsal\\PH23G_CODEX_REHEARSAL_20260716192937_result.json",
+        "C:\\Users\\Jaylan\\Desktop\\New folder\\GSV_CODEX_TEST_Apply_Rehearsal\\PH23G_CODEX_REHEARSAL_20260716192937_backup.json"
+      ]
+    },
+    {
+      "rootPath": "C:\\Users\\Jaylan\\Desktop\\GSV_CODEX_DEMO_MIGRATION",
+      "type": "CODEX_DEMO MIGRATION/COMPLETION EVIDENCE",
+      "fileCount": 1,
+      "totalSize": 2214,
+      "gitRepository": false,
+      "worktree": false,
+      "branch": null,
+      "head": null,
+      "uniqueCommits": "unknown",
+      "uniqueSource": "unknown",
+      "uniqueEvidence": "yes",
+      "containsCredentials": "no",
+      "safeDeletionCandidate": false,
+      "reason": "Retain/manual review due worktree/evidence/credential/unique-source uncertainty.",
+      "samplePaths": [
+        "C:\\Users\\Jaylan\\Desktop\\GSV_CODEX_DEMO_MIGRATION\\before-1785816016840.json"
+      ]
+    },
+    {
+      "rootPath": "C:\\Users\\Jaylan\\Desktop\\GSV_CODEX_DEMO_COMPLETION",
+      "type": "CODEX_DEMO MIGRATION/COMPLETION EVIDENCE",
+      "fileCount": 1,
+      "totalSize": 22563,
+      "gitRepository": false,
+      "worktree": false,
+      "branch": null,
+      "head": null,
+      "uniqueCommits": "unknown",
+      "uniqueSource": "unknown",
+      "uniqueEvidence": "yes",
+      "containsCredentials": "no",
+      "safeDeletionCandidate": false,
+      "reason": "Retain/manual review due worktree/evidence/credential/unique-source uncertainty.",
+      "samplePaths": [
+        "C:\\Users\\Jaylan\\Desktop\\GSV_CODEX_DEMO_COMPLETION\\before-1785848679515.json"
+      ]
+    },
+    {
+      "rootPath": "C:\\Users\\Jaylan\\Downloads",
+      "type": "SECURITY/CREDENTIAL REVIEW",
+      "fileCount": 1,
+      "totalSize": 2382,
+      "gitRepository": false,
+      "worktree": false,
+      "branch": null,
+      "head": null,
+      "uniqueCommits": "unknown",
+      "uniqueSource": "unknown",
+      "uniqueEvidence": "unknown",
+      "containsCredentials": "yes",
+      "safeDeletionCandidate": false,
+      "reason": "Retain/manual review due worktree/evidence/credential/unique-source uncertainty.",
+      "samplePaths": [
+        "C:\\Users\\Jaylan\\Downloads\\gathervibeshub-firebase-adminsdk-fbsvc-7667cf534c.json"
+      ]
+    }
+  ]
+}

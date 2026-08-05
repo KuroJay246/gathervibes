@@ -139,6 +139,9 @@ const classifyFile = (rel, isDirectory) => {
   if (top === 'node_modules') return 'VENDOR / THIRD PARTY'
   if (generatedTops.has(top)) return 'GENERATED'
   if (top === 'output') return 'REVIEW REQUIRED EVIDENCE'
+  if (rel === 'firestore.rules') return 'ACTIVE FIRESTORE SECURITY RULES'
+  if (rel === 'firestore.indexes.json') return 'ACTIVE FIRESTORE INDEX CONFIG'
+  if (rel === 'firebase.json' || rel === '.firebaserc') return 'ACTIVE FIREBASE CONFIGURATION'
   if (rel.startsWith('docs/archive/')) return 'ARCHIVED DOCUMENTATION'
   if (docExts.has(ext) || /handoff|agent|rules|instructions/i.test(filename)) return 'ACTIVE DOCUMENTATION'
   if (sourceExts.has(ext) && sourceTops.has(top)) return top === 'tests' || top === 'e2e' ? 'ACTIVE TEST' : 'ACTIVE SOURCE'
@@ -292,7 +295,9 @@ const documentRegistry = markdownFiles.map((entry) => {
   if (isCurrent && /copy-only command center|Communications Pro|Phase \d+/.test(content)) {
     staleFacts.push('Legacy product or phase wording appears in active documentation.')
   }
-  if (isCurrent && entry.path !== 'docs/HISTORICAL_ARCHIVE_INDEX.md' && /CPB-specific|CPB lock|protected CPB|zero-write/.test(content)) {
+  const cpbProtectionMention = /CPB-specific|CPB lock|protected CPB|zero-write/.test(content)
+  const negatedCpbProtectionMention = /do not preserve CPB-specific|do not add CPB-specific|do not create CPB-specific|Remove CPB-specific/i.test(content)
+  if (isCurrent && entry.path !== 'docs/HISTORICAL_ARCHIVE_INDEX.md' && cpbProtectionMention && !negatedCpbProtectionMention) {
     contradictions.push('Active doc may imply CPB-specific protection rather than standard real-event safeguards.')
   }
   const action = classification === 'ARCHIVED'
@@ -325,8 +330,10 @@ const summary = {
   generatedAt: new Date().toISOString(),
   root,
   branch: runGit(['branch', '--show-current']),
-  head: runGit(['rev-parse', 'HEAD']),
-  originMain: runGit(['rev-parse', 'origin/main']),
+  headAtGeneration: runGit(['rev-parse', 'HEAD']),
+  originMainAtGeneration: runGit(['rev-parse', 'origin/main']),
+  gitMetadataMode: 'stable-current-state',
+  gitMetadataNote: 'Use git rev-parse HEAD and git rev-parse origin/main for authoritative final hashes; embedding the enclosing inventory commit hash would create infinite churn.',
   repositoryBytes: directorySizes.get('.') || 0,
   totalEntries: entries.length,
   totalFiles: fileEntries.length,
