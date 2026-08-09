@@ -44,7 +44,8 @@ test('organizer shell explains every major route without changing route paths', 
   assert.match(pageGuidance['/events'].purpose, /Completed real events remain editable by approved organizers/)
   assert.match(pageGuidance['/communications'].boundary, /Messages are not sent automatically/)
   assert.match(pageGuidance['/tickets'].boundary, /QR payload remains GSV:TICKET:\{ticketCode\}/)
-  assert.match(shell, /Demo \/ training event: example data only/)
+  assert.match(shell, /Training event · safe to practice with example data/)
+  assert.doesNotMatch(shell, /Demo \/ training event: example data only/)
   assert.match(pageGuidance['/payments'].boundary, /Registration payments are not merged into Operations Ledger totals automatically/)
 })
 

@@ -199,6 +199,48 @@ test('Run of Show and Resources forms use practical relationship selectors inste
   assert.doesNotMatch(resourcesPage, /Supplier contact ID/)
 })
 
+test('Run of Show and Resources actions provide success feedback and contextual delete confirmation', async () => {
+  const [runOfShowPage, resourcesPage] = await Promise.all([
+    readFile('src/pages/RunOfShowPage.jsx', 'utf8'),
+    readFile('src/pages/ResourcesPage.jsx', 'utf8'),
+  ])
+
+  for (const text of [
+    'Run of Show item added.',
+    'Run of Show item updated.',
+    'Run of Show item deleted.',
+    'Run of Show item marked ${status}.',
+    'Delete Run of Show item?',
+    'This removes the item from the event-day sequence',
+  ]) {
+    assert.ok(runOfShowPage.includes(text), text)
+  }
+
+  for (const text of [
+    'Resource added.',
+    'Resource updated.',
+    'Resource deleted.',
+    'Resource marked ${status}.',
+    'Delete resource?',
+    'This removes the resource from ${activeEvent?.eventName',
+  ]) {
+    assert.ok(resourcesPage.includes(text), text)
+  }
+
+  assert.match(runOfShowPage, /ConfirmDialog/)
+  assert.match(resourcesPage, /ConfirmDialog/)
+  assert.doesNotMatch(runOfShowPage, /window\.confirm/)
+  assert.doesNotMatch(resourcesPage, /window\.confirm/)
+  assert.match(runOfShowPage, /role="status"/)
+  assert.match(resourcesPage, /role="status"/)
+  const tasksPage = await readFile('src/pages/TasksPage.jsx', 'utf8')
+  assert.match(tasksPage, /role="status"/)
+  assert.match(tasksPage, /aria-label="Task summary"/)
+  assert.doesNotMatch(tasksPage, /aria-label="Task status summary"/)
+  assert.match(runOfShowPage, /No local success state was applied/)
+  assert.match(resourcesPage, /organizerSaveErrorMessage/)
+})
+
 test('Guardrail source checks remain explicit', async () => {
   const [app, rules, packageJson, ticketService] = await Promise.all([
     readFile('src/App.jsx', 'utf8'),

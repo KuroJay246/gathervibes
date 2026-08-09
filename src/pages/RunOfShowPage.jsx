@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { collection, onSnapshot } from 'firebase/firestore'
 import { AlertTriangle, CheckCircle2, Clock3, PackageCheck, Plus, UserRoundCheck } from 'lucide-react'
+import { ErrorState } from '../components/ui/ErrorState'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { db } from '../lib/firebase'
@@ -167,6 +169,8 @@ export function RunOfShowPage() {
   const [editing, setEditing] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [deleteCandidate, setDeleteCandidate] = useState(null)
 
   useEffect(() => subscribeToRunOfShow(activeEvent?.eventId, setItems, (err) => setError(err.message)), [activeEvent?.eventId])
   useEffect(() => subscribeToEventResources(activeEvent?.eventId, setResources, () => {}), [activeEvent?.eventId])
@@ -189,10 +193,69 @@ export function RunOfShowPage() {
   const resourceSummary = buildResourceSummary(resources)
 
   async function save(values) {
-    if (editing?.itemId) await updateRunOfShowItem(activeEvent, editing, values, user)
-    else await createRunOfShowItem(activeEvent, values, user)
-    setEditing(null)
-    setShowForm(false)
+    try {
+      setError('')
+      setSuccess('')
+      if (editing?.itemId) {
+        await updateRunOfShowItem(activeEvent, editing, values, user)
+        setSuccess('Run of Show item updated.')
+      } else {
+        await createRunOfShowItem(activeEvent, values, user)
+        setSuccess('Run of Show item added.')
+      }
+      setEditing(null)
+      setShowForm(false)
+    } catch (err) {
+      setError(err?.code === 'permission-denied'
+        ? 'Run of Show could not be saved because Firestore rejected this update. Confirm your account and event scope in System QA.'
+        : err?.message || 'Run of Show item could not be saved.')
+    }
+  }
+
+  async function changeStatus(item, status, values = {}) {
+    try {
+      setError('')
+      setSuccess('')
+      await updateRunOfShowStatus(activeEvent, item, status, user, values)
+      setSuccess(`Run of Show item marked ${status}.`)
+    } catch (err) {
+      setError(err?.code === 'permission-denied'
+        ? 'Run of Show status was not saved because Firestore rejected this update. No local success state was applied.'
+        : err?.message || 'Run of Show status could not be updated.')
+    }
+  }
+
+  async function markArrived(item) {
+    try {
+      setError('')
+      setSuccess('')
+      await updateRunOfShowItem(activeEvent, item, { arrivalStatus: 'Arrived', actualArrivalTime: new Date().toTimeString().slice(0, 5) }, user, 'run-of-show.arrival')
+      setSuccess('Arrival marked for Run of Show item.')
+    } catch (err) {
+      setError(err?.code === 'permission-denied'
+        ? 'Arrival was not saved because Firestore rejected this update. No local success state was applied.'
+        : err?.message || 'Arrival could not be updated.')
+    }
+  }
+
+  async function removeItem(item) {
+    setDeleteCandidate(item)
+  }
+
+  async function confirmRemoveItem() {
+    const item = deleteCandidate
+    if (!item) return
+    try {
+      setError('')
+      setSuccess('')
+      await deleteRunOfShowItem(activeEvent, item, user)
+      setSuccess('Run of Show item deleted.')
+      setDeleteCandidate(null)
+    } catch (err) {
+      setError(err?.code === 'permission-denied'
+        ? 'Run of Show item was not deleted because Firestore rejected this update.'
+        : err?.message || 'Run of Show item could not be deleted.')
+    }
   }
 
   function createTask(item) {
@@ -202,7 +265,8 @@ export function RunOfShowPage() {
 
   return (
     <div data-tour-id="run-of-show-workspace" className="space-y-5">
-      {error && <p className="rounded-xl border border-[#F3C6C6] bg-[#FFF1F1] px-3 py-2 text-sm font-semibold text-[#8A1F1F]">{error}</p>}
+      {success && <div role="status" className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{success}</div>}
+      {error && <ErrorState title="Run of Show action could not be completed" message={error} />}
       <section className="rounded-[2rem] bg-[#2B1723] p-5 text-white shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -259,11 +323,11 @@ export function RunOfShowPage() {
                   {blockers.length > 0 && <p className="mt-2 flex items-center gap-2 rounded-xl bg-[#FFF6E8] px-3 py-2 text-sm font-semibold text-[#7A4B16]"><AlertTriangle className="size-4" /> Blocked by {blockers.map((entry) => entry.title).join(', ')}</p>}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {['Confirmed', 'In Progress', 'Completed', 'Delayed'].map((status) => <button key={status} type="button" onClick={() => updateRunOfShowStatus(activeEvent, item, status, user, status === 'Delayed' ? { delayReason: item.delayReason || 'Marked delayed by organizer.' } : {})} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">{status}</button>)}
-                  {item.expectedArrivalTime && item.arrivalStatus !== 'Arrived' && <button type="button" onClick={() => updateRunOfShowItem(activeEvent, item, { arrivalStatus: 'Arrived', actualArrivalTime: new Date().toTimeString().slice(0, 5) }, user, 'run-of-show.arrival')} className="min-h-10 rounded-xl border border-[#D7E6CF] px-3 text-xs font-bold text-[#4F7A57]">Mark arrived</button>}
+                  {['Confirmed', 'In Progress', 'Completed', 'Delayed'].map((status) => <button key={status} type="button" onClick={() => changeStatus(item, status, status === 'Delayed' ? { delayReason: item.delayReason || 'Marked delayed by organizer.' } : {})} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">{status}</button>)}
+                  {item.expectedArrivalTime && item.arrivalStatus !== 'Arrived' && <button type="button" onClick={() => markArrived(item)} className="min-h-10 rounded-xl border border-[#D7E6CF] px-3 text-xs font-bold text-[#4F7A57]">Mark arrived</button>}
                   <button type="button" onClick={() => { setEditing(item); setShowForm(true) }} className="min-h-10 rounded-xl bg-[#2B1723] px-3 text-xs font-bold text-white">Edit</button>
                   <button type="button" onClick={() => createTask(item)} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">Create task</button>
-                  <button type="button" onClick={() => deleteRunOfShowItem(activeEvent, item, user)} className="min-h-10 rounded-xl border border-[#F3C6C6] px-3 text-xs font-bold text-[#8A1F1F]">Delete</button>
+                  <button type="button" onClick={() => removeItem(item)} className="min-h-10 rounded-xl border border-[#F3C6C6] px-3 text-xs font-bold text-[#8A1F1F]">Delete</button>
                 </div>
               </div>
             </article>
@@ -273,6 +337,16 @@ export function RunOfShowPage() {
       <div className="rounded-3xl border border-[#E7D6CC] bg-white p-5 text-sm text-[#6B564C]">
         Documents, Contacts, Tasks, Operations, and Resources can be linked by ID without rewriting older related records. <Link to="/resources" className="font-bold text-[#8A3F4B]">Open Resources</Link>
       </div>
+      <ConfirmDialog
+        open={Boolean(deleteCandidate)}
+        title="Delete Run of Show item?"
+        recordName={deleteCandidate?.title}
+        message={`This removes the item from the event-day sequence for ${activeEvent?.eventName || 'the Working Event'}.`}
+        confirmLabel="Delete Item"
+        pending={false}
+        onCancel={() => setDeleteCandidate(null)}
+        onConfirm={confirmRemoveItem}
+      />
     </div>
   )
 }

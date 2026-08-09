@@ -10,6 +10,7 @@ import {
 } from '../../utils/eventPlanning'
 import { formatCurrency, formatPaymentMethod } from '../../utils/financeUtils'
 import { validatePartnerRecord } from '../../utils/validators'
+import { ConfirmDialog } from '../ui/ConfirmDialog'
 
 function SummaryCard({ label, value, detail }) {
   return (
@@ -34,6 +35,7 @@ export function PartnerCommitmentsPanel({ event, onSaveRecord, onDeleteRecord })
   const [search, setSearch] = useState('')
   const [recordTypeFilter, setRecordTypeFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [deleteCandidate, setDeleteCandidate] = useState(null)
   const summary = useMemo(() => buildPartnerSummary(hydratedEvent.partnerRecords), [hydratedEvent.partnerRecords])
 
   const visibleRecords = useMemo(() => hydratedEvent.partnerRecords.filter((record) => {
@@ -72,13 +74,19 @@ export function PartnerCommitmentsPanel({ event, onSaveRecord, onDeleteRecord })
   }
 
   async function handleDelete(record) {
-    if (!window.confirm(`Remove ${record.name} from ${event.eventName}?`)) return
+    setDeleteCandidate(record)
+  }
+
+  async function confirmDeleteRecord() {
+    const record = deleteCandidate
+    if (!record) return
     setSaving(true)
     setMessage('')
     try {
       await onDeleteRecord(record.partnerId)
       setMessage('Record removed.')
       if (partnerForm.partnerId === record.partnerId) setPartnerForm(createEmptyPartner())
+      setDeleteCandidate(null)
     } finally {
       setSaving(false)
     }
@@ -353,6 +361,16 @@ export function PartnerCommitmentsPanel({ event, onSaveRecord, onDeleteRecord })
         <ReceiptText className="mb-2 size-4 text-[#7A5818]" />
         Requested sponsorship does not count as confirmed income. Record actual event money in the Operations ledger only when cash or expenses have really been received, paid, or committed there.
       </div>
+      <ConfirmDialog
+        open={Boolean(deleteCandidate)}
+        title="Remove partner record?"
+        recordName={deleteCandidate?.name}
+        message={`This removes the planning contact or commitment from ${event?.eventName || 'the Working Event'}. It does not change registration payments.`}
+        confirmLabel="Remove Record"
+        pending={saving}
+        onCancel={() => setDeleteCandidate(null)}
+        onConfirm={confirmDeleteRecord}
+      />
     </section>
   )
 }

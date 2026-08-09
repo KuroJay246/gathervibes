@@ -5,6 +5,7 @@ import { AssignedEventGate } from '../components/AssignedEventGate'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { useAuth } from '../auth/useAuth'
 import { canManageTasks, isApprovedAdmin } from '../utils/accessRoles'
@@ -22,6 +23,12 @@ import {
   normalizeExternalUrl,
 } from '../utils/documentRegistry'
 import { createDocumentReference, deleteDocumentReference, subscribeToDocuments, updateDocumentReference, updateDocumentStatus } from '../services/documentService'
+
+function friendlyDocumentError(error, action = 'document reference') {
+  if (error?.code === 'permission-denied') return `${action} was blocked by Firestore authorization or document-record validation. Confirm Protected Owner and Working Event status in System QA.`
+  if (error?.code === 'unauthenticated') return 'Your session expired. Sign in again to continue.'
+  return error?.message || `${action} could not be completed.`
+}
 
 function statusClass(status) {
   if (['Approved', 'Current', 'Received'].includes(status)) return 'bg-[#EAF6EF] text-[#17623A]'
@@ -202,6 +209,7 @@ export function DocumentsPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [formDocument, setFormDocument] = useState(null)
+  const [deleteCandidate, setDeleteCandidate] = useState(null)
   const [saving, setSaving] = useState(false)
   const canEdit = isApprovedAdmin(access)
   const canCreateTask = canManageTasks(access, activeEvent?.eventId)
@@ -222,7 +230,7 @@ export function DocumentsPage() {
         setLoading(false)
       },
       (nextError) => {
-        setError(nextError?.code === 'permission-denied' ? 'Your account cannot read document references for this event.' : nextError?.message || 'Document references are unavailable.')
+        setError(friendlyDocumentError(nextError, 'Document references'))
         setLoading(false)
       },
     )
@@ -235,6 +243,7 @@ export function DocumentsPage() {
   async function saveDocument(values) {
     setSaving(true)
     setError('')
+    setSuccess('')
     try {
       if (formDocument?.documentId) {
         await updateDocumentReference(activeEvent, formDocument, values, user)
@@ -245,7 +254,7 @@ export function DocumentsPage() {
       }
       setFormDocument(null)
     } catch (saveError) {
-      setError(saveError?.message || 'Document reference could not be saved.')
+      setError(friendlyDocumentError(saveError, 'Document reference'))
     } finally {
       setSaving(false)
     }
@@ -253,24 +262,34 @@ export function DocumentsPage() {
 
   async function markStatus(documentRecord, status) {
     setSaving(true)
+    setError('')
+    setSuccess('')
     try {
       await updateDocumentStatus(activeEvent, documentRecord, status, user)
       setSuccess(`Document marked ${status}.`)
     } catch (statusError) {
-      setError(statusError?.message || 'Document status could not be updated.')
+      setError(friendlyDocumentError(statusError, 'Document status'))
     } finally {
       setSaving(false)
     }
   }
 
   async function removeDocument(documentRecord) {
-    if (!window.confirm(`Delete the reference for "${documentRecord.title}"? This does not delete the external file.`)) return
+    setDeleteCandidate(documentRecord)
+  }
+
+  async function confirmRemoveDocument() {
+    const documentRecord = deleteCandidate
+    if (!documentRecord) return
     setSaving(true)
+    setError('')
+    setSuccess('')
     try {
       await deleteDocumentReference(activeEvent, documentRecord, user)
       setSuccess('Document reference removed. External file was not deleted.')
+      setDeleteCandidate(null)
     } catch (deleteError) {
-      setError(deleteError?.message || 'Document reference could not be deleted.')
+      setError(friendlyDocumentError(deleteError, 'Document reference'))
     } finally {
       setSaving(false)
     }
@@ -352,6 +371,16 @@ export function DocumentsPage() {
             <p><strong>Storage boundary:</strong> this register stores title, status, dates, relationships, notes, and external URLs only. It does not upload, copy, scan, OCR, or delete external files.</p>
           </div>
         </section>
+        <ConfirmDialog
+          open={Boolean(deleteCandidate)}
+          title="Delete document reference?"
+          recordName={deleteCandidate?.title}
+          message="This removes the reference from the Working Event. It does not delete or change the external file."
+          confirmLabel="Delete Reference"
+          pending={saving}
+          onCancel={() => setDeleteCandidate(null)}
+          onConfirm={confirmRemoveDocument}
+        />
       </div>
     </AssignedEventGate>
   )

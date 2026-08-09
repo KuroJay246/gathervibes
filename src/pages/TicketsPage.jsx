@@ -9,6 +9,7 @@ import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { TicketQrCode } from '../components/tickets/TicketQrCode'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { generateSequentialTicketCode, generateTicketCode, getTicketPrefix, normalizeTicketCode, searchableRegistrationText } from '../utils/ticketUtils'
 import { formatPaymentLabel, normalizePaymentStatus, paymentStatusMatches } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency } from '../utils/financeUtils'
@@ -136,6 +137,7 @@ export function TicketsPage() {
   const [actionError, setActionError] = useState('')
   const [showPrintableQrs, setShowPrintableQrs] = useState(false)
   const [selectedRegistrationId, setSelectedRegistrationId] = useState('')
+  const [ticketConfirmation, setTicketConfirmation] = useState(null)
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -238,13 +240,25 @@ export function TicketsPage() {
   }
 
   async function handleClear(registration) {
-    if (!window.confirm(`Clear ticket code for ${registration.fullName}?`)) return
+    setTicketConfirmation({ action: 'clear', registration })
+  }
+
+  async function confirmTicketAction() {
+    const pendingAction = ticketConfirmation
+    if (!pendingAction?.registration) return
+    const registration = pendingAction.registration
+    if (pendingAction.action === 'regenerate') {
+      setTicketConfirmation(null)
+      await assignCode(registration, generateSequentialTicketCode(existingCodes, activeEvent), 'ticket.regenerate')
+      return
+    }
     setSavingId(registration.registrationId)
     setMessage('')
     setActionError('')
     try {
       await clearTicketAssignment(registration, user)
       setMessage('Ticket code cleared.')
+      setTicketConfirmation(null)
     } catch (err) {
       if (import.meta.env.DEV) console.error(err)
       setActionError('Ticket code could not be cleared.')
@@ -279,11 +293,7 @@ export function TicketsPage() {
           <div className="flex flex-wrap justify-end gap-2">
           <button
             type="button"
-            onClick={() => {
-              if (window.confirm(`Regenerate ticket code for ${registration.fullName}?`)) {
-                assignCode(registration, generateSequentialTicketCode(existingCodes, activeEvent), 'ticket.regenerate')
-              }
-            }}
+            onClick={() => setTicketConfirmation({ action: 'regenerate', registration })}
             disabled={savingId === registration.registrationId}
             className="inline-flex items-center gap-2 rounded-lg border border-[#E7D6CC] bg-white px-3 py-2 text-xs font-bold text-[#6B564C] hover:bg-[#FBF8F5] disabled:opacity-50"
           >
@@ -644,6 +654,18 @@ export function TicketsPage() {
           </div>
         </>
       )}
+      <ConfirmDialog
+        open={Boolean(ticketConfirmation)}
+        title={ticketConfirmation?.action === 'regenerate' ? 'Regenerate ticket code?' : 'Clear ticket code?'}
+        recordName={ticketConfirmation?.registration?.fullName}
+        message={ticketConfirmation?.action === 'regenerate'
+          ? `This replaces the current ticket code for ${activeEvent?.eventName || 'the Working Event'}. QR codes still use the existing ticket-code-only payload format.`
+          : `This removes the ticket code from this registration in ${activeEvent?.eventName || 'the Working Event'}.`}
+        confirmLabel={ticketConfirmation?.action === 'regenerate' ? 'Regenerate Code' : 'Clear Ticket'}
+        pending={Boolean(savingId)}
+        onCancel={() => setTicketConfirmation(null)}
+        onConfirm={confirmTicketAction}
+      />
     </div>
   )
 }

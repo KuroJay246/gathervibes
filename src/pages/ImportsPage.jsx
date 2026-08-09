@@ -12,6 +12,7 @@ import { ImportSummary } from '../components/imports/ImportSummary'
 import { ImportTemplatesPanel } from '../components/imports/ImportTemplatesPanel'
 import { EmptyState } from '../components/ui/EmptyState'
 import { InfoHint } from '../components/ui/InfoHint'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import {
   IMPORT_WORKFLOW_STEPS,
   getImportRecordType,
@@ -88,6 +89,7 @@ export function ImportsPage() {
   const [error, setError] = useState('')
   const [importErrorDetails, setImportErrorDetails] = useState(null)
   const [importResult, setImportResult] = useState(null)
+  const [changeSheetConfirmationOpen, setChangeSheetConfirmationOpen] = useState(false)
   const selectedSource = getImportSource(sourceType)
   const selectedRecordType = getImportRecordType(recordType)
   const sourceGroups = groupedImportSources()
@@ -244,7 +246,11 @@ export function ImportsPage() {
   }
 
   function handleChangeSheet() {
-    if (!window.confirm('Changing sheets will reset mapping, duplicate review, and preview for the current sheet. Continue?')) return
+    setChangeSheetConfirmationOpen(true)
+  }
+
+  function confirmChangeSheet() {
+    setChangeSheetConfirmationOpen(false)
     setConfirmedSheetId('')
     setParsedData({ headers: [], rows: [] })
     setFieldMap({})
@@ -1065,6 +1071,16 @@ export function ImportsPage() {
       {step === 6 && (
         <ImportSummary result={importResult} onReset={reset} />
       )}
+
+      <ConfirmDialog
+        open={changeSheetConfirmationOpen}
+        title="Change import sheet?"
+        recordName={selectedSheet?.name}
+        message="Changing sheets resets mapping, duplicate review, and preview for the current sheet."
+        confirmLabel="Change Sheet"
+        onCancel={() => setChangeSheetConfirmationOpen(false)}
+        onConfirm={confirmChangeSheet}
+      />
     </div>
   )
 }

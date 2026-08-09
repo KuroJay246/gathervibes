@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, Check, CircleAlert, LogOut, RotateCcw, Search, ShieldCheck, Ticket, UserRound, WifiOff } from 'lucide-react'
 import { BrandMark } from '../components/BrandMark'
 import { QrScannerPanel } from '../components/checkin/QrScannerPanel'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { subscribeToRegistrations } from '../services/registrationService'
@@ -41,6 +42,7 @@ export function ScannerPage() {
   const [resumeScanTrigger, setResumeScanTrigger] = useState(0)
   const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine)
   const [lastResult, setLastResult] = useState(null)
+  const [confirmUndo, setConfirmUndo] = useState(false)
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -165,8 +167,11 @@ export function ScannerPage() {
       return
     }
     if (!selectedRegistration?.checkedIn || saving) return
-    if (!window.confirm(`Undo check-in for ${selectedRegistration.fullName || 'this guest'}? This is an admin correction only.`)) return
+    setConfirmUndo(true)
+  }
 
+  async function confirmAdminUndoCheckIn() {
+    if (!selectedRegistration?.checkedIn || saving) return
     setSaving(true)
     setError('')
     try {
@@ -180,6 +185,7 @@ export function ScannerPage() {
       })
       setNotice(`Check-in undone for ${selectedRegistration.fullName || 'Guest'}.`)
       setResumeScanTrigger((value) => value + 1)
+      setConfirmUndo(false)
     } catch (undoError) {
       setError(undoError?.message || 'Undo Check-In could not be completed.')
     } finally {
@@ -444,6 +450,16 @@ export function ScannerPage() {
             </div>
           </aside>
         </section>
+        <ConfirmDialog
+          open={confirmUndo}
+          title="Undo check-in?"
+          recordName={selectedRegistration?.fullName || 'This guest'}
+          message="This admin correction moves the guest back to not checked in for the assigned event."
+          confirmLabel="Undo Check-In"
+          pending={saving}
+          onCancel={() => setConfirmUndo(false)}
+          onConfirm={confirmAdminUndoCheckIn}
+        />
       </div>
     </main>
   )

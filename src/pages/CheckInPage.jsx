@@ -26,6 +26,7 @@ import { normalizePaymentStatus } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
 import { buildRegistrationMetrics, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
 import { InfoHint } from '../components/ui/InfoHint'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 
 const CHECK_IN_FILTER_GROUPS = [
@@ -120,6 +121,7 @@ export function CheckInPage() {
   const [helperMessage, setHelperMessage] = useState('')
   const [resumeScanTrigger, setResumeScanTrigger] = useState(0)
   const [selectedListIds, setSelectedListIds] = useState(new Set())
+  const [bulkConfirmation, setBulkConfirmation] = useState(null)
   const summary = useMemo(() => buildEventDaySummary(registrations), [registrations])
   const visibleRegistrations = useMemo(
     () => filterCheckInRegistrations(registrations, activeView, activeEvent),
@@ -248,8 +250,10 @@ export function CheckInPage() {
   async function handleBulkCheckIn() {
     const candidates = selectedListRows.filter((registration) => canCompleteCheckIn(registration).allowed)
     if (candidates.length === 0) return
-    if (!window.confirm(`Check in ${candidates.length} selected guest registration${candidates.length === 1 ? '' : 's'} for ${activeEvent.eventName}?`)) return
+    setBulkConfirmation({ action: 'check-in', candidates })
+  }
 
+  async function confirmBulkCheckIn(candidates) {
     setSaving(true)
     setMessage('')
     setActionError('')
@@ -274,8 +278,10 @@ export function CheckInPage() {
     }
     const candidates = selectedListRows.filter((registration) => registration.checkedIn)
     if (candidates.length === 0) return
-    if (!window.confirm(`Undo check-in for ${candidates.length} selected guest registration${candidates.length === 1 ? '' : 's'}?`)) return
+    setBulkConfirmation({ action: 'undo', candidates })
+  }
 
+  async function confirmBulkUndoCheckIn(candidates) {
     setSaving(true)
     setMessage('')
     setActionError('')
@@ -950,6 +956,23 @@ export function CheckInPage() {
           </div>
         </div>
       )}
+      <ConfirmDialog
+        open={Boolean(bulkConfirmation)}
+        title={bulkConfirmation?.action === 'undo' ? 'Undo selected check-ins?' : 'Check in selected guests?'}
+        recordName={`${bulkConfirmation?.candidates?.length || 0} selected registration${bulkConfirmation?.candidates?.length === 1 ? '' : 's'}`}
+        message={bulkConfirmation?.action === 'undo'
+          ? `This admin correction moves the selected checked-in registrations back to not checked in for ${activeEvent?.eventName || 'the Working Event'}.`
+          : `This records attendance for the selected registrations in ${activeEvent?.eventName || 'the Working Event'}.`}
+        confirmLabel={bulkConfirmation?.action === 'undo' ? 'Undo Check-Ins' : 'Check In Guests'}
+        pending={saving}
+        onCancel={() => setBulkConfirmation(null)}
+        onConfirm={() => {
+          const confirmation = bulkConfirmation
+          setBulkConfirmation(null)
+          if (confirmation?.action === 'undo') void confirmBulkUndoCheckIn(confirmation.candidates || [])
+          else void confirmBulkCheckIn(confirmation?.candidates || [])
+        }}
+      />
     </div>
   )
 }

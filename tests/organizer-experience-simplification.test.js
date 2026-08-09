@@ -36,6 +36,8 @@ test('organizer navigation is grouped by real work and exposes page purpose acti
   assert.match(shell, /to: '\/communications', label: 'Message Builder'/)
   assert.match(shell, /to: '\/event-review', label: 'Reports'/)
   assert.match(shell, /to: '\/contacts', label: 'Contacts & Organizations'/)
+  assert.match(shell, /Training event · safe to practice/)
+  assert.doesNotMatch(shell, /Demo \/ training event: example data only/)
 })
 
 test('planning forms explain required fields, status meaning, and non-automatic relationships', async () => {

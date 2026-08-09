@@ -19,6 +19,7 @@ import {
 } from '../../utils/eventPlanning'
 import { formatCurrency } from '../../utils/financeUtils'
 import { validatePlanningTask } from '../../utils/validators'
+import { ConfirmDialog } from '../ui/ConfirmDialog'
 
 function SummaryCard({ label, value, detail }) {
   return (
@@ -68,6 +69,7 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
   const [taskFilter, setTaskFilter] = useState('all')
   const [taskSort, setTaskSort] = useState('due-date')
   const [taskMessage, setTaskMessage] = useState('')
+  const [deleteCandidate, setDeleteCandidate] = useState(null)
 
   const filteredTasks = useMemo(() => {
     const tasks = hydratedEvent.planningTasks.filter((task) => {
@@ -147,13 +149,19 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
   }
 
   async function removeTask(task) {
-    if (!window.confirm(`Remove task "${task.title}" from ${event.eventName}?`)) return
+    setDeleteCandidate(task)
+  }
+
+  async function confirmRemoveTask() {
+    const task = deleteCandidate
+    if (!task) return
     setSavingTask(true)
     setTaskMessage('')
     try {
       await onDeleteTask(task.taskId)
       setTaskMessage('Task removed.')
       if (taskForm.taskId === task.taskId) setTaskForm(createEmptyTask())
+      setDeleteCandidate(null)
     } finally {
       setSavingTask(false)
     }
@@ -493,6 +501,16 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
           )}
         </article>
       </section>
+      <ConfirmDialog
+        open={Boolean(deleteCandidate)}
+        title="Remove planning task?"
+        recordName={deleteCandidate?.title}
+        message={`This removes the planning task from ${event?.eventName || 'the event setup workspace'}.`}
+        confirmLabel="Remove Task"
+        pending={savingTask}
+        onCancel={() => setDeleteCandidate(null)}
+        onConfirm={confirmRemoveTask}
+      />
     </section>
   )
 }

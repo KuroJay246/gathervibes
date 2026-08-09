@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { AlertTriangle, ClipboardList, PackageCheck, Plus, Truck } from 'lucide-react'
+import { ErrorState } from '../components/ui/ErrorState'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { RelationshipSelector } from '../components/RelationshipSelector'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
@@ -150,6 +152,8 @@ export function ResourcesPage() {
   const [editing, setEditing] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [deleteCandidate, setDeleteCandidate] = useState(null)
 
   useEffect(() => subscribeToEventResources(activeEvent?.eventId, setResources, (err) => setError(err.message)), [activeEvent?.eventId])
   useEffect(() => subscribeToRunOfShow(activeEvent?.eventId, setRunItems, () => {}), [activeEvent?.eventId])
@@ -168,6 +172,7 @@ export function ResourcesPage() {
     try {
       if (editing?.resourceId) await updateEventResource(activeEvent, editing, values, user)
       else await createEventResource(activeEvent, values, user)
+      setSuccess(editing?.resourceId ? 'Resource updated.' : 'Resource added.')
       setEditing(null)
       setShowForm(false)
       setError('')
@@ -181,6 +186,7 @@ export function ResourcesPage() {
     try {
       await updateEventResourceStatus(activeEvent, resource, status, user)
       setError('')
+      setSuccess(`Resource marked ${status}.`)
     } catch (err) {
       if (import.meta.env.DEV) console.error('Resource status error:', err)
       setError(organizerSaveErrorMessage(err, 'resource status'))
@@ -188,9 +194,17 @@ export function ResourcesPage() {
   }
 
   async function removeResource(resource) {
+    setDeleteCandidate(resource)
+  }
+
+  async function confirmRemoveResource() {
+    const resource = deleteCandidate
+    if (!resource) return
     try {
       await deleteEventResource(activeEvent, resource, user)
       setError('')
+      setSuccess('Resource deleted.')
+      setDeleteCandidate(null)
     } catch (err) {
       if (import.meta.env.DEV) console.error('Resource delete error:', err)
       setError(organizerSaveErrorMessage(err, 'resource'))
@@ -204,7 +218,8 @@ export function ResourcesPage() {
 
   return (
     <div data-tour-id="resources-workspace" className="space-y-5">
-      {error && <p className="rounded-xl border border-[#F3C6C6] bg-[#FFF1F1] px-3 py-2 text-sm font-semibold text-[#8A1F1F]">{error}</p>}
+      {success && <div role="status" className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{success}</div>}
+      {error && <ErrorState title="Resource action could not be completed" message={error} />}
       <section className="rounded-[2rem] bg-[#FFF8F2] p-5 shadow-sm ring-1 ring-[#E7D6CC] sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -252,6 +267,16 @@ export function ResourcesPage() {
           </article>
         ))}
       </section>
+      <ConfirmDialog
+        open={Boolean(deleteCandidate)}
+        title="Delete resource?"
+        recordName={deleteCandidate?.name}
+        message={`This removes the resource from ${activeEvent?.eventName || 'the Working Event'}. It does not change Operations, payments, or tasks automatically.`}
+        confirmLabel="Delete Resource"
+        pending={false}
+        onCancel={() => setDeleteCandidate(null)}
+        onConfirm={confirmRemoveResource}
+      />
     </div>
   )
 }

@@ -194,7 +194,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
             </span>
             {demoEventSelected && !collapsed && (
               <span className="mt-2 inline-flex rounded-full bg-[#FFF4DF] px-2 py-1 text-[8px] font-bold uppercase tracking-[0.16em] text-[#7A5818]">
-                Demo / training
+                Training event · safe to practice
               </span>
             )}
             {collapsed && <CalendarDays className="mx-auto size-5 text-white/80" aria-hidden="true" />}
@@ -341,7 +341,7 @@ export function AppShell() {
                   </p>
                   {demoEventSelected && (
                     <p className="mt-2 inline-flex rounded-full bg-[#FFF4DF] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.16em] text-[#7A5818]">
-                      Demo / training event: example data only
+                      Training event · safe to practice with example data
                     </p>
                   )}
                 </div>

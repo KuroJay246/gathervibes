@@ -19,6 +19,7 @@ import { RegistrationFormModal } from '../components/registrations/RegistrationF
 import { DeleteRegistrationDialog } from '../components/registrations/DeleteRegistrationDialog'
 import { ExportModal } from '../components/registrations/ExportModal'
 import { RegistrationFilters } from '../components/registrations/RegistrationFilters'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { InfoHint } from '../components/ui/InfoHint'
 import { Link, useSearchParams } from 'react-router'
 import { buildRegistrationMetrics, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
@@ -150,6 +151,7 @@ export function RegistrationsPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
   const [editingRegistration, setEditingRegistration] = useState(null)
   const [deletingRegistration, setDeletingRegistration] = useState(null)
+  const [bulkConfirmation, setBulkConfirmation] = useState(null)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -328,8 +330,10 @@ export function RegistrationsPage() {
   async function handleBulkDelete() {
     const selected = selectedRegistrations.filter((registration) => registration.eventId === activeEvent.eventId)
     if (selected.length === 0) return
-    const confirmed = window.confirm(`Delete ${selected.length} selected registrations from ${activeEvent.eventName}?`)
-    if (!confirmed) return
+    setBulkConfirmation({ action: 'delete', selected })
+  }
+
+  async function confirmBulkDelete(selected = []) {
     if (selected.length > 10) {
       const typed = window.prompt(`Type DELETE to confirm deleting ${selected.length} selected registrations from ${activeEvent.eventName}.`)
       if (typed !== 'DELETE') return
@@ -369,8 +373,15 @@ export function RegistrationsPage() {
   async function handleBulkFinance(updates, confirmation = '') {
     const selected = selectedRegistrations.filter((registration) => registration.eventId === activeEvent.eventId)
     if (selected.length === 0) return
-    if (confirmation && !window.confirm(`${confirmation} This affects ${selected.length} selected registration${selected.length === 1 ? '' : 's'} in ${activeEvent.eventName} only.`)) return
+    if (confirmation) {
+      setBulkConfirmation({ action: 'finance', selected, updates, confirmation })
+      return
+    }
 
+    await confirmBulkFinance(selected, updates)
+  }
+
+  async function confirmBulkFinance(selected = [], updates = {}) {
     setSaving(true)
     setSuccess('')
     try {
@@ -837,6 +848,24 @@ export function RegistrationsPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeletingRegistration(null)}
         deleting={saving}
+      />
+
+      <ConfirmDialog
+        open={Boolean(bulkConfirmation)}
+        title={bulkConfirmation?.action === 'delete' ? 'Delete selected registrations?' : bulkConfirmation?.confirmation || 'Update selected registrations?'}
+        recordName={`${bulkConfirmation?.selected?.length || 0} selected registration${bulkConfirmation?.selected?.length === 1 ? '' : 's'}`}
+        message={bulkConfirmation?.action === 'delete'
+          ? `This deletes the selected registrations from ${activeEvent?.eventName || 'the Working Event'}. Large batches still require typing DELETE in the next step.`
+          : `This updates finance fields for the selected registrations in ${activeEvent?.eventName || 'the Working Event'} only.`}
+        confirmLabel={bulkConfirmation?.action === 'delete' ? 'Delete Registrations' : 'Update Registrations'}
+        pending={saving}
+        onCancel={() => setBulkConfirmation(null)}
+        onConfirm={() => {
+          const confirmation = bulkConfirmation
+          setBulkConfirmation(null)
+          if (confirmation?.action === 'delete') void confirmBulkDelete(confirmation.selected || [])
+          else void confirmBulkFinance(confirmation?.selected || [], confirmation?.updates || {})
+        }}
       />
 
       <ExportModal

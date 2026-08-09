@@ -6,6 +6,7 @@ import { PartnerCommitmentsPanel } from '../components/operations/PartnerCommitm
 import { useActiveEvent } from '../events/useActiveEvent'
 import { EmptyState } from '../components/ui/EmptyState'
 import { LoadingState } from '../components/ui/LoadingState'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { buildFinanceSummary, formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
 import { subscribeToRegistrations } from '../services/registrationService'
 import {
@@ -117,6 +118,7 @@ export function OperationsPage() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const [selectedDetail, setSelectedDetail] = useState(null)
+  const [cancelCandidate, setCancelCandidate] = useState(null)
   const adminUser = isApprovedAdmin(access)
   const currentEvent = resolvedActiveEvent || activeEvent
   const canEditOperations = canWriteOperations(access, currentEvent?.eventId)
@@ -302,13 +304,19 @@ export function OperationsPage() {
       setError('This role can view assigned operations entries but cannot cancel them.')
       return
     }
-    if (!window.confirm(`Cancel ledger entry "${entry.label}" for ${currentEvent.eventName}?`)) return
+    setCancelCandidate(entry)
+  }
+
+  async function confirmCancelEntry() {
+    const entry = cancelCandidate
+    if (!entry) return
     setSaving(true)
     setError('')
     setMessage('')
     try {
       await cancelLedgerEntry(entry, user)
       setMessage('Operations ledger entry cancelled.')
+      setCancelCandidate(null)
     } catch (err) {
       if (import.meta.env.DEV) console.error(err)
       setError(err.message || 'Could not cancel ledger entry.')
@@ -878,6 +886,16 @@ export function OperationsPage() {
         <AlertTriangle className="mt-0.5 size-4 shrink-0" />
         Operations ledger remains scoped to the selected Working Event. Admins can edit entries; operations helpers can only view assigned-event entries until a separately approved write scope is designed.
       </p>
+      <ConfirmDialog
+        open={Boolean(cancelCandidate)}
+        title="Cancel ledger entry?"
+        recordName={cancelCandidate?.label}
+        message={`This keeps the entry visible for ${currentEvent?.eventName || 'the Working Event'} but removes it from active Operations totals.`}
+        confirmLabel="Cancel Entry"
+        pending={saving}
+        onCancel={() => setCancelCandidate(null)}
+        onConfirm={confirmCancelEntry}
+      />
     </div>
   )
 }

@@ -31,7 +31,8 @@ test('XLSX sheet selection requires explicit confirmation before mapping or prev
 test('changing a confirmed sheet resets stale mapping and preview safely', async () => {
   const page = await readFile('src/pages/ImportsPage.jsx', 'utf8')
 
-  assert.match(page, /Changing sheets will reset mapping, duplicate review, and preview/)
+  assert.match(page, /Change import sheet\?/)
+  assert.match(page, /Changing sheets resets mapping, duplicate review, and preview/)
   assert.match(page, /setFieldMap\(\{\}\)/)
   assert.match(page, /setProcessedRows\(\[\]\)/)
   assert.match(page, /setFinalRows\(\[\]\)/)

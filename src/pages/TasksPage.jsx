@@ -6,6 +6,7 @@ import { AssignedEventGate } from '../components/AssignedEventGate'
 import { EmptyState } from '../components/ui/EmptyState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { ErrorState } from '../components/ui/ErrorState'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
 import {
@@ -211,6 +212,7 @@ export function TasksPage() {
   const [formTask, setFormTask] = useState(null)
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState('')
+  const [deleteCandidate, setDeleteCandidate] = useState(null)
   const canRead = canViewTasks(access, activeEvent?.eventId)
   const canManage = canManageTasks(access, activeEvent?.eventId)
   const prefilledTask = useMemo(() => {
@@ -286,12 +288,18 @@ export function TasksPage() {
   }
 
   async function handleDelete(task) {
-    if (!window.confirm(`Delete "${task.title}"? Cancel is preferred for historical task records.`)) return
+    setDeleteCandidate(task)
+  }
+
+  async function confirmDeleteTask() {
+    const task = deleteCandidate
+    if (!task) return
     setSaving(true)
     setSuccess('')
     try {
       await deleteTask(activeEvent, task, user)
       setSuccess('Task deleted.')
+      setDeleteCandidate(null)
     } catch (deleteError) {
       setError(friendlyFirebaseError(deleteError))
     } finally {
@@ -320,7 +328,7 @@ export function TasksPage() {
           </div>
         </header>
 
-        {success && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{success}</div>}
+        {success && <div role="status" className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{success}</div>}
         {error && <ErrorState title="Tasks could not be loaded" message={error} />}
         {!canManage && canRead && (
           <div className="rounded-2xl border border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm text-[#6B564C]">
@@ -339,7 +347,7 @@ export function TasksPage() {
           />
         )}
 
-        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-8" aria-label="Task status summary">
+        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-8" aria-label="Task summary">
           <TaskMetric label="Open" value={summary.open} active={filter === 'All'} onClick={() => setFilter('All')} />
           <TaskMetric label="Overdue" value={summary.overdue} active={filter === 'Overdue'} onClick={() => setFilter('Overdue')} />
           <TaskMetric label="Due Today" value={summary.dueToday} active={filter === 'Due Today'} onClick={() => setFilter('Due Today')} />
@@ -386,6 +394,17 @@ export function TasksPage() {
             <p>Overdue means a due date earlier than today and not Completed or Cancelled. Due Soon covers the next seven calendar days.</p>
           </div>
         </section>
+
+        <ConfirmDialog
+          open={Boolean(deleteCandidate)}
+          title="Delete task?"
+          recordName={deleteCandidate?.title}
+          message={`This removes the task from ${activeEvent?.eventName || 'the Working Event'}. Use Cancel instead when historical task context should remain visible.`}
+          confirmLabel="Delete Task"
+          pending={saving}
+          onCancel={() => setDeleteCandidate(null)}
+          onConfirm={confirmDeleteTask}
+        />
       </div>
     </AssignedEventGate>
   )
