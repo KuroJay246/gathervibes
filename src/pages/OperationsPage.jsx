@@ -617,7 +617,7 @@ export function OperationsPage() {
         </section>
       )}
 
-      <details className="phase23v-panel" data-tour-container="partners-commitments">
+      <details className="phase23v-panel" data-tour-id="partners-commitments-panel" data-tour-container="partners-commitments">
         <summary className="phase23v-summary">Partner commitments, sponsors, and supplier contacts</summary>
         <div className="phase23v-body">
           <PartnerCommitmentsPanel

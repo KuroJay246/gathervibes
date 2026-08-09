@@ -17,12 +17,12 @@ test('[tutorial-v3] eligible users are Jaylan and Anica without hardcoded organi
 })
 
 test('[tutorial-v3] version is new and does not reuse v2 completion', () => {
-  assert.equal(TUTORIAL_VERSION, 'tutorial-v3-specific-guidance')
+  assert.equal(TUTORIAL_VERSION, 'tutorial-v4-organizer-modules')
   assert.notEqual(TUTORIAL_VERSION, 'interactive-product-tour-v2')
 })
 
-test('[tutorial-v3] guided orientation covers 23 anchored lessons plus welcome and completion', () => {
-  assert.equal(guidedTutorialSteps.length, 23)
+test('[tutorial-v3] guided orientation covers 30 anchored lessons plus welcome and completion', () => {
+  assert.equal(guidedTutorialSteps.length, 30)
   assert.deepEqual(guidedTutorialSteps.map((step) => step.id), [
     'working-event',
     'overview',
@@ -38,13 +38,20 @@ test('[tutorial-v3] guided orientation covers 23 anchored lessons plus welcome a
     'tickets',
     'check-in',
     'operations',
+    'commitments',
     'run-of-show',
     'resources',
+    'documents',
+    'contacts',
+    'organizations',
+    'event-relationships',
     'event-readiness',
     'reconciliation',
     'communications',
     'reports',
     'imports',
+    'response-inbox',
+    'import-templates',
     'settings',
     'system-qa',
   ])
@@ -79,10 +86,17 @@ test('[tutorial-v3] exact targets replace broad workspace targets for action ste
   assert.equal(targets.payments, TUTORIAL_TARGETS.paymentsSummary)
   assert.equal(targets['check-in'], TUTORIAL_TARGETS.checkInSearch)
   assert.equal(targets.tasks, TUTORIAL_TARGETS.tasksWorkspace)
+  assert.equal(targets.commitments, TUTORIAL_TARGETS.partnersSponsors)
   assert.equal(targets['run-of-show'], TUTORIAL_TARGETS.runOfShowWorkspace)
   assert.equal(targets.resources, TUTORIAL_TARGETS.resourcesWorkspace)
+  assert.equal(targets.documents, TUTORIAL_TARGETS.documentsWorkspace)
+  assert.equal(targets.contacts, TUTORIAL_TARGETS.contactsWorkspace)
+  assert.equal(targets.organizations, TUTORIAL_TARGETS.organizationsWorkspace)
+  assert.equal(targets['event-relationships'], TUTORIAL_TARGETS.eventRelationshipsWorkspace)
   assert.equal(targets['event-readiness'], TUTORIAL_TARGETS.eventReadinessSummary)
   assert.equal(targets.reconciliation, TUTORIAL_TARGETS.reconciliationWorkspace)
+  assert.equal(targets['response-inbox'], TUTORIAL_TARGETS.responseInboxWorkspace)
+  assert.equal(targets['import-templates'], TUTORIAL_TARGETS.importTemplatesWorkspace)
 })
 
 test('[tutorial-v3] state machine exposes explicit legal states', () => {
@@ -136,6 +150,9 @@ test('[tutorial-v3] route and target registries are semantic and not text-select
   assert.ok(TUTORIAL_ROUTE_TARGETS.tasks.includes(TUTORIAL_TARGETS.tasksWorkspace))
   assert.ok(TUTORIAL_ROUTE_TARGETS['run-of-show'].includes(TUTORIAL_TARGETS.runOfShowWorkspace))
   assert.ok(TUTORIAL_ROUTE_TARGETS.resources.includes(TUTORIAL_TARGETS.resourcesWorkspace))
+  assert.ok(TUTORIAL_ROUTE_TARGETS.documents.includes(TUTORIAL_TARGETS.documentsWorkspace))
+  assert.ok(TUTORIAL_ROUTE_TARGETS.contacts.includes(TUTORIAL_TARGETS.contactsWorkspace))
+  assert.ok(TUTORIAL_ROUTE_TARGETS.imports.includes(TUTORIAL_TARGETS.responseInboxWorkspace))
   assert.ok(TUTORIAL_ROUTE_TARGETS.dashboardReadiness.includes(TUTORIAL_TARGETS.eventReadinessSummary))
   assert.ok(TUTORIAL_ROUTE_TARGETS.reconciliation.includes(TUTORIAL_TARGETS.reconciliationWorkspace))
   assert.ok(TUTORIAL_ROUTE_TARGETS['system-qa'].includes(TUTORIAL_TARGETS.systemQa))

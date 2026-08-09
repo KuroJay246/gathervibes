@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
+import { PageTabs } from '../components/ui/PageTabs'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { useAuth } from '../auth/useAuth'
 import {
@@ -198,6 +199,7 @@ export function ContactsPage() {
   const [saving, setSaving] = useState(false)
   const [formType, setFormType] = useState('')
   const [editing, setEditing] = useState(null)
+  const [activeTab, setActiveTab] = useState('people')
 
   useEffect(() => {
     const unsubscribeContacts = subscribeToContacts((rows) => { setContacts(rows); setLoading(false) }, (err) => { setError(err?.message || 'Contacts unavailable.'); setLoading(false) })
@@ -223,6 +225,23 @@ export function ContactsPage() {
     if (filters.eventLinked === 'unlinked') return rows.filter((contact) => !linkedContactIds.has(contact.contactId))
     return rows
   }, [contacts, filters, linkedContactIds, organizations])
+  const contactsById = useMemo(() => new Map(contacts.map((contact) => [contact.contactId, contact])), [contacts])
+  const organizationsById = useMemo(() => new Map(organizations.map((organization) => [organization.organizationId, organization])), [organizations])
+  const filteredOrganizations = useMemo(() => organizations.filter((organization) => {
+    const search = filters.search.trim().toLowerCase()
+    if (search && ![organization.name, organization.email, organization.phone, organization.website, organization.location, organization.notes].filter(Boolean).join(' ').toLowerCase().includes(search)) return false
+    if (filters.category !== 'All' && organization.category !== filters.category) return false
+    if (filters.status !== 'All' && organization.status !== filters.status) return false
+    return true
+  }), [filters, organizations])
+  const visibleLinks = useMemo(() => links.filter((link) => {
+    const contact = contactsById.get(link.contactId)
+    const organization = organizationsById.get(link.organizationId)
+    const search = filters.search.trim().toLowerCase()
+    if (search && ![contact?.displayName, organization?.name, link.relationshipType, link.roleForEvent, link.notes].filter(Boolean).join(' ').toLowerCase().includes(search)) return false
+    if (filters.status !== 'All' && link.status !== filters.status) return false
+    return true
+  }), [contactsById, filters, links, organizationsById])
 
   async function saveContact(values) {
     setSaving(true)
@@ -301,9 +320,9 @@ export function ContactsPage() {
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">Keep supplier, venue, organization, sponsor, and helper details reusable across events. These records do not grant app access.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => { setEditing(null); setFormType('contact') }} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#9A5260] px-5 text-xs font-bold text-white"><Plus className="size-4" /> Add Contact</button>
-          <button type="button" onClick={() => { setEditing(null); setFormType('organization') }} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#E7D6CC] px-5 text-xs font-bold text-[#6B564C]"><Building2 className="size-4" /> Add Organization</button>
-          <button type="button" onClick={() => setFormType('relationship')} disabled={!activeEvent?.eventId} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#E7D6CC] px-5 text-xs font-bold text-[#6B564C] disabled:opacity-50"><LinkIcon className="size-4" /> Link to Event</button>
+          <button type="button" onClick={() => { setActiveTab('people'); setEditing(null); setFormType('contact') }} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#9A5260] px-5 text-xs font-bold text-white"><Plus className="size-4" /> Add Contact</button>
+          <button type="button" onClick={() => { setActiveTab('organizations'); setEditing(null); setFormType('organization') }} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#E7D6CC] px-5 text-xs font-bold text-[#6B564C]"><Building2 className="size-4" /> Add Organization</button>
+          <button type="button" onClick={() => { setActiveTab('relationships'); setFormType('relationship') }} disabled={!activeEvent?.eventId} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#E7D6CC] px-5 text-xs font-bold text-[#6B564C] disabled:opacity-50"><LinkIcon className="size-4" /> Link to Event</button>
         </div>
       </header>
 
@@ -329,10 +348,21 @@ export function ContactsPage() {
         </div>
       </section>
 
-      {loading ? <LoadingState message="Loading contacts..." /> : filteredContacts.length === 0 ? (
+      <PageTabs
+        label="Contact directory views"
+        active={activeTab}
+        onChange={setActiveTab}
+        tabs={[
+          { id: 'people', label: 'People', count: filteredContacts.length },
+          { id: 'organizations', label: 'Organizations', count: filteredOrganizations.length },
+          { id: 'relationships', label: 'Event Relationships', count: visibleLinks.length },
+        ]}
+      />
+
+      {loading ? <LoadingState message="Loading contacts..." /> : activeTab === 'people' && filteredContacts.length === 0 ? (
         <EmptyState icon={UsersRound} title="No contacts match" description="Add reusable contacts and organizations so event planning records can point to the same people and businesses." />
-      ) : (
-        <section className="grid gap-3 xl:grid-cols-2">
+      ) : activeTab === 'people' ? (
+        <section id="people-panel" role="tabpanel" data-tour-id="contacts-workspace" className="grid gap-3 xl:grid-cols-2">
           {filteredContacts.map((contact) => {
             const organization = organizations.find((item) => item.organizationId === contact.organizationId)
             return (
@@ -349,6 +379,53 @@ export function ContactsPage() {
                     <button type="button" onClick={() => createFollowUpTask(contact)} className="inline-flex min-h-10 items-center rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">Create Follow-Up Task</button>
                     <button type="button" onClick={() => prepareMessage(contact)} className="inline-flex min-h-10 items-center rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">Message Context</button>
                     <button type="button" onClick={() => { setEditing(contact); setFormType('contact') }} className="grid size-10 place-items-center rounded-xl border border-[#E7D6CC] text-[#6B564C]" aria-label={`Edit ${contact.displayName}`}><Pencil className="size-4" /></button>
+                  </div>
+                </div>
+              </article>
+            )
+          })}
+        </section>
+      ) : activeTab === 'organizations' ? (
+        <section id="organizations-panel" role="tabpanel" data-tour-id="organizations-workspace" className="grid gap-3 xl:grid-cols-2">
+          {filteredOrganizations.length === 0 ? (
+            <EmptyState icon={Building2} title="No organizations match" description="Add venues, suppliers, sponsors, schools, and partner organizations once, then link them to events as needed." />
+          ) : filteredOrganizations.map((organization) => {
+            const primaryContact = contactsById.get(organization.primaryContactId)
+            return (
+              <article key={organization.organizationId} className="rounded-[22px] border border-[#EEDFD6] bg-white p-4 shadow-[0_6px_18px_rgba(84,53,67,0.035)]">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-[#F8E9CB] px-2.5 py-1 text-[10px] font-bold uppercase text-[#7A5818]">{organization.category}</span><span className="rounded-full bg-[#EAF6EF] px-2.5 py-1 text-[10px] font-bold uppercase text-[#17623A]">{organization.status}</span></div>
+                    <h3 className="mt-3 break-words font-serif text-xl text-[#2B1723]">{organization.name}</h3>
+                    <p className="mt-1 break-words text-sm text-[#80685B]">{primaryContact ? `Primary contact: ${primaryContact.displayName}` : 'No primary contact selected'}</p>
+                    <p className="mt-2 break-all text-xs leading-5 text-[#6B564C]">{organization.email || 'No email'}{organization.phone ? ` · ${organization.phone}` : ' · No phone'}{organization.website ? ` · ${organization.website}` : ''}</p>
+                    {organization.notes && <p className="mt-3 rounded-xl bg-[#FFF8F2] px-3 py-2 text-xs leading-5 text-[#6B564C]">{organization.notes}</p>}
+                  </div>
+                  <button type="button" onClick={() => { setEditing(organization); setFormType('organization') }} className="grid size-10 place-items-center rounded-xl border border-[#E7D6CC] text-[#6B564C]" aria-label={`Edit ${organization.name}`}><Pencil className="size-4" /></button>
+                </div>
+              </article>
+            )
+          })}
+        </section>
+      ) : (
+        <section id="relationships-panel" role="tabpanel" data-tour-id="event-relationships-workspace" className="space-y-3">
+          <div className="rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] px-4 py-3 text-xs leading-5 text-[#80685B]">
+            Event relationships connect reusable people or organizations to the Working Event. They do not copy contact records, grant login access, or update Tasks, Documents, Run of Show, or Operations automatically.
+          </div>
+          {visibleLinks.length === 0 ? (
+            <EmptyState icon={LinkIcon} title="No event relationships match" description="Link contacts and organizations to this Working Event when they have an event-specific role." />
+          ) : visibleLinks.map((link) => {
+            const contact = contactsById.get(link.contactId)
+            const organization = organizationsById.get(link.organizationId)
+            const title = [contact?.displayName, organization?.name].filter(Boolean).join(' / ') || 'Unresolved relationship'
+            return (
+              <article key={link.linkId} className="rounded-[22px] border border-[#EEDFD6] bg-white p-4 shadow-[0_6px_18px_rgba(84,53,67,0.035)]">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-[#F8E9CB] px-2.5 py-1 text-[10px] font-bold uppercase text-[#7A5818]">{link.relationshipType}</span><span className="rounded-full bg-[#EAF6EF] px-2.5 py-1 text-[10px] font-bold uppercase text-[#17623A]">{link.status}</span>{link.primaryForEvent && <span className="rounded-full bg-[#E9EFFB] px-2.5 py-1 text-[10px] font-bold uppercase text-[#415F91]">Primary</span>}</div>
+                    <h3 className="mt-3 break-words font-serif text-xl text-[#2B1723]">{title}</h3>
+                    <p className="mt-1 text-sm text-[#80685B]">{link.roleForEvent || 'No event role recorded'}</p>
+                    {link.notes && <p className="mt-3 rounded-xl bg-[#FFF8F2] px-3 py-2 text-xs leading-5 text-[#6B564C]">{link.notes}</p>}
                   </div>
                 </div>
               </article>

@@ -3,8 +3,8 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { guidedTutorialSteps } from '../src/tutorial/tutorialSteps.js'
 
-test('tutorial v3 preserves organizer route paths and expands coverage to 23 anchored lessons', () => {
-  assert.equal(guidedTutorialSteps.length, 23)
+test('tutorial v3 preserves organizer route paths and expands coverage to 30 anchored lessons', () => {
+  assert.equal(guidedTutorialSteps.length, 30)
   assert.deepEqual(guidedTutorialSteps.map((step) => step.pathname), [
     '/dashboard',
     '/dashboard',
@@ -20,12 +20,19 @@ test('tutorial v3 preserves organizer route paths and expands coverage to 23 anc
     '/tickets',
     '/check-in',
     '/operations',
+    '/operations',
     '/run-of-show',
     '/resources',
+    '/documents',
+    '/contacts',
+    '/contacts',
+    '/contacts',
     '/dashboard',
     '/payments/reconciliation',
     '/communications',
     '/event-review',
+    '/imports',
+    '/imports',
     '/imports',
     '/settings',
     '/qa',
@@ -48,13 +55,20 @@ test('tutorial v3 uses stable semantic targets already present on organizer page
     ['src/pages/TicketsPage.jsx', 'tickets-workspace'],
     ['src/pages/CheckInPage.jsx', 'checkin-search-field'],
     ['src/pages/OperationsPage.jsx', 'operations-workspace'],
+    ['src/pages/OperationsPage.jsx', 'partners-commitments-panel'],
     ['src/pages/RunOfShowPage.jsx', 'run-of-show-workspace'],
     ['src/pages/ResourcesPage.jsx', 'resources-workspace'],
+    ['src/pages/DocumentsPage.jsx', 'documents-workspace'],
+    ['src/pages/ContactsPage.jsx', 'contacts-workspace'],
+    ['src/pages/ContactsPage.jsx', 'organizations-workspace'],
+    ['src/pages/ContactsPage.jsx', 'event-relationships-workspace'],
     ['src/pages/DashboardPage.jsx', 'event-readiness-summary'],
     ['src/pages/PaymentReconciliationPage.jsx', 'reconciliation-workspace'],
     ['src/pages/CommunicationsPage.jsx', 'message-builder-workspace'],
     ['src/pages/EventReviewPage.jsx', 'reports-workspace'],
     ['src/pages/ImportsPage.jsx', 'imports-workspace'],
+    ['src/pages/ImportsPage.jsx', 'response-inbox-workspace'],
+    ['src/pages/ImportsPage.jsx', 'import-templates-workspace'],
     ['src/pages/SettingsPage.jsx', 'settings-workspace'],
     ['src/pages/QaPage.jsx', 'system-qa-workspace'],
   ]

@@ -116,6 +116,13 @@ export class TutorialTransitionController {
     if (prepare.type === 'open-details') {
       const details = document.querySelector(prepare.selector)
       if (details instanceof HTMLDetailsElement) details.open = true
+      return
+    }
+
+    if (prepare.type === 'select-tab') {
+      const tab = document.querySelector(`[role="tab"][aria-controls="${prepare.panelId}"]`)
+      tab?.click()
+      await animationFrame()
     }
   }
 
@@ -143,7 +150,7 @@ export class TutorialTransitionController {
       return { ok: Boolean(findRegisteredTarget(step.targetId)), message: 'The unsaved form is closed and the planning workspace is visible.' }
     }
 
-    if (step.id === 'partners') {
+    if (step.id === 'partners' || step.id === 'commitments') {
       const details = document.querySelector('[data-tour-container="partners-commitments"]')
       if (details instanceof HTMLDetailsElement) details.open = true
       await animationFrame()

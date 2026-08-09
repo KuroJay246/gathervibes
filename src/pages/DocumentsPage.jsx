@@ -318,7 +318,7 @@ export function DocumentsPage() {
 
   return (
     <AssignedEventGate purpose="Documents">
-      <div data-route="documents" className="space-y-6">
+      <div data-route="documents" data-tour-id="documents-workspace" className="space-y-6">
         <header className="flex flex-col gap-4 rounded-[28px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7 xl:flex-row xl:items-center xl:justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Event documents</p>

@@ -13,6 +13,7 @@ import { ImportTemplatesPanel } from '../components/imports/ImportTemplatesPanel
 import { EmptyState } from '../components/ui/EmptyState'
 import { InfoHint } from '../components/ui/InfoHint'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
+import { PageTabs } from '../components/ui/PageTabs'
 import {
   IMPORT_WORKFLOW_STEPS,
   getImportRecordType,
@@ -83,6 +84,7 @@ export function ImportsPage() {
   const [formsInboxText, setFormsInboxText] = useState('')
   const [formsInboxTargetType, setFormsInboxTargetType] = useState('guest-registration')
   const [formsInboxResponses, setFormsInboxResponses] = useState([])
+  const [activeImportTab, setActiveImportTab] = useState('import')
 
   const [importing, setImporting] = useState(false)
   const [importProgress, setImportProgress] = useState(0)
@@ -473,6 +475,7 @@ export function ImportsPage() {
     setImportResult(null)
     setError('')
     setImportErrorDetails(null)
+    setActiveImportTab('import')
     setFormsInboxText('')
     setFormsInboxResponses([])
   }
@@ -503,6 +506,7 @@ export function ImportsPage() {
       formTargetType: formsInboxTargetType,
     })
     setFormsInboxResponses(responses)
+    setActiveImportTab('response-inbox')
     setError('')
   }
 
@@ -527,6 +531,7 @@ export function ImportsPage() {
       approvedResponseCount: approvedIds.size,
       sourceFileName: 'google-forms-response-inbox',
     })
+    setActiveImportTab('import')
   }
 
   function reset() {
@@ -604,7 +609,20 @@ export function ImportsPage() {
       )}
 
       {step === 1 && (
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+        <PageTabs
+          label="Import Center views"
+          active={activeImportTab}
+          onChange={setActiveImportTab}
+          tabs={[
+            { id: 'import', label: 'Import Data' },
+            { id: 'response-inbox', label: 'Response Inbox', count: formsInboxResponses.length },
+            { id: 'templates', label: 'Templates / Help' },
+          ]}
+        />
+      )}
+
+      {step === 1 && (
+        <div id="import-panel" role="tabpanel" hidden={activeImportTab !== 'import'} className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
           <div className="rounded-2xl bg-white p-5 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
             <h3 className="font-serif text-xl text-[#2B1723]">Choose source</h3>
             <p className="mt-2 text-sm text-[#816D62]">Pick the closest source so the mapping step starts with the right expectations.</p>
@@ -760,8 +778,8 @@ export function ImportsPage() {
 
       {step === 1 && (
         <div className="mt-8">
-          {selectedSource.mode === 'response-inbox' && (
-          <section className="mb-8 rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
+          {activeImportTab === 'response-inbox' && (
+          <section id="response-inbox-panel" role="tabpanel" data-tour-id="response-inbox-workspace" className="mb-8 rounded-2xl border border-[#EEDFD6] bg-white p-5 shadow-[0_4px_24px_rgba(43,23,35,0.04)] sm:p-6">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Google Forms Response Inbox</p>
@@ -868,7 +886,11 @@ export function ImportsPage() {
             )}
           </section>
           )}
-          <ImportTemplatesPanel />
+          {activeImportTab === 'templates' && (
+            <section id="templates-panel" role="tabpanel" data-tour-id="import-templates-workspace">
+              <ImportTemplatesPanel />
+            </section>
+          )}
         </div>
       )}
 

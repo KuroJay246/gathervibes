@@ -22,6 +22,12 @@ export const TUTORIAL_TARGETS = {
   messageBuilder: 'message-builder-workspace',
   reportsSummary: 'reports-workspace',
   importCenterSource: 'imports-workspace',
+  responseInboxWorkspace: 'response-inbox-workspace',
+  importTemplatesWorkspace: 'import-templates-workspace',
+  documentsWorkspace: 'documents-workspace',
+  contactsWorkspace: 'contacts-workspace',
+  organizationsWorkspace: 'organizations-workspace',
+  eventRelationshipsWorkspace: 'event-relationships-workspace',
   settingsTourReplay: 'settings-workspace',
   systemQa: 'system-qa-workspace',
 }
@@ -51,7 +57,9 @@ export const TUTORIAL_ROUTE_TARGETS = {
   reconciliation: [TUTORIAL_TARGETS.reconciliationWorkspace],
   communications: [TUTORIAL_TARGETS.messageBuilder],
   reports: [TUTORIAL_TARGETS.reportsSummary],
-  imports: [TUTORIAL_TARGETS.importCenterSource],
+  imports: [TUTORIAL_TARGETS.importCenterSource, TUTORIAL_TARGETS.responseInboxWorkspace, TUTORIAL_TARGETS.importTemplatesWorkspace],
+  documents: [TUTORIAL_TARGETS.documentsWorkspace],
+  contacts: [TUTORIAL_TARGETS.contactsWorkspace, TUTORIAL_TARGETS.organizationsWorkspace, TUTORIAL_TARGETS.eventRelationshipsWorkspace],
   settings: [TUTORIAL_TARGETS.settingsTourReplay],
   'system-qa': [TUTORIAL_TARGETS.systemQa],
 }
