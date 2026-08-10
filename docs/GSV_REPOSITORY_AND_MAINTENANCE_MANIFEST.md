@@ -234,6 +234,7 @@ It should include a concise index, current canonical docs, selected high-value s
 ## Troubleshooting
 
 - If auth succeeds but writes fail, inspect UID/access state, event scope, service write shape, audit batch, then Firestore rules.
+- If the Protected Owner can read a record but cannot update it, compare immutable stored creator fields against current-writer validation. Updates should preserve legitimate historical `createdBy` values while validating `updatedBy` as the current authenticated user.
 - If Protected Owner access fails, inspect `src/config/protectedOwner.js`, `src/auth/AuthProvider.jsx`, `firestore.rules`, and System QA.
 - If CODEX_DEMO is missing from QA flows, inspect `src/utils/demoEvent.js`, `src/utils/qaHelper.js`, event classification fields, and event-list filtering.
 - If CPB is read-only, search for CPB-specific locks or status-based edit blocks; CPB should be a normal completed real event.

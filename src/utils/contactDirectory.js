@@ -32,6 +32,46 @@ export const RELATIONSHIP_TYPES = [
   'Other',
 ]
 
+const LEGACY_CONTACT_CATEGORIES = {
+  event: 'Other',
+  supplier: 'Supplier',
+  vendor: 'Vendor',
+  venue: 'Venue',
+  partner: 'Partner',
+  sponsor: 'Sponsor',
+  'staff-helper': 'Helper / Staff Contact',
+  helper: 'Helper / Staff Contact',
+}
+
+const LEGACY_CONTACT_STATUSES = {
+  active: 'Active',
+  inactive: 'Inactive',
+  disabled: 'Inactive',
+}
+
+const LEGACY_RELATIONSHIP_TYPES = {
+  supplier: 'Supplier',
+  venue: 'Venue contact',
+  planner: 'Partner',
+  sponsor: 'Sponsor',
+  helper: 'Helper',
+}
+
+function normalizeCategory(value) {
+  const mapped = LEGACY_CONTACT_CATEGORIES[String(value ?? '').trim().toLowerCase()] || value
+  return CONTACT_CATEGORIES.includes(mapped) ? mapped : 'Other'
+}
+
+function normalizeStatus(value) {
+  const mapped = LEGACY_CONTACT_STATUSES[String(value ?? '').trim().toLowerCase()] || value
+  return CONTACT_STATUSES.includes(mapped) ? mapped : 'Active'
+}
+
+function normalizeRelationshipType(value) {
+  const mapped = LEGACY_RELATIONSHIP_TYPES[String(value ?? '').trim().toLowerCase()] || value
+  return RELATIONSHIP_TYPES.includes(mapped) ? mapped : 'Other'
+}
+
 function clean(value, max = 1000) {
   return String(value ?? '').trim().slice(0, max)
 }
@@ -113,7 +153,7 @@ export function contactPayload(values = {}, existing = {}) {
     lastName: clean(values.lastName, 90),
     organizationId: clean(values.organizationId, 128),
     roleTitle: clean(values.roleTitle, 120),
-    category: CONTACT_CATEGORIES.includes(values.category) ? values.category : 'Other',
+    category: normalizeCategory(values.category),
     email: clean(values.email, 320).toLowerCase(),
     phone: clean(values.phone, 64),
     phoneNormalized: normalizePhone(values.phone),
@@ -121,7 +161,7 @@ export function contactPayload(values = {}, existing = {}) {
     location: clean(values.location, 240),
     website: normalizeWebsite(values.website),
     socialLink: normalizeWebsite(values.socialLink),
-    status: CONTACT_STATUSES.includes(values.status) ? values.status : 'Active',
+    status: normalizeStatus(values.status),
     notes: clean(values.notes, 2000),
     searchText: normalizeContactSearch(`${displayName} ${values.email || ''} ${values.phone || ''} ${values.category || ''}`),
     createdBy: clean(existing.createdBy || values.createdBy, 256),
@@ -132,7 +172,7 @@ export function organizationPayload(values = {}, existing = {}) {
   return {
     organizationId: clean(values.organizationId || existing.organizationId, 128),
     name: clean(values.name || 'Unnamed organization', 180),
-    category: CONTACT_CATEGORIES.includes(values.category) ? values.category : 'Other',
+    category: normalizeCategory(values.category),
     primaryContactId: clean(values.primaryContactId, 128),
     email: clean(values.email, 320).toLowerCase(),
     phone: clean(values.phone, 64),
@@ -140,7 +180,7 @@ export function organizationPayload(values = {}, existing = {}) {
     website: normalizeWebsite(values.website),
     socialLink: normalizeWebsite(values.socialLink),
     location: clean(values.location, 240),
-    status: CONTACT_STATUSES.includes(values.status) ? values.status : 'Active',
+    status: normalizeStatus(values.status),
     notes: clean(values.notes, 2000),
     searchText: normalizeContactSearch(`${values.name || ''} ${values.email || ''} ${values.phone || ''} ${values.category || ''}`),
     createdBy: clean(existing.createdBy || values.createdBy, 256),
@@ -154,9 +194,9 @@ export function relationshipPayload(values = {}, event = {}, existing = {}) {
     eventName: clean(event.eventName || values.eventName || existing.eventName, 180),
     contactId: clean(values.contactId, 128),
     organizationId: clean(values.organizationId, 128),
-    relationshipType: RELATIONSHIP_TYPES.includes(values.relationshipType) ? values.relationshipType : 'Other',
+    relationshipType: normalizeRelationshipType(values.relationshipType),
     roleForEvent: clean(values.roleForEvent, 120),
-    status: CONTACT_STATUSES.includes(values.status) ? values.status : 'Active',
+    status: normalizeStatus(values.status),
     primaryForEvent: Boolean(values.primaryForEvent),
     notes: clean(values.notes, 1000),
     createdBy: clean(existing.createdBy || values.createdBy, 256),

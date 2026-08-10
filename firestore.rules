@@ -683,7 +683,7 @@ service cloud.firestore {
         && data.notes.size() <= 1000
         && data.createdAt is timestamp
         && data.updatedAt is timestamp
-        && validPerformedBy(data.createdBy);
+        && validStoredPerformedBy(data.createdBy);
     }
 
     function validDocumentCategory(category) {
@@ -758,7 +758,7 @@ service cloud.firestore {
         && data.notes.size() <= 2000
         && data.createdAt is timestamp
         && data.updatedAt is timestamp
-        && validPerformedBy(data.createdBy)
+        && validStoredPerformedBy(data.createdBy)
         && validPerformedBy(data.updatedBy);
     }
 
@@ -823,7 +823,7 @@ service cloud.firestore {
         && data.searchText.size() <= 1000
         && data.createdAt is timestamp
         && data.updatedAt is timestamp
-        && validPerformedBy(data.createdBy)
+        && validStoredPerformedBy(data.createdBy)
         && validPerformedBy(data.updatedBy);
     }
 
@@ -867,7 +867,7 @@ service cloud.firestore {
         && data.searchText.size() <= 1000
         && data.createdAt is timestamp
         && data.updatedAt is timestamp
-        && validPerformedBy(data.createdBy)
+        && validStoredPerformedBy(data.createdBy)
         && validPerformedBy(data.updatedBy);
     }
 
@@ -914,7 +914,7 @@ service cloud.firestore {
         && data.notes.size() <= 1000
         && data.createdAt is timestamp
         && data.updatedAt is timestamp
-        && validPerformedBy(data.createdBy)
+        && validStoredPerformedBy(data.createdBy)
         && validPerformedBy(data.updatedBy);
     }
 
@@ -989,7 +989,7 @@ service cloud.firestore {
         && validOptionalString(data.blockerReason, 500)
         && data.createdAt is timestamp
         && data.updatedAt is timestamp
-        && validPerformedBy(data.createdBy)
+        && validStoredPerformedBy(data.createdBy)
         && validPerformedBy(data.updatedBy)
         && (data.completedAt == null || data.completedAt is timestamp)
         && (data.cancelledAt == null || data.cancelledAt is timestamp)
@@ -1091,7 +1091,7 @@ service cloud.firestore {
         && data.linkedResourceIds.size() <= 50
         && data.createdAt is timestamp
         && data.updatedAt is timestamp
-        && validPerformedBy(data.createdBy)
+        && validStoredPerformedBy(data.createdBy)
         && validPerformedBy(data.updatedBy)
         && data.criticalForEvent is bool
         && data.delayReason is string
@@ -1250,7 +1250,8 @@ service cloud.firestore {
         && (data.eventId == 'global' || validShortId(data.eventId))
         && data.action in [
           'contact.create', 'contact.update', 'organization.create',
-          'organization.update', 'contact-link.create', 'contact-link.update'
+          'organization.update', 'contact-link.create', 'contact-link.update',
+          'contact-link.delete'
         ]
         && data.targetType in ['contact', 'organization', 'contactLink']
         && validShortId(data.targetId)
@@ -1536,7 +1537,58 @@ service cloud.firestore {
         && data.targetType == 'contactLink'
         && exists(/databases/$(database)/documents/events/$(data.eventId)/contactLinks/$(data.targetId))
         && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/contactLinks/$(data.targetId))
+      ) || (
+        data.action == 'contact-link.delete'
+        && data.targetType == 'contactLink'
+        && exists(/databases/$(database)/documents/events/$(data.eventId)/contactLinks/$(data.targetId))
+        && !existsAfter(/databases/$(database)/documents/events/$(data.eventId)/contactLinks/$(data.targetId))
       );
+    }
+
+    function matchesRunOfShowMutation(data) {
+      return data.targetType == 'runOfShow'
+        && (
+          (
+            data.action == 'run-of-show.create'
+            && !exists(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action in ['run-of-show.update', 'run-of-show.delayed', 'run-of-show.status', 'run-of-show.arrival']
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && get(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action == 'run-of-show.delete'
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && !existsAfter(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId))
+            && get(/databases/$(database)/documents/events/$(data.eventId)/runOfShow/$(data.targetId)).data.eventId == data.eventId
+          )
+        );
+    }
+
+    function matchesResourceMutation(data) {
+      return data.targetType == 'resource'
+        && (
+          (
+            data.action == 'resource.create'
+            && !exists(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action in ['resource.update', 'resource.status']
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && existsAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && get(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
+            && getAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
+          ) || (
+            data.action == 'resource.delete'
+            && exists(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && !existsAfter(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId))
+            && get(/databases/$(database)/documents/events/$(data.eventId)/resources/$(data.targetId)).data.eventId == data.eventId
+          )
+        );
     }
 
     function registrationIdentityUnchanged() {
@@ -1803,6 +1855,7 @@ service cloud.firestore {
       allow read: if canReadTask(eventId);
       allow create: if canManageTask(eventId)
         && validTask(request.resource.data, eventId, taskId)
+        && validPerformedBy(request.resource.data.createdBy)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if canManageTask(eventId)
@@ -1869,7 +1922,8 @@ service cloud.firestore {
                             && matchesDocumentMutation(request.resource.data)
                           : request.resource.data.action in [
                               'contact.create', 'contact.update', 'organization.create',
-                              'organization.update', 'contact-link.create', 'contact-link.update'
+                              'organization.update', 'contact-link.create', 'contact-link.update',
+                              'contact-link.delete'
                             ]
                             ? isValidContactAuditLog(request.resource.data, logId)
                               && matchesContactMutation(request.resource.data)
@@ -1879,11 +1933,13 @@ service cloud.firestore {
                                 'run-of-show.arrival', 'run-of-show.delete'
                               ]
                               ? isValidRunOfShowAuditLog(request.resource.data, logId)
+                                && matchesRunOfShowMutation(request.resource.data)
                               : request.resource.data.action in [
                                   'resource.create', 'resource.update',
                                   'resource.status', 'resource.delete'
                                 ]
                                 ? isValidResourceAuditLog(request.resource.data, logId)
+                                  && matchesResourceMutation(request.resource.data)
                                 : false
           )
         ) || (
@@ -1908,6 +1964,7 @@ service cloud.firestore {
         || isAssignedOperationsHelper(resource.data.eventId);
       allow create: if isApprovedAdmin()
         && isValidOperationLedgerEntry(request.resource.data, ledgerEntryId)
+        && validPerformedBy(request.resource.data.createdBy)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if isApprovedAdmin()
@@ -1923,6 +1980,7 @@ service cloud.firestore {
         || isAssignedViewer(eventId);
       allow create: if (isApprovedAdmin() || isAssignedEventManager(eventId))
         && validDocumentRecord(request.resource.data, eventId, documentId)
+        && validPerformedBy(request.resource.data.createdBy)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if (isApprovedAdmin() || isAssignedEventManager(eventId))
@@ -1936,6 +1994,7 @@ service cloud.firestore {
       allow read: if canReadTask(eventId);
       allow create: if isApprovedAdmin()
         && validRunOfShowItem(request.resource.data, eventId, itemId)
+        && validPerformedBy(request.resource.data.createdBy)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if isApprovedAdmin()
@@ -1963,6 +2022,7 @@ service cloud.firestore {
       allow read: if isApprovedAdmin();
       allow create: if isApprovedAdmin()
         && validContactRecord(request.resource.data, contactId)
+        && validPerformedBy(request.resource.data.createdBy)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if isApprovedAdmin()
@@ -1976,6 +2036,7 @@ service cloud.firestore {
       allow read: if isApprovedAdmin();
       allow create: if isApprovedAdmin()
         && validOrganizationRecord(request.resource.data, organizationId)
+        && validPerformedBy(request.resource.data.createdBy)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if isApprovedAdmin()
@@ -1992,6 +2053,7 @@ service cloud.firestore {
         || isAssignedOperationsHelper(eventId);
       allow create: if (isApprovedAdmin() || isAssignedEventManager(eventId))
         && validEventContactLink(request.resource.data, eventId, linkId)
+        && validPerformedBy(request.resource.data.createdBy)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if (isApprovedAdmin() || isAssignedEventManager(eventId))

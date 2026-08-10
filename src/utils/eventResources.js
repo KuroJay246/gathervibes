@@ -18,6 +18,22 @@ export const RESOURCE_CATEGORIES = [
 export const RESOURCE_SOURCE_TYPES = ['Owned', 'Purchased', 'Rented', 'Borrowed', 'Supplier Provided', 'Venue Provided', 'Sponsor / Partner Provided']
 export const RESOURCE_STATUSES = ['Needed', 'Requested', 'Ordered / Reserved', 'Confirmed', 'Received', 'Packed', 'On Site', 'Returned', 'Cancelled']
 
+const LEGACY_RESOURCE_CATEGORIES = {
+  Media: 'Technology',
+  'Food Service': 'Food / Beverage',
+}
+
+const LEGACY_RESOURCE_SOURCE_TYPES = {
+  supplier: 'Supplier Provided',
+  vendor: 'Supplier Provided',
+  venue: 'Venue Provided',
+  sponsor: 'Sponsor / Partner Provided',
+}
+
+const LEGACY_RESOURCE_STATUSES = {
+  Partial: 'Requested',
+}
+
 function cleanText(value, maxLength = 1000) {
   return String(value ?? '').trim().slice(0, maxLength)
 }
@@ -71,14 +87,17 @@ export function createEmptyResource(prefill = {}) {
 export function normalizeEventResource(values = {}, event = {}, existing = {}) {
   const quantityNeeded = cleanQuantity(values.quantityNeeded, existing.quantityNeeded || 0)
   const quantityConfirmed = cleanQuantity(values.quantityConfirmed, existing.quantityConfirmed || 0)
+  const categoryValue = LEGACY_RESOURCE_CATEGORIES[values.category] || values.category
+  const sourceTypeValue = LEGACY_RESOURCE_SOURCE_TYPES[values.sourceType] || values.sourceType
+  const statusValue = LEGACY_RESOURCE_STATUSES[values.status] || values.status
   return {
     resourceId: cleanText(values.resourceId || existing.resourceId, 128),
     eventId: cleanText(event.eventId || values.eventId || existing.eventId, 128),
     eventName: cleanText(event.eventName || values.eventName || existing.eventName, 180),
     name: cleanText(values.name || 'Untitled resource', 180),
-    category: RESOURCE_CATEGORIES.includes(values.category) ? values.category : 'Other',
-    sourceType: RESOURCE_SOURCE_TYPES.includes(values.sourceType) ? values.sourceType : 'Owned',
-    status: RESOURCE_STATUSES.includes(values.status) ? values.status : 'Needed',
+    category: RESOURCE_CATEGORIES.includes(categoryValue) ? categoryValue : 'Other',
+    sourceType: RESOURCE_SOURCE_TYPES.includes(sourceTypeValue) ? sourceTypeValue : 'Owned',
+    status: RESOURCE_STATUSES.includes(statusValue) ? statusValue : 'Needed',
     quantityNeeded,
     quantityConfirmed,
     unit: cleanText(values.unit, 40),

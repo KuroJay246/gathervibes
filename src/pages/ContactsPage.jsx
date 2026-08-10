@@ -21,6 +21,7 @@ import {
   createContact,
   createEventContactLink,
   createOrganization,
+  deleteEventContactLink,
   subscribeToContacts,
   subscribeToEventContactLinks,
   subscribeToOrganizations,
@@ -294,6 +295,19 @@ export function ContactsPage() {
     }
   }
 
+  async function removeRelationship(link) {
+    if (!activeEvent?.eventId || saving) return
+    setSaving(true)
+    try {
+      await deleteEventContactLink(activeEvent, link, user)
+      setSuccess('Contact relationship removed from Working Event.')
+    } catch (saveError) {
+      setError(saveError?.message || 'Relationship could not be removed.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   function prepareMessage(contact) {
     const params = new URLSearchParams({ context: 'contact', recipientName: contact.displayName, recipientEmail: contact.email || '', recipientPhone: contact.phone || '' })
     navigate(`/communications?${params.toString()}`)
@@ -429,6 +443,7 @@ export function ContactsPage() {
                     <p className="mt-1 text-sm text-[#80685B]">{link.roleForEvent || 'No event role recorded'}</p>
                     {link.notes && <p className="mt-3 rounded-xl bg-[#FFF8F2] px-3 py-2 text-xs leading-5 text-[#6B564C]">{link.notes}</p>}
                   </div>
+                  <button type="button" onClick={() => removeRelationship(link)} disabled={saving} className="inline-flex min-h-10 items-center rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C] disabled:opacity-50">Remove Link</button>
                 </div>
               </article>
             )

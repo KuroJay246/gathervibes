@@ -25,6 +25,20 @@ export const RUN_OF_SHOW_CATEGORIES = [
 export const RUN_OF_SHOW_STATUSES = ['Planned', 'Confirmed', 'In Progress', 'Completed', 'Delayed', 'Cancelled']
 export const ARRIVAL_STATUSES = ['Expected', 'Arrived', 'Delayed', 'Cancelled / Not Required']
 
+const LEGACY_RUN_OF_SHOW_STATUSES = {
+  Ready: 'Confirmed',
+  Expected: 'Planned',
+}
+
+const LEGACY_RUN_OF_SHOW_CATEGORIES = {
+  Staff: 'Staff Arrival',
+  Supplier: 'Supplier Arrival',
+  'Guest Flow': 'Guest Arrival',
+  Food: 'Food / Beverage Service',
+  Media: 'Photo / Media',
+  Closeout: 'Closing',
+}
+
 function cleanText(value, maxLength = 1000) {
   return String(value ?? '').trim().slice(0, maxLength)
 }
@@ -71,8 +85,10 @@ export function createEmptyRunOfShowItem(prefill = {}) {
 }
 
 export function normalizeRunOfShowItem(values = {}, event = {}, existing = {}) {
-  const status = RUN_OF_SHOW_STATUSES.includes(values.status) ? values.status : 'Planned'
-  const category = RUN_OF_SHOW_CATEGORIES.includes(values.category) ? values.category : 'Other'
+  const statusValue = LEGACY_RUN_OF_SHOW_STATUSES[values.status] || values.status
+  const categoryValue = LEGACY_RUN_OF_SHOW_CATEGORIES[values.category] || values.category
+  const status = RUN_OF_SHOW_STATUSES.includes(statusValue) ? statusValue : 'Planned'
+  const category = RUN_OF_SHOW_CATEGORIES.includes(categoryValue) ? categoryValue : 'Other'
   const eventDate = toDateInput(event.eventDate || values.date || existing.date)
   return {
     itemId: cleanText(values.itemId || existing.itemId, 128),

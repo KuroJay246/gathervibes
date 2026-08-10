@@ -25,6 +25,16 @@ export const TASK_CATEGORY_OPTIONS = [
   'Other',
 ]
 
+const LEGACY_TASK_PRIORITIES = {
+  Medium: 'Normal',
+}
+
+const LEGACY_TASK_CATEGORIES = {
+  Registration: 'Guests and Registration',
+  Supplier: 'Suppliers and Partners',
+  Suppliers: 'Suppliers and Partners',
+}
+
 export const TASK_FILTERS = [
   'All',
   'Overdue',
@@ -64,8 +74,10 @@ export function createEmptyTaskDraft() {
 
 export function normalizeTask(value = {}) {
   const status = TASK_STATUS_OPTIONS.includes(value.status) ? value.status : 'Not Started'
-  const priority = TASK_PRIORITY_OPTIONS.includes(value.priority) ? value.priority : 'Normal'
-  const category = TASK_CATEGORY_OPTIONS.includes(value.category) ? value.category : 'Other'
+  const priorityValue = LEGACY_TASK_PRIORITIES[value.priority] || value.priority
+  const categoryValue = LEGACY_TASK_CATEGORIES[value.category] || value.category
+  const priority = TASK_PRIORITY_OPTIONS.includes(priorityValue) ? priorityValue : 'Normal'
+  const category = TASK_CATEGORY_OPTIONS.includes(categoryValue) ? categoryValue : 'Other'
   return {
     taskId: String(value.taskId || value.id || '').trim(),
     eventId: String(value.eventId || '').trim(),

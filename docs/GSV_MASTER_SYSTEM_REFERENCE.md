@@ -185,6 +185,8 @@ Protected Owner identity:
 
 The Protected Owner must retain app and Firestore access even if mutable role documents are edited. This is UID-based and must not depend on `approvedEmails`, staff assignments, or scanner assignments. System QA must expose diagnostics that let the owner confirm the signed-in UID and access state.
 
+Firestore write validation still applies to the Protected Owner. Owner writes must satisfy the current schema, event scope, status enums, immutable identity fields, and audit-log contract. Updates may preserve a historical `createdBy` value from another legitimate organizer; creates must set `createdBy`/`updatedBy` to the current authenticated user, while updates validate only the current `updatedBy` and keep immutable creator fields unchanged.
+
 ## 10. Other Role And Access Model
 
 Primary files:
@@ -267,6 +269,8 @@ Canonical paths:
 - `staffProfiles/{uid}/preferences/onboarding`: tutorial preferences.
 
 Legacy compatibility is required. Existing records may contain older field shapes. Services and rules should validate write intent without forcing destructive migrations of real data.
+
+Known supported legacy organizer values are normalized by services before writes, including task priority/category aliases, run-of-show `Ready`/`Expected` and older category names, resource `supplier` source types and `Partial` status, and lower-case contact/relationship statuses. Rules remain strict for the stored post-write shape and continue to reject unsupported arbitrary fields or statuses.
 
 ## 15. Firestore Rules Architecture
 

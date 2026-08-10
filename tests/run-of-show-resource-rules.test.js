@@ -268,6 +268,47 @@ rulesTest('[run-resource-rules] approved admin can mark a run item arrived with 
   }
 })
 
+rulesTest('[run-resource-rules] protected owner can normalize legacy run-of-show status and persist status update', async () => {
+  const testEnv = await createTestEnv()
+  try {
+    await seedBaseData(testEnv)
+    const createdAt = Timestamp.fromDate(new Date('2026-08-01T12:00:00.000Z'))
+    await testEnv.withSecurityRulesDisabled(async (env) => {
+      await setDoc(doc(env.firestore(), 'events', EVENT_ID, 'runOfShow', 'legacy-run'), runItem({
+        itemId: 'legacy-run',
+        status: 'Ready',
+        category: 'Supplier',
+        createdAt,
+        updatedAt: createdAt,
+      }))
+    })
+    const db = testEnv.authenticatedContext(PROTECTED_OWNER_UID, { email: PROTECTED_OWNER_EMAIL }).firestore()
+    const batch = writeBatch(db)
+    batch.update(doc(db, 'events', EVENT_ID, 'runOfShow', 'legacy-run'), {
+      status: 'Completed',
+      category: 'Supplier Arrival',
+      updatedAt: serverTimestamp(),
+      updatedBy: PROTECTED_OWNER_EMAIL,
+    })
+    batch.set(doc(db, 'auditLogs', 'legacy-run-status-audit'), audit('legacy-run-status-audit', EVENT_ID, 'run-of-show.status', 'runOfShow', 'legacy-run', PROTECTED_OWNER_EMAIL, { itemTitle: 'Supplier arrival' }))
+    await assertSucceeds(batch.commit())
+  } finally {
+    await testEnv.cleanup()
+  }
+})
+
+rulesTest('[run-resource-rules] run-of-show and resource audit logs must match a target mutation', async () => {
+  const testEnv = await createTestEnv()
+  try {
+    await seedBaseData(testEnv)
+    const db = testEnv.authenticatedContext(PROTECTED_OWNER_UID, { email: PROTECTED_OWNER_EMAIL }).firestore()
+    await assertFails(setDoc(doc(db, 'auditLogs', 'orphan-run-audit'), audit('orphan-run-audit', EVENT_ID, 'run-of-show.status', 'runOfShow', 'missing-run', PROTECTED_OWNER_EMAIL, { itemTitle: 'Missing' })))
+    await assertFails(setDoc(doc(db, 'auditLogs', 'orphan-resource-audit'), audit('orphan-resource-audit', EVENT_ID, 'resource.status', 'resource', 'missing-resource', PROTECTED_OWNER_EMAIL, { resourceName: 'Missing' })))
+  } finally {
+    await testEnv.cleanup()
+  }
+})
+
 rulesTest('[run-resource-rules] event manager cannot create organizer-only run/resource records in this foundation', async () => {
   const testEnv = await createTestEnv()
   try {

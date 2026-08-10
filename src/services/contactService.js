@@ -208,3 +208,19 @@ export async function updateEventContactLink(event, existing, values, user) {
   batch.set(audit.ref, audit.data)
   await batch.commit()
 }
+
+export async function deleteEventContactLink(event, link, user) {
+  const firestore = requireDatabase()
+  const audit = createAuditLogWrite({
+    eventId: event.eventId,
+    action: 'contact-link.delete',
+    targetType: 'contactLink',
+    targetId: link.linkId,
+    performedBy: user,
+    details: { relationshipType: link.relationshipType, changes: safeAuditChanges(link, {}, RELATIONSHIP_AUDIT_FIELDS) },
+  })
+  const batch = writeBatch(firestore)
+  batch.delete(doc(requireDatabase(), 'events', event.eventId, 'contactLinks', link.linkId))
+  batch.set(audit.ref, audit.data)
+  await batch.commit()
+}
