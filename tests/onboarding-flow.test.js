@@ -283,9 +283,9 @@ test('[tutorial-v3] controller uses AbortController-backed transitions without f
   assert.doesNotMatch(controller, /setTimeout\(.*100/)
 })
 
-test('[tutorial-v3] Firestore rules allow v3 23-step guided boundary', async () => {
+test('[tutorial-v3] Firestore rules allow v4 30-step guided boundary', async () => {
   const rules = await readFile('firestore.rules', 'utf8')
   assert.match(rules, /staffProfiles\/\{uid\}\/preferences\/onboarding/)
-  assert.match(rules, /lastStep.*<= 23/)
+  assert.match(rules, /lastStep.*<= 30/)
   assert.match(rules, /lastStep.*>= 0/)
 })

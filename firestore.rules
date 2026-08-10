@@ -242,7 +242,7 @@ service cloud.firestore {
         && (!('completed' in data) || data.completed is bool)
         && (!('completedAt' in data) || data.completedAt is timestamp)
         && (!('skippedAt' in data) || data.skippedAt is timestamp)
-        && (!('lastStep' in data) || (data.lastStep is int && data.lastStep >= 0 && data.lastStep <= 23))
+        && (!('lastStep' in data) || (data.lastStep is int && data.lastStep >= 0 && data.lastStep <= 30))
         && (!('replayRequestedAt' in data) || data.replayRequestedAt is timestamp)
         && (!('updatedAt' in data) || data.updatedAt is timestamp);
     }

@@ -244,11 +244,11 @@ rulesTest('[onboarding-rules] Rejects lastStep below minimum (-1)', async () => 
   }
 })
 
-rulesTest('[onboarding-rules] Rejects lastStep above maximum (24)', async () => {
+rulesTest('[onboarding-rules] Rejects lastStep above maximum (31)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
-    await assertFails(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 24 })))
+    await assertFails(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 31 })))
   } finally {
     await testEnv.cleanup()
   }
@@ -264,11 +264,11 @@ rulesTest('[onboarding-rules] Accepts lastStep at unopened boundary (0)', async 
   }
 })
 
-rulesTest('[onboarding-rules] Accepts lastStep at maximum boundary (23)', async () => {
+rulesTest('[onboarding-rules] Accepts lastStep at maximum boundary (30)', async () => {
   const testEnv = await createTestEnv()
   try {
     const ctx = testEnv.authenticatedContext(JAYLAN_UID)
-    await assertSucceeds(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 23 })))
+    await assertSucceeds(setDoc(onboardingDocRef(ctx.firestore(), JAYLAN_UID), validOnboarding({ lastStep: 30 })))
   } finally {
     await testEnv.cleanup()
   }
