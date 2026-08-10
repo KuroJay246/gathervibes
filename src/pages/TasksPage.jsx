@@ -166,26 +166,36 @@ function TaskForm({ task, onCancel, onSave, saving }) {
 function TaskRow({ task, canManage, onEdit, onStatus, onDelete }) {
   const dueState = taskDueState(task)
   return (
-    <article className="rounded-[22px] border border-[#EEDFD6] bg-white p-4 shadow-[0_6px_18px_rgba(84,53,67,0.035)]">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-        <div className="min-w-0 flex-1">
+    <article className="gsv-record-row">
+      <div className="gsv-record-row-main xl:grid-cols-[minmax(15rem,1.35fr)_minmax(30rem,2fr)_auto]">
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${statusClass(task.status)}`}>{task.status}</span>
-            <span className="rounded-full bg-[#FFF8F2] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">{task.priority}</span>
-            <span className="rounded-full bg-[#F8E9CB] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7A5818]">{task.category}</span>
+            {task.status === 'Blocked' && <span className="rounded-full bg-[#FFF1F1] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#A32626]">Blocked</span>}
           </div>
-          <h3 className="mt-3 break-words font-serif text-xl text-[#2B1723]">{task.title}</h3>
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#80685B]">
-            <span className={`font-bold ${dueClass(dueState)}`}>{task.dueDate ? `Due ${formatEventDate(task.dueDate)}` : 'No due date'}</span>
-            {task.followUpDate && <span>Follow up {formatEventDate(task.followUpDate)}</span>}
-            {task.responsibleLabel && <span>Responsible: {task.responsibleLabel}</span>}
-            {task.waitingOn && <span>Waiting on: {task.waitingOn}</span>}
+          <h3 className="gsv-record-title mt-2">{task.title}</h3>
+          <p className="mt-1 text-xs font-semibold text-[#80685B]">{task.category}</p>
+        </div>
+        <div className="gsv-record-meta-grid">
+          <div className="gsv-record-meta">
+            <p className="gsv-record-meta-label">Priority</p>
+            <p className="gsv-record-meta-value">{task.priority}</p>
           </div>
-          {task.blockerReason && <p className="mt-3 rounded-xl bg-[#FFF1F1] px-3 py-2 text-xs font-semibold text-[#A32626]">Blocked: {task.blockerReason}</p>}
-          {task.notes && <p className="mt-3 text-sm leading-6 text-[#5F493F]">{task.notes}</p>}
+          <div className="gsv-record-meta">
+            <p className="gsv-record-meta-label">Due</p>
+            <p className={`gsv-record-meta-value ${dueClass(dueState)}`}>{task.dueDate ? formatEventDate(task.dueDate) : 'No due date'}</p>
+          </div>
+          <div className="gsv-record-meta">
+            <p className="gsv-record-meta-label">Responsible</p>
+            <p className="gsv-record-meta-value">{task.responsibleLabel || 'Unassigned'}</p>
+          </div>
+          <div className="gsv-record-meta">
+            <p className="gsv-record-meta-label">Follow-up</p>
+            <p className="gsv-record-meta-value">{task.followUpDate ? formatEventDate(task.followUpDate) : task.waitingOn ? `Waiting on ${task.waitingOn}` : 'None'}</p>
+          </div>
         </div>
         {canManage && (
-          <div className="flex flex-wrap gap-2 xl:justify-end">
+          <div className="gsv-record-actions xl:justify-end">
             {task.status !== 'Completed' && <button type="button" onClick={() => onStatus(task, 'Completed')} className="rounded-xl bg-[#1E7345] px-3 py-2 text-xs font-bold text-white">Complete</button>}
             {task.status !== 'In Progress' && !['Completed', 'Cancelled'].includes(task.status) && <button type="button" onClick={() => onStatus(task, 'In Progress')} className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#6B564C]">In Progress</button>}
             {task.status !== 'Waiting on Someone' && !['Completed', 'Cancelled'].includes(task.status) && <button type="button" onClick={() => onStatus(task, 'Waiting on Someone')} className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#6B564C]">Waiting</button>}
@@ -197,6 +207,12 @@ function TaskRow({ task, canManage, onEdit, onStatus, onDelete }) {
           </div>
         )}
       </div>
+      {(task.blockerReason || task.notes) && (
+        <div className="gsv-secondary-detail">
+          {task.blockerReason && <p className="font-semibold text-[#A32626]">Blocked: {task.blockerReason}</p>}
+          {task.notes && <p className={task.blockerReason ? 'mt-1' : ''}>{task.notes}</p>}
+        </div>
+      )}
     </article>
   )
 }
@@ -377,7 +393,7 @@ export function TasksPage() {
             description={tasks.length === 0 ? 'Add the first event-scoped task when there is planning work, a deadline, a blocker, or follow-up to track.' : 'Choose a different task filter or clear completed work.'}
           />
         ) : (
-          <div className="space-y-3">
+          <div className="gsv-record-list" aria-label="Compact task rows">
             {visibleTasks.map((task) => (
               <TaskRow key={task.taskId} task={task} canManage={canManage && !saving} onEdit={setFormTask} onStatus={handleStatus} onDelete={handleDelete} />
             ))}

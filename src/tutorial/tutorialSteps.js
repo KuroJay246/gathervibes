@@ -275,7 +275,7 @@ export const guidedTutorialSteps = [
     example: 'Track a baker invoice balance or sponsor promise here, then record actual money movement in the Operations ledger when confirmed.',
     showMe: 'Open the partner commitments workspace.',
     letMeTry: 'Verify the partner and supplier commitment boundary is visible.',
-    prepare: { type: 'open-details', selector: '[data-tour-container="partners-commitments"]' },
+    prepare: { type: 'open-details', selector: '[data-tour-container="partners-commitments"]', operationsView: 'commitments' },
   }),
   lesson({
     id: 'run-of-show',

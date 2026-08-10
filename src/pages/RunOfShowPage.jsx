@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { collection, onSnapshot } from 'firebase/firestore'
-import { AlertTriangle, CheckCircle2, Clock3, PackageCheck, Plus, UserRoundCheck } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Clock3, PackageCheck, Plus } from 'lucide-react'
 import { ErrorState } from '../components/ui/ErrorState'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { useAuth } from '../auth/useAuth'
@@ -307,20 +307,33 @@ export function RunOfShowPage() {
         {items.map((item) => {
           const blockers = unresolvedDependencies(item, items)
           return (
-            <article key={item.itemId} className="rounded-3xl border border-[#E7D6CC] bg-white p-4 shadow-sm sm:p-5">
-              <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+            <article key={item.itemId} className="gsv-record-row">
+              <div className="gsv-record-row-main xl:grid-cols-[minmax(14rem,1.2fr)_minmax(32rem,2fr)_auto]">
                 <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-[#F5E6C8] px-3 py-1 text-xs font-bold text-[#5A443B]">{item.startTime}{item.endTime ? `-${item.endTime}` : ''}</span>
-                    <span className="rounded-full bg-[#F7DDE6] px-3 py-1 text-xs font-bold text-[#8A3F4B]">{item.status}</span>
-                    <span className="rounded-full bg-[#EEF4EA] px-3 py-1 text-xs font-bold text-[#4F7A57]">{item.category}</span>
-                    {item.criticalForEvent && <span className="rounded-full bg-[#FFF1F1] px-3 py-1 text-xs font-bold text-[#8A1F1F]">Critical</span>}
+                  <p className="text-xl font-black text-[#2B1723]">{item.startTime}{item.endTime ? `-${item.endTime}` : ''}</p>
+                  <h3 className="gsv-record-title mt-1">{item.title}</h3>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-[#F7DDE6] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8A3F4B]">{item.status}</span>
+                    {item.criticalForEvent && <span className="rounded-full bg-[#FFF1F1] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8A1F1F]">Critical</span>}
                   </div>
-                  <h3 className="mt-3 text-lg font-bold text-[#2B1723]">{item.title}</h3>
-                  <p className="mt-1 text-sm text-[#6B564C]">{item.location || 'Location not set'} · {item.responsibleLabel || item.responsibleContactId || item.responsibleOrganizationId || 'Responsibility not assigned'}</p>
-                  {item.expectedArrivalTime && <p className="mt-2 flex items-center gap-2 text-sm text-[#6B564C]"><UserRoundCheck className="size-4" /> Expected {item.expectedArrivalTime}: {item.arrivalStatus}{item.actualArrivalTime ? ` at ${item.actualArrivalTime}` : ''}</p>}
-                  {item.linkedResourceIds.length > 0 && <p className="mt-2 flex items-center gap-2 text-sm text-[#6B564C]"><PackageCheck className="size-4" /> Linked resources: {item.linkedResourceIds.join(', ')}</p>}
-                  {blockers.length > 0 && <p className="mt-2 flex items-center gap-2 rounded-xl bg-[#FFF6E8] px-3 py-2 text-sm font-semibold text-[#7A4B16]"><AlertTriangle className="size-4" /> Blocked by {blockers.map((entry) => entry.title).join(', ')}</p>}
+                </div>
+                <div className="gsv-record-meta-grid">
+                  <div className="gsv-record-meta">
+                    <p className="gsv-record-meta-label">Activity</p>
+                    <p className="gsv-record-meta-value">{item.category}</p>
+                  </div>
+                  <div className="gsv-record-meta">
+                    <p className="gsv-record-meta-label">Responsible</p>
+                    <p className="gsv-record-meta-value">{item.responsibleLabel || item.responsibleContactId || item.responsibleOrganizationId || 'Unassigned'}</p>
+                  </div>
+                  <div className="gsv-record-meta">
+                    <p className="gsv-record-meta-label">Location</p>
+                    <p className="gsv-record-meta-value">{item.location || 'Not set'}</p>
+                  </div>
+                  <div className="gsv-record-meta">
+                    <p className="gsv-record-meta-label">Arrival</p>
+                    <p className="gsv-record-meta-value">{item.expectedArrivalTime ? `${item.expectedArrivalTime} · ${item.arrivalStatus}${item.actualArrivalTime ? ` at ${item.actualArrivalTime}` : ''}` : 'Not tracked'}</p>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {['Confirmed', 'In Progress', 'Completed', 'Delayed'].map((status) => <button key={status} type="button" onClick={() => changeStatus(item, status, status === 'Delayed' ? { delayReason: item.delayReason || 'Marked delayed by organizer.' } : {})} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">{status}</button>)}
@@ -330,6 +343,13 @@ export function RunOfShowPage() {
                   <button type="button" onClick={() => removeItem(item)} className="min-h-10 rounded-xl border border-[#F3C6C6] px-3 text-xs font-bold text-[#8A1F1F]">Delete</button>
                 </div>
               </div>
+              {(item.linkedResourceIds.length > 0 || blockers.length > 0 || item.notes) && (
+                <div className="gsv-secondary-detail">
+                  {item.linkedResourceIds.length > 0 && <p className="flex items-center gap-2"><PackageCheck className="size-4" /> Linked resources: {item.linkedResourceIds.join(', ')}</p>}
+                  {blockers.length > 0 && <p className="mt-1 flex items-center gap-2 font-semibold text-[#7A4B16]"><AlertTriangle className="size-4" /> Blocked by {blockers.map((entry) => entry.title).join(', ')}</p>}
+                  {item.notes && <p className="mt-1">{item.notes}</p>}
+                </div>
+              )}
             </article>
           )
         })}

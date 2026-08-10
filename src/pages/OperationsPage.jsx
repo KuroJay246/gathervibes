@@ -112,7 +112,7 @@ export function OperationsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
-  const [activeView, setActiveView] = useState('ledger')
+  const [activeView, setActiveView] = useState('overview')
   const [form, setForm] = useState(EMPTY_FORM)
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -131,7 +131,7 @@ export function OperationsPage() {
     setRegistrations([])
     setResolvedActiveEvent(activeEvent)
     setFilters(DEFAULT_FILTERS)
-    setActiveView('ledger')
+    setActiveView('overview')
     setForm(EMPTY_FORM)
     setEditing(null)
     setMessage('')
@@ -140,6 +140,16 @@ export function OperationsPage() {
     setLoading(Boolean(activeEvent?.eventId))
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [activeEvent])
+
+  useEffect(() => {
+    function handleTutorialView(event) {
+      if (event.detail?.view && ['overview', 'ledger', 'commitments', 'partners', 'in-kind'].includes(event.detail.view)) {
+        setActiveView(event.detail.view)
+      }
+    }
+    window.addEventListener('tutorial:operations-view', handleTutorialView)
+    return () => window.removeEventListener('tutorial:operations-view', handleTutorialView)
+  }, [])
 
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
@@ -438,13 +448,14 @@ export function OperationsPage() {
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Operations views</p>
-            <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Commitments, partners, and in-kind support</h3>
+            <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Overview, ledger, and commitments</h3>
             <p className="mt-2 max-w-3xl text-xs leading-5 text-[#816D62]">
-              Review event-level money separately from outstanding commitments, partner records, and non-cash support.
+              Start with what happened and what is pending, then open the ledger or commitment workspaces for action.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             {[
+              ['overview', 'Overview'],
               ['ledger', 'Ledger'],
               ['commitments', 'Commitments'],
               ['partners', 'Partners & Suppliers'],
@@ -461,6 +472,32 @@ export function OperationsPage() {
             ))}
           </div>
         </div>
+
+        {activeView === 'overview' && (
+          <div className="mt-5 grid gap-3 lg:grid-cols-3">
+            <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-4">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">What happened</p>
+              <p className="mt-2 text-sm leading-6 text-[#2B1723]">
+                {filteredCounts.settled} settled Operations {filteredCounts.settled === 1 ? 'entry' : 'entries'} in the current view.
+              </p>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">Registration payment evidence remains in Payments and is not merged into this ledger.</p>
+            </div>
+            <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-4">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">What is pending</p>
+              <p className="mt-2 text-sm leading-6 text-[#2B1723]">
+                {filteredControl.openEntries} open ledger {filteredControl.openEntries === 1 ? 'item' : 'items'} · {formatCurrency(operationsSettlement.outstandingCommitments)} outstanding commitments.
+              </p>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">Use Ledger for money rows and Commitments for partner or supplier promises.</p>
+            </div>
+            <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-4">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">Next action</p>
+              <p className="mt-2 text-sm leading-6 text-[#2B1723]">
+                {possibleRegistrationPaymentOverlap.length > 0 ? 'Review possible registration-payment overlap before adding totals.' : commitmentRows.some((row) => row.overdue) ? 'Follow up overdue commitments.' : 'Add or review ledger evidence as event operations change.'}
+              </p>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">Copy and print are scoped to the visible ledger filters.</p>
+            </div>
+          </div>
+        )}
 
         {activeView === 'commitments' && (
           <div className="mt-5 space-y-3">

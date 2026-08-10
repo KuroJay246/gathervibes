@@ -1,6 +1,6 @@
 import { findRegisteredTarget, isTargetAllowedForRoute } from './tutorialRegistry.js'
 
-const DEFAULT_TIMEOUT_MS = 8000
+const DEFAULT_TIMEOUT_MS = 15000
 
 export class TutorialTransitionController {
   constructor({ navigate, locationProvider, dispatch, activeEventName }) {
@@ -114,6 +114,10 @@ export class TutorialTransitionController {
     }
 
     if (prepare.type === 'open-details') {
+      if (prepare.operationsView) {
+        window.dispatchEvent(new CustomEvent('tutorial:operations-view', { detail: { view: prepare.operationsView } }))
+        await animationFrame()
+      }
       const details = document.querySelector(prepare.selector)
       if (details instanceof HTMLDetailsElement) details.open = true
       return

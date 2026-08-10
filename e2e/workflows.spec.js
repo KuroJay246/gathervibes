@@ -180,8 +180,8 @@ test('Operations journey records paid, outstanding, and in-kind entries then can
 
   for (const entry of entries) {
     const row = page.getByRole('row').filter({ hasText: entry.label })
-    page.once('dialog', (dialog) => dialog.accept())
     await row.getByRole('button', { name: 'Cancel', exact: true }).click()
+    await page.getByRole('button', { name: 'Cancel Entry' }).click()
     await expect(row).toContainText('Cancelled')
   }
 })

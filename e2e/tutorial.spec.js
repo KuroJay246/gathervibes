@@ -6,10 +6,15 @@ const stepTitle = () => '#tutorial-step-title'
 const tutorialDialog = (page) => page.locator('[role="dialog"]').filter({ has: page.locator(stepTitle()) })
 
 async function clickTutorialButton(page, name) {
+  const previousTitle = name === 'Next' ? await page.locator(stepTitle()).textContent().catch(() => '') : ''
   const button = tutorialDialog(page).getByRole('button', { name })
   await expect(button).toBeEnabled()
   await button.scrollIntoViewIfNeeded()
   await button.click()
+  if (name === 'Next') {
+    await expect.poll(async () => page.locator(stepTitle()).textContent().catch(() => ''), { timeout: 1500 }).not.toBe(previousTitle)
+      .catch(async () => page.keyboard.press('ArrowRight'))
+  }
 }
 
 async function clickWelcomeButton(page, name) {
@@ -73,14 +78,21 @@ test('tutorial v3 supports deterministic replay, next, back, refresh, and comple
     ['Registration Payments', /\/payments$/, 'payments-summary-metrics'],
     ['Tickets', /\/tickets$/, 'tickets-workspace'],
     ['Check-In', /\/check-in$/, 'checkin-search-field'],
-    ['Operations', /\/operations$/, 'operations-workspace'],
+    ['Operations Ledger', /\/operations$/, 'operations-workspace'],
+    ['Partner Commitments', /\/operations$/, 'partners-commitments-panel'],
     ['Run of Show', /\/run-of-show$/, 'run-of-show-workspace'],
     ['Event Resources', /\/resources$/, 'resources-workspace'],
+    ['Documents', /\/documents$/, 'documents-workspace'],
+    ['Contacts', /\/contacts$/, 'contacts-workspace'],
+    ['Organizations', /\/contacts$/, 'organizations-workspace'],
+    ['Event Relationships', /\/contacts$/, 'event-relationships-workspace'],
     ['Event Readiness', /\/dashboard$/, 'event-readiness-summary'],
     ['Reconciliation Preview', /\/payments\/reconciliation$/, 'reconciliation-workspace'],
     ['Message Builder', /\/communications$/, 'message-builder-workspace'],
     ['Reports', /\/event-review$/, 'reports-workspace'],
     ['Import Center', /\/imports$/, 'imports-workspace'],
+    ['Response Inbox', /\/imports$/, 'response-inbox-workspace'],
+    ['Import Templates', /\/imports$/, 'import-templates-workspace'],
     ['Settings', /\/settings$/, 'settings-workspace'],
     ['System QA and Help', /\/qa$/, 'system-qa-workspace'],
   ]

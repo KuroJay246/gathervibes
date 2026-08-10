@@ -241,21 +241,33 @@ export function ResourcesPage() {
       <section className="grid gap-3">
         {resources.length === 0 && <div className="rounded-3xl border border-dashed border-[#D9C7BC] bg-white p-6 text-sm text-[#6B564C]">No resources yet. Add equipment, supplies, documents/print, safety, packing, pickup, or return needs when the plan becomes real.</div>}
         {resources.map((resource) => (
-          <article key={resource.resourceId} className="rounded-3xl border border-[#E7D6CC] bg-white p-4 shadow-sm sm:p-5">
-            <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <article key={resource.resourceId} className="gsv-record-row">
+            <div className="gsv-record-row-main xl:grid-cols-[minmax(15rem,1.25fr)_minmax(34rem,2fr)_auto]">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-[#F5E6C8] px-3 py-1 text-xs font-bold text-[#5A443B]">{resource.category}</span>
-                  <span className="rounded-full bg-[#F7DDE6] px-3 py-1 text-xs font-bold text-[#8A3F4B]">{resource.status}</span>
-                  <span className="rounded-full bg-[#EEF4EA] px-3 py-1 text-xs font-bold text-[#4F7A57]">{resource.sourceType}</span>
-                  {resource.criticalForEvent && <span className="rounded-full bg-[#FFF1F1] px-3 py-1 text-xs font-bold text-[#8A1F1F]">Critical</span>}
+                  <span className="rounded-full bg-[#F7DDE6] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8A3F4B]">{resource.status}</span>
+                  {resource.criticalForEvent && <span className="rounded-full bg-[#FFF1F1] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8A1F1F]">Critical</span>}
                 </div>
-                <h3 className="mt-3 text-lg font-bold text-[#2B1723]">{resource.name}</h3>
-                <p className="mt-1 text-sm text-[#6B564C]">{resource.quantityConfirmed} of {resource.quantityNeeded} {resource.unit || 'needed'} confirmed · {resource.location || 'Location not set'}</p>
-                {resource.shortage > 0 && <p className="mt-2 flex items-center gap-2 rounded-xl bg-[#FFF6E8] px-3 py-2 text-sm font-semibold text-[#7A4B16]"><AlertTriangle className="size-4" /> Short by {resource.shortage}</p>}
-                <p className="mt-2 flex items-center gap-2 text-sm text-[#6B564C]"><Truck className="size-4" /> {resource.supplierLabel || resource.supplierContactId || resource.supplierOrganizationId || 'Supplier not set'}</p>
-                {resource.linkedRunOfShowItemIds.length > 0 && <p className="mt-2 flex items-center gap-2 text-sm text-[#6B564C]"><ClipboardList className="size-4" /> Run of Show: {resource.linkedRunOfShowItemIds.map((id) => runItemNames.get(id) || id).join(', ')}</p>}
-                {(resource.packingRequired || resource.pickupRequired || resource.returnRequired) && <p className="mt-2 flex items-center gap-2 text-sm text-[#6B564C]"><PackageCheck className="size-4" /> {resource.packingRequired ? 'Pack. ' : ''}{resource.pickupRequired ? `Pickup ${resource.pickupDueDate || 'due date not set'}. ` : ''}{resource.returnRequired ? `Return ${resource.returnDueDate || 'due date not set'}.` : ''}</p>}
+                <h3 className="gsv-record-title mt-2">{resource.name}</h3>
+                <p className="mt-1 text-xs font-semibold text-[#80685B]">{resource.category}</p>
+              </div>
+              <div className="gsv-record-meta-grid">
+                <div className="gsv-record-meta">
+                  <p className="gsv-record-meta-label">Quantity</p>
+                  <p className="gsv-record-meta-value">{resource.quantityConfirmed} of {resource.quantityNeeded} {resource.unit || 'needed'}</p>
+                </div>
+                <div className="gsv-record-meta">
+                  <p className="gsv-record-meta-label">Source</p>
+                  <p className="gsv-record-meta-value">{resource.sourceType}</p>
+                </div>
+                <div className="gsv-record-meta">
+                  <p className="gsv-record-meta-label">Supplier</p>
+                  <p className="gsv-record-meta-value">{resource.supplierLabel || resource.supplierContactId || resource.supplierOrganizationId || 'Not set'}</p>
+                </div>
+                <div className="gsv-record-meta">
+                  <p className="gsv-record-meta-label">Problem</p>
+                  <p className={`gsv-record-meta-value ${resource.shortage > 0 ? 'text-[#7A4B16]' : ''}`}>{resource.shortage > 0 ? `Short by ${resource.shortage}` : 'No shortage'}</p>
+                </div>
               </div>
               <div className="flex flex-wrap gap-2">
                 {['Requested', 'Ordered / Reserved', 'Confirmed', 'Received', 'Packed', 'On Site', 'Returned'].map((status) => <button key={status} type="button" onClick={() => updateStatus(resource, status)} className="min-h-10 rounded-xl border border-[#E7D6CC] px-3 text-xs font-bold text-[#6B564C]">{status}</button>)}
@@ -264,6 +276,15 @@ export function ResourcesPage() {
                 <button type="button" onClick={() => removeResource(resource)} className="min-h-10 rounded-xl border border-[#F3C6C6] px-3 text-xs font-bold text-[#8A1F1F]">Delete</button>
               </div>
             </div>
+            {(resource.shortage > 0 || resource.location || resource.linkedRunOfShowItemIds.length > 0 || resource.packingRequired || resource.pickupRequired || resource.returnRequired || resource.notes) && (
+              <div className="gsv-secondary-detail">
+                {resource.shortage > 0 && <p className="flex items-center gap-2 font-semibold text-[#7A4B16]"><AlertTriangle className="size-4" /> Short by {resource.shortage}</p>}
+                {resource.location && <p className="mt-1"><Truck className="mr-2 inline size-4" />Location: {resource.location}</p>}
+                {resource.linkedRunOfShowItemIds.length > 0 && <p className="mt-1"><ClipboardList className="mr-2 inline size-4" />Run of Show: {resource.linkedRunOfShowItemIds.map((id) => runItemNames.get(id) || id).join(', ')}</p>}
+                {(resource.packingRequired || resource.pickupRequired || resource.returnRequired) && <p className="mt-1"><PackageCheck className="mr-2 inline size-4" />{resource.packingRequired ? 'Pack. ' : ''}{resource.pickupRequired ? `Pickup ${resource.pickupDueDate || 'due date not set'}. ` : ''}{resource.returnRequired ? `Return ${resource.returnDueDate || 'due date not set'}.` : ''}</p>}
+                {resource.notes && <p className="mt-1">{resource.notes}</p>}
+              </div>
+            )}
           </article>
         ))}
       </section>

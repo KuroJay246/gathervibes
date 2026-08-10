@@ -359,10 +359,12 @@ export function ContactsPage() {
         ]}
       />
 
-      {loading ? <LoadingState message="Loading contacts..." /> : activeTab === 'people' && filteredContacts.length === 0 ? (
-        <EmptyState icon={UsersRound} title="No contacts match" description="Add reusable contacts and organizations so event planning records can point to the same people and businesses." />
-      ) : activeTab === 'people' ? (
+      {activeTab === 'people' ? (
         <section id="people-panel" role="tabpanel" data-tour-id="contacts-workspace" className="grid gap-3 xl:grid-cols-2">
+          {loading && <LoadingState message="Loading contacts..." />}
+          {!loading && filteredContacts.length === 0 && (
+            <EmptyState icon={UsersRound} title="No contacts match" description="Add reusable contacts and organizations so event planning records can point to the same people and businesses." />
+          )}
           {filteredContacts.map((contact) => {
             const organization = organizations.find((item) => item.organizationId === contact.organizationId)
             return (

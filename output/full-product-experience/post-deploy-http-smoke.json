@@ -1,0 +1,116 @@
+[
+  {
+    "route": "/dashboard",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/events",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/tasks",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/registrations",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/payments",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/payments/reconciliation",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/imports",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/tickets",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/check-in",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/operations",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/run-of-show",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/resources",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/documents",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/contacts",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/event-review",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/communications",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/settings",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/qa",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  },
+  {
+    "route": "/scanner",
+    "status": 200,
+    "ok": true,
+    "bytes": 1497
+  }
+]

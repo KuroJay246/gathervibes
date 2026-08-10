@@ -12,6 +12,10 @@ test('Phase 23V adds reusable summary/detail layout primitives without new depen
     assert.match(styles, new RegExp(`\\.${className}`))
   }
 
+  for (const className of ['gsv-record-list', 'gsv-record-row', 'gsv-record-meta-grid', 'gsv-secondary-detail']) {
+    assert.match(styles, new RegExp(`\\.${className}`))
+  }
+
   assert.equal(packageJson.dependencies.xlsx, undefined)
   assert.equal(packageJson.dependencies['read-excel-file'], '^9.2.0')
 })
@@ -58,6 +62,31 @@ test('Phase 23V dense organizer pages keep primary work visible and collapse sec
   assert.match(operations, /Partner commitments, sponsors, and supplier contacts/)
   assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
   assert.match(reports, /Show full report metrics/)
+})
+
+test('Phase 23V completion pass makes priority operational records scanable before detail', async () => {
+  const tasks = await readFile('src/pages/TasksPage.jsx', 'utf8')
+  const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
+  const runOfShow = await readFile('src/pages/RunOfShowPage.jsx', 'utf8')
+  const resources = await readFile('src/pages/ResourcesPage.jsx', 'utf8')
+
+  assert.match(tasks, /Compact task rows/)
+  for (const visibleField of ['Priority', 'Due', 'Responsible', 'Follow-up']) {
+    assert.match(tasks, new RegExp(`>${visibleField}<`))
+  }
+
+  assert.match(operations, /Overview, ledger, and commitments/)
+  assert.match(operations, /What happened/)
+  assert.match(operations, /What is pending/)
+  assert.match(operations, /Registration payment evidence remains in Payments/)
+
+  for (const visibleField of ['Activity', 'Responsible', 'Location', 'Arrival']) {
+    assert.match(runOfShow, new RegExp(`>${visibleField}<`))
+  }
+
+  for (const visibleField of ['Quantity', 'Source', 'Supplier', 'Problem']) {
+    assert.match(resources, new RegExp(`>${visibleField}<`))
+  }
 })
 
 test('Phase 23V guardrails preserve routes, QR payload, rules, indexes, access, and workflow boundaries', async () => {

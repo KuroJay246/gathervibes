@@ -398,6 +398,77 @@ input:focus-visible {
   box-shadow: 0 6px 18px rgba(84, 53, 67, 0.035);
 }
 
+.gsv-record-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.gsv-record-row {
+  min-width: 0;
+  border: 1px solid #eedfd6;
+  border-radius: 1rem;
+  background: #fff;
+  padding: 0.85rem;
+  box-shadow: 0 4px 14px rgba(84, 53, 67, 0.025);
+}
+
+.gsv-record-row-main {
+  display: grid;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.gsv-record-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #2b1723;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.gsv-record-meta-grid {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+}
+
+.gsv-record-meta {
+  min-width: 0;
+}
+
+.gsv-record-meta-label {
+  color: #80685b;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gsv-record-meta-value {
+  margin-top: 0.15rem;
+  overflow-wrap: anywhere;
+  color: #2b1723;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.gsv-record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.gsv-secondary-detail {
+  margin-top: 0.65rem;
+  border-top: 1px solid #f2e8e1;
+  padding-top: 0.65rem;
+  color: #5f493f;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
 .gsv-action-toolbar {
   display: flex;
   flex-wrap: wrap;

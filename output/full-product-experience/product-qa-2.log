@@ -1,0 +1,895 @@
+
+> gather-savor-event-hub@0.1.0 product:qa
+> node scripts/product/runProductCommand.mjs qa
+
+
+> npm run lint
+
+> gather-savor-event-hub@0.1.0 lint
+> eslint src tests scripts e2e eslint.config.js vite.config.js playwright.config.js
+
+
+> npm test
+
+> gather-savor-event-hub@0.1.0 test
+> node --test tests/*.test.js
+
+✔ auth reliability keeps localhost desktop on popup-first Google sign-in (0.66ms)
+✔ auth reliability keeps mobile and embedded fallback on redirect (0.2375ms)
+✔ auth reliability return path rules reject login, external, and stale scanner loops (0.1296ms)
+✔ auth reliability derives intended route from protected-route state safely (0.2378ms)
+✔ auth reliability popup fallback and cancellation logic stay deterministic (0.1653ms)
+✔ auth reliability provider initializes persistence, popup sign-in, and unauthorized-state handling (6.4618ms)
+✔ shared confirmation dialog provides accessible in-app destructive confirmation (7.6969ms)
+✔ parseCSV - handles simple comma separation (1.7382ms)
+✔ parseCSV - handles quoted commas and newlines (0.333ms)
+✔ parseCSV - handles escaped quotes (0.1698ms)
+✔ normalizePaymentStatus (0.3048ms)
+✔ normalizeEmail (0.3775ms)
+✔ validateRow - missing email and phone is not a hard blocker (0.5422ms)
+✔ validateRow - valid if at least phone is present (0.1796ms)
+✔ generateStableId - is deterministic and privacy-safe (8.7782ms)
+✔ generateStableId - differs across events for same email (0.9441ms)
+✔ findDuplicate - detects sourceRowId against existing registrations (0.4953ms)
+✔ findDuplicate - shared email is no longer a hard duplicate by itself (0.2201ms)
+✔ mapRows - maps CSV columns using field map (0.7711ms)
+✔ validateRegistration - ticket status validation (0.3233ms)
+✔ Document Register route and copy preserve no-file-upload boundary (6.4511ms)
+✔ document helpers validate URL, categories, statuses, required state, expiry, and task prefill (2.028ms)
+✔ Contacts route supports reusable contacts, organizations, event relationships, and duplicate suggestions without auto-merge (3.9235ms)
+✔ route access keeps scanner isolated while allowing document event-scope roles (0.4378ms)
+✔ protected owner keeps admin approval across new document and contact routes (0.4111ms)
+✔ Document and contact services use batched audit logs and keep storage, messaging, and QR guardrails (3.771ms)
+✔ Firestore rules cover new document/contact paths with validators and scanner denial by omission (2.2093ms)
+﹣ [document-contact-rules] admin can create a document reference with append-only audit (0.9504ms) # Firestore emulator is not running
+﹣ [document-contact-rules] document URL and scanner access are constrained (0.1804ms) # Firestore emulator is not running
+﹣ [document-contact-rules] admin can create contact directory records and event links with audits (0.1306ms) # Firestore emulator is not running
+﹣ [document-contact-rules] viewer can read event links but not global contacts (0.1715ms) # Firestore emulator is not running
+✔ event readiness helper handles no selected event safely (1.6843ms)
+✔ event readiness helper keeps an empty event review-only without inventing data (6.9476ms)
+✔ event readiness helper flags pending payments as needs attention (2.3094ms)
+✔ event readiness helper flags paid registrations missing ticket codes (0.8595ms)
+✔ event readiness helper marks complete ticket assignment as ready (0.6987ms)
+✔ event readiness helper surfaces operations warnings from existing ledger entries only (0.622ms)
+✔ event validation accepts complete event values (2.0301ms)
+✔ event validation rejects missing and invalid required values (0.3923ms)
+✔ active-event dates remain stable when stored locally (1.6411ms)
+✔ financial plan totals exclude projected income from budget totals (2.0417ms)
+✔ organizer overview projects cash position from income minus budgeted expenses (4.3585ms)
+﹣ Firestore rules allow approved admin check-in batch for imported ticketed registration (1.42ms) # SKIP
+﹣ Firestore rules allow protected owner UID when email is absent from mutable allowlist (0.1604ms) # SKIP
+﹣ Firestore rules allow approved admin registration detail update with append-only audit (0.1412ms) # SKIP
+﹣ Firestore rules allow normal edits to reviewed production-shaped registrations (0.1112ms) # SKIP
+﹣ Firestore rules allow production-shaped registration edit without audit batch coupling (0.1663ms) # SKIP
+﹣ Firestore rules allow legacy registration detail edits when attendance fields remain absent (0.1088ms) # SKIP
+﹣ Firestore rules reject normal detail edits that add attendance evidence fields (0.129ms) # SKIP
+﹣ Firestore rules allow routine registration audit create for reviewed production-shaped registrations (0.1325ms) # SKIP
+﹣ Firestore rules allow small approved admin registration import batch (0.1389ms) # SKIP
+﹣ Firestore rules reject oversized single registration import batch due audit verification access limits (0.2071ms) # SKIP
+﹣ Firestore rules allow approved admin ticket assignment batch (0.2194ms) # SKIP
+﹣ Firestore rules allow approved admin ticket regeneration batch (0.1105ms) # SKIP
+﹣ Firestore rules reject standalone ticket audit without registration transition (0.1027ms) # SKIP
+﹣ Firestore rules reject approved admin audit log update (0.0743ms) # SKIP
+﹣ Firestore rules reject approved admin audit log delete (0.0652ms) # SKIP
+﹣ Firestore rules reject assigned scanner audit log update and delete (0.1311ms) # SKIP
+﹣ Firestore rules reject unapproved audit log delete (0.084ms) # SKIP
+﹣ Firestore rules reject ticket audit with mismatched target registration (0.0527ms) # SKIP
+﹣ Firestore rules reject ticket audit with mismatched event (0.0583ms) # SKIP
+﹣ Firestore rules reject audit log create with missing required fields (0.0505ms) # SKIP
+﹣ Firestore rules reject the whole ticket batch when audit validation fails (0.0677ms) # SKIP
+﹣ Firestore rules reject unapproved check-in batch (0.053ms) # SKIP
+﹣ Firestore rules reject standalone check-in audit without registration transition (0.0801ms) # SKIP
+﹣ Firestore rules reject duplicate check-in registration update (0.0555ms) # SKIP
+﹣ Firestore rules allow approved admin undo check-in batch (0.0665ms) # SKIP
+﹣ Firestore rules reject unapproved undo check-in batch (0.0482ms) # SKIP
+﹣ Firestore rules reject standalone undo audit without registration transition (0.0465ms) # SKIP
+✔ Firestore rules test harness is skipped unless the Firestore emulator is running (0.1568ms)
+✔ check-in rules allow only check-in field changes without broad schema loosening (14.445ms)
+✔ audit log rules and services preserve append-only behavior (9.3954ms)
+✔ check-in and undo services send minimal persistence payloads plus audit logs (1.2051ms)
+✔ Google Forms inbox is event agnostic and exposes required workflow columns (2.0345ms)
+✔ manual Google Forms responses enter review before mapping or import (3.0105ms)
+✔ response duplicate candidates use response ID, email, phone, and name without auto-merge (0.4431ms)
+✔ signed HTTPS receiver rejects missing, invalid, stale, wrong, and disabled submissions (1.4404ms)
+✔ Import Center and integration package preserve guardrails (21.6486ms)
+✔ Immediate Stabilization operation manifests are deterministic and chunk-aware (1.8536ms)
+✔ Immediate Stabilization partial completion report separates completed, failed, and unattempted rows (2.026ms)
+✔ Immediate Stabilization payment status validation blocks contradictory bulk updates (2.9369ms)
+✔ Immediate Stabilization audit changes include safe field before and after values only (0.3916ms)
+✔ Immediate Stabilization services expose deterministic audit IDs and operation results (8.5164ms)
+✔ Immediate Stabilization role wording no longer claims staff rules are unenforced (1.4265ms)
+✔ Import Center exposes the approved step workflow and source taxonomy (2.1867ms)
+✔ record types are explicit and only guest-registration writes from Import Center (0.4871ms)
+✔ parser accepts CSV, pasted tab tables, and semicolon exports (1.0581ms)
+✔ header mapping preview shows examples, statuses, duplicate headers, and unmapped columns (2.4128ms)
+✔ Import Center page labels PDF fallback and Response Inbox honestly (7.0458ms)
+✔ Response Inbox remains manual review unless an authorized receiver is separately active (0.4255ms)
+✔ Import upgrade preserves package and ticket guardrails (6.5935ms)
+✔ Import Center source selector covers supported source types (2.2153ms)
+✔ Import Center excludes completed CPB recovery tools from organizer sources (8.1384ms)
+✔ Import Center keeps Google Sheets OAuth deferred and enables XLSX parsing (0.3607ms)
+✔ Import Center page labels source selector and XLSX upload as preview-first (1.6197ms)
+✔ existing CSV parsing and mapping still works for registration imports (2.7065ms)
+✔ Import Center detects ticket code headers and blocks duplicate imported ticket codes (8.9417ms)
+✔ XLSX row normalization detects headers and preserves existing mapping flow (0.481ms)
+✔ pasted table import still uses the same CSV parser and preview path (0.2132ms)
+✔ Import Center source and record language is honest and review scoped (1.7798ms)
+✔ Response Inbox exposes review filters, safe statuses, and no unsupported import action (1.7008ms)
+✔ Import and inbox pages show final confirmation, status details, and copy-only handoff (7.0989ms)
+✔ Message Builder is structured, deterministic, and copy only (2.6911ms)
+✔ Refinement guardrails preserve QR, dependencies, rules, indexes, and access boundaries (7.2345ms)
+✔ [tutorial-v3] eligible users are Jaylan and Anica without hardcoded organizer copy (9.7971ms)
+✔ [tutorial-v3] version is new and does not reuse v2 completion (0.3996ms)
+✔ [tutorial-v3] guided orientation covers 30 anchored lessons plus welcome and completion (0.9756ms)
+✔ [tutorial-v3] every guided step has rich practical content and a registered target (0.3476ms)
+✔ [tutorial-v3] exact targets replace broad workspace targets for action steps (0.2756ms)
+✔ [tutorial-v3] state machine exposes explicit legal states (0.1971ms)
+✔ [tutorial-v3] stale transition events cannot overwrite current presentation (0.304ms)
+✔ [tutorial-v3] Back and Next transitions are first-class reducer operations (0.1733ms)
+✔ [tutorial-v3] route and target registries are semantic and not text-selector based (0.2616ms)
+✔ [tutorial-v3] target registry chooses a measurable target when duplicate layouts exist (3.4427ms)
+✔ [tutorial-v3] storage uses the secure onboarding preference subcollection (0.8781ms)
+✔ [tutorial-v3] legacy stored progress is preserved but not resumed as v3 progress (1.1048ms)
+✔ [tutorial-v3] normal guided tour writes no business records (2.1194ms)
+✔ [tutorial-v3] current event-day workflows explain boundaries and readiness truthfully (0.3771ms)
+✔ [tutorial-v3] practice missions are non-writing by default and CPB isolated (0.4931ms)
+✔ [tutorial-v3] tooltip exposes specific action controls (4.318ms)
+✔ [tutorial-v3] hidden containers open automatically (2.1455ms)
+✔ [tutorial-v3] legacy runtime files are removed from AppShell imports (1.0667ms)
+✔ [tutorial-v3] replay starts from the beginning without clearing completion (1.1443ms)
+✔ [tutorial-v3] transition controller is not recreated during route changes (1.5625ms)
+✔ [tutorial-v3] overlay uses observer-based measurement and one document-body portal (0.8803ms)
+✔ [tutorial-v3] controller uses AbortController-backed transitions without fixed route sleeps (0.7211ms)
+✔ [tutorial-v3] Firestore rules allow v4 30-step guided boundary (1.9407ms)
+﹣ [onboarding-rules] Jaylan can create their own onboarding document (new user) (1.4804ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Jaylan can create with all optional onboarding fields (0.2166ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Jaylan can merge-update their existing onboarding document (0.1286ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Anica can create her own onboarding document (0.1388ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Jaylan cannot write to Anica onboarding document (0.1281ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Anica cannot write to Jaylan onboarding document (0.1401ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Third-party user cannot write to Jaylan onboarding document (0.0973ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Rejects write with unauthorized field "role" (0.1037ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Rejects write with unauthorized field "status" (0.1485ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Rejects write with unauthorized field "email" (0.1147ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Rejects write with arbitrary extra field "adminOverride" (0.1173ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Rejects lastStep below minimum (-1) (0.0653ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Rejects lastStep above maximum (31) (0.0864ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Accepts lastStep at unopened boundary (0) (0.0574ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Accepts lastStep at maximum boundary (30) (0.0496ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Rejects non-boolean "completed" value (0.0657ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Rejects version string longer than 64 characters (0.083ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Jaylan can read their own onboarding document (0.0396ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Jaylan cannot read Anica onboarding document (0.0421ms) # Firestore emulator is not running
+﹣ [onboarding-rules] Unauthenticated user cannot read onboarding document (0.035ms) # Firestore emulator is not running
+✔ [onboarding-rules] firestore.rules contains the dedicated onboarding subcollection match block (10.2306ms)
+✔ organizer navigation is grouped by real work and exposes page purpose actions (7.2175ms)
+✔ planning forms explain required fields, status meaning, and non-automatic relationships (5.5911ms)
+✔ simplification guardrails keep data model, QR, dependencies, and rules untouched by UI copy (6.3474ms)
+✔ organizer shell uses grouped navigation without changing route paths or role filtering (8.359ms)
+✔ shared visual system tokens define calm event-neutral shell foundations (1.7829ms)
+✔ Overview uses supported event metrics, attention, quick actions, and safe recent activity (3.7237ms)
+✔ Phase 1 guardrails preserve QR, dependencies, rules, indexes, and disabled access workflows (7.3813ms)
+✔ organizer shell explains every major route without changing route paths (6.4751ms)
+✔ mobile navigation keeps event-day actions primary and System QA behind More (1.0973ms)
+✔ demo editability guidance points to account, selected event, and System QA instead of vague permissions (0.2695ms)
+✔ organizer usability standards and demo maintenance docs exist (12.3428ms)
+✔ Registration Payments exposes detail review, method filtering, and task-prefill follow-up (8.8006ms)
+✔ Payments workspace keeps follow-up separate from internal review counts (3.4487ms)
+✔ Operations exposes derived commitment, partner, and in-kind views with task-prefill actions (2.0758ms)
+✔ Operations and payments boundaries remain explicit (2.67ms)
+✔ Phase 10 role detection keeps approvedEmails backward compatible (1.2773ms)
+✔ Phase 10 UI displays roles without weakening Firestore rules (10.6669ms)
+✔ Phase 11 communications templates and placeholders are copy-only and safe (24.2688ms)
+✔ Phase 11 segment counts, recipient list, and CSV packet are generated without sending (5.7198ms)
+✔ Phase 11 UI has packet builder and no sending or OAuth implementation (15.3934ms)
+✔ System QA includes access and copy-only message checks (16.874ms)
+✔ CSV injection prevention: sanitises formula-starting values (2.9085ms)
+✔ RegistrationsPage includes Door Paid and To Pay at Door tabs (9.7787ms)
+✔ QA page includes empty allowlist check (1.704ms)
+✔ CommunicationsPage includes prompt-builder safety notice (1.1394ms)
+✔ QrScannerPanel includes success beep via Web Audio API (2.1477ms)
+✔ QrScannerPanel includes haptic feedback via navigator.vibrate (1.7175ms)
+✔ QrScannerPanel includes Continuous Scan Mode toggle (2.3374ms)
+✔ QrScannerPanel includes torch/flashlight toggle (2.1287ms)
+✔ QrScannerPanel mentions HTTPS requirement in camera error message (1.5886ms)
+✔ QrScannerPanel beep and haptic only fire for new (non-duplicate) scan match (4.6415ms)
+✔ QrScannerPanel accepts resumeTrigger prop (1.314ms)
+✔ QrScannerPanel only accepts decoded QR values after explicit Scan QR arming (0.9754ms)
+✔ QrScannerPanel camera decoder uses refs for current data and callback state (0.9068ms)
+✔ manual fallback and camera decoded payload resolve the same ticket fixture (1.0206ms)
+✔ QR parser extracts ticket code without private payload data (0.2818ms)
+✔ QrScannerPanel keeps manual fallback collapsed until the operator chooses it (1.4821ms)
+✔ CheckInPage has sticky header for mobile event-day use (2.6764ms)
+✔ CheckInPage shows inline checked-in count in header (1.4886ms)
+✔ CheckInPage includes organizer-review list filters and group badges (2.222ms)
+✔ CheckInPage includes check-in timestamp on undo confirmation modal (1.0909ms)
+✔ CheckInPage search cap is raised to 20 (2.7661ms)
+✔ CheckInPage passes resumeScanTrigger to QrScannerPanel (1.4521ms)
+✔ CheckInPage guest result buttons have minimum 72px touch target height (2.5979ms)
+✔ importService chunkSize is 50 (4.5628ms)
+✔ importService commitImport accepts onProgress callback (5.3519ms)
+✔ importService reports clear error on chunk failure (4.3303ms)
+✔ ImportPreviewTable shows chunked progress during import (2.4214ms)
+✔ firebase.js uses initializeFirestore with persistentLocalCache (0.8284ms)
+✔ firebase.js guards persistence against test environment (1.3801ms)
+✔ firebase.js disables persistent cache for emulator browser tests (1.6271ms)
+✔ runtimeHealth includes offline persistence status item (1.896ms)
+✔ CommunicationsPage does not reference Gmail or Outlook OAuth tokens (1.5277ms)
+✔ CommunicationsPage does not reference real AI API keys (4.514ms)
+✔ Export utils do not include auditLogs collection data (3.3104ms)
+✔ Export utils do not include settings/accessControl data (8.8817ms)
+✔ payment audit workbook headers are recognized (1.3507ms)
+✔ payment audit dry-run matches rows, flags review, and writes nothing (2.825ms)
+✔ payment audit finance mapping is explicit and privacy-safe (2.4073ms)
+✔ payment mapping does not invent methods or store Gmail links (0.2756ms)
+✔ base ticket price does not silently calculate missing amount due (0.6418ms)
+✔ Phase 14B UI and rules expose required safe surfaces (47.83ms)
+✔ QR payload remains ticket-code only (0.5713ms)
+✔ Firebase Hosting applies private admin security headers (7.7767ms)
+✔ Firebase Hosting preserves SPA rewrite while adding headers (3.8781ms)
+✔ private admin app blocks crawling without sitemap or JSON-LD (3.7806ms)
+✔ private admin SEO surfaces remain intentionally deferred (8.4333ms)
+✔ Phase 15B removes vulnerable xlsx package while keeping read-excel-file import path (8.9368ms)
+✔ XLSX imports still use preview-first sheet parsing workflow (4.7785ms)
+✔ Settings removes the roadmap archive while documentation retains release history (8.1133ms)
+✔ private access status reflects disabled workflow boundaries without roadmap copy (2.6708ms)
+✔ Phase 17D planning docs and readiness docs exist and preserve current live safety boundaries (18.0034ms)
+✔ Event Operations page documents active ledger and future modules only (3.6888ms)
+✔ Phase 15B keeps QR privacy and Phase 15A private indexing protections (8.3672ms)
+✔ Phase 16 keeps Firebase Hosting SPA routes and non-overblocking security headers (9.1788ms)
+✔ built index references existing asset chunks without local paths or sourcemaps (3.5458ms)
+✔ service worker remains lifecycle-only and does not cache private admin data (2.9334ms)
+✔ root render has a safe browser loading fallback (1.7247ms)
+✔ System Health normalizes allowlist email comparison defensively (1.1695ms)
+✔ System QA includes browser and CODEX_TEST retest guidance (2.7491ms)
+✔ Phase 16 preserves ticket-code-only QR payloads (0.5192ms)
+✔ Phase 17B access helpers keep approved admin full access (1.5625ms)
+✔ Phase 17B access helpers deny inactive and revoked staff (0.3937ms)
+✔ Phase 17B scanner can view only scanner route and cannot access admin routes (0.5478ms)
+✔ Phase 17B viewer and operations helper remain limited (0.2918ms)
+✔ Phase 17B no assignment and clean local state are safe (1.0023ms)
+✔ Phase 17B preserves ticket prefix and QR payload privacy (0.4215ms)
+✔ Phase 17B UI surfaces staff role gating and assigned-event fallback (15.9675ms)
+✔ Phase 17B Firestore rules contain staff profile, assignment, scanner, viewer, and operations restrictions (3.8806ms)
+✔ Phase 17C-B scanner role defaults to scanner-only route (1.6662ms)
+✔ Phase 17C-B scanner nav excludes admin routes and admin keeps existing access (0.3941ms)
+✔ Phase 17C-B scanner can check in only assigned CODEX_DEMO and not CPB (0.226ms)
+✔ Phase 17C-B no-assignment scanner state is safe (1.9348ms)
+✔ Phase 17C-B3 staff auth path admits active scanner without approvedEmails (0.326ms)
+✔ Phase 17C-B3 inactive staff profile and inactive assignments are denied (0.2204ms)
+✔ Phase 17C-B scanner route is outside AppShell and auto-selects a single assignment (13.3533ms)
+✔ Phase 17C-B scanner page is narrow and excludes admin-only controls (1.9381ms)
+✔ Phase 17C-B1 scanner undo is admin-only and reuses safe audited service (4.8439ms)
+✔ Phase 17C-B1 scanner shortcuts exist for approved admins without adding staff nav (3.0055ms)
+✔ Settings documents current access categories without rules rewriting UI (1.0977ms)
+✔ Phase 17C-B1b Settings uses accessible query-linked tabs (0.9764ms)
+✔ Settings tabs preserve required guardrail content (2.6495ms)
+✔ Phase 17C-B3 AuthProvider checks staff path before not-approved error (3.897ms)
+✔ Phase 17C-B scanner lookup preserves QR privacy and manual fallback (1.668ms)
+✔ Phase 17C-B preserved standards remain covered (0.7635ms)
+✔ Phase 17C-A rules keep unauthenticated and public access denied (9.6303ms)
+✔ Phase 17C-A rules preserve approved-admin boundary and protected settings (2.8626ms)
+✔ Phase 17C-A rules allow only admins to manage staff profiles and assignments (2.9078ms)
+✔ Phase 17C-A rules deny inactive or revoked staff through profile and assignment gates (3.374ms)
+✔ Phase 17C-A scanner rules are assigned-event read and check-in completion only (2.1095ms)
+✔ Phase 17C-A scanner cannot alter payment contact ticket source import identity fields (5.5164ms)
+✔ Phase 17C-A viewer operations helper and event manager remain non-admin (0.8075ms)
+✔ Phase 17C-A audit logs remain append-only with scanner audit constrained to assigned check-in (2.2871ms)
+✔ Phase 17C-A query review documents safe query constraints (10.672ms)
+✔ Phase 17C-A regression helpers preserve clean account counts defaults and QR privacy (2.6352ms)
+✔ Phase 17E-B prototype adds accessRequests collection rules without deploying workflow behavior (9.1591ms)
+✔ Phase 17E-B docs and current UI keep accessRequests non-live (10.7476ms)
+✔ Daily QA workflow stays read-only and matches the current login surface (7.7861ms)
+✔ access workflow remains disabled in organizer Settings (2.1033ms)
+✔ Phase 17E-E readiness artifact preserves deployment gates and rollback boundaries (2.4295ms)
+✔ Phase 17F-A plan and 17F-C checklist stay planning-only and preserve guardrails (8.8174ms)
+✔ Phase 17F-B disabled contract exposes no live write path (4.4414ms)
+✔ 17F status stays in docs while UI keeps access workflows disabled (9.1738ms)
+✔ Phase 17G-A approval package stays non-live and documents the rules deployment boundary (4.0905ms)
+✔ Phase 17R core routes keep clean no-selected-event boundaries and explicit working-event guidance (17.8485ms)
+✔ Phase 17R preserves auth route gating and blocked access workflow boundaries (3.8672ms)
+✔ Phase 17R preserves CPB, approvedEmails, and QR payload guardrails (4.3703ms)
+✔ Phase 17R clears stale dashboard event scope and syncs selected Working Event snapshots (1.2334ms)
+✔ Phase 17R preserves event, registration, and ticket audit action boundaries (4.6158ms)
+✔ Phase 18 resets import state when the Working Event changes (6.7533ms)
+✔ Phase 18 clears stale registrations page selection and modal state on Working Event changes (1.5277ms)
+✔ Phase 18 clears stale ticket assignment state on Working Event changes and short-circuits load errors (2.3018ms)
+✔ Phase 19 operations ledger report summarizes the visible view safely (2.014ms)
+✔ Phase 19 operations helper keeps filtered summaries scoped to the copied current view only (0.2782ms)
+✔ Phase 19 operations page keeps existing design while adding practical filtering and export helpers (5.7608ms)
+✔ guided event setup progress follows the standard stages without new routes or collections (8.7053ms)
+✔ task deadline summary separates overdue, today, soon, open, and completed work (0.7763ms)
+✔ Events and planning workspace present guided setup and deadlines on existing event workflow (9.2543ms)
+✔ Phase 2 standards and result documents exist without making CPB special (9.1537ms)
+✔ Phase 20 dashboard and events preserve approved layout while clarifying working-event pricing context (6.7412ms)
+✔ Phase 20 keeps registration audit wording and ticket QR guardrails intact (1.3393ms)
+✔ Phase 20 keeps import preview-first, xlsx absent, read-excel-file active, and access workflow disabled (5.0679ms)
+✔ Phase 20 operational handoff guide stays practical and preserves CPB and CODEX_TEST guardrails (2.1311ms)
+✔ Overview keeps event priorities and high-frequency action destinations (8.392ms)
+✔ Phase 21 improves operations control summaries using existing ledger data only (3.0601ms)
+✔ Phase 21 preserves QR, dependency, access, and private-data guardrails (4.9952ms)
+✔ Phase 22 event review handles no selected event safely (2.3122ms)
+✔ Phase 22 follow-up flags missing contact, duplicate contacts, missing tickets, and open operations (9.7654ms)
+✔ Phase 22 follow-up identifies check-in in progress and complete states (2.0298ms)
+✔ Phase 22 follow-up flags completed event with unresolved issues (0.8212ms)
+✔ Phase 22 payment review preserves registration finance distinctions (1.1962ms)
+✔ Phase 22 payment review does not silently derive missing registration price from event default (0.9034ms)
+✔ Phase 22 operations summary separates received and pending ledger values (0.756ms)
+✔ Phase 22 event summary keeps registrations and guests distinct and uses personsAttending for attendance (1.6531ms)
+✔ Phase 22 event summary handles zero-data and invalid-capacity cases safely (0.7278ms)
+✔ Phase 22 current-event wording stays separate from post-event wording (0.7937ms)
+✔ Phase 22 route, guardrails, and read-only page structure are present without rules or dependency changes (17.4849ms)
+✔ Phase 22 event review preview rows use stable unique keys for duplicate names (1.1627ms)
+✔ registration payment truth table derives due, received, balance, and organizer status labels (3.7136ms)
+✔ invalid negative registration money remains a blocking finance review defect (0.4913ms)
+✔ operations effect table separates cash, commitments, in-kind support, reimbursements, and adjustments (0.497ms)
+✔ reports preserve financial source boundaries and use settled Operations cash movement for ledger difference (8.9744ms)
+✔ payment reconciliation remains read-only, Working Event-scoped, and distinguishes missing evidence from outstanding balance (3.5479ms)
+✔ financial workflow guardrails preserve QR payload, dependencies, and disabled access workflow (11.2056ms)
+✔ financial workflow pages expose clear organizer wording without claiming final profit (4.3315ms)
+✔ Phase 23 task workflow uses required statuses priorities categories and date filters (3.3983ms)
+✔ Phase 23 route labels preserve paths and keep scanner isolated from tasks (8.4896ms)
+✔ Phase 23 Firestore rules define scoped task documents and task audit actions (2.5128ms)
+✔ Phase 23 registration refinement exposes supported source ticket and attendance filters without formula changes (3.3386ms)
+✔ organizer navigation uses product labels while preserving route paths (7.6338ms)
+✔ Overview removes phase clutter and keeps event-scoped decision sections (3.0513ms)
+✔ Message Builder is copy-only and does not claim automatic sending or real AI (1.8795ms)
+✔ Settings contains practical settings and not a roadmap archive (1.1921ms)
+✔ Reports remains read-only and separates registration payments from Operations (1.287ms)
+✔ Phase 23A guardrails keep QR, dependencies, rules, and access boundaries unchanged (5.5472ms)
+✔ Payments route is organizer-facing while scanner navigation remains isolated (18.2939ms)
+✔ Payments workspace classifies registration payment follow-up without inventing money (4.53ms)
+✔ Registration finance classification catches data defects and duplicate references (0.5395ms)
+✔ Payments page exposes price context and links to the existing registration review workflow (4.7268ms)
+✔ Operations page and helpers keep registration payments separate from ledger totals (2.8935ms)
+✔ Financial boundary examples stay separated across payments, operations, planning, and reports (13.3361ms)
+✔ CPB historical evidence is relocated out of daily Payments and Operations presentation (2.7884ms)
+✔ Phase 23B guardrails keep QR, dependencies, Firestore rules, and access workflows unchanged (5.0075ms)
+✔ Phase 23C route is preview-only, Working Event-scoped, and not CPB-gated (11.0595ms)
+✔ Payment reconciliation parses workbook rows without committing private CPB data (2.3562ms)
+✔ Payment reconciliation uses strong identifiers and never treats name-only as a safe match (4.6604ms)
+✔ Payment reconciliation keeps workbook and app classifications mutually exclusive (1.5193ms)
+✔ Shared contact warnings do not override a unique ticket-code match (0.847ms)
+✔ Payment reconciliation blocks duplicate identifiers and keeps Operations separate (1.1655ms)
+✔ Payment reconciliation exposes field-level proposal evidence and totals (0.6705ms)
+✔ Payment reconciliation supported proposal fields exclude paymentReference and count fields deterministically (0.8451ms)
+✔ Payment reconciliation keeps warnings separate from record classifications (0.685ms)
+✔ Payment reconciliation UI includes refinement evidence tables and reset safety (5.8157ms)
+✔ Phase 23C read-only architecture and guardrails remain intact (6.0904ms)
+✔ Phase 23D-0 stored status and display label contract distinguishes derived partial and door states (2.5338ms)
+✔ Phase 23D-0 payment status behavior preserves money evidence and method separation (0.6865ms)
+✔ Phase 23D-0 Payments filters and follow-up handle Door Paid versus To Pay at Door (3.1506ms)
+✔ Phase 23D-0 Overview and Reports finance totals align with Payments workspace (10.8616ms)
+✔ Phase 23D-0 import normalization matches manual editor status contract (2.8796ms)
+✔ Phase 23D-0 registration update writes remain registration plus audit only (9.1832ms)
+✔ Phase 23D-0 classification flags invalid Door Paid and derives Partial rows from amounts (0.386ms)
+✔ Phase 23E generator uses the released parser and finance contracts (6.5093ms)
+✔ Phase 23E manifest generation preserves canonical payment-status behavior (2.7361ms)
+✔ Phase 23E preview produces complete classification counts and deterministic proposal fields (3.5627ms)
+✔ Phase 23E generator remains read-only and does not expose CPB apply behavior (2.3311ms)
+✔ Phase 23F approval package reads the new manifest and writes only Desktop approval artifacts (1.2819ms)
+✔ Phase 23F approval package keeps organizer decisions unresolved until explicit approval (0.217ms)
+✔ Phase 23F approval phrases are exact and scoped to rehearsal/design only (0.2223ms)
+✔ Phase 23F approval package has no Firestore write or manifest mutation path (0.3633ms)
+✔ Phase 23F flags risky financial replacements and door-list proposals (0.1993ms)
+✔ Phase 23G apply lock allows CODEX_DEMO rehearsal only with exact manifest approval phrase (1.8011ms)
+✔ Phase 23G apply plan supports only registration finance fields and audit metadata (1.3ms)
+✔ Phase 23G apply plan rejects unsupported fields and scope drift (0.3538ms)
+✔ real-event production apply approval is not CPB-specific and requires exact approval plus a positive proposal count (0.4054ms)
+✔ Phase 23G rehearsal script is CODEX_DEMO-only and does not write Operations, tickets, or check-ins (0.6996ms)
+✔ package scripts do not expose a CPB-specific production apply path (0.4454ms)
+✔ Phase 23M Overview displays canonical expected registration income without using event default price (2.4838ms)
+✔ Phase 23M Overview, Payments, and Reports finance totals align (14.0288ms)
+✔ Phase 23M source uses aligned finance concepts across Overview, Payments, and Reports (7.1214ms)
+✔ Phase 23M Payments keeps desktop table and adds responsive cards with full finance context (2.763ms)
+✔ Phase 23M Payments filters and search results remain unchanged (1.3356ms)
+✔ Phase 23M guardrails preserve QR, scanner, rules, indexes, and dependencies (7.358ms)
+✔ Phase 23N preserves exact evidence classes and CPB-only audit lookup (1.653ms)
+✔ Phase 23N keeps operational totals separate from documentary audit totals (11.9516ms)
+✔ Phase 23N in-kind support does not enter cash Operations totals (0.3449ms)
+✔ Phase 23N baker variance and historical records do not alter paid or outstanding totals (0.188ms)
+✔ Phase 23N approximate attendance does not create system check-ins (1.9034ms)
+✔ Phase 23N UI surfaces documentary audit without reopening completed-event planning work (14.0645ms)
+✔ Phase 23N-B Operations cash position is not labelled final profit (2.2629ms)
+✔ Phase 23N-B registration payments remain separate from Operations (1.7783ms)
+✔ Phase 23N-B paid expenses and commitments remain separate (0.5266ms)
+✔ Phase 23N-B completed closeout panel cannot reapply records (1.5848ms)
+✔ Phase 23N-B corrective tasks do not alter totals (0.3442ms)
+✔ Phase 23N-B applied proposal-count reporting is internally consistent (1.1075ms)
+✔ Phase 23N-B Subsets 5 and 6 remain locked in UI and report (3.6154ms)
+✔ Phase 23N generator is dry-run only and blocks ambiguous automatic apply (0.7894ms)
+✔ Phase 23N guardrails preserve QR payload, scanner boundaries, and append-only audit logs (2.369ms)
+✔ Phase 23O recognizes protected owner by Firebase UID without mutable allowlist membership (1.7262ms)
+✔ Phase 23O keeps protected owner email normalized and visible without making email the primary grant (0.3213ms)
+✔ Phase 23O preserves secondary organizer access and lists protected owner as immutable (0.5379ms)
+✔ Phase 23O Settings UI marks protected owner as not removable through organizer settings (7.6648ms)
+✔ Phase 23O Firestore rules grant owner UID first without widening signed-in access (2.6921ms)
+✔ Phase 23O guardrails preserve QR privacy, CODEX_DEMO isolation, and standard real-event safeguards (6.5845ms)
+✔ Phase 23P configures Sentry React SDK without hardcoding DSN or default PII (10.1028ms)
+✔ Phase 23P adds permanent product QA and audit commands without production credentials (5.5871ms)
+✔ Phase 23P adds Dependabot and CodeQL repository guardrails (2.9785ms)
+✔ Phase 23P keeps legacy payment-audit recovery controls out of normal organizer imports (2.9587ms)
+✔ Phase 23P keeps Import Center reachable from mobile admin navigation (1.2347ms)
+✔ Phase 23Q paid records with complete finance fields stay resolved with no review state (2.478ms)
+✔ Phase 23Q paid records with missing amounts stay paid, move to Data Review, and stay out of reminder audiences (2.6446ms)
+✔ Phase 23Q complimentary and unresolved payment states split Data Review from patron payment follow-up (0.6897ms)
+✔ Phase 23Q workspace counts and filters keep collection work separate from internal data cleanup (0.7536ms)
+✔ Phase 23R organizer-confirmed payment stays Paid and visible as internal cleanup only (2.6613ms)
+✔ Phase 23R missing optional payment reference alone becomes historical, not urgent (1.1788ms)
+✔ Phase 23R group guests covered by a payer do not require individual payment metadata (0.6604ms)
+✔ Phase 23R active missing payment method remains internal cleanup before an event is historical (0.2983ms)
+✔ Phase 23R amount mismatches remain action required (1.2639ms)
+✔ Phase 23R duplicate references remain action required (0.4202ms)
+✔ Phase 23R paid amount not recorded remains visible but never enters collection follow-up (0.2862ms)
+✔ Phase 23R resolved CPB-style review rows keep outstanding and payment follow-up at zero (0.4888ms)
+✔ Phase 23R reminder audiences exclude resolved historical data-review rows (1.4823ms)
+✔ Phase 23R data-review category counts reconcile to their named records (0.7071ms)
+✔ Phase 23T keeps organizer navigation and QA actions product-facing (7.9991ms)
+✔ Phase 23T removes remaining organizer-facing phase and database jargon (6.027ms)
+✔ Phase 23T current-product docs exist for organizer rehearsal, QA, deployment, and finance boundaries (9.8042ms)
+﹣ Phase 23T allows protected owner to create a full planner event with its append-only audit log (0.5147ms) # SKIP
+﹣ Phase 23T still rejects unexpected operations plan keys during event creation (0.0994ms) # SKIP
+✔ Phase 23V adds reusable summary/detail layout primitives without new dependencies (5.5823ms)
+✔ Phase 23V Overview is summary-first and moves secondary detail behind disclosure panels (1.4813ms)
+✔ Phase 23V dense organizer pages keep primary work visible and collapse secondary review detail (4.881ms)
+✔ Phase 23V completion pass makes priority operational records scanable before detail (3.0356ms)
+✔ Phase 23V guardrails preserve routes, QR payload, rules, indexes, access, and workflow boundaries (5.844ms)
+✔ PWA manifest carries the Gather & Savor mobile identity (7.7526ms)
+✔ service worker does not cache or intercept private admin data (1.2541ms)
+✔ Google and email sign-in both retain admin allowlist verification (3.2038ms)
+✔ registration audit logs preserve registration target type (1.4713ms)
+✔ mobile navigation keeps More, Settings, and logout reachable (1.69ms)
+✔ sidebar Working Event box contains long event text safely (0.9534ms)
+✔ Overview quick actions prioritize organizer planning and event-day work (1.2613ms)
+✔ duplicate-contact review actions open filtered registrations, not Import Center (3.3024ms)
+✔ event categories include universal event types and preserve legacy values (0.7192ms)
+✔ event capabilities support category defaults and organizer overrides (0.726ms)
+✔ old events without capability data continue working (4.073ms)
+✔ event validation accepts each category and rejects unsafe capability shape (0.9093ms)
+✔ event save path persists capabilities without changing routes or rules (7.7105ms)
+✔ historical attendance is distinct from scanner-confirmed check-in (1.5127ms)
+✔ historical attendance does not inflate checked-in totals (0.6221ms)
+✔ registration validation blocks ambiguous historical attendance records (0.5045ms)
+✔ historical attendance service is audited and never changes checkedIn (6.4181ms)
+✔ Firestore rules validate event capabilities and isolate scanner attendance permissions (1.6905ms)
+✔ historical attendance payload records evidence without inventing scan data (1.3237ms)
+✔ tutorial v3 preserves organizer route paths and expands coverage to 30 anchored lessons (1.3316ms)
+✔ tutorial v3 uses stable semantic targets already present on organizer pages (24.2827ms)
+✔ tutorial v3 removes legacy walkthrough runtime and brittle target helpers (1.5716ms)
+✔ tutorial v3 normal path remains zero-write except onboarding preferences (1.5217ms)
+✔ personalized onboarding copy uses trusted display names without email or UID display (1.3522ms)
+✔ mobile primary navigation is role filtered and deduplicated (1.6954ms)
+✔ product footer copy is semantic and appears in authenticated and login shells (7.9989ms)
+✔ VALID_TIER_NAMES includes all 7 expected names (1.71ms)
+✔ VALID_TIER_STATUSES has active, sold-out, hidden (0.2492ms)
+✔ validatePriceTier - valid tier passes (1.1607ms)
+✔ validatePriceTier - rejects missing name (0.2715ms)
+✔ validatePriceTier - rejects negative price (0.2164ms)
+✔ validatePriceTier - allows zero price (Complimentary) (0.1654ms)
+✔ validatePriceTier - rejects invalid status (0.1528ms)
+✔ validatePriceTiers - returns empty for empty array (0.225ms)
+✔ validatePriceTiers - returns empty for null (0.1713ms)
+✔ validatePriceTiers - rejects more than MAX_PRICE_TIERS (0.2804ms)
+✔ validatePriceTiers - collects errors per index (0.2774ms)
+✔ validateEvent - accepts event with no priceTiers (0.5223ms)
+✔ validateEvent - accepts event with valid priceTiers (0.1792ms)
+✔ validateEvent - rejects event with invalid priceTier (0.1725ms)
+✔ getCountdown - returns null for past date (0.222ms)
+✔ getCountdown - returns null for invalid value (0.1589ms)
+✔ getCountdown - returns positive values for future date (0.1628ms)
+✔ formatCountdown - returns "Past" for past date (0.1729ms)
+✔ formatCountdown - returns days+hours string for far future (0.1026ms)
+✔ upcomingEvents - returns empty for empty array (0.2079ms)
+✔ upcomingEvents - excludes past events (0.1773ms)
+✔ upcomingEvents - sorts by date ascending (0.1623ms)
+✔ upcomingEvents - excludes cancelled events (0.1109ms)
+✔ parseCSV - skips blank rows before header row (0.9275ms)
+✔ parseCSV - handles single blank line at top (0.2459ms)
+✔ parseCSV - returns empty for all-blank input (0.1905ms)
+✔ parseCSV - handles different header names for auto-detection (0.2056ms)
+✔ ticket code generation is readable, unique, and privacy-safe (1.3593ms)
+✔ ticket code generation avoids existing event codes (0.3545ms)
+✔ ticket assignment validation rejects invalid and duplicate codes (0.4007ms)
+✔ event-style ticket prefix and sequential generation use selected event context (0.4846ms)
+✔ ticket prefix helpers fall back safely for null clean-browser state (0.1774ms)
+✔ event default helpers return clean selected-event fallbacks (1.0669ms)
+✔ ticket status transitions stay controlled (0.2003ms)
+✔ check-in transition allows false to true and blocks duplicates (1.0864ms)
+✔ checked-in summary counts registrations and persons attending (0.8405ms)
+✔ undo check-in moves guest back to not checked in counts and tabs (0.412ms)
+✔ ticket code duplicate helper blocks existing and imported batch duplicates (0.2802ms)
+✔ check-in warnings flag pending payments and missing ticket codes (0.2195ms)
+✔ ticket code search includes name, email, phone, and ticket code (0.1703ms)
+✔ ticket and check-in services create registration audit actions (10.0208ms)
+✔ Tickets and Check-In pages keep selected-event empty states ahead of event-specific fields (1.8155ms)
+✔ Firestore rules include ticket and check-in fields and actions (2.6428ms)
+✔ Phase 5 Tickets is summary-first and keeps QR plus check-in actions explicit (19.3544ms)
+✔ Phase 5 Check-In adds manual-check-in framing and recent activity without broadening permissions (3.2098ms)
+✔ Phase 5 Reports adds event summary and administrative closeout framing while staying read-only (1.9383ms)
+✔ Phase 5 Reconciliation distinguishes payment balance from evidence discrepancy and adds details review (1.5038ms)
+✔ COMMUNICATION_TEMPLATES exist and have correct placeholders (1.1235ms)
+✔ buildMessagePreview substitutes placeholders safely (20.2079ms)
+✔ buildMessagePreview handles missing values safely (0.2525ms)
+✔ extractAvailableGroups finds unique non-empty groups and sorts them (1.2414ms)
+✔ filterCommunicationsRegistrations applies status filters correctly (4.0583ms)
+✔ filterCommunicationsRegistrations applies group and search filters (0.4608ms)
+✔ buildCommunicationsExport formats multiple registrations into copyable text (0.3175ms)
+✔ QR ticket payload uses safe prefixed ticket code only (1.7389ms)
+✔ QR ticket parser accepts raw and prefixed ticket codes (1.312ms)
+✔ QR ticket parser rejects empty and invalid payloads (0.314ms)
+✔ QR lookup matches only registrations supplied for the selected Working Event (0.3359ms)
+✔ Tickets page renders QR previews without adding private data to QR payloads (8.1711ms)
+✔ Check-In QR scanner selects a guest but does not auto check in (1.3806ms)
+✔ event-day summary includes registrations, persons, payments, and ticket coverage (1.4611ms)
+✔ event-day helper lists isolate missing tickets and pending payments (11.7735ms)
+✔ event-day labels are plain and operator-friendly (0.391ms)
+✔ event-day CSV export is client-side text and includes status labels (0.645ms)
+✔ Check-In page exposes event-day mode, helper lists, and clear QR feedback states (9.8592ms)
+✔ Overview includes event-day actions without enabling external integrations (2.1133ms)
+✔ XLSX sheet selection requires explicit confirmation before mapping or preview (8.0365ms)
+✔ changing a confirmed sheet resets stale mapping and preview safely (2.0781ms)
+✔ empty sheet cannot be confirmed and single-sheet workbooks still use confirmation UI (2.366ms)
+✔ Google Forms-style headers map correctly and extra columns remain ignored (1.7828ms)
+✔ buyer and purchaser headers map separately from attendee names (0.8716ms)
+✔ attendee names normalize from one multi-name column (0.473ms)
+✔ attendee names map from Guest 1, Guest 2, and Guest 3 columns (2.0525ms)
+✔ buyerName alone does not replace attending guest name (7.7392ms)
+✔ missing fullName uses first attendee name with soft warning (1.7468ms)
+✔ persons attending matches attendee names count without warning (1.1884ms)
+✔ persons attending mismatch creates warning or review (1.8035ms)
+✔ blank persons attending suggests attendee count and requires review (0.9976ms)
+✔ shared phone and email across different names are warnings, not hard errors (1.3992ms)
+✔ same buyer with multiple attendee names is not a hard duplicate (1.6294ms)
+✔ possible duplicate attendee with same buyer requires review (1.3883ms)
+✔ same fullName and same contact becomes needs-review, not silent import (1.1774ms)
+✔ ticket code duplicates remain hard errors for batch and existing event scope (1.8582ms)
+✔ event-style multi-part ticket codes are valid for imports and QR lookup (0.789ms)
+✔ sourceRowId and registration IDs do not collide just because contact is shared (0.8242ms)
+✔ manual merge sums persons and preserves original names in notes (0.7206ms)
+✔ manual merge keeps sourceRowId within Firestore rule limit (0.5082ms)
+✔ manual merge preserves buyerName and attendeeNames (0.392ms)
+✔ manual merge blocks conflicting buyer names (0.1949ms)
+✔ manual merge blocks multiple ticket codes instead of losing data (0.1972ms)
+✔ row table identity includes sheet source data (0.2016ms)
+✔ Import Center keeps preview before writes and skip rows excluded from final import (6.7558ms)
+✔ confirmed import write strips UI-only review fields (1.0761ms)
+✔ Import Center shows clear Firestore permission-denied diagnostics without guest rows (0.957ms)
+✔ duplicate checks stay scoped to the selected Working Event data passed to processing (0.7482ms)
+✔ search can match buyerName and attendeeNames (0.2024ms)
+✔ QR output remains ticket-code only without personal data (0.1765ms)
+✔ Firestore registration rules allow only narrow buyer and attendee fields (3.0311ms)
+✔ door payment values normalize to door and unknown payment status requires review (12.3245ms)
+✔ organizer ticket codes are accepted but duplicates stay blocked (1.837ms)
+✔ preferred school maps safely and is preserved in import notes only (2.3264ms)
+✔ Import Center exposes editable preview, bulk actions, and ticket handling without writing before confirm (3.827ms)
+✔ Registrations page has count bars and current-event bulk actions (2.7865ms)
+✔ Settings, QA, and Communications pages expose practical admin polish (4.5729ms)
+✔ old internal labels are removed from organizer-facing UI (13.4752ms)
+✔ Phase 8.3 canonical domain and route health stay loop-safe (9.4474ms)
+✔ finance calculations use amounts, not paymentStatus alone (1.6709ms)
+✔ finance summary separates expected, collected, outstanding, door, and complimentary values (0.8483ms)
+✔ finance currency helpers fall back safely for null clean-browser state (0.7038ms)
+✔ finance summary does not crash when selected event or registrations are null (0.3218ms)
+✔ Import Center maps finance fields and flags missing event price for review (11.1147ms)
+✔ finance filters, communications segments, and QR privacy are safe (2.4963ms)
+✔ Phase 9 UI and Firestore rules expose finance without broad access (12.649ms)
+✔ Dashboard documents missing selected event, default currency, and missing pricing fallbacks (1.5646ms)
+✔ QA helper creates stable CODEX_DEMO prefixes and fake sample CSV rows (2.8478ms)
+✔ QA helper recognizes only the CODEX_DEMO Working Event (0.3719ms)
+✔ System QA route and text keep production QA scoped to CODEX_DEMO (10.0817ms)
+✔ production fixture verification script is read-only and strict (1.8959ms)
+✔ protected owner matrix documents the permanent update procedure for every new write path (10.6002ms)
+✔ protected owner matrix covers every current Firestore write surface (2.2714ms)
+✔ protected owner remains UID-based and independent of approvedEmails or staff assignments (1.3ms)
+✔ protected owner receives every current organizer route and manage capability from one contract (0.5409ms)
+✔ lower roles do not inherit protected-owner route and task management capabilities (0.4932ms)
+✔ System QA exposes protected-owner diagnostics and manual CODEX_DEMO write verification (2.4456ms)
+✔ Tasks and shared error UI do not mislabel task failures as Events failures (1.6098ms)
+✔ Firestore rules continue to centralize owner access without widening public writes (2.636ms)
+✔ registration edits remain atomic with append-only audit evidence (1.8586ms)
+✔ resource status edits normalize and remove legacy fields with append-only audit evidence (2.1942ms)
+✔ System QA payment follow-up remains a review item rather than a stale blocking failure (3.6254ms)
+✔ System QA classifies CODEX_DEMO paid outstanding rows as follow-up, not blocking failure (1.8561ms)
+✔ production owner write root cause documents deployment and manual verification boundaries (1.8723ms)
+✔ legacy registration compatibility hotfix documents the exact old schema rejection (3.7497ms)
+✔ shared registration metrics separate registrations from persons attending (1.6513ms)
+✔ registration and guest count helpers handle empty and missing persons safely (0.4848ms)
+✔ persons attending normalization defaults blanks and blocks invalid imports (2.2168ms)
+✔ Dashboard and Check-In use shared count wording and helpers (10.4093ms)
+✔ Check-In page waits for Firestore success and avoids false success on permission denied (1.0839ms)
+✔ Check-In page labels undo and clear actions truthfully (1.2522ms)
+✔ production count diagnostic is read-only and uses shared metrics (2.0965ms)
+✔ validateRegistration - accepts valid registration (1.9675ms)
+✔ validateRegistration - rejects missing fullName (0.279ms)
+✔ validateRegistration - rejects non-integer personsAttending (0.1714ms)
+✔ validateRegistration - rejects zero personsAttending (0.1574ms)
+✔ validateRegistration - rejects invalid paymentStatus (0.2143ms)
+✔ repository scripts stay scoped to the active app (6.6331ms)
+✔ repository ignore rules exclude accidental nested archives and evidence (1.9637ms)
+﹣ [run-resource-rules] approved admin can create run item and resource with append-only audits (0.4824ms) # Firestore emulator is not running
+﹣ [run-resource-rules] approved admin can mark a run item arrived with append-only audit (0.1022ms) # Firestore emulator is not running
+﹣ [run-resource-rules] event manager cannot create organizer-only run/resource records in this foundation (0.0611ms) # Firestore emulator is not running
+﹣ [run-resource-rules] viewer can read but cannot create, scanner and operations helper cannot read planning collections (0.0837ms) # Firestore emulator is not running
+﹣ [run-resource-rules] invalid event scope, invalid timing, quantity over-confirmation, and unknown fields are rejected (0.0729ms) # Firestore emulator is not running
+﹣ [run-resource-rules] legacy resource partial updates are rejected because stale fields remain in request.resource.data (0.0578ms) # Firestore emulator is not running
+﹣ [run-resource-rules] protected owner can update a current resource without approvedEmails membership (0.0784ms) # Firestore emulator is not running
+﹣ [run-resource-rules] protected owner can replace-normalize a legacy resource status with append-only audit (0.0726ms) # Firestore emulator is not running
+✔ Phase Run of Show and Resources routes are preserved and scanner navigation remains isolated (3.4367ms)
+✔ Run of Show supports event-day sequencing, dependencies, arrivals, and task prefill (2.5664ms)
+✔ Resources support quantities, packing lifecycle, old links, and task prefill (0.649ms)
+✔ Overview readiness includes event-scoped Run of Show and Resources without changing finance boundaries (4.6645ms)
+✔ Run of Show and Resources forms use practical relationship selectors instead of manual ID entry (1.6581ms)
+✔ Run of Show and Resources actions provide success feedback and contextual delete confirmation (1.3338ms)
+✔ Guardrail source checks remain explicit (1.5364ms)
+✔ admin search returns events without a Working Event and explains scoped search in UI (6.4776ms)
+✔ admin search includes registration, ticket, and check-in scoped to Working Event (1.1773ms)
+✔ runtime health helpers hide allowlist contents while reporting approval (0.4014ms)
+✔ runtime health treats missing build commit as informational (0.2803ms)
+✔ final Settings refinement separates access sources, roles, integrations, tutorial, and administration (4.3599ms)
+✔ final role wording matches route and settings permissions without broadening access (0.3598ms)
+✔ final System QA refinement presents technical groups and manual checks distinctly (1.7522ms)
+✔ final tutorial matrix includes current product routes and stable targets (0.5966ms)
+✔ final refinement guardrails preserve QR, dependencies, rules, indexes, and false integration boundaries (5.0372ms)
+﹣ [task-rules] approved admin can create a valid scoped task with append-only audit (0.4342ms) # Firestore emulator is not running
+﹣ [task-rules] invalid status and forged event scope are rejected (0.0863ms) # Firestore emulator is not running
+﹣ [task-rules] viewer can read scoped tasks and scanner cannot list tasks (0.1263ms) # Firestore emulator is not running
+ℹ tests 619
+ℹ suites 0
+ℹ pass 555
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 64
+ℹ todo 0
+ℹ duration_ms 1073.2436
+
+> npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub "npm run product:qa:emulator-checks"
+[31m[1m!!  emulators:[22m[39m firebase-tools will drop support for Java version < 21 soon in firebase-tools@15. Please install a JDK at version 21 or above to get a compatible runtime.
+[36m[1mi  emulators:[22m[39m Starting emulators: auth, firestore
+[36m[1mi  firestore:[22m[39m Firestore Emulator logging to [1mfirestore-debug.log[22m
+[32m[1m+  firestore:[22m[39m Firestore Emulator UI websocket is running on 9150.
+[36m[1mi [22m[39m Running script: [1mnpm run product:qa:emulator-checks[22m
+
+> gather-savor-event-hub@0.1.0 product:qa:emulator-checks
+> node --test tests/firestore-checkin-rules.test.js tests/task-workflow-rules.test.js tests/document-contact-rules.test.js tests/run-of-show-resource-rules.test.js && npm run e2e:smoke:inner
+
+✔ [document-contact-rules] admin can create a document reference with append-only audit (5700.3559ms)
+[2026-08-10T01:06:20.451Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x300c694f error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1924:24 for 'create' @ L1924, false for 'create' @ L2080, evaluation error at L1928:24 for 'update' @ L1928, false for 'update' @ L2080, false for 'update' @ L1928, false for 'update' @ L2080
+✔ [document-contact-rules] document URL and scanner access are constrained (1024.0682ms)
+✔ [document-contact-rules] admin can create contact directory records and event links with audits (727.2027ms)
+✔ [document-contact-rules] viewer can read event links but not global contacts (601.2781ms)
+✔ Firestore rules allow approved admin check-in batch for imported ticketed registration (5720.0986ms)
+✔ Firestore rules allow protected owner UID when email is absent from mutable allowlist (905.9719ms)
+✔ Firestore rules allow approved admin registration detail update with append-only audit (650.7868ms)
+✔ Firestore rules allow normal edits to reviewed production-shaped registrations (584.7389ms)
+✔ Firestore rules allow production-shaped registration edit without audit batch coupling (499.0816ms)
+✔ Firestore rules allow legacy registration detail edits when attendance fields remain absent (484.8676ms)
+[2026-08-10T01:06:23.234Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e717 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, false for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1828, false for 'update' @ L1830, false for 'update' @ L2080
+✔ Firestore rules reject normal detail edits that add attendance evidence fields (452.7306ms)
+✔ Firestore rules allow routine registration audit create for reviewed production-shaped registrations (454.6872ms)
+✔ Firestore rules allow small approved admin registration import batch (437.6546ms)
+[2026-08-10T01:06:24.575Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e71d error. Code: 7 Message: 7 PERMISSION_DENIED: 
+Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L1820, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L2080, evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L1820, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L2080, evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L1820, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L2080, evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L1820, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L2080, evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L1820, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L2080, evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L1820, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L2080, evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L1820, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'create' @ L2080, evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, false for 'update' @ L1828, false for 'update' @ L1830, false for 'update' @ L2080
+✔ Firestore rules reject oversized single registration import batch due audit verification access limits (448.0779ms)
+✔ Firestore rules allow approved admin ticket assignment batch (426.1554ms)
+✔ Firestore rules allow approved admin ticket regeneration batch (425.2494ms)
+[2026-08-10T01:06:25.851Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e723 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080
+✔ Firestore rules reject standalone ticket audit without registration transition (425.0086ms)
+[2026-08-10T01:06:26.292Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e726 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'update' @ L1903, false for 'update' @ L2080
+✔ Firestore rules reject approved admin audit log update (440.1035ms)
+[2026-08-10T01:06:26.715Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e729 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'delete' @ L1903, false for 'delete' @ L2080
+✔ Firestore rules reject approved admin audit log delete (423.1728ms)
+[2026-08-10T01:06:27.179Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e72e error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'update' @ L1903, false for 'update' @ L2080
+[2026-08-10T01:06:27.190Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e72f error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'delete' @ L1903, false for 'delete' @ L2080
+✔ Firestore rules reject assigned scanner audit log update and delete (475.1193ms)
+[2026-08-10T01:06:27.621Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e732 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'delete' @ L1903, false for 'delete' @ L2080
+✔ Firestore rules reject unapproved audit log delete (430.9025ms)
+[2026-08-10T01:06:28.047Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e734 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, false for 'create' @ L1837, false for 'create' @ L2080
+✔ Firestore rules reject ticket audit with mismatched target registration (426.1558ms)
+[2026-08-10T01:06:28.474Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e736 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, false for 'update' @ L1828, false for 'update' @ L2080, false for 'create' @ L1837, false for 'create' @ L2080
+✔ Firestore rules reject ticket audit with mismatched event (427.0838ms)
+[2026-08-10T01:06:28.889Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e738 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, false for 'create' @ L1837, false for 'create' @ L2080
+✔ Firestore rules reject audit log create with missing required fields (415.0746ms)
+[2026-08-10T01:06:29.309Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e73a error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, false for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080
+✔ Firestore rules reject the whole ticket batch when audit validation fails (438.4894ms)
+[2026-08-10T01:06:29.755Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e73d error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, false for 'update' @ L1828, false for 'update' @ L1830, false for 'update' @ L2080
+✔ Firestore rules reject unapproved check-in batch (427.2298ms)
+[2026-08-10T01:06:30.168Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e73f error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080
+✔ Firestore rules reject standalone check-in audit without registration transition (413.0315ms)
+[2026-08-10T01:06:30.585Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e741 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, false for 'update' @ L1828, false for 'update' @ L1830, false for 'update' @ L2080
+✔ Firestore rules reject duplicate check-in registration update (416.7645ms)
+✔ Firestore rules allow approved admin undo check-in batch (411.7179ms)
+[2026-08-10T01:06:31.410Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e745 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1828:24 for 'update' @ L1828, evaluation error at L1830:24 for 'update' @ L1830, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080
+✔ Firestore rules reject unapproved undo check-in batch (412.9391ms)
+[2026-08-10T01:06:31.820Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x4640e747 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080
+✔ Firestore rules reject standalone undo audit without registration transition (410.11ms)
+✔ Firestore rules test harness is skipped unless the Firestore emulator is running (0.1665ms)
+✔ check-in rules allow only check-in field changes without broad schema loosening (2.3727ms)
+✔ audit log rules and services preserve append-only behavior (1.8481ms)
+✔ check-in and undo services send minimal persistence payloads plus audit logs (0.6479ms)
+✔ [run-resource-rules] approved admin can create run item and resource with append-only audits (5693.3558ms)
+✔ [run-resource-rules] approved admin can mark a run item arrived with append-only audit (748.8666ms)
+[2026-08-10T01:06:21.054Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x2904f5c7 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1937:24 for 'create' @ L1937, false for 'create' @ L2080, evaluation error at L1941:24 for 'update' @ L1941, false for 'update' @ L2080, evaluation error at L1837:24 for 'create' @ L1837, false for 'create' @ L2080, false for 'update' @ L1903, false for 'update' @ L2080, false for 'update' @ L1941, false for 'update' @ L2080
+✔ [run-resource-rules] event manager cannot create organizer-only run/resource records in this foundation (663.9096ms)
+[2026-08-10T01:06:21.761Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x2904f5cb error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1950:24 for 'create' @ L1950, false for 'create' @ L2080, evaluation error at L1955:24 for 'update' @ L1955, false for 'update' @ L2080, false for 'create' @ L1950, false for 'create' @ L2080
+✔ [run-resource-rules] viewer can read but cannot create, scanner and operations helper cannot read planning collections (777.2955ms)
+[2026-08-10T01:06:22.338Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x2904f5cf error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1937:24 for 'create' @ L1937, false for 'create' @ L2080, evaluation error at L1941:24 for 'update' @ L1941, false for 'update' @ L2080, false for 'update' @ L1941, false for 'update' @ L2080
+[2026-08-10T01:06:22.350Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x2904f5d0 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1937:24 for 'create' @ L1937, false for 'create' @ L2080, evaluation error at L1941:24 for 'update' @ L1941, false for 'update' @ L2080, false for 'update' @ L1941, false for 'update' @ L2080
+[2026-08-10T01:06:22.361Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x2904f5d1 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1950:24 for 'create' @ L1950, false for 'create' @ L2080, evaluation error at L1955:24 for 'update' @ L1955, false for 'update' @ L2080, false for 'update' @ L1955, false for 'update' @ L2080
+[2026-08-10T01:06:22.377Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x2904f5d2 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1950:24 for 'create' @ L1950, false for 'create' @ L2080, evaluation error at L1955:24 for 'update' @ L1955, false for 'update' @ L2080, false for 'update' @ L1955, false for 'update' @ L2080
+[2026-08-10T01:06:22.393Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x2904f5d3 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1950:24 for 'create' @ L1950, false for 'create' @ L2080, evaluation error at L1955:24 for 'update' @ L1955, false for 'update' @ L2080, false for 'create' @ L1950, false for 'create' @ L2080
+✔ [run-resource-rules] invalid event scope, invalid timing, quantity over-confirmation, and unknown fields are rejected (560.8178ms)
+[2026-08-10T01:06:22.886Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x2904f5d6 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1955:24 for 'update' @ L1955, false for 'update' @ L2080, false for 'update' @ L1955, false for 'update' @ L2080
+✔ [run-resource-rules] legacy resource partial updates are rejected because stale fields remain in request.resource.data (493.4363ms)
+✔ [run-resource-rules] protected owner can update a current resource without approvedEmails membership (486.8977ms)
+✔ [run-resource-rules] protected owner can replace-normalize a legacy resource status with append-only audit (466.7691ms)
+✔ [task-rules] approved admin can create a valid scoped task with append-only audit (5680.4024ms)
+[2026-08-10T01:06:20.451Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x2402b1c1 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1804:24 for 'create' @ L1804, false for 'create' @ L2080, evaluation error at L1808:24 for 'update' @ L1808, false for 'update' @ L2080, false for 'update' @ L1808, false for 'update' @ L2080
+[2026-08-10T01:06:20.471Z]  @firebase/firestore: Firestore (12.15.0): GrpcConnection RPC 'Write' stream 0x2402b1c2 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L1804:24 for 'create' @ L1804, false for 'create' @ L2080, evaluation error at L1808:24 for 'update' @ L1808, false for 'update' @ L2080, false for 'update' @ L1808, false for 'update' @ L2080
+✔ [task-rules] invalid status and forged event scope are rejected (835.5561ms)
+✔ [task-rules] viewer can read scoped tasks and scanner cannot list tasks (886.1723ms)
+ℹ tests 46
+ℹ suites 0
+ℹ pass 46
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18130.0586
+
+> gather-savor-event-hub@0.1.0 e2e:smoke:inner
+> playwright test --project=chromium e2e/navigation.spec.js
+
+
+Running 1 test using 1 worker
+
+  ok 1 [chromium] › e2e\navigation.spec.js:5:1 › approved emulator organizer can open every organizer route without application errors (20.7s)
+
+  1 passed (23.4s)
+[32m[1m+ [22m[39m Script exited successfully (code 0)
+[36m[1mi  emulators:[22m[39m Shutting down emulators.
+[36m[1mi  firestore:[22m[39m Stopping Firestore Emulator
+[33m[1m! [22m[39m Firestore Emulator has exited upon receiving signal: SIGINT
+[36m[1mi  auth:[22m[39m Stopping Authentication Emulator
+[36m[1mi  hub:[22m[39m Stopping emulator hub
+[36m[1mi  logging:[22m[39m Stopping Logging Emulator
+[33m[1m!  emulators:[22m[39m firebase-tools will drop support for Java version < 21 soon in firebase-tools@15. Please install a JDK at version 21 or above to get a compatible runtime.
+
+> npm run build
+
+> gather-savor-event-hub@0.1.0 build
+> vite build
+
+[36mvite v7.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m✓[39m 2249 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                                    [39m[1m[2m  1.50 kB[22m[1m[22m[2m │ gzip:   0.62 kB[22m
+[2mdist/[22m[35massets/index-DHkMXAZL.css                     [39m[1m[2m 73.04 kB[22m[1m[22m[2m │ gzip:  14.08 kB[22m
+[2mdist/[22m[36massets/organizerErrors-DEMPZp7Q.js            [39m[1m[2m  0.48 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+[2mdist/[22m[36massets/LoadingState-B7OO-4KN.js               [39m[1m[2m  0.49 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+[2mdist/[22m[36massets/qrTicketUtils-0P-YNCAR.js              [39m[1m[2m  0.60 kB[22m[1m[22m[2m │ gzip:   0.38 kB[22m
+[2mdist/[22m[36massets/ErrorState-BPobLuDO.js                 [39m[1m[2m  0.74 kB[22m[1m[22m[2m │ gzip:   0.46 kB[22m
+[2mdist/[22m[36massets/InfoHint-Bx4ZQ3YZ.js                   [39m[1m[2m  0.85 kB[22m[1m[22m[2m │ gzip:   0.54 kB[22m
+[2mdist/[22m[36massets/EmptyState-BHWQ7yXc.js                 [39m[1m[2m  0.91 kB[22m[1m[22m[2m │ gzip:   0.55 kB[22m
+[2mdist/[22m[36massets/NotFoundPage-C2KADA30.js               [39m[1m[2m  0.99 kB[22m[1m[22m[2m │ gzip:   0.54 kB[22m
+[2mdist/[22m[36massets/PageTabs-Bo6IxMko.js                   [39m[1m[2m  1.15 kB[22m[1m[22m[2m │ gzip:   0.68 kB[22m
+[2mdist/[22m[36massets/RelationshipSelector-DLDRKmG9.js       [39m[1m[2m  1.50 kB[22m[1m[22m[2m │ gzip:   0.81 kB[22m
+[2mdist/[22m[36massets/financialEvidenceAudit-t8bUzr9l.js     [39m[1m[2m  2.24 kB[22m[1m[22m[2m │ gzip:   1.06 kB[22m
+[2mdist/[22m[36massets/ticketService-Bgyw04qs.js              [39m[1m[2m  2.44 kB[22m[1m[22m[2m │ gzip:   0.83 kB[22m
+[2mdist/[22m[36massets/ConfirmDialog-DX8QG-WY.js              [39m[1m[2m  2.53 kB[22m[1m[22m[2m │ gzip:   1.15 kB[22m
+[2mdist/[22m[36massets/operationsLedgerService-CzAwKJd9.js    [39m[1m[2m  3.24 kB[22m[1m[22m[2m │ gzip:   1.24 kB[22m
+[2mdist/[22m[36massets/exportUtils-BIPI9BRv.js                [39m[1m[2m  3.60 kB[22m[1m[22m[2m │ gzip:   1.33 kB[22m
+[2mdist/[22m[36massets/runOfShowService-gCVS56ka.js           [39m[1m[2m  4.86 kB[22m[1m[22m[2m │ gzip:   1.65 kB[22m
+[2mdist/[22m[36massets/documentService-DO-O9w83.js            [39m[1m[2m  5.78 kB[22m[1m[22m[2m │ gzip:   2.30 kB[22m
+[2mdist/[22m[36massets/taskService-BHzRQPGX.js                [39m[1m[2m  5.96 kB[22m[1m[22m[2m │ gzip:   2.18 kB[22m
+[2mdist/[22m[36massets/validators-B0lKpgiV.js                 [39m[1m[2m  6.80 kB[22m[1m[22m[2m │ gzip:   2.49 kB[22m
+[2mdist/[22m[36massets/contactService-Di5S6doA.js             [39m[1m[2m  7.02 kB[22m[1m[22m[2m │ gzip:   2.18 kB[22m
+[2mdist/[22m[36massets/runOfShow-DEc92z9L.js                  [39m[1m[2m  9.18 kB[22m[1m[22m[2m │ gzip:   2.76 kB[22m
+[2mdist/[22m[36massets/LoginPage-Da3WMMUa.js                  [39m[1m[2m 11.16 kB[22m[1m[22m[2m │ gzip:   4.05 kB[22m
+[2mdist/[22m[36massets/eventReadiness-DAeJ4WAc.js             [39m[1m[2m 11.60 kB[22m[1m[22m[2m │ gzip:   3.70 kB[22m
+[2mdist/[22m[36massets/checkInUtils-LZ7bzV6B.js               [39m[1m[2m 12.21 kB[22m[1m[22m[2m │ gzip:   4.04 kB[22m
+[2mdist/[22m[36massets/ScannerPage-B0fMk0Pf.js                [39m[1m[2m 13.58 kB[22m[1m[22m[2m │ gzip:   4.08 kB[22m
+[2mdist/[22m[36massets/communicationsUtils-DHoRKaAc.js        [39m[1m[2m 14.61 kB[22m[1m[22m[2m │ gzip:   4.00 kB[22m
+[2mdist/[22m[36massets/DocumentsPage-DPzsA_3M.js              [39m[1m[2m 17.40 kB[22m[1m[22m[2m │ gzip:   4.85 kB[22m
+[2mdist/[22m[36massets/TasksPage-Uqxb3dHP.js                  [39m[1m[2m 17.59 kB[22m[1m[22m[2m │ gzip:   4.88 kB[22m
+[2mdist/[22m[36massets/ResourcesPage-CBUn6v8Y.js              [39m[1m[2m 17.98 kB[22m[1m[22m[2m │ gzip:   4.54 kB[22m
+[2mdist/[22m[36massets/icons-BgRkW0hV.js                      [39m[1m[2m 18.71 kB[22m[1m[22m[2m │ gzip:   5.93 kB[22m
+[2mdist/[22m[36massets/CommunicationsPage-CiSQJkuy.js         [39m[1m[2m 18.97 kB[22m[1m[22m[2m │ gzip:   4.92 kB[22m
+[2mdist/[22m[36massets/SettingsPage-Dr-pQTPs.js               [39m[1m[2m 19.24 kB[22m[1m[22m[2m │ gzip:   5.92 kB[22m
+[2mdist/[22m[36massets/RunOfShowPage-D8ckciIF.js              [39m[1m[2m 19.76 kB[22m[1m[22m[2m │ gzip:   5.16 kB[22m
+[2mdist/[22m[36massets/DashboardPage-5dnYL1d7.js              [39m[1m[2m 21.50 kB[22m[1m[22m[2m │ gzip:   6.09 kB[22m
+[2mdist/[22m[36massets/PaymentsPage-wn1rJljG.js               [39m[1m[2m 23.31 kB[22m[1m[22m[2m │ gzip:   5.81 kB[22m
+[2mdist/[22m[36massets/readXlsxFileBrowser-aArUGNv0.js        [39m[1m[2m 26.81 kB[22m[1m[22m[2m │ gzip:   8.75 kB[22m
+[2mdist/[22m[36massets/ContactsPage-D8UHZo9O.js               [39m[1m[2m 30.07 kB[22m[1m[22m[2m │ gzip:   5.64 kB[22m
+[2mdist/[22m[36massets/EventReviewPage-DtIaP9eD.js            [39m[1m[2m 33.18 kB[22m[1m[22m[2m │ gzip:   8.55 kB[22m
+[2mdist/[22m[36massets/CheckInPage-CVMgfRAZ.js                [39m[1m[2m 34.11 kB[22m[1m[22m[2m │ gzip:   8.60 kB[22m
+[2mdist/[22m[36massets/PaymentReconciliationPage-D4FAXuiQ.js  [39m[1m[2m 37.83 kB[22m[1m[22m[2m │ gzip:  10.60 kB[22m
+[2mdist/[22m[36massets/TicketsPage-e36KzOyo.js                [39m[1m[2m 49.75 kB[22m[1m[22m[2m │ gzip:  16.02 kB[22m
+[2mdist/[22m[36massets/RegistrationsPage-Bqv3VfXu.js          [39m[1m[2m 50.91 kB[22m[1m[22m[2m │ gzip:  12.42 kB[22m
+[2mdist/[22m[36massets/OperationsPage-CyAG5TbL.js             [39m[1m[2m 55.50 kB[22m[1m[22m[2m │ gzip:  12.17 kB[22m
+[2mdist/[22m[36massets/QaPage-B0lKGccf.js                     [39m[1m[2m 58.78 kB[22m[1m[22m[2m │ gzip:  15.60 kB[22m
+[2mdist/[22m[36massets/EventsPage-CCtYacBH.js                 [39m[1m[2m 68.49 kB[22m[1m[22m[2m │ gzip:  15.74 kB[22m
+[2mdist/[22m[36massets/firebase-auth-DxP5RQdZ.js              [39m[1m[2m 77.41 kB[22m[1m[22m[2m │ gzip:  23.03 kB[22m
+[2mdist/[22m[36massets/firebase-core-C3yvdNLm.js              [39m[1m[2m 79.34 kB[22m[1m[22m[2m │ gzip:  28.02 kB[22m
+[2mdist/[22m[36massets/ImportsPage-COq8IXdW.js                [39m[1m[2m 86.76 kB[22m[1m[22m[2m │ gzip:  22.81 kB[22m
+[2mdist/[22m[36massets/index-Cfif5Rre.js                      [39m[1m[2m196.41 kB[22m[1m[22m[2m │ gzip:  57.87 kB[22m
+[2mdist/[22m[36massets/react-vendor-CErAWrki.js               [39m[1m[2m229.23 kB[22m[1m[22m[2m │ gzip:  73.46 kB[22m
+[2mdist/[22m[36massets/index-d4NAUUl1.js                      [39m[1m[2m375.15 kB[22m[1m[22m[2m │ gzip: 110.57 kB[22m
+[2mdist/[22m[36massets/firebase-firestore-Bpux6Kot.js         [39m[1m[2m484.39 kB[22m[1m[22m[2m │ gzip: 139.79 kB[22m
+[32m✓ built in 4.03s[39m
+
+> npm audit --omit=dev
+found 0 vulnerabilities
+
+> npm run doctor:changed
+
+> gather-savor-event-hub@0.1.0 doctor:changed
+> react-doctor . --project . --scope changed --base main --blocking error --no-telemetry
+
+[1mReact Doctor[22m [2mv0.8.3[22m
+
+Scanning changes: [36mcodex/finish-full-product-experience[39m → [36mmain[39m
+
+[90m  [39m
+
+  [1mAll 1 issue[22m
+
+  [1mBugs[22m [2m>[22m [33m[2m1 warning[22m[39m
+
+  [2mRun[22m [1m[36mnpx react-doctor@latest --verbose[39m[22m [2mto list every error and warning[22m
+
+  React Doctor [2m(https://react.doctor)[22m
+  [90mScore disabled by --no-score. Want something custom to your company? Contact us at https://react.doctor/enterprise.[39m
+
+
+[2m  ────────────────────────────────────────────────────────────[22m
+
+  [1mDocs:[22m [36mhttps://react.doctor/docs[39m
+[2m  Learn more about fixing issues, setting up CI/CD, and[22m
+[2m  configuring rules with a config file[22m
+
+  [1mGitHub:[22m [36mhttps://github.com/millionco/react-doctor[39m
+[2m  Report issues and star the repository![22m
+
+
+> npm run product:copy-scan
+
+> gather-savor-event-hub@0.1.0 product:copy-scan
+> node scripts/product/copyScan.mjs
+
+Copy scan passed for 15 primary UI files.
+
+> npm run product:routes
+
+> gather-savor-event-hub@0.1.0 product:routes
+> node scripts/product/routeInventory.mjs
+
+Route inventory passed: 18 routes and 15 navigation labels.
