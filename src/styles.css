@@ -491,6 +491,100 @@ input:focus-visible {
   font-weight: 800;
 }
 
+[data-tour-id="working-event-selector"] {
+  box-shadow: none;
+}
+
+[data-route] > header:first-child {
+  border-radius: 1rem !important;
+  padding: 1rem !important;
+  box-shadow: none !important;
+}
+
+[data-route] > header:first-child h2 {
+  margin-top: 0.25rem;
+  line-height: 1.12;
+}
+
+[data-route] > header:first-child p {
+  line-height: 1.45;
+}
+
+[aria-label$="summary"] > * {
+  min-width: 0;
+}
+
+[aria-label$="summary"] > button,
+[aria-label$="summary"] > div,
+[aria-label$="summary"] > article {
+  border-radius: 0.95rem !important;
+  padding: 0.85rem !important;
+}
+
+[aria-label$="summary"] p:first-child {
+  line-height: 1.05;
+}
+
+[aria-label="Task summary"] > button {
+  min-width: 0;
+}
+
+@media (max-width: 639px) {
+  [data-tour-id="working-event-selector"] {
+    margin-bottom: 0.75rem;
+    padding: 0.65rem 0.75rem;
+  }
+
+  [data-tour-id="page-purpose"] {
+    display: none;
+  }
+
+  [data-route] {
+    row-gap: 0.85rem !important;
+  }
+
+  [data-route] > header:first-child {
+    gap: 0.75rem !important;
+    padding: 0.85rem 0 !important;
+    border-width: 0 0 1px 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  [data-route] > header:first-child h2 {
+    font-size: 1.45rem !important;
+  }
+
+  [data-route] > header:first-child p:not(:first-child) {
+    margin-top: 0.25rem;
+  }
+
+  [aria-label$="summary"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.5rem !important;
+  }
+
+  [aria-label$="summary"] > button,
+  [aria-label$="summary"] > div,
+  [aria-label$="summary"] > article {
+    padding: 0.65rem 0.75rem !important;
+  }
+
+  [aria-label$="summary"] p:first-child {
+    font-size: 1.25rem !important;
+  }
+
+  [aria-label$="summary"] p:last-child {
+    margin-top: 0.25rem !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  [aria-label="Task summary"] > button {
+    border-radius: 0.85rem;
+    padding: 0.65rem 0.75rem;
+  }
+}
+
 @media (max-width: 1023px) {
   html {
     scroll-padding-bottom: calc(7.5rem + env(safe-area-inset-bottom));

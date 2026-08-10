@@ -325,13 +325,13 @@ export function TasksPage() {
 
   return (
     <AssignedEventGate purpose="Tasks">
-      <div data-route="tasks" data-tour-id="tasks-workspace" className="space-y-6">
-        <header className="flex flex-col gap-4 rounded-[28px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7 xl:flex-row xl:items-center xl:justify-between">
+      <div data-route="tasks" data-tour-id="tasks-workspace" className="space-y-4 sm:space-y-5">
+        <header className="flex flex-col gap-3 border-b border-[#EEDFD6] pb-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Event-scoped workflow</p>
-            <h2 className="mt-2 font-serif text-3xl text-[#2B1723]">Tasks & Deadlines</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
-              Track event setup, due dates, blockers, and follow-up for <strong>{activeEvent?.eventName || 'the selected Working Event'}</strong>. Completed events stay editable through the same confirmations and audit log.
+            <h2 className="mt-1 font-serif text-2xl text-[#2B1723] sm:text-3xl">Tasks & Deadlines</h2>
+            <p className="mt-1 max-w-3xl text-sm leading-5 text-[#816D62]">
+              Track setup work, due dates, blockers, and follow-up for <strong>{activeEvent?.eventName || 'the selected Working Event'}</strong>.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -363,7 +363,7 @@ export function TasksPage() {
           />
         )}
 
-        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-8" aria-label="Task summary">
+        <section className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-8" aria-label="Task summary">
           <TaskMetric label="Open" value={summary.open} active={filter === 'All'} onClick={() => setFilter('All')} />
           <TaskMetric label="Overdue" value={summary.overdue} active={filter === 'Overdue'} onClick={() => setFilter('Overdue')} />
           <TaskMetric label="Due Today" value={summary.dueToday} active={filter === 'Due Today'} onClick={() => setFilter('Due Today')} />
@@ -374,10 +374,10 @@ export function TasksPage() {
           <TaskMetric label="Total" value={summary.total} active={false} onClick={() => setFilter('All')} />
         </section>
 
-        <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-4">
-          <div className="flex flex-wrap gap-2">
+        <section aria-label="Task filters">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {TASK_FILTERS.map((option) => (
-              <button key={option} type="button" onClick={() => setFilter(option)} className={`rounded-full px-4 py-2 text-xs font-bold ${filter === option ? 'bg-[#2B1723] text-white' : 'border border-[#E5D7CF] text-[#80685B]'}`}>
+              <button key={option} type="button" onClick={() => setFilter(option)} className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold ${filter === option ? 'bg-[#2B1723] text-white' : 'border border-[#E5D7CF] bg-white text-[#80685B]'}`}>
                 {option}
               </button>
             ))}
