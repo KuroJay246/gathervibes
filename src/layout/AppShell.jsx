@@ -175,7 +175,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
           <button
             type="button"
             onClick={onToggleCollapsed}
-            className={`${collapsed ? 'absolute right-[-0.9rem] top-7' : ''} hidden rounded-full border border-white/15 bg-white/10 p-2 text-white/70 transition hover:bg-white/15 hover:text-white lg:inline-flex`}
+            className={`${collapsed ? 'absolute right-[-0.9rem] top-7' : ''} hidden min-h-10 min-w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 p-2.5 text-white/70 transition hover:bg-white/15 hover:text-white lg:inline-flex`}
             aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
             aria-expanded={!collapsed}
           >
@@ -218,7 +218,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
                     title={collapsed ? label : undefined}
                     aria-label={collapsed ? label : undefined}
                     className={({ isActive }) =>
-                      `group flex items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3'} rounded-xl py-2.5 text-[13px] transition ${
+                      `group flex min-h-10 items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3'} rounded-xl py-2.5 text-[13px] transition ${
                         isActive
                           ? 'bg-[#7F3E49] text-white shadow-[0_8px_24px_rgba(127,62,73,0.24)]'
                           : 'text-white/70 hover:bg-white/[0.06] hover:text-white'
@@ -249,7 +249,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
           <button
             type="button"
             onClick={signOut}
-            className={`${collapsed ? 'sr-only' : ''} rounded-lg p-2 text-white/70 transition hover:bg-white/10 hover:text-white`}
+            className={`${collapsed ? 'sr-only' : ''} inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg p-2.5 text-white/70 transition hover:bg-white/10 hover:text-white`}
             aria-label="Sign out"
           >
             <LogOut className="size-4" aria-hidden="true" />
@@ -329,48 +329,41 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="px-3 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-6 sm:px-7 sm:pt-7 lg:px-10 lg:py-9">
+        <main className="px-3 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-4 sm:px-7 sm:pt-6 lg:px-10 lg:py-7">
           <div className="gsv-page-container">
-            <div data-tour-id="working-event-selector" className="mb-5 rounded-2xl border border-[#EEDDD3] bg-white px-4 py-3 shadow-[0_6px_18px_rgba(84,53,67,0.04)]">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#8A3F4B]">Everything here is scoped to</p>
-                  <p className="mt-1 truncate text-sm font-bold text-[#2B1723]">{activeEvent?.eventName || 'No selected Working Event'}</p>
-                  <p className="mt-0.5 text-xs text-[#5F493F]">
-                    {activeEvent ? `${formatEventDate(activeEvent.eventDate)} · ${activeEvent.status || 'status not set'}` : 'Choose an event before using event-scoped pages.'}
-                  </p>
+            <section data-tour-id="working-event-selector" className="mb-4 rounded-xl border border-[#EEDDD3] bg-white px-3 py-3 shadow-[0_4px_14px_rgba(84,53,67,0.035)] sm:px-4">
+              <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+                <div className="grid gap-3 md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)] md:items-center">
+                  <div className="min-w-0">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A3F4B]">Scoped to</p>
+                    <p className="mt-1 truncate text-sm font-bold text-[#2B1723]">{activeEvent?.eventName || 'No selected Working Event'}</p>
+                    <p className="mt-0.5 text-xs text-[#5F493F]">
+                      {activeEvent ? `${formatEventDate(activeEvent.eventDate)} · ${activeEvent.status || 'status not set'}` : 'Choose an event before using event-scoped pages.'}
+                    </p>
+                  </div>
+                  {guidance && (
+                    <div data-tour-id="page-purpose" className="min-w-0 border-t border-[#F2E8E1] pt-3 md:border-l md:border-t-0 md:pl-4 md:pt-0">
+                      <h2 className="sr-only">How to use this page</h2>
+                      <span className="sr-only">Primary action</span>
+                      <span className="sr-only">Automatic boundary</span>
+                      <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A3F4B]">{guidance.label} · {guidance.primaryAction}</p>
+                      <p className="mt-1 max-h-10 overflow-hidden text-sm leading-5 text-[#4F3B33]">{guidance.purpose}</p>
+                      <p className="mt-1 hidden text-xs leading-5 text-[#80685B] sm:block">{guidance.boundary}</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-wrap items-center gap-2 lg:justify-end">
                   {demoEventSelected && (
-                    <p className="mt-2 inline-flex rounded-full bg-[#FFF4DF] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.16em] text-[#7A5818]">
+                    <p className="inline-flex min-h-8 items-center rounded-full bg-[#FFF4DF] px-2.5 text-[9px] font-bold uppercase tracking-[0.12em] text-[#7A5818]">
                       Training event · safe to practice with example data
                     </p>
                   )}
+                  <Link to="/events" className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#6B564C] hover:bg-[#FFF8F2]">
+                    Change event
+                  </Link>
                 </div>
-                <Link to="/events" className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#6B564C] hover:bg-[#FFF8F2]">
-                  Change event
-                </Link>
               </div>
-            </div>
-            {guidance && (
-              <section data-tour-id="page-purpose" className="mb-5 rounded-2xl border border-[#EEDDD3] bg-[#FFFCFA] px-4 py-3 shadow-[0_6px_18px_rgba(84,53,67,0.03)]">
-                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                  <div className="min-w-0">
-                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#8A3F4B]">{guidance.label}</p>
-                    <h2 className="sr-only">How to use this page</h2>
-                    <p className="mt-1 text-sm leading-6 text-[#4F3B33]">{guidance.purpose}</p>
-                  </div>
-                  <div className="grid gap-2 sm:grid-cols-2 md:max-w-xl">
-                    <p className="rounded-xl bg-white px-3 py-2 text-xs font-semibold leading-5 text-[#2B1723] ring-1 ring-[#E7D6CC]">
-                      <span className="block text-[9px] uppercase tracking-[0.16em] text-[#8A3F4B]">Primary action</span>
-                      {guidance.primaryAction}
-                    </p>
-                    <p className="rounded-xl bg-white px-3 py-2 text-xs font-semibold leading-5 text-[#6B564C] ring-1 ring-[#E7D6CC]">
-                      <span className="block text-[9px] uppercase tracking-[0.16em] text-[#8A3F4B]">Automatic boundary</span>
-                      {guidance.boundary}
-                    </p>
-                  </div>
-                </div>
-              </section>
-            )}
+            </section>
             <Outlet />
             <ProductFooter />
           </div>

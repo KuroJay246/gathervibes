@@ -24,6 +24,8 @@ test('organizer navigation uses product labels while preserving route paths', as
   assert.doesNotMatch(mobileMoreGroups, /\/dashboard|\/registrations|\/tickets|\/check-in/)
   assert.match(app, /path="\/communications"/)
   assert.match(app, /path="\/event-review"/)
+  assert.match(app, /path="\/reports" element=\{<Navigate to="\/event-review" replace \/>}/)
+  assert.match(app, /path="\/reconciliation" element=\{<Navigate to="\/payments\/reconciliation" replace \/>}/)
   assert.match(app, /path="\/qa"/)
   assert.match(access, /scanner:[\s\S]*'\/scanner'/)
   assert.doesNotMatch(access, /scanner:[\s\S]*'\/qa'/)

@@ -37,6 +37,8 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/security" element={<Navigate to="/settings" replace />} />
+        <Route path="/reconciliation" element={<Navigate to="/payments/reconciliation" replace />} />
+        <Route path="/reports" element={<Navigate to="/event-review" replace />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/scanner" element={<AssignedEventGate purpose="Scanner" autoSelectSingle><ScannerPage /></AssignedEventGate>} />
           <Route element={<AppShell />}>
