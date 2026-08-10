@@ -318,14 +318,6 @@ export function EventsPage() {
         </div>
       </section>
 
-      {!loading && !loadError && visibleEvents.length > 0 && (
-        <section className="grid gap-3 sm:grid-cols-3" aria-label="Event totals">
-          <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#80685B]">All events</p><p className="mt-2 font-serif text-3xl">{totals.events}</p></div>
-          <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#80685B]">Upcoming / active</p><p className="mt-2 font-serif text-3xl">{totals.upcoming}</p></div>
-          <div className="rounded-2xl border border-[#E6D4B4] bg-[#F8E9CB] p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#7A5818]">Planned capacity</p><p className="mt-2 font-serif text-3xl text-[#4E3928]">{totals.capacity.toLocaleString('en-BB')}</p></div>
-        </section>
-      )}
-
       {loading && <LoadingState message="Gathering your events…" />}
       {!loading && loadError && <ErrorState title="Events could not be loaded" message={loadError} onRetry={retryEvents} />}
       {!loading && !loadError && events.length === 0 && <EmptyState onCreate={openCreate} />}
@@ -394,6 +386,14 @@ export function EventsPage() {
               )
             })}
           </div>
+        </section>
+      )}
+
+      {!loading && !loadError && visibleEvents.length > 0 && (
+        <section className="grid gap-3 sm:grid-cols-3" aria-label="Event totals">
+          <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#80685B]">All events</p><p className="mt-2 font-serif text-3xl">{totals.events}</p></div>
+          <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#80685B]">Upcoming / active</p><p className="mt-2 font-serif text-3xl">{totals.upcoming}</p></div>
+          <div className="rounded-2xl border border-[#E6D4B4] bg-[#F8E9CB] p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#7A5818]">Planned capacity</p><p className="mt-2 font-serif text-3xl text-[#4E3928]">{totals.capacity.toLocaleString('en-BB')}</p></div>
         </section>
       )}
 

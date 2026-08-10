@@ -390,76 +390,6 @@ export function PaymentsPage() {
         <Metric label="Partially Paid" value={workspace.summary.partialPaymentRegistrations} />
       </section>
 
-      <section className="phase23v-metric-grid">
-        <Metric label="Unpaid" value={workspace.summary.pendingRegistrations + workspace.summary.doorListRegistrations} />
-        <Metric label="Complimentary" value={workspace.summary.complimentaryRegistrations} help={`${workspace.summary.complimentaryGuests} guests`} />
-        <Metric label="Door Paid" value={workspace.summary.doorPaidRegistrations} />
-        <Metric label="Payment Review Needed" value={workspace.summary.actionRequiredCount + workspace.summary.internalCleanupCount} />
-        <Metric label="Follow-Up Required" value={workspace.summary.paymentFollowUpCount} />
-      </section>
-
-      <details className="phase23v-panel">
-        <summary className="phase23v-summary">Payment status and review detail</summary>
-        <div className="phase23v-body space-y-4">
-          <section className="phase23v-metric-grid">
-            <Metric label="Paid" value={workspace.summary.paidRegistrations} />
-            <Metric label="Partial payments" value={workspace.summary.partialPaymentRegistrations} />
-            <Metric label="Pending" value={workspace.summary.pendingRegistrations} />
-            <Metric label="Door Paid" value={workspace.summary.doorPaidRegistrations} />
-            <Metric label="To Pay at Door" value={workspace.summary.doorListRegistrations} />
-          </section>
-          <section className="phase23v-metric-grid">
-            <Metric label="Action Required" value={workspace.summary.actionRequiredCount} />
-            <Metric label="Internal Cleanup" value={workspace.summary.internalCleanupCount} />
-            <Metric label="Historical Limitations" value={workspace.summary.historicalLimitationCount} />
-            <Metric label="Informational Only" value={workspace.summary.informationalOnlyCount} />
-            <Metric label="Paid — Amount Not Recorded" value={workspace.summary.paidAmountNotRecordedCount} />
-          </section>
-        </div>
-      </details>
-
-      {selectedRow && (
-        <PaymentDetailsPanel row={selectedRow} currency={currency} onClose={() => setSelectedRegistrationId('')} />
-      )}
-
-      {evidenceAudit && (
-        <section className="rounded-2xl border border-[#D8C5A8] bg-[#FFFCF6] p-4 text-sm leading-6 text-[#715D46]" aria-label="Historical reconciliation moved to Reports">
-          <strong className="text-[#4E3928]">Historical reconciliation evidence is not part of the daily Registration Payments workflow.</strong>
-          {' '}Use Reports for historical reconciliation detail and Reconciliation Preview for a read-only workbook comparison. The totals above remain the current registration payment records only.
-        </section>
-      )}
-
-      <details className="phase23v-panel">
-        <summary className="phase23v-summary">Historical and informational review</summary>
-        <div className="phase23v-body">
-          <p className="text-xs leading-5 text-[#816D62]">
-            Historical and informational review items stay searchable for audit context without being treated as current guest debt by default.
-          </p>
-        </div>
-      </details>
-
-      <ReviewList
-        eyebrow="Payment Follow-Up"
-        title="Records that may still need organizer action"
-        description="Use this list when money may still be due, a payment is partial, or the current payment state is not yet settled."
-        rows={workspace.paymentFollowUpRows}
-        currency={currency}
-        emptyMessage={workspace.summary.prominentDataReviewCount > 0 || workspace.summary.historicalLimitationCount > 0
-          ? 'No guest payment follow-up is detected. Review counts below are internal finance review only.'
-          : 'No guest payment follow-up is detected from the current records.'}
-        onOpenDetails={setSelectedRegistrationId}
-      />
-
-      <ReviewList
-        eyebrow="Internal Review"
-        title="Records that still need organizer review"
-        description="Use this list for data contradictions, missing evidence, duplicate references, or internal cleanup that should be resolved without treating the guest as unpaid by default."
-        rows={workspace.prominentDataReviewRows}
-        currency={currency}
-        emptyMessage="No active finance review is currently detected."
-        onOpenDetails={setSelectedRegistrationId}
-      />
-
       <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -473,18 +403,21 @@ export function PaymentsPage() {
             <label className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[#B8A49A]" />
               <input
+                id="payment-record-search"
+                name="paymentRecordSearch"
+                aria-label="Search payment records"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search name, ticket, reference"
                 className="min-h-10 rounded-xl border border-[#E5D7CF] py-2 pl-9 pr-3 text-xs font-bold"
               />
             </label>
-            <select aria-label="Payment record filter" value={activeFilter} onChange={(event) => setFilter(event.target.value)} className="min-h-10 rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
+            <select id="payment-record-filter" name="paymentRecordFilter" aria-label="Payment record filter" value={activeFilter} onChange={(event) => setFilter(event.target.value)} className="min-h-10 rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
               {PAYMENT_FILTERS.map(([value, label]) => (
                 <option key={value} value={value}>{label} ({workspace.filterCounts[value] ?? workspace.rows.length})</option>
               ))}
             </select>
-            <select aria-label="Payment method filter" value={methodFilter} onChange={(event) => setMethodFilter(event.target.value)} className="min-h-10 rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
+            <select id="payment-method-filter" name="paymentMethodFilter" aria-label="Payment method filter" value={methodFilter} onChange={(event) => setMethodFilter(event.target.value)} className="min-h-10 rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold">
               {PAYMENT_METHOD_FILTERS.map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
@@ -565,6 +498,70 @@ export function PaymentsPage() {
           )}
         </div>
       </section>
+
+      {selectedRow && (
+        <PaymentDetailsPanel row={selectedRow} currency={currency} onClose={() => setSelectedRegistrationId('')} />
+      )}
+
+      <section className="phase23v-metric-grid">
+        <Metric label="Unpaid" value={workspace.summary.pendingRegistrations + workspace.summary.doorListRegistrations} />
+        <Metric label="Complimentary" value={workspace.summary.complimentaryRegistrations} help={`${workspace.summary.complimentaryGuests} guests`} />
+        <Metric label="Door Paid" value={workspace.summary.doorPaidRegistrations} />
+        <Metric label="Payment Review Needed" value={workspace.summary.actionRequiredCount + workspace.summary.internalCleanupCount} />
+        <Metric label="Follow-Up Required" value={workspace.summary.paymentFollowUpCount} />
+      </section>
+
+      <ReviewList
+        eyebrow="Payment Follow-Up"
+        title="Records that may still need organizer action"
+        description="Use this list when money may still be due, a payment is partial, or the current payment state is not yet settled."
+        rows={workspace.paymentFollowUpRows}
+        currency={currency}
+        emptyMessage={workspace.summary.prominentDataReviewCount > 0 || workspace.summary.historicalLimitationCount > 0
+          ? 'No guest payment follow-up is detected. Review counts below are internal finance review only.'
+          : 'No guest payment follow-up is detected from the current records.'}
+        onOpenDetails={setSelectedRegistrationId}
+      />
+
+      <ReviewList
+        eyebrow="Internal Review"
+        title="Records that still need organizer review"
+        description="Use this list for data contradictions, missing evidence, duplicate references, or internal cleanup that should be resolved without treating the guest as unpaid by default."
+        rows={workspace.prominentDataReviewRows}
+        currency={currency}
+        emptyMessage="No active finance review is currently detected."
+        onOpenDetails={setSelectedRegistrationId}
+      />
+
+      <details className="phase23v-panel">
+        <summary className="phase23v-summary">Payment status and review detail</summary>
+        <div className="phase23v-body space-y-4">
+          <section className="phase23v-metric-grid">
+            <Metric label="Paid" value={workspace.summary.paidRegistrations} />
+            <Metric label="Partial payments" value={workspace.summary.partialPaymentRegistrations} />
+            <Metric label="Pending" value={workspace.summary.pendingRegistrations} />
+            <Metric label="Door Paid" value={workspace.summary.doorPaidRegistrations} />
+            <Metric label="To Pay at Door" value={workspace.summary.doorListRegistrations} />
+          </section>
+          <section className="phase23v-metric-grid">
+            <Metric label="Action Required" value={workspace.summary.actionRequiredCount} />
+            <Metric label="Internal Cleanup" value={workspace.summary.internalCleanupCount} />
+            <Metric label="Historical Limitations" value={workspace.summary.historicalLimitationCount} />
+            <Metric label="Informational Only" value={workspace.summary.informationalOnlyCount} />
+            <Metric label="Paid — Amount Not Recorded" value={workspace.summary.paidAmountNotRecordedCount} />
+          </section>
+          <p className="text-xs leading-5 text-[#816D62]">
+            Historical and informational review items stay searchable for audit context without being treated as current guest debt by default.
+          </p>
+        </div>
+      </details>
+
+      {evidenceAudit && (
+        <section className="rounded-2xl border border-[#D8C5A8] bg-[#FFFCF6] p-4 text-sm leading-6 text-[#715D46]" aria-label="Historical reconciliation moved to Reports">
+          <strong className="text-[#4E3928]">Historical reconciliation evidence is not part of the daily Registration Payments workflow.</strong>
+          {' '}Use Reports for historical reconciliation detail and Reconciliation Preview for a read-only workbook comparison. The totals above remain the current registration payment records only.
+        </section>
+      )}
     </div>
   )
 }

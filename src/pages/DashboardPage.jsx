@@ -484,30 +484,9 @@ export function DashboardPage() {
         </>
       ) : (
         <>
-          <section className="phase23v-metric-grid" aria-label="Key event numbers">
-            <Metric label="Registration records" value={metrics.totalRegistrations} detail="Form entries" />
-            <Metric label="Guests" value={metrics.totalPersons} detail="From persons attending" />
-            <Metric
-              label="Payments received"
-              value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)}
-              detail="Registration payments only"
-            />
-            <Metric label="Payments outstanding" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} detail="Registration balances only" />
-            <Metric label="Capacity used" value={hydratedEvent?.capacity ? `${metrics.capacityPercent}%` : 'Not set'} detail={capacityLabel} />
-            <Metric label="Tickets issued" value={registrations.filter((registration) => registration.ticketCode).length} detail="Ticket-code records" />
-            <Metric label="Check-Ins" value={metrics.checkedInRegistrations} detail={`${metrics.checkedInPersons} guests checked in`} />
-            <Metric label="Run of Show" value={readiness.runOfShowSummary.total} detail={`${readiness.runOfShowSummary.delayed} delayed`} />
-            <Metric label="Resources" value={readiness.resourceSummary.total} detail={`${readiness.resourceSummary.shortages} shortage`} />
-            <Metric label="Operations expenses recorded" value={formatCurrency(readiness.planningOverview.operationsSettlement.paidExpenses, financeSummary.currency)} detail="Event-level ledger only" />
-            <Metric label="Outstanding commitments" value={formatCurrency(readiness.planningOverview.totalOutstandingCommitments, financeSummary.currency)} detail="Operations commitments only" />
-          </section>
-
           <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
             <div data-tour-id="event-readiness-summary">
               <Section eyebrow="Needs Attention" title="What should I do next?">
-                <p className="mb-4 rounded-2xl border border-[#EFE2DA] bg-[#FFF8F2] p-3 text-sm leading-6 text-[#6B564C]">
-                  Event Readiness is derived from visible records such as registration follow-up, ticket gaps, Operations review, Run of Show delays, and Resource shortages. It is not a hidden score or a guarantee that nothing can go wrong.
-                </p>
                 {readiness.actionItems.length === 0 ? (
                   <p className="rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
                     No urgent planning blockers are currently visible for this event.
@@ -525,6 +504,24 @@ export function DashboardPage() {
               {quickActions.slice(0, 8).map((action) => <ActionLink key={action.label} {...action} />)}
               </div>
             </Section>
+          </section>
+
+          <section className="phase23v-metric-grid" aria-label="Key event numbers">
+            <Metric label="Registration records" value={metrics.totalRegistrations} detail="Form entries" />
+            <Metric label="Guests" value={metrics.totalPersons} detail="From persons attending" />
+            <Metric
+              label="Payments received"
+              value={formatCurrency(financeSummary.totalCollected, financeSummary.currency)}
+              detail="Registration payments only"
+            />
+            <Metric label="Payments outstanding" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} detail="Registration balances only" />
+            <Metric label="Capacity used" value={hydratedEvent?.capacity ? `${metrics.capacityPercent}%` : 'Not set'} detail={capacityLabel} />
+            <Metric label="Tickets issued" value={registrations.filter((registration) => registration.ticketCode).length} detail="Ticket-code records" />
+            <Metric label="Check-Ins" value={metrics.checkedInRegistrations} detail={`${metrics.checkedInPersons} guests checked in`} />
+            <Metric label="Run of Show" value={readiness.runOfShowSummary.total} detail={`${readiness.runOfShowSummary.delayed} delayed`} />
+            <Metric label="Resources" value={readiness.resourceSummary.total} detail={`${readiness.resourceSummary.shortages} shortage`} />
+            <Metric label="Operations expenses recorded" value={formatCurrency(readiness.planningOverview.operationsSettlement.paidExpenses, financeSummary.currency)} detail="Event-level ledger only" />
+            <Metric label="Outstanding commitments" value={formatCurrency(readiness.planningOverview.totalOutstandingCommitments, financeSummary.currency)} detail="Operations commitments only" />
           </section>
 
           <Section eyebrow="Recent Activity" title="Latest safe changes">

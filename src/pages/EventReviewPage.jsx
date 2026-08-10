@@ -29,9 +29,9 @@ function SummaryCard({ label, value, help }) {
   )
 }
 
-function Section({ eyebrow, title, children }) {
+function Section({ eyebrow, title, children, className = '' }) {
   return (
-    <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
+    <section className={`rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7 ${className}`}>
       <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">{eyebrow}</p>
       <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">{title}</h2>
       <div className="mt-5">{children}</div>
@@ -188,8 +188,8 @@ export function EventReviewPage() {
   ]
 
   return (
-    <div data-tour-id="reports-workspace" className="space-y-6">
-      <section className="rounded-[28px] bg-[#2B1723] px-6 py-8 text-white shadow-[0_18px_50px_rgba(43,23,35,0.15)] sm:px-9 sm:py-10">
+    <div data-tour-id="reports-workspace" className="flex flex-col gap-6">
+      <section className="order-1 rounded-[28px] bg-[#2B1723] px-6 py-8 text-white shadow-[0_18px_50px_rgba(43,23,35,0.15)] sm:px-9 sm:py-10">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-3xl">
             <p className="inline-flex items-center gap-2 rounded-full border border-[#F5E6C8]/15 bg-[#F5E6C8]/10 px-3 py-1.5 text-[10px] font-bold tracking-[0.15em] text-[#F5E6C8]">
@@ -217,7 +217,7 @@ export function EventReviewPage() {
         </div>
       </section>
 
-      <Section eyebrow="Event Summary" title={review.summary.title}>
+      <Section eyebrow="Event Summary" title={review.summary.title} className="order-3">
         <div className="gsv-compact-metric-grid">
           <SummaryCard label="Event status" value={review.summary.eventStatus} />
           <SummaryCard label="Registration records" value={review.summary.registrationCount} />
@@ -245,7 +245,7 @@ export function EventReviewPage() {
         </details>
       </Section>
 
-      <Section eyebrow="Administrative review" title="Event closeout review">
+      <Section eyebrow="Administrative review" title="Event closeout review" className="order-4">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {adminReviewItems.map(([label, value]) => <DetailRow key={label} label={label} value={value} />)}
         </div>
@@ -254,7 +254,7 @@ export function EventReviewPage() {
         </div>
       </Section>
 
-      <Section eyebrow="Payment Follow-Up and Finance Review" title="What needs attention now">
+      <Section eyebrow="Payment Follow-Up and Finance Review" title="What needs attention now" className="order-2">
         {review.followUp.items.length === 0 ? (
           <div className="rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
             No guest payment follow-up or active finance review items were detected for the selected Working Event from current registration and operations data.
@@ -266,7 +266,7 @@ export function EventReviewPage() {
         )}
       </Section>
 
-      <Section eyebrow="Financial Boundaries" title="Registration Payments and Operations Summary">
+      <Section eyebrow="Financial Boundaries" title="Registration Payments and Operations Summary" className="order-5">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
           Registration payment records track guest charges, payments received, balances, payment follow-up, and data review. The Operations Ledger tracks manually recorded sponsor income, vendor or supplier payments, expenses, refunds, reimbursements, and adjustments. These are separate records and are not automatically reconciled.
         </div>
@@ -378,7 +378,7 @@ export function EventReviewPage() {
       </Section>
 
       {evidenceAudit && (
-        <Section eyebrow="In-Kind Support and Historical Reconciliation" title={evidenceAudit.auditStatus}>
+        <Section eyebrow="In-Kind Support and Historical Reconciliation" title={evidenceAudit.auditStatus} className="order-6">
           <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
             Historical reconciliation evidence is preserved here for CPB review. It is not part of the daily Registration Payments workflow and it is not an automatic accounting ledger. Final profit cannot be confirmed until bank, 1stPay, baker and supplier evidence is complete.
           </div>
@@ -428,7 +428,7 @@ export function EventReviewPage() {
         </Section>
       )}
 
-      <Section eyebrow={review.summary.eyebrow} title="Attendance and read-only reporting boundaries">
+      <Section eyebrow={review.summary.eyebrow} title="Attendance and read-only reporting boundaries" className="order-7">
         <div className="rounded-2xl border border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#715D46]">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 size-5 shrink-0" />

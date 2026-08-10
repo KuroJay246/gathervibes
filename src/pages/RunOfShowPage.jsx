@@ -115,20 +115,20 @@ function RunOfShowForm({ event, item, resources, items, contacts, organizations,
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">What happens and when</p>
           <p className="mt-1 text-xs text-[#80685B]">Required: title, date, and time. Status is changed manually by the organizer or event-day team.</p>
         </div>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Title<input value={values.title} onChange={(e) => updateField('title', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Category<select value={values.category} onChange={(e) => updateField('category', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{RUN_OF_SHOW_CATEGORIES.map((category) => <option key={category}>{category}</option>)}</select></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Date<input type="date" value={values.date} onChange={(e) => updateField('date', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Title<input name="runOfShowTitle" value={values.title} onChange={(e) => updateField('title', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Category<select name="runOfShowCategory" value={values.category} onChange={(e) => updateField('category', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{RUN_OF_SHOW_CATEGORIES.map((category) => <option key={category}>{category}</option>)}</select></label>
+        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Date<input name="runOfShowDate" type="date" value={values.date} onChange={(e) => updateField('date', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <div className="grid grid-cols-2 gap-3">
-          <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Start<input type="time" value={values.startTime} onChange={(e) => updateField('startTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
-          <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">End<input type="time" value={values.endTime} onChange={(e) => updateField('endTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+          <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Start<input name="runOfShowStartTime" type="time" value={values.startTime} onChange={(e) => updateField('startTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+          <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">End<input name="runOfShowEndTime" type="time" value={values.endTime} onChange={(e) => updateField('endTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         </div>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Status<select value={values.status} onChange={(e) => updateField('status', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{RUN_OF_SHOW_STATUSES.map((status) => <option key={status}>{status}</option>)}</select></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Location<input value={values.location} onChange={(e) => updateField('location', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Status<select name="runOfShowStatus" value={values.status} onChange={(e) => updateField('status', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{RUN_OF_SHOW_STATUSES.map((status) => <option key={status}>{status}</option>)}</select></label>
+        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Location<input name="runOfShowLocation" value={values.location} onChange={(e) => updateField('location', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <div className="md:col-span-2">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Who is responsible?</p>
           <p className="mt-1 text-xs text-[#80685B]">Choose a staff profile, contact, organization, or type a plain-language label. Assigning a contact does not give app access.</p>
         </div>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Responsible label<input value={values.responsibleLabel} onChange={(e) => updateField('responsibleLabel', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Responsible label<input name="runOfShowResponsibleLabel" value={values.responsibleLabel} onChange={(e) => updateField('responsibleLabel', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
         <RelationshipSelector label="Responsible staff" value={values.responsibleStaffUid} onChange={(next) => updateField('responsibleStaffUid', next)} options={staffOptions(staffProfiles)} placeholder="Select staff profile" emptyText="No staff profiles available." />
         <RelationshipSelector label="Responsible contact" value={values.responsibleContactId} onChange={(next) => updateField('responsibleContactId', next)} options={contactOptions(contacts)} placeholder="Select contact" emptyText="No contacts available." />
         <RelationshipSelector label="Responsible organization" value={values.responsibleOrganizationId} onChange={(next) => updateField('responsibleOrganizationId', next)} options={organizationOptions(organizations)} placeholder="Select organization" emptyText="No organizations available." />
@@ -136,9 +136,9 @@ function RunOfShowForm({ event, item, resources, items, contacts, organizations,
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Arrival and follow-up</p>
           <p className="mt-1 text-xs text-[#80685B]">Use arrival fields for suppliers, staff, or items that must arrive before this timeline item can happen.</p>
         </div>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Expected arrival<input type="time" value={values.expectedArrivalTime} onChange={(e) => updateField('expectedArrivalTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Actual arrival<input type="time" value={values.actualArrivalTime} onChange={(e) => updateField('actualArrivalTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Arrival status<select value={values.arrivalStatus} onChange={(e) => updateField('arrivalStatus', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{ARRIVAL_STATUSES.map((status) => <option key={status}>{status}</option>)}</select></label>
+        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Expected arrival<input name="runOfShowExpectedArrival" type="time" value={values.expectedArrivalTime} onChange={(e) => updateField('expectedArrivalTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Actual arrival<input name="runOfShowActualArrival" type="time" value={values.actualArrivalTime} onChange={(e) => updateField('actualArrivalTime', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3" /></label>
+        <label className="grid gap-1 text-sm font-semibold text-[#2B1723]">Arrival status<select name="runOfShowArrivalStatus" value={values.arrivalStatus} onChange={(e) => updateField('arrivalStatus', e.target.value)} className="min-h-11 rounded-xl border border-[#E7D6CC] px-3">{ARRIVAL_STATUSES.map((status) => <option key={status}>{status}</option>)}</select></label>
         <div className="md:col-span-2">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Linked records</p>
           <p className="mt-1 text-xs text-[#80685B]">Links help you jump to related work. Linking a Task, Resource, or Document does not complete it or change its status.</p>
@@ -147,8 +147,8 @@ function RunOfShowForm({ event, item, resources, items, contacts, organizations,
         <RelationshipSelector label="Linked resources" values={values.linkedResourceIds} onChange={(next) => updateField('linkedResourceIds', next)} multiple options={resourceOptions(resources)} placeholder="Add resource link" emptyText="No resources available." />
         <RelationshipSelector label="Linked task" value={values.linkedTaskId} onChange={(next) => updateField('linkedTaskId', next)} options={taskOptions(tasks)} placeholder="Select task" emptyText="No tasks available." />
         <RelationshipSelector label="Linked documents" values={values.linkedDocumentIds} onChange={(next) => updateField('linkedDocumentIds', next)} multiple options={documentOptions(documents)} placeholder="Add document link" emptyText="No documents available." />
-        <label className="flex min-h-11 items-center gap-2 rounded-xl border border-[#E7D6CC] px-3 text-sm font-semibold text-[#2B1723]"><input type="checkbox" checked={values.criticalForEvent} onChange={(e) => updateField('criticalForEvent', e.target.checked)} /> Critical for event-day readiness</label>
-        <label className="grid gap-1 text-sm font-semibold text-[#2B1723] md:col-span-2">Notes<textarea value={values.notes} onChange={(e) => updateField('notes', e.target.value)} className="min-h-24 rounded-xl border border-[#E7D6CC] px-3 py-2" /></label>
+        <label className="flex min-h-11 items-center gap-2 rounded-xl border border-[#E7D6CC] px-3 text-sm font-semibold text-[#2B1723]"><input name="runOfShowCritical" type="checkbox" checked={values.criticalForEvent} onChange={(e) => updateField('criticalForEvent', e.target.checked)} /> Critical for event-day readiness</label>
+        <label className="grid gap-1 text-sm font-semibold text-[#2B1723] md:col-span-2">Notes<textarea name="runOfShowNotes" value={values.notes} onChange={(e) => updateField('notes', e.target.value)} className="min-h-24 rounded-xl border border-[#E7D6CC] px-3 py-2" /></label>
       </div>
       <button type="submit" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Save timeline item</button>
     </form>
@@ -283,26 +283,9 @@ export function RunOfShowPage() {
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-3xl border border-[#E7D6CC] bg-white p-5">
-          <h3 className="flex items-center gap-2 font-serif text-xl"><Clock3 className="size-5 text-[#8A3F4B]" /> Now</h3>
-          <p className="mt-2 text-sm text-[#6B564C]">{timelineState.now ? `${timelineState.now.startTime} ${timelineState.now.title}` : 'No current item by clock time. Use chronological sequence below.'}</p>
-        </div>
-        <div className="rounded-3xl border border-[#E7D6CC] bg-white p-5">
-          <h3 className="flex items-center gap-2 font-serif text-xl"><CheckCircle2 className="size-5 text-[#4F7A57]" /> Next</h3>
-          <p className="mt-2 text-sm text-[#6B564C]">{timelineState.next ? `${timelineState.next.startTime} ${timelineState.next.title}` : 'No upcoming item found.'}</p>
-        </div>
-      </section>
-
-      <section className="grid gap-4 xl:grid-cols-3">
-        <TimelineList title="Upcoming" items={timelineState.upcoming.slice(0, 5)} emptyText="No upcoming items by clock time." />
-        <TimelineList title="Delayed" items={timelineState.delayed} emptyText="No delayed timeline items." />
-        <TimelineList title="Recently Completed" items={timelineState.recentlyCompleted} emptyText="No completed items yet." />
-      </section>
-
       {showForm && <RunOfShowForm key={editing?.itemId || `new-${activeEvent?.eventId || ''}`} event={activeEvent} item={editing} resources={resources} items={items} contacts={contacts} organizations={organizations} documents={documents} tasks={tasks} staffProfiles={staffProfiles} onSave={save} onCancel={() => { setShowForm(false); setEditing(null) }} />}
 
-      <section className="space-y-3">
+      <section className="space-y-3" aria-label="Chronological Run of Show sequence">
         {items.length === 0 && <div className="rounded-3xl border border-dashed border-[#D9C7BC] bg-white p-6 text-sm text-[#6B564C]">No Run of Show items yet. Add setup, arrivals, programme, service, closing, and breakdown items when the event plan becomes real.</div>}
         {items.map((item) => {
           const blockers = unresolvedDependencies(item, items)
@@ -353,6 +336,23 @@ export function RunOfShowPage() {
             </article>
           )
         })}
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-3xl border border-[#E7D6CC] bg-white p-5">
+          <h3 className="flex items-center gap-2 font-serif text-xl"><Clock3 className="size-5 text-[#8A3F4B]" /> Now</h3>
+          <p className="mt-2 text-sm text-[#6B564C]">{timelineState.now ? `${timelineState.now.startTime} ${timelineState.now.title}` : 'No current item by clock time. Use chronological sequence above.'}</p>
+        </div>
+        <div className="rounded-3xl border border-[#E7D6CC] bg-white p-5">
+          <h3 className="flex items-center gap-2 font-serif text-xl"><CheckCircle2 className="size-5 text-[#4F7A57]" /> Next</h3>
+          <p className="mt-2 text-sm text-[#6B564C]">{timelineState.next ? `${timelineState.next.startTime} ${timelineState.next.title}` : 'No upcoming item found.'}</p>
+        </div>
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-3">
+        <TimelineList title="Upcoming" items={timelineState.upcoming.slice(0, 5)} emptyText="No upcoming items by clock time." />
+        <TimelineList title="Delayed" items={timelineState.delayed} emptyText="No delayed timeline items." />
+        <TimelineList title="Recently Completed" items={timelineState.recentlyCompleted} emptyText="No completed items yet." />
       </section>
       <div className="rounded-3xl border border-[#E7D6CC] bg-white p-5 text-sm text-[#6B564C]">
         Documents, Contacts, Tasks, Operations, and Resources can be linked by ID without rewriting older related records. <Link to="/resources" className="font-bold text-[#8A3F4B]">Open Resources</Link>

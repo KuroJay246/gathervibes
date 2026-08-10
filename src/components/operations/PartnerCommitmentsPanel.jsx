@@ -248,7 +248,7 @@ export function PartnerCommitmentsPanel({ event, onSaveRecord, onDeleteRecord })
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="partner-notes" className="event-label">Notes</label>
-              <textarea id="partner-notes" value={partnerForm.notes} onChange={(changeEvent) => setPartnerForm((current) => ({ ...current, notes: changeEvent.target.value }))} className="event-input resize-y" rows={3} placeholder="Anything the organizer should remember about this contact or commitment." />
+              <textarea id="partner-notes" name="partnerNotes" value={partnerForm.notes} onChange={(changeEvent) => setPartnerForm((current) => ({ ...current, notes: changeEvent.target.value }))} className="event-input resize-y" rows={3} placeholder="Anything the organizer should remember about this contact or commitment." />
             </div>
           </div>
 
@@ -269,13 +269,13 @@ export function PartnerCommitmentsPanel({ event, onSaveRecord, onDeleteRecord })
             <div className="flex flex-wrap gap-2">
               <label className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[#B8A49A]" />
-                <input aria-label="Search partner records" value={search} onChange={(changeEvent) => setSearch(changeEvent.target.value)} placeholder="Search name, service, note..." className="rounded-xl border border-[#E5D7CF] py-2 pl-9 pr-3 text-xs font-bold" />
+                <input id="partner-record-search" name="partnerRecordSearch" aria-label="Search partner records" value={search} onChange={(changeEvent) => setSearch(changeEvent.target.value)} placeholder="Search name, service, note..." className="rounded-xl border border-[#E5D7CF] py-2 pl-9 pr-3 text-xs font-bold" />
               </label>
-              <select aria-label="Partner type filter" value={recordTypeFilter} onChange={(changeEvent) => setRecordTypeFilter(changeEvent.target.value)} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold text-[#5A443B]">
+              <select id="partner-record-type-filter" name="partnerRecordTypeFilter" aria-label="Partner type filter" value={recordTypeFilter} onChange={(changeEvent) => setRecordTypeFilter(changeEvent.target.value)} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold text-[#5A443B]">
                 <option value="all">All types</option>
                 {PARTNER_TYPE_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
               </select>
-              <select aria-label="Partner status filter" value={statusFilter} onChange={(changeEvent) => setStatusFilter(changeEvent.target.value)} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold text-[#5A443B]">
+              <select id="partner-status-filter" name="partnerStatusFilter" aria-label="Partner status filter" value={statusFilter} onChange={(changeEvent) => setStatusFilter(changeEvent.target.value)} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold text-[#5A443B]">
                 <option value="all">All statuses</option>
                 {PARTNER_STATUS_OPTIONS.map((value) => <option key={value} value={value}>{value}</option>)}
               </select>

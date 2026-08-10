@@ -359,13 +359,13 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
               <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Add and track organizer work</h3>
             </div>
             <div className="flex flex-wrap gap-2">
-              <select aria-label="Task filter" value={taskFilter} onChange={(changeEvent) => setTaskFilter(changeEvent.target.value)} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold text-[#5A443B]">
+              <select id="event-planning-task-filter" name="eventPlanningTaskFilter" aria-label="Task filter" value={taskFilter} onChange={(changeEvent) => setTaskFilter(changeEvent.target.value)} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold text-[#5A443B]">
                 <option value="all">All tasks</option>
                 <option value="open">Open tasks</option>
                 <option value="overdue">Overdue</option>
                 <option value="completed">Completed</option>
               </select>
-              <select aria-label="Task sort" value={taskSort} onChange={(changeEvent) => setTaskSort(changeEvent.target.value)} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold text-[#5A443B]">
+              <select id="event-planning-task-sort" name="eventPlanningTaskSort" aria-label="Task sort" value={taskSort} onChange={(changeEvent) => setTaskSort(changeEvent.target.value)} className="rounded-xl border border-[#E5D7CF] px-3 py-2 text-xs font-bold text-[#5A443B]">
                 <option value="due-date">Sort by due date</option>
                 <option value="priority">Sort by priority</option>
                 <option value="category">Sort by category</option>

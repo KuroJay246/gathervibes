@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { cloneElement, isValidElement, useEffect, useMemo, useState } from 'react'
 import { Building2, Link as LinkIcon, Pencil, Plus, UsersRound, X } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -30,10 +30,15 @@ import {
 } from '../services/contactService'
 
 function Field({ label, children, span = '' }) {
+  const controlId = `contact-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`
+  const child = isValidElement(children)
+    ? cloneElement(children, { id: children.props.id || controlId, name: children.props.name || controlId })
+    : children
+
   return (
-    <label className={span}>
+    <label htmlFor={controlId} className={span}>
       <span className="text-xs font-bold text-[#5A443B]">{label}</span>
-      {children}
+      {child}
     </label>
   )
 }
@@ -355,10 +360,10 @@ export function ContactsPage() {
 
       <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-4">
         <div className="grid gap-3 lg:grid-cols-5">
-          <input aria-label="Search contacts" value={filters.search} onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))} placeholder="Search name, email, phone, organization..." className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm lg:col-span-2" />
-          <select aria-label="Category filter" value={filters.category} onChange={(event) => setFilters((current) => ({ ...current, category: event.target.value }))} className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm"><option>All</option>{CONTACT_CATEGORIES.map((option) => <option key={option}>{option}</option>)}</select>
-          <select aria-label="Status filter" value={filters.status} onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))} className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm"><option>All</option>{CONTACT_STATUSES.map((option) => <option key={option}>{option}</option>)}</select>
-          <select aria-label="Working Event link filter" value={filters.eventLinked} onChange={(event) => setFilters((current) => ({ ...current, eventLinked: event.target.value }))} className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm"><option value="all">All event links</option><option value="linked">Linked to Working Event</option><option value="unlinked">Not linked to Working Event</option></select>
+          <input id="contacts-search" name="contactsSearch" aria-label="Search contacts" value={filters.search} onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))} placeholder="Search name, email, phone, organization..." className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm lg:col-span-2" />
+          <select id="contacts-category-filter" name="contactsCategoryFilter" aria-label="Category filter" value={filters.category} onChange={(event) => setFilters((current) => ({ ...current, category: event.target.value }))} className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm"><option>All</option>{CONTACT_CATEGORIES.map((option) => <option key={option}>{option}</option>)}</select>
+          <select id="contacts-status-filter" name="contactsStatusFilter" aria-label="Status filter" value={filters.status} onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))} className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm"><option>All</option>{CONTACT_STATUSES.map((option) => <option key={option}>{option}</option>)}</select>
+          <select id="contacts-event-link-filter" name="contactsEventLinkFilter" aria-label="Working Event link filter" value={filters.eventLinked} onChange={(event) => setFilters((current) => ({ ...current, eventLinked: event.target.value }))} className="rounded-xl border border-[#E7D6CC] px-3 py-2 text-sm"><option value="all">All event links</option><option value="linked">Linked to Working Event</option><option value="unlinked">Not linked to Working Event</option></select>
         </div>
       </section>
 
