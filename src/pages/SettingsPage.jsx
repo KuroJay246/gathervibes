@@ -8,7 +8,7 @@ import { firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
 import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeUtils'
 import { ACCESS_ROLES, listApprovedAccessEntries, normalizeAccessEmail, roleCapabilitySummary, roleLabel } from '../utils/accessRoles'
 import { TARGET_UIDS } from '../tutorial/tutorialSteps'
-import { addApprovedOrganizer, changeApprovedOrganizerStatus, subscribeAccessHistory } from '../services/accessManagementService'
+import { addApprovedOrganizer, changeApprovedOrganizerStatus, subscribeAccessControl, subscribeAccessHistory } from '../services/accessManagementService'
 import { DEFAULT_INTEGRATIONS, recordIntegrationCheck, subscribeIntegrationSettings } from '../services/integrationSettingsService'
 import { saveStaffAssignment, saveStaffProfile, setStaffProfileStatus, subscribeStaffAssignments, subscribeStaffProfiles } from '../services/staffManagementService'
 
@@ -157,6 +157,7 @@ export function SettingsPage() {
   const [staffProfiles, setStaffProfiles] = useState([])
   const [staffAssignments, setStaffAssignments] = useState([])
   const [history, setHistory] = useState([])
+  const [liveAccessControl, setLiveAccessControl] = useState(null)
   const [integrationState, setIntegrationState] = useState({ integrations: DEFAULT_INTEGRATIONS })
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
@@ -165,7 +166,9 @@ export function SettingsPage() {
   const isOwner = Boolean(access?.protectedOwner)
   const requestedTab = searchParams.get('tab') || 'account'
   const activeTab = SETTINGS_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'account'
-  const approvedEntries = useMemo(() => listApprovedAccessEntries(accessControl || {}), [accessControl])
+  useEffect(() => subscribeAccessControl(setLiveAccessControl, (err) => setError(err.message)), [])
+
+  const approvedEntries = useMemo(() => listApprovedAccessEntries(liveAccessControl || accessControl || {}), [accessControl, liveAccessControl])
   const activeApprovedCount = approvedEntries.filter((entry) => !entry.protectedOwner && entry.status === 'active').length
 
   useEffect(() => subscribeStaffProfiles(setStaffProfiles, (err) => setError(err.message)), [])

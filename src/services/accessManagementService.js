@@ -47,6 +47,14 @@ export async function getAccessControlSnapshot() {
   return currentAccessData(snapshot)
 }
 
+export function subscribeAccessControl(onData, onError) {
+  return onSnapshot(
+    doc(requireDb(), 'settings', 'accessControl'),
+    (snapshot) => onData(currentAccessData(snapshot)),
+    onError,
+  )
+}
+
 export function subscribeAccessHistory(onData, onError) {
   return onSnapshot(
     query(collection(requireDb(), 'settings', 'accessControl', 'history'), orderBy('changedAt', 'desc')),
