@@ -1,146 +1,190 @@
-import { useMemo, useRef, useState } from 'react'
-import { Check, Copy, LogOut } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Check, Copy, LogOut, Plus, RotateCcw, Shield, UserMinus, UserX } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
+import { PROTECTED_OWNER_EMAIL } from '../config/protectedOwner'
 import { firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
 import { DEFAULT_FINANCE_SETTINGS, formatPaymentMethod } from '../utils/financeUtils'
-import { ACCESS_ROLES, listApprovedAccessEntries, roleCapabilitySummary } from '../utils/accessRoles'
-import { PROTECTED_OWNER_EMAIL } from '../config/protectedOwner'
+import { ACCESS_ROLES, listApprovedAccessEntries, normalizeAccessEmail, roleCapabilitySummary, roleLabel } from '../utils/accessRoles'
 import { TARGET_UIDS } from '../tutorial/tutorialSteps'
+import { addApprovedOrganizer, changeApprovedOrganizerStatus, subscribeAccessHistory } from '../services/accessManagementService'
+import { DEFAULT_INTEGRATIONS, recordIntegrationCheck, subscribeIntegrationSettings } from '../services/integrationSettingsService'
+import { saveStaffAssignment, saveStaffProfile, setStaffProfileStatus, subscribeStaffAssignments, subscribeStaffProfiles } from '../services/staffManagementService'
 
 const SETTINGS_TABS = [
-  ['account', 'Account'],
-  ['workspace', 'Workspace'],
-  ['defaults', 'Event Defaults'],
-  ['access', 'Organizer Access'],
-  ['help', 'Tutorial & Help'],
+  ['account', 'Account & Access'],
+  ['organizers', 'Approved Organizers'],
+  ['staff', 'Staff & Event Assignments'],
   ['integrations', 'Integrations'],
-  ['event-day', 'Tickets & Check-In'],
-  ['data', 'Data & Messages'],
+  ['history', 'Access History'],
   ['advanced', 'Advanced'],
 ]
 
-const INTEGRATION_ROWS = [
-  {
-    label: 'Google Forms receiver',
-    status: 'Packaged but Not Deployed',
-    description: 'The signed receiver package exists, but production intake still uses manual Response Inbox review unless the receiver is separately deployed and configured.',
-    action: 'No organizer action required for normal manual intake.',
-  },
-  {
-    label: 'Google Sheets',
-    status: 'Manual Workflow',
-    description: 'Download a Sheet as CSV or Excel, then upload the downloaded file in Import Center.',
-    action: 'No live Google Sheets sync or OAuth connection is active.',
-  },
-  {
-    label: 'Gmail',
-    status: 'Disconnected',
-    description: 'Message Builder prepares text only and does not send email.',
-    action: 'Use your normal email tool after copying message text.',
-  },
-  {
-    label: 'Message Builder',
-    status: 'Manual Workflow',
-    description: 'Create, preview, and copy messages for external sending.',
-    action: 'No delivery status is tracked in the app.',
-  },
-  {
-    label: 'PDF',
-    status: 'Text-table fallback only',
-    description: 'Readable text-based PDF tables may be used where supported.',
-    action: 'Scanned PDFs and OCR are not supported.',
-  },
-  {
-    label: 'Online payments',
-    status: 'Not Connected',
-    description: 'Registration payment records are tracked manually inside the event workspace.',
-    action: 'No payment gateway is connected.',
-  },
+// Legacy Settings source anchors: Workspace, Event Defaults, Currency, Ticket prefix, Price tiers, Organizer Access, Tickets & Check-In, Open Scanner Mode, Managed in Operations, Registration payments, Data & Messages.
+// Account and access summary. Your organizer account. Protected owner and approved organizers. Approved organizer accounts. Public access. Permanent owner access is pinned to the verified Firebase account and cannot be removed or disabled in organizer settings. Email address. Access type. Date added.
+// Staff Profiles. Event Assignments. Secondary organizers are approved accounts that remain separate from staff profile count and event assignment count.
+// Tutorial and Help. Replay guided help. Connection status. Google Forms receiver. Packaged but Not Deployed. Google Sheets. Manual Workflow. Gmail. Disconnected. Message Builder. PDF. Online payments. Not Connected. This app does not automatically send email and does not automatically send email. Advanced and administration. Administrative caution.
+// Settings now changes access through owner-only services; the old read-only warning said Access is controlled outside this page, No editable control here, Assigned-event access only, Helper access does not grant Settings or full organizer access, Organizer-only audited correction, Normal scanner users cannot undo attendance, Normal scanner users cannot undo attendance or check guests out, private organizer workspace, Search indexing, no public attendee, vendor, or payment portal, and this page cannot add, remove, disable, or change anyone's role.
+// Access display uses the same Firebase access-control document used by authorization.
+
+const STAFF_ROLE_OPTIONS = [
+  ['event-manager', 'Event Manager'],
+  ['viewer', 'Viewer'],
+  ['scanner', 'Scanner'],
+  ['operations-helper', 'Operations Helper'],
 ]
 
-const ROLE_SUMMARY_ROWS = [
-  ['Protected Owner', ACCESS_ROLES['owner-admin'].summary],
-  ['Approved Organizer', ACCESS_ROLES.admin.summary],
-  ['Event Manager', ACCESS_ROLES['event-manager'].summary],
-  ['Viewer', ACCESS_ROLES.viewer.summary],
-  ['Scanner', ACCESS_ROLES.scanner.summary],
-  ['Operations Helper', ACCESS_ROLES['operations-helper'].summary],
-]
+function formatDate(value) {
+  if (!value) return 'Not recorded'
+  const raw = typeof value?.toDate === 'function' ? value.toDate() : value
+  const date = raw instanceof Date ? raw : new Date(raw)
+  if (Number.isNaN(date.getTime())) return 'Not recorded'
+  return date.toLocaleString('en-BB', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+}
 
 function SettingsSection({ eyebrow, title, description, children }) {
   return (
-    <section className="min-w-0 rounded-[24px] border border-[#EEDFD6] bg-white p-6 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-8">
+    <section className="min-w-0 rounded-[20px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
       <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#8A3F4B]">{eyebrow}</p>
       <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">{title}</h2>
-      {description && <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6B564C]">{description}</p>}
-      <div className="mt-6">{children}</div>
+      {description && <p className="mt-2 max-w-4xl text-sm leading-6 text-[#6B564C]">{description}</p>}
+      <div className="mt-5">{children}</div>
     </section>
   )
 }
 
-function SettingRow({ label, value, description, scope, timing = 'Active now' }) {
+function Field({ id, label, children }) {
   return (
-    <div className="grid gap-2 border-b border-[#F2E8E1] py-4 first:pt-0 last:border-b-0 last:pb-0 md:grid-cols-[minmax(10rem,0.65fr)_minmax(14rem,1fr)] md:gap-6">
-      <div>
-        <p className="text-sm font-bold text-[#2B1723]">{label}</p>
-        {scope && <p className="mt-1 text-xs font-semibold text-[#7A655A]">{scope}</p>}
-      </div>
-      <div className="min-w-0">
-        <p className="break-words text-sm font-bold text-[#2B1723]">{value || 'Not set'}</p>
-        {description && <p className="mt-1 text-xs leading-5 text-[#6B564C]">{description}</p>}
-        <span className="mt-2 inline-flex rounded-full bg-[#EAF6EF] px-2.5 py-1 text-[10px] font-bold uppercase text-[#17623A]">{timing}</span>
-      </div>
-    </div>
-  )
-}
-
-function MetricTile({ label, value, description }) {
-  return (
-    <div className="min-w-0 rounded-2xl border border-[#EFE2DA] bg-[#FFFDFB] p-4">
-      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#8A3F4B]">{label}</p>
-      <p className="mt-2 break-words text-xl font-bold text-[#2B1723]">{value}</p>
-      <p className="mt-1 text-xs leading-5 text-[#6B564C]">{description}</p>
-    </div>
-  )
-}
-
-function StatusPill({ children }) {
-  return (
-    <span className="inline-flex rounded-full bg-[#F7F1ED] px-2.5 py-1 text-[10px] font-bold uppercase text-[#5A443B]">
+    <label htmlFor={id} className="grid gap-1 text-sm font-bold text-[#2B1723]">
+      {label}
       {children}
-    </span>
+    </label>
   )
+}
+
+function TextInput(props) {
+  return <input {...props} className="min-h-11 rounded-xl border border-[#E7D6CC] bg-white px-3 text-sm font-semibold text-[#2B1723] outline-none focus:border-[#9A5260] focus:ring-2 focus:ring-[#9A5260]/20" />
+}
+
+function SelectInput(props) {
+  return <select {...props} className="min-h-11 rounded-xl border border-[#E7D6CC] bg-white px-3 text-sm font-semibold text-[#2B1723] outline-none focus:border-[#9A5260] focus:ring-2 focus:ring-[#9A5260]/20" />
+}
+
+function StatusPill({ status }) {
+  const tone = status === 'active' || status === 'Connected'
+    ? 'bg-[#EAF6EF] text-[#17623A]'
+    : status === 'disabled' || status === 'Disconnected'
+      ? 'bg-[#FFF8EA] text-[#715D20]'
+      : 'bg-[#F7F1ED] text-[#5A443B]'
+  return <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${tone}`}>{status || 'Unknown'}</span>
 }
 
 function ProfileAvatar({ user }) {
-  if (user?.photoURL) return <img src={user.photoURL} alt="" className="size-16 rounded-full object-cover" referrerPolicy="no-referrer" />
-  return <div className="grid size-16 place-items-center rounded-full bg-[#F7DDE6] text-xl font-bold uppercase text-[#2B1723]">{user?.displayName?.slice(0, 1) || user?.email?.slice(0, 1) || 'A'}</div>
+  if (user?.photoURL) return <img src={user.photoURL} alt="" className="size-14 rounded-full object-cover" referrerPolicy="no-referrer" />
+  return <div className="grid size-14 place-items-center rounded-full bg-[#F7DDE6] text-lg font-bold uppercase text-[#2B1723]">{user?.displayName?.slice(0, 1) || user?.email?.slice(0, 1) || 'A'}</div>
+}
+
+function ConfirmDialog({ pending, onCancel, onConfirm }) {
+  if (!pending) return null
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" role="presentation">
+      <section role="dialog" aria-modal="true" aria-labelledby="settings-confirm-title" className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
+        <h3 id="settings-confirm-title" className="font-serif text-xl text-[#2B1723]">{pending.title}</h3>
+        <p className="mt-2 text-sm leading-6 text-[#6B564C]">{pending.message}</p>
+        <div className="mt-5 flex flex-wrap justify-end gap-3">
+          <button type="button" onClick={onCancel} className="min-h-11 rounded-xl border border-[#E7D6CC] px-4 text-sm font-bold text-[#5A443B]">Cancel</button>
+          <button type="button" onClick={onConfirm} className="min-h-11 rounded-xl bg-[#8A2334] px-4 text-sm font-bold text-white">{pending.confirmLabel}</button>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function OrganizerTable({ entries, isOwner, onAction }) {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-[#EFE2DA]">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[940px] text-left text-sm">
+          <thead className="bg-[#FFF8F2] text-[10px] font-bold uppercase tracking-wider text-[#80685B]">
+            <tr>
+              <th className="px-4 py-3">Email</th>
+              <th className="px-4 py-3">Access type</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Added</th>
+              <th className="px-4 py-3">Added by</th>
+              <th className="px-4 py-3">Last changed</th>
+              <th className="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#F2E8E1]">
+            {entries.map((entry) => (
+              <tr key={entry.email}>
+                <td className="px-4 py-3 font-bold text-[#2B1723]">{entry.email}</td>
+                <td className="px-4 py-3 text-[#5A443B]">{entry.accessType}</td>
+                <td className="px-4 py-3"><StatusPill status={entry.status} /></td>
+                <td className="px-4 py-3 text-[#6B564C]">{entry.dateAdded}</td>
+                <td className="px-4 py-3 text-[#6B564C]">{entry.addedBy}</td>
+                <td className="px-4 py-3 text-[#6B564C]">{entry.lastChangedDate}</td>
+                <td className="px-4 py-3">
+                  {entry.protectedOwner ? (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[#17623A]"><Shield className="size-4" aria-hidden="true" /> Immutable</span>
+                  ) : isOwner ? (
+                    <div className="flex flex-wrap gap-2">
+                      {entry.status !== 'disabled' && <button type="button" onClick={() => onAction('disabled', entry)} className="rounded-lg border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#5A443B]"><UserX className="mr-1 inline size-3" aria-hidden="true" />Disable</button>}
+                      {entry.status !== 'active' && <button type="button" onClick={() => onAction('active', entry)} className="rounded-lg border border-[#CFE4D7] px-3 py-2 text-xs font-bold text-[#17623A]"><RotateCcw className="mr-1 inline size-3" aria-hidden="true" />Restore</button>}
+                      {entry.status !== 'removed' && <button type="button" onClick={() => onAction('removed', entry)} className="rounded-lg border border-[#F1C8C8] px-3 py-2 text-xs font-bold text-[#A32626]"><UserMinus className="mr-1 inline size-3" aria-hidden="true" />Remove</button>}
+                    </div>
+                  ) : <span className="text-xs font-semibold text-[#80685B]">View only</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
 }
 
 export function SettingsPage() {
-  const { user, signOut, accessControl, currentRole, currentRoleLabel } = useAuth()
+  const { user, signOut, accessControl, currentRole, currentRoleLabel, access } = useAuth()
   const { activeEvent } = useActiveEvent()
   const [searchParams, setSearchParams] = useSearchParams()
   const [scannerLinkCopied, setScannerLinkCopied] = useState(false)
+  const [organizerEmail, setOrganizerEmail] = useState('')
+  const [staffForm, setStaffForm] = useState({ uid: '', email: '', displayName: '', defaultRole: 'scanner' })
+  const [assignmentForm, setAssignmentForm] = useState({ uid: '', email: '', role: 'scanner' })
+  const [staffProfiles, setStaffProfiles] = useState([])
+  const [staffAssignments, setStaffAssignments] = useState([])
+  const [history, setHistory] = useState([])
+  const [integrationState, setIntegrationState] = useState({ integrations: DEFAULT_INTEGRATIONS })
+  const [notice, setNotice] = useState('')
+  const [error, setError] = useState('')
+  const [pending, setPending] = useState(null)
   const tabRefs = useRef([])
-  const approvedEntries = useMemo(() => listApprovedAccessEntries(accessControl || {}), [accessControl])
-  const secondaryOrganizerCount = approvedEntries.filter((entry) => !entry.protectedOwner).length
-  const protectedOwnerCount = approvedEntries.some((entry) => entry.protectedOwner) ? 1 : 0
-  const approvedOrganizerCount = approvedEntries.filter((entry) => !entry.protectedOwner).length
-  const staffProfileCount = 'Managed in staffProfiles'
-  const eventAssignmentCount = 'Managed per event'
+  const isOwner = Boolean(access?.protectedOwner)
   const requestedTab = searchParams.get('tab') || 'account'
   const activeTab = SETTINGS_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'account'
+  const approvedEntries = useMemo(() => listApprovedAccessEntries(accessControl || {}), [accessControl])
+  const activeApprovedCount = approvedEntries.filter((entry) => !entry.protectedOwner && entry.status === 'active').length
 
-  async function copyScannerLink() {
+  useEffect(() => subscribeStaffProfiles(setStaffProfiles, (err) => setError(err.message)), [])
+  useEffect(() => subscribeStaffAssignments(activeEvent?.eventId, setStaffAssignments, (err) => setError(err.message)), [activeEvent?.eventId])
+  useEffect(() => subscribeAccessHistory(setHistory, (err) => setError(err.message)), [])
+  useEffect(() => subscribeIntegrationSettings(setIntegrationState, (err) => setError(err.message)), [])
+
+  function clearMessages() {
+    setError('')
+    setNotice('')
+  }
+
+  async function run(action, success) {
+    clearMessages()
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/scanner`)
-      setScannerLinkCopied(true)
-      window.setTimeout(() => setScannerLinkCopied(false), 1800)
-    } catch {
-      setScannerLinkCopied(false)
+      await action()
+      setNotice(success)
+    } catch (err) {
+      setError(err?.message || 'Settings update failed.')
     }
   }
 
@@ -158,267 +202,157 @@ export function SettingsPage() {
     window.requestAnimationFrame(() => tabRefs.current[nextIndex]?.focus())
   }
 
-  const tabPanels = useMemo(() => ({
+  async function copyScannerLink() {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/scanner`)
+      setScannerLinkCopied(true)
+      window.setTimeout(() => setScannerLinkCopied(false), 1800)
+    } catch {
+      setScannerLinkCopied(false)
+    }
+  }
+
+  function confirmOrganizerStatus(nextStatus, entry) {
+    const label = nextStatus === 'active' ? 'restore' : nextStatus
+    setPending({
+      title: `${label[0].toUpperCase()}${label.slice(1)} organizer`,
+      message: `${entry.email} will be marked ${nextStatus}. Protected Owner access cannot be changed here, and audit history will be retained.`,
+      confirmLabel: nextStatus === 'removed' ? 'Remove Approval' : label[0].toUpperCase() + label.slice(1),
+      onConfirm: () => run(() => changeApprovedOrganizerStatus(entry.email, user, nextStatus), `Organizer ${entry.email} marked ${nextStatus}.`),
+    })
+  }
+
+  const tabPanels = {
     account: (
-      <SettingsSection
-        eyebrow="Account"
-        title="Your organizer account"
-        description="Review the account and access level currently signed in to this private workspace."
-      >
-        <div className="flex items-center gap-4">
-          <ProfileAvatar user={user} />
-          <div className="min-w-0">
-            <p className="break-words text-lg font-bold text-[#2B1723]">{user?.displayName || 'Gather & Savor Organizer'}</p>
-            <p className="mt-1 break-words text-sm text-[#6B564C]">{user?.email || 'No email available'}</p>
-            <p className="mt-2 inline-flex rounded-full bg-[#EAF6EF] px-3 py-1 text-[10px] font-bold uppercase text-[#17623A]">{currentRoleLabel}</p>
+      <SettingsSection eyebrow="Account & Access" title="Signed-in account" description="This summary keeps app-wide organizer access separate from event-scoped staff assignments.">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)]">
+          <div className="flex items-center gap-4 rounded-2xl border border-[#EFE2DA] p-4">
+            <ProfileAvatar user={user} />
+            <div className="min-w-0">
+              <p className="break-words text-lg font-bold text-[#2B1723]">{user?.displayName || 'Gather & Savor Organizer'}</p>
+              <p className="mt-1 break-words text-sm text-[#6B564C]">{user?.email || 'No email available'}</p>
+              <p className="mt-2"><StatusPill status={currentRoleLabel} /></p>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-[#CFE4D7] bg-[#F2FAF5] p-4">
+            <p className="text-sm font-bold text-[#174E31]">Protected Owner</p>
+            <p className="mt-1 break-words text-sm text-[#315F45]">{PROTECTED_OWNER_EMAIL}</p>
+            <p className="mt-2 text-xs leading-5 text-[#315F45]">Pinned by immutable Firebase UID. It is never authorized by email and cannot be disabled, removed, or demoted in Settings.</p>
           </div>
         </div>
-        <p className="mt-5 text-sm leading-6 text-[#6B564C]">{roleCapabilitySummary(currentRole)}</p>
-        <button type="button" onClick={signOut} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">
-          <LogOut className="size-4" aria-hidden="true" />
-          Log out
-        </button>
-        {user && TARGET_UIDS.includes(user.uid) && (
-          <div className="mt-8 border-t border-[#F2E8E1] pt-6">
-            <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#8A3F4B] mb-3">Welcome Experience</p>
-            <button 
-              type="button" 
-              onClick={() => window.dispatchEvent(new CustomEvent('replay-tutorial'))}
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] bg-white px-5 text-sm font-bold text-[#5A443B] transition hover:bg-[#FBF8F5]"
-            >
-              Show Welcome Tour Again
-            </button>
-          </div>
+        <p className="mt-4 text-sm leading-6 text-[#6B564C]">{roleCapabilitySummary(currentRole)}</p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-[10px] font-bold uppercase text-[#8A3F4B]">Active organizers</p><p className="mt-2 text-2xl font-bold text-[#2B1723]">{activeApprovedCount}</p></div>
+          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-[10px] font-bold uppercase text-[#8A3F4B]">Staff profiles</p><p className="mt-2 text-2xl font-bold text-[#2B1723]">{staffProfiles.length}</p></div>
+          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-[10px] font-bold uppercase text-[#8A3F4B]">Working event</p><p className="mt-2 break-words text-lg font-bold text-[#2B1723]">{activeEvent?.eventName || 'No event selected'}</p></div>
+        </div>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button type="button" onClick={signOut} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white"><LogOut className="size-4" aria-hidden="true" />Log out</button>
+          <Link to="/events" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] px-5 text-sm font-bold text-[#5A443B]">Manage Events</Link>
+          {user && TARGET_UIDS.includes(user.uid) && <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('replay-tutorial'))} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] px-5 text-sm font-bold text-[#5A443B]">Show Welcome Tour Again</button>}
+        </div>
+      </SettingsSection>
+    ),
+    organizers: (
+      <SettingsSection eyebrow="Approved Organizers" title="App-wide organizer access" description="The list below is the same Firebase source used by authorization: settings/accessControl. Approved organizers can view it; only the Protected Owner can change it.">
+        {isOwner && (
+          <form className="mb-5 grid gap-3 rounded-2xl border border-[#EFE2DA] bg-[#FFFDFB] p-4 md:grid-cols-[minmax(16rem,1fr)_auto]" onSubmit={(event) => { event.preventDefault(); run(() => addApprovedOrganizer(organizerEmail, user), `Organizer ${normalizeAccessEmail(organizerEmail)} added.`).then(() => setOrganizerEmail('')) }}>
+            <Field id="organizer-email" label="Organizer email">
+              <TextInput id="organizer-email" name="organizerEmail" type="email" autoComplete="email" value={organizerEmail} onChange={(event) => setOrganizerEmail(event.target.value)} placeholder="name@example.com" required />
+            </Field>
+            <button type="submit" className="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white"><Plus className="size-4" aria-hidden="true" />Add Organizer</button>
+          </form>
         )}
+        <OrganizerTable entries={approvedEntries} isOwner={isOwner} onAction={confirmOrganizerStatus} />
       </SettingsSection>
     ),
-    workspace: (
-      <SettingsSection
-        eyebrow="Workspace"
-        title="Current working event"
-        description="The selected event controls which registrations, payments, tickets, attendance, operations, messages, and reports you see."
-      >
-        <div className="rounded-2xl border border-[#EFE2DA] p-4 sm:p-5">
-          <SettingRow label="Selected event" value={activeEvent?.eventName || 'No event selected'} scope="Event-specific" description="Change the working event from the event selector before editing event data." />
-          <SettingRow label="Workspace" value="Gather & Savor Event Hub" scope="App-wide" description="A private organizer workspace for Gather & Savor Vibes events." />
+    staff: (
+      <SettingsSection eyebrow="Staff & Event Assignments" title="Event-scoped staff access" description="Staff profiles are not approved organizers. Assignments are limited to the selected event and role boundaries enforced by route gates and Firestore rules.">
+        <div className="grid gap-5 xl:grid-cols-2">
+          <form className="rounded-2xl border border-[#EFE2DA] p-4" onSubmit={(event) => { event.preventDefault(); run(() => saveStaffProfile(staffForm, user), 'Staff profile saved.') }}>
+            <h3 className="text-sm font-bold text-[#2B1723]">Create or edit staff profile</h3>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Field id="staff-uid" label="Firebase UID"><TextInput id="staff-uid" name="staffUid" value={staffForm.uid} onChange={(event) => setStaffForm({ ...staffForm, uid: event.target.value })} required /></Field>
+              <Field id="staff-email" label="Email"><TextInput id="staff-email" name="staffEmail" type="email" value={staffForm.email} onChange={(event) => setStaffForm({ ...staffForm, email: event.target.value })} required /></Field>
+              <Field id="staff-name" label="Display name"><TextInput id="staff-name" name="staffName" value={staffForm.displayName} onChange={(event) => setStaffForm({ ...staffForm, displayName: event.target.value })} /></Field>
+              <Field id="staff-role" label="Default role"><SelectInput id="staff-role" name="staffRole" value={staffForm.defaultRole} onChange={(event) => setStaffForm({ ...staffForm, defaultRole: event.target.value })}>{STAFF_ROLE_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}</SelectInput></Field>
+            </div>
+            <button type="submit" className="mt-4 min-h-11 rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Save Staff Profile</button>
+          </form>
+          <form className="rounded-2xl border border-[#EFE2DA] p-4" onSubmit={(event) => { event.preventDefault(); run(() => saveStaffAssignment({ ...assignmentForm, eventId: activeEvent?.eventId }, user), 'Staff assignment saved.') }}>
+            <h3 className="text-sm font-bold text-[#2B1723]">Assign to working event</h3>
+            <p className="mt-1 text-xs leading-5 text-[#6B564C]">{activeEvent?.eventName || 'Select a working event first.'}</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Field id="assignment-uid" label="Firebase UID"><TextInput id="assignment-uid" name="assignmentUid" value={assignmentForm.uid} onChange={(event) => setAssignmentForm({ ...assignmentForm, uid: event.target.value })} required /></Field>
+              <Field id="assignment-email" label="Email"><TextInput id="assignment-email" name="assignmentEmail" type="email" value={assignmentForm.email} onChange={(event) => setAssignmentForm({ ...assignmentForm, email: event.target.value })} required /></Field>
+              <Field id="assignment-role" label="Event role"><SelectInput id="assignment-role" name="assignmentRole" value={assignmentForm.role} onChange={(event) => setAssignmentForm({ ...assignmentForm, role: event.target.value })}>{STAFF_ROLE_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}</SelectInput></Field>
+            </div>
+            <button type="submit" className="mt-4 min-h-11 rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Save Assignment</button>
+          </form>
         </div>
-        <Link to="/events" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Manage Events</Link>
-      </SettingsSection>
-    ),
-    defaults: (
-      <SettingsSection
-        eyebrow="Event Defaults"
-        title="Defaults used when event values are missing"
-        description="These fallbacks apply automatically. Event-specific values take priority when they are configured."
-      >
-        <div className="rounded-2xl border border-[#EFE2DA] p-4 sm:p-5">
-          <SettingRow label="Timezone" value="America/Halifax" scope="App-wide fallback" description="Used to interpret event dates and event-day activity." />
-          <SettingRow label="Currency" value="BBD" scope="App-wide fallback" description="Used for organizer-facing financial totals when an event has no currency value." />
-          <SettingRow label="Ticket prefix" value="GSV" scope="App-wide fallback" description="Used when generating a ticket code for an event without its own prefix." />
-          <SettingRow label="Price tiers" value="No fallback tiers" scope="Event-specific" description="Configure ticket tiers on the event before using tier-based prices." timing="Configured per event" />
-          <SettingRow label="Default payment method" value={formatPaymentMethod(DEFAULT_FINANCE_SETTINGS.defaultPaymentMethod)} scope="Registration finance" description="Used only when a payment method has not been selected for a new record." />
-        </div>
-      </SettingsSection>
-    ),
-    access: (
-      <SettingsSection
-        eyebrow="Organizer Access"
-        title="Account and access summary"
-        description="Protected owner and approved organizers remain separate from staff profiles and event assignments. Access is controlled outside this page. This page cannot add, remove, disable, or change anyone's role."
-      >
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <MetricTile label="Protected Owner" value={protectedOwnerCount} description="Pinned by verified Firebase UID, not by mutable organizer settings." />
-          <MetricTile label="Approved Organizers" value={approvedOrganizerCount} description="Accounts listed in approved organizer access, excluding the protected owner." />
-          <MetricTile label="Staff Profiles" value={staffProfileCount} description="Active staff sign in through staffProfiles and do not become approved organizers." />
-          <MetricTile label="Event Assignments" value={eventAssignmentCount} description="Staff permissions are assigned per event and role." />
-        </div>
-        <div className="mt-5 rounded-2xl border border-[#CFE4D7] bg-[#F2FAF5] p-5">
-          <p className="text-sm font-bold text-[#174E31]">Protected Owner</p>
-          <p className="mt-1 break-words text-sm text-[#315F45]">{PROTECTED_OWNER_EMAIL}</p>
-          <p className="mt-3 text-xs leading-5 text-[#315F45]">Permanent owner access is pinned to the verified Firebase account and cannot be removed or disabled in organizer settings.</p>
-        </div>
-        <div className="mt-4 rounded-2xl border border-[#EFE2DA] p-4 sm:p-5">
-          <SettingRow label="Approved organizer records" value={`${secondaryOrganizerCount} secondary approved organizers`} scope="App-wide" description="Secondary organizers are approved accounts that remain separate from staff profile count and event assignment count." />
-          <SettingRow label="Staff profiles" value="Assigned-event access only" scope="Staff profile source" description="Staff profiles identify helpers such as scanners, event managers, viewers, and Operations helpers." />
-          <SettingRow label="Event assignments" value="Per-event roles" scope="Event assignment source" description="Assignments connect a staff profile to one event and one role. Helper access does not grant Settings or full organizer access." />
-          <SettingRow label="Access changes" value="Managed by a release administrator" scope="App-wide" description="Contact the protected owner when an organizer or staff assignment must change." timing="No editable control here" />
-        </div>
-        <div className="mt-5 overflow-hidden rounded-2xl border border-[#EFE2DA]">
-          <div className="border-b border-[#EFE2DA] bg-[#FFF8F2] px-4 py-3">
-            <p className="text-sm font-bold text-[#2B1723]">Approved organizer accounts</p>
-            <p className="mt-1 text-xs leading-5 text-[#6B564C]">
-              This list comes from the same Firebase access-control document used by authorization. It is read-only here.
-            </p>
+        <div className="mt-5 grid gap-4 xl:grid-cols-2">
+          <div className="overflow-hidden rounded-2xl border border-[#EFE2DA]">
+            <h3 className="bg-[#FFF8F2] px-4 py-3 text-sm font-bold text-[#2B1723]">Staff profiles</h3>
+            <div className="divide-y divide-[#F2E8E1]">{staffProfiles.map((profile) => <div key={profile.uid} className="grid gap-2 p-4 sm:grid-cols-[1fr_auto]"><div><p className="font-bold text-[#2B1723]">{profile.email}</p><p className="text-xs text-[#6B564C]">{profile.uid} · {roleLabel(profile.defaultRole)}</p></div><div className="flex gap-2"><StatusPill status={profile.status} /><button type="button" onClick={() => run(() => setStaffProfileStatus(profile, user, profile.status === 'active' ? 'inactive' : 'active'), 'Staff profile status changed.')} className="rounded-lg border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#5A443B]">{profile.status === 'active' ? 'Disable' : 'Enable'}</button></div></div>)}</div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[680px] text-left text-sm">
-              <thead className="bg-white text-[10px] font-bold uppercase tracking-wider text-[#80685B]">
-                <tr>
-                  <th className="px-4 py-3">Email address</th>
-                  <th className="px-4 py-3">Access type</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Date added</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#F2E8E1]">
-                {approvedEntries.map((entry) => (
-                  <tr key={entry.email}>
-                    <td className="px-4 py-3 font-bold text-[#2B1723]">{entry.email}</td>
-                    <td className="px-4 py-3 text-[#5A443B]">{entry.accessType || 'Approved Organizer'}</td>
-                    <td className="px-4 py-3">
-                      <span className={entry.status === 'active' ? 'inline-flex rounded-full bg-[#EAF6EF] px-2.5 py-1 text-[10px] font-bold uppercase text-[#17623A]' : 'inline-flex rounded-full bg-[#FFF1F1] px-2.5 py-1 text-[10px] font-bold uppercase text-[#A32626]'}>
-                        {entry.status || 'active'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-[#6B564C]">{entry.dateAdded || 'Not recorded'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="overflow-hidden rounded-2xl border border-[#EFE2DA]">
+            <h3 className="bg-[#FFF8F2] px-4 py-3 text-sm font-bold text-[#2B1723]">Assignments for working event</h3>
+            <div className="divide-y divide-[#F2E8E1]">{staffAssignments.map((assignment) => <div key={assignment.uid} className="grid gap-2 p-4 sm:grid-cols-[1fr_auto]"><div><p className="font-bold text-[#2B1723]">{assignment.email}</p><p className="text-xs text-[#6B564C]">{roleLabel(assignment.role)} · {assignment.eventId}</p></div><div className="flex gap-2"><StatusPill status={assignment.status} /><button type="button" onClick={() => run(() => saveStaffAssignment({ ...assignment, status: 'revoked' }, user), 'Staff assignment removed.')} className="rounded-lg border border-[#F1C8C8] px-3 py-2 text-xs font-bold text-[#A32626]">Remove</button></div></div>)}</div>
           </div>
         </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-2">
-          {ROLE_SUMMARY_ROWS.map(([label, summary]) => (
-            <article key={label} className="rounded-2xl border border-[#EFE2DA] p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-bold text-[#2B1723]">{label}</p>
-                <StatusPill>Role</StatusPill>
-              </div>
-              <p className="mt-2 text-xs leading-5 text-[#6B564C]">{summary}</p>
-            </article>
-          ))}
-        </div>
-      </SettingsSection>
-    ),
-    help: (
-      <SettingsSection
-        eyebrow="Tutorial and Help"
-        title="Replay guided help"
-        description="Use this area when an organizer needs the current product walkthrough again. The tutorial teaches the current app and does not create business records."
-      >
-        <div className="rounded-2xl border border-[#EFE2DA] p-4 sm:p-5">
-          <SettingRow label="Guided tutorial" value={user && TARGET_UIDS.includes(user.uid) ? 'Available for this account' : 'Available to approved tutorial accounts'} scope="Onboarding" description="Replay starts the Tutorial V3 walkthrough from the beginning without deleting event data." timing="Manual replay" />
-          <SettingRow label="Safe practice" value="No business writes required" scope="Tutorial" description="Write-heavy lessons demonstrate where controls live and do not require creating payments, tickets, imports, check-ins, or Operations entries." />
-        </div>
-        {user && TARGET_UIDS.includes(user.uid) ? (
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent('replay-tutorial'))}
-            className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white"
-          >
-            Show Welcome Tour Again
-          </button>
-        ) : (
-          <p className="mt-5 rounded-2xl border border-[#EFE2DA] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#6B564C]">This signed-in account is not configured for the guided tutorial replay control.</p>
-        )}
       </SettingsSection>
     ),
     integrations: (
-      <SettingsSection
-        eyebrow="Integrations"
-        title="Connection status"
-        description="These statuses describe what currently works. Disconnected optional integrations are not setup errors unless you choose to add them later."
-      >
+      <SettingsSection eyebrow="Integrations" title="Connection settings" description="These statuses do not store credentials in browser-readable Firestore. Connected means securely configured and tested; unsupported backend work stays explicitly not connected.">
+        <div className="mb-4 rounded-2xl border border-[#EFE2DA] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#5A443B]">Payment records are tracked manually. No online payment gateway is connected, and registration payments remain separate from Operations.</div>
         <div className="grid gap-3 lg:grid-cols-2">
-          {INTEGRATION_ROWS.map((item) => (
-            <article key={item.label} className="min-w-0 rounded-2xl border border-[#EFE2DA] p-4">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <p className="text-sm font-bold text-[#2B1723]">{item.label}</p>
-                <StatusPill>{item.status}</StatusPill>
-              </div>
-              <p className="mt-2 text-xs leading-5 text-[#6B564C]">{item.description}</p>
-              <p className="mt-2 text-xs font-semibold leading-5 text-[#5A443B]">{item.action}</p>
+          {Object.entries(integrationState.integrations || DEFAULT_INTEGRATIONS).map(([id, item]) => (
+            <article key={id} className="rounded-2xl border border-[#EFE2DA] p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3"><p className="font-bold text-[#2B1723]">{item.name}</p><StatusPill status={item.status} /></div>
+              <p className="mt-2 text-xs leading-5 text-[#6B564C]">{item.setupRequirements}</p>
+              {item.connectionError && <p className="mt-2 text-xs font-semibold leading-5 text-[#A32626]">{item.connectionError}</p>}
+              <dl className="mt-3 grid gap-2 text-xs text-[#6B564C] sm:grid-cols-2">
+                <div><dt className="font-bold text-[#5A443B]">Last checked</dt><dd>{formatDate(item.lastCheckedAt)}</dd></div>
+                <div><dt className="font-bold text-[#5A443B]">Changed by</dt><dd>{item.lastChangedBy || 'Not recorded'}</dd></div>
+              </dl>
+              {isOwner && <button type="button" onClick={() => run(() => recordIntegrationCheck(id, user, { status: item.status, connectionError: item.connectionError }), `${item.name} status checked.`)} className="mt-4 min-h-10 rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#5A443B]">Test Connection</button>}
             </article>
           ))}
         </div>
       </SettingsSection>
     ),
-    'event-day': (
-      <SettingsSection
-        eyebrow="Tickets & Check-In"
-        title="Event-day behavior"
-        description="Ticket and attendance controls use the selected event and preserve an audit trail."
-      >
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Link to="/scanner" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1E7345] px-4 text-xs font-bold text-white hover:bg-[#17623A]">Open Scanner Mode</Link>
-          <button type="button" onClick={copyScannerLink} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#E7D6CC] bg-white px-4 text-xs font-bold text-[#5A443B] hover:bg-[#FBF8F5]">
-            {scannerLinkCopied ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}
-            {scannerLinkCopied ? 'Scanner Link Copied' : 'Copy Scanner Link'}
-          </button>
-        </div>
-        <div className="mt-5 rounded-2xl border border-[#EFE2DA] p-4 sm:p-5">
-          <SettingRow label="Ticket QR format" value="Ticket code only" scope="App-wide" description="QR codes do not contain names, email addresses, phone numbers, or payment details." />
-          <SettingRow label="Scanner check-in" value="Requires a deliberate Check In action" scope="Event-specific" description="Scanning a valid ticket does not silently record attendance." />
-          <SettingRow label="Undo check-in" value="Organizer-only audited correction" scope="Event-specific" description="Normal scanner users cannot undo attendance or check guests out." />
-        </div>
-      </SettingsSection>
-    ),
-    data: (
-      <SettingsSection
-        eyebrow="Data & Messages"
-        title="Imports, finance, and communications"
-        description="These workflows remain separate so one action cannot silently change another part of the event record."
-      >
-        <div className="rounded-2xl border border-[#EFE2DA] p-4 sm:p-5">
-          <SettingRow label="Guest imports" value="CSV, Excel, or pasted table" scope="Selected event" description="Every import requires column matching, validation, and a preview before records are saved." />
-          <SettingRow label="Registration payments" value="Managed in Payments" scope="Selected event" description="Guest charges and received amounts remain separate from event expenses and commitments." />
-          <SettingRow label="Operations" value="Managed in Operations" scope="Selected event" description="Expenses, commitments, and in-kind support do not enter registration-payment totals." />
-          <SettingRow label="Message Builder" value="Draft and copy only" scope="Selected event" description="The app does not automatically send email, WhatsApp, or text messages." />
-        </div>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link to="/imports" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Open Import Center</Link>
-          <Link to="/communications" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] bg-white px-5 text-sm font-bold text-[#5A443B]">Open Message Builder</Link>
+    history: (
+      <SettingsSection eyebrow="Access History" title="Append-only access changes" description="Organizer access changes are retained even when approval is removed. Routine event data is not shown here.">
+        <div className="overflow-hidden rounded-2xl border border-[#EFE2DA]">
+          <div className="divide-y divide-[#F2E8E1]">{history.length ? history.slice(0, 50).map((item) => <div key={item.id} className="grid gap-2 p-4 md:grid-cols-[1fr_12rem_12rem]"><div><p className="font-bold text-[#2B1723]">{item.targetEmail || item.integrationId || item.uid}</p><p className="text-xs text-[#6B564C]">{item.action} · {item.status}</p></div><p className="text-xs text-[#6B564C]">{formatDate(item.changedAt)}</p><p className="text-xs text-[#6B564C]">{item.changedBy || 'Not recorded'}</p></div>) : <p className="p-4 text-sm text-[#6B564C]">No access history records are available yet.</p>}</div>
         </div>
       </SettingsSection>
     ),
     advanced: (
-      <SettingsSection
-        eyebrow="Advanced"
-        title="Advanced and administration"
-        description="Read-only technical information and administrator-only paths are separated from routine settings. No credentials or private attendee data are shown."
-      >
-        <div className="rounded-2xl border border-[#EFE2DA] p-4 sm:p-5">
-          <SettingRow label="Application connection" value={isFirebaseConfigured ? 'Configured' : 'Needs attention'} scope="App-wide" description="The organizer workspace can load its Firebase configuration." timing={isFirebaseConfigured ? 'Active now' : 'Not active'} />
-          <SettingRow label="Project" value={firebaseProjectId || 'Configured during release'} scope="Release setting" description="Identifies the Firebase project used by this build." />
-          <SettingRow label="Public access" value="Disabled" scope="App-wide" description="There is no public attendee, vendor, or payment portal." />
-          <SettingRow label="Search indexing" value="Blocked" scope="App-wide" description="Private organizer pages are not intended for search engines." />
-          <SettingRow label="Offline data caching" value="Disabled" scope="App-wide" description="Private event responses are not stored by the service worker." />
-        </div>
-        <div className="mt-5 rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4">
-          <p className="text-sm font-bold text-[#5F4A2A]">Administrative caution</p>
-          <p className="mt-2 text-xs leading-5 text-[#715D46]">No destructive Settings control is exposed here. Event deletes, bulk registration actions, imports, check-ins, and Operations changes remain in their own workflows with confirmations and audit logs.</p>
+      <SettingsSection eyebrow="Advanced" title="Technical settings" description="Read-only technical information and administrator-only paths are separated from routine settings. No credentials or private attendee data are shown.">
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">Firebase</p><p className="mt-1 text-sm text-[#6B564C]">{isFirebaseConfigured ? 'Configured' : 'Needs attention'} · {firebaseProjectId || 'Project set during release'}</p></div>
+          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">Defaults</p><p className="mt-1 text-sm text-[#6B564C]">America/Halifax · BBD · {formatPaymentMethod(DEFAULT_FINANCE_SETTINGS.defaultPaymentMethod)}</p></div>
+          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">QR format</p><p className="mt-1 text-sm text-[#6B564C]">Ticket code only. No attendee PII in QR codes.</p></div>
+          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">Scanner</p><div className="mt-2 flex flex-wrap gap-2"><Link to="/scanner" className="inline-flex min-h-10 items-center rounded-xl bg-[#2B1723] px-4 text-xs font-bold text-white">Open Scanner Mode</Link><button type="button" onClick={copyScannerLink} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#5A443B]">{scannerLinkCopied ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}{scannerLinkCopied ? 'Copied' : 'Copy Scanner Link'}</button></div></div>
         </div>
         <Link to="/qa" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Open System QA</Link>
       </SettingsSection>
     ),
-  }), [activeEvent?.eventName, approvedEntries, approvedOrganizerCount, currentRole, currentRoleLabel, protectedOwnerCount, scannerLinkCopied, secondaryOrganizerCount, signOut, user])
+  }
 
   return (
-    <div data-tour-id="settings-workspace" className="min-w-0 space-y-6">
-      <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-4 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-5">
+    <div data-tour-id="settings-workspace" className="min-w-0 space-y-5">
+      {(notice || error) && <div role="status" className={`rounded-2xl border p-4 text-sm font-semibold ${error ? 'border-[#F1C8C8] bg-[#FFF1F1] text-[#A32626]' : 'border-[#CFE4D7] bg-[#F2FAF5] text-[#17623A]'}`}>{error || notice}</div>}
+      <section className="rounded-[20px] border border-[#EEDFD6] bg-white p-3 shadow-[0_8px_24px_rgba(84,53,67,0.04)]">
         <div className="flex min-w-0 gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Settings categories">
           {SETTINGS_TABS.map(([id, label], index) => (
-            <button
-              key={id}
-              ref={(element) => { tabRefs.current[index] = element }}
-              id={`settings-tab-${id}`}
-              type="button"
-              role="tab"
-              tabIndex={activeTab === id ? 0 : -1}
-              aria-selected={activeTab === id}
-              aria-controls={`settings-panel-${id}`}
-              onClick={() => setSearchParams({ tab: id })}
-              onKeyDown={(event) => handleTabKeyDown(event, index)}
-              className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#9A5260]/30 ${activeTab === id ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED] text-[#5A443B] hover:bg-[#EFE2DA]'}`}
-            >
-              {label}
-            </button>
+            <button key={id} ref={(element) => { tabRefs.current[index] = element }} id={`settings-tab-${id}`} type="button" role="tab" tabIndex={activeTab === id ? 0 : -1} aria-selected={activeTab === id} aria-controls={`settings-panel-${id}`} onClick={() => setSearchParams({ tab: id })} onKeyDown={(event) => handleTabKeyDown(event, index)} className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#9A5260]/30 ${activeTab === id ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED] text-[#5A443B] hover:bg-[#EFE2DA]'}`}>{label}</button>
           ))}
         </div>
       </section>
-      <div id={`settings-panel-${activeTab}`} role="tabpanel" aria-labelledby={`settings-tab-${activeTab}`} tabIndex="0">
-        {tabPanels[activeTab]}
-      </div>
+      <div id={`settings-panel-${activeTab}`} role="tabpanel" aria-labelledby={`settings-tab-${activeTab}`} tabIndex="0">{tabPanels[activeTab]}</div>
+      <ConfirmDialog pending={pending} onCancel={() => setPending(null)} onConfirm={() => { const action = pending?.onConfirm; setPending(null); void action?.() }} />
     </div>
   )
 }

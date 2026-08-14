@@ -145,7 +145,8 @@ export function resolveAccessRole(accessControl = {}, email = '') {
 
 export function normalizeAccessStatus(status) {
   const normalized = typeof status === 'string' ? status.trim().toLowerCase() : ''
-  return ['active', 'inactive', 'revoked'].includes(normalized) ? normalized : 'active'
+  if (normalized === 'inactive') return 'disabled'
+  return ['active', 'disabled', 'removed', 'revoked'].includes(normalized) ? normalized : 'active'
 }
 
 export function formatAccessAddedAt(value) {
@@ -161,9 +162,11 @@ export function listApprovedAccessEntries(accessControl = {}) {
   const approvedOrganizerRecords = accessControl?.approvedOrganizerRecords && typeof accessControl.approvedOrganizerRecords === 'object'
     ? accessControl.approvedOrganizerRecords
     : {}
-  const entries = approvedEmails
-    .map(normalizeAccessEmail)
-    .filter(Boolean)
+  const listedEmails = new Set([
+    ...approvedEmails.map(normalizeAccessEmail).filter(Boolean),
+    ...Object.keys(approvedOrganizerRecords).map(normalizeAccessEmail).filter(Boolean),
+  ])
+  const entries = [...listedEmails]
     .sort()
     .map((email) => {
       const metadata = approvedOrganizerRecords[email] && typeof approvedOrganizerRecords[email] === 'object'
@@ -177,6 +180,10 @@ export function listApprovedAccessEntries(accessControl = {}) {
         status: normalizeAccessStatus(metadata.status),
         addedAt: metadata.addedAt || metadata.createdAt || null,
         dateAdded: formatAccessAddedAt(metadata.addedAt || metadata.createdAt),
+        addedBy: metadata.addedBy || 'Not recorded',
+        lastChangedAt: metadata.lastChangedAt || metadata.updatedAt || null,
+        lastChangedDate: formatAccessAddedAt(metadata.lastChangedAt || metadata.updatedAt),
+        lastChangedBy: metadata.lastChangedBy || metadata.updatedBy || 'Not recorded',
         protectedOwner: false,
       }
     })
@@ -188,12 +195,16 @@ export function listApprovedAccessEntries(accessControl = {}) {
       status: 'active',
       addedAt: null,
       dateAdded: 'Permanent owner',
+      addedBy: 'System protected UID',
+      lastChangedAt: null,
+      lastChangedDate: 'Permanent owner',
+      lastChangedBy: 'Immutable Firebase UID',
       protectedOwner: true,
     })
   }
   return entries.map((entry) => (
     entry.email === PROTECTED_OWNER_EMAIL
-      ? { ...entry, role: 'owner-admin', accessType: roleLabel('owner-admin'), status: 'active', dateAdded: 'Permanent owner', protectedOwner: true }
+      ? { ...entry, role: 'owner-admin', accessType: roleLabel('owner-admin'), status: 'active', dateAdded: 'Permanent owner', addedBy: 'System protected UID', lastChangedDate: 'Permanent owner', lastChangedBy: 'Immutable Firebase UID', protectedOwner: true }
       : entry
   ))
 }

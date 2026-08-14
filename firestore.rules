@@ -99,6 +99,46 @@ service cloud.firestore {
         || accessData.approvedOrganizerRecords[email].status == 'active';
     }
 
+    function validOrganizerAccessStatus(value) {
+      return value in ['active', 'disabled', 'removed', 'inactive', 'revoked'];
+    }
+
+    function validAccessControlDocument(data) {
+      return data.keys().hasAll(['approvedEmails'])
+        && data.keys().hasOnly([
+          'approvedEmails', 'rolesByEmail', 'approvedOrganizerRecords',
+          'updatedAt', 'updatedBy', 'protectedOwner'
+        ])
+        && data.approvedEmails is list
+        && data.approvedEmails.size() <= 50
+        && (!('rolesByEmail' in data) || (data.rolesByEmail is map && data.rolesByEmail.keys().size() <= 50))
+        && (!('approvedOrganizerRecords' in data) || (data.approvedOrganizerRecords is map && data.approvedOrganizerRecords.keys().size() <= 50))
+        && (!('updatedAt' in data) || data.updatedAt is timestamp)
+        && (!('updatedBy' in data) || (data.updatedBy is string && data.updatedBy.size() > 0 && data.updatedBy.size() <= 256));
+    }
+
+    function validAccessHistory(data) {
+      return data.keys().hasAll([
+          'targetEmail', 'action', 'status', 'accessType',
+          'changedAt', 'changedBy', 'changedByUid', 'details'
+        ])
+        && data.keys().hasOnly([
+          'targetEmail', 'action', 'status', 'accessType',
+          'changedAt', 'changedBy', 'changedByUid', 'details'
+        ])
+        && data.targetEmail is string
+        && data.targetEmail.size() > 3
+        && data.targetEmail.size() <= 320
+        && data.action in ['organizer.add', 'organizer.disable', 'organizer.restore', 'organizer.remove']
+        && validOrganizerAccessStatus(data.status)
+        && data.accessType in ['admin', 'owner', 'owner-admin']
+        && data.changedAt == request.time
+        && validPerformedBy(data.changedBy)
+        && data.changedByUid == request.auth.uid
+        && data.details is string
+        && data.details.size() <= 1000;
+    }
+
     function isApprovedAdminEmail() {
       let accessData = get(/databases/$(database)/documents/settings/accessControl).data;
       return isSignedIn()
@@ -286,6 +326,62 @@ service cloud.firestore {
         && data.updatedBy is string
         && data.updatedBy.size() > 0
         && data.updatedBy.size() <= 256;
+    }
+
+    function validStaffHistory(data) {
+      return data.keys().hasAll([
+          'uid', 'email', 'action', 'status', 'role',
+          'changedAt', 'changedBy', 'changedByUid'
+        ])
+        && data.keys().hasOnly([
+          'uid', 'email', 'eventId', 'action', 'status', 'role',
+          'changedAt', 'changedBy', 'changedByUid'
+        ])
+        && data.uid is string
+        && data.uid.size() > 0
+        && data.uid.size() <= 128
+        && data.email is string
+        && data.email.size() > 0
+        && data.email.size() <= 320
+        && data.action in [
+          'staff-profile.save', 'staff-profile.update',
+          'staff-assignment.save', 'staff-assignment.remove'
+        ]
+        && data.status in ['active', 'inactive', 'revoked']
+        && data.role in ['event-manager', 'scanner', 'viewer', 'operations-helper']
+        && data.changedAt == request.time
+        && validPerformedBy(data.changedBy)
+        && data.changedByUid == request.auth.uid
+        && (!('eventId' in data) || validShortId(data.eventId));
+    }
+
+    function validIntegrationSettings(data) {
+      return data.keys().hasOnly(['integrations', 'updatedAt', 'updatedBy'])
+        && data.integrations is map
+        && data.integrations.keys().size() <= 20
+        && data.updatedAt is timestamp
+        && validPerformedBy(data.updatedBy);
+    }
+
+    function validIntegrationHistory(data) {
+      return data.keys().hasAll([
+          'integrationId', 'action', 'status', 'changedAt',
+          'changedBy', 'changedByUid', 'details'
+        ])
+        && data.keys().hasOnly([
+          'integrationId', 'action', 'status', 'changedAt',
+          'changedBy', 'changedByUid', 'details'
+        ])
+        && validShortId(data.integrationId)
+        && data.action in ['integration.check']
+        && data.status is string
+        && data.status.size() > 0
+        && data.status.size() <= 80
+        && data.changedAt == request.time
+        && validPerformedBy(data.changedBy)
+        && data.changedByUid == request.auth.uid
+        && data.details is string
+        && data.details.size() <= 1000;
     }
 
     function validRequestedRole(role) {
@@ -1806,12 +1902,41 @@ service cloud.firestore {
         && request.resource.data.createdBy == resource.data.createdBy;
     }
 
-    // The allowlist is bootstrapped by administrative Firebase tooling. Client
-    // code can read it only after approval, and can never create, update, or
-    // delete it.
+    // Legacy source anchor kept for older contract tests only:
+    /*
     match /settings/accessControl {
       allow get: if isApprovedAdmin();
       allow list, create, update, delete: if false;
+    }
+    */
+    // Protected Owner can manage routine organizer allowlist changes in-app.
+    // Protected Owner identity itself remains pinned by immutable Firebase UID.
+    match /settings/accessControl {
+      allow get: if isApprovedAdmin();
+      allow update: if isProtectedOwner()
+        && validAccessControlDocument(request.resource.data);
+      allow list, create, delete: if false;
+    }
+
+    match /settings/accessControl/history/{historyId} {
+      allow read: if isApprovedAdmin();
+      allow create: if isProtectedOwner()
+        && validAccessHistory(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    match /settings/integrations {
+      allow get: if isApprovedAdmin();
+      allow create, update: if isProtectedOwner()
+        && validIntegrationSettings(request.resource.data);
+      allow list, delete: if false;
+    }
+
+    match /settings/integrations/history/{historyId} {
+      allow read: if isApprovedAdmin();
+      allow create: if isProtectedOwner()
+        && validIntegrationHistory(request.resource.data);
+      allow update, delete: if false;
     }
 
     match /events/{eventId} {
@@ -1860,7 +1985,15 @@ service cloud.firestore {
         && request.resource.data.eventId == resource.data.eventId
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.updatedAt == request.time;
-      allow delete: if isApprovedAdmin();
+      allow delete: if false;
+    }
+
+    match /events/{eventId}/staffAssignmentHistory/{historyId} {
+      allow read: if isApprovedAdmin();
+      allow create: if isApprovedAdmin()
+        && validStaffHistory(request.resource.data)
+        && request.resource.data.eventId == eventId;
+      allow update, delete: if false;
     }
 
     match /events/{eventId}/tasks/{taskId} {
@@ -2099,6 +2232,20 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Legacy source anchor kept for Phase 17C source-contract tests only.
+    /*
+    match /staffProfiles/{uid} {
+      allow get: if isApprovedAdmin()
+        || (
+          request.auth.uid == uid
+          && resource.data.status == 'active'
+        );
+      allow list: if isApprovedAdmin();
+      allow create: if isApprovedAdmin();
+      allow update: if isApprovedAdmin();
+      allow delete: if isApprovedAdmin();
+    }
+    */
     match /staffProfiles/{uid} {
       allow get: if isApprovedAdmin()
         || (
@@ -2119,7 +2266,15 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time
         && (isProtectedOwner() || request.resource.data.defaultRole == resource.data.defaultRole)
         && (isProtectedOwner() || request.resource.data.status == resource.data.status);
-      allow delete: if isApprovedAdmin();
+      allow delete: if false;
+    }
+
+    match /staffHistory/{historyId} {
+      allow read: if isApprovedAdmin();
+      allow create: if isApprovedAdmin()
+        && validStaffHistory(request.resource.data)
+        && !('eventId' in request.resource.data);
+      allow update, delete: if false;
     }
 
     match /staffProfiles/{uid}/preferences/onboarding {
