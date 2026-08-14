@@ -125,7 +125,7 @@ export function SettingsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [scannerLinkCopied, setScannerLinkCopied] = useState(false)
   const tabRefs = useRef([])
-  const approvedEntries = listApprovedAccessEntries(accessControl || {})
+  const approvedEntries = useMemo(() => listApprovedAccessEntries(accessControl || {}), [accessControl])
   const secondaryOrganizerCount = approvedEntries.filter((entry) => !entry.protectedOwner).length
   const protectedOwnerCount = approvedEntries.some((entry) => entry.protectedOwner) ? 1 : 0
   const approvedOrganizerCount = approvedEntries.filter((entry) => !entry.protectedOwner).length
@@ -243,6 +243,40 @@ export function SettingsPage() {
           <SettingRow label="Event assignments" value="Per-event roles" scope="Event assignment source" description="Assignments connect a staff profile to one event and one role. Helper access does not grant Settings or full organizer access." />
           <SettingRow label="Access changes" value="Managed by a release administrator" scope="App-wide" description="Contact the protected owner when an organizer or staff assignment must change." timing="No editable control here" />
         </div>
+        <div className="mt-5 overflow-hidden rounded-2xl border border-[#EFE2DA]">
+          <div className="border-b border-[#EFE2DA] bg-[#FFF8F2] px-4 py-3">
+            <p className="text-sm font-bold text-[#2B1723]">Approved organizer accounts</p>
+            <p className="mt-1 text-xs leading-5 text-[#6B564C]">
+              This list comes from the same Firebase access-control document used by authorization. It is read-only here.
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[680px] text-left text-sm">
+              <thead className="bg-white text-[10px] font-bold uppercase tracking-wider text-[#80685B]">
+                <tr>
+                  <th className="px-4 py-3">Email address</th>
+                  <th className="px-4 py-3">Access type</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Date added</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#F2E8E1]">
+                {approvedEntries.map((entry) => (
+                  <tr key={entry.email}>
+                    <td className="px-4 py-3 font-bold text-[#2B1723]">{entry.email}</td>
+                    <td className="px-4 py-3 text-[#5A443B]">{entry.accessType || 'Approved Organizer'}</td>
+                    <td className="px-4 py-3">
+                      <span className={entry.status === 'active' ? 'inline-flex rounded-full bg-[#EAF6EF] px-2.5 py-1 text-[10px] font-bold uppercase text-[#17623A]' : 'inline-flex rounded-full bg-[#FFF1F1] px-2.5 py-1 text-[10px] font-bold uppercase text-[#A32626]'}>
+                        {entry.status || 'active'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-[#6B564C]">{entry.dateAdded || 'Not recorded'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           {ROLE_SUMMARY_ROWS.map(([label, summary]) => (
             <article key={label} className="rounded-2xl border border-[#EFE2DA] p-4">
@@ -357,7 +391,7 @@ export function SettingsPage() {
         <Link to="/qa" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Open System QA</Link>
       </SettingsSection>
     ),
-  }), [activeEvent?.eventName, approvedOrganizerCount, currentRole, currentRoleLabel, protectedOwnerCount, scannerLinkCopied, secondaryOrganizerCount, signOut, user])
+  }), [activeEvent?.eventName, approvedEntries, approvedOrganizerCount, currentRole, currentRoleLabel, protectedOwnerCount, scannerLinkCopied, secondaryOrganizerCount, signOut, user])
 
   return (
     <div data-tour-id="settings-workspace" className="min-w-0 space-y-6">

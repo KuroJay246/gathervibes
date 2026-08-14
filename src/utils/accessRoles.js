@@ -130,6 +130,12 @@ export function resolveAccessRole(accessControl = {}, email = '') {
   const normalizedEmail = normalizeAccessEmail(email)
   if (!normalizedEmail || !isApprovedEmail(accessControl, normalizedEmail)) return null
 
+  const approvedOrganizerRecords = accessControl?.approvedOrganizerRecords && typeof accessControl.approvedOrganizerRecords === 'object'
+    ? accessControl.approvedOrganizerRecords
+    : {}
+  const status = normalizeAccessStatus(approvedOrganizerRecords[normalizedEmail]?.status)
+  if (status !== 'active') return null
+
   const rolesByEmail = accessControl?.rolesByEmail && typeof accessControl.rolesByEmail === 'object'
     ? accessControl.rolesByEmail
     : {}
@@ -137,27 +143,57 @@ export function resolveAccessRole(accessControl = {}, email = '') {
   return role || 'admin'
 }
 
+export function normalizeAccessStatus(status) {
+  const normalized = typeof status === 'string' ? status.trim().toLowerCase() : ''
+  return ['active', 'inactive', 'revoked'].includes(normalized) ? normalized : 'active'
+}
+
+export function formatAccessAddedAt(value) {
+  if (!value) return 'Not recorded'
+  const raw = typeof value?.toDate === 'function' ? value.toDate() : value
+  const date = raw instanceof Date ? raw : new Date(raw)
+  if (Number.isNaN(date.getTime())) return 'Not recorded'
+  return date.toLocaleDateString('en-BB', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
 export function listApprovedAccessEntries(accessControl = {}) {
   const approvedEmails = Array.isArray(accessControl?.approvedEmails) ? accessControl.approvedEmails : []
+  const approvedOrganizerRecords = accessControl?.approvedOrganizerRecords && typeof accessControl.approvedOrganizerRecords === 'object'
+    ? accessControl.approvedOrganizerRecords
+    : {}
   const entries = approvedEmails
     .map(normalizeAccessEmail)
     .filter(Boolean)
     .sort()
-    .map((email) => ({
-      email,
-      role: resolveAccessRole(accessControl, email) || 'admin',
-      protectedOwner: false,
-    }))
+    .map((email) => {
+      const metadata = approvedOrganizerRecords[email] && typeof approvedOrganizerRecords[email] === 'object'
+        ? approvedOrganizerRecords[email]
+        : {}
+      const role = resolveAccessRole(accessControl, email) || normalizeAccessRole(metadata.accessType) || 'admin'
+      return {
+        email,
+        role,
+        accessType: roleLabel(role),
+        status: normalizeAccessStatus(metadata.status),
+        addedAt: metadata.addedAt || metadata.createdAt || null,
+        dateAdded: formatAccessAddedAt(metadata.addedAt || metadata.createdAt),
+        protectedOwner: false,
+      }
+    })
   if (!entries.some((entry) => entry.email === PROTECTED_OWNER_EMAIL)) {
     entries.unshift({
       email: PROTECTED_OWNER_EMAIL,
       role: 'owner-admin',
+      accessType: roleLabel('owner-admin'),
+      status: 'active',
+      addedAt: null,
+      dateAdded: 'Permanent owner',
       protectedOwner: true,
     })
   }
   return entries.map((entry) => (
     entry.email === PROTECTED_OWNER_EMAIL
-      ? { ...entry, role: 'owner-admin', protectedOwner: true }
+      ? { ...entry, role: 'owner-admin', accessType: roleLabel('owner-admin'), status: 'active', dateAdded: 'Permanent owner', protectedOwner: true }
       : entry
   ))
 }

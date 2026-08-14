@@ -12,7 +12,9 @@ service cloud.firestore {
     //   through normal organizer Settings and does not bypass validators.
     //
     // settings/accessControl
-    //   approvedEmails: list<string> (secondary organizers; created only in Firebase Console)
+    //   approvedEmails: list<string> (secondary organizers; created only by administrative Firebase tooling)
+    //   rolesByEmail: map<string,string> optional role override keyed by normalized email
+    //   approvedOrganizerRecords: map<string,map> optional display/status metadata keyed by normalized email
     //
     // events/{eventId}
     //   eventId: string (immutable, must equal document ID)
@@ -91,14 +93,23 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == protectedOwnerUid();
     }
 
+    function approvedOrganizerMetadataAllowsAccess(email, accessData) {
+      return !('approvedOrganizerRecords' in accessData)
+        || !(email in accessData.approvedOrganizerRecords)
+        || accessData.approvedOrganizerRecords[email].status == 'active';
+    }
+
+    function isApprovedAdminEmail() {
+      let accessData = get(/databases/$(database)/documents/settings/accessControl).data;
+      return isSignedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email.lower() in accessData.approvedEmails
+        && approvedOrganizerMetadataAllowsAccess(request.auth.token.email.lower(), accessData);
+    }
+
     function isApprovedAdmin() {
       return isProtectedOwner()
-        || (
-          isSignedIn()
-          && request.auth.token.email is string
-          && request.auth.token.email.lower() in
-            get(/databases/$(database)/documents/settings/accessControl).data.approvedEmails
-        );
+        || isApprovedAdminEmail();
     }
 
     function activeStaffProfile() {
@@ -1795,8 +1806,9 @@ service cloud.firestore {
         && request.resource.data.createdBy == resource.data.createdBy;
     }
 
-    // The allowlist is bootstrapped in the Firebase Console. Client code can
-    // never create, update, or delete it.
+    // The allowlist is bootstrapped by administrative Firebase tooling. Client
+    // code can read it only after approval, and can never create, update, or
+    // delete it.
     match /settings/accessControl {
       allow get: if isApprovedAdmin();
       allow list, create, update, delete: if false;

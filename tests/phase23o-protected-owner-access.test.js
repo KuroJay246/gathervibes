@@ -52,16 +52,38 @@ test('Phase 23O keeps protected owner email normalized and visible without makin
 
 test('Phase 23O preserves secondary organizer access and lists protected owner as immutable', () => {
   const accessControl = {
-    approvedEmails: ['secondary@example.com'],
-    rolesByEmail: { 'secondary@example.com': 'admin' },
+    approvedEmails: ['secondary@example.com', 'gathersavorvibes@gmail.com'],
+    rolesByEmail: { 'secondary@example.com': 'admin', 'gathersavorvibes@gmail.com': 'admin' },
+    approvedOrganizerRecords: {
+      'secondary@example.com': { accessType: 'admin', status: 'active', addedAt: '2026-08-13T00:00:00.000Z' },
+      'gathersavorvibes@gmail.com': { accessType: 'admin', status: 'active', addedAt: '2026-08-13T00:00:00.000Z' },
+    },
   }
   const entries = listApprovedAccessEntries(accessControl)
 
-  assert.deepEqual(entries.map((entry) => entry.email), [PROTECTED_OWNER_EMAIL, 'secondary@example.com'])
+  assert.deepEqual(entries.map((entry) => entry.email), [PROTECTED_OWNER_EMAIL, 'gathersavorvibes@gmail.com', 'secondary@example.com'])
   assert.equal(entries[0].role, 'owner-admin')
   assert.equal(entries[0].protectedOwner, true)
   assert.equal(resolveAccessRole(accessControl, 'secondary@example.com'), 'admin')
+  assert.equal(resolveAccessRole(accessControl, 'gathersavorvibes@gmail.com'), 'admin')
+  assert.equal(entries.find((entry) => entry.email === 'gathersavorvibes@gmail.com').status, 'active')
+  assert.equal(entries.find((entry) => entry.email === 'gathersavorvibes@gmail.com').accessType, 'Approved Organizer')
   assert.match(roleCapabilitySummary('owner-admin'), /pinned to the Firebase UID/)
+})
+
+test('Phase 23O inactive approved organizer metadata blocks app role resolution', () => {
+  const accessControl = {
+    approvedEmails: ['revoked@example.com'],
+    rolesByEmail: { 'revoked@example.com': 'admin' },
+    approvedOrganizerRecords: {
+      'revoked@example.com': { accessType: 'admin', status: 'revoked', addedAt: '2026-08-13T00:00:00.000Z' },
+    },
+  }
+
+  assert.equal(resolveAccessRole(accessControl, 'revoked@example.com'), null)
+  const entry = listApprovedAccessEntries(accessControl).find((item) => item.email === 'revoked@example.com')
+  assert.equal(entry.status, 'revoked')
+  assert.equal(entry.accessType, 'Approved Organizer')
 })
 
 test('Phase 23O Settings UI marks protected owner as not removable through organizer settings', async () => {
@@ -72,7 +94,11 @@ test('Phase 23O Settings UI marks protected owner as not removable through organ
 
   assert.match(settings, /Permanent owner access is pinned to the verified Firebase account/)
   assert.match(settings, /cannot be removed or disabled in organizer settings/)
-  assert.match(settings, /Secondary organizers/)
+  assert.match(settings, /Approved organizer accounts/)
+  assert.match(settings, /Email address/)
+  assert.match(settings, /Access type/)
+  assert.match(settings, /Date added/)
+  assert.match(settings, /same Firebase access-control document used by authorization/)
   assert.match(authProvider, /isProtectedOwnerUser\(nextUser\)/)
   assert.match(authProvider, /approvedEmails: \[PROTECTED_OWNER_EMAIL\]/)
   assert.match(systemHealth, /isProtectedOwnerUser\(user\)/)
@@ -85,6 +111,8 @@ test('Phase 23O Firestore rules grant owner UID first without widening signed-in
   assert.match(rules, new RegExp(PROTECTED_OWNER_UID))
   assert.match(rules, /function isProtectedOwner\(\) \{\s*return isSignedIn\(\) && request\.auth\.uid == protectedOwnerUid\(\);/)
   assert.match(rules, /function isApprovedAdmin\(\) \{\s*return isProtectedOwner\(\)\s*\|\|/)
+  assert.match(rules, /approvedOrganizerRecords/)
+  assert.match(rules, /accessData\.approvedOrganizerRecords\[email\]\.status == 'active'/)
   assert.match(rules, /settings\/accessControl[\s\S]*secondary organizers/)
   assert.match(rules, /match \/settings\/accessControl \{[\s\S]*allow get: if isApprovedAdmin\(\);[\s\S]*allow list, create, update, delete: if false;/)
   assert.match(rules, /match \/auditLogs\/\{logId\} \{[\s\S]*allow update, delete: if false;/)
