@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Link, useSearchParams } from 'react-router'
 import { AlertTriangle, Copy, Edit3, Plus, Printer, ReceiptText, Save, Search, X } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { PartnerCommitmentsPanel } from '../components/operations/PartnerCommitmentsPanel'
@@ -28,6 +28,7 @@ import {
   findPossibleRegistrationPaymentOverlap,
 } from '../utils/operationsReport'
 import { InfoHint } from '../components/ui/InfoHint'
+import { PageTabs } from '../components/ui/PageTabs'
 import { canWriteOperations, isApprovedAdmin } from '../utils/accessRoles'
 import { hydrateEventForPlanning, isCompletedEvent } from '../utils/eventPlanning'
 
@@ -65,6 +66,14 @@ const STATUS_HELP = {
 }
 
 const DEFAULT_FILTERS = { type: 'all', category: '', status: 'all', search: '' }
+
+const OPERATIONS_TABS = [
+  ['overview', 'Overview'],
+  ['ledger', 'Ledger'],
+  ['commitments', 'Commitments'],
+  ['partners', 'Partners & Suppliers'],
+  ['in-kind', 'In-Kind Support'],
+]
 
 function labelFor(value) {
   return String(value || '').split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
@@ -106,13 +115,13 @@ function buildTaskHref({ title, category, notes, priority = 'Normal' }) {
 export function OperationsPage() {
   const { user, access } = useAuth()
   const { activeEvent } = useActiveEvent()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [resolvedActiveEvent, setResolvedActiveEvent] = useState(activeEvent)
   const [registrations, setRegistrations] = useState([])
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
-  const [activeView, setActiveView] = useState('overview')
   const [form, setForm] = useState(EMPTY_FORM)
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -124,6 +133,16 @@ export function OperationsPage() {
   const canEditOperations = canWriteOperations(access, currentEvent?.eventId)
   const completedEvent = isCompletedEvent(currentEvent)
   const planningEvent = useMemo(() => hydrateEventForPlanning(currentEvent || {}), [currentEvent])
+  const requestedTab = searchParams.get('tab') || 'overview'
+  const activeView = OPERATIONS_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'overview'
+
+  const setOperationsTab = useCallback((tab) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      next.set('tab', tab)
+      return next
+    })
+  }, [setSearchParams])
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -131,7 +150,6 @@ export function OperationsPage() {
     setRegistrations([])
     setResolvedActiveEvent(activeEvent)
     setFilters(DEFAULT_FILTERS)
-    setActiveView('overview')
     setForm(EMPTY_FORM)
     setEditing(null)
     setMessage('')
@@ -144,12 +162,12 @@ export function OperationsPage() {
   useEffect(() => {
     function handleTutorialView(event) {
       if (event.detail?.view && ['overview', 'ledger', 'commitments', 'partners', 'in-kind'].includes(event.detail.view)) {
-        setActiveView(event.detail.view)
+        setOperationsTab(event.detail.view)
       }
     }
     window.addEventListener('tutorial:operations-view', handleTutorialView)
     return () => window.removeEventListener('tutorial:operations-view', handleTutorialView)
-  }, [])
+  }, [setOperationsTab])
 
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
@@ -453,28 +471,11 @@ export function OperationsPage() {
               Start with what happened and what is pending, then open the ledger or commitment workspaces for action.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {[
-              ['overview', 'Overview'],
-              ['ledger', 'Ledger'],
-              ['commitments', 'Commitments'],
-              ['partners', 'Partners & Suppliers'],
-              ['in-kind', 'In-Kind Support'],
-            ].map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setActiveView(value)}
-                className={`rounded-xl px-4 py-2 text-xs font-bold ${activeView === value ? 'bg-[#2B1723] text-white' : 'border border-[#E7D6CC] text-[#6B564C]'}`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <PageTabs tabs={OPERATIONS_TABS.map(([id, label]) => ({ id, label }))} active={activeView} onChange={setOperationsTab} label="Operations workspaces" idPrefix="operations" />
         </div>
 
         {activeView === 'overview' && (
-          <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          <div id="operations-overview-panel" role="tabpanel" aria-labelledby="operations-overview-tab" tabIndex="0" className="mt-5 grid gap-3 lg:grid-cols-3">
             <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-4">
               <p className="text-[10px] font-bold uppercase tracking-wider text-[#80685B]">What happened</p>
               <p className="mt-2 text-sm leading-6 text-[#2B1723]">
@@ -500,7 +501,7 @@ export function OperationsPage() {
         )}
 
         {activeView === 'commitments' && (
-          <div className="mt-5 space-y-3">
+          <div id="operations-commitments-panel" role="tabpanel" aria-labelledby="operations-commitments-tab" tabIndex="0" className="mt-5 space-y-3">
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-3">
                 <p className="text-sm font-bold text-[#2B1723]">{commitmentRows.length}</p>
@@ -559,7 +560,7 @@ export function OperationsPage() {
         )}
 
         {activeView === 'partners' && (
-          <div className="mt-5 space-y-3">
+          <div id="operations-partners-panel" role="tabpanel" aria-labelledby="operations-partners-tab" tabIndex="0" className="mt-5 space-y-3">
             {partnerRows.length === 0 ? (
               <div className="rounded-xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] p-5 text-sm leading-6 text-[#816D62]">
                 No partner or supplier records are recorded for this Working Event yet.
@@ -588,7 +589,7 @@ export function OperationsPage() {
         )}
 
         {activeView === 'in-kind' && (
-          <div className="mt-5 space-y-3">
+          <div id="operations-in-kind-panel" role="tabpanel" aria-labelledby="operations-in-kind-tab" tabIndex="0" className="mt-5 space-y-3">
             {inKindRows.length === 0 ? (
               <div className="rounded-xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] p-5 text-sm leading-6 text-[#816D62]">
                 No in-kind support is recorded for this Working Event yet.
@@ -617,7 +618,7 @@ export function OperationsPage() {
         )}
 
         {activeView === 'ledger' && (
-          <div className="mt-5 rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] px-4 py-3 text-xs leading-5 text-[#816D62]">
+          <div id="operations-ledger-panel" role="tabpanel" aria-labelledby="operations-ledger-tab" tabIndex="0" className="mt-5 rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] px-4 py-3 text-xs leading-5 text-[#816D62]">
             Ledger view stays below so existing create, edit, cancel, copy, and print controls remain in the normal Operations workflow.
           </div>
         )}

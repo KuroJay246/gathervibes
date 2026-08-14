@@ -79,7 +79,7 @@ test('tutorial v3 supports deterministic replay, next, back, refresh, and comple
     ['Tickets', /\/tickets$/, 'tickets-workspace'],
     ['Check-In', /\/check-in$/, 'checkin-search-field'],
     ['Operations Ledger', /\/operations$/, 'operations-workspace'],
-    ['Partner Commitments', /\/operations$/, 'partners-commitments-panel'],
+    ['Partner Commitments', /\/operations\?tab=commitments$/, 'partners-commitments-panel'],
     ['Run of Show', /\/run-of-show$/, 'run-of-show-workspace'],
     ['Event Resources', /\/resources$/, 'resources-workspace'],
     ['Documents', /\/documents$/, 'documents-workspace'],

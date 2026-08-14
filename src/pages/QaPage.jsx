@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router'
+import { useLocation, useSearchParams } from 'react-router'
 import { AlertTriangle, CheckCircle2, ChevronDown, Clipboard, Database, ShieldCheck, XCircle } from 'lucide-react'
 import { collection, getDocs, limit, query, where } from 'firebase/firestore'
 import { SystemHealthPanel } from '../components/SystemHealthPanel'
@@ -23,6 +23,15 @@ import {
   isCodexDemoWorkingEvent,
   qaChecklist,
 } from '../utils/qaHelper'
+import { PageTabs } from '../components/ui/PageTabs'
+
+const QA_TABS = [
+  ['status', 'System Status'],
+  ['access', 'Access & Owner'],
+  ['event', 'Working Event'],
+  ['firebase', 'Firebase'],
+  ['diagnostics', 'Diagnostics'],
+]
 
 const browserTroubleshootingSteps = [
   'Confirm URL is https://gathervibeshub.web.app/login',
@@ -121,6 +130,7 @@ export function QaPage() {
   const { user, accessControl, access, currentRoleLabel } = useAuth()
   const { activeEvent, setActiveEvent } = useActiveEvent()
   const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [events, setEvents] = useState([])
   const [auditStatus, setAuditStatus] = useState('checking')
   const [loading, setLoading] = useState(true)
@@ -482,6 +492,16 @@ export function QaPage() {
     ['Copy checks', import.meta.env.VITE_QA_COPY_CHECKS || 'Required before release'],
     ['Bundle summary', import.meta.env.VITE_QA_BUNDLE_SUMMARY || 'Available in the latest release report'],
   ]
+  const requestedTab = searchParams.get('tab') || 'status'
+  const activeTab = QA_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'status'
+
+  function setQaTab(tab) {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      next.set('tab', tab)
+      return next
+    })
+  }
 
   return (
     <div data-tour-id="system-qa-workspace" className="min-w-0 space-y-6">
@@ -532,6 +552,16 @@ export function QaPage() {
         </div>
       </section>
 
+      <PageTabs tabs={QA_TABS.map(([id, label]) => ({ id, label }))} active={activeTab} onChange={setQaTab} label="System QA workspaces" idPrefix="qa" />
+
+      {activeTab === 'status' && (
+        <div id="qa-status-panel" role="tabpanel" aria-labelledby="qa-status-tab" tabIndex="0" className="rounded-2xl border border-[#EEDFD6] bg-white p-5 text-sm leading-6 text-[#6B564C]">
+          System status is summarized above. Use the other QA tabs for owner access, Working Event scope, Firebase environment facts, and dense diagnostics.
+        </div>
+      )}
+
+      {activeTab === 'firebase' && (
+      <div id="qa-firebase-panel" role="tabpanel" aria-labelledby="qa-firebase-tab" tabIndex="0">
       <QaSection
         eyebrow="Environment"
         title="Current app environment"
@@ -544,7 +574,11 @@ export function QaPage() {
           <DiagnosticRow label="Authentication state" status={user?.uid ? 'Pass' : 'Needs Review'} detail={user?.email ? `Signed in as ${user.email}` : 'No signed-in user detected.'} />
         </div>
       </QaSection>
+      </div>
+      )}
 
+      {activeTab === 'event' && (
+      <div id="qa-event-panel" role="tabpanel" aria-labelledby="qa-event-tab" tabIndex="0">
       <QaSection
         eyebrow="Working Event"
         title="Selected event classification"
@@ -556,7 +590,11 @@ export function QaPage() {
           <DiagnosticRow label="Event status" status="Pass" detail={activeEvent?.status || 'No status available.'} />
         </div>
       </QaSection>
+      </div>
+      )}
 
+      {activeTab === 'access' && (
+      <div id="qa-access-panel" role="tabpanel" aria-labelledby="qa-access-tab" tabIndex="0">
       <QaSection
         eyebrow="Access"
         title="Current role and permissions"
@@ -607,7 +645,11 @@ export function QaPage() {
           </div>
         </div>
       </QaSection>
+      </div>
+      )}
 
+      {activeTab === 'diagnostics' && (
+      <div id="qa-diagnostics-panel" role="tabpanel" aria-labelledby="qa-diagnostics-tab" tabIndex="0" className="space-y-6">
       <QaSection
         eyebrow="Data Boundaries"
         title="Product data contracts"
@@ -844,6 +886,8 @@ export function QaPage() {
         </summary>
         <SystemHealthPanel compact />
       </details>
+      </div>
+      )}
     </div>
   )
 }

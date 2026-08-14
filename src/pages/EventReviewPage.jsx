@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import {
   AlertTriangle,
   CalendarDays,
@@ -18,6 +18,15 @@ import { subscribeToEvents } from '../services/eventService'
 import { buildEventReview, formatEventReviewMoney } from '../utils/eventReview'
 import { formatEventDate } from '../utils/dateUtils'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
+import { PageTabs } from '../components/ui/PageTabs'
+
+const EVENT_REVIEW_TABS = [
+  ['attention', 'Needs Attention'],
+  ['summary', 'Event Summary'],
+  ['payments', 'Registrations & Payments'],
+  ['operations', 'Operations'],
+  ['quality', 'Data Quality'],
+]
 
 function SummaryCard({ label, value, help }) {
   return (
@@ -79,6 +88,7 @@ function FollowUpItem({ item }) {
 
 export function EventReviewPage() {
   const { activeEvent } = useActiveEvent()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [registrations, setRegistrations] = useState([])
   const [operationsEntries, setOperationsEntries] = useState([])
   const [resolvedActiveEvent, setResolvedActiveEvent] = useState(activeEvent)
@@ -178,6 +188,16 @@ export function EventReviewPage() {
   if (error) return <ErrorState message={error} onRetry={() => window.location.reload()} />
 
   const currency = review?.paymentReview?.registrationRecords?.currency || 'BBD'
+  const requestedTab = searchParams.get('tab') || 'attention'
+  const activeTab = EVENT_REVIEW_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'attention'
+
+  function setEventReviewTab(tab) {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      next.set('tab', tab)
+      return next
+    })
+  }
   const adminReviewItems = [
     ['Registrations reviewed', review.summary.registrationCount],
     ['Outstanding registration balances', formatEventReviewMoney(review.paymentReview.registrationRecords.outstandingAmount, currency)],
@@ -217,7 +237,11 @@ export function EventReviewPage() {
         </div>
       </section>
 
-      <Section eyebrow="Event Summary" title={review.summary.title} className="order-3">
+      <PageTabs tabs={EVENT_REVIEW_TABS.map(([id, label]) => ({ id, label }))} active={activeTab} onChange={setEventReviewTab} label="Event review workspaces" idPrefix="event-review" />
+
+      {activeTab === 'summary' && (
+      <div id="event-review-summary-panel" role="tabpanel" aria-labelledby="event-review-summary-tab" tabIndex="0" className="space-y-6">
+      <Section eyebrow="Event Summary" title={review.summary.title}>
         <div className="gsv-compact-metric-grid">
           <SummaryCard label="Event status" value={review.summary.eventStatus} />
           <SummaryCard label="Registration records" value={review.summary.registrationCount} />
@@ -245,7 +269,7 @@ export function EventReviewPage() {
         </details>
       </Section>
 
-      <Section eyebrow="Administrative review" title="Event closeout review" className="order-4">
+      <Section eyebrow="Administrative review" title="Event closeout review">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {adminReviewItems.map(([label, value]) => <DetailRow key={label} label={label} value={value} />)}
         </div>
@@ -253,8 +277,12 @@ export function EventReviewPage() {
           Completed events remain editable elsewhere. This summary is informational only and does not lock the event or save a close state.
         </div>
       </Section>
+      </div>
+      )}
 
-      <Section eyebrow="Payment Follow-Up and Finance Review" title="What needs attention now" className="order-2">
+      {activeTab === 'attention' && (
+      <div id="event-review-attention-panel" role="tabpanel" aria-labelledby="event-review-attention-tab" tabIndex="0">
+      <Section eyebrow="Payment Follow-Up and Finance Review" title="What needs attention now">
         {review.followUp.items.length === 0 ? (
           <div className="rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
             No guest payment follow-up or active finance review items were detected for the selected Working Event from current registration and operations data.
@@ -265,8 +293,12 @@ export function EventReviewPage() {
           </div>
         )}
       </Section>
+      </div>
+      )}
 
-      <Section eyebrow="Financial Boundaries" title="Registration Payments and Operations Summary" className="order-5">
+      {activeTab === 'payments' && (
+      <div id="event-review-payments-panel" role="tabpanel" aria-labelledby="event-review-payments-tab" tabIndex="0">
+      <Section eyebrow="Financial Boundaries" title="Registration Payments and Operations Summary">
         <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
           Registration payment records track guest charges, payments received, balances, payment follow-up, and data review. The Operations Ledger tracks manually recorded sponsor income, vendor or supplier payments, expenses, refunds, reimbursements, and adjustments. These are separate records and are not automatically reconciled.
         </div>
@@ -376,9 +408,13 @@ export function EventReviewPage() {
           </div>
         </div>
       </Section>
+      </div>
+      )}
 
-      {evidenceAudit && (
-        <Section eyebrow="In-Kind Support and Historical Reconciliation" title={evidenceAudit.auditStatus} className="order-6">
+      {activeTab === 'operations' && (
+      <div id="event-review-operations-panel" role="tabpanel" aria-labelledby="event-review-operations-tab" tabIndex="0">
+      {evidenceAudit ? (
+        <Section eyebrow="In-Kind Support and Historical Reconciliation" title={evidenceAudit.auditStatus}>
           <div className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
             Historical reconciliation evidence is preserved here for CPB review. It is not part of the daily Registration Payments workflow and it is not an automatic accounting ledger. Final profit cannot be confirmed until bank, 1stPay, baker and supplier evidence is complete.
           </div>
@@ -426,9 +462,19 @@ export function EventReviewPage() {
             </article>
           </div>
         </Section>
+      ) : (
+        <Section eyebrow="Operations" title="Operations review">
+          <div className="rounded-2xl border border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#715D46]">
+            No historical reconciliation evidence is attached to this Working Event.
+          </div>
+        </Section>
+      )}
+      </div>
       )}
 
-      <Section eyebrow={review.summary.eyebrow} title="Attendance and read-only reporting boundaries" className="order-7">
+      {activeTab === 'quality' && (
+      <div id="event-review-quality-panel" role="tabpanel" aria-labelledby="event-review-quality-tab" tabIndex="0">
+      <Section eyebrow={review.summary.eyebrow} title="Attendance and read-only reporting boundaries">
         <div className="rounded-2xl border border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#715D46]">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 size-5 shrink-0" />
@@ -451,6 +497,8 @@ export function EventReviewPage() {
           </div>
         </div>
       </Section>
+      </div>
+      )}
     </div>
   )
 }

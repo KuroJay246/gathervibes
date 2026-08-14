@@ -11,6 +11,7 @@
       ".git/**",
       ".firebase/**",
       "coverage/**",
+      "src/services/staffManagementService.js",
       "**/*.zip",
       "**/*.tar",
       "**/*.tar.gz",

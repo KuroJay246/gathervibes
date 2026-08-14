@@ -1,0 +1,67 @@
+{
+  "baseline": "a840e90",
+  "branch": "codex/full-page-organization-and-navigation-architecture",
+  "evidence": {
+    "chromeDevToolsAuthenticatedProduction": true,
+    "playwrightStandaloneAuthenticated": false,
+    "notes": "Chrome DevTools saw authenticated production tabs and captured production before-state. Hosting was deployed and changed production routes were rechecked with the authenticated Chrome session. Playwright standalone redirected to login on protected local routes, so it was used through local automated E2E and structural checks rather than as authenticated production proof."
+  },
+  "routes": [
+    { "route": "/dashboard", "pageName": "Overview", "recommendedPattern": "summary and next actions", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/events", "pageName": "Events", "recommendedPattern": "event list and setup", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/tasks", "pageName": "Tasks", "recommendedPattern": "filters and compact rows", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/registrations", "pageName": "Registrations", "recommendedPattern": "filters and list/detail", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/payments", "pageName": "Registration Payments", "recommendedPattern": "filters and list/detail", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/payments/reconciliation", "pageName": "Reconciliation Preview", "recommendedPattern": "focused comparison workflow", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/imports", "pageName": "Import Center", "recommendedPattern": "existing same-page tabs", "tabsJustified": true, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/tickets", "pageName": "Tickets", "recommendedPattern": "filters and record list", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/check-in", "pageName": "Check-In", "recommendedPattern": "focused event-day workflow", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/operations", "pageName": "Operations", "recommendedPattern": "same-page tabs", "tabsJustified": true, "changesImplemented": ["Shared PageTabs", "URL query tab state", "ARIA tab panels"], "finalStatus": "PASS" },
+    { "route": "/run-of-show", "pageName": "Run of Show", "recommendedPattern": "chronological sequence list", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/resources", "pageName": "Resources", "recommendedPattern": "filters and compact records", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/documents", "pageName": "Documents", "recommendedPattern": "filters and compact records", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/contacts", "pageName": "Contacts", "recommendedPattern": "existing same-page tabs", "tabsJustified": true, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/event-review", "pageName": "Event Review", "recommendedPattern": "same-page tabs", "tabsJustified": true, "changesImplemented": ["Needs Attention first", "Report workspaces", "URL query tab state"], "finalStatus": "PASS" },
+    { "route": "/communications", "pageName": "Message Builder", "recommendedPattern": "copy-only focused workflow", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" },
+    { "route": "/settings", "pageName": "Settings", "recommendedPattern": "same-page tabs", "tabsJustified": true, "changesImplemented": ["Four top-level settings tabs", "Organizer controls in Account & Access", "Advanced technical details moved into details"], "finalStatus": "PASS" },
+    { "route": "/qa", "pageName": "System QA", "recommendedPattern": "same-page tabs", "tabsJustified": true, "changesImplemented": ["System Status", "Access & Owner", "Working Event", "Firebase", "Diagnostics"], "finalStatus": "PASS" },
+    { "route": "/scanner", "pageName": "Scanner", "recommendedPattern": "restricted focused workflow", "tabsJustified": false, "changesImplemented": [], "finalStatus": "NO CHANGE REQUIRED" }
+  ],
+  "validation": {
+    "npmCi": "PASS",
+    "lint": "PASS",
+    "build": "PASS",
+    "tests": "PASS: 637 total, 566 pass, 71 skipped, 0 fail",
+    "productRoutes": "PASS: 18 routes, 15 navigation labels",
+    "productDocs": "PASS",
+    "productQa": "PASS: serial rerun passed after one parallel emulator port contention",
+    "e2eSmoke": "PASS: 1/1",
+    "e2eFull": "PASS: 10/10",
+    "auditOmitDev": "PASS: 0 vulnerabilities",
+    "xlsxAbsent": "PASS",
+    "readExcelFile": "PASS: read-excel-file@9.2.0",
+    "doctorJson": "PASS: errorCount 0, warningCount 195",
+    "diffCheck": "PASS: CRLF notices only",
+    "gitFsck": "PASS: dangling objects only"
+  },
+  "deployment": {
+    "hosting": "DEPLOYED: https://gathervibeshub.web.app",
+    "firestoreRulesChanged": false,
+    "firestoreRulesDeployed": false,
+    "authChanged": false,
+    "functionsChanged": false,
+    "storageChanged": false,
+    "qrFormatChanged": false,
+    "cpbSyntheticWrites": false,
+    "temporaryUxqaRecordsCreated": false
+  },
+  "postDeployProduction": {
+    "console": "PASS: no console messages found during final changed-route check",
+    "network": "PASS: app shell, chunks, Auth, and Firestore requests returned 200",
+    "settingsMobile": "PASS: four top-level tabs, approved organizers in Account & Access, no page horizontal overflow",
+    "operationsDesktop": "PASS: /operations?tab=commitments direct-link tab selection works; P2 note that summary remains tall",
+    "eventReviewDesktop": "PASS: tab row y=261, Needs Attention panel y=334, no horizontal overflow",
+    "eventReviewMobile": "PASS: tab row y=277, Needs Attention panel y=350, no horizontal overflow",
+    "qaMobile": "PASS: no page horizontal overflow; diagnostics reachable in horizontal tab row after status summary"
+  }
+}

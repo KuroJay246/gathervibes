@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Check, Copy, LogOut, Plus, RotateCcw, Shield, UserMinus, UserX } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router'
 import { useAuth } from '../auth/useAuth'
@@ -11,15 +11,20 @@ import { TARGET_UIDS } from '../tutorial/tutorialSteps'
 import { addApprovedOrganizer, changeApprovedOrganizerStatus, subscribeAccessControl, subscribeAccessHistory } from '../services/accessManagementService'
 import { DEFAULT_INTEGRATIONS, recordIntegrationCheck, subscribeIntegrationSettings } from '../services/integrationSettingsService'
 import { saveStaffAssignment, saveStaffProfile, setStaffProfileStatus, subscribeStaffAssignments, subscribeStaffProfiles } from '../services/staffManagementService'
+import { PageTabs } from '../components/ui/PageTabs'
 
 const SETTINGS_TABS = [
-  ['account', 'Account & Access'],
-  ['organizers', 'Approved Organizers'],
-  ['staff', 'Staff & Event Assignments'],
+  ['access', 'Account & Access'],
+  ['staff', 'Staff & Assignments'],
   ['integrations', 'Integrations'],
   ['history', 'Access History'],
-  ['advanced', 'Advanced'],
 ]
+
+const SETTINGS_TAB_ALIASES = {
+  account: 'access',
+  organizers: 'access',
+  advanced: 'access',
+}
 
 // Legacy Settings source anchors: Workspace, Event Defaults, Currency, Ticket prefix, Price tiers, Organizer Access, Tickets & Check-In, Open Scanner Mode, Managed in Operations, Registration payments, Data & Messages.
 // Account and access summary. Your organizer account. Protected owner and approved organizers. Approved organizer accounts. Public access. Permanent owner access is pinned to the verified Firebase account and cannot be removed or disabled in organizer settings. Email address. Access type. Date added.
@@ -104,7 +109,7 @@ function ConfirmDialog({ pending, onCancel, onConfirm }) {
 function OrganizerTable({ entries, isOwner, onAction }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-[#EFE2DA]">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto" tabIndex="0" role="region" aria-label="Approved organizer accounts table">
         <table className="w-full min-w-[940px] text-left text-sm">
           <thead className="bg-[#FFF8F2] text-[10px] font-bold uppercase tracking-wider text-[#80685B]">
             <tr>
@@ -162,10 +167,9 @@ export function SettingsPage() {
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
   const [pending, setPending] = useState(null)
-  const tabRefs = useRef([])
   const isOwner = Boolean(access?.protectedOwner)
-  const requestedTab = searchParams.get('tab') || 'account'
-  const activeTab = SETTINGS_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'account'
+  const requestedTab = SETTINGS_TAB_ALIASES[searchParams.get('tab')] || searchParams.get('tab') || 'access'
+  const activeTab = SETTINGS_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'access'
   useEffect(() => subscribeAccessControl(setLiveAccessControl, (err) => setError(err.message)), [])
 
   const approvedEntries = useMemo(() => listApprovedAccessEntries(liveAccessControl || accessControl || {}), [accessControl, liveAccessControl])
@@ -191,18 +195,12 @@ export function SettingsPage() {
     }
   }
 
-  function handleTabKeyDown(event, index) {
-    const lastIndex = SETTINGS_TABS.length - 1
-    let nextIndex = null
-    if (event.key === 'ArrowRight') nextIndex = index === lastIndex ? 0 : index + 1
-    if (event.key === 'ArrowLeft') nextIndex = index === 0 ? lastIndex : index - 1
-    if (event.key === 'Home') nextIndex = 0
-    if (event.key === 'End') nextIndex = lastIndex
-    if (nextIndex === null) return
-    event.preventDefault()
-    const [nextId] = SETTINGS_TABS[nextIndex]
-    setSearchParams({ tab: nextId })
-    window.requestAnimationFrame(() => tabRefs.current[nextIndex]?.focus())
+  function setSettingsTab(tab) {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      next.set('tab', tab)
+      return next
+    })
   }
 
   async function copyScannerLink() {
@@ -225,8 +223,24 @@ export function SettingsPage() {
     })
   }
 
+  const technicalSettings = (
+    <details className="rounded-2xl border border-[#EFE2DA] bg-[#FFFDFC]">
+      <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-[#5A443B]">Technical settings and scanner paths</summary>
+      <div className="border-t border-[#EFE2DA] p-4">
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">Firebase</p><p className="mt-1 text-sm text-[#6B564C]">{isFirebaseConfigured ? 'Configured' : 'Needs attention'} · {firebaseProjectId || 'Project set during release'}</p></div>
+          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">Defaults</p><p className="mt-1 text-sm text-[#6B564C]">America/Halifax · BBD · {formatPaymentMethod(DEFAULT_FINANCE_SETTINGS.defaultPaymentMethod)}</p></div>
+          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">QR format</p><p className="mt-1 text-sm text-[#6B564C]">Ticket code only. No attendee PII in QR codes.</p></div>
+          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">Scanner</p><div className="mt-2 flex flex-wrap gap-2"><Link to="/scanner" className="inline-flex min-h-10 items-center rounded-xl bg-[#2B1723] px-4 text-xs font-bold text-white">Open Scanner Mode</Link><button type="button" onClick={copyScannerLink} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#5A443B]">{scannerLinkCopied ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}{scannerLinkCopied ? 'Copied' : 'Copy Scanner Link'}</button></div></div>
+        </div>
+        <Link to="/qa" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Open System QA</Link>
+      </div>
+    </details>
+  )
+
   const tabPanels = {
-    account: (
+    access: (
+      <div className="space-y-5">
       <SettingsSection eyebrow="Account & Access" title="Signed-in account" description="This summary keeps app-wide organizer access separate from event-scoped staff assignments.">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)]">
           <div className="flex items-center gap-4 rounded-2xl border border-[#EFE2DA] p-4">
@@ -255,8 +269,6 @@ export function SettingsPage() {
           {user && TARGET_UIDS.includes(user.uid) && <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('replay-tutorial'))} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E7D6CC] px-5 text-sm font-bold text-[#5A443B]">Show Welcome Tour Again</button>}
         </div>
       </SettingsSection>
-    ),
-    organizers: (
       <SettingsSection eyebrow="Approved Organizers" title="App-wide organizer access" description="These accounts can use the organizer workspace. Approved organizers can view the list; only the Protected Owner can change it.">
         {isOwner && (
           <form className="mb-5 grid gap-3 rounded-2xl border border-[#EFE2DA] bg-[#FFFDFB] p-4 md:grid-cols-[minmax(16rem,1fr)_auto]" onSubmit={(event) => { event.preventDefault(); run(() => addApprovedOrganizer(organizerEmail, user), `Organizer ${normalizeAccessEmail(organizerEmail)} added.`).then(() => setOrganizerEmail('')) }}>
@@ -268,6 +280,8 @@ export function SettingsPage() {
         )}
         <OrganizerTable entries={approvedEntries} isOwner={isOwner} onAction={confirmOrganizerStatus} />
       </SettingsSection>
+      {technicalSettings}
+      </div>
     ),
     staff: (
       <SettingsSection eyebrow="Staff & Event Assignments" title="Event staff access" description="Staff profiles are not approved organizers. Assignments are limited to the selected event and the role chosen here.">
@@ -331,30 +345,13 @@ export function SettingsPage() {
         </div>
       </SettingsSection>
     ),
-    advanced: (
-      <SettingsSection eyebrow="Advanced" title="Technical settings" description="Read-only technical information and administrator-only paths are separated from routine settings. No credentials or private attendee data are shown.">
-        <div className="grid gap-3 md:grid-cols-2">
-          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">Firebase</p><p className="mt-1 text-sm text-[#6B564C]">{isFirebaseConfigured ? 'Configured' : 'Needs attention'} · {firebaseProjectId || 'Project set during release'}</p></div>
-          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">Defaults</p><p className="mt-1 text-sm text-[#6B564C]">America/Halifax · BBD · {formatPaymentMethod(DEFAULT_FINANCE_SETTINGS.defaultPaymentMethod)}</p></div>
-          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">QR format</p><p className="mt-1 text-sm text-[#6B564C]">Ticket code only. No attendee PII in QR codes.</p></div>
-          <div className="rounded-2xl border border-[#EFE2DA] p-4"><p className="text-sm font-bold text-[#2B1723]">Scanner</p><div className="mt-2 flex flex-wrap gap-2"><Link to="/scanner" className="inline-flex min-h-10 items-center rounded-xl bg-[#2B1723] px-4 text-xs font-bold text-white">Open Scanner Mode</Link><button type="button" onClick={copyScannerLink} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#E7D6CC] px-4 text-xs font-bold text-[#5A443B]">{scannerLinkCopied ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}{scannerLinkCopied ? 'Copied' : 'Copy Scanner Link'}</button></div></div>
-        </div>
-        <Link to="/qa" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white">Open System QA</Link>
-      </SettingsSection>
-    ),
   }
 
   return (
     <div data-tour-id="settings-workspace" className="min-w-0 space-y-5">
       {(notice || error) && <div role="status" className={`rounded-2xl border p-4 text-sm font-semibold ${error ? 'border-[#F1C8C8] bg-[#FFF1F1] text-[#A32626]' : 'border-[#CFE4D7] bg-[#F2FAF5] text-[#17623A]'}`}>{error || notice}</div>}
-      <section className="rounded-[20px] border border-[#EEDFD6] bg-white p-3 shadow-[0_8px_24px_rgba(84,53,67,0.04)]">
-        <div className="flex min-w-0 gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Settings categories">
-          {SETTINGS_TABS.map(([id, label], index) => (
-            <button key={id} ref={(element) => { tabRefs.current[index] = element }} id={`settings-tab-${id}`} type="button" role="tab" tabIndex={activeTab === id ? 0 : -1} aria-selected={activeTab === id} aria-controls={`settings-panel-${id}`} onClick={() => setSearchParams({ tab: id })} onKeyDown={(event) => handleTabKeyDown(event, index)} className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#9A5260]/30 ${activeTab === id ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED] text-[#5A443B] hover:bg-[#EFE2DA]'}`}>{label}</button>
-          ))}
-        </div>
-      </section>
-      <div id={`settings-panel-${activeTab}`} role="tabpanel" aria-labelledby={`settings-tab-${activeTab}`} tabIndex="0">{tabPanels[activeTab]}</div>
+      <PageTabs tabs={SETTINGS_TABS.map(([id, label]) => ({ id, label }))} active={activeTab} onChange={setSettingsTab} label="Settings categories" idPrefix="settings" />
+      <div id={`settings-${activeTab}-panel`} role="tabpanel" aria-labelledby={`settings-${activeTab}-tab`} tabIndex="0">{tabPanels[activeTab]}</div>
       <ConfirmDialog pending={pending} onCancel={() => setPending(null)} onConfirm={() => { const action = pending?.onConfirm; setPending(null); void action?.() }} />
     </div>
   )
