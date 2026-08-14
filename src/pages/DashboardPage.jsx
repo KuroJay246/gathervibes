@@ -15,7 +15,7 @@ import {
   Users,
   X,
 } from 'lucide-react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { useAuth } from '../auth/useAuth'
 import { subscribeToEvents } from '../services/eventService'
@@ -39,6 +39,14 @@ import {
 } from '../utils/eventPlanning'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 import { buildTaskWorkflowSummary } from '../utils/taskWorkflow.js'
+import { PageTabs } from '../components/ui/PageTabs'
+
+const HOME_TABS = [
+  ['summary', 'Event Summary'],
+  ['money', 'Money'],
+  ['readiness', 'Readiness'],
+  ['upcoming', 'Upcoming'],
+]
 
 function useEventRegistrations(eventId) {
   const [rows, setRows] = useState([])
@@ -141,13 +149,67 @@ function Section({ eyebrow, title, children }) {
   )
 }
 
+function issueExplanationFor(item) {
+  const key = item?.key || ''
+  const label = item?.label || ''
+  if (key.includes('run-of-show') || key.includes('timeline') || label.includes('timeline') || label.includes('Run of Show')) {
+    return {
+      title: item.summary,
+      why: 'This can affect the event-day sequence, arrivals, or handoffs.',
+      action: 'Review the schedule, confirm the status, and update the delayed item.',
+    }
+  }
+  if (key.includes('resource') || label.includes('Resource')) {
+    return {
+      title: item.summary,
+      why: 'The event plan may be missing equipment, supplies, services, or confirmed quantities.',
+      action: 'Review the resource record, confirm what is available, and assign the next step.',
+    }
+  }
+  if (key.includes('payment')) {
+    return {
+      title: item.summary,
+      why: 'Guest registration money may still need collection, evidence, or a clear organizer review state.',
+      action: 'Open Registration Payments and review the affected records.',
+    }
+  }
+  if (key.includes('ticket')) {
+    return {
+      title: item.summary,
+      why: 'A guest may be paid or expected but still missing a usable ticket code.',
+      action: 'Open Tickets and assign or review the ticket records.',
+    }
+  }
+  if (key.includes('data')) {
+    return {
+      title: item.summary,
+      why: 'Incomplete or repeated contact/payment data can make follow-up and check-in harder.',
+      action: 'Open the linked records and correct only the fields you can verify.',
+    }
+  }
+  if (key.includes('operations') || key.includes('partners')) {
+    return {
+      title: item.summary,
+      why: 'Partner promises, supplier balances, or event-level money may still need review.',
+      action: 'Open Operations and check the relevant workspace.',
+    }
+  }
+  return {
+    title: item.summary,
+    why: 'This item may affect planning clarity or the next organizer action.',
+    action: 'Open the linked page and review the affected records.',
+  }
+}
+
 function PriorityItem({ item }) {
+  const explanation = issueExplanationFor(item)
   return (
     <Link to={item.to} className="block rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 hover:bg-white">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-bold text-[#2B1723]">{item.label}</p>
-          <p className="mt-2 text-xs leading-5 text-[#816D62]">{item.summary}</p>
+          <p className="text-sm font-bold text-[#2B1723]">{explanation.title}</p>
+          <p className="mt-2 text-xs leading-5 text-[#816D62]">{explanation.why}</p>
+          <p className="mt-1 text-xs leading-5 text-[#5D4A52]">{explanation.action}</p>
         </div>
         <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
           item.statusLabel === 'Needs attention' ? 'bg-[#FFF1F1] text-[#A32626]' : 'bg-[#FFF4DF] text-[#7A5818]'
@@ -244,7 +306,7 @@ function buildRecentActivity({ event, registrations = [], operationsEntries = []
   if (event?.updatedAt || event?.createdAt) {
     activity.push({
       key: 'event-updated',
-      label: 'Event details updated',
+      label: `${event.eventName || 'Event'} details were updated`,
       source: 'Events',
       date: dateFromTimestamp(event.updatedAt || event.createdAt),
       to: '/events',
@@ -256,7 +318,7 @@ function buildRecentActivity({ event, registrations = [], operationsEntries = []
     if (!date) return
     activity.push({
       key: `registration-${registration.registrationId || registration.id || date.getTime()}`,
-      label: registration.ticketCode ? 'Registration and ticket record updated' : 'Registration record updated',
+      label: `${registration.fullName || registration.buyerName || 'Registration'} ${registration.ticketCode ? 'registration and ticket record' : 'registration record'} was updated`,
       source: 'Guests & Registrations',
       date,
       to: '/registrations',
@@ -268,7 +330,7 @@ function buildRecentActivity({ event, registrations = [], operationsEntries = []
     if (!date) return
     activity.push({
       key: `operations-${entry.entryId || entry.id || date.getTime()}`,
-      label: 'Operations ledger entry updated',
+      label: `${entry.label || 'Operations ledger entry'} was updated`,
       source: 'Operations',
       date,
       to: '/operations',
@@ -287,6 +349,7 @@ export function DashboardPage() {
   const [allEvents, setAllEvents] = useState([])
   const [eventsLoaded, setEventsLoaded] = useState(false)
   const [currentTime, setCurrentTime] = useState(() => new Date())
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const adminUser = isApprovedAdmin(access)
   const visibleEvents = adminUser ? allEvents : assignedEvents
@@ -350,13 +413,22 @@ export function DashboardPage() {
     () => buildRecentActivity({ event: selectedEvent, registrations, operationsEntries }),
     [operationsEntries, registrations, selectedEvent],
   )
+  const requestedTab = searchParams.get('tab') || 'summary'
+  const activeHomeTab = HOME_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'summary'
+  function setHomeTab(tab) {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      next.set('tab', tab)
+      return next
+    })
+  }
 
   return (
     <div className="space-y-6">
       <section data-route="dashboard" data-tour-id="overview-summary" className="rounded-[28px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-7">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Overview</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Home</p>
             <h2 className="mt-2 break-words font-serif text-3xl text-[#2B1723]">{getWorkingEventDisplayName(activeEvent)}</h2>
             <p className="mt-2 text-sm leading-6 text-[#816D62]">
               {activeEvent
@@ -499,9 +571,9 @@ export function DashboardPage() {
               </Section>
             </div>
 
-            <Section eyebrow="Quick Actions" title="Common organizer actions">
+            <Section eyebrow="Next Actions" title="Common next steps">
               <div className="grid gap-2">
-              {quickActions.slice(0, 8).map((action) => <ActionLink key={action.label} {...action} />)}
+              {quickActions.slice(0, 4).map((action) => <ActionLink key={action.label} {...action} />)}
               </div>
             </Section>
           </section>
@@ -524,7 +596,7 @@ export function DashboardPage() {
             <Metric label="Outstanding commitments" value={formatCurrency(readiness.planningOverview.totalOutstandingCommitments, financeSummary.currency)} detail="Operations commitments only" />
           </section>
 
-          <Section eyebrow="Recent Activity" title="Latest safe changes">
+          <Section eyebrow="Latest Changes" title="Latest changes to this event">
             {recentActivity.length === 0 ? (
               <p className="rounded-2xl border border-dashed border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm text-[#816D62]">
                 No recent event, registration, or Operations updates are available yet. Activity appears here after existing event-scoped records are created or corrected.
@@ -542,13 +614,18 @@ export function DashboardPage() {
             )}
           </Section>
 
-          <details className="phase23v-panel">
-            <summary className="phase23v-summary">
-              Event details, money snapshot, and readiness progress
-            </summary>
-            <div className="phase23v-body space-y-5">
-              <section aria-label="Event Summary details">
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Event Summary</p>
+          <section data-tour-id="home-workspace-tabs" className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Event workspace</p>
+                <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Event Summary, Money, Readiness, and Upcoming</h2>
+                <p className="mt-2 max-w-3xl text-xs leading-5 text-[#816D62]">Use these categories for context. Use the linked pages when you need to change records.</p>
+              </div>
+              <PageTabs tabs={HOME_TABS.map(([id, label]) => ({ id, label }))} active={activeHomeTab} onChange={setHomeTab} label="Home workspace categories" idPrefix="home" />
+            </div>
+
+            {activeHomeTab === 'summary' && (
+              <section id="home-summary-panel" role="tabpanel" aria-labelledby="home-summary-tab" tabIndex="0" className="mt-5" aria-label="Event Summary details">
                 <div className="mt-3 phase23v-metric-grid">
                   <Metric label="Days remaining" value={formatDaysUntilEvent(selectedEvent.eventDate)} />
                   <Metric label="Status" value={eventStatusLabel(selectedEvent.status)} detail={hydratedEvent.registrationRequired ? 'Registration required' : 'Registration optional'} />
@@ -556,9 +633,11 @@ export function DashboardPage() {
                   <Metric label="Capacity" value={hydratedEvent.capacity || 'Not set'} detail={capacityLabel} />
                 </div>
               </section>
+            )}
 
-              <section aria-label="Financial snapshot">
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Financial Snapshot</p>
+            {activeHomeTab === 'money' && (
+              <section id="home-money-panel" role="tabpanel" aria-labelledby="home-money-tab" tabIndex="0" className="mt-5" aria-label="Financial snapshot">
+                <p className="text-sm leading-6 text-[#816D62]">Registration Payments and Operations stay separate. These numbers help you decide where to review next; they are not final event profit.</p>
                 <div className="mt-3 phase23v-metric-grid">
                   <Metric label="Projected registration income" value={formatCurrency(readiness.planningOverview.budgets.projectedRegistrationIncome, financeSummary.currency)} />
                   <Metric label="Outstanding registration balance" value={formatCurrency(financeSummary.totalOutstanding, financeSummary.currency)} />
@@ -566,13 +645,11 @@ export function DashboardPage() {
                   <Metric label="Outstanding commitments" value={formatCurrency(readiness.planningOverview.totalOutstandingCommitments, financeSummary.currency)} detail="Operations commitments remain separate from registration payments." />
                 </div>
               </section>
-            </div>
-          </details>
+            )}
 
-          <details className="phase23v-panel">
-            <summary className="phase23v-summary">Planning progress and upcoming events</summary>
-            <div className="phase23v-body grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-              <Section eyebrow="Planning Progress" title="How prepared is this event?">
+            {activeHomeTab === 'readiness' && (
+              <section id="home-readiness-panel" role="tabpanel" aria-labelledby="home-readiness-tab" tabIndex="0" className="mt-5">
+                <p className="text-sm leading-6 text-[#816D62]">Readiness is based on visible tasks, event setup, resources, run-of-show, registrations, and commitments.</p>
                 <div className="phase23v-metric-grid">
                   <Metric label="Completed tasks" value={taskSummary.completed} />
                   <Metric label="Overdue tasks" value={taskSummary.overdue} />
@@ -582,9 +659,11 @@ export function DashboardPage() {
                   <Metric label="Supplier and sponsor records" value={readiness.planningOverview.partners.totalRecords} />
                   <Metric label="Confirmed sponsor cash" value={formatCurrency(readiness.planningOverview.partners.confirmedCashSponsors, financeSummary.currency)} />
                 </div>
-              </Section>
+              </section>
+            )}
 
-              <Section eyebrow="Upcoming Events" title="What else is coming up?">
+            {activeHomeTab === 'upcoming' && (
+              <section id="home-upcoming-panel" role="tabpanel" aria-labelledby="home-upcoming-tab" tabIndex="0" className="mt-5">
                 <div className="space-y-3">
                   {!visibleEventsLoaded ? (
                     <p className="py-4 text-sm text-[#816D62]">Loading events...</p>
@@ -613,9 +692,9 @@ export function DashboardPage() {
                     )
                   })}
                 </div>
-              </Section>
-            </div>
-          </details>
+              </section>
+            )}
+          </section>
         </>
       )}
     </div>
