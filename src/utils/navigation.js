@@ -1,7 +1,7 @@
 import { canViewRoute } from './accessRoles.js'
 
 export const MOBILE_PRIMARY_NAV_ITEMS = [
-  { to: '/dashboard', label: 'Overview', icon: 'LayoutDashboard' },
+  { to: '/dashboard', label: 'Home', icon: 'LayoutDashboard' },
   { to: '/registrations', label: 'Guests', icon: 'UsersRound' },
   { to: '/tickets', label: 'Tickets', icon: 'TicketCheck' },
   { to: '/check-in', label: 'Check-In', icon: 'ClipboardCheck' },

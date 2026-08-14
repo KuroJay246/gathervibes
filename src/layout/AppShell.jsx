@@ -41,7 +41,7 @@ const navGroups = [
   {
     label: 'Plan',
     items: [
-      { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+      { to: '/dashboard', label: 'Home', icon: LayoutDashboard },
       { to: '/events', label: 'Events', icon: CalendarDays },
       { to: '/tasks', label: 'Tasks & Deadlines', icon: ClipboardList },
       { to: '/contacts', label: 'Contacts & Organizations', icon: Building2 },
@@ -69,7 +69,7 @@ const navGroups = [
       { to: '/payments', label: 'Registration Payments', icon: CreditCard },
       { to: '/operations', label: 'Operations & Commitments', icon: ReceiptText },
       { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
-      { to: '/payments/reconciliation', label: 'Reconciliation Preview', icon: ReceiptText },
+      { to: '/payments/reconciliation', label: 'Review & Reconcile Records', icon: ReceiptText },
     ],
   },
   {
@@ -111,7 +111,7 @@ const mobileMoreGroups = [
       { to: '/payments', label: 'Registration Payments', icon: CreditCard },
       { to: '/operations', label: 'Operations & Commitments', icon: ReceiptText },
       { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
-      { to: '/payments/reconciliation', label: 'Reconciliation Preview', icon: ReceiptText },
+      { to: '/payments/reconciliation', label: 'Review & Reconcile Records', icon: ReceiptText },
     ],
   },
   {
@@ -131,12 +131,12 @@ const mobileMoreGroups = [
 ]
 
 const pageTitles = {
-  '/dashboard': ['Overview', 'Current event status, priorities, and next actions'],
+  '/dashboard': ['Event Overview', 'Current event status, priorities, and next actions'],
   '/events': ['Events', 'Plan and organize every gathering'],
   '/tasks': ['Tasks & Deadlines', 'Event-scoped work, blockers, and follow-up dates'],
   '/registrations': ['Guests & Registrations', 'Manage registration records and guest counts'],
   '/payments': ['Registration Payments', 'Review registration charges, payments, balances, and follow-up'],
-  '/payments/reconciliation': ['Reconciliation Preview', 'Read-only payment workbook comparison'],
+  '/payments/reconciliation': ['Review & Reconcile Records', 'Read-only workbook comparison before any correction'],
   '/tickets': ['Tickets', 'Assign ticket codes and prepare QR access'],
   '/check-in': ['Check-In', 'Track event-day attendance'],
   '/operations': ['Operations', 'Track event-level money and obligations'],
@@ -168,7 +168,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className={`flex items-center ${collapsed ? 'justify-center px-3' : 'justify-between px-6'} pb-6 pt-6`}>
-        <Link to="/dashboard" onClick={onNavigate} className="block focus:outline-none focus:ring-2 focus:ring-[#F5E6C8]/60" aria-label="Go to Overview">
+        <Link to="/dashboard" onClick={onNavigate} className="block focus:outline-none focus:ring-2 focus:ring-[#F5E6C8]/60" aria-label="Go to Home">
           <BrandMark light compact={collapsed} />
         </Link>
         {!mobile && (
