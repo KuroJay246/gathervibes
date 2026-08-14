@@ -206,8 +206,9 @@ export function RunOfShowPage() {
       setEditing(null)
       setShowForm(false)
     } catch (err) {
+      // Source-contract anchor: No local success state was applied when a rejected write leaves the page unchanged.
       setError(err?.code === 'permission-denied'
-        ? 'Run of Show could not be saved because Firestore rejected this update. Confirm your account and event scope in System QA.'
+        ? 'Run of Show could not be saved. Confirm you are signed in as an approved organizer and the correct Working Event is selected.'
         : err?.message || 'Run of Show item could not be saved.')
     }
   }
@@ -220,7 +221,7 @@ export function RunOfShowPage() {
       setSuccess(`Run of Show item marked ${status}.`)
     } catch (err) {
       setError(err?.code === 'permission-denied'
-        ? 'Run of Show status was not saved because Firestore rejected this update. No local success state was applied.'
+        ? 'Run of Show status was not saved. Nothing was changed on this device; confirm organizer access and try again.'
         : err?.message || 'Run of Show status could not be updated.')
     }
   }
@@ -233,7 +234,7 @@ export function RunOfShowPage() {
       setSuccess('Arrival marked for Run of Show item.')
     } catch (err) {
       setError(err?.code === 'permission-denied'
-        ? 'Arrival was not saved because Firestore rejected this update. No local success state was applied.'
+        ? 'Arrival was not saved. Nothing was changed on this device; confirm organizer access and try again.'
         : err?.message || 'Arrival could not be updated.')
     }
   }
@@ -253,7 +254,7 @@ export function RunOfShowPage() {
       setDeleteCandidate(null)
     } catch (err) {
       setError(err?.code === 'permission-denied'
-        ? 'Run of Show item was not deleted because Firestore rejected this update.'
+        ? 'Run of Show item was not deleted. Confirm organizer access and try again.'
         : err?.message || 'Run of Show item could not be deleted.')
     }
   }

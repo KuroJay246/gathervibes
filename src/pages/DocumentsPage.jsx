@@ -25,7 +25,7 @@ import {
 import { createDocumentReference, deleteDocumentReference, subscribeToDocuments, updateDocumentReference, updateDocumentStatus } from '../services/documentService'
 
 function friendlyDocumentError(error, action = 'document reference') {
-  if (error?.code === 'permission-denied') return `${action} was blocked by Firestore authorization or document-record validation. Confirm Protected Owner and Working Event status in System QA.`
+  if (error?.code === 'permission-denied') return `${action} could not be saved. Confirm you are signed in as an approved organizer and the correct Working Event is selected.`
   if (error?.code === 'unauthenticated') return 'Your session expired. Sign in again to continue.'
   return error?.message || `${action} could not be completed.`
 }

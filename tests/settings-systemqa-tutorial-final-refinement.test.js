@@ -43,7 +43,7 @@ test('final Settings refinement separates access sources, roles, integrations, t
 
 test('final role wording matches route and settings permissions without broadening access', () => {
   assert.equal(ACCESS_ROLES['owner-admin'].label, 'Protected Owner')
-  assert.match(ACCESS_ROLES['owner-admin'].summary, /owner protections pinned to the protected Firebase UID/)
+  assert.match(ACCESS_ROLES['owner-admin'].summary, /permanent and cannot be removed from Settings/)
   assert.match(ACCESS_ROLES.admin.summary, /Normal organizer-level management/)
   assert.match(ACCESS_ROLES['event-manager'].summary, /Assigned-event task and check-in workflow access only/)
   assert.match(ACCESS_ROLES.viewer.summary, /Read-only assigned-event behavior/)

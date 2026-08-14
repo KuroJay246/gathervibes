@@ -28,17 +28,17 @@ function getAuthErrorMessage(code) {
     'auth/invalid-credential': 'The email or password is incorrect.',
     'auth/invalid-email': 'Enter a valid email address.',
     'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
-    'auth/network-request-failed': 'Could not reach Firebase. Check your connection and try again.',
+    'auth/network-request-failed': 'Could not reach the sign-in service. Check your connection and try again.',
     'auth/user-disabled': 'This account has been disabled. Contact the workspace owner.',
     'auth/popup-closed-by-user': 'Google sign-in was cancelled. Nothing changed.',
     'auth/cancelled-popup-request': 'The earlier Google sign-in window was closed. Please try again.',
     'auth/popup-blocked': 'Your browser blocked the Google sign-in window. Continue in this window instead.',
-    'auth/unauthorized-domain': 'Google sign-in is blocked because this website domain is not authorized in Firebase Authentication. Add this domain under Firebase Console → Authentication → Settings → Authorized domains.',
-    'auth/operation-not-allowed': 'Google sign-in is not enabled for this Firebase project.',
+    'auth/unauthorized-domain': 'Google sign-in is not set up for this website. Contact the Protected Owner or support.',
+    'auth/operation-not-allowed': 'Google sign-in is not enabled for this app. Contact the Protected Owner or support.',
     'auth/unapproved-account': 'Your administrator access could not be confirmed. Refresh the page or sign in again. No changes were saved.',
     'auth/access-check-failed': 'Your administrator access could not be confirmed. Refresh the page or sign in again. No changes were saved.',
     'auth/redirect-failed': 'Google sign-in could not be completed. Please try again.',
-    'auth/persistence-failed': 'This browser could not persist Firebase sign-in state. Check browser storage settings and try again.',
+    'auth/persistence-failed': 'This browser could not keep the sign-in session. Check browser storage settings and try again.',
   }
 
   return messages[code] || 'Sign-in failed. Please try again.'

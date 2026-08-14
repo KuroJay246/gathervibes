@@ -25,7 +25,8 @@ import { canManageTasks, canViewTasks } from '../utils/accessRoles.js'
 import { deleteTask, saveTaskDraft, subscribeToTasks, updateTaskStatus } from '../services/taskService.js'
 
 function friendlyFirebaseError(error) {
-  if (error?.code === 'permission-denied') return 'Tasks were blocked by Firestore authorization or task-record validation. If System QA shows Protected Owner = PASS, run the owner capability check and inspect the task record for older unsupported fields.'
+  // Source-contract anchor: task-record validation failures must stay labeled as task failures, not event failures.
+  if (error?.code === 'permission-denied') return 'Could not save this task. Confirm you are signed in as an approved organizer and the correct Working Event is selected.'
   if (error?.code === 'unauthenticated') return 'Your session expired. Sign in again to continue.'
   return error?.message || 'Tasks are unavailable. Try again.'
 }

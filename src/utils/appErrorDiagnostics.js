@@ -18,37 +18,59 @@ export function categorizeAppError(error, online = typeof navigator !== 'undefin
 export function appErrorContentForCategory(category) {
   const content = {
     connection: {
-      title: 'Gather & Savor Hub cannot reach the internet.',
-      body: 'Your browser appears offline or the connection is unstable. Check the connection, then try again.',
+      title: 'No internet connection',
+      body: 'Gather & Savor cannot load right now. Check your connection and try again.',
+      supportExplanation: 'The app could not reach the internet from this browser. Your event data is normally safe; reconnect and try again.',
+      actions: ['try-again', 'check-connection'],
     },
     'stale-deployment': {
-      title: 'Gather & Savor Hub needs the latest deployed files.',
-      body: 'The browser may be holding an older page that references a JavaScript file replaced during deployment. Reloading the latest version usually fixes this.',
+      title: 'The app was updated',
+      body: 'Your browser is still using an older version. Reload the latest version to continue.',
+      supportExplanation: 'The website was updated, but this browser tried to load a file from the older version. Reloading the latest version should correct it. This does not normally mean event data was lost.',
+      actions: ['reload-latest', 'try-again'],
     },
     'module-load': {
-      title: 'A required application file did not load.',
-      body: 'One of the JavaScript files needed by this page was not available. This can happen during a deployment or a temporary network interruption.',
+      title: 'The app was updated',
+      body: 'Your browser is still using an older version. Reload the latest version to continue.',
+      supportExplanation: 'A page file did not load. This is most often caused by a recent app update or a short connection interruption. Reloading the latest version should correct it, and event data is normally safe.',
+      actions: ['reload-latest', 'try-again'],
     },
     firebase: {
-      title: 'Firebase is not available right now.',
-      body: 'The app could not reach its Firebase services. Try again, and check the connection if it continues.',
+      title: 'Gather & Savor is temporarily unavailable',
+      body: 'The app could not connect to its data service. Wait a moment and try again.',
+      supportExplanation: 'Gather & Savor could not reach the data service. This usually means the service or connection is temporarily unavailable. Try again shortly; saved event data is normally safe.',
+      actions: ['try-again'],
     },
     'permission-denied': {
-      title: 'This account does not have permission for that action.',
-      body: 'Your sign-in worked, but Firestore rejected the requested access. Sign in with an approved organizer account or ask the protected owner to review access.',
+      title: 'You do not have access to this page',
+      body: 'This account may not have permission to use this feature. Check Settings or contact the Protected Owner.',
+      supportExplanation: 'The app loaded, but this account was not allowed to open the page or complete the action. Ask the Protected Owner to review access if this seems wrong. No event data was changed by this error.',
+      actions: ['dashboard'],
     },
     'auth-session': {
-      title: 'Your sign-in session needs attention.',
-      body: 'The current browser session may have expired or become invalid. Sign in again to refresh access.',
+      title: 'Please sign in again',
+      body: 'Your sign-in session has expired or could not be verified.',
+      supportExplanation: 'The browser could not verify the current sign-in session. Sign in again and retry the action. This does not normally mean event data was lost.',
+      actions: ['sign-in', 'try-again'],
     },
     'server-hosting': {
-      title: 'Gather & Savor Hub hosting did not respond correctly.',
-      body: 'The hosted app or one of its server responses failed. Try again after a moment.',
+      title: 'Gather & Savor is temporarily unavailable',
+      body: 'The app could not connect to its data service. Wait a moment and try again.',
+      supportExplanation: 'The hosted app or a supporting service did not respond correctly. Try again after a moment. Saved event data is normally safe.',
+      actions: ['try-again'],
     },
     unknown: {
-      title: 'Something went wrong loading Gather & Savor Hub.',
-      body: 'Try again first. If this account still gets stuck, reload the latest version, then sign in again if needed.',
+      title: 'Something went wrong',
+      body: 'Gather & Savor could not complete this request. Try again, and open support details if the problem continues.',
+      supportExplanation: 'The app hit an unexpected problem. Try again first. If it keeps happening, copy the support details so the issue can be investigated. Saved event data is normally safe unless the failed action said otherwise.',
+      actions: ['try-again', 'dashboard'],
     },
   }
   return content[category] || content.unknown
+}
+
+export function failedFileFromError(error = {}) {
+  const message = String(error?.message || '')
+  const match = message.match(/https?:\/\/[^\s)'"]+|\/assets\/[^\s)'"]+/)
+  return match?.[0] || 'not detected'
 }

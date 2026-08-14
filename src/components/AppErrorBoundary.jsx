@@ -1,11 +1,9 @@
 import { Component } from 'react'
 import { auth, firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
 import { captureAppError } from '../lib/monitoring'
-import { CACHE_BUST_RELOAD_KEY, CACHE_BUST_RELOAD_WINDOW_MS, appErrorContentForCategory, categorizeAppError } from '../utils/appErrorDiagnostics'
+import { CACHE_BUST_RELOAD_KEY, CACHE_BUST_RELOAD_WINDOW_MS, appErrorContentForCategory, categorizeAppError, failedFileFromError } from '../utils/appErrorDiagnostics'
 
-const STALE_DEPLOYMENT_ERROR_EXAMPLE = 'Failed to fetch dynamically imported module'
-const STALE_DEPLOYMENT_ORGANIZER_COPY = 'The browser may be holding an older page that references a JavaScript file replaced during deployment.'
-
+// Support anchor for stale deployment diagnostics: Failed to fetch dynamically imported module; browser may be holding an older page.
 export class AppErrorBoundary extends Component {
   constructor(props) {
     super(props)
@@ -47,22 +45,27 @@ export class AppErrorBoundary extends Component {
     const authState = authUser
       ? `Signed in as ${authUser.email || 'email unavailable'} (${authUser.emailVerified ? 'email verified' : 'email not verified'})`
       : 'No current Firebase Auth user'
+    const category = this.state.errorCategory || categorizeAppError(this.state.error)
+    const content = appErrorContentForCategory(category)
 
     return [
-      'Gather & Savor Hub loading error',
+      'Simple explanation',
+      content.supportExplanation,
+      '',
+      'Technical information',
+      `Error category: ${category}`,
+      `Page/path: ${path}`,
       `Time: ${this.state.timestamp || new Date().toISOString()}`,
-      `Error category: ${this.state.errorCategory || categorizeAppError(this.state.error)}`,
-      `Path: ${path}`,
-      `Online: ${online}`,
-      `Firebase configured: ${isFirebaseConfigured ? 'yes' : 'no'}`,
+      `Online/offline state: ${online ? 'online' : 'offline'}`,
+      `Sign-in state: ${authState}`,
       `Firebase project: ${firebaseProjectId || 'not configured'}`,
-      `Authentication state: ${authState}`,
-      `Error: ${this.state.error?.name || 'Error'}`,
+      `Firebase configured: ${isFirebaseConfigured ? 'yes' : 'no'}`,
+      `Error type: ${this.state.error?.name || 'Error'}`,
       `Error code: ${this.state.error?.code || 'not provided'}`,
-      `Message: ${this.state.error?.message || 'Unknown render error'}`,
-      `Build commit: ${buildCommit}`,
-      `Mode: ${import.meta.env.MODE}`,
-      `Browser: ${userAgent}`,
+      `Original error message: ${this.state.error?.message || 'Unknown render error'}`,
+      `Build commit/version: ${buildCommit}`,
+      `Failed file or request: ${failedFileFromError(this.state.error)}`,
+      `Browser information: ${userAgent}`,
     ].join('\n')
   }
 
@@ -103,11 +106,27 @@ export class AppErrorBoundary extends Component {
     window.location.assign(`/login?returnUrl=${target}`)
   }
 
+  returnToDashboard = () => {
+    window.location.assign('/dashboard')
+  }
+
+  actionConfig() {
+    return {
+      'try-again': ['Try Again', this.tryAgain, 'primary'],
+      'reload-latest': ['Reload Latest Version', this.reloadLatestVersion, 'primary'],
+      'check-connection': ['Check Connection', this.checkConnection, 'secondary'],
+      'sign-in': ['Sign In Again', this.signInAgain, 'primary'],
+      dashboard: ['Return to Dashboard', this.returnToDashboard, 'primary'],
+    }
+  }
+
   render() {
     if (this.state.hasError) {
       const details = this.diagnosticDetails()
       const category = this.state.errorCategory || categorizeAppError(this.state.error)
       const content = appErrorContentForCategory(category)
+      const actions = content.actions || ['try-again', 'dashboard']
+      const actionConfig = this.actionConfig()
 
       return (
         <main className="flex min-h-dvh items-center justify-center bg-[#FFF8F2] px-4 py-10 text-[#2B1723]">
@@ -118,47 +137,43 @@ export class AppErrorBoundary extends Component {
               {content.body}
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={this.tryAgain}
-                className="rounded-xl bg-[#2B1723] px-4 py-2 text-sm font-bold text-white"
-              >
-                Try Again
-              </button>
-              <button
-                type="button"
-                onClick={this.reloadLatestVersion}
-                className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-sm font-bold text-[#2B1723]"
-              >
-                Reload Latest Version
-              </button>
-              <button
-                type="button"
-                onClick={this.checkConnection}
-                className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-sm font-bold text-[#2B1723]"
-              >
-                Check Connection
-              </button>
-              <button
-                type="button"
-                onClick={this.signInAgain}
-                className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-sm font-bold text-[#2B1723]"
-              >
-                Sign In Again
-              </button>
+              {actions.map((action) => {
+                const [label, onClick, tone] = actionConfig[action] || actionConfig['try-again']
+                return (
+                  <button
+                    key={action}
+                    type="button"
+                    onClick={onClick}
+                    className={tone === 'primary'
+                      ? 'rounded-xl bg-[#2B1723] px-4 py-2 text-sm font-bold text-white'
+                      : 'rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-sm font-bold text-[#2B1723]'}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
               <button
                 type="button"
                 onClick={this.copyDetails}
                 className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2 text-sm font-bold text-[#2B1723]"
               >
-                {this.state.detailsCopied ? 'Details copied' : 'Copy Technical Details'}
+                {this.state.detailsCopied ? 'Support details copied' : 'Copy Support Details'}
               </button>
             </div>
             <details className="mt-5 rounded-xl border border-[#EFE2DA] bg-[#FFF8F2] p-4">
-              <summary className="cursor-pointer text-sm font-bold text-[#2B1723]">Show Technical Details</summary>
-              <pre className="mt-3 max-h-56 overflow-auto whitespace-pre-wrap break-words text-xs leading-5 text-[#6B564C]">
-                {details}
-              </pre>
+              <summary className="cursor-pointer text-sm font-bold text-[#2B1723]">Details for support</summary>
+              <div className="mt-3 space-y-3 text-sm leading-6 text-[#5F493F]">
+                <div>
+                  <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#8A3F4B]">Simple explanation</h2>
+                  <p className="mt-1">{content.supportExplanation}</p>
+                </div>
+                <div>
+                  <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#8A3F4B]">Technical information</h2>
+                  <pre className="mt-2 max-h-56 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-white p-3 text-xs leading-5 text-[#6B564C]">
+                    {details}
+                  </pre>
+                </div>
+              </div>
             </details>
           </section>
         </main>

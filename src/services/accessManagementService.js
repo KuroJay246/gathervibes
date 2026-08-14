@@ -13,7 +13,7 @@ function requireDb() {
 export function validateOrganizerEmail(rawEmail) {
   const email = normalizeAccessEmail(rawEmail)
   if (!EMAIL_PATTERN.test(email)) throw new Error('Enter a valid email address.')
-  if (email === PROTECTED_OWNER_EMAIL) throw new Error('Protected Owner access is pinned by Firebase UID and cannot be edited here.')
+  if (email === PROTECTED_OWNER_EMAIL) throw new Error('Protected Owner access is permanent and cannot be edited here.')
   return email
 }
 

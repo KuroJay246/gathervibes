@@ -24,7 +24,7 @@ export const ACCESS_ROLES = {
   'owner-admin': {
     id: 'owner-admin',
     label: 'Protected Owner',
-    summary: 'Full approved-organizer functionality plus owner protections pinned to the protected Firebase UID.',
+    summary: 'Full approved-organizer functionality. Protected Owner access is permanent and cannot be removed from Settings.',
   },
   owner: {
     id: 'owner',
@@ -211,7 +211,7 @@ export function listApprovedAccessEntries(accessControl = {}) {
 
 export function roleCapabilitySummary(role) {
   const normalizedRole = normalizeAccessRole(role) || 'admin'
-  if (normalizedRole === 'owner-admin') return 'Protected owner access is pinned to the Firebase UID and cannot be removed through the mutable allowlist.'
+  if (normalizedRole === 'owner-admin') return 'Protected Owner access is permanent and cannot be removed from Settings.'
   if (ADMIN_ROLES.has(normalizedRole)) return 'Approved organizer access supports normal organizer-level management while the account remains approved.'
   if (normalizedRole === 'event-manager') return 'Assigned-event role for limited task and check-in workflows. Route gates and Firestore rules keep writes narrow and event-scoped. It does not grant Settings, imports, payments, tickets, Reports, or full organizer access.'
   if (normalizedRole === 'scanner' || normalizedRole === 'checkInStaff') return 'Assigned-event check-in lookup and check-in completion only. No ticket, payment, settings, reports, or admin shell access.'

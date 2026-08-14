@@ -439,8 +439,8 @@ export function ImportsPage() {
       setImportErrorDetails(buildSafeImportErrorDetails(err, validRows.length))
       setError(
         isPermissionDeniedImportError(err)
-          ? 'Import failed because your account could not save the confirmed rows. No rows were imported. This usually means the confirmed import payload no longer matches the current workspace rules or required fields.'
-          : err.operationResult?.message || 'Import failed before any rows were imported. Check the diagnostic details below and try again.',
+          ? 'Import failed because your account could not save the confirmed rows. No rows were imported. Confirm you are signed in as an approved organizer and the correct Working Event is selected.'
+          : err.operationResult?.message || 'Import failed before any rows were imported. Review the import summary and try again.',
       )
     } finally {
       setImporting(false)
@@ -1060,7 +1060,7 @@ export function ImportsPage() {
               ))}
             </div>
             <p className="mt-4 text-xs leading-5 text-[#816D62]">
-              QR payload remains GSV:TICKET:{'{ticketCode}'}. Importing registrations never changes scanner permissions.
+              Ticket QR codes stay ticket-code only. Importing registrations never changes scanner access.
             </p>
             <div className="mt-5 rounded-2xl border border-[#F2E8E1] bg-[#FBF8F5] p-4 text-sm text-[#5D4A52]">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A5260]">Final confirmation summary</p>

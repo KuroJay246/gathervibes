@@ -68,7 +68,7 @@ test('Phase 23O preserves secondary organizer access and lists protected owner a
   assert.equal(resolveAccessRole(accessControl, 'gathersavorvibes@gmail.com'), 'admin')
   assert.equal(entries.find((entry) => entry.email === 'gathersavorvibes@gmail.com').status, 'active')
   assert.equal(entries.find((entry) => entry.email === 'gathersavorvibes@gmail.com').accessType, 'Approved Organizer')
-  assert.match(roleCapabilitySummary('owner-admin'), /pinned to the Firebase UID/)
+  assert.match(roleCapabilitySummary('owner-admin'), /permanent and cannot be removed from Settings/)
 })
 
 test('Phase 23O inactive approved organizer metadata blocks app role resolution', () => {

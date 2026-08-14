@@ -52,7 +52,7 @@ function validateStaffProfile({ uid, email, displayName, defaultRole }) {
   const cleanUid = typeof uid === 'string' ? uid.trim() : ''
   const cleanEmail = normalizeAccessEmail(email)
   const role = normalizeAccessRole(defaultRole)
-  if (!cleanUid) throw new Error('Firebase UID is required for staff access.')
+  if (!cleanUid) throw new Error('Staff account ID is required for staff access.')
   if (!cleanEmail || !cleanEmail.includes('@')) throw new Error('A valid staff email is required.')
   if (!STAFF_ROLES.has(role)) throw new Error('Choose a valid staff role.')
   return {

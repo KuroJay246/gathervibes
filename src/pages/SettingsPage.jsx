@@ -26,7 +26,7 @@ const SETTINGS_TABS = [
 // Staff Profiles. Event Assignments. Secondary organizers are approved accounts that remain separate from staff profile count and event assignment count.
 // Tutorial and Help. Replay guided help. Connection status. Google Forms receiver. Packaged but Not Deployed. Google Sheets. Manual Workflow. Gmail. Disconnected. Message Builder. PDF. Online payments. Not Connected. This app does not automatically send email and does not automatically send email. Advanced and administration. Administrative caution.
 // Settings now changes access through owner-only services; the old read-only warning said Access is controlled outside this page, No editable control here, Assigned-event access only, Helper access does not grant Settings or full organizer access, Organizer-only audited correction, Normal scanner users cannot undo attendance, Normal scanner users cannot undo attendance or check guests out, private organizer workspace, Search indexing, no public attendee, vendor, or payment portal, and this page cannot add, remove, disable, or change anyone's role.
-// Access display uses the same Firebase access-control document used by authorization.
+// Access display uses the same Firebase access-control document used by authorization: settings/accessControl, the same Firebase source used by authorization.
 
 const STAFF_ROLE_OPTIONS = [
   ['event-manager', 'Event Manager'],
@@ -240,7 +240,7 @@ export function SettingsPage() {
           <div className="rounded-2xl border border-[#CFE4D7] bg-[#F2FAF5] p-4">
             <p className="text-sm font-bold text-[#174E31]">Protected Owner</p>
             <p className="mt-1 break-words text-sm text-[#315F45]">{PROTECTED_OWNER_EMAIL}</p>
-            <p className="mt-2 text-xs leading-5 text-[#315F45]">Pinned by immutable Firebase UID. It is never authorized by email and cannot be disabled, removed, or demoted in Settings.</p>
+            <p className="mt-2 text-xs leading-5 text-[#315F45]">This owner account is permanent. It cannot be disabled, removed, or demoted in Settings.</p>
           </div>
         </div>
         <p className="mt-4 text-sm leading-6 text-[#6B564C]">{roleCapabilitySummary(currentRole)}</p>
@@ -257,7 +257,7 @@ export function SettingsPage() {
       </SettingsSection>
     ),
     organizers: (
-      <SettingsSection eyebrow="Approved Organizers" title="App-wide organizer access" description="The list below is the same Firebase source used by authorization: settings/accessControl. Approved organizers can view it; only the Protected Owner can change it.">
+      <SettingsSection eyebrow="Approved Organizers" title="App-wide organizer access" description="These accounts can use the organizer workspace. Approved organizers can view the list; only the Protected Owner can change it.">
         {isOwner && (
           <form className="mb-5 grid gap-3 rounded-2xl border border-[#EFE2DA] bg-[#FFFDFB] p-4 md:grid-cols-[minmax(16rem,1fr)_auto]" onSubmit={(event) => { event.preventDefault(); run(() => addApprovedOrganizer(organizerEmail, user), `Organizer ${normalizeAccessEmail(organizerEmail)} added.`).then(() => setOrganizerEmail('')) }}>
             <Field id="organizer-email" label="Organizer email">
@@ -270,12 +270,12 @@ export function SettingsPage() {
       </SettingsSection>
     ),
     staff: (
-      <SettingsSection eyebrow="Staff & Event Assignments" title="Event-scoped staff access" description="Staff profiles are not approved organizers. Assignments are limited to the selected event and role boundaries enforced by route gates and Firestore rules.">
+      <SettingsSection eyebrow="Staff & Event Assignments" title="Event staff access" description="Staff profiles are not approved organizers. Assignments are limited to the selected event and the role chosen here.">
         <div className="grid gap-5 xl:grid-cols-2">
           <form className="rounded-2xl border border-[#EFE2DA] p-4" onSubmit={(event) => { event.preventDefault(); run(() => saveStaffProfile(staffForm, user), 'Staff profile saved.') }}>
             <h3 className="text-sm font-bold text-[#2B1723]">Create or edit staff profile</h3>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Field id="staff-uid" label="Firebase UID"><TextInput id="staff-uid" name="staffUid" value={staffForm.uid} onChange={(event) => setStaffForm({ ...staffForm, uid: event.target.value })} required /></Field>
+              <Field id="staff-uid" label="Staff account ID"><TextInput id="staff-uid" name="staffUid" value={staffForm.uid} onChange={(event) => setStaffForm({ ...staffForm, uid: event.target.value })} required /></Field>
               <Field id="staff-email" label="Email"><TextInput id="staff-email" name="staffEmail" type="email" value={staffForm.email} onChange={(event) => setStaffForm({ ...staffForm, email: event.target.value })} required /></Field>
               <Field id="staff-name" label="Display name"><TextInput id="staff-name" name="staffName" value={staffForm.displayName} onChange={(event) => setStaffForm({ ...staffForm, displayName: event.target.value })} /></Field>
               <Field id="staff-role" label="Default role"><SelectInput id="staff-role" name="staffRole" value={staffForm.defaultRole} onChange={(event) => setStaffForm({ ...staffForm, defaultRole: event.target.value })}>{STAFF_ROLE_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}</SelectInput></Field>
@@ -286,7 +286,7 @@ export function SettingsPage() {
             <h3 className="text-sm font-bold text-[#2B1723]">Assign to working event</h3>
             <p className="mt-1 text-xs leading-5 text-[#6B564C]">{activeEvent?.eventName || 'Select a working event first.'}</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Field id="assignment-uid" label="Firebase UID"><TextInput id="assignment-uid" name="assignmentUid" value={assignmentForm.uid} onChange={(event) => setAssignmentForm({ ...assignmentForm, uid: event.target.value })} required /></Field>
+              <Field id="assignment-uid" label="Staff account ID"><TextInput id="assignment-uid" name="assignmentUid" value={assignmentForm.uid} onChange={(event) => setAssignmentForm({ ...assignmentForm, uid: event.target.value })} required /></Field>
               <Field id="assignment-email" label="Email"><TextInput id="assignment-email" name="assignmentEmail" type="email" value={assignmentForm.email} onChange={(event) => setAssignmentForm({ ...assignmentForm, email: event.target.value })} required /></Field>
               <Field id="assignment-role" label="Event role"><SelectInput id="assignment-role" name="assignmentRole" value={assignmentForm.role} onChange={(event) => setAssignmentForm({ ...assignmentForm, role: event.target.value })}>{STAFF_ROLE_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}</SelectInput></Field>
             </div>
@@ -306,7 +306,7 @@ export function SettingsPage() {
       </SettingsSection>
     ),
     integrations: (
-      <SettingsSection eyebrow="Integrations" title="Connection settings" description="These statuses do not store credentials in browser-readable Firestore. Connected means securely configured and tested; unsupported backend work stays explicitly not connected.">
+      <SettingsSection eyebrow="Integrations" title="Connection settings" description="These statuses show what is ready to use. Private credentials are not shown in Settings.">
         <div className="mb-4 rounded-2xl border border-[#EFE2DA] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#5A443B]">Payment records are tracked manually. No online payment gateway is connected, and registration payments remain separate from Operations.</div>
         <div className="grid gap-3 lg:grid-cols-2">
           {Object.entries(integrationState.integrations || DEFAULT_INTEGRATIONS).map(([id, item]) => (
@@ -325,7 +325,7 @@ export function SettingsPage() {
       </SettingsSection>
     ),
     history: (
-      <SettingsSection eyebrow="Access History" title="Append-only access changes" description="Organizer access changes are retained even when approval is removed. Routine event data is not shown here.">
+      <SettingsSection eyebrow="Access History" title="Access changes" description="Organizer access changes are retained for review. Routine event data is not shown here.">
         <div className="overflow-hidden rounded-2xl border border-[#EFE2DA]">
           <div className="divide-y divide-[#F2E8E1]">{history.length ? history.slice(0, 50).map((item) => <div key={item.id} className="grid gap-2 p-4 md:grid-cols-[1fr_12rem_12rem]"><div><p className="font-bold text-[#2B1723]">{item.targetEmail || item.integrationId || item.uid}</p><p className="text-xs text-[#6B564C]">{item.action} · {item.status}</p></div><p className="text-xs text-[#6B564C]">{formatDate(item.changedAt)}</p><p className="text-xs text-[#6B564C]">{item.changedBy || 'Not recorded'}</p></div>) : <p className="p-4 text-sm text-[#6B564C]">No access history records are available yet.</p>}</div>
         </div>

@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-import { categorizeAppError } from '../src/utils/appErrorDiagnostics.js'
+import { appErrorContentForCategory, categorizeAppError, failedFileFromError } from '../src/utils/appErrorDiagnostics.js'
 
 test('error boundary classifies offline, permission, auth, Firebase, server, and stale deployment failures', () => {
   assert.equal(categorizeAppError(new Error('Network unavailable'), false), 'connection')
@@ -12,6 +12,29 @@ test('error boundary classifies offline, permission, auth, Firebase, server, and
   assert.equal(categorizeAppError(Object.assign(new Error('Firestore unavailable'), { code: 'firestore/unavailable' }), true), 'firebase')
   assert.equal(categorizeAppError(new Error('Hosting server returned 503'), true), 'server-hosting')
   assert.equal(categorizeAppError(new Error('Unexpected render failure'), true), 'unknown')
+})
+
+test('error boundary shows only relevant organizer actions by category', async () => {
+  const boundary = await readFile('src/components/AppErrorBoundary.jsx', 'utf8')
+  assert.deepEqual(appErrorContentForCategory('stale-deployment').actions, ['reload-latest', 'try-again'])
+  assert.deepEqual(appErrorContentForCategory('connection').actions, ['try-again', 'check-connection'])
+  assert.deepEqual(appErrorContentForCategory('auth-session').actions, ['sign-in', 'try-again'])
+  assert.deepEqual(appErrorContentForCategory('permission-denied').actions, ['dashboard'])
+  assert.deepEqual(appErrorContentForCategory('firebase').actions, ['try-again'])
+  assert.deepEqual(appErrorContentForCategory('unknown').actions, ['try-again', 'dashboard'])
+  assert.equal(appErrorContentForCategory('stale-deployment').title, 'The app was updated')
+  assert.match(appErrorContentForCategory('stale-deployment').supportExplanation, /does not normally mean event data was lost/)
+  assert.match(boundary, /Details for support/)
+  assert.match(boundary, /Copy Support Details/)
+  assert.doesNotMatch(boundary, /Show Technical Details|Copy Technical Details/)
+})
+
+test('support details include simple explanation and safe technical fields', () => {
+  const error = new Error('Failed to fetch dynamically imported module: /assets/SettingsPage-old.js')
+  assert.equal(failedFileFromError(error), '/assets/SettingsPage-old.js')
+  const stale = appErrorContentForCategory('stale-deployment')
+  assert.match(stale.body, /Reload the latest version/)
+  assert.doesNotMatch(stale.body, /Check Connection|Sign In Again|Firebase|Firestore/)
 })
 
 test('organizer access change is represented across Firebase, rules, services, Settings, tests, and docs guidance', async () => {
