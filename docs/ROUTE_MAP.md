@@ -5,11 +5,11 @@
 | Route | Navigation label | Purpose | Notes |
 | --- | --- | --- | --- |
 | `/login` | Login | Sign in with approved organizer access. | Public entry only. |
-| `/dashboard` | Overview | Review the current Working Event, priorities, numbers, and quick actions. | Best starting point for daily organizer work. |
+| `/dashboard` | Home | Review the current Working Event, priorities, numbers, and next actions. | Best starting point for daily organizer work. |
 | `/events` | Events | Create, edit, select, and remove event records. | Working Event changes start here. |
 | `/registrations` | Guests & Registrations | Manage registration records, guests, finance fields, and review filters. | Registrations and guests stay distinct. |
 | `/payments` | Payments | Review registration charges, payments, balances, and finance follow-up. | Registration payments only. |
-| `/payments/reconciliation` | Reconciliation Preview | Compare an organizer-approved payment workbook with the selected event in read-only mode. | Internal audit tool; no apply action. |
+| `/payments/reconciliation` | Review & Reconcile Records | Compare an organizer-approved payment workbook with the selected event in read-only mode. | Internal audit tool; no apply action. |
 | `/tickets` | Tickets | Assign ticket codes and prepare QR-ready access. | QR payload stays `GSV:TICKET:{ticketCode}`. |
 | `/check-in` | Check-In | Search guests, confirm attendance, and use event-day helper lists. | Uses the selected event only. |
 | `/scanner` | Scanner | Assigned-event scanner workflow for event-day staff. | Separate from organizer navigation. |

@@ -40,10 +40,10 @@ test('Phase 23C route is preview-only, Working Event-scoped, and not CPB-gated',
 
   assert.match(app, /path="\/payments\/reconciliation"/)
   assert.doesNotMatch(app, /path="\/payments\/reconciliation" element=\{<AssignedEventGate/)
-  assert.match(paymentsPage, /Reconciliation Preview/)
+  assert.match(paymentsPage, /Review & Reconcile Records/)
   assert.doesNotMatch(await readFile('src/utils/paymentReconciliation.js', 'utf8'), /CPB_DRY_RUN_CONFIRMATION_TEXT|CPB_RECONCILIATION_EVENT_ID/)
   assert.match(reconciliationPage, /selected Working Event/)
-  assert.match(reconciliationPage, /Load Preview/)
+  assert.match(reconciliationPage, /Compare Records/)
   assert.doesNotMatch(reconciliationPage, /localStorage|setActiveEvent|updateDoc|writeBatch|setDoc|addDoc|deleteDoc|runTransaction/)
   assert.doesNotMatch(access, /scanner:[\s\S]*'\/payments'/)
 })

@@ -398,25 +398,18 @@ export function OperationsPage() {
         </div>
       </header>
 
-      <section className="flex items-center gap-2 rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
+      <section className="rounded-xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
         <p className="font-semibold text-[#6B564C]">
-          Operations now covers both planning commitments and the event-level ledger.
+          Use Ledger for event-level income and expenses. Use Commitments and Partners & Suppliers for promises, sponsors, vendors, venue contacts, and helpers.
           {!canEditOperations && ' Your role is read-only for this assigned event.'}
+        </p>
+        <p className="mt-1">
+          Registration ticket payments stay in Registration Payments. Operations cash position is not final event profit.
         </p>
         <InfoHint label="Operations Ledger Info">
           Use the contact and commitment workspace for partners, vendors, suppliers, sponsors, venue contacts, and helpers. Use the ledger for event-level income, expenses, refunds, reimbursements, and adjustments. Registration payments stay in Payments.
         </InfoHint>
       </section>
-
-      <details className="order-8 phase23v-panel border-[#E6D4B4] bg-[#FFF8EA]">
-        <summary className="phase23v-summary text-[#4E3928]">Operations finance boundary</summary>
-        <div className="phase23v-body text-xs leading-5 text-[#715D46]">
-          <h3 id="operations-finance-summary-heading" className="text-sm font-bold text-[#4E3928]">Operations finance boundary</h3>
-          <p className="mt-1">
-            Operations tracks event expenses, commitments and non-registration income. Registration ticket payments are recorded separately under Payments, so the Operations cash position is not the event's final profit or loss.
-          </p>
-        </div>
-      </details>
 
       {completedEvent && (
         <section className="rounded-xl border border-[#D9E3F8] bg-[#F6F9FF] px-4 py-3 text-sm leading-6 text-[#415F91]">
@@ -437,6 +430,7 @@ export function OperationsPage() {
       {error && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{error}</div>}
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
 
+      {activeView === 'overview' && (
       <section className="order-5 phase23v-metric-grid">
         {[
           ...(adminUser ? [
@@ -461,6 +455,7 @@ export function OperationsPage() {
           </div>
         ))}
       </section>
+      )}
 
       <section className="order-6 rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -911,16 +906,22 @@ export function OperationsPage() {
         </section>
       </section>
 
-      <details className="order-7 phase23v-panel" data-tour-id="partners-commitments-panel" data-tour-container="partners-commitments">
-        <summary className="phase23v-summary">Partner commitments, sponsors, and supplier contacts</summary>
-        <div className="phase23v-body">
-          <PartnerCommitmentsPanel
-            event={currentEvent}
-            onSaveRecord={(record) => savePartnerRecord(currentEvent, record, user)}
-            onDeleteRecord={(partnerId) => deletePartnerRecord(currentEvent, partnerId, user)}
-          />
-        </div>
-      </details>
+      {['commitments', 'partners', 'in-kind'].includes(activeView) && (
+        <section className="order-7 rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6" data-tour-id="partners-commitments-panel" data-tour-container="partners-commitments">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Partner workspace</p>
+          <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Partner commitments, sponsors, and supplier contacts</h3>
+          <p className="mt-2 text-xs leading-5 text-[#816D62]">
+            Use this workspace for the contact and commitment records behind the selected Operations tab. These records do not create app access and do not merge Registration Payments into Operations.
+          </p>
+          <div className="mt-5">
+            <PartnerCommitmentsPanel
+              event={currentEvent}
+              onSaveRecord={(record) => savePartnerRecord(currentEvent, record, user)}
+              onDeleteRecord={(partnerId) => deletePartnerRecord(currentEvent, partnerId, user)}
+            />
+          </div>
+        </section>
+      )}
 
       <p className="flex gap-2 rounded-xl border border-[#F2D6A3] bg-[#FFF7E8] px-4 py-3 text-xs leading-5 text-[#7A5818]">
         <AlertTriangle className="mt-0.5 size-4 shrink-0" />

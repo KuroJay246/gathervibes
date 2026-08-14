@@ -50,8 +50,8 @@ test('Operations and payments boundaries remain explicit', async () => {
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'))
 
-  assert.match(payments, /Operations remains separate/)
-  assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
+  assert.match(payments, /separate from the Operations ledger/)
+  assert.match(operations, /Registration ticket payments stay in Registration Payments/)
   assert.match(operations, /This is not final event profit/)
   assert.equal(qrPayloadForTicketCode('AUG26-001'), 'GSV:TICKET:AUG26-001')
   assert.equal(packageJson.dependencies.xlsx, undefined)

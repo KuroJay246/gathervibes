@@ -2,12 +2,12 @@ import { expect } from '@playwright/test'
 import { E2E_EMAIL, E2E_EVENT_NAME, E2E_PASSWORD } from '../scripts/e2e/globalSetup.mjs'
 
 export const organizerRoutes = [
-  { path: '/dashboard', heading: 'Overview' },
+  { path: '/dashboard', heading: 'Event Overview' },
   { path: '/events', heading: 'Events' },
   { path: '/tasks', heading: 'Tasks & Deadlines' },
   { path: '/registrations', heading: 'Guests & Registrations' },
   { path: '/payments', heading: 'Payments' },
-  { path: '/payments/reconciliation', heading: 'Reconciliation Preview' },
+  { path: '/payments/reconciliation', heading: 'Review & Reconcile Records' },
   { path: '/imports', heading: 'Import Center' },
   { path: '/tickets', heading: 'Tickets' },
   { path: '/check-in', heading: 'Check-In' },
@@ -24,7 +24,7 @@ export async function signInAndSelectEvent(page) {
   await page.locator('#password').fill(E2E_PASSWORD)
   await page.getByRole('button', { name: 'Sign in securely' }).click()
   await expect(page).toHaveURL(/\/dashboard$/)
-  await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Event Overview' })).toBeVisible()
   await dismissWelcomeTourIfPresent(page)
 
   await page.goto('/events')

@@ -10,7 +10,6 @@ import {
   COMMUNICATION_SEGMENTS,
   COMMUNICATION_TEMPLATES,
   MESSAGE_TONE_OPTIONS,
-  MESSAGE_WORKFLOW_STEPS,
   buildCommunicationMessages,
   buildCommunicationsCsvPacket,
   buildCommunicationsExport,
@@ -61,6 +60,7 @@ export function CommunicationsPage() {
   const [selectedTemplate, setSelectedTemplate] = useState(COMMUNICATION_TEMPLATES[0].id)
   const [draftContent, setDraftContent] = useState(COMMUNICATION_TEMPLATES[0].content)
   const [copiedAction, setCopiedAction] = useState('')
+  const [copyError, setCopyError] = useState('')
   const [labMode, setLabMode] = useState('standard') // 'standard' or 'prompt'
   const [selectedTone, setSelectedTone] = useState('Professional')
   const messageContext = useMemo(() => ({
@@ -141,11 +141,12 @@ export function CommunicationsPage() {
   async function copyText(label, text) {
     try {
       await navigator.clipboard.writeText(text)
+      setCopyError('')
       setCopiedAction(label)
       window.setTimeout(() => setCopiedAction(''), 2000)
     } catch (err) {
       if (import.meta.env.DEV) console.error('Failed to copy', err)
-      alert('Failed to copy to clipboard')
+      setCopyError('Clipboard access failed. Select the preview text and copy it manually.')
     }
   }
 
@@ -190,10 +191,16 @@ Data context for this segment:
 
       <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-sm">
         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Message workflow</p>
-        <ol className="mt-3 grid gap-2 text-[10px] font-bold uppercase tracking-wider text-[#80685B] sm:grid-cols-4 lg:grid-cols-7">
-          {MESSAGE_WORKFLOW_STEPS.map((label, index) => (
-            <li key={label} className={`rounded-full px-3 py-2 text-center ${index < 6 ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED]'}`}>
-              {label}
+        <ol className="mt-3 grid gap-2 text-[10px] font-bold uppercase tracking-wider text-[#80685B] sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            ['1', 'Choose Recipients', 'Use filters and search to define the audience.'],
+            ['2', 'Pick Template', 'Choose a starter and edit the copy.'],
+            ['3', 'Preview', 'Check merge fields and warnings.'],
+            ['4', 'Copy', 'Copy text for your outside messaging tool.'],
+          ].map(([number, label, detail], index) => (
+            <li key={label} className={`rounded-xl px-3 py-2 ${index === 0 ? 'bg-[#2B1723] text-white' : 'bg-[#F7F1ED] text-[#5D4A52]'}`}>
+              <span className="block">{number}. {label}</span>
+              <span className={`mt-1 block normal-case tracking-normal ${index === 0 ? 'text-[#F7E8DE]' : 'text-[#5D4A52]'}`}>{detail}</span>
             </li>
           ))}
         </ol>
@@ -422,6 +429,11 @@ Data context for this segment:
             {copiedAction && (
               <p role="status" className="mt-3 rounded-xl bg-[#EAF6EF] px-4 py-2 text-xs font-bold text-[#1E7345]">
                 Copied to clipboard. No message was sent.
+              </p>
+            )}
+            {copyError && (
+              <p role="alert" className="mt-3 rounded-xl bg-[#FFF1F1] px-4 py-2 text-xs font-bold text-[#A32626]">
+                {copyError}
               </p>
             )}
 

@@ -40,7 +40,7 @@ Purpose: record where organizer-visible financial figures come from after the fi
 
 | Page | Label | Source collection | Source fields | Utility | Planned or actual | Cash or non-cash | Included in totals | Test events excluded | Wording accurate |
 |---|---|---|---|---|---|---|---|---|---|
-| Payment Reconciliation Preview | Workbook expected/paid/current app/hypothetical app | Uploaded workbook, `registrations`, `operationsLedger` reads | workbook headers, registration finance, Operations entries | `buildPaymentReconciliationPreview` | Evidence comparison only | Cash evidence | Preview only, no writes | Selected Working Event scoped | Yes |
+| Review & Reconcile Records | Workbook expected/paid/current app/hypothetical app | Uploaded workbook, `registrations`, `operationsLedger` reads | workbook headers, registration finance, Operations entries | `buildPaymentReconciliationPreview` | Evidence comparison only | Cash evidence | Preview only, no writes | Selected Working Event scoped | Yes |
 | Reports | Historical Reconciliation | Static evidence utility | event-specific historical evidence constants | `getEventFinancialEvidenceAudit` | Evidence notes | Mixed evidence | Display only | Only returns an audit object for known historical evidence | Yes, not daily workflow |
 
 ## Guardrail Notes

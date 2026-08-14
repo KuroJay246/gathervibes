@@ -1,9 +1,9 @@
 export const pageGuidance = {
   '/dashboard': {
     label: 'Plan',
-    purpose: 'Start here to understand the selected event, attention items, guest totals, registration money, and next actions.',
+    purpose: 'Start on Home to understand the selected event, attention items, guest totals, registration money, and next actions.',
     primaryAction: 'Review Needs Attention',
-    boundary: 'Overview summarizes work; use the linked pages to make changes.',
+    boundary: 'Home summarizes work; use the linked pages to make changes.',
   },
   '/events': {
     label: 'Plan',
@@ -31,8 +31,8 @@ export const pageGuidance = {
   },
   '/payments/reconciliation': {
     label: 'Money & follow-up',
-    purpose: 'Compare workbook payment evidence against the selected Working Event before any approved correction workflow.',
-    primaryAction: 'Preview comparison',
+    purpose: 'Review and reconcile records by comparing workbook payment evidence against the selected Working Event before any approved correction workflow.',
+    primaryAction: 'Compare records',
     boundary: 'This preview does not write records by itself.',
   },
   '/tickets': {
@@ -79,7 +79,7 @@ export const pageGuidance = {
   },
   '/communications': {
     label: 'Tools',
-    purpose: 'Create, personalize, preview, and copy event messages for use outside the app.',
+    purpose: 'Choose recipients, select a template, preview merge fields, and copy event messages for use outside the app.',
     primaryAction: 'Create and copy message',
     boundary: 'Messages are not sent automatically and no live AI or delivery tracking is enabled.',
   },
@@ -91,7 +91,7 @@ export const pageGuidance = {
   },
   '/imports': {
     label: 'Tools',
-    purpose: 'Import CSV, pasted tables, and supported workbooks only after mapping and preview review.',
+    purpose: 'Choose an import source, review response inbox rows when needed, map fields, validate, and preview before saving.',
     primaryAction: 'Choose import source',
     boundary: 'Use CODEX_DEMO for synthetic import rehearsal before touching a real event.',
   },

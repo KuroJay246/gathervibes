@@ -42,10 +42,10 @@ function GuardrailNotice() {
       <div className="flex gap-3">
         <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[#7A5818]" />
         <div>
-          <h3 className="font-bold text-[#4E3928]">Read-only reconciliation preview</h3>
+          <h3 className="font-bold text-[#4E3928]">Preview only</h3>
           <p className="mt-1">
-            This tool loads workbook records, the selected event's registration records, and the selected event's Operations records for comparison only.
-            It uses the selected Working Event, does not save changes, does not import registrations, and does not apply payment updates.
+            Compare registration, payment, ticket, attendance, and Operations-related evidence to find records that may not agree.
+            Nothing is changed until you review an available action in the normal audited workflow.
           </p>
         </div>
       </div>
@@ -94,10 +94,10 @@ function SetupPanel({ activeEvent, fileName, onFileChange, onLoad, loading }) {
           className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#2B1723] px-5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
         >
           {loading ? <RefreshCw className="size-4 animate-spin" /> : <LockKeyhole className="size-4" />}
-          Load Preview
+          Compare Records
         </button>
         <p className="text-xs leading-5 text-[#816D62]">
-          Select the correct Working Event before loading. The preview never writes event, registration, ticket, attendance, Operations, or audit-log records.
+          Select the correct Working Event before loading. This comparison never writes event, registration, ticket, attendance, Operations, or audit-log records.
         </p>
       </div>
     </section>
@@ -263,8 +263,8 @@ function ReconciliationTable({ preview, filter, onSelect, selectedRowKey }) {
   return (
     <section className="overflow-hidden rounded-[24px] border border-[#EEDFD6] bg-white shadow-[0_8px_24px_rgba(84,53,67,0.04)]">
       <div className="border-b border-[#EEDFD6] bg-[#FBF8F5] p-4">
-        <h3 className="font-serif text-2xl text-[#2B1723]">Dry-run classifications</h3>
-        <p className="mt-1 text-sm text-[#816D62]">Payment balance and evidence discrepancy stay separate. Strong exact or multi-field matches may produce proposed payment-field updates. Name-only matches stay manual review.</p>
+        <h3 className="font-serif text-2xl text-[#2B1723]">Review differences</h3>
+        <p className="mt-1 text-sm text-[#816D62]">Each row explains what is being compared, why it matters, and what the organizer should review next. Payment status and evidence status stay separate.</p>
       </div>
       {rows.length === 0 ? (
         <p className="p-6 text-sm text-[#816D62]">No rows match this filter.</p>
@@ -284,7 +284,7 @@ function ReconciliationTable({ preview, filter, onSelect, selectedRowKey }) {
                     <RowLabel row={row} />
                     <span className="rounded-full bg-[#F7F1ED] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6B564C]">{row.status}</span>
                   </div>
-                  <p className="mt-3 text-xs text-[#816D62]">Payment status stays separate from reconciliation status.</p>
+                  <p className="mt-3 text-xs text-[#816D62]">Payment status stays separate from workbook evidence status.</p>
                 </button>
               )
             })}
@@ -298,7 +298,7 @@ function ReconciliationTable({ preview, filter, onSelect, selectedRowKey }) {
                 <th className="px-3 py-2">Recorded amount</th>
                 <th className="px-3 py-2">Evidence amount</th>
                 <th className="px-3 py-2">Difference</th>
-                <th className="px-3 py-2">Reconciliation status</th>
+                <th className="px-3 py-2">Comparison status</th>
                 <th className="px-3 py-2">Evidence reference</th>
                 <th className="px-3 py-2">Next action</th>
               </tr>
@@ -376,7 +376,7 @@ export function PaymentReconciliationPage() {
       setSelectedRow(nextPreview.rows[0] || null)
       setSelectedRowKey(nextPreview.rows[0] ? `${nextPreview.rows[0].filterKey}-${nextPreview.rows[0].workbookRecord?.workbookRecordId || nextPreview.rows[0].registrationRecord?.registrationId || 0}` : '')
     } catch (err) {
-      setError(err?.message || 'Payment reconciliation preview could not load.')
+      setError(err?.message || 'Record comparison could not load.')
     } finally {
       setLoading(false)
     }
@@ -396,16 +396,16 @@ export function PaymentReconciliationPage() {
     setSelectedRowKey(key)
   }
 
-  if (loading) return <LoadingState message="Loading payment reconciliation preview..." />
+  if (loading) return <LoadingState message="Loading record comparison..." />
 
   return (
     <div data-tour-id="reconciliation-workspace" className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Payments · dry-run only</p>
-          <h2 className="font-serif text-3xl text-[#2B1723]">Payment Reconciliation</h2>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Payments · preview only</p>
+          <h2 className="font-serif text-3xl text-[#2B1723]">Review & Reconcile Records</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
-            Compare a payment workbook to the selected event's registration payment records without changing data. Missing evidence does not automatically mean unpaid.
+            Compare a payment workbook with this event's registration, payment, ticket, attendance, and Operations evidence. Missing evidence does not automatically mean unpaid.
           </p>
         </div>
         <div className="rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
@@ -429,8 +429,8 @@ export function PaymentReconciliationPage() {
           <div className="flex gap-3">
             <FileSpreadsheet className="mt-0.5 size-5 shrink-0" />
             <div>
-              <h3 className="font-bold text-[#2B1723]">No target loaded</h3>
-              <p>Select a Working Event and choose its organizer-approved payment workbook to load a read-only preview.</p>
+              <h3 className="font-bold text-[#2B1723]">No comparison loaded</h3>
+              <p>Select a Working Event and choose its organizer-approved payment workbook to compare records.</p>
             </div>
           </div>
         </section>
@@ -439,12 +439,20 @@ export function PaymentReconciliationPage() {
       {preview && (
         <>
           <section className="gsv-section-card">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Reconciliation summary</p>
-            <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Payment balance vs evidence discrepancy</h3>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Comparison summary</p>
+            <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">What is being compared</h3>
             <div className="mt-4 grid gap-4 lg:grid-cols-2">
               <DetailSection label="Payment balance" value="Registration payment fields show what the app currently records as expected, collected, and outstanding for the selected Working Event." />
-              <DetailSection label="Evidence discrepancy" value="Reconciliation statuses describe how well workbook evidence matches those payment records. They do not by themselves change the payment status." tone="warning" />
+              <DetailSection label="Workbook evidence" value="Workbook rows are compared with app records. A mismatch is a review prompt, not an automatic payment change." tone="warning" />
             </div>
+          </section>
+          <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Review flow</p>
+            <ol className="mt-3 grid gap-2 text-xs font-bold text-[#5D4A52] sm:grid-cols-2 xl:grid-cols-6">
+              {['Choose workbook', 'Compare records', 'Review differences', 'Understand why', 'Review proposed action', 'Confirm elsewhere'].map((label, index) => (
+                <li key={label} className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] px-3 py-2">{index + 1}. {label}</li>
+              ))}
+            </ol>
           </section>
           {workbookParserNote && (
             <section className="rounded-2xl border border-[#F2D6A3] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
@@ -472,22 +480,22 @@ export function PaymentReconciliationPage() {
           </section>
           {selectedRow && (
             <section className="gsv-section-card">
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Review details</p>
-              <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Selected reconciliation item</h3>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Difference details</p>
+              <h3 className="mt-1 font-serif text-2xl text-[#2B1723]">Selected comparison item</h3>
               <div className="mt-4 grid gap-4 lg:grid-cols-2">
                 <DetailSection label="Registration" value={selectedRow.registrationRecord?.fullName || selectedRow.workbookRecord?.guestName || 'No matched registration yet'} />
                 <DetailSection label="Recorded payment" value={`${formatCurrency(selectedRow.registrationRecord?.amountPaid ?? 0, preview.targetEvent.currency)} · ${selectedRow.registrationRecord?.paymentStatus || 'unknown'}`} />
                 <DetailSection label="Evidence" value={`${formatCurrency(selectedRow.workbookRecord?.amountPaid ?? 0, preview.targetEvent.currency)} · ${selectedRow.workbookRecord?.paymentReference || 'No evidence reference'}`} />
                 <DetailSection label="Difference" value={formatCurrency((selectedRow.workbookRecord?.amountPaid ?? 0) - (selectedRow.registrationRecord?.amountPaid ?? 0), preview.targetEvent.currency)} tone={selectedRow.filterKey === 'proposed-update' || selectedRow.filterKey === 'no-change' ? 'success' : 'warning'} />
-                <DetailSection label="Reconciliation status" value={selectedRow.status} />
-                <DetailSection label="Notes" value={selectedRow.reason} />
+                <DetailSection label="Comparison status" value={selectedRow.status} />
+                <DetailSection label="Why it matters" value={selectedRow.reason} />
               </div>
             </section>
           )}
           <ReconciliationTable preview={preview} filter={filter} onSelect={handleSelectRow} selectedRowKey={selectedRowKey} />
           <section className="rounded-2xl border border-[#F2C3C3] bg-[#FFF8F8] p-5 text-sm leading-6 text-[#7E1E1E]">
-            <h3 className="font-bold">No apply action is available here</h3>
-            <p className="mt-1">Supported updates are previewed only for organizer review. Identity fields, event ID, guest count, ticket codes, check-in fields, and audit history are never proposed here.</p>
+            <h3 className="font-bold">No records are changed here</h3>
+            <p className="mt-1">Supported corrections are reviewed only for organizer understanding. Identity fields, event ID, guest count, ticket codes, check-in fields, and audit history are never changed by this page.</p>
           </section>
         </>
       )}

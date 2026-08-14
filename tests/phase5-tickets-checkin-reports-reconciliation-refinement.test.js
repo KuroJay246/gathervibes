@@ -44,10 +44,10 @@ test('Phase 5 Reports adds event summary and administrative closeout framing whi
 test('Phase 5 Reconciliation distinguishes payment balance from evidence discrepancy and adds details review', async () => {
   const page = await readFile('src/pages/PaymentReconciliationPage.jsx', 'utf8')
 
-  assert.match(page, /Payment balance vs evidence discrepancy/)
-  assert.match(page, /Missing evidence does not automatically mean unpaid/)
-  assert.match(page, /Selected reconciliation item/)
-  assert.match(page, /Reconciliation status/)
-  assert.match(page, /Payment status stays separate from reconciliation status/)
+  assert.match(page, /Compare registration, payment, ticket, attendance, and Operations-related evidence/)
+  assert.match(page, /Nothing is changed until you review an available action in the normal audited workflow/)
+  assert.match(page, /Selected comparison item/)
+  assert.match(page, /Comparison status/)
+  assert.match(page, /Payment status stays separate from workbook evidence status/)
   assert.doesNotMatch(page, /setDoc|updateDoc|addDoc|writeBatch|runTransaction/)
 })

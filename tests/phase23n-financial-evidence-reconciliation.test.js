@@ -91,7 +91,7 @@ test('Phase 23N UI surfaces documentary audit without reopening completed-event 
   assert.match(payments, /Historical reconciliation evidence is not part of the daily Registration Payments workflow/)
   assert.match(registrations, /Registration Evidence Reconciliation/)
   assert.match(checkIn, /Historical attendance is not system check-in/)
-  assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
+  assert.match(operations, /Registration ticket payments stay in Registration Payments/)
   assert.match(reports, /Historical Reconciliation/)
   assert.match(reports, /Final profit cannot be confirmed until bank, 1stPay, baker and supplier evidence is complete/)
 })
@@ -110,7 +110,7 @@ test('Phase 23N-B registration payments remain separate from Operations', async 
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
   const reports = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
 
-  assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
+  assert.match(operations, /Registration ticket payments stay in Registration Payments/)
   assert.match(operations, /should not be added automatically to registration payment totals/)
   assert.match(reports, /Registration payment records track guest charges/)
   assert.match(reports, /Operations cash position excludes registration ticket receipts/)
@@ -135,7 +135,7 @@ test('Phase 23N-B completed closeout panel cannot reapply records', async () => 
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
   const reports = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
 
-  assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
+  assert.match(operations, /Registration ticket payments stay in Registration Payments/)
   assert.match(reports, /Historical Reconciliation/)
   assert.match(reports, /Historical reconciliation evidence is preserved here for CPB review/)
   assert.doesNotMatch(operations, /waiting for organizer approval/)
@@ -173,7 +173,7 @@ test('Phase 23N-B Subsets 5 and 6 remain locked in UI and report', async () => {
   const reportsPage = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
   const report = await readFile('docs/archive/phases/PHASE_23N_SUBSETS_1_4_PRODUCTION_APPLY.md', 'utf8')
 
-  assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
+  assert.match(operations, /Registration ticket payments stay in Registration Payments/)
   assert.match(reportsPage, /Final profit cannot be confirmed/)
   assert.match(report, /Subset 5: Registration Evidence Metadata/)
   assert.match(report, /Subset 6: Registration\/Attendance Corrections/)

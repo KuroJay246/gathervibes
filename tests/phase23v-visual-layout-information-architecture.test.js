@@ -29,9 +29,9 @@ test('Phase 23V Overview is summary-first and moves secondary detail behind disc
   assert.match(dashboard, /Payments received/)
   assert.match(dashboard, /Capacity used/)
   assert.match(dashboard, /Needs Attention/)
-  assert.match(dashboard, /Quick Actions/)
-  assert.match(dashboard, /Event details, money snapshot, and readiness progress/)
-  assert.match(dashboard, /Planning progress and upcoming events/)
+  assert.match(dashboard, /Next Actions/)
+  assert.match(dashboard, /Event Summary, Money, Readiness, and Upcoming/)
+  assert.match(dashboard, /Home workspace categories/)
   assert.doesNotMatch(dashboard, /Phase \d+|roadmap|deferred/i)
 })
 
@@ -47,9 +47,9 @@ test('Phase 23V dense organizer pages keep primary work visible and collapse sec
   assert.match(registrations, /Daily review shortcuts/)
   assert.match(registrations, /Registration evidence reconciliation/)
 
-  assert.match(payments, /Payment status and review detail/)
+  assert.match(payments, /Records, follow-up, and summary/)
   assert.match(payments, /Historical reconciliation evidence is not part of the daily Registration Payments workflow/)
-  assert.match(payments, /Historical and informational review/)
+  assert.match(payments, /Review & Follow-Up/)
 
   assert.match(tickets, /Advanced ticket filters/)
   assert.match(tickets, /Show QR code/)
@@ -60,7 +60,7 @@ test('Phase 23V dense organizer pages keep primary work visible and collapse sec
   assert.match(checkIn, /Advanced check-in filters/)
 
   assert.match(operations, /Partner commitments, sponsors, and supplier contacts/)
-  assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
+  assert.match(operations, /Registration ticket payments stay in Registration Payments/)
   assert.match(reports, /Show full report metrics/)
 })
 

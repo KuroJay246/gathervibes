@@ -7,7 +7,7 @@ Tutorial V3 teaches the current organizer workflow. It must be concise, event-ne
 | # | Lesson | Route | Target | Purpose | Write behavior |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Working Event | `/dashboard` | `working-event-selector` | Explain selected-event scope. | No business write |
-| 2 | Overview | `/dashboard` | `overview-summary` | Teach event health scan. | No business write |
+| 2 | Home | `/dashboard` | `overview-summary` | Teach event health scan. | No business write |
 | 3 | Create Event | `/events` | `create-event-action` | Show event setup entry. | Opens unsaved form only |
 | 4 | Event Basics | `/events` | `event-name-field` | Explain event identity fields. | No save |
 | 5 | Event Category | `/events` | `event-category-selector` | Explain event category. | No save |
@@ -20,7 +20,7 @@ Tutorial V3 teaches the current organizer workflow. It must be concise, event-ne
 | 12 | Tickets | `/tickets` | `tickets-workspace` | Teach ticket preparation. | No ticket write |
 | 13 | Check-In | `/check-in` | `checkin-search-field` | Teach search before check-in. | No check-in write |
 | 14 | Operations Ledger | `/operations` | `operations-workspace` | Teach event-level ledger boundary. | No ledger write |
-| 15 | Reconciliation Preview | `/payments/reconciliation` | `reconciliation-workspace` | Teach dry-run payment evidence review. | No save |
+| 15 | Review & Reconcile Records | `/payments/reconciliation` | `reconciliation-workspace` | Teach preview-only payment evidence review. | No save |
 | 16 | Message Builder | `/communications` | `message-builder-workspace` | Teach copy-only messaging. | Clipboard only |
 | 17 | Reports | `/event-review` | `reports-workspace` | Teach read-only reporting. | No business write |
 | 18 | Import Center | `/imports` | `imports-workspace` | Teach preview-first import. | No import write |

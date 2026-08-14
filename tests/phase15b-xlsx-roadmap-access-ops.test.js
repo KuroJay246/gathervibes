@@ -126,8 +126,8 @@ test('Event Operations page documents active ledger and future modules only', as
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
 
-  assert.match(operations, /Operations now covers both planning commitments and the event-level ledger/)
-  assert.match(operations, /separate from registration payment records/)
+  assert.match(operations, /Use Ledger for event-level income and expenses/)
+  assert.match(operations, /Registration ticket payments stay in Registration Payments/)
   assert.match(operations, /sponsor income/)
   assert.match(operations, /operations helpers can only view assigned-event entries/)
   assert.match(settings, /Managed in Operations/)

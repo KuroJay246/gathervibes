@@ -139,7 +139,7 @@ test('Phase 23O guardrails preserve QR privacy, CODEX_DEMO isolation, and standa
   assert.match(qaPage, /Legacy one-off write controls unavailable/)
   assert.match(dashboard, /Completed status does not make an event read-only/)
   assert.match(events, /showTestEvents/)
-  assert.match(operations, /Registration ticket payments are recorded separately under Payments/)
+  assert.match(operations, /Registration ticket payments stay in Registration Payments/)
   assert.match(reports, /Historical reconciliation evidence is preserved here for CPB review/)
   assert.match(phase23n, /Subset 5: Registration Evidence Metadata/)
   assert.match(phase23n, /Subset 6: Registration\/Attendance Corrections/)

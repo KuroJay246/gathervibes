@@ -23,7 +23,7 @@ test('organizer shell uses grouped navigation without changing route paths or ro
   assert.match(shell, /canViewRoute\(access, to\)/)
   assert.match(shell, /aria-label=\{collapsed \? label : undefined\}/)
   assert.match(shell, /aria-label=\{collapsed \? 'Expand navigation' : 'Collapse navigation'\}/)
-  assert.match(navigation, /Overview[\s\S]*Guests[\s\S]*Tickets[\s\S]*Check-In/)
+  assert.match(navigation, /Home[\s\S]*Guests[\s\S]*Tickets[\s\S]*Check-In/)
   assert.doesNotMatch(navigation, /System QA/)
 })
 
@@ -62,9 +62,9 @@ test('Overview uses supported event metrics, attention, quick actions, and safe 
     'Operations expenses recorded',
     'Outstanding commitments',
     'Needs Attention',
-    'Quick Actions',
-    'Recent Activity',
-    'Latest safe changes',
+    'Next Actions',
+    'Latest Changes',
+    'Latest changes to this event',
   ]) {
     assert.match(dashboard, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }

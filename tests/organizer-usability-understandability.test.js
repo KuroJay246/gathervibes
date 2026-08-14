@@ -51,7 +51,7 @@ test('organizer shell explains every major route without changing route paths', 
 
 test('mobile navigation keeps event-day actions primary and System QA behind More', () => {
   assert.deepEqual(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.label), [
-    'Overview',
+    'Home',
     'Guests',
     'Tickets',
     'Check-In',

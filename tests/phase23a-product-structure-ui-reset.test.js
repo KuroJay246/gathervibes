@@ -9,17 +9,17 @@ test('organizer navigation uses product labels while preserving route paths', as
   const app = await readFile('src/App.jsx', 'utf8')
   const access = await readFile('src/utils/accessRoles.js', 'utf8')
 
-  for (const label of ['Overview', 'Guests & Registrations', 'Tickets', 'Check-In', 'Operations', 'Message Builder', 'Reports', 'Settings', 'System QA']) {
+  for (const label of ['Home', 'Guests & Registrations', 'Tickets', 'Check-In', 'Operations', 'Message Builder', 'Reports', 'Settings', 'System QA']) {
     assert.match(shell, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
   assert.match(shell, /to: '\/communications', label: 'Message Builder'/)
   assert.match(shell, /to: '\/event-review', label: 'Reports'/)
   assert.match(shell, /to: '\/qa', label: 'System QA'/)
-  assert.match(shell, /Overview[\s\S]*Guests[\s\S]*Tickets[\s\S]*Check-In[\s\S]*More/)
+  assert.match(shell, /Home[\s\S]*Guests[\s\S]*Tickets[\s\S]*Check-In[\s\S]*More/)
   const mobileMoreGroups = shell.slice(shell.indexOf('const mobileMoreGroups'), shell.indexOf('const pageTitles'))
   assert.match(mobileMoreGroups, /Plan[\s\S]*\/events[\s\S]*Tasks & Deadlines[\s\S]*Contacts & Organizations[\s\S]*Documents/)
-  assert.match(mobileMoreGroups, /Money & Follow-Up[\s\S]*Registration Payments[\s\S]*Operations & Commitments[\s\S]*Reports[\s\S]*Reconciliation Preview/)
+  assert.match(mobileMoreGroups, /Money & Follow-Up[\s\S]*Registration Payments[\s\S]*Operations & Commitments[\s\S]*Reports[\s\S]*Review & Reconcile Records/)
   assert.match(mobileMoreGroups, /Tools[\s\S]*\/imports[\s\S]*Message Builder[\s\S]*System[\s\S]*\/settings[\s\S]*\/qa/)
   assert.doesNotMatch(mobileMoreGroups, /\/dashboard|\/registrations|\/tickets|\/check-in/)
   assert.match(app, /path="\/communications"/)
@@ -34,7 +34,7 @@ test('organizer navigation uses product labels while preserving route paths', as
 test('Overview removes phase clutter and keeps event-scoped decision sections', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
 
-  for (const text of ['Overview', 'Registration records', 'Guests', 'Payments received', 'Payments outstanding', 'Tickets issued', 'Check-Ins', 'Operations expenses recorded', 'Outstanding commitments', 'Needs Attention', 'Quick Actions', 'Recent Activity', 'Planning Progress', 'Upcoming Events']) {
+  for (const text of ['Home', 'Registration records', 'Guests', 'Payments received', 'Payments outstanding', 'Tickets issued', 'Check-Ins', 'Operations expenses recorded', 'Outstanding commitments', 'Needs Attention', 'Next Actions', 'Latest Changes', 'Event Summary, Money, Readiness, and Upcoming', 'Home workspace categories']) {
     assert.match(dashboard, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 

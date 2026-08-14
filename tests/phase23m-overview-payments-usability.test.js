@@ -65,10 +65,11 @@ test('Phase 23M source uses aligned finance concepts across Overview, Payments, 
   assert.match(dashboard, /formatCurrency\(financeSummary\.totalCollected, financeSummary\.currency\)/)
   assert.doesNotMatch(dashboard, /defaultTicketPriceForEvent|ticketPrice \* metrics|metrics\.totalPersons \*/)
 
-  for (const source of [payments, reports]) {
-    assert.match(source, /Expected Registration Income/)
-    assert.match(source, /Payments Received/)
-    assert.match(source, /Outstanding Balance/)
+  for (const label of ['Expected', 'Collected', 'Outstanding']) {
+    assert.match(payments, new RegExp(label))
+  }
+  for (const label of ['Expected Registration Income', 'Payments Received', 'Outstanding Balance']) {
+    assert.match(reports, new RegExp(label))
   }
   assert.doesNotMatch(payments, /Operations Ledger tracks[\s\S]*workspace\.summary\.expectedRegistrationIncome/)
 })

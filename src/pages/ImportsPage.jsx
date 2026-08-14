@@ -105,9 +105,9 @@ export function ImportsPage() {
   })
   const formsInboxConnectionLabel = formConnectionStatusLabel(manualFormsConnection)
   const workflowStepIndex = step === 1
-    ? 2
+    ? 0
     : step === 2
-      ? 3
+      ? 2
       : step === 3
         ? 5
         : step === 4
@@ -567,6 +567,11 @@ export function ImportsPage() {
             <p className="mt-1 text-xs leading-5 text-[#80685B]">
               {selectedSource.connectionStatus}. {selectedRecordType.helperText}
             </p>
+            {step === 1 && (
+              <p className="mt-2 text-xs leading-5 text-[#80685B]">
+                Start on Import Data for normal files, Response Inbox for pasted form responses, or Templates / Help for the required columns.
+              </p>
+            )}
           </div>
           <ol className="grid grid-cols-2 gap-2 text-[10px] font-bold uppercase tracking-wider text-[#80685B] sm:grid-cols-5">
             {IMPORT_WORKFLOW_STEPS.map((label, index) => {
@@ -705,6 +710,7 @@ export function ImportsPage() {
               <div className="mt-8 rounded-2xl border border-[#EEDFD6] bg-[#FFFDFC] p-5">
                 <p className="text-sm font-bold text-[#2B1723]">Use the Google Forms Response Inbox below.</p>
                 <p className="mt-2 text-sm leading-6 text-[#816D62]">Paste exported response rows, review them, approve safe guest-registration responses, then continue approved rows to mapping. No automatic receiver is deployed from this screen.</p>
+                <button type="button" onClick={() => setActiveImportTab('response-inbox')} className="mt-4 rounded-xl bg-[#2B1723] px-5 py-2.5 text-sm font-bold text-white">Open Response Inbox</button>
               </div>
             ) : selectedSource.mode === 'xlsx' ? (
               <div className="mt-8 space-y-5">

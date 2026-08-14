@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { AlertTriangle, CheckCircle2, ChevronRight, CreditCard, ExternalLink, Search } from 'lucide-react'
 import { useActiveEvent } from '../events/useActiveEvent'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -14,6 +14,13 @@ import {
   PAYMENT_METHODS,
 } from '../utils/financeUtils'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
+import { PageTabs } from '../components/ui/PageTabs'
+
+const PAYMENT_TABS = [
+  ['records', 'Payment Records'],
+  ['review', 'Review & Follow-Up'],
+  ['summary', 'Summary'],
+]
 
 const PAYMENT_FILTERS = [
   ['all', 'All'],
@@ -53,10 +60,8 @@ function Metric({ label, value, help }) {
 function BoundaryNotice() {
   return (
     <section className="rounded-2xl border border-[#E6D4B4] bg-[#FFF8EA] p-4 text-sm leading-6 text-[#715D46]">
-      <strong className="text-[#4E3928]">Registration payment records only.</strong> This page reviews registration charges,
-      payments received, balances, methods, follow-up, and internal data review. It is not a payment gateway, bank reconciliation,
-      invoice system, or accounting ledger. Operations remains separate for sponsor income, vendor payments, expenses, refunds,
-      reimbursements, adjustments, and other event-level obligations.
+      <strong className="text-[#4E3928]">Track payments connected to guest registrations.</strong> These records are separate from the Operations ledger.
+      Expected means what should be paid, collected means what is recorded as received, and outstanding means the balance still visible on the registration.
     </section>
   )
 }
@@ -291,6 +296,7 @@ function PaymentDetailsPanel({ row, currency, onClose }) {
 
 export function PaymentsPage() {
   const { activeEvent } = useActiveEvent()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('payment-follow-up')
@@ -340,6 +346,15 @@ export function PaymentsPage() {
   const selectedRow = selectedRegistrationId
     ? workspace.rows.find((row) => row.registrationId === selectedRegistrationId) || null
     : null
+  const requestedTab = searchParams.get('tab') || 'records'
+  const activePaymentTab = PAYMENT_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'records'
+  function setPaymentTab(tab) {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      next.set('tab', tab)
+      return next
+    })
+  }
 
   if (!activeEvent?.eventId) {
     return (
@@ -361,7 +376,7 @@ export function PaymentsPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Selected Working Event only</p>
           <h2 className="font-serif text-3xl text-[#2B1723]">Registration Payments</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#816D62]">
-            Review who still owes money, which records need evidence or cleanup, and what follow-up should happen next for <strong>{activeEvent.eventName}</strong>.
+            Track payments connected to guest registrations for <strong>{activeEvent.eventName}</strong>.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -375,30 +390,37 @@ export function PaymentsPage() {
             Open Reports
           </Link>
           <Link to="/payments/reconciliation" className="rounded-xl border border-[#E7D6CC] bg-white px-4 py-2.5 text-xs font-bold text-[#6B564C]">
-            Reconciliation Preview
+            Review & Reconcile Records
           </Link>
         </div>
       </header>
 
       <BoundaryNotice />
 
-      <section data-tour-id="payments-summary-metrics" className="phase23v-metric-grid">
-        <Metric label="Expected Registration Income" value={formatCurrency(workspace.summary.expectedRegistrationIncome, currency)} />
-        <Metric label="Payments Received" value={formatCurrency(workspace.summary.recordedPayments, currency)} />
-        <Metric label="Outstanding Balance" value={formatCurrency(workspace.summary.outstandingBalance, currency)} />
-        <Metric label="Fully Paid" value={workspace.summary.paidRegistrations} />
-        <Metric label="Partially Paid" value={workspace.summary.partialPaymentRegistrations} />
+      <section data-tour-id="payments-summary-metrics" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <Metric label="Expected" value={formatCurrency(workspace.summary.expectedRegistrationIncome, currency)} help="Registration charges recorded for this event." />
+        <Metric label="Collected" value={formatCurrency(workspace.summary.recordedPayments, currency)} help="Payments currently recorded as received." />
+        <Metric label="Outstanding" value={formatCurrency(workspace.summary.outstandingBalance, currency)} help="Visible registration balances still open." />
+        <Metric label="Need Follow-Up" value={workspace.summary.paymentFollowUpCount} help="Records where action may be needed." />
+        <Metric label="Need Review" value={workspace.summary.actionRequiredCount + workspace.summary.internalCleanupCount} help="Evidence, contradiction, or cleanup checks." />
       </section>
 
       <section className="rounded-[24px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Payment Records</p>
-            <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Registration payment records</h2>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Payment workspace</p>
+            <h2 className="mt-2 font-serif text-2xl text-[#2B1723]">Records, follow-up, and summary</h2>
             <p className="mt-2 max-w-3xl text-xs leading-5 text-[#816D62]">
-              Search the full selected-event payment workspace, filter by payment state or method, and open details without leaving this page.
+              Start with Payment Records for daily work. Use Review & Follow-Up for issues, and Summary for totals and term definitions.
             </p>
           </div>
+          <PageTabs tabs={PAYMENT_TABS.map(([id, label]) => ({ id, label }))} active={activePaymentTab} onChange={setPaymentTab} label="Payment workspace sections" idPrefix="payments" />
+        </div>
+
+        {activePaymentTab === 'records' && (
+          <div id="payments-records-panel" role="tabpanel" aria-labelledby="payments-records-tab" tabIndex="0">
+        <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <p className="text-sm font-bold text-[#2B1723]">Payment Records</p>
           <div className="flex flex-wrap gap-2">
             <label className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[#B8A49A]" />
@@ -497,69 +519,64 @@ export function PaymentsPage() {
             </div>
           )}
         </div>
+          </div>
+        )}
+
+        {activePaymentTab === 'review' && (
+          <div id="payments-review-panel" role="tabpanel" aria-labelledby="payments-review-tab" tabIndex="0" className="mt-5 space-y-4">
+            <ReviewList
+              eyebrow="Payment Follow-Up"
+              title="Records that may still need organizer action"
+              description="Use this when money may still be due, a payment is partial, or the current payment state is not settled."
+              rows={workspace.paymentFollowUpRows}
+              currency={currency}
+              emptyMessage={workspace.summary.prominentDataReviewCount > 0 || workspace.summary.historicalLimitationCount > 0
+                ? 'No guest payment follow-up is detected. Review counts below are internal finance review only.'
+                : 'No guest payment follow-up is detected from the current records.'}
+              onOpenDetails={setSelectedRegistrationId}
+            />
+            <ReviewList
+              eyebrow="Internal Review"
+              title="Records that still need organizer review"
+              description="Use this for missing evidence, amount differences, duplicate references, or cleanup that should be resolved without treating the guest as unpaid by default."
+              rows={workspace.prominentDataReviewRows}
+              currency={currency}
+              emptyMessage="No active finance review is currently detected."
+              onOpenDetails={setSelectedRegistrationId}
+            />
+          </div>
+        )}
+
+        {activePaymentTab === 'summary' && (
+          <div id="payments-summary-panel" role="tabpanel" aria-labelledby="payments-summary-tab" tabIndex="0" className="mt-5 space-y-4">
+            <section className="phase23v-metric-grid">
+              <Metric label="Paid" value={workspace.summary.paidRegistrations} />
+              <Metric label="Partial payments" value={workspace.summary.partialPaymentRegistrations} />
+              <Metric label="Pending" value={workspace.summary.pendingRegistrations} />
+              <Metric label="Door Paid" value={workspace.summary.doorPaidRegistrations} />
+              <Metric label="Complimentary" value={workspace.summary.complimentaryRegistrations} help={`${workspace.summary.complimentaryGuests} guests`} />
+              <Metric label="Paid — Amount Not Recorded" value={workspace.summary.paidAmountNotRecordedCount} help="Paid status exists, but the amount field is missing and must not be silently treated as zero." />
+            </section>
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#816D62]">
+                <strong className="text-[#6B564C]">Missing amount is not zero.</strong> It means the app cannot confirm the amount yet.
+              </div>
+              <div className="rounded-xl border border-[#EEDFD6] bg-[#FFF8F2] p-4 text-sm leading-6 text-[#816D62]">
+                <strong className="text-[#6B564C]">Zero is not automatically complimentary.</strong> Complimentary status must be explicit on the registration.
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       {selectedRow && (
         <PaymentDetailsPanel row={selectedRow} currency={currency} onClose={() => setSelectedRegistrationId('')} />
       )}
 
-      <section className="phase23v-metric-grid">
-        <Metric label="Unpaid" value={workspace.summary.pendingRegistrations + workspace.summary.doorListRegistrations} />
-        <Metric label="Complimentary" value={workspace.summary.complimentaryRegistrations} help={`${workspace.summary.complimentaryGuests} guests`} />
-        <Metric label="Door Paid" value={workspace.summary.doorPaidRegistrations} />
-        <Metric label="Payment Review Needed" value={workspace.summary.actionRequiredCount + workspace.summary.internalCleanupCount} />
-        <Metric label="Follow-Up Required" value={workspace.summary.paymentFollowUpCount} />
-      </section>
-
-      <ReviewList
-        eyebrow="Payment Follow-Up"
-        title="Records that may still need organizer action"
-        description="Use this list when money may still be due, a payment is partial, or the current payment state is not yet settled."
-        rows={workspace.paymentFollowUpRows}
-        currency={currency}
-        emptyMessage={workspace.summary.prominentDataReviewCount > 0 || workspace.summary.historicalLimitationCount > 0
-          ? 'No guest payment follow-up is detected. Review counts below are internal finance review only.'
-          : 'No guest payment follow-up is detected from the current records.'}
-        onOpenDetails={setSelectedRegistrationId}
-      />
-
-      <ReviewList
-        eyebrow="Internal Review"
-        title="Records that still need organizer review"
-        description="Use this list for data contradictions, missing evidence, duplicate references, or internal cleanup that should be resolved without treating the guest as unpaid by default."
-        rows={workspace.prominentDataReviewRows}
-        currency={currency}
-        emptyMessage="No active finance review is currently detected."
-        onOpenDetails={setSelectedRegistrationId}
-      />
-
-      <details className="phase23v-panel">
-        <summary className="phase23v-summary">Payment status and review detail</summary>
-        <div className="phase23v-body space-y-4">
-          <section className="phase23v-metric-grid">
-            <Metric label="Paid" value={workspace.summary.paidRegistrations} />
-            <Metric label="Partial payments" value={workspace.summary.partialPaymentRegistrations} />
-            <Metric label="Pending" value={workspace.summary.pendingRegistrations} />
-            <Metric label="Door Paid" value={workspace.summary.doorPaidRegistrations} />
-            <Metric label="To Pay at Door" value={workspace.summary.doorListRegistrations} />
-          </section>
-          <section className="phase23v-metric-grid">
-            <Metric label="Action Required" value={workspace.summary.actionRequiredCount} />
-            <Metric label="Internal Cleanup" value={workspace.summary.internalCleanupCount} />
-            <Metric label="Historical Limitations" value={workspace.summary.historicalLimitationCount} />
-            <Metric label="Informational Only" value={workspace.summary.informationalOnlyCount} />
-            <Metric label="Paid — Amount Not Recorded" value={workspace.summary.paidAmountNotRecordedCount} />
-          </section>
-          <p className="text-xs leading-5 text-[#816D62]">
-            Historical and informational review items stay searchable for audit context without being treated as current guest debt by default.
-          </p>
-        </div>
-      </details>
-
       {evidenceAudit && (
         <section className="rounded-2xl border border-[#D8C5A8] bg-[#FFFCF6] p-4 text-sm leading-6 text-[#715D46]" aria-label="Historical reconciliation moved to Reports">
           <strong className="text-[#4E3928]">Historical reconciliation evidence is not part of the daily Registration Payments workflow.</strong>
-          {' '}Use Reports for historical reconciliation detail and Reconciliation Preview for a read-only workbook comparison. The totals above remain the current registration payment records only.
+          {' '}Use Reports for historical reconciliation detail and Review & Reconcile Records for a read-only workbook comparison. The totals above remain the current registration payment records only.
         </section>
       )}
     </div>

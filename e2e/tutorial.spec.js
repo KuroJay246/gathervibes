@@ -47,7 +47,7 @@ test('tutorial v3 supports deterministic replay, next, back, refresh, and comple
   await expect(page.locator('[data-tour-id="working-event-selector"]').first()).toBeVisible()
 
   await clickTutorialButton(page, 'Next')
-  await expect(page.locator(stepTitle())).toContainText('Overview')
+  await expect(page.locator(stepTitle())).toContainText('Home')
   await expect(page.locator('[data-tour-id="overview-summary"]')).toBeVisible()
   await expect(tutorialDialog(page)).toContainText('What to do now:')
   await expect(tutorialDialog(page).getByRole('button', { name: 'Show Me' })).toBeVisible()
@@ -58,15 +58,15 @@ test('tutorial v3 supports deterministic replay, next, back, refresh, and comple
   await expect(page).toHaveURL(/\/dashboard$/)
 
   await clickTutorialButton(page, 'Next')
-  await expect(page.locator(stepTitle())).toContainText('Overview')
+  await expect(page.locator(stepTitle())).toContainText('Home')
 
   await page.reload()
-  await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Event Overview' })).toBeVisible()
 
   await openReplay(page)
   const expectedSteps = [
     ['Working Event', /\/dashboard$/, 'working-event-selector'],
-    ['Overview', /\/dashboard$/, 'overview-summary'],
+    ['Home', /\/dashboard$/, 'overview-summary'],
     ['Create Event', /\/events$/, 'create-event-action'],
     ['Event Basics', /\/events$/, 'event-name-field'],
     ['Event Category', /\/events$/, 'event-category-selector'],
@@ -87,7 +87,7 @@ test('tutorial v3 supports deterministic replay, next, back, refresh, and comple
     ['Organizations', /\/contacts$/, 'organizations-workspace'],
     ['Event Relationships', /\/contacts$/, 'event-relationships-workspace'],
     ['Event Readiness', /\/dashboard$/, 'event-readiness-summary'],
-    ['Reconciliation Preview', /\/payments\/reconciliation$/, 'reconciliation-workspace'],
+    ['Review & Reconcile Records', /\/payments\/reconciliation$/, 'reconciliation-workspace'],
     ['Message Builder', /\/communications$/, 'message-builder-workspace'],
     ['Reports', /\/event-review$/, 'reports-workspace'],
     ['Import Center', /\/imports$/, 'imports-workspace'],
@@ -126,7 +126,7 @@ test('tutorial v3 remains usable on small mobile viewports and supports rapid re
   await expect(page.locator('[data-tour-id="event-name-field"]')).toBeVisible()
   await page.getByRole('button', { name: 'Cancel' }).click()
   await clickTutorialButton(page, 'Back')
-  await expect(page.locator(stepTitle())).toContainText('Overview')
+  await expect(page.locator(stepTitle())).toContainText('Home')
   await clickTutorialButton(page, 'Next')
   await expect(page.locator(stepTitle())).toContainText('Create Event')
   await expect(page.locator('[role="dialog"]').first()).toBeVisible()
