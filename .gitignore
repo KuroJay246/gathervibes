@@ -19,6 +19,7 @@ test_output.txt
 test-results/
 playwright-report/
 output/
+tmp/
 
 test_output.txt
 

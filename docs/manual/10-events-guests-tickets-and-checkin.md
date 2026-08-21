@@ -22,7 +22,7 @@ Do not put private guest data into QR payloads.
 
 ```mermaid
 flowchart TD
-  Ticket[Ticket code] --> Payload[GSV:TICKET:{ticketCode}]
+  Ticket[Ticket code] --> Payload["GSV:TICKET:{ticketCode}"]
   Payload --> QR[QRCode rendering]
   QR --> Scanner[Camera or manual scanner panel]
   Scanner --> Parse[qrTicketUtils parses safe ticket code]

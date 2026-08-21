@@ -70,6 +70,14 @@ Documentation is not complete when it only describes the code. It must describe 
 
 For documentation-only work, state explicitly whether Firebase Hosting, Firestore Rules, Auth, Functions, Storage, QR format, production data, or runtime UI were unchanged. For runtime work, the final handoff must identify the documentation files reviewed or updated, or explain why no documentation update was required.
 
+When documentation includes screenshots, diagrams, HTML manuals, or PDFs:
+
+- Replace screenshots when critical labels, controls, layout, or workflow steps changed.
+- Regenerate diagrams when auth, routes, permissions, deployment flow, imports, QR flow, or repair flow changed.
+- Revalidate PDF bookmarks, internal links, rendered tables, rendered diagrams, and page-image contact sheets whenever the generator or manual source changes.
+- Update field-level dictionary entries whenever a proven Firestore write/read/rule contract changes.
+- Record documentation repairs in `docs/changelog/DOCUMENTATION_CHANGELOG.md`.
+
 ## Handoff Rule
 
 Every handoff must state:
