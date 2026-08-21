@@ -45,7 +45,7 @@ test('document helpers validate URL, categories, statuses, required state, expir
     required: true,
     url: 'https://drive.google.com/file/d/abc',
     documentType: 'Google Drive',
-    expiryDate: '2026-08-20',
+    expiryDate: '2026-08-30',
   }, event)
   const documents = [
     record,
