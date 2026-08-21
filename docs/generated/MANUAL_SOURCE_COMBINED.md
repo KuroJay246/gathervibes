@@ -7,10 +7,10 @@ manual/00-cover-and-document-control.md
 Displayed title: Gathetr Technical Manual
 
 Document version: 2026-08-21 Phase 3B
-Generated: 2026-08-21T05:42:42.487Z
+Generated: 2026-08-21T05:44:25.749Z
 Application source commit documented: 5234f87d467d1331909c75e2443f8efb641b7dde
-Documentation commit: 5234f87d467d1331909c75e2443f8efb641b7dde
-Documentation branch at generation: docs/phase-3b-manual-rendering-repair
+Documentation source base commit: 2f8d4dfbf9420bcd2a444d1754886133e6aa604f
+Documentation branch at generation: main
 Repository: https://github.com/KuroJay246/gathervibes.git
 Firebase project: gathervibeshub
 Production URL: https://gathervibeshub.web.app
@@ -18,7 +18,7 @@ Status: Documentation-only manual repair and expansion
 
 ## Document Control
 
-This manual covers the runtime application source at the recorded application commit and the documentation source at the recorded documentation commit. It does not claim to describe later changes unless regenerated.
+This manual covers the runtime application source at the recorded application commit and the documentation source snapshot rooted at the recorded documentation source base commit. It does not claim to describe later changes unless regenerated.
 
 Source documents in `docs/` are authoritative. The HTML and PDF outputs are generated reading copies.
 

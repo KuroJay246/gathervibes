@@ -5,7 +5,7 @@ Displayed title: Gathetr Technical Manual
 Document version: 2026-08-21 Phase 3B
 Generated: {{GENERATION_DATE}}
 Application source commit documented: {{APPLICATION_COMMIT}}
-Documentation commit: {{DOCUMENTATION_COMMIT}}
+Documentation source base commit: {{DOCUMENTATION_COMMIT}}
 Documentation branch at generation: {{CURRENT_BRANCH}}
 Repository: https://github.com/KuroJay246/gathervibes.git
 Firebase project: gathervibeshub
@@ -14,7 +14,7 @@ Status: Documentation-only manual repair and expansion
 
 ## Document Control
 
-This manual covers the runtime application source at the recorded application commit and the documentation source at the recorded documentation commit. It does not claim to describe later changes unless regenerated.
+This manual covers the runtime application source at the recorded application commit and the documentation source snapshot rooted at the recorded documentation source base commit. It does not claim to describe later changes unless regenerated.
 
 Source documents in `docs/` are authoritative. The HTML and PDF outputs are generated reading copies.
 
