@@ -20,7 +20,7 @@ test('Phase 23V adds reusable summary/detail layout primitives without new depen
   assert.equal(packageJson.dependencies['read-excel-file'], '^9.2.0')
 })
 
-test('Phase 23V Overview is summary-first and moves secondary detail behind disclosure panels', async () => {
+test('Phase 23V Overview uses organizer-ready issue rows and data-connected next steps', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
 
   assert.match(dashboard, /aria-label="Key event numbers"/)
@@ -29,7 +29,11 @@ test('Phase 23V Overview is summary-first and moves secondary detail behind disc
   assert.match(dashboard, /Payments received/)
   assert.match(dashboard, /Capacity used/)
   assert.match(dashboard, /Needs Attention/)
-  assert.match(dashboard, /Next Actions/)
+  assert.match(dashboard, /What happened/)
+  assert.match(dashboard, /Why it matters/)
+  assert.match(dashboard, /What to do next/)
+  assert.match(dashboard, /recommendedSteps/)
+  assert.match(dashboard, /Next Steps/)
   assert.match(dashboard, /Event Summary, Money, Readiness, and Upcoming/)
   assert.match(dashboard, /Home workspace categories/)
   assert.doesNotMatch(dashboard, /Phase \d+|roadmap|deferred/i)
@@ -51,13 +55,17 @@ test('Phase 23V dense organizer pages keep primary work visible and collapse sec
   assert.match(payments, /Historical reconciliation evidence is not part of the daily Registration Payments workflow/)
   assert.match(payments, /Review & Follow-Up/)
 
-  assert.match(tickets, /Advanced ticket filters/)
+  assert.match(tickets, /Find the ticket records that need work/)
+  assert.doesNotMatch(tickets, /<summary className="phase23v-summary">Advanced ticket filters/)
   assert.match(tickets, /Show QR code/)
   assert.doesNotMatch(tickets, /GSV:TICKET:\{ticketCode\}/)
 
-  assert.match(checkIn, /More attendance and readiness counts/)
-  assert.match(checkIn, /Event-day helper lists and exports/)
-  assert.match(checkIn, /Advanced check-in filters/)
+  assert.match(checkIn, /Counts to watch while checking in guests/)
+  assert.match(checkIn, /Event-day helpers/)
+  assert.match(checkIn, /Advanced Filters/)
+  assert.doesNotMatch(checkIn, /<summary className="phase23v-summary">More attendance and readiness counts/)
+  assert.doesNotMatch(checkIn, /<summary className="phase23v-summary">Event-day helper lists and exports/)
+  assert.doesNotMatch(checkIn, /<summary className="phase23v-summary">Advanced check-in filters/)
 
   assert.match(operations, /Partner commitments, sponsors, and supplier contacts/)
   assert.match(operations, /Registration ticket payments stay in Registration Payments/)
@@ -87,6 +95,8 @@ test('Phase 23V completion pass makes priority operational records scanable befo
   for (const visibleField of ['Quantity', 'Source', 'Supplier', 'Problem']) {
     assert.match(resources, new RegExp(`>${visibleField}<`))
   }
+  assert.match(resources, /resourceStatusTone/)
+  assert.match(resources, /On Site/)
 })
 
 test('Phase 23V guardrails preserve routes, QR payload, rules, indexes, access, and workflow boundaries', async () => {

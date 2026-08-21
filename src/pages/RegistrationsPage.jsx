@@ -532,9 +532,15 @@ export function RegistrationsPage() {
             />
           ))}
         </div>
-        <details className="mt-4 rounded-2xl border border-[#F2E8E1] bg-[#FBF8F5]">
-          <summary className="phase23v-summary">Secondary totals</summary>
-          <div className="phase23v-body gsv-compact-metric-grid">
+        {registrationMetricCards.length > 14 && (
+          <div className="mt-4 rounded-2xl border border-[#F2E8E1] bg-[#FBF8F5] p-4">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h4 className="text-sm font-bold text-[#2B1723]">Additional review totals</h4>
+                <p className="text-xs leading-5 text-[#816D62]">Secondary counts stay visible for scanning without interrupting the registration list.</p>
+              </div>
+            </div>
+            <div className="mt-3 gsv-compact-metric-grid">
             {registrationMetricCards.slice(14).map((item) => (
               <CountCard
                 key={item.label}
@@ -548,8 +554,9 @@ export function RegistrationsPage() {
                 }}
               />
             ))}
+            </div>
           </div>
-        </details>
+        )}
       </section>
 
       {evidenceAudit && (

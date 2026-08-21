@@ -827,32 +827,6 @@ export function OperationsPage() {
             <strong className="text-[#6B564C]">What this means:</strong> open ledger items are still expected or pending, while the visible Current Ledger Difference reflects only the filtered Operations rows on screen. This is not final event profit and should not be added automatically to registration payment totals.
           </div>
 
-          <details className="mt-4 rounded-xl border border-[#EEDFD6] bg-[#FBF8F5]">
-            <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-[#6B564C]">Operations entry effect table</summary>
-            <div className="overflow-x-auto border-t border-[#EFE2DA]">
-              <table className="w-full min-w-[760px] text-left text-xs">
-                <thead className="bg-white uppercase tracking-wider text-[#80685B]">
-                  <tr>
-                    <th className="px-3 py-2">Entry type</th>
-                    <th className="px-3 py-2">Cash effect</th>
-                    <th className="px-3 py-2">Commitment effect</th>
-                    <th className="px-3 py-2">Reporting treatment</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#EFE2DA]">
-                  {OPERATIONS_ENTRY_EFFECTS.map((effect) => (
-                    <tr key={effect.entryType}>
-                      <td className="px-3 py-2 font-bold text-[#2B1723]">{labelFor(effect.entryType)}</td>
-                      <td className="px-3 py-2">{effect.cashEffect}</td>
-                      <td className="px-3 py-2">{effect.commitmentEffect}</td>
-                      <td className="px-3 py-2">{effect.reportingTreatment}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </details>
-
           <div className="mt-4 overflow-hidden rounded-xl border border-[#F2E8E1]">
             {filteredEntries.length === 0 ? (
               <div className="p-6 text-sm leading-6 text-[#816D62]">
@@ -903,6 +877,32 @@ export function OperationsPage() {
               </div>
             )}
           </div>
+
+          <details className="mt-4 rounded-xl border border-[#EEDFD6] bg-[#FBF8F5]">
+            <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-[#6B564C]">Operations entry effect table</summary>
+            <div className="overflow-x-auto border-t border-[#EFE2DA]">
+              <table className="w-full min-w-[760px] text-left text-xs">
+                <thead className="bg-white uppercase tracking-wider text-[#80685B]">
+                  <tr>
+                    <th className="px-3 py-2">Entry type</th>
+                    <th className="px-3 py-2">Cash effect</th>
+                    <th className="px-3 py-2">Commitment effect</th>
+                    <th className="px-3 py-2">Reporting treatment</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#EFE2DA]">
+                  {OPERATIONS_ENTRY_EFFECTS.map((effect) => (
+                    <tr key={effect.entryType}>
+                      <td className="px-3 py-2 font-bold text-[#2B1723]">{labelFor(effect.entryType)}</td>
+                      <td className="px-3 py-2">{effect.cashEffect}</td>
+                      <td className="px-3 py-2">{effect.commitmentEffect}</td>
+                      <td className="px-3 py-2">{effect.reportingTreatment}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </details>
         </section>
       </section>
 

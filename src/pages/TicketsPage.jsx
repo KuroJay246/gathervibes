@@ -276,6 +276,9 @@ export function TicketsPage() {
         <div className="flex flex-col gap-2 sm:items-end">
           <div className="flex flex-col gap-2 sm:flex-row">
             <input
+              id={`ticket-manual-code-${registration.registrationId}`}
+              name={`ticketManualCode-${registration.registrationId}`}
+              aria-label={`Manual ticket code for ${registration.fullName}`}
               value={draftCode}
               onChange={(event) => setDraftCodes((prev) => ({ ...prev, [registration.registrationId]: event.target.value.toUpperCase() }))}
               placeholder={registration.ticketCode || `${ticketPrefix}-001`}
@@ -317,6 +320,9 @@ export function TicketsPage() {
     return (
       <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
         <input
+          id={`ticket-assign-code-${registration.registrationId}`}
+          name={`ticketAssignCode-${registration.registrationId}`}
+          aria-label={`Ticket code to assign to ${registration.fullName}`}
           value={draftCode}
           onChange={(event) => setDraftCodes((prev) => ({ ...prev, [registration.registrationId]: event.target.value.toUpperCase() }))}
           placeholder={`${ticketPrefix}-001`}
@@ -393,14 +399,13 @@ export function TicketsPage() {
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
       {actionError && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{actionError}</div>}
 
-      <details className="phase23v-panel">
-        <summary className="phase23v-summary">Advanced ticket filters</summary>
-        <div className="phase23v-body space-y-4">
+      <section className="gsv-section-card space-y-4" data-tour-id="ticket-filter-workspace">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="font-bold text-[#2B1723]">Advanced Filters</h3>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Ticket review</p>
+            <h3 className="mt-1 font-serif text-xl text-[#2B1723]">Find the ticket records that need work</h3>
             <p className="mt-1 text-xs leading-5 text-[#816D62]">
-              Search ticket code, guest, buyer, attendees, email, phone, group, payment status, or price tier.
+              Search ticket code, guest, buyer, attendees, email, phone, group, payment status, or price tier. These controls filter the visible ticket records below.
             </p>
           </div>
           <button 
@@ -415,6 +420,9 @@ export function TicketsPage() {
           <div className="relative max-w-2xl">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#B8A49A]" />
             <input
+              id="ticket-search"
+              name="ticketSearch"
+              aria-label="Search ticket records"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Search keyword..."
@@ -441,8 +449,7 @@ export function TicketsPage() {
             ))}
           </div>
         </div>
-        </div>
-      </details>
+      </section>
 
       {assignedRegistrations.length > 0 && (
         <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">

@@ -107,7 +107,7 @@ test('Check-In page exposes event-day mode, helper lists, and clear QR feedback 
 test('Overview includes event-day actions without enabling external integrations', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
 
-  assert.match(dashboard, /Next Actions/)
+  assert.match(dashboard, /Next Steps/)
   assert.match(dashboard, /Open Check-In/)
   assert.match(dashboard, /Ticket Lookup/)
   assert.match(dashboard, /Urgent Contacts and Commitments/)

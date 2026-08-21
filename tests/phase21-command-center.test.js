@@ -9,7 +9,7 @@ test('Overview keeps event priorities and high-frequency action destinations', a
   const readiness = await readFile('src/utils/eventReadiness.js', 'utf8')
 
   assert.match(dashboard, /Needs Attention/)
-  assert.match(dashboard, /Next Actions/)
+  assert.match(dashboard, /Next Steps/)
   assert.match(dashboard, /Registration records/)
   assert.match(dashboard, /Payments received/)
   assert.match(dashboard, /to: '\/registrations'/)

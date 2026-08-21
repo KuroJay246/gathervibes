@@ -57,6 +57,16 @@ function runItemOptions(items = []) {
   return items.map((item) => option(item.itemId, `${item.startTime} ${item.title}`, item.status))
 }
 
+function resourceStatusTone(status = '') {
+  const normalized = status.toLowerCase()
+  if (normalized.includes('on site') || normalized.includes('confirmed') || normalized.includes('packed') || normalized.includes('received')) {
+    return 'bg-[#E5F3EC] text-[#1E7345] border border-[#CFE8D8]'
+  }
+  if (normalized.includes('returned')) return 'bg-[#EEF2F7] text-[#4A5D70] border border-[#DCE4EC]'
+  if (normalized.includes('ordered') || normalized.includes('reserved')) return 'bg-[#FFF4DF] text-[#7A5818] border border-[#F2D6A3]'
+  return 'bg-[#FFF8F2] text-[#8A3F4B] border border-[#F2CDD7]'
+}
+
 function ResourceForm({ resource, runItems, contacts, organizations, documents, tasks, operationsEntries, onSave, onCancel }) {
   const [values, setValues] = useState(createEmptyResource(resource))
   const [error, setError] = useState('')
@@ -245,7 +255,7 @@ export function ResourcesPage() {
             <div className="gsv-record-row-main xl:grid-cols-[minmax(15rem,1.25fr)_minmax(34rem,2fr)_auto]">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-[#F7DDE6] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8A3F4B]">{resource.status}</span>
+                  <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${resourceStatusTone(resource.status)}`}>{resource.status}</span>
                   {resource.criticalForEvent && <span className="rounded-full bg-[#FFF1F1] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8A1F1F]">Critical</span>}
                 </div>
                 <h3 className="gsv-record-title mt-2">{resource.name}</h3>

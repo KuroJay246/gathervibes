@@ -152,9 +152,12 @@ function Section({ eyebrow, title, children }) {
 function issueExplanationFor(item) {
   const key = item?.key || ''
   const label = item?.label || ''
+  const affected = item?.count ?? item?.value ?? item?.total ?? ''
   if (key.includes('run-of-show') || key.includes('timeline') || label.includes('timeline') || label.includes('Run of Show')) {
     return {
       title: item.summary,
+      affected,
+      happened: 'Schedule items need review before the event-day sequence is dependable.',
       why: 'This can affect the event-day sequence, arrivals, or handoffs.',
       action: 'Review the schedule, confirm the status, and update the delayed item.',
     }
@@ -162,6 +165,8 @@ function issueExplanationFor(item) {
   if (key.includes('resource') || label.includes('Resource')) {
     return {
       title: item.summary,
+      affected,
+      happened: 'A supply, equipment, service, pickup, return, or quantity record is not fully ready.',
       why: 'The event plan may be missing equipment, supplies, services, or confirmed quantities.',
       action: 'Review the resource record, confirm what is available, and assign the next step.',
     }
@@ -169,6 +174,8 @@ function issueExplanationFor(item) {
   if (key.includes('payment')) {
     return {
       title: item.summary,
+      affected,
+      happened: 'Some registration payment records still need collection, evidence, or review.',
       why: 'Guest registration money may still need collection, evidence, or a clear organizer review state.',
       action: 'Open Registration Payments and review the affected records.',
     }
@@ -176,6 +183,8 @@ function issueExplanationFor(item) {
   if (key.includes('ticket')) {
     return {
       title: item.summary,
+      affected,
+      happened: 'One or more expected guests do not have a complete ticket record.',
       why: 'A guest may be paid or expected but still missing a usable ticket code.',
       action: 'Open Tickets and assign or review the ticket records.',
     }
@@ -183,6 +192,8 @@ function issueExplanationFor(item) {
   if (key.includes('data')) {
     return {
       title: item.summary,
+      affected,
+      happened: 'Some record details are incomplete, repeated, or need organizer confirmation.',
       why: 'Incomplete or repeated contact/payment data can make follow-up and check-in harder.',
       action: 'Open the linked records and correct only the fields you can verify.',
     }
@@ -190,12 +201,16 @@ function issueExplanationFor(item) {
   if (key.includes('operations') || key.includes('partners')) {
     return {
       title: item.summary,
+      affected,
+      happened: 'An event-level ledger, commitment, partner, or supplier item is still unsettled.',
       why: 'Partner promises, supplier balances, or event-level money may still need review.',
       action: 'Open Operations and check the relevant workspace.',
     }
   }
   return {
     title: item.summary,
+    affected,
+    happened: 'The event has a planning item that still needs organizer review.',
     why: 'This item may affect planning clarity or the next organizer action.',
     action: 'Open the linked page and review the affected records.',
   }
@@ -204,20 +219,39 @@ function issueExplanationFor(item) {
 function PriorityItem({ item }) {
   const explanation = issueExplanationFor(item)
   return (
-    <Link to={item.to} className="block rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 hover:bg-white">
-      <div className="flex items-start justify-between gap-3">
-        <div>
+    <Link to={item.to} className="grid gap-3 rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 transition hover:border-[#D8B9AF] hover:bg-white sm:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
           <p className="text-sm font-bold text-[#2B1723]">{explanation.title}</p>
-          <p className="mt-2 text-xs leading-5 text-[#816D62]">{explanation.why}</p>
-          <p className="mt-1 text-xs leading-5 text-[#5D4A52]">{explanation.action}</p>
+          {explanation.affected !== '' && explanation.affected !== undefined && (
+            <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#80685B]">
+              {explanation.affected} affected
+            </span>
+          )}
         </div>
+        <dl className="mt-3 grid gap-2 text-xs leading-5 text-[#5D4A52] md:grid-cols-3">
+          <div>
+            <dt className="font-bold text-[#80685B]">What happened</dt>
+            <dd>{explanation.happened}</dd>
+          </div>
+          <div>
+            <dt className="font-bold text-[#80685B]">Why it matters</dt>
+            <dd>{explanation.why}</dd>
+          </div>
+          <div>
+            <dt className="font-bold text-[#80685B]">What to do next</dt>
+            <dd>{explanation.action}</dd>
+          </div>
+        </dl>
+      </div>
+      <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
         <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
           item.statusLabel === 'Needs attention' ? 'bg-[#FFF1F1] text-[#A32626]' : 'bg-[#FFF4DF] text-[#7A5818]'
         }`}>
           {item.statusLabel}
         </span>
+        <span className="rounded-xl bg-[#2B1723] px-3 py-2 text-xs font-bold text-white">{item.linkLabel}</span>
       </div>
-      <p className="mt-3 text-xs font-bold text-[#9A5260]">{item.linkLabel}</p>
     </Link>
   )
 }
@@ -229,6 +263,20 @@ function ActionLink({ to, icon: Icon, label, detail }) {
       <span>
         <span className="block">{label}</span>
         {detail && <span className="mt-1 block text-xs font-medium leading-5 text-[#80685B]">{detail}</span>}
+      </span>
+    </Link>
+  )
+}
+
+function RecommendedStep({ action, reason, feature }) {
+  const Icon = action.icon
+  return (
+    <Link to={action.to} className="flex min-h-14 items-start gap-3 rounded-xl border border-[#EFE2DA] bg-white px-4 py-3 text-sm transition hover:bg-[#FFF8F2]">
+      <Icon className="mt-0.5 size-4 shrink-0 text-[#9A5260]" />
+      <span className="min-w-0">
+        <span className="block font-bold text-[#2B1723]">{action.label}</span>
+        <span className="mt-1 block text-xs leading-5 text-[#80685B]">{reason}</span>
+        <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-[#9A5260]">{feature}</span>
       </span>
     </Link>
   )
@@ -409,6 +457,39 @@ export function DashboardPage() {
     () => PLANNING_ACTIONS.filter((action) => canViewRoute(access, action.to)),
     [access],
   )
+  const recommendedSteps = useMemo(() => {
+    const byDestination = new Map(quickActions.map((action) => [action.to, action]))
+    const issueSteps = readiness.actionItems
+      .map((item) => {
+        const action = byDestination.get(item.to)
+        if (!action) return null
+        const explanation = issueExplanationFor(item)
+        return {
+          key: item.key || action.to,
+          action,
+          reason: explanation.action,
+          feature: action.detail || item.linkLabel || 'Current event',
+        }
+      })
+      .filter(Boolean)
+    const seen = new Set()
+    const uniqueIssueSteps = issueSteps.filter((step) => {
+      if (seen.has(step.action.to)) return false
+      seen.add(step.action.to)
+      return true
+    })
+    if (uniqueIssueSteps.length >= 3) return uniqueIssueSteps.slice(0, 3)
+    const fallbacks = quickActions
+      .filter((action) => !seen.has(action.to))
+      .slice(0, 3 - uniqueIssueSteps.length)
+      .map((action) => ({
+        key: `fallback-${action.to}`,
+        action,
+        reason: action.detail || 'Useful for the selected Working Event.',
+        feature: 'Organizer utility',
+      }))
+    return [...uniqueIssueSteps, ...fallbacks]
+  }, [quickActions, readiness.actionItems])
   const recentActivity = useMemo(
     () => buildRecentActivity({ event: selectedEvent, registrations, operationsEntries }),
     [operationsEntries, registrations, selectedEvent],
@@ -558,7 +639,7 @@ export function DashboardPage() {
         <>
           <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
             <div data-tour-id="event-readiness-summary">
-              <Section eyebrow="Needs Attention" title="What should I do next?">
+            <Section eyebrow="Needs Attention" title="Planning issues to review">
                 {readiness.actionItems.length === 0 ? (
                   <p className="rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
                     No urgent planning blockers are currently visible for this event.
@@ -571,9 +652,11 @@ export function DashboardPage() {
               </Section>
             </div>
 
-            <Section eyebrow="Next Actions" title="Common next steps">
+            <Section eyebrow="Next Steps" title="Recommended now">
               <div className="grid gap-2">
-              {quickActions.slice(0, 4).map((action) => <ActionLink key={action.label} {...action} />)}
+                {recommendedSteps.map((step) => (
+                  <RecommendedStep key={step.key} action={step.action} reason={step.reason} feature={step.feature} />
+                ))}
               </div>
             </Section>
           </section>

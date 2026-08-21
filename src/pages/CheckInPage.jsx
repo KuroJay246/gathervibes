@@ -442,9 +442,14 @@ export function CheckInPage() {
         </article>
       </section>
 
-      <details className="phase23v-panel">
-        <summary className="phase23v-summary">More attendance and readiness counts</summary>
-        <div className="phase23v-body phase23v-metric-grid">
+      <section className="gsv-section-card">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Door readiness</p>
+            <h3 className="mt-1 font-serif text-xl text-[#2B1723]">Counts to watch while checking in guests</h3>
+          </div>
+        </div>
+        <div className="mt-3 phase23v-metric-grid">
         {[
           ['Remaining Registrations', summary.remainingRegistrations],
           ['Remaining Guests', summary.remainingPersons],
@@ -457,7 +462,7 @@ export function CheckInPage() {
           </article>
         ))}
         </div>
-      </details>
+      </section>
 
       {evidenceAudit && (
         <details className="phase23v-panel border-[#D8C5A8] bg-[#FFFCF6]" aria-labelledby="checkin-evidence-heading">
@@ -497,9 +502,7 @@ export function CheckInPage() {
         </InfoHint>
       </section>
 
-      <details className="phase23v-panel">
-        <summary className="phase23v-summary">Event-day helper lists and exports</summary>
-        <div className="phase23v-body">
+      <section className="gsv-section-card" data-tour-id="checkin-helper-workspace">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Event-day helpers</p>
@@ -587,12 +590,9 @@ export function CheckInPage() {
             </table>
           </div>
         </div>
-        </div>
-      </details>
+      </section>
 
-      <details className="phase23v-panel">
-        <summary className="phase23v-summary">Advanced check-in filters</summary>
-        <div className="phase23v-body">
+      <section className="gsv-section-card" data-tour-id="checkin-view-filters">
         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Advanced Filters</p>
         <p className="mt-1 text-xs leading-5 text-[#816D62]">
           Switch between QR lookup and manual guest lists. Bulk check-in and undo still require confirmation and never delete records.
@@ -624,8 +624,7 @@ export function CheckInPage() {
             </div>
           ))}
         </div>
-        </div>
-      </details>
+      </section>
 
       {activeView === 'search' ? (
         <section className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">

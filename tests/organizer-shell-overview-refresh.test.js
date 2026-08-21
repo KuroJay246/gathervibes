@@ -62,7 +62,7 @@ test('Overview uses supported event metrics, attention, quick actions, and safe 
     'Operations expenses recorded',
     'Outstanding commitments',
     'Needs Attention',
-    'Next Actions',
+    'Next Steps',
     'Latest Changes',
     'Latest changes to this event',
   ]) {
