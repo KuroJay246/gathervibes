@@ -1,6 +1,6 @@
 # Gather & Savor Repository And Maintenance Manifest
 
-Last updated: 2026-08-04.
+Last updated: 2026-08-20.
 
 This manifest is the repository-maintenance source of truth for Gather & Savor Event Hub. Pair it with `docs/GSV_MASTER_SYSTEM_REFERENCE.md`: the Master Reference explains how the app works; this manifest explains where things live, what is generated, what is safe to clean, and how to keep repository knowledge current.
 
@@ -51,8 +51,8 @@ Specialized standards remain active when they define a current invariant, produc
 Start debugging from these anchors:
 
 - `src/App.jsx`: route tree.
-- `src/layout/AppShell.jsx`: organizer shell and navigation rendering.
-- `src/utils/navigation.js`: navigation definitions.
+- `src/layout/AppShell.jsx`: organizer shell, grouped desktop sidebar, collapsed-sidebar tooltips, and mobile drawer rendering.
+- `src/utils/navigation.js`: primary mobile navigation definitions.
 - `src/utils/accessRoles.js`: route-access roles.
 - `src/auth/AuthProvider.jsx`: Firebase Auth and organizer approval.
 - `src/config/protectedOwner.js`: Protected Owner constants.

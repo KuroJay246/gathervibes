@@ -72,7 +72,7 @@ test('final System QA refinement presents technical groups and manual checks dis
     'Current role and permissions',
     'Data Boundaries',
     'Registration Payments separate from Operations',
-    'Test Event exclusion',
+    'Training Event exclusion',
     'QR format',
     'Scanner isolation',
     'Import write boundary',

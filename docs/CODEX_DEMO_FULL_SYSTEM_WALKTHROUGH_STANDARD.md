@@ -8,8 +8,8 @@
 
 - Event name: `CODEX_DEMO - Full System Walkthrough`
 - Event ID: `codex_demo_full_system_walkthrough`
-- Classification: Test Event
-- Visibility: hidden from normal real-event lists by default, available through Show Test Events and System QA
+- Classification: Training Event
+- Visibility: hidden from normal real-event lists by default, available through Show Training Events and System QA
 - Data policy: synthetic `EXAMPLE -` records only
 
 ## Dataset Coverage

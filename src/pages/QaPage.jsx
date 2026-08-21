@@ -58,7 +58,7 @@ const FEATURE_STATUS_ITEMS = [
 
 const DATA_BOUNDARY_ITEMS = [
   ['Registration Payments separate from Operations', 'Pass', 'Guest charges and received amounts are reviewed separately from Operations Ledger records.'],
-  ['Demo/Test Event exclusion', 'Pass', 'CODEX_DEMO is the safe synthetic demo and QA event and is hidden from normal business use by default where supported.'],
+  ['Demo/Training Event exclusion', 'Pass', 'CODEX_DEMO is the safe synthetic demo and QA event and is hidden from normal business use by default where supported.'],
   ['QR format', 'Pass', 'Ticket QR payload remains GSV:TICKET:{ticketCode}.'],
   ['Scanner isolation', 'Pass', 'Scanner role remains assigned-event check-in only.'],
   ['Historical attendance separation', 'Pass', 'Historical attendance evidence does not create scanner-confirmed check-ins.'],

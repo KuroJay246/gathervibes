@@ -354,7 +354,9 @@ function buildRecentActivity({ event, registrations = [], operationsEntries = []
   if (event?.updatedAt || event?.createdAt) {
     activity.push({
       key: 'event-updated',
-      label: `${event.eventName || 'Event'} details were updated`,
+      label: event.eventName || 'Event',
+      action: 'Event details updated',
+      actor: 'Organizer workspace',
       source: 'Events',
       date: dateFromTimestamp(event.updatedAt || event.createdAt),
       to: '/events',
@@ -366,7 +368,9 @@ function buildRecentActivity({ event, registrations = [], operationsEntries = []
     if (!date) return
     activity.push({
       key: `registration-${registration.registrationId || registration.id || date.getTime()}`,
-      label: `${registration.fullName || registration.buyerName || 'Registration'} ${registration.ticketCode ? 'registration and ticket record' : 'registration record'} was updated`,
+      label: registration.fullName || registration.buyerName || 'Registration',
+      action: registration.ticketCode ? 'Registration and ticket record updated' : 'Registration record updated',
+      actor: registration.updatedByName || registration.updatedBy || registration.createdByName || 'Organizer',
       source: 'Guests & Registrations',
       date,
       to: '/registrations',
@@ -378,7 +382,9 @@ function buildRecentActivity({ event, registrations = [], operationsEntries = []
     if (!date) return
     activity.push({
       key: `operations-${entry.entryId || entry.id || date.getTime()}`,
-      label: `${entry.label || 'Operations ledger entry'} was updated`,
+      label: entry.label || 'Operations ledger entry',
+      action: 'Operations entry updated',
+      actor: entry.updatedByName || entry.updatedBy || entry.createdByName || 'Organizer',
       source: 'Operations',
       date,
       to: '/operations',
@@ -685,12 +691,18 @@ export function DashboardPage() {
                 No recent event, registration, or Operations updates are available yet. Activity appears here after existing event-scoped records are created or corrected.
               </p>
             ) : (
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+              <div className="grid gap-2">
                 {recentActivity.map((activity) => (
-                  <Link key={activity.key} to={activity.to} className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 hover:bg-white">
-                    <span className="gsv-status-pill gsv-status-pill-info">{activity.source}</span>
-                    <p className="mt-3 text-sm font-bold text-[#2B1723]">{activity.label}</p>
-                    <p className="mt-2 text-xs text-[#80685B]">{formatEventDate(activity.date, { hour: 'numeric', minute: '2-digit' })}</p>
+                  <Link key={activity.key} to={activity.to} className="grid gap-3 rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-3 hover:bg-white sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                    <span className="min-w-0">
+                      <span className="gsv-status-pill gsv-status-pill-info">{activity.source}</span>
+                      <span className="mt-2 block text-sm font-bold text-[#2B1723]">{activity.action}</span>
+                      <span className="mt-1 block truncate text-xs text-[#5D4A52]">{activity.label}</span>
+                    </span>
+                    <span className="text-xs leading-5 text-[#80685B] sm:text-right">
+                      <span className="block font-semibold">{activity.actor}</span>
+                      <span>{formatEventDate(activity.date, { hour: 'numeric', minute: '2-digit' })}</span>
+                    </span>
                   </Link>
                 ))}
               </div>

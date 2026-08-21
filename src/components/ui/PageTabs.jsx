@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 
-export function PageTabs({ tabs, active, onChange, label = 'Page sections', idPrefix = '' }) {
+export function PageTabs({ tabs, active, onChange, label = 'Page sections', idPrefix = '', controlsPanels = true }) {
   const tabRefs = useRef([])
 
   function panelId(tabId) {
@@ -53,7 +53,7 @@ export function PageTabs({ tabs, active, onChange, label = 'Page sections', idPr
             type="button"
             role="tab"
             aria-selected={selected}
-            aria-controls={panelId(tab.id)}
+            aria-controls={controlsPanels ? panelId(tab.id) : undefined}
             tabIndex={selected ? 0 : -1}
             onClick={() => selectTab(tab, index)}
             onKeyDown={handleKeyDown}

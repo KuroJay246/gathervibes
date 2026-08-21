@@ -82,9 +82,10 @@ test('[tutorial-v3] exact targets replace broad workspace targets for action ste
   assert.equal(targets['event-category'], TUTORIAL_TARGETS.eventCategorySelector)
   assert.equal(targets['event-capabilities'], TUTORIAL_TARGETS.eventCapabilities)
   assert.equal(targets['add-registration'], TUTORIAL_TARGETS.registrationsAddButton)
-  assert.equal(targets['registration-filters'], TUTORIAL_TARGETS.registrationFilters)
+  assert.equal(targets['registration-filters'], TUTORIAL_TARGETS.registrationsWorkspaceTabs)
   assert.equal(targets.payments, TUTORIAL_TARGETS.paymentsSummary)
-  assert.equal(targets['check-in'], TUTORIAL_TARGETS.checkInSearch)
+  assert.equal(targets.tickets, TUTORIAL_TARGETS.ticketsWorkspaceTabs)
+  assert.equal(targets['check-in'], TUTORIAL_TARGETS.checkInWorkspaceTabs)
   assert.equal(targets.tasks, TUTORIAL_TARGETS.tasksWorkspace)
   assert.equal(targets.commitments, TUTORIAL_TARGETS.partnersSponsors)
   assert.equal(targets['run-of-show'], TUTORIAL_TARGETS.runOfShowWorkspace)
@@ -146,7 +147,7 @@ test('[tutorial-v3] Back and Next transitions are first-class reducer operations
 
 test('[tutorial-v3] route and target registries are semantic and not text-selector based', () => {
   assert.ok(TUTORIAL_ROUTE_TARGETS.dashboard.includes(TUTORIAL_TARGETS.workingEventSelector))
-  assert.ok(TUTORIAL_ROUTE_TARGETS.registrations.includes(TUTORIAL_TARGETS.registrationFilters))
+  assert.ok(TUTORIAL_ROUTE_TARGETS.registrations.includes(TUTORIAL_TARGETS.registrationsWorkspaceTabs))
   assert.ok(TUTORIAL_ROUTE_TARGETS.tasks.includes(TUTORIAL_TARGETS.tasksWorkspace))
   assert.ok(TUTORIAL_ROUTE_TARGETS['run-of-show'].includes(TUTORIAL_TARGETS.runOfShowWorkspace))
   assert.ok(TUTORIAL_ROUTE_TARGETS.resources.includes(TUTORIAL_TARGETS.resourcesWorkspace))

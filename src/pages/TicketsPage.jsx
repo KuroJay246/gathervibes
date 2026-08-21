@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { Printer, RefreshCw, Search, TicketCheck, Trash2, Wand2, X } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
@@ -14,6 +14,7 @@ import { generateSequentialTicketCode, generateTicketCode, getTicketPrefix, norm
 import { formatPaymentLabel, normalizePaymentStatus, paymentStatusMatches } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency } from '../utils/financeUtils'
 import { InfoHint } from '../components/ui/InfoHint'
+import { PageTabs } from '../components/ui/PageTabs'
 
 const FILTER_GROUPS = [
   {
@@ -129,6 +130,7 @@ export function TicketsPage() {
   const { user } = useAuth()
   const { activeEvent } = useActiveEvent()
   const { registrations, loading, error, retry } = useRegistrationList(activeEvent)
+  const [searchParams, setSearchParams] = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState('all')
   const [draftCodes, setDraftCodes] = useState({})
@@ -138,6 +140,17 @@ export function TicketsPage() {
   const [showPrintableQrs, setShowPrintableQrs] = useState(false)
   const [selectedRegistrationId, setSelectedRegistrationId] = useState('')
   const [ticketConfirmation, setTicketConfirmation] = useState(null)
+  const requestedWorkspace = searchParams.get('workspace') || 'records'
+  const activeWorkspace = ['records', 'assignment-delivery', 'review-tools'].includes(requestedWorkspace) ? requestedWorkspace : 'records'
+
+  function setTicketWorkspace(workspace) {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      if (workspace === 'records') next.delete('workspace')
+      else next.set('workspace', workspace)
+      return next
+    }, { replace: true })
+  }
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -380,11 +393,30 @@ export function TicketsPage() {
         <CompactMetric label="Ticket Records Needing Review" value={ticketMetrics.reviewNeeded} />
       </section>
 
-      <section className="flex items-center gap-2 rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
-        <p><strong>Advanced ticket filters:</strong> use these to find assigned tickets, missing codes, payment states, check-in state, and review-needed rows.</p>
-        <InfoHint label="QR Payload Info">
-          QR codes still contain only <code>GSV:TICKET:ticketCode</code>.
-        </InfoHint>
+      <section className="gsv-section-card" data-tour-id="tickets-workspace-tabs">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Ticket workspace</p>
+            <h3 className="mt-1 font-serif text-xl text-[#2B1723]">
+              {activeWorkspace === 'records' ? 'Ticket Records' : activeWorkspace === 'assignment-delivery' ? 'Assignment & Delivery' : 'Review & Tools'}
+            </h3>
+            <p className="mt-1 text-xs leading-5 text-[#816D62]">
+              Ticket Records remain the normal workflow. Assignment controls change ticket codes only; Review & Tools contains filters, QR printing, and recovery work.
+            </p>
+          </div>
+          <PageTabs
+            tabs={[
+              { id: 'records', label: 'Ticket Records' },
+              { id: 'assignment-delivery', label: 'Assignment & Delivery' },
+              { id: 'review-tools', label: 'Review & Tools' },
+            ]}
+            active={activeWorkspace}
+            onChange={setTicketWorkspace}
+            label="Ticket workspaces"
+            idPrefix="tickets"
+            controlsPanels={false}
+          />
+        </div>
       </section>
 
       <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#EEDFD6] bg-white px-4 py-3 text-xs leading-5 text-[#816D62]">
@@ -399,6 +431,28 @@ export function TicketsPage() {
       {message && <div className="rounded-xl border border-[#CFE8D8] bg-[#E5F3EC] px-4 py-3 text-sm text-[#1E7345]">{message}</div>}
       {actionError && <div className="rounded-xl border border-[#F2C3C3] bg-[#FFF1F1] px-4 py-3 text-sm text-[#A32626]">{actionError}</div>}
 
+      {activeWorkspace === 'assignment-delivery' && (
+        <section className="gsv-section-card" data-tour-id="ticket-assignment-delivery">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Assignment & Delivery</p>
+          <h3 className="mt-1 font-serif text-xl text-[#2B1723]">What ticket actions change</h3>
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-4">
+              <p className="text-sm font-bold text-[#2B1723]">Generate or assign</p>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">Creates or replaces the ticket code on the registration record for this Working Event.</p>
+            </div>
+            <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-4">
+              <p className="text-sm font-bold text-[#2B1723]">QR state</p>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">QR uses only <code>GSV:TICKET:ticketCode</code>. It does not store contact, payment, or guest names.</p>
+            </div>
+            <div className="rounded-xl border border-[#F2E8E1] bg-[#FBF8F5] p-4">
+              <p className="text-sm font-bold text-[#2B1723]">Delivery reference</p>
+              <p className="mt-1 text-xs leading-5 text-[#816D62]">This app prepares ticket codes and QR access. It does not send email, SMS, or payment messages.</p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {activeWorkspace === 'review-tools' && (
       <section className="gsv-section-card space-y-4" data-tour-id="ticket-filter-workspace">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -450,8 +504,9 @@ export function TicketsPage() {
           </div>
         </div>
       </section>
+      )}
 
-      {assignedRegistrations.length > 0 && (
+      {activeWorkspace === 'review-tools' && assignedRegistrations.length > 0 && (
         <section className="rounded-2xl border border-[#EEDFD6] bg-white p-4 shadow-[0_4px_16px_rgba(43,23,35,0.03)]">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>

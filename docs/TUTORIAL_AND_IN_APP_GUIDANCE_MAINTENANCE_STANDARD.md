@@ -60,7 +60,7 @@ Tutorial and in-app guidance must stay aligned with the shell page-purpose strip
 When a user reports that the demo is locked, first confirm:
 
 - the signed-in account is the protected owner or an approved organizer;
-- `CODEX_DEMO - Full System Walkthrough` is visible after `Show Test Events`;
+- `CODEX_DEMO - Full System Walkthrough` is visible after `Show Training Events`;
 - CODEX_DEMO is selected as the Working Event;
 - a harmless reversible CODEX_DEMO edit saves and persists after reload;
 - the edit is reverted after verification.

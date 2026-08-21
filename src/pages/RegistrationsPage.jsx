@@ -21,6 +21,7 @@ import { ExportModal } from '../components/registrations/ExportModal'
 import { RegistrationFilters } from '../components/registrations/RegistrationFilters'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { InfoHint } from '../components/ui/InfoHint'
+import { PageTabs } from '../components/ui/PageTabs'
 import { Link, useSearchParams } from 'react-router'
 import { buildRegistrationMetrics, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
 import { formatPaymentLabel, paymentStatusMatches } from '../utils/paymentStatus'
@@ -134,7 +135,7 @@ function CountCard({ label, value, help, active, onClick }) {
 export function RegistrationsPage() {
   const { user } = useAuth()
   const { activeEvent } = useActiveEvent()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -146,6 +147,17 @@ export function RegistrationsPage() {
   const [selectedIds, setSelectedIds] = useState(new Set())
   const reviewRegistrationId = searchParams.get('reviewRegistration') || ''
   const reviewMode = searchParams.get('review') || ''
+  const requestedWorkspace = searchParams.get('workspace') || 'records'
+  const activeWorkspace = ['records', 'daily-review', 'bulk-actions'].includes(requestedWorkspace) ? requestedWorkspace : 'records'
+
+  function setRegistrationWorkspace(workspace) {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      if (workspace === 'records') next.delete('workspace')
+      else next.set('workspace', workspace)
+      return next
+    }, { replace: true })
+  }
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
@@ -505,11 +517,38 @@ export function RegistrationsPage() {
         ))}
       </section>
 
-      <section className="gsv-section-card">
+      <section className="gsv-section-card" data-tour-id="registrations-workspace-tabs">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Registration workspace</p>
+            <h3 className="mt-1 font-serif text-xl text-[#2B1723]">
+              {activeWorkspace === 'records' ? 'Registration records' : activeWorkspace === 'daily-review' ? 'Daily Review' : 'Bulk Actions'}
+            </h3>
+            <p className="mt-1 text-xs leading-5 text-[#816D62]">
+              Records stay the default workflow. Daily Review and Bulk Actions are separated so normal edits, issue review, and batch changes do not compete.
+            </p>
+          </div>
+          <PageTabs
+            tabs={[
+              { id: 'records', label: 'Registration Records' },
+              { id: 'daily-review', label: 'Daily Review' },
+              { id: 'bulk-actions', label: 'Bulk Actions' },
+            ]}
+            active={activeWorkspace}
+            onChange={setRegistrationWorkspace}
+            label="Registration workspaces"
+            idPrefix="registrations"
+            controlsPanels={false}
+          />
+        </div>
+      </section>
+
+      {activeWorkspace === 'daily-review' && (
+      <section className="gsv-section-card" data-tour-id="registrations-daily-review">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="font-serif text-xl text-[#2B1723]">Daily review shortcuts</h3>
-            <p className="mt-1 text-xs leading-5 text-[#816D62]">Common registration review states are visible so normal work does not depend on nested disclosures.</p>
+            <p className="mt-1 text-xs leading-5 text-[#816D62]">Review incomplete guests, balances, missing tickets, and data-quality concerns for this Working Event.</p>
           </div>
           {activeFilterCount > 0 && (
             <button type="button" onClick={() => { setFilters({}); setActiveTab('All'); setCardFilter('') }} className="w-fit rounded-xl border border-[#E7D6CC] px-3 py-2 text-xs font-bold text-[#6B564C]">
@@ -558,6 +597,7 @@ export function RegistrationsPage() {
           </div>
         )}
       </section>
+      )}
 
       {evidenceAudit && (
         <details className="phase23v-panel border-[#D8C5A8] bg-[#FFFCF6]" aria-labelledby="registration-audit-heading">
@@ -615,8 +655,11 @@ export function RegistrationsPage() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 rounded-2xl border border-[#EEDFD6] bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div data-tour-id="registrations-bulk-actions" className={`${activeWorkspace === 'bulk-actions' ? 'flex' : 'hidden'} flex-col gap-3 rounded-2xl border border-[#EEDFD6] bg-white p-4 sm:flex-row sm:items-center sm:justify-between`}>
         <div className="flex flex-wrap gap-2">
+          <p className="w-full text-xs leading-5 text-[#816D62]">
+            Bulk Actions affect only selected registrations in this Working Event. Select rows from the records list, review the selected count, and confirm before anything changes.
+          </p>
           <button
             type="button"
             onClick={allVisibleSelected ? clearSelection : selectVisibleRows}

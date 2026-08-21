@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { AlertTriangle, CheckCircle2, ClipboardCheck, Copy, Printer, Search, XCircle } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
@@ -28,6 +28,7 @@ import { buildRegistrationMetrics, formatRegistrationGuestSummary } from '../uti
 import { InfoHint } from '../components/ui/InfoHint'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
+import { PageTabs } from '../components/ui/PageTabs'
 
 const CHECK_IN_FILTER_GROUPS = [
   { label: 'Guest Lookup', values: ['search'] },
@@ -109,6 +110,7 @@ function useRegistrations(activeEvent) {
 export function CheckInPage() {
   const { user, access } = useAuth()
   const { activeEvent } = useActiveEvent()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { registrations, loading, error } = useRegistrations(activeEvent)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedId, setSelectedId] = useState('')
@@ -122,6 +124,17 @@ export function CheckInPage() {
   const [resumeScanTrigger, setResumeScanTrigger] = useState(0)
   const [selectedListIds, setSelectedListIds] = useState(new Set())
   const [bulkConfirmation, setBulkConfirmation] = useState(null)
+  const requestedWorkspace = searchParams.get('workspace') || 'check-in'
+  const activeWorkspace = ['check-in', 'recent-activity', 'review-issues', 'tools'].includes(requestedWorkspace) ? requestedWorkspace : 'check-in'
+
+  function setCheckInWorkspace(workspace) {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      if (workspace === 'check-in') next.delete('workspace')
+      else next.set('workspace', workspace)
+      return next
+    }, { replace: true })
+  }
   const summary = useMemo(() => buildEventDaySummary(registrations), [registrations])
   const visibleRegistrations = useMemo(
     () => filterCheckInRegistrations(registrations, activeView, activeEvent),
@@ -404,6 +417,34 @@ export function CheckInPage() {
         ))}
       </section>
 
+      <section className="gsv-section-card" data-tour-id="checkin-workspace-tabs">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Check-In workspace</p>
+            <h3 className="mt-1 font-serif text-xl text-[#2B1723]">
+              {activeWorkspace === 'check-in' ? 'Check In' : activeWorkspace === 'recent-activity' ? 'Recent Activity' : activeWorkspace === 'review-issues' ? 'Review & Issues' : 'Tools'}
+            </h3>
+            <p className="mt-1 text-xs leading-5 text-[#816D62]">
+              The scan and search workflow stays first. Secondary activity, issue review, helper lists, and filters are organized here.
+            </p>
+          </div>
+          <PageTabs
+            tabs={[
+              { id: 'check-in', label: 'Check In' },
+              { id: 'recent-activity', label: 'Recent Activity' },
+              { id: 'review-issues', label: 'Review & Issues' },
+              { id: 'tools', label: 'Tools' },
+            ]}
+            active={activeWorkspace}
+            onChange={setCheckInWorkspace}
+            label="Check-In workspaces"
+            idPrefix="checkin"
+            controlsPanels={false}
+          />
+        </div>
+      </section>
+
+      {(activeWorkspace === 'check-in' || activeWorkspace === 'recent-activity') && (
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <article className="gsv-section-card">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Manual check-in</p>
@@ -441,8 +482,10 @@ export function CheckInPage() {
           )}
         </article>
       </section>
+      )}
 
-      <section className="gsv-section-card">
+      {(activeWorkspace === 'check-in' || activeWorkspace === 'review-issues') && (
+      <section className="gsv-section-card" data-tour-id="checkin-review-issues">
         <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Door readiness</p>
@@ -463,6 +506,7 @@ export function CheckInPage() {
         ))}
         </div>
       </section>
+      )}
 
       {evidenceAudit && (
         <details className="phase23v-panel border-[#D8C5A8] bg-[#FFFCF6]" aria-labelledby="checkin-evidence-heading">
@@ -502,6 +546,7 @@ export function CheckInPage() {
         </InfoHint>
       </section>
 
+      {activeWorkspace === 'tools' && (
       <section className="gsv-section-card" data-tour-id="checkin-helper-workspace">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -591,7 +636,9 @@ export function CheckInPage() {
           </div>
         </div>
       </section>
+      )}
 
+      {activeWorkspace === 'tools' && (
       <section className="gsv-section-card" data-tour-id="checkin-view-filters">
         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1E7345]">Advanced Filters</p>
         <p className="mt-1 text-xs leading-5 text-[#816D62]">
@@ -625,6 +672,7 @@ export function CheckInPage() {
           ))}
         </div>
       </section>
+      )}
 
       {activeView === 'search' ? (
         <section className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">

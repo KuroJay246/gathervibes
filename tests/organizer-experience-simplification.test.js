@@ -12,7 +12,7 @@ async function source(path) {
 test('organizer navigation is grouped by real work and exposes page purpose actions', async () => {
   const shell = await source('src/layout/AppShell.jsx')
 
-  for (const group of ['Plan', 'Guests & Attendance', 'Event Day', 'Money & Follow-Up', 'Tools', 'System']) {
+  for (const group of ['Home', 'Plan', 'Guests', 'Operations', 'Administration']) {
     assert.match(shell, new RegExp(`label: '${group}'`))
   }
 

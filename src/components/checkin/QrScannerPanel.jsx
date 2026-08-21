@@ -349,7 +349,7 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
           </div>
           <div className="flex items-center justify-between text-xs font-semibold text-[#80685B]">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={continuousScan} onChange={(e) => setContinuousScan(e.target.checked)} className="rounded text-[#9A5260] focus:ring-[#9A5260]" />
+              <input id="qr-continuous-scan" name="qrContinuousScan" type="checkbox" checked={continuousScan} onChange={(e) => setContinuousScan(e.target.checked)} className="rounded text-[#9A5260] focus:ring-[#9A5260]" />
               Continuous Scan Mode
             </label>
             {torchSupported && (
@@ -361,11 +361,11 @@ export function QrScannerPanel({ registrations, onMatch, onMissing, onInvalid, r
           <div className="grid gap-2 sm:grid-cols-2">
             <label className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-[#E7D6CC] bg-[#FFFDFC] px-3 text-xs font-semibold text-[#6B564C]">
               Sound feedback
-              <input type="checkbox" checked={soundEnabled} onChange={handleSoundToggle} className="rounded text-[#9A5260] focus:ring-[#9A5260]" />
+              <input id="qr-sound-feedback" name="qrSoundFeedback" type="checkbox" checked={soundEnabled} onChange={handleSoundToggle} className="rounded text-[#9A5260] focus:ring-[#9A5260]" />
             </label>
             <label className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-[#E7D6CC] bg-[#FFFDFC] px-3 text-xs font-semibold text-[#6B564C]">
               Vibration / haptic
-              <input type="checkbox" checked={hapticEnabled} onChange={handleHapticToggle} className="rounded text-[#9A5260] focus:ring-[#9A5260]" />
+              <input id="qr-haptic-feedback" name="qrHapticFeedback" type="checkbox" checked={hapticEnabled} onChange={handleHapticToggle} className="rounded text-[#9A5260] focus:ring-[#9A5260]" />
             </label>
           </div>
         </div>

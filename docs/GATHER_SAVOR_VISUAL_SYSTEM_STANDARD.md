@@ -53,7 +53,7 @@ Statuses must be understandable without relying on color alone:
 - Active
 - Completed
 - Cancelled
-- Test Event
+- Training Event
 - Paid
 - Partially Paid
 - Unpaid

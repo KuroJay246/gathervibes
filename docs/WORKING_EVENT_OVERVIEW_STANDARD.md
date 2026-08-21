@@ -59,7 +59,7 @@ Empty states should say what is unavailable and what the organizer can do next:
 - No registrations: add a registration or use Import Center.
 - No payment evidence: open Registration Payments.
 - No Operations entries: open Operations.
-- Test Event selected: treat it as QA data, not real totals.
+- Training Event selected: treat it as QA data, not real totals.
 - Completed Event selected: allow audited corrections through normal workflows.
 
 ## Guardrails

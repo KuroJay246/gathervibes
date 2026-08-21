@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router'
 import {
   CalendarDays,
@@ -39,48 +39,43 @@ import { pageGuidance } from '../utils/pageGuidance'
 
 const navGroups = [
   {
-    label: 'Plan',
+    label: 'Home',
     items: [
       { to: '/dashboard', label: 'Home', icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: 'Plan',
+    items: [
       { to: '/events', label: 'Events', icon: CalendarDays },
       { to: '/tasks', label: 'Tasks & Deadlines', icon: ClipboardList },
       { to: '/contacts', label: 'Contacts & Organizations', icon: Building2 },
       { to: '/documents', label: 'Documents', icon: FileText },
-    ],
-  },
-  {
-    label: 'Guests & Attendance',
-    items: [
-      { to: '/registrations', label: 'Guests & Registrations', icon: UsersRound },
-      { to: '/tickets', label: 'Tickets', icon: TicketCheck },
-      { to: '/check-in', label: 'Check-In', icon: ClipboardCheck },
-    ],
-  },
-  {
-    label: 'Event Day',
-    items: [
       { to: '/run-of-show', label: 'Run of Show', icon: ScrollText },
       { to: '/resources', label: 'Equipment & Supplies', icon: Boxes },
     ],
   },
   {
-    label: 'Money & Follow-Up',
+    label: 'Guests',
     items: [
+      { to: '/registrations', label: 'Guests & Registrations', icon: UsersRound },
       { to: '/payments', label: 'Registration Payments', icon: CreditCard },
-      { to: '/operations', label: 'Operations & Commitments', icon: ReceiptText },
-      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
-      { to: '/payments/reconciliation', label: 'Review & Reconcile Records', icon: ReceiptText },
+      { to: '/tickets', label: 'Tickets', icon: TicketCheck },
+      { to: '/check-in', label: 'Check-In', icon: ClipboardCheck },
     ],
   },
   {
-    label: 'Tools',
+    label: 'Operations',
     items: [
-      { to: '/imports', label: 'Import Center & Response Inbox', icon: FileInput },
+      { to: '/operations', label: 'Operations', icon: ReceiptText },
+      { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
+      { to: '/payments/reconciliation', label: 'Review & Reconcile Records', icon: ReceiptText },
+      { to: '/imports', label: 'Import Center', icon: FileInput },
       { to: '/communications', label: 'Message Builder', icon: MessageSquareText },
     ],
   },
   {
-    label: 'System',
+    label: 'Administration',
     items: [
       { to: '/settings', label: 'Settings', icon: Settings },
       { to: '/qa', label: 'System QA', icon: ShieldCheck },
@@ -96,33 +91,23 @@ const mobileMoreGroups = [
       { to: '/tasks', label: 'Tasks & Deadlines', icon: ClipboardList },
       { to: '/contacts', label: 'Contacts & Organizations', icon: Building2 },
       { to: '/documents', label: 'Documents', icon: FileText },
-    ],
-  },
-  {
-    label: 'Event Day',
-    items: [
       { to: '/run-of-show', label: 'Run of Show', icon: ScrollText },
       { to: '/resources', label: 'Equipment & Supplies', icon: Boxes },
     ],
   },
   {
-    label: 'Money & Follow-Up',
+    label: 'Operations',
     items: [
       { to: '/payments', label: 'Registration Payments', icon: CreditCard },
-      { to: '/operations', label: 'Operations & Commitments', icon: ReceiptText },
+      { to: '/operations', label: 'Operations', icon: ReceiptText },
       { to: '/event-review', label: 'Reports', icon: ClipboardCheck },
       { to: '/payments/reconciliation', label: 'Review & Reconcile Records', icon: ReceiptText },
-    ],
-  },
-  {
-    label: 'Tools',
-    items: [
       { to: '/imports', label: 'Import Center', icon: FileInput },
       { to: '/communications', label: 'Message Builder', icon: MessageSquareText },
     ],
   },
   {
-    label: 'System',
+    label: 'Administration',
     items: [
       { to: '/settings', label: 'Settings', icon: Settings },
       { to: '/qa', label: 'System QA', icon: ShieldCheck },
@@ -217,8 +202,9 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
                     onClick={onNavigate}
                     title={collapsed ? label : undefined}
                     aria-label={collapsed ? label : undefined}
+                    data-tooltip={collapsed ? label : undefined}
                     className={({ isActive }) =>
-                      `group flex min-h-10 items-center ${collapsed ? 'justify-center px-2' : 'gap-3 px-3'} rounded-xl py-2.5 text-[13px] transition ${
+                      `group relative flex min-h-10 items-center ${collapsed ? 'justify-center px-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F5E6C8]' : 'gap-3 px-3'} rounded-xl py-2.5 text-[13px] transition ${
                         isActive
                           ? 'bg-[#7F3E49] text-white shadow-[0_8px_24px_rgba(127,62,73,0.24)]'
                           : 'text-white/70 hover:bg-white/[0.06] hover:text-white'
@@ -227,6 +213,11 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
                   >
                     <Icon className="size-[17px] shrink-0" strokeWidth={1.8} aria-hidden="true" />
                     <span className={collapsed ? 'sr-only' : 'flex-1'}>{label}</span>
+                    {collapsed && (
+                      <span role="tooltip" className="pointer-events-none absolute left-[calc(100%+0.65rem)] top-1/2 z-50 hidden -translate-y-1/2 whitespace-nowrap rounded-lg bg-[#2B1723] px-3 py-2 text-xs font-bold text-white shadow-xl ring-1 ring-white/15 group-hover:block group-focus-visible:block">
+                        {label}
+                      </span>
+                    )}
                   </NavLink>,
                 )
                 return links
@@ -263,6 +254,8 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const menuButtonRef = useRef(null)
+  const mobilePanelRef = useRef(null)
   const location = useLocation()
   const { currentRoleLabel, access } = useAuth()
   const { activeEvent } = useActiveEvent()
@@ -270,6 +263,44 @@ export function AppShell() {
   const guidance = pageGuidance[location.pathname]
   const adminUser = isApprovedAdmin(access)
   const demoEventSelected = activeEvent && isTestEvent(activeEvent)
+
+  useEffect(() => {
+    if (!menuOpen) return undefined
+    const previous = document.activeElement
+    const menuButton = menuButtonRef.current
+    const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    const focusFirst = () => {
+      const focusables = Array.from(mobilePanelRef.current?.querySelectorAll(focusableSelector) || [])
+      focusables[0]?.focus()
+    }
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setMenuOpen(false)
+        return
+      }
+      if (event.key !== 'Tab') return
+      const focusables = Array.from(mobilePanelRef.current?.querySelectorAll(focusableSelector) || [])
+      if (focusables.length === 0) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    window.setTimeout(focusFirst, 0)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      if (previous === menuButton || previous?.isConnected) {
+        menuButton?.focus()
+      }
+    }
+  }, [menuOpen])
 
   return (
     <TutorialProvider>
@@ -289,7 +320,7 @@ export function AppShell() {
             aria-label="Close navigation"
             type="button"
           />
-          <aside className="relative h-[100dvh] w-[min(20rem,calc(100vw-2rem))] overflow-hidden bg-[#2B1723] shadow-2xl">
+          <aside ref={mobilePanelRef} className="relative h-[100dvh] w-[min(20rem,calc(100vw-2rem))] overflow-hidden bg-[#2B1723] shadow-2xl" aria-modal="true" role="dialog" aria-label="Navigation menu">
             <button
               className="absolute right-3 top-3 rounded-lg p-2 text-white/70 hover:bg-white/10 hover:text-white"
               onClick={() => setMenuOpen(false)}
@@ -307,6 +338,7 @@ export function AppShell() {
         <header className="app-safe-top sticky top-0 z-20 border-b border-[#EEDDD3] bg-[#FFF8F2]/90 px-4 py-3.5 backdrop-blur-xl sm:px-7 sm:py-4 lg:px-10">
           <div className="gsv-page-container flex items-center gap-4">
             <button
+              ref={menuButtonRef}
               type="button"
               onClick={() => setMenuOpen(true)}
               className="rounded-xl border border-[#E7D6CC] bg-white p-2.5 text-[#2B1723] lg:hidden"

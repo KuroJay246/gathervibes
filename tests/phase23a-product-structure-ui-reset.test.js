@@ -18,9 +18,9 @@ test('organizer navigation uses product labels while preserving route paths', as
   assert.match(shell, /to: '\/qa', label: 'System QA'/)
   assert.match(shell, /Home[\s\S]*Guests[\s\S]*Tickets[\s\S]*Check-In[\s\S]*More/)
   const mobileMoreGroups = shell.slice(shell.indexOf('const mobileMoreGroups'), shell.indexOf('const pageTitles'))
-  assert.match(mobileMoreGroups, /Plan[\s\S]*\/events[\s\S]*Tasks & Deadlines[\s\S]*Contacts & Organizations[\s\S]*Documents/)
-  assert.match(mobileMoreGroups, /Money & Follow-Up[\s\S]*Registration Payments[\s\S]*Operations & Commitments[\s\S]*Reports[\s\S]*Review & Reconcile Records/)
-  assert.match(mobileMoreGroups, /Tools[\s\S]*\/imports[\s\S]*Message Builder[\s\S]*System[\s\S]*\/settings[\s\S]*\/qa/)
+  assert.match(mobileMoreGroups, /Plan[\s\S]*\/events[\s\S]*Tasks & Deadlines[\s\S]*Contacts & Organizations[\s\S]*Documents[\s\S]*Run of Show[\s\S]*Equipment & Supplies/)
+  assert.match(mobileMoreGroups, /Operations[\s\S]*Registration Payments[\s\S]*to: '\/operations', label: 'Operations'[\s\S]*Reports[\s\S]*Review & Reconcile Records[\s\S]*Import Center[\s\S]*Message Builder/)
+  assert.match(mobileMoreGroups, /Administration[\s\S]*\/settings[\s\S]*\/qa/)
   assert.doesNotMatch(mobileMoreGroups, /\/dashboard|\/registrations|\/tickets|\/check-in/)
   assert.match(app, /path="\/communications"/)
   assert.match(app, /path="\/event-review"/)
@@ -64,8 +64,8 @@ test('Settings contains practical settings and not a roadmap archive', async () 
     assert.match(settings, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
-  assert.match(settings, /Access is controlled outside this page/)
-  assert.match(settings, /cannot add, remove, disable, or change anyone's role/)
+  assert.match(settings, /Organizer Access/)
+  assert.match(settings, /Add Organizer/)
   assert.doesNotMatch(settings, /Phase \d+|roadmap|backlog|closed \/ shipped|Current active phase|Submit request \(not live\)/i)
 })
 

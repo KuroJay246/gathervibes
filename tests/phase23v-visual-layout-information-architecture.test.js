@@ -48,6 +48,7 @@ test('Phase 23V dense organizer pages keep primary work visible and collapse sec
   const reports = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
 
   assert.match(registrations, /registrationMetricCards\.slice\(0, 6\)/)
+  assert.match(registrations, /registrations-workspace-tabs/)
   assert.match(registrations, /Daily review shortcuts/)
   assert.match(registrations, /Registration evidence reconciliation/)
 
@@ -56,11 +57,14 @@ test('Phase 23V dense organizer pages keep primary work visible and collapse sec
   assert.match(payments, /Review & Follow-Up/)
 
   assert.match(tickets, /Find the ticket records that need work/)
+  assert.match(tickets, /tickets-workspace-tabs/)
+  assert.match(tickets, /Assignment & Delivery/)
   assert.doesNotMatch(tickets, /<summary className="phase23v-summary">Advanced ticket filters/)
   assert.match(tickets, /Show QR code/)
   assert.doesNotMatch(tickets, /GSV:TICKET:\{ticketCode\}/)
 
   assert.match(checkIn, /Counts to watch while checking in guests/)
+  assert.match(checkIn, /checkin-workspace-tabs/)
   assert.match(checkIn, /Event-day helpers/)
   assert.match(checkIn, /Advanced Filters/)
   assert.doesNotMatch(checkIn, /<summary className="phase23v-summary">More attendance and readiness counts/)

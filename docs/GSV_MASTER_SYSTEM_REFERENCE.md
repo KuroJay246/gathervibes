@@ -1,6 +1,6 @@
 # Gather & Savor Master System Reference
 
-Last updated: 2026-08-04.
+Last updated: 2026-08-20.
 
 This is the primary engineering, debugging, QA, and release reference for the Gather & Savor Event Hub. It describes the current product, source layout, route map, access model, Firestore shape, safety boundaries, and first files to inspect when a feature breaks. Historical phase reports under `docs/archive/` are evidence only and are not current operating instructions.
 
@@ -73,12 +73,12 @@ Routes are declared in `src/App.jsx`. Preserve route paths unless a route is gen
 
 Organizer routes:
 
-- `/dashboard`: Overview, file `src/pages/DashboardPage.jsx`.
+- `/dashboard`: Home, file `src/pages/DashboardPage.jsx`.
 - `/events`: Events and setup, file `src/pages/EventsPage.jsx`.
 - `/tasks`: Tasks, file `src/pages/TasksPage.jsx`.
 - `/registrations`: Guests & Registrations, file `src/pages/RegistrationsPage.jsx`.
 - `/payments`: Registration Payments, file `src/pages/PaymentsPage.jsx`.
-- `/payments/reconciliation`: Payment Reconciliation, file `src/pages/PaymentReconciliationPage.jsx`.
+- `/payments/reconciliation`: Review & Reconcile Records, file `src/pages/PaymentReconciliationPage.jsx`.
 - `/imports`: Import Center, file `src/pages/ImportsPage.jsx`.
 - `/tickets`: Tickets, file `src/pages/TicketsPage.jsx`.
 - `/check-in`: Check-In, file `src/pages/CheckInPage.jsx`.
@@ -103,30 +103,19 @@ Route access data is centralized in `src/utils/accessRoles.js`. Navigation label
 
 ## 6. Navigation Architecture
 
-Organizer navigation follows real work, not historical phases:
+Organizer navigation follows real work, not historical phases. The desktop shell groups routes as:
 
-- Overview
-- Events
-- Tasks
-- Guests & Registrations
-- Payments
-- Payment Reconciliation
-- Import Center
-- Tickets
-- Check-In
-- Operations
-- Run of Show
-- Resources
-- Documents
-- Contacts
-- Reports
-- Message Builder
-- Settings
-- System QA
+- Home: Home.
+- Plan: Events, Tasks & Deadlines, Contacts & Organizations, Documents, Run of Show, Equipment & Supplies.
+- Guests: Guests & Registrations, Registration Payments, Tickets, Check-In.
+- Operations: Operations, Reports, Review & Reconcile Records, Import Center, Message Builder.
+- Administration: Settings, System QA.
+
+Mobile keeps the event-day primary row compact with Home, Guests, Tickets, Check-In, and More. The More drawer uses the same Plan, Operations, and Administration structure for secondary routes.
 
 Scanner navigation is isolated from organizer navigation. Do not expose organizer routes in scanner mode unless access-role policy explicitly changes.
 
-Mobile navigation should keep event-day work reachable: Overview, Guests, Tickets, Check-In, and More. System QA is not a primary event-day action.
+Mobile navigation should keep event-day work reachable: Home, Guests, Tickets, Check-In, and More. System QA is not a primary event-day action.
 
 ## 7. App Shell And Layout
 

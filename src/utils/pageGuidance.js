@@ -9,7 +9,7 @@ export const pageGuidance = {
     label: 'Plan',
     purpose: 'Create, select, and update events. Completed real events remain editable by approved organizers.',
     primaryAction: 'Create or edit an event',
-    boundary: 'Test events are hidden until Show Test Events is enabled.',
+    boundary: 'Training events are hidden until Show Training Events is enabled.',
   },
   '/tasks': {
     label: 'Plan',

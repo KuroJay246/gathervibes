@@ -7,7 +7,7 @@ System QA is a technical verification workspace for release and troubleshooting.
 - Environment: Firebase project, configuration state, route, authentication state.
 - Working Event: selected event, real/test classification, event status.
 - Access: current role, access level, assigned events where relevant.
-- Data Boundaries: Registration Payments versus Operations, Test Event exclusion, QR format, scanner isolation, historical attendance, import write boundary.
+- Data Boundaries: Registration Payments versus Operations, Training Event exclusion, QR format, scanner isolation, historical attendance, import write boundary.
 - Feature Status: Tasks, Import Center, Response Inbox, Message Builder, automatic Forms receiver, Gmail, online payments, OCR.
 - Manual Acceptance: authenticated visual review, true 200 percent zoom, scanner-device feel.
 

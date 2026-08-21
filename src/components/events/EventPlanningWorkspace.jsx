@@ -23,8 +23,8 @@ import { ConfirmDialog } from '../ui/ConfirmDialog'
 
 function SummaryCard({ label, value, detail }) {
   return (
-    <div className="rounded-2xl border border-[#EEDFD6] bg-white p-4">
-      <p className="text-lg font-bold text-[#2B1723]">{value}</p>
+    <div className="rounded-xl border border-[#EEDFD6] bg-white p-3">
+      <p className="text-base font-bold text-[#2B1723]">{value}</p>
       <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#80685B]">{label}</p>
       {detail && <p className="mt-2 text-xs leading-5 text-[#816D62]">{detail}</p>}
     </div>
@@ -173,14 +173,14 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
 
   return (
     <section id="planning-workspace" data-tour-id="event-planning-workspace" className="space-y-6">
-      <section className="rounded-[26px] border border-[#EEDFD6] bg-white p-6 shadow-[0_10px_32px_rgba(84,53,67,0.05)] sm:p-7">
+      <section className="rounded-[22px] border border-[#EEDFD6] bg-white p-5 shadow-[0_8px_24px_rgba(84,53,67,0.04)] sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <p className="inline-flex items-center gap-2 rounded-full bg-[#FCEEF1] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A3F4B]">
               <CalendarDays className="size-3.5" />
               Plan a New Event
             </p>
-            <h3 className="mt-4 font-serif text-3xl text-[#2B1723]">{event.eventName}</h3>
+            <h3 className="mt-3 font-serif text-2xl text-[#2B1723]">{event.eventName}</h3>
             <p className="mt-2 text-sm leading-6 text-[#6B564C]">
               {formatEventDate(event.eventDate)} · {hydratedEvent.venueName || hydratedEvent.location || 'Venue not set'} · {eventStatusLabel(event.status)}
             </p>
@@ -203,7 +203,7 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+      <section className="gsv-compact-metric-grid">
         <SummaryCard label="Days remaining" value={formatDaysUntilEvent(event.eventDate)} />
         <SummaryCard label="Capacity" value={hydratedEvent.capacity || 'Not set'} detail={hydratedEvent.registrationRequired ? 'Registration is required' : 'Registration is optional'} />
         <SummaryCard label="Projected cash position" value={formatCurrency(overview.projectedCashPosition)} detail="Budget plan only, not final profit" />
@@ -217,7 +217,7 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Guided setup</p>
-              <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Event setup stage</h3>
+              <h3 className="mt-1 font-serif text-xl text-[#2B1723]">Setup Summary</h3>
               <p className="mt-2 text-xs leading-5 text-[#816D62]">
                 Follow the stages from event profile through readiness without changing the existing event record or routes.
               </p>
@@ -226,16 +226,16 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
               {setupProgress.label}
             </span>
           </div>
-          <div className="mt-5 grid gap-3 md:grid-cols-5">
+          <div className="mt-4 grid gap-2 md:grid-cols-5">
             {setupProgress.stages.map((stage, index) => (
-              <div key={stage.id} className={`rounded-2xl border p-4 ${stage.complete ? 'border-[#CFE8D8] bg-[#F2FAF5]' : 'border-[#EEDFD6] bg-[#FFF8F2]'}`}>
+              <div key={stage.id} className={`rounded-xl border p-3 ${stage.complete ? 'border-[#CFE8D8] bg-[#F2FAF5]' : 'border-[#EEDFD6] bg-[#FFF8F2]'}`}>
                 <div className="flex items-center gap-2">
                   <span className={`grid size-7 place-items-center rounded-full text-[10px] font-bold ${stage.complete ? 'bg-[#1E7345] text-white' : 'bg-[#F7E7EA] text-[#8A3F4B]'}`}>
                     {stage.complete ? <CheckCircle2 className="size-3.5" /> : index + 1}
                   </span>
                   <p className="text-xs font-bold text-[#2B1723]">{stage.label}</p>
                 </div>
-                <p className="mt-3 text-[11px] leading-5 text-[#816D62]">{stage.description}</p>
+                <p className="mt-2 text-[11px] leading-5 text-[#816D62]">{stage.description}</p>
               </div>
             ))}
           </div>
@@ -261,7 +261,7 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
       <section className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
         <article className="gsv-section-card sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Setup summary</p>
-          <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">What is already defined</h3>
+          <h3 className="mt-1 font-serif text-xl text-[#2B1723]">What is already defined</h3>
           <div className="mt-4">
             <DetailRow label="Event type" value={eventTypeLabel(hydratedEvent.eventType)} />
             <DetailRow label="Date and time" value={`${formatEventDate(event.eventDate)}${hydratedEvent.eventStartTime ? ` · ${hydratedEvent.eventStartTime}` : ''}${hydratedEvent.eventEndTime ? ` to ${hydratedEvent.eventEndTime}` : ''}`} />
@@ -274,7 +274,7 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
 
         <article className="gsv-section-card sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">What to do next</p>
-          <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Organizer next steps</h3>
+          <h3 className="mt-1 font-serif text-xl text-[#2B1723]">Organizer next steps</h3>
           {quickActions.length === 0 ? (
             <p className="mt-5 rounded-2xl border border-[#D9EBD8] bg-[#EAF6EF] p-4 text-sm text-[#244B32]">
               No high-priority planning blockers are currently visible for this event.
@@ -282,9 +282,12 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
           ) : (
             <div className="mt-5 space-y-3">
               {quickActions.map((item) => (
-                <Link key={`${item.label}-${item.to}`} to={item.to} className="block rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4 hover:bg-white">
-                  <p className="text-sm font-bold text-[#2B1723]">{item.label}</p>
-                  <p className="mt-2 text-xs leading-5 text-[#816D62]">{item.detail}</p>
+                <Link key={`${item.label}-${item.to}`} to={item.to} className="grid gap-2 rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-3 hover:bg-white sm:grid-cols-[minmax(0,1fr)_auto]">
+                  <span>
+                    <span className="block text-sm font-bold text-[#2B1723]">{item.label}</span>
+                    <span className="mt-1 block text-xs leading-5 text-[#816D62]">{item.detail}</span>
+                  </span>
+                  <span className="self-center rounded-lg bg-white px-3 py-2 text-xs font-bold text-[#6B564C]">Open</span>
                 </Link>
               ))}
             </div>
@@ -295,7 +298,7 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
       <section className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
         <article className="gsv-section-card sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Planning figures</p>
-          <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">Budget and cash planning</h3>
+          <h3 className="mt-1 font-serif text-xl text-[#2B1723]">Budget and cash planning</h3>
           <p className="mt-2 text-xs leading-5 text-[#816D62]">
             These are setup and planning figures. Registration payments and Operations ledger records remain separate sources.
           </p>
@@ -314,13 +317,13 @@ export function EventPlanningWorkspace({ event, onEditEvent, onSaveTask, onDelet
 
         <article className="gsv-section-card sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9A5260]">Readiness checklist</p>
-          <h3 className="mt-2 font-serif text-2xl text-[#2B1723]">What still needs attention</h3>
-          <div className="mt-5 space-y-3">
+          <h3 className="mt-1 font-serif text-xl text-[#2B1723]">What still needs attention</h3>
+          <div className="mt-4 space-y-2">
             {readiness.items.map((item) => {
               const toggleable = Object.prototype.hasOwnProperty.call(hydratedEvent.readinessChecklist, item.key)
               const currentValue = Boolean(hydratedEvent.readinessChecklist[item.key])
               return (
-                <div key={item.key} className="rounded-2xl border border-[#EFE2DA] bg-[#FBF8F5] p-4">
+                <div key={item.key} className="rounded-xl border border-[#EFE2DA] bg-[#FBF8F5] p-3">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <p className="text-sm font-bold text-[#2B1723]">{item.label}</p>

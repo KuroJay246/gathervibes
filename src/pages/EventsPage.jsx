@@ -304,13 +304,12 @@ export function EventsPage() {
           <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#FCEEF1] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A3F4B]">
             <Sparkles className="size-3.5" /> Live events
           </div>
-          <h2 className="font-serif text-3xl text-[#2B1723]">Your gatherings</h2>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-[#806C61]">Create each event once, plan it progressively, and keep one Working Event selected for the organizer team.</p>
-          <p className="mt-1 max-w-xl text-xs leading-5 text-[#80685B]">The event planner now includes event setup, budget planning, readiness, and task tracking without leaving the normal organizer workflow.</p>
+          <h2 className="font-serif text-3xl text-[#2B1723]">Events</h2>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-[#806C61]">Create each event once, select the Working Event, and open setup only when a record needs planning work.</p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
           <button type="button" onClick={() => setShowTestEvents((value) => !value)} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#E1D1C8] bg-white px-5 py-3 text-xs font-bold text-[#6B564C]">
-            {showTestEvents ? 'Hide Test Events' : 'Show Test Events'}
+            {showTestEvents ? 'Hide Training Events' : 'Show Training Events'}
           </button>
           <button type="button" data-tour-id="create-event-action" onClick={openCreate} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#9A5260] px-5 py-3 text-xs font-bold text-white shadow-lg shadow-[#9A5260]/20 transition hover:bg-[#A9606B]">
             <Plus className="size-4" strokeWidth={2.5} /> Plan a New Event
@@ -324,8 +323,8 @@ export function EventsPage() {
       {!loading && !loadError && events.length > 0 && visibleEvents.length === 0 && (
         <section className="rounded-[24px] border border-dashed border-[#D8C3B6] bg-white/70 px-6 py-10 text-center shadow-[0_8px_24px_rgba(84,53,67,0.04)]">
           <h3 className="font-serif text-2xl text-[#2B1723]">Only test events are hidden</h3>
-          <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-[#80685B]">Normal event lists hide CODEX_DEMO so real event totals and workflows stay clean. Show test events when you need QA, training, or synthetic testing.</p>
-          <button type="button" onClick={() => setShowTestEvents(true)} className="mt-6 rounded-2xl bg-[#2B1723] px-5 py-3 text-sm font-bold text-white shadow-[0_18px_28px_rgba(43,23,35,0.18)] hover:bg-[#3B2232]">Show Test Events</button>
+          <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-[#80685B]">Normal event lists hide CODEX_DEMO so real event totals and workflows stay clean. Show training events when you need QA, training, or synthetic testing.</p>
+          <button type="button" onClick={() => setShowTestEvents(true)} className="mt-6 rounded-2xl bg-[#2B1723] px-5 py-3 text-sm font-bold text-white shadow-[0_18px_28px_rgba(43,23,35,0.18)] hover:bg-[#3B2232]">Show Training Events</button>
         </section>
       )}
 
@@ -334,7 +333,7 @@ export function EventsPage() {
           <div className="flex items-center justify-between border-b border-[#EFE2DA] px-5 py-4 sm:px-6">
             <div>
               <h3 className="text-sm font-bold text-[#3A2630]">Event calendar</h3>
-              <p className="mt-1 text-[11px] text-[#80685B]">{visibleEvents.length} {visibleEvents.length === 1 ? 'event' : 'events'} shown{!showTestEvents ? ' · test events hidden' : ''}</p>
+              <p className="mt-1 text-[11px] text-[#80685B]">{visibleEvents.length} {visibleEvents.length === 1 ? 'event' : 'events'} shown{!showTestEvents ? ' · training events hidden' : ''}</p>
             </div>
             <MoreHorizontal className="size-5 text-[#B49B8D]" />
           </div>
@@ -349,7 +348,7 @@ export function EventsPage() {
                   const isActive = activeEvent?.eventId === event.eventId
                   return (
                     <tr key={event.eventId} className={isActive ? 'bg-[#FFF8F2]' : 'hover:bg-[#FFFCFA]'}>
-                      <td className="px-6 py-4"><div className="flex items-center gap-3"><span className={`grid size-10 shrink-0 place-items-center rounded-xl ${isActive ? 'bg-[#9A5260] text-white' : 'bg-[#FCEEF1] text-[#9A5260]'}`}><CalendarDays className="size-[17px]" /></span><div><p className="text-sm font-bold text-[#3A2630]">{event.eventName} {isTestEvent(event) && <span className="ml-2 rounded-full bg-[#FFF4DF] px-2 py-1 text-[8px] font-bold uppercase tracking-wider text-[#7A5818]">Test Event</span>}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-[#80685B]"><MapPin className="size-3" />{event.location}</p><p className="mt-1 text-[10px] font-semibold text-[#80685B]">{pricingModeLabel(event)}</p><p className="mt-2 flex flex-wrap items-center gap-2"><SetupStageBadge event={event} /><DeadlineLine event={event} /></p></div></div></td>
+                      <td className="px-6 py-4"><div className="flex items-center gap-3"><span className={`grid size-10 shrink-0 place-items-center rounded-xl ${isActive ? 'bg-[#9A5260] text-white' : 'bg-[#FCEEF1] text-[#9A5260]'}`}><CalendarDays className="size-[17px]" /></span><div><p className="text-sm font-bold text-[#3A2630]">{event.eventName} {isActive && <span className="ml-2 rounded-full bg-[#E7F6ED] px-2 py-1 text-[8px] font-bold uppercase tracking-wider text-[#17623A]">Working Event</span>} {isTestEvent(event) && <span className="ml-2 rounded-full bg-[#FFF4DF] px-2 py-1 text-[8px] font-bold uppercase tracking-wider text-[#7A5818]">Training Event · Safe to Practice</span>}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-[#80685B]"><MapPin className="size-3" />{event.location || 'Location not set'}</p><p className="mt-1 text-[10px] font-semibold text-[#80685B]">{pricingModeLabel(event)}</p><p className="mt-2 flex flex-wrap items-center gap-2"><SetupStageBadge event={event} /><DeadlineLine event={event} /></p></div></div></td>
                       <td className="px-4 py-4 text-xs text-[#6D594F]">{formatEventDate(event.eventDate)}</td>
                       <td className="px-4 py-4"><StatusBadge status={event.status} /></td>
                       <td className="px-4 py-4 text-xs font-semibold text-[#6D594F]">{Number(event.capacity).toLocaleString('en-BB')}</td>
@@ -372,7 +371,7 @@ export function EventsPage() {
               return (
                 <article key={event.eventId} className={`p-4 sm:p-5 ${isActive ? 'bg-[#FFF8F2]' : ''}`}>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h4 className="font-serif text-lg text-[#35212B]">{event.eventName}</h4>{isTestEvent(event) && <span className="inline-flex rounded-full bg-[#FFF4DF] px-2 py-1 text-[8px] font-bold uppercase text-[#7A5818]">Test Event</span>}{isActive && <span className="inline-flex items-center gap-1 rounded-full bg-[#E7F6ED] px-2 py-1 text-[8px] font-bold uppercase text-[#1E7345]"><CheckCircle2 className="size-3" /> Selected</span>}</div><p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#806C61]"><MapPin className="size-3.5" /> {event.location}</p></div>
+                    <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h4 className="font-serif text-lg text-[#35212B]">{event.eventName}</h4>{isTestEvent(event) && <span className="inline-flex rounded-full bg-[#FFF4DF] px-2 py-1 text-[8px] font-bold uppercase text-[#7A5818]">Training · Safe to Practice</span>}{isActive && <span className="inline-flex items-center gap-1 rounded-full bg-[#E7F6ED] px-2 py-1 text-[8px] font-bold uppercase text-[#1E7345]"><CheckCircle2 className="size-3" /> Working Event</span>}</div><p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#806C61]"><MapPin className="size-3.5" /> {event.location || 'Location not set'}</p></div>
                     <StatusBadge status={event.status} />
                   </div>
                   <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-white p-3 text-center"><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#80685B]">Date</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{formatEventDate(event.eventDate, { year: undefined })}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#80685B]">Capacity</p><p className="mt-1 flex items-center justify-center gap-1 text-[10px] font-semibold text-[#59454E]"><UsersRound className="size-3" /> {event.capacity}</p></div><div><p className="text-[8px] font-bold uppercase tracking-wider text-[#80685B]">Base</p><p className="mt-1 text-[10px] font-semibold text-[#59454E]">{currency.format(Number(event.ticketPrice) || 0)}</p></div></div>
@@ -390,10 +389,10 @@ export function EventsPage() {
       )}
 
       {!loading && !loadError && visibleEvents.length > 0 && (
-        <section className="grid gap-3 sm:grid-cols-3" aria-label="Event totals">
-          <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#80685B]">All events</p><p className="mt-2 font-serif text-3xl">{totals.events}</p></div>
-          <div className="rounded-2xl border border-[#EEDFD6] bg-white p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#80685B]">Upcoming / active</p><p className="mt-2 font-serif text-3xl">{totals.upcoming}</p></div>
-          <div className="rounded-2xl border border-[#E6D4B4] bg-[#F8E9CB] p-5"><p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#7A5818]">Planned capacity</p><p className="mt-2 font-serif text-3xl text-[#4E3928]">{totals.capacity.toLocaleString('en-BB')}</p></div>
+        <section className="gsv-compact-metric-grid" aria-label="Event totals">
+          <div className="rounded-xl border border-[#EEDFD6] bg-white p-3"><p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#80685B]">Events shown</p><p className="mt-1 text-lg font-bold text-[#2B1723]">{totals.events}</p></div>
+          <div className="rounded-xl border border-[#EEDFD6] bg-white p-3"><p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#80685B]">Upcoming / active</p><p className="mt-1 text-lg font-bold text-[#2B1723]">{totals.upcoming}</p></div>
+          <div className="rounded-xl border border-[#E6D4B4] bg-[#FFF8EA] p-3"><p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#7A5818]">Planned capacity</p><p className="mt-1 text-lg font-bold text-[#4E3928]">{totals.capacity.toLocaleString('en-BB')}</p></div>
         </section>
       )}
 

@@ -9,7 +9,7 @@ test('organizer shell uses grouped navigation without changing route paths or ro
   const app = await readFile('src/App.jsx', 'utf8')
   const navigation = await readFile('src/utils/navigation.js', 'utf8')
 
-  for (const group of ['Plan', 'Guests & Attendance', 'Event Day', 'Money & Follow-Up', 'Tools', 'System']) {
+  for (const group of ['Home', 'Plan', 'Guests', 'Operations', 'Administration']) {
     assert.match(shell, new RegExp(`label: '${group}'`))
   }
 
