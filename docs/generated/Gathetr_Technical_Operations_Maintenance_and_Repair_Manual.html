@@ -1,0 +1,652 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Gathetr Technical Manual</title>
+<style>
+@page { margin: 0.65in 0.55in; }
+body { font-family: Arial, Helvetica, sans-serif; color: #24151c; line-height: 1.42; font-size: 10.5pt; }
+h1 { break-before: page; font-size: 22pt; color: #2b1723; margin: 0 0 12px; }
+h1:first-child { break-before: auto; }
+h2 { font-size: 15pt; color: #6f3340; margin: 18px 0 8px; border-bottom: 1px solid #ead8cf; padding-bottom: 3px; }
+h3 { font-size: 12pt; color: #4d2b35; margin: 14px 0 6px; }
+p { margin: 5px 0; }
+.bullet { padding-left: 14px; text-indent: -10px; }
+pre { background: #fff8f2; border: 1px solid #ead8cf; border-radius: 6px; padding: 8px; white-space: pre-wrap; font-family: Consolas, monospace; font-size: 8pt; }
+.table-line { font-family: Consolas, monospace; font-size: 7.3pt; white-space: pre-wrap; background: #fffdf9; margin: 1px 0; }
+</style>
+</head>
+<body><p>&lt;!-- Source: docs\manual\00-cover-and-document-control.md --&gt;</p>
+
+<h1>Gathetr Owner's Technical Operations, Development, Maintenance and Repair Manual</h1>
+
+<p>Displayed title: Gathetr Technical Manual</p>
+
+<p>Document version: 2026-08-21 Phase 3</p>
+<p>Generated: 2026-08-21T04:41:38.930Z</p>
+<p>Application commit documented: 1baf2796f4c5be143bc1f8f242546ebc2c155e1d</p>
+<p>Documentation branch at generation: docs/gathetr-technical-manual</p>
+<p>Repository: https://github.com/KuroJay246/gathervibes.git</p>
+<p>Firebase project: gathervibeshub</p>
+<p>Production URL: https://gathervibeshub.web.app</p>
+
+<h2>Document Control</h2>
+
+<p>This manual covers the code and configuration present at the recorded commit only. It does not claim to describe later commits unless regenerated.</p>
+
+<p>Source documents in `docs/` are authoritative. The PDF is a generated readable snapshot.</p>
+
+<h2>Protected Boundaries</h2>
+
+<p class="bullet">- Do not expose `.env.local`, cookies, tokens, service account JSON, or private Firebase keys.</p>
+<p class="bullet">- Do not use CPB for synthetic QA or fake data.</p>
+<p class="bullet">- QR payload format must remain `GSV:TICKET:{ticketCode}` unless explicitly approved and migrated.</p>
+<p class="bullet">- Firestore Rules, Auth, Hosting, Functions, and production data require explicit validation and approval before deployment.</p>
+<p class="bullet">- This Phase 3 documentation generation requires no Firebase deployment and makes no runtime behavior change.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\01-quick-start-and-emergency-reference.md --&gt;</p>
+
+<h1>Quick Start and Emergency Reference</h1>
+
+<h2>Immediate Symptom Table</h2>
+
+<p class="table-line">| Symptom | First check | Next manual section |</p>
+<p class="table-line">| --- | --- | --- |</p>
+<p class="table-line">| Blank page | Browser Console and Network; check stale chunk or Firebase config | Troubleshooting: blank page or dynamic import failure |</p>
+<p class="table-line">| Permission denied | Signed-in account, `settings/accessControl`, staff assignment, Firestore rule line | Permissions and Security; Permission runbooks |</p>
+<p class="table-line">| Login fails | Firebase Auth provider, authorized domain, popup/redirect state | Firebase Authentication; Login failure runbook |</p>
+<p class="table-line">| Scanner fails | Camera permission, HTTPS, QR payload, assigned event, ticket code lookup | Imports/Exports/QR; Scanner runbook |</p>
+<p class="table-line">| Build fails | Terminal error and changed files | Build Deployment and Recovery |</p>
+<p class="table-line">| Production fails | Hosting deployment, asset cache, Firebase project, Console | Emergency recovery runbooks |</p>
+
+<h2>Safe First Commands</h2>
+
+<pre><code>git status --short --branch
+git rev-list --left-right --count main...origin/main
+npm run lint
+npm test
+npm run build</code></pre>
+
+<p>Do not run deployment commands while diagnosing unless the fix is known, tested, and approved.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\02-application-overview.md --&gt;</p>
+
+<h1>Application Overview</h1>
+
+<p>Gathetr is a private React/Firebase event operations application for planning, guest management, registration payments, tickets, check-in, operations, run of show, resources, documents, contacts, reports, imports, message preparation, Settings, and System QA.</p>
+
+<p>The active synthetic training event is `CODEX_DEMO - Full System Walkthrough`. CPB is real historical production data and must not receive synthetic writes.</p>
+
+<h2>Main User Groups</h2>
+
+<p class="bullet">- Protected Owner: UID-protected permanent owner access.</p>
+<p class="bullet">- Approved Organizer: active approved email in `settings/accessControl`.</p>
+<p class="bullet">- Staff roles: active `staffProfiles/{uid}` plus active event assignment.</p>
+<p class="bullet">- Scanner: assigned-event check-in-only route and narrow Firestore update path.</p>
+
+<h2>Stack</h2>
+
+<p class="table-line">| Layer | Actual technology |</p>
+<p class="table-line">| --- | --- |</p>
+<p class="table-line">| Frontend | React ^19.2.0, Vite ^7.2.4, React Router ^8.3.0 |</p>
+<p class="table-line">| Styling | Tailwind CSS ^4.1.17 through @tailwindcss/vite |</p>
+<p class="table-line">| Backend services | Firebase client SDK ^12.6.0 |</p>
+<p class="table-line">| Database | Cloud Firestore with local emulator tests |</p>
+<p class="table-line">| Authentication | Firebase Authentication with Google and email/password |</p>
+<p class="table-line">| Hosting | Firebase Hosting classic static SPA rewrites to index.html |</p>
+<p class="table-line">| QR | qrcode ^1.5.4; scanner uses html5-qrcode ^2.3.8 |</p>
+<p class="table-line">| Excel parsing | read-excel-file ^9.2.0; xlsx package intentionally absent |</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\03-system-architecture.md --&gt;</p>
+
+<h1>System Architecture</h1>
+
+<h2>High-Level Flow</h2>
+
+<pre><code>flowchart TD
+  User[Owner, organizer, staff, scanner] --&gt; Browser[Browser / PWA shell]
+  Browser --&gt; React[React 19 + Vite app]
+  React --&gt; RouteGate[ProtectedRoute and canViewRoute]
+  RouteGate --&gt; Auth[Firebase Authentication]
+  Auth --&gt; Access[Access resolver: settings/accessControl + staff profile + assignment]
+  Access --&gt; FirestoreRules[Firestore Security Rules]
+  FirestoreRules --&gt; Firestore[(Cloud Firestore)]
+  React --&gt; Hosting[Firebase Hosting static assets]
+  React --&gt; QA[Local emulator tests and Playwright QA]</code></pre>
+
+<h2>Important Boundaries</h2>
+
+<p class="bullet">- Frontend route checks improve user experience but do not replace Firestore Rules.</p>
+<p class="bullet">- Firestore Rules are the backend security boundary.</p>
+<p class="bullet">- Audit logs are append-only evidence and are coupled to business mutations.</p>
+<p class="bullet">- Message Builder is copy-only; it does not send email.</p>
+<p class="bullet">- Documents are references/links and metadata only; no Firebase Storage upload is active.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\04-project-file-map.md --&gt;</p>
+
+<h1>Project File Map</h1>
+
+<h2>Feature Ownership Map</h2>
+
+<p class="table-line">| Feature | Main files | Related tests | Risk |</p>
+<p class="table-line">| --- | --- | --- | --- |</p>
+<p class="table-line">| Authentication and access resolution | src/lib/firebase.js; src/auth/AuthProvider.jsx; src/auth/ProtectedRoute.jsx; src/utils/accessRoles.js; src/config/protectedOwner.js | tests/auth-reliability.test.js; tests/protected-owner-authorization-matrix.test.js; tests/settings-access-management.test.js | High |</p>
+<p class="table-line">| Events and working event | src/pages/EventsPage.jsx; src/services/eventService.js; src/events/ActiveEventProvider.jsx; src/utils/eventPlanning.js | tests/event-utils.test.js; tests/phase26-event-categories-capabilities.test.js | High |</p>
+<p class="table-line">| Tasks and deadlines | src/pages/TasksPage.jsx; src/services/taskService.js; src/utils/taskWorkflow.js | tests/phase2-guided-event-setup-task-deadline.test.js; tests/task-workflow-rules.test.js | Medium |</p>
+<p class="table-line">| Guests and registrations | src/pages/RegistrationsPage.jsx; src/services/registrationService.js; src/utils/validators.js; src/utils/registrationMetrics.js | tests/registration-utils.test.js; tests/registration-metrics.test.js | High |</p>
+<p class="table-line">| Registration payments | src/pages/PaymentsPage.jsx; src/utils/financeUtils.js; src/utils/paymentStatus.js | tests/phase23b-payments-operations-boundaries.test.js; tests/payments-operations-refinement-2026-08.test.js | High |</p>
+<p class="table-line">| Review and reconciliation | src/pages/PaymentReconciliationPage.jsx; src/services/reconciliationReadService.js; src/utils/paymentReconciliation.js; src/utils/reconciliationWorkbook.js | tests/phase23c-payment-reconciliation.test.js | High |</p>
+<p class="table-line">| Tickets and QR | src/pages/TicketsPage.jsx; src/components/tickets/TicketQrCode.jsx; src/services/ticketService.js; src/utils/ticketUtils.js; src/utils/qrTicketUtils.js | tests/phase45-ticketing.test.js; tests/phase7-qr-checkin.test.js | High |</p>
+<p class="table-line">| Check-in and scanner | src/pages/CheckInPage.jsx; src/pages/ScannerPage.jsx; src/components/checkin/QrScannerPanel.jsx; src/utils/checkInUtils.js | tests/phase14-camera-checkin.test.js; tests/firestore-checkin-rules.test.js; e2e/workflows.spec.js | High |</p>
+<p class="table-line">| Imports and XLSX parsing | src/pages/ImportsPage.jsx; src/services/importService.js; src/utils/importUtils.js; src/utils/xlsxImport.js | tests/import-center.test.js; tests/import-center-workflow-upgrade.test.js | High |</p>
+<p class="table-line">| Operations ledger and commitments | src/pages/OperationsPage.jsx; src/services/operationsLedgerService.js; src/components/operations/PartnerCommitmentsPanel.jsx | tests/phase19-operations-productivity.test.js; tests/phase23b-payments-operations-boundaries.test.js | High |</p>
+<p class="table-line">| Run of Show | src/pages/RunOfShowPage.jsx; src/services/runOfShowService.js; src/utils/runOfShow.js | tests/run-of-show-resources-foundation.test.js; tests/run-of-show-resource-rules.test.js | Medium |</p>
+<p class="table-line">| Equipment and supplies | src/pages/ResourcesPage.jsx; src/services/eventResourceService.js; src/utils/eventResources.js | tests/run-of-show-resources-foundation.test.js; tests/run-of-show-resource-rules.test.js | Medium |</p>
+<p class="table-line">| Documents | src/pages/DocumentsPage.jsx; src/services/documentService.js; src/utils/documentRegistry.js | tests/document-contact-foundation.test.js; tests/document-contact-rules.test.js | Medium |</p>
+<p class="table-line">| Contacts and organizations | src/pages/ContactsPage.jsx; src/services/contactService.js; src/utils/contactDirectory.js | tests/document-contact-foundation.test.js; tests/document-contact-rules.test.js | Medium |</p>
+<p class="table-line">| Settings, staff, integrations | src/pages/SettingsPage.jsx; src/services/accessManagementService.js; src/services/staffManagementService.js; src/services/integrationSettingsService.js | tests/settings-access-management.test.js | High |</p>
+<p class="table-line">| Message Builder | src/pages/CommunicationsPage.jsx; src/utils/communicationsUtils.js | tests/phase6-communications.test.js | Medium |</p>
+<p class="table-line">| System QA | src/pages/QaPage.jsx; src/utils/qaHelper.js; src/utils/runtimeHealth.js | tests/production-qa.test.js; tests/settings-systemqa-tutorial-final-refinement.test.js | Medium |</p>
+<p class="table-line">| Tutorial/onboarding | src/tutorial/* | tests/onboarding-flow.test.js; tests/phase26-interactive-product-tour.test.js; e2e/tutorial.spec.js | Medium |</p>
+
+<h2>Root Configuration</h2>
+
+<p class="table-line">| Path | Purpose | Risk |</p>
+<p class="table-line">| --- | --- | --- |</p>
+<p class="table-line">| package.json | Scripts and dependencies for development, QA, E2E, Firebase deploy helpers, docs generation. | High |</p>
+<p class="table-line">| firebase.json | Auth provider notes, emulator ports, Firestore file references, Hosting headers and rewrites. | High |</p>
+<p class="table-line">| firestore.rules | Backend authorization and schema validation. | Critical |</p>
+<p class="table-line">| firestore.indexes.json | Firestore composite index configuration. | High |</p>
+<p class="table-line">| vite.config.js | Vite/React/Tailwind build configuration. | Medium |</p>
+<p class="table-line">| playwright.config.js | E2E browser test configuration and emulator env. | Medium |</p>
+<p class="table-line">| AI_AGENT_RULES.md | Permanent coding assistant governance. | High |</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\05-frontend-react-and-tailwind.md --&gt;</p>
+
+<h1>Frontend React and Tailwind</h1>
+
+<p>Entry point: `src/main.jsx`</p>
+<p>Top-level app: `src/App.jsx`</p>
+<p>Authenticated shell: `src/layout/AppShell.jsx`</p>
+<p>Global styles: `src/styles.css`</p>
+
+<h2>React Patterns</h2>
+
+<p class="bullet">- Lazy-loaded route pages are declared in `src/App.jsx`.</p>
+<p class="bullet">- `ProtectedRoute` blocks unauthenticated or unauthorized users.</p>
+<p class="bullet">- `AppShell` owns desktop sidebar, mobile drawer, mobile tab bar, page titles, Admin Search, page guidance, and TutorialProvider wrapping.</p>
+<p class="bullet">- Firebase writes are kept in service modules under `src/services/`.</p>
+<p class="bullet">- Shared validation and display helpers live in `src/utils/`.</p>
+
+<h2>Tailwind Usage</h2>
+
+<p>Tailwind is used directly through class names and the Vite Tailwind plugin. The app uses compact cards, dense grids, responsive `sm`, `md`, `lg`, `xl` breakpoints, and semantic color usage tied to the Gather &amp; Savor visual system.</p>
+
+<p>Troubleshooting:</p>
+
+<p class="bullet">- Element not visible: check responsive utility prefixes and route/access gating.</p>
+<p class="bullet">- Mobile overflow: inspect fixed widths, tables, and long event names.</p>
+<p class="bullet">- Dynamic class not applying: avoid constructing class strings that Tailwind cannot see statically.</p>
+<p class="bullet">- Form accessibility issue: inspect associated label, id, name, and focus behavior.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\06-routing-and-navigation.md --&gt;</p>
+
+<h1>Routing and Navigation</h1>
+
+<p>Routes are declared in `src/App.jsx`; page titles and navigation groups are in `src/layout/AppShell.jsx`.</p>
+
+<h2>Route Map</h2>
+
+<p class="table-line">| Route | Title | Purpose | Component/Gate | Access | Source |</p>
+<p class="table-line">| --- | --- | --- | --- | --- | --- |</p>
+<p class="table-line">| /dashboard | Event Overview | Current event status, priorities, and next actions | &lt;DashboardPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /events | Events | Plan and organize every gathering | &lt;EventsPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /tasks | Tasks &amp; Deadlines | Event-scoped work, blockers, and follow-up dates | &lt;TasksPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /registrations | Guests &amp; Registrations | Manage registration records and guest counts | &lt;RegistrationsPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /payments | Registration Payments | Review registration charges, payments, balances, and follow-up | &lt;AssignedEventGate purpose="Payments"&gt;&lt;PaymentsPage /&gt;&lt;/AssignedEventGate&gt; | Authenticated + assigned Working Event gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /payments/reconciliation | Review &amp; Reconcile Records | Read-only workbook comparison before any correction | &lt;PaymentReconciliationPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /tickets | Tickets | Assign ticket codes and prepare QR access | &lt;TicketsPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /check-in | Check-In | Track event-day attendance | &lt;AssignedEventGate purpose="Check-In"&gt;&lt;CheckInPage /&gt;&lt;/AssignedEventGate&gt; | Authenticated + assigned Working Event gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /operations | Operations | Track event-level money and obligations | &lt;AssignedEventGate purpose="Operations"&gt;&lt;OperationsPage /&gt;&lt;/AssignedEventGate&gt; | Authenticated + assigned Working Event gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /run-of-show | Run of Show | Event-day sequence, supplier arrivals, dependencies, and Now/Next | &lt;AssignedEventGate purpose="Run of Show"&gt;&lt;RunOfShowPage /&gt;&lt;/AssignedEventGate&gt; | Authenticated + assigned Working Event gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /resources | Equipment &amp; Supplies | Equipment, supplies, packing, pickup, and return tracking | &lt;AssignedEventGate purpose="Resources"&gt;&lt;ResourcesPage /&gt;&lt;/AssignedEventGate&gt; | Authenticated + assigned Working Event gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /documents | Documents | Event document references, links, and evidence | &lt;DocumentsPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /contacts | Contacts &amp; Organizations | Reusable people, businesses, and event relationships | &lt;ContactsPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /event-review | Reports | Read-only follow-up, payments, operations, and summary | &lt;EventReviewPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /imports | Import Center | Bring in CSV exports and pasted table rows safely | &lt;ImportsPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /qa | System QA | System health, data checks, and safe test guidance | &lt;QaPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /communications | Message Builder | Create, personalize, and copy event messages | &lt;CommunicationsPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+<p class="table-line">| /settings | Settings | Practical workspace and event defaults | &lt;SettingsPage /&gt; | Authenticated route gate | src/App.jsx; src/layout/AppShell.jsx |</p>
+
+<pre><code>flowchart LR
+  Login[/login/] --&gt; Protected[ProtectedRoute]
+  Protected --&gt; Shell[AppShell]
+  Shell --&gt; Home[/dashboard/]
+  Shell --&gt; Plan[/events /tasks /contacts /documents /run-of-show /resources/]
+  Shell --&gt; Guests[/registrations /payments /tickets /check-in/]
+  Shell --&gt; Ops[/operations /event-review /payments/reconciliation /imports /communications/]
+  Shell --&gt; Admin[/settings /qa/]
+  Protected --&gt; Scanner[/scanner assigned-event gate/]</code></pre>
+
+<p>Public route: `/login`.</p>
+
+<p>Redirect aliases: `/security -&gt; /settings`, `/reconciliation -&gt; /payments/reconciliation`, `/reports -&gt; /event-review`.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\07-firebase-authentication.md --&gt;</p>
+
+<h1>Firebase Authentication</h1>
+
+<p>Firebase initialization is in `src/lib/firebase.js`. Authentication lifecycle is in `src/auth/AuthProvider.jsx`.</p>
+
+<h2>Auth Sequence</h2>
+
+<pre><code>sequenceDiagram
+  participant B as Browser
+  participant A as AuthProvider
+  participant F as Firebase Auth
+  participant D as Firestore
+  participant R as ProtectedRoute
+  B-&gt;&gt;A: App opens
+  A-&gt;&gt;F: setPersistence + onAuthStateChanged
+  F--&gt;&gt;A: current user or null
+  A-&gt;&gt;D: read settings/accessControl
+  A-&gt;&gt;D: fallback read staffProfiles and assignments
+  A-&gt;&gt;A: resolve access level and default route
+  A--&gt;&gt;R: user, loading, isAuthorized, access
+  R--&gt;&gt;B: render page or redirect</code></pre>
+
+<p>Definitions:</p>
+
+<p class="bullet">- Authentication state: Firebase's current determination of whether a user is signed in.</p>
+<p class="bullet">- Authorization state: Gathetr's determination that the signed-in user has owner, approved organizer, or assigned staff access.</p>
+
+<h2>Flow</h2>
+
+<p>1. App initializes Firebase from Vite environment variables.</p>
+<p>2. Auth persistence is set to browser local persistence.</p>
+<p>3. Firebase reports the current user through `onAuthStateChanged`.</p>
+<p>4. Gathetr reads `settings/accessControl` for approved organizer access.</p>
+<p>5. If organizer access is not found, it reads `staffProfiles/{uid}` and active assignment docs for supported event IDs.</p>
+<p>6. `getUserAccessLevel` builds the access object used by route gates and labels.</p>
+<p>7. Firestore Rules still enforce every backend read/write.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\08-firestore-data-model.md --&gt;</p>
+
+<h1>Firestore Data Model</h1>
+
+<p>This dictionary is based on current services, Firestore Rules, and tests. It does not include real production personal data.</p>
+
+<h2>Collections and Subcollections</h2>
+
+<p class="table-line">| Collection path | Purpose | Code that uses it | Rules reference | Security note |</p>
+<p class="table-line">| --- | --- | --- | --- | --- |</p>
+<p class="table-line">| settings/accessControl | Authoritative approved organizer source plus metadata records. | src/auth/AuthProvider.jsx; src/services/accessManagementService.js; src/pages/SettingsPage.jsx | firestore.rules match /settings/accessControl | Protected Owner only for mutations; approved admins read. |</p>
+<p class="table-line">| settings/accessControl/history/{historyId} | Append-only history for organizer access changes. | src/services/accessManagementService.js | firestore.rules match /settings/accessControl/history/{historyId} | Protected Owner create; approved admins read. |</p>
+<p class="table-line">| settings/integrations | Supported integration status settings surfaced in Settings. | src/services/integrationSettingsService.js | firestore.rules match /settings/integrations | Protected Owner create/update; approved admins read. |</p>
+<p class="table-line">| events/{eventId} | Event records, planning data, capability configuration, and working-event source. | src/services/eventService.js; src/events/ActiveEventProvider.jsx | firestore.rules match /events/{eventId} | Approved admins manage; assigned staff can read assigned events. |</p>
+<p class="table-line">| events/{eventId}/staffAssignments/{uid} | Event-scoped staff assignment records. | src/services/staffManagementService.js; src/auth/AuthProvider.jsx | firestore.rules match /events/{eventId}/staffAssignments/{uid} | Approved admins manage; assigned user can read own active assignment. |</p>
+<p class="table-line">| events/{eventId}/tasks/{taskId} | Event-scoped tasks and deadlines. | src/services/taskService.js | firestore.rules match /events/{eventId}/tasks/{taskId} | Approved admins and assigned event managers manage; viewers can read. |</p>
+<p class="table-line">| registrations/{registrationId} | Guest registration, ticket, payment, and check-in status records. | src/services/registrationService.js; src/services/ticketService.js | firestore.rules match /registrations/{registrationId} | Approved admins manage; assigned scanners can perform narrow check-in updates. |</p>
+<p class="table-line">| auditLogs/{logId} | Append-only audit evidence for business mutations. | src/services/auditService.js; service write batches | firestore.rules match /auditLogs/{logId} | Create only when matching a permitted target mutation; never update/delete. |</p>
+<p class="table-line">| operationsLedger/{ledgerEntryId} | Event-level Operations ledger, commitments, partners, in-kind support. | src/services/operationsLedgerService.js | firestore.rules match /operationsLedger/{ledgerEntryId} | Approved admins create/update; no delete. |</p>
+<p class="table-line">| events/{eventId}/documents/{documentId} | Event document references and external links. No Firebase Storage upload. | src/services/documentService.js | firestore.rules match /events/{eventId}/documents/{documentId} | Approved admins and event managers create/update; admins delete. |</p>
+<p class="table-line">| events/{eventId}/runOfShow/{itemId} | Event-day schedule sequence, dependencies, arrivals, status. | src/services/runOfShowService.js | firestore.rules match /events/{eventId}/runOfShow/{itemId} | Approved admins manage; assigned event staff can read through task read gate. |</p>
+<p class="table-line">| events/{eventId}/resources/{resourceId} | Equipment, supplies, packing, pickup, return, quantity tracking. | src/services/eventResourceService.js | firestore.rules match /events/{eventId}/resources/{resourceId} | Approved admins manage; assigned event staff can read through task read gate. |</p>
+<p class="table-line">| contacts/{contactId} | Reusable contact directory. | src/services/contactService.js | firestore.rules match /contacts/{contactId} | Approved admins create/update/read; delete false. |</p>
+<p class="table-line">| organizations/{organizationId} | Reusable organization directory. | src/services/contactService.js | firestore.rules match /organizations/{organizationId} | Approved admins create/update/read; delete false. |</p>
+<p class="table-line">| events/{eventId}/contactLinks/{linkId} | Event relationship links to contacts/organizations. | src/services/contactService.js | firestore.rules match /events/{eventId}/contactLinks/{linkId} | Approved admins and event managers create/update; admins delete. |</p>
+<p class="table-line">| accessRequests/{requestId} | Signed-in user access request workflow. | src/services/accessRequestContract.js | firestore.rules match /accessRequests/{requestId} | Signed-in create; approved admins review; no delete. |</p>
+<p class="table-line">| staffProfiles/{uid} | Global staff profile records. | src/services/staffManagementService.js; src/auth/AuthProvider.jsx | firestore.rules match /staffProfiles/{uid} | Approved admins manage; staff can read own active profile. |</p>
+
+<h2>Indexes</h2>
+
+<p class="table-line">| Collection group | Fields | Purpose |</p>
+<p class="table-line">| --- | --- | --- |</p>
+<p class="table-line">| registrations | eventId ASCENDING, createdAt DESCENDING | Supports scoped Firestore query ordering used by the app. |</p>
+
+<h2>Schema Truth Rule</h2>
+
+<p>Do not infer schema from one example record. Cross-check service writes, page reads, utils, Firestore Rules validators, and tests.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\09-permissions-and-security-rules.md --&gt;</p>
+
+<h1>Permissions and Security Rules</h1>
+
+<p>Permission architecture has two layers:</p>
+
+<p>1. Frontend access checks in `src/utils/accessRoles.js` and `ProtectedRoute`.</p>
+<p>2. Firestore Rules in `firestore.rules`.</p>
+
+<pre><code>flowchart TD
+  Start[Request route or Firestore operation] --&gt; Signed{Signed in?}
+  Signed -- No --&gt; Login[Redirect/login denied]
+  Signed -- Yes --&gt; Owner{Protected Owner UID?}
+  Owner -- Yes --&gt; Admin[Admin-level frontend access]
+  Owner -- No --&gt; Allowlist{Active approved organizer?}
+  Allowlist -- Yes --&gt; Admin
+  Allowlist -- No --&gt; Staff{Active staff profile + event assignment?}
+  Staff -- No --&gt; Deny[Deny access]
+  Staff -- Yes --&gt; Role{Assignment role}
+  Role --&gt; Scanner[Scanner: assigned event check-in only]
+  Role --&gt; Manager[Event manager/viewer: narrow event reads/tasks/docs]
+  Role --&gt; Ops[Operations helper: operations visibility only]
+  Admin --&gt; Rules[Firestore validates fields, audits, and event scope]</code></pre>
+
+<h2>Permission Matrix</h2>
+
+<p class="table-line">| Action | Protected Owner | Approved Organizer/Admin | Assigned Staff | Scanner | Unapproved |</p>
+<p class="table-line">| --- | --- | --- | --- | --- | --- |</p>
+<p class="table-line">| Open organizer shell | Yes | Yes | Limited by assigned route | No, scanner uses /scanner | No |</p>
+<p class="table-line">| Manage Settings organizer access | Yes, immutable owner cannot be removed | No owner-only controls | No | No | No |</p>
+<p class="table-line">| Create/update events | Yes | Yes | No | No | No |</p>
+<p class="table-line">| Read assigned event | Yes | Yes | Yes if assignment active | Yes for scanner route | No |</p>
+<p class="table-line">| Create/update registrations | Yes | Yes | No | No except scanner check-in fields | No |</p>
+<p class="table-line">| Assign tickets | Yes | Yes | No | No | No |</p>
+<p class="table-line">| Complete check-in | Yes | Yes | No unless scanner assignment | Yes for assigned event | No |</p>
+<p class="table-line">| Use Operations ledger | Yes | Yes | operations-helper read only | No | No |</p>
+<p class="table-line">| Use Import Center | Yes | Yes | No | No | No |</p>
+<p class="table-line">| Read documents/tasks as assigned staff | Yes | Yes | event-manager/viewer where allowed | No | No |</p>
+<p class="table-line">| Create audit logs | Only with matching mutation | Only with matching mutation | Only where rules allow matching mutation | Only check-in audit path | No |</p>
+
+<h2>Firestore Rules Reference</h2>
+
+<p>Important helper functions include `isSignedIn`, `isProtectedOwner`, `isApprovedAdmin`, `activeStaffProfile`, `activeStaffAssignment`, `isAssignedScanner`, `canReadTask`, and `canManageTask`.</p>
+
+<p>Rules distinguish `resource.data` from `request.resource.data`, and create/read/update/delete paths are intentionally different. Query rules are not filters: if a query can return forbidden documents, Firestore denies the whole query.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\10-events-guests-tickets-and-checkin.md --&gt;</p>
+
+<h1>Events, Guests, Tickets, and Check-In</h1>
+
+<h2>Event Management</h2>
+
+<p>Events are managed by `EventsPage` and `eventService`. The Working Event context determines which event-scoped pages load data.</p>
+
+<h2>Guest Registrations</h2>
+
+<p>Registrations include guest identity, persons attending, payment state, ticket status, historical attendance evidence, and scanner-confirmed check-in fields. Registration mutations must stay atomic with audit evidence.</p>
+
+<h2>Tickets and QR</h2>
+
+<p>QR payload is exactly:</p>
+
+<pre><code>GSV:TICKET:{ticketCode}</code></pre>
+
+<p>Do not put private guest data into QR payloads.</p>
+
+<h2>Check-In Flow</h2>
+
+<pre><code>flowchart TD
+  Ticket[Ticket code] --&gt; Payload[GSV:TICKET:{ticketCode}]
+  Payload --&gt; QR[QRCode rendering]
+  QR --&gt; Scanner[Camera or manual scanner panel]
+  Scanner --&gt; Parse[qrTicketUtils parses safe ticket code]
+  Parse --&gt; Lookup[Lookup registration in selected/assigned event]
+  Lookup --&gt; Confirm[Operator explicitly checks in]
+  Confirm --&gt; Firestore[Minimal checkedIn fields + audit log]
+  Firestore --&gt; Feedback[Success, duplicate, or permission feedback]</code></pre>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\11-imports-exports-and-qr-systems.md --&gt;</p>
+
+<h1>Imports, Exports, and QR Systems</h1>
+
+<h2>Import Flow</h2>
+
+<pre><code>flowchart TD
+  Source[CSV, XLSX, pasted table] --&gt; Parse[Parser and source type]
+  Parse --&gt; Mapping[Header mapping and sheet confirmation]
+  Mapping --&gt; Preview[Preview rows: valid, warning, needs review, blocked]
+  Preview --&gt; Duplicate[Duplicate and ticket code checks]
+  Duplicate --&gt; Confirm[Explicit final confirmation]
+  Confirm --&gt; Batch[Chunked Firestore writes + audit logs]
+  Batch --&gt; Review[Registration records and follow-up]</code></pre>
+
+<p>Supported sources: CSV, XLSX through `read-excel-file`, and pasted table rows. The app uses preview-first validation, explicit sheet confirmation, duplicate detection, ticket-code collision checks, and chunked writes with audits.</p>
+
+<p>Exports are client-side generated files from `src/utils/exportUtils.js` and related finance/reconciliation helpers. Audit log and access-control collections are not included in ordinary organizer exports.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\12-testing-and-quality-assurance.md --&gt;</p>
+
+<h1>Testing and Quality Assurance</h1>
+
+<h2>Command Reference</h2>
+
+<p class="table-line">| Command | Purpose | Actual script | When to run | Expected result |</p>
+<p class="table-line">| --- | --- | --- | --- | --- |</p>
+<p class="table-line">| npm run dev | Local validation/development command | vite | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run build | Local validation/development command | vite build | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run preview | Local validation/development command | vite preview | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run docs:generate | Local validation/development command | node scripts/docs/generateTechnicalManual.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run docs:validate | Local validation/development command | node scripts/docs/validateTechnicalDocs.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run lint | Local validation/development command | eslint src tests scripts e2e eslint.config.js vite.config.js playwright.config.js | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run test | Local validation/development command | node --test tests/*.test.js | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run doctor | Local validation/development command | react-doctor . --project . --scope full --blocking none --no-telemetry | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run doctor:changed | Local validation/development command | react-doctor . --project . --scope changed --base main --blocking error --no-telemetry | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run doctor:json | Local validation/development command | react-doctor . --project . --scope full --blocking none --json --json-compact --no-telemetry | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run product:copy-scan | Local validation/development command | node scripts/product/copyScan.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run product:routes | Local validation/development command | node scripts/product/routeInventory.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run product:bundle | Local validation/development command | node scripts/product/bundleSummary.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run product:docs | Local validation/development command | node scripts/product/documentationCheck.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run product:legacy | Local validation/development command | node scripts/product/legacyControlCheck.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run product:qa | Local validation/development command | node scripts/product/runProductCommand.mjs qa | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run product:audit | Local validation/development command | node scripts/product/runProductCommand.mjs audit | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run product:qa:emulator-checks | Local validation/development command | node --test tests/firestore-checkin-rules.test.js tests/task-workflow-rules.test.js tests/document-contact-rules.test.js tests/run-of-show-resource-rules.test.js &amp;&amp; npm run e2e:smoke:inner | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run e2e:smoke | Local validation/development command | npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub "npm run e2e:smoke:inner" | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run e2e:smoke:inner | Local validation/development command | playwright test --project=chromium e2e/navigation.spec.js | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run e2e:full | Local validation/development command | npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub "playwright test --project=chromium" | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run e2e:firefox | Local validation/development command | npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub "playwright test --project=firefox" | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run e2e:webkit | Local validation/development command | npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub "playwright test --project=webkit" | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run admin:ensure-access | Local validation/development command | node scripts/admin/ensureAccessControl.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run admin:verify-firebase | Local validation/development command | node scripts/admin/verifyFirebaseSetup.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run admin:replace-codex-test-with-demo | Local validation/development command | node scripts/admin/replaceCodexTestWithDemoEvent.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run admin:verify-production-fixtures | Local validation/development command | node scripts/admin/verifyProductionFixtures.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run admin:verify-production-counts | Local validation/development command | node scripts/admin/verifyProductionCounts.mjs | During development, QA, or documentation validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run firebase:deploy-rules | PRODUCTION-IMPACTING COMMAND where noted | npx firebase-tools deploy --only firestore:rules,firestore:indexes --project gathervibeshub | Only after explicit approval and validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run firebase:deploy-hosting | PRODUCTION-IMPACTING COMMAND where noted | npx firebase-tools deploy --only hosting --project gathervibeshub | Only after explicit approval and validation | Exit code 0; command-specific pass message |</p>
+<p class="table-line">| npm run firebase:deploy-all | PRODUCTION-IMPACTING COMMAND where noted | npx firebase-tools deploy --only firestore:rules,firestore:indexes,hosting --project gathervibeshub | Only after explicit approval and validation | Exit code 0; command-specific pass message |</p>
+
+<h2>Testing Layers</h2>
+
+<p class="bullet">- Unit and source contract tests: `tests/*.test.js`.</p>
+<p class="bullet">- Firestore Rules tests: rules-specific test files run against emulators.</p>
+<p class="bullet">- E2E smoke: `e2e/navigation.spec.js`.</p>
+<p class="bullet">- Accessibility and responsive E2E: `e2e/accessibility.spec.js`, `e2e/responsive.spec.js`.</p>
+<p class="bullet">- Product QA wrapper: `npm run product:qa`.</p>
+<p class="bullet">- React Doctor: `npm run doctor:json` or `npm run doctor:changed`.</p>
+
+<h2>Date-Sensitive Test Policy</h2>
+
+<p>Phase 2 found `tests/document-contact-foundation.test.js` used `2026-08-20` as an expiring-soon fixture. On 2026-08-21 that fixture became expired for helpers using the current clock. It was updated to `2026-08-30` to preserve the intended behavior.</p>
+
+<p>Future date-sensitive tests should either inject an explicit clock into every helper under test or choose dates far enough away to avoid silent expiry.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\13-build-deployment-and-recovery.md --&gt;</p>
+
+<h1>Build, Deployment, and Recovery</h1>
+
+<h2>Local Build</h2>
+
+<pre><code>npm ci
+npm run lint
+npm test
+npm run build
+npm run product:qa</code></pre>
+
+<h2>Firebase Project</h2>
+
+<p>Default project in `.firebaserc`: `gathervibeshub`.</p>
+
+<p>Hosting public folder: `dist`.</p>
+
+<p>Security headers and SPA rewrite are configured in `firebase.json`.</p>
+
+<h2>Production-Impacting Commands</h2>
+
+<p class="table-line">| Command | Impact | Prerequisites |</p>
+<p class="table-line">| --- | --- | --- |</p>
+<p class="table-line">| npm run firebase:deploy-hosting | PRODUCTION-IMPACTING COMMAND: deploys Hosting assets from dist. | Build passed; production visual check plan ready. |</p>
+<p class="table-line">| npm run firebase:deploy-rules | PRODUCTION-IMPACTING COMMAND: deploys Firestore Rules and indexes. | Rules tests passed; authorization impact reviewed. |</p>
+<p class="table-line">| npm run firebase:deploy-all | PRODUCTION-IMPACTING COMMAND: deploys Hosting, Rules, and indexes. | Use only when all targets intentionally changed. |</p>
+
+<h2>Deployment Flow</h2>
+
+<pre><code>flowchart TD
+  Change[Code or docs change] --&gt; Lint[npm run lint]
+  Lint --&gt; Tests[npm test]
+  Tests --&gt; Build[npm run build]
+  Build --&gt; QA[npm run product:qa]
+  QA --&gt; Decision{Runtime deployment needed?}
+  Decision -- Docs only --&gt; NoDeploy[No Firebase deploy]
+  Decision -- Hosting changed --&gt; Hosting[npm run firebase:deploy-hosting]
+  Decision -- Rules changed --&gt; Rules[npm run firebase:deploy-rules]
+  Hosting --&gt; Verify[Hard refresh production + console/network check]
+  Rules --&gt; Verify</code></pre>
+
+<p>No production deployment is performed by documentation generation.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\14-troubleshooting-and-repairs.md --&gt;</p>
+
+<h1>Troubleshooting and Repairs</h1>
+
+<p>Use the runbooks in `docs/runbooks/` for step-by-step procedures.</p>
+
+<p>Priority problems:</p>
+
+<p class="bullet">- Blank page or stale deployment chunk.</p>
+<p class="bullet">- Login or auth persistence failure.</p>
+<p class="bullet">- Missing or insufficient permissions.</p>
+<p class="bullet">- Owner account denied.</p>
+<p class="bullet">- Staff assignment missing.</p>
+<p class="bullet">- Scanner cannot check in.</p>
+<p class="bullet">- Firestore permits data that frontend hides or frontend shows data Firestore denies.</p>
+<p class="bullet">- Build, dependency, emulator, or deployment failure.</p>
+<p class="bullet">- QR scanner failure during an event.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\15-legacy-systems-and-technical-debt.md --&gt;</p>
+
+<h1>Legacy Systems and Technical Debt</h1>
+
+<h2>Current Register</h2>
+
+<p class="table-line">| Item | Classification | Notes |</p>
+<p class="table-line">| --- | --- | --- |</p>
+<p class="table-line">| Archived migration evidence | archive only / future review required | Located at C:\Users\Jaylan\Documents\Archived Projects\gsv-codex-demo-migration-evidence-2026-08-21. Contains CPB/CODEX_DEMO evidence and old repo snapshots. |</p>
+<p class="table-line">| Legacy repository archive | archive only | Located at C:\Users\Jaylan\Documents\Archived Projects\gathervibes-legacy-repository-archive-2026-08-21. |</p>
+<p class="table-line">| 21 node_modules in historical archive snapshots | future review required | Generated dependencies likely reclaimable, but recursive deletion was blocked in Phase 2. |</p>
+<p class="table-line">| Historical branches | future review required | Branches were not deleted in Phase 2. Review merge status before any cleanup. |</p>
+<p class="table-line">| Active copilot worktree | current / unknown future work | Retained at C:\Users\Jaylan\Documents\gathetr.worktrees\copilot-personalized-welcome-tour-implementation. |</p>
+<p class="table-line">| React Doctor warnings | technical debt | doctor:json reports warnings, but doctor:changed found no issues for Phase 2 changed file. |</p>
+<p class="table-line">| Legacy role aliases | legacy but required | accessRoles retains aliases such as checkInStaff for compatibility. |</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\16-change-management.md --&gt;</p>
+
+<h1>Change Management</h1>
+
+<p>No meaningful coding task is complete until documentation impact has been reviewed.</p>
+
+<p>Every handoff must report:</p>
+
+<p class="bullet">- Documentation reviewed: YES/NO</p>
+<p class="bullet">- Documentation changed: YES/NO</p>
+<p class="bullet">- Documentation files changed</p>
+<p class="bullet">- Reason no documentation update was required</p>
+
+<p>Use templates in `docs/templates/` for change records, incidents, repair runbooks, release checklists, and manual update checklists.</p>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\17-reference-and-glossary.md --&gt;</p>
+
+<h1>Reference and Glossary</h1>
+
+<h2>Glossary</h2>
+
+<p class="bullet">- Approved Organizer: an active email in `settings/accessControl`.</p>
+<p class="bullet">- Protected Owner: the permanent UID-protected owner account, independent of mutable allowlists.</p>
+<p class="bullet">- Working Event: selected event context used by event-scoped pages.</p>
+<p class="bullet">- CODEX_DEMO: synthetic training event safe for reversible QA.</p>
+<p class="bullet">- CPB: real completed event; not a synthetic QA target.</p>
+<p class="bullet">- Audit log: append-only evidence document required for many business writes.</p>
+<p class="bullet">- Query rules are not filters: Firestore denies a query if it could return unauthorized documents.</p>
+
+<h2>Search Keywords</h2>
+
+<pre><code>Firebase missing or insufficient permissions resource.data request.resource.data
+Firestore query rules are not filters
+React Firebase auth state loading before Firestore query
+Vite dynamic import Failed to fetch dynamically imported module
+Firebase Hosting stale service worker chunk cache
+Playwright Firebase emulator auth firestore port taken 9099 8080
+html5-qrcode camera permission HTTPS mobile browser
+GSV:TICKET QR payload ticketCode privacy
+read-excel-file browser XLSX import mapping
+React Doctor no-loading-flag-reset-outside-finally</code></pre>
+
+
+<p>---</p>
+
+<p>&lt;!-- Source: docs\manual\18-future-app-development-reference.md --&gt;</p>
+
+<h1>Future App Development Reference</h1>
+
+<p>Lessons from Gathetr that apply to future React/Firebase apps:</p>
+
+<p class="bullet">- Design the permission model before building pages.</p>
+<p class="bullet">- Keep frontend route gates and backend Rules aligned but separate.</p>
+<p class="bullet">- Use one authoritative source for access control and display it in Settings.</p>
+<p class="bullet">- Avoid synthetic QA against real event data.</p>
+<p class="bullet">- Keep QR payloads privacy-safe and stable.</p>
+<p class="bullet">- Add emulator-backed rule tests before deploying Rules.</p>
+<p class="bullet">- Document every schema, role, status, and workflow change at the time it changes.</p>
+<p class="bullet">- Keep generated PDFs as snapshots, not the source of truth.</p>
+</body>
+</html>

@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant B as Browser
+  participant A as AuthProvider
+  participant F as Firebase Auth
+  participant D as Firestore
+  participant R as ProtectedRoute
+  B->>A: App opens
+  A->>F: setPersistence + onAuthStateChanged
+  F-->>A: current user or null
+  A->>D: read settings/accessControl
+  A->>D: fallback read staffProfiles and assignments
+  A->>A: resolve access level and default route
+  A-->>R: user, loading, isAuthorized, access
+  R-->>B: render page or redirect

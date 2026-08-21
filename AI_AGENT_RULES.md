@@ -62,6 +62,14 @@ Whenever a change affects schemas, fields, statuses, calculations, validators, F
 - Do not bulk-modify real production data without explicit approval after inspection, classification, dry run, and testing.
 - Add tests for new records, old records, imported old records, partially populated records, and completed-event records where relevant.
 
+## Permanent Documentation Impact Rule
+
+Every meaningful change must include a documentation-impact check before handoff. If a setting, permission, schema, field, workflow, external integration, Firebase rule, data contract, status, import/export shape, report, or owner/admin surface changes, update every affected source of truth in the same change set: runtime code, Firebase data or rules where intentionally changed, service functions, validation/normalization, Settings/admin visibility, tests, operational documentation, and repair runbooks.
+
+Documentation is not complete when it only describes the code. It must describe the owner/operator workflow, the authoritative Firebase source, the security boundary, expected failure modes, recovery steps, and any known legacy tolerance. Use `docs/manual`, `docs/runbooks`, `docs/data-dictionary`, `docs/permissions`, `docs/problem-register`, `docs/decisions`, and `docs/changelog` as the living technical manual system.
+
+For documentation-only work, state explicitly whether Firebase Hosting, Firestore Rules, Auth, Functions, Storage, QR format, production data, or runtime UI were unchanged. For runtime work, the final handoff must identify the documentation files reviewed or updated, or explain why no documentation update was required.
+
 ## Handoff Rule
 
 Every handoff must state:

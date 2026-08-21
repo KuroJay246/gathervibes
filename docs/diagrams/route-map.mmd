@@ -1,0 +1,9 @@
+flowchart LR
+  Login[/login/] --> Protected[ProtectedRoute]
+  Protected --> Shell[AppShell]
+  Shell --> Home[/dashboard/]
+  Shell --> Plan[/events /tasks /contacts /documents /run-of-show /resources/]
+  Shell --> Guests[/registrations /payments /tickets /check-in/]
+  Shell --> Ops[/operations /event-review /payments/reconciliation /imports /communications/]
+  Shell --> Admin[/settings /qa/]
+  Protected --> Scanner[/scanner assigned-event gate/]

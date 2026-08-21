@@ -1,0 +1,10 @@
+flowchart TD
+  User[Owner, organizer, staff, scanner] --> Browser[Browser / PWA shell]
+  Browser --> React[React 19 + Vite app]
+  React --> RouteGate[ProtectedRoute and canViewRoute]
+  RouteGate --> Auth[Firebase Authentication]
+  Auth --> Access[Access resolver: settings/accessControl + staff profile + assignment]
+  Access --> FirestoreRules[Firestore Security Rules]
+  FirestoreRules --> Firestore[(Cloud Firestore)]
+  React --> Hosting[Firebase Hosting static assets]
+  React --> QA[Local emulator tests and Playwright QA]

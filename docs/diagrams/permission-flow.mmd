@@ -1,0 +1,14 @@
+flowchart TD
+  Start[Request route or Firestore operation] --> Signed{Signed in?}
+  Signed -- No --> Login[Redirect/login denied]
+  Signed -- Yes --> Owner{Protected Owner UID?}
+  Owner -- Yes --> Admin[Admin-level frontend access]
+  Owner -- No --> Allowlist{Active approved organizer?}
+  Allowlist -- Yes --> Admin
+  Allowlist -- No --> Staff{Active staff profile + event assignment?}
+  Staff -- No --> Deny[Deny access]
+  Staff -- Yes --> Role{Assignment role}
+  Role --> Scanner[Scanner: assigned event check-in only]
+  Role --> Manager[Event manager/viewer: narrow event reads/tasks/docs]
+  Role --> Ops[Operations helper: operations visibility only]
+  Admin --> Rules[Firestore validates fields, audits, and event scope]

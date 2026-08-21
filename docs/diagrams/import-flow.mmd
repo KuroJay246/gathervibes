@@ -1,0 +1,8 @@
+flowchart TD
+  Source[CSV, XLSX, pasted table] --> Parse[Parser and source type]
+  Parse --> Mapping[Header mapping and sheet confirmation]
+  Mapping --> Preview[Preview rows: valid, warning, needs review, blocked]
+  Preview --> Duplicate[Duplicate and ticket code checks]
+  Duplicate --> Confirm[Explicit final confirmation]
+  Confirm --> Batch[Chunked Firestore writes + audit logs]
+  Batch --> Review[Registration records and follow-up]

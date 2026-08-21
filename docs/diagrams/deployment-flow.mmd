@@ -1,0 +1,11 @@
+flowchart TD
+  Change[Code or docs change] --> Lint[npm run lint]
+  Lint --> Tests[npm test]
+  Tests --> Build[npm run build]
+  Build --> QA[npm run product:qa]
+  QA --> Decision{Runtime deployment needed?}
+  Decision -- Docs only --> NoDeploy[No Firebase deploy]
+  Decision -- Hosting changed --> Hosting[npm run firebase:deploy-hosting]
+  Decision -- Rules changed --> Rules[npm run firebase:deploy-rules]
+  Hosting --> Verify[Hard refresh production + console/network check]
+  Rules --> Verify
