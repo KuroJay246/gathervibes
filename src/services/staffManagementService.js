@@ -85,7 +85,6 @@ export async function saveStaffProfile(profile, user) {
     createdBy: profile.createdBy || actor(user),
     updatedBy: actor(user),
   }
-  if (Array.isArray(profile.assignedEventIds)) payload.assignedEventIds = normalizeAssignedEventIds(profile.assignedEventIds)
   await setDoc(profileRef, payload, { merge: true })
   await setDoc(doc(collection(requireDb(), 'staffHistory')), {
     uid: clean.uid,

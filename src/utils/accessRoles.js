@@ -303,7 +303,7 @@ export function getUserAccessLevel(user, accessControl = {}, staffProfile = null
     level: 'staff',
     role: normalizeAccessRole(profile.defaultRole) || activeAssignments[0].role,
     roleLabel: roleLabel(normalizeAccessRole(profile.defaultRole) || activeAssignments[0].role),
-    assignedEventIds: activeAssignments.map((assignment) => assignment.eventId),
+    assignedEventIds: [...new Set(activeAssignments.map((assignment) => assignment.eventId))],
     assignmentsByEvent,
     assignedEvents: safeAssignedEvents,
     protectedOwner: false,

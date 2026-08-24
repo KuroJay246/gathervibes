@@ -64,6 +64,24 @@ test('staff and integration management preserve product boundaries', async () =>
   assert.doesNotMatch(integrationService, /secret|token|password/i)
 })
 
+test('staff assignment index is maintained only through assignment writes and batch synchronization', async () => {
+  const staffService = await readFile('src/services/staffManagementService.js', 'utf8')
+  const saveProfileStart = staffService.indexOf('export async function saveStaffProfile')
+  const setStatusStart = staffService.indexOf('export async function setStaffProfileStatus')
+  const saveAssignmentStart = staffService.indexOf('export async function saveStaffAssignment')
+  const saveProfile = staffService.slice(saveProfileStart, setStatusStart)
+  const saveAssignment = staffService.slice(saveAssignmentStart)
+
+  assert.doesNotMatch(saveProfile, /assignedEventIds/)
+  assert.match(saveAssignment, /const assignedEventIds = new Set\(normalizeAssignedEventIds\(existingProfileData\?\.assignedEventIds\)\)/)
+  assert.match(saveAssignment, /if \(payload\.status === 'active'\) assignedEventIds\.add\(eventId\)/)
+  assert.match(saveAssignment, /else assignedEventIds\.delete\(eventId\)/)
+  assert.match(saveAssignment, /const batch = writeBatch\(firestore\)/)
+  assert.match(saveAssignment, /batch\.set\(assignmentRef, payload, \{ merge: true \}\)/)
+  assert.match(saveAssignment, /batch\.set\(profileRef, \{\s*assignedEventIds: \[\.\.\.assignedEventIds\]/)
+  assert.match(saveAssignment, /await batch\.commit\(\)/)
+})
+
 test('rules allow only protected owner organizer and integration mutations', async () => {
   const rules = await readFile('firestore.rules', 'utf8')
   assert.match(rules, /match \/settings\/accessControl \{[\s\S]*allow update: if isProtectedOwner\(\)[\s\S]*validAccessControlDocument/)

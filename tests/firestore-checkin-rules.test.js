@@ -416,6 +416,45 @@ test('Firestore rules allow staff to read their own profile index and assignment
   }
 })
 
+test('Firestore rules reject staff self-edit of assignedEventIds on their own profile', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    await seedScanner(env)
+    const db = env.authenticatedContext(scannerUid, { email: scannerEmail }).firestore()
+
+    await assertFails(updateDoc(doc(db, 'staffProfiles', scannerUid), {
+      assignedEventIds: [eventId, 'another-event'],
+      updatedAt: serverTimestamp(),
+      updatedBy: scannerEmail,
+    }))
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject scanner self-creation of an event assignment', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    const db = env.authenticatedContext(scannerUid, { email: scannerEmail }).firestore()
+
+    await assertFails(setDoc(doc(db, 'events', eventId, 'staffAssignments', scannerUid), {
+      uid: scannerUid,
+      eventId,
+      email: scannerEmail,
+      role: 'scanner',
+      status: 'active',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      createdBy: scannerEmail,
+      updatedBy: scannerEmail,
+    }))
+  } finally {
+    await env.cleanup()
+  }
+})
+
 test('Firestore rules allow approved admin registration detail update with append-only audit', { skip: !emulatorHost }, async () => {
   const env = await createTestEnv()
   try {
