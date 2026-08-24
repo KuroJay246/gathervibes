@@ -36,7 +36,7 @@ test('Phase 23C route is preview-only, Working Event-scoped, and not CPB-gated',
   const app = await readFile('src/App.jsx', 'utf8')
   const paymentsPage = await readFile('src/pages/PaymentsPage.jsx', 'utf8')
   const reconciliationPage = await readFile('src/pages/PaymentReconciliationPage.jsx', 'utf8')
-  const access = await readFile('src/utils/accessRoles.js', 'utf8')
+  const access = await readFile('packages/contracts/src/accessRoles.js', 'utf8')
 
   assert.match(app, /path="\/payments\/reconciliation"/)
   assert.doesNotMatch(app, /path="\/payments\/reconciliation" element=\{<AssignedEventGate/)

@@ -20,7 +20,7 @@ test('Phase 5 Tickets is summary-first and keeps QR plus check-in actions explic
 
 test('Phase 5 Check-In adds manual-check-in framing and recent activity without broadening permissions', async () => {
   const page = await readFile('src/pages/CheckInPage.jsx', 'utf8')
-  const access = await readFile('src/utils/accessRoles.js', 'utf8')
+  const access = await readFile('packages/contracts/src/accessRoles.js', 'utf8')
 
   assert.match(page, /Manual check-in/)
   assert.match(page, /Find the next guest fast/)

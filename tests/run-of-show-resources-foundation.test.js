@@ -246,7 +246,7 @@ test('Guardrail source checks remain explicit', async () => {
     readFile('src/App.jsx', 'utf8'),
     readFile('firestore.rules', 'utf8'),
     readFile('package.json', 'utf8'),
-    readFile('src/utils/qrTicketUtils.js', 'utf8'),
+    readFile('packages/contracts/src/qrTicketUtils.js', 'utf8'),
   ])
 
   assert.match(app, /path="\/run-of-show"/)

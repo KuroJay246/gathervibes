@@ -7,7 +7,7 @@ import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
 test('organizer navigation uses product labels while preserving route paths', async () => {
   const shell = await readFile('src/layout/AppShell.jsx', 'utf8')
   const app = await readFile('src/App.jsx', 'utf8')
-  const access = await readFile('src/utils/accessRoles.js', 'utf8')
+  const access = await readFile('packages/contracts/src/accessRoles.js', 'utf8')
 
   for (const label of ['Home', 'Guests & Registrations', 'Tickets', 'Check-In', 'Operations', 'Message Builder', 'Reports', 'Settings', 'System QA']) {
     assert.match(shell, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
@@ -87,7 +87,7 @@ test('Phase 23A guardrails keep QR, dependencies, rules, and access boundaries u
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'))
   const rules = await readFile('firestore.rules', 'utf8')
   const indexes = await readFile('firestore.indexes.json', 'utf8')
-  const access = await readFile('src/utils/accessRoles.js', 'utf8')
+  const access = await readFile('packages/contracts/src/accessRoles.js', 'utf8')
   const contract = await readFile('src/services/accessRequestContract.js', 'utf8')
 
   assert.equal(qrPayloadForTicketCode('PH23A-001'), 'GSV:TICKET:PH23A-001')

@@ -40,7 +40,7 @@ test('support details include simple explanation and safe technical fields', () 
 test('organizer access change is represented across Firebase, rules, services, Settings, tests, and docs guidance', async () => {
   const settings = await readFile('src/pages/SettingsPage.jsx', 'utf8')
   const authProvider = await readFile('src/auth/AuthProvider.jsx', 'utf8')
-  const accessRoles = await readFile('src/utils/accessRoles.js', 'utf8')
+  const accessRoles = await readFile('packages/contracts/src/accessRoles.js', 'utf8')
   const rules = await readFile('firestore.rules', 'utf8')
   const adminScript = await readFile('scripts/admin/ensureAccessControl.mjs', 'utf8')
   const docs = await readFile('docs/ACCESS_CHANGE_CHECKLIST.md', 'utf8')
