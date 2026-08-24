@@ -153,6 +153,8 @@ Auth state is Firebase Auth based. Organizer approval is checked against `settin
 - staff/scanner assignment problem;
 - Firestore rule denial after auth succeeded.
 
+Staff/scanner auth resolution reads the signed-in user's `staffProfiles/{uid}` document, uses its admin-maintained `assignedEventIds` index, then reads the user's matching active `events/{eventId}/staffAssignments/{uid}` documents before loading the corresponding event records.
+
 Do not fix permission-denied save errors by loosening broad rules. Verify the user UID, access document, target event, write shape, and audit-log batch first.
 
 ## 9. Protected Owner

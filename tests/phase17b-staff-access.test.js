@@ -113,9 +113,8 @@ test('Phase 17B UI surfaces staff role gating and assigned-event fallback', asyn
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
 
   assert.match(auth, /staffProfiles/)
-  assert.match(auth, /STAFF_ASSIGNMENT_EVENT_IDS/)
-  assert.match(auth, /doc\(db, 'events', eventId, 'staffAssignments', nextUser\.uid\)/)
-  assert.doesNotMatch(auth, /collectionGroup\(db, 'staffAssignments'\)/)
+  assert.match(auth, /staffProfile\?\.assignedEventIds/)
+  assert.match(auth, /getDoc\(doc\(db, 'events', eventId, 'staffAssignments', nextUser\.uid\)\)/)
   assert.match(protectedRoute, /canViewRoute/)
   assert.match(shell, /canViewRoute\(access, to\)/)
   assert.match(app, /path="\/scanner"/)

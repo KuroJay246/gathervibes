@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, setDoc, writeBatch } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { normalizeAccessEmail, normalizeAccessRole } from '../utils/accessRoles'
 
@@ -11,6 +11,16 @@ function requireDb() {
 
 function actor(user) {
   return user?.email || user?.uid || 'unknown'
+}
+
+function normalizeAssignedEventIds(value) {
+  if (!Array.isArray(value)) return []
+  return [...new Set(
+    value
+      .filter((eventId) => typeof eventId === 'string')
+      .map((eventId) => eventId.trim())
+      .filter(Boolean),
+  )].slice(0, 50)
 }
 
 export function subscribeStaffProfiles(onData, onError) {
@@ -75,6 +85,7 @@ export async function saveStaffProfile(profile, user) {
     createdBy: profile.createdBy || actor(user),
     updatedBy: actor(user),
   }
+  if (Array.isArray(profile.assignedEventIds)) payload.assignedEventIds = normalizeAssignedEventIds(profile.assignedEventIds)
   await setDoc(profileRef, payload, { merge: true })
   await setDoc(doc(collection(requireDb(), 'staffHistory')), {
     uid: clean.uid,
@@ -100,9 +111,14 @@ export async function saveStaffAssignment({ eventId, uid, email, role, status = 
   const cleanRole = normalizeAccessRole(role)
   if (!eventId) throw new Error('Select a working event before assigning staff.')
   if (!cleanUid || !cleanEmail || !STAFF_ROLES.has(cleanRole)) throw new Error('Assignment requires staff UID, email, and role.')
-  const assignmentRef = doc(requireDb(), 'events', eventId, 'staffAssignments', cleanUid)
+  const firestore = requireDb()
+  const assignmentRef = doc(firestore, 'events', eventId, 'staffAssignments', cleanUid)
+  const profileRef = doc(firestore, 'staffProfiles', cleanUid)
+  const profileSnapshot = await getDoc(profileRef)
+  if (!profileSnapshot.exists()) throw new Error('Create the staff profile before assigning event access.')
   const existing = await getDoc(assignmentRef)
   const existingData = existing.exists() ? existing.data() : {}
+  const existingProfileData = profileSnapshot.data()
   const payload = {
     uid: cleanUid,
     email: cleanEmail,
@@ -114,8 +130,18 @@ export async function saveStaffAssignment({ eventId, uid, email, role, status = 
     createdBy: existingData.createdBy || actor(user),
     updatedBy: actor(user),
   }
-  await setDoc(assignmentRef, payload, { merge: true })
-  await setDoc(doc(collection(requireDb(), 'events', eventId, 'staffAssignmentHistory')), {
+  const assignedEventIds = new Set(normalizeAssignedEventIds(existingProfileData?.assignedEventIds))
+  if (payload.status === 'active') assignedEventIds.add(eventId)
+  else assignedEventIds.delete(eventId)
+
+  const batch = writeBatch(firestore)
+  batch.set(assignmentRef, payload, { merge: true })
+  batch.set(profileRef, {
+    assignedEventIds: [...assignedEventIds],
+    updatedAt: serverTimestamp(),
+    updatedBy: actor(user),
+  }, { merge: true })
+  batch.set(doc(collection(firestore, 'events', eventId, 'staffAssignmentHistory')), {
     uid: cleanUid,
     email: cleanEmail,
     eventId,
@@ -126,4 +152,5 @@ export async function saveStaffAssignment({ eventId, uid, email, role, status = 
     changedBy: actor(user),
     changedByUid: user?.uid || '',
   })
+  await batch.commit()
 }
