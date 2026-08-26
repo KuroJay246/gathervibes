@@ -190,6 +190,8 @@ Use Hosting-only deployment for app-source changes:
 
 The current web deployment evidence is recorded in `output/web-production-completion/`, including before/after response headers, production login evidence, local authenticated visual evidence, the Android preservation screenshot, and the readiness ledger. The ledger is authoritative for the distinction between implemented code, deployed behavior, local verification, and owner-controlled production actions.
 
+The owner closeout extension is in `output/web-production-completion/owner-closeout/`. It contains redacted live Protected Owner screenshots, the Firebase Console MFA blocker capture, mobile audit JSON, production route screenshots, and provider-status evidence. No credentials, tokens, private key values, or production test writes were captured.
+
 ```bash
 npx firebase-tools deploy --only hosting --project gathervibeshub
 ```

@@ -1,5 +1,11 @@
 # Documentation Changelog
 
+## 2026-08-26 Production Closeout
+
+- Updated canonical GSV rules, handoff, README, master reference, and maintenance manifest with live Protected Owner evidence, unrestricted API-key findings, MFA access boundary, provider truth, billing/monitoring/backup status, mobile audit classification, iOS preparation, and final owner actions.
+- Added the final production closeout PDF and owner-closeout evidence package under `output/web-production-completion/`.
+- No Couple Book files, CPB records, or mobile source/build artifacts were changed.
+
 ## 2026-08-21
 
 - Created Phase 3 technical manual source structure.
