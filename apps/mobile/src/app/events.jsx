@@ -47,13 +47,15 @@ export default function EventSelectionScreen() {
                     await setActiveEvent(event)
                     router.replace('/home')
                   }}
+                  testID={`event-select-open-${event.eventId}`}
+                  accessibilityLabel={`event-select-open-${event.eventId}`}
                 />
               </Card>
             ))}
           </View>
         )}
 
-        <SecondaryButton label="Sign Out" onPress={() => void signOut()} />
+        <SecondaryButton label="Sign Out" onPress={() => void signOut()} testID="event-select-sign-out-button" accessibilityLabel="event-select-sign-out-button" />
       </Section>
     </Screen>
   )

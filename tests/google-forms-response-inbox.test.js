@@ -15,7 +15,13 @@ import {
   findFormResponseDuplicateCandidates,
   formConnectionStatusLabel,
 } from '../src/utils/formResponseInbox.js'
-import { validatePayload, verifySignedRequest } from '../integrations/google-forms/function/googleFormsReceiver.js'
+import {
+  createRateLimiter,
+  handleGoogleFormsReceiver,
+  sanitizePayloadForLogging,
+  validatePayload,
+  verifySignedRequest,
+} from '../integrations/google-forms/function/googleFormsReceiver.js'
 import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
 
 const event = { eventId: 'xPfa0b3KZyLSDnAD2uGI', eventName: 'CODEX_TEST Live Verification Event' }
@@ -100,6 +106,129 @@ test('signed HTTPS receiver rejects missing, invalid, stale, wrong, and disabled
   assert.equal(verifySignedRequest({ method: 'POST', headers: { 'x-gsv-timestamp': timestamp, 'x-gsv-signature': signature, 'x-gsv-idempotency-key': 'conn-1:response-1' }, rawBody: body, secret, allowedConnections: allowed }).status, 202)
   assert.equal(validatePayload({ ...payload, formId: 'wrong' }, allowed).status, 403)
   assert.equal(validatePayload(payload, new Map([['conn-1', { ...allowed.get('conn-1'), status: 'disabled' }]])).status, 403)
+})
+
+test('Forms receiver stages inbox rows once, rejects invalid payloads, rate limits bursts, and logs safely', async () => {
+  const secret = 'b'.repeat(40)
+  const payload = {
+    connectionId: 'conn-1',
+    eventId: event.eventId,
+    formId: 'form-1',
+    responseId: 'response-1',
+    receivedAt: '2026-07-30T12:00:00Z',
+    answers: [{ itemId: '1', title: 'Full Name', response: 'Test Guest' }],
+  }
+  const rawBody = JSON.stringify(payload)
+  const timestamp = String(Date.now())
+  const signature = crypto.createHmac('sha256', secret).update(`${timestamp}.${rawBody}`).digest('hex')
+  const allowed = new Map([['conn-1', { status: 'active', formId: 'form-1', eventId: event.eventId, targetType: 'guest-registration' }]])
+  const staged = new Map()
+  const logEntries = []
+  const db = {
+    collection: () => ({
+      doc: (id) => ({ id }),
+    }),
+    runTransaction: async (callback) => {
+      await callback({
+        get: async (ref) => ({ exists: staged.has(ref.id) }),
+        set: (ref, value) => staged.set(ref.id, value),
+      })
+    },
+  }
+
+  const first = await handleGoogleFormsReceiver({
+    request: {
+      method: 'POST',
+      headers: {
+        'x-gsv-timestamp': timestamp,
+        'x-gsv-signature': signature,
+        'x-gsv-idempotency-key': 'conn-1:response-1',
+      },
+      rawBody,
+      ip: '127.0.0.1',
+    },
+    secret,
+    allowedConnections: allowed,
+    rateLimiter: createRateLimiter({ limit: 10, windowMs: 60_000 }),
+    db,
+    log: (entry) => logEntries.push(entry),
+  })
+  const second = await handleGoogleFormsReceiver({
+    request: {
+      method: 'POST',
+      headers: {
+        'x-gsv-timestamp': timestamp,
+        'x-gsv-signature': signature,
+        'x-gsv-idempotency-key': 'conn-1:response-1',
+      },
+      rawBody,
+      ip: '127.0.0.1',
+    },
+    secret,
+    allowedConnections: allowed,
+    rateLimiter: createRateLimiter({ limit: 10, windowMs: 60_000 }),
+    db,
+  })
+
+  assert.equal(first.status, 202)
+  assert.equal(second.status, 202)
+  assert.equal(staged.size, 1)
+  assert.deepEqual(first.payload, sanitizePayloadForLogging(payload))
+  assert.equal(logEntries[0].payload.answerCount, 1)
+
+  const invalid = await handleGoogleFormsReceiver({
+    request: {
+      method: 'POST',
+      headers: {
+        'x-gsv-timestamp': timestamp,
+        'x-gsv-signature': crypto.createHmac('sha256', secret).update(`${timestamp}.${JSON.stringify({ ...payload, answers: 'bad' })}`).digest('hex'),
+        'x-gsv-idempotency-key': 'conn-1:response-2',
+      },
+      rawBody: JSON.stringify({ ...payload, answers: 'bad' }),
+      ip: '127.0.0.1',
+    },
+    secret,
+    allowedConnections: allowed,
+    rateLimiter: createRateLimiter({ limit: 10, windowMs: 60_000 }),
+    db,
+  })
+  assert.equal(invalid.status, 400)
+
+  const tightLimiter = createRateLimiter({ limit: 1, windowMs: 60_000 })
+  const limitedFirst = await handleGoogleFormsReceiver({
+    request: {
+      method: 'POST',
+      headers: {
+        'x-gsv-timestamp': timestamp,
+        'x-gsv-signature': signature,
+        'x-gsv-idempotency-key': 'conn-1:response-3',
+      },
+      rawBody,
+      ip: '10.0.0.1',
+    },
+    secret,
+    allowedConnections: allowed,
+    rateLimiter: tightLimiter,
+    db,
+  })
+  const limitedSecond = await handleGoogleFormsReceiver({
+    request: {
+      method: 'POST',
+      headers: {
+        'x-gsv-timestamp': timestamp,
+        'x-gsv-signature': signature,
+        'x-gsv-idempotency-key': 'conn-1:response-4',
+      },
+      rawBody,
+      ip: '10.0.0.1',
+    },
+    secret,
+    allowedConnections: allowed,
+    rateLimiter: tightLimiter,
+    db,
+  })
+  assert.equal(limitedFirst.status, 202)
+  assert.equal(limitedSecond.status, 429)
 })
 
 test('Import Center and integration package preserve guardrails', async () => {

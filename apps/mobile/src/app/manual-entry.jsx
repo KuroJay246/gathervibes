@@ -74,7 +74,15 @@ export default function ManualEntryScreen() {
         description="Use the same ticket code contract as the QR payload: GSV:TICKET:{ticketCode}."
       >
         <Card>
-          <Field label="Ticket code" value={ticketInput} onChangeText={setTicketInput} placeholder="GSV-ABC123 or GSV:TICKET:GSV-ABC123" autoCapitalize="characters" />
+          <Field
+            label="Ticket code"
+            value={ticketInput}
+            onChangeText={setTicketInput}
+            placeholder="GSV-ABC123 or GSV:TICKET:GSV-ABC123"
+            autoCapitalize="characters"
+            testID="manual-ticket-input"
+            accessibilityLabel="manual-ticket-input"
+          />
           {parsed.error && ticketInput.trim() ? <Banner tone="warning">{parsed.error}</Banner> : null}
         </Card>
 
@@ -86,9 +94,9 @@ export default function ManualEntryScreen() {
             <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2023' }}>{registration.fullName || registration.buyerName || 'Guest'}</Text>
             <Text style={{ color: '#5c554f' }}>{registration.ticketCode || parsed.ticketCode}</Text>
             {registration.checkedIn ? (
-              <SecondaryButton label="Record Duplicate Attempt" onPress={handleDuplicate} disabled={saving} />
+              <SecondaryButton label="Record Duplicate Attempt" onPress={handleDuplicate} disabled={saving} testID="manual-duplicate-button" accessibilityLabel="manual-duplicate-button" />
             ) : (
-              <PrimaryButton label="Authoritative Check-In" onPress={handleCheckIn} disabled={saving || !canCheckInState.allowed} />
+              <PrimaryButton label="Authoritative Check-In" onPress={handleCheckIn} disabled={saving || !canCheckInState.allowed} testID="manual-checkin-button" accessibilityLabel="manual-checkin-button" />
             )}
             {!registration.checkedIn && !canCheckInState.allowed ? <Banner tone="warning">{canCheckInState.reason}</Banner> : null}
           </Card>

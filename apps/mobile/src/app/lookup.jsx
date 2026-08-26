@@ -96,7 +96,15 @@ export default function LookupScreen() {
         {online ? null : <Banner tone="warning">Lookup remains usable offline only while the current registration list is cached. Check-in stays blocked.</Banner>}
 
         <Card>
-          <Field label="Search" value={queryText} onChangeText={setQueryText} placeholder="Search guest, buyer, or ticket code" autoCapitalize="none" />
+          <Field
+            label="Search"
+            value={queryText}
+            onChangeText={setQueryText}
+            placeholder="Search guest, buyer, or ticket code"
+            autoCapitalize="none"
+            testID="lookup-search-input"
+            accessibilityLabel="lookup-search-input"
+          />
         </Card>
 
         {actionError ? <Banner tone="danger">{actionError}</Banner> : null}

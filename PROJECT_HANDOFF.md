@@ -1,6 +1,6 @@
 # Gather & Savor Current Project Handoff
 
-Last updated: 2026-08-04.
+Last updated: 2026-08-26.
 
 ## Current State
 
@@ -49,3 +49,17 @@ That archive is release evidence, not the current project instruction source.
 - Do not deploy Firebase targets that were not intentionally changed.
 - Do not migrate or bulk-write real production records without explicit approval.
 - Do not silently treat missing or legacy values as explicit financial evidence.
+
+## Mobile And Cross-App Boundary
+
+- Gather & Savor mobile is `com.gathervibeshub.staff` in Firebase project `gathervibeshub`; it is not Couple Book and must not share package IDs, emulator state, fixtures, credentials, or deployment assumptions with Couple Book.
+- Android staff QA requires a dedicated clean GSV AVD with explicit device and AVD-name guard variables. The Couple Book `medium_phone` AVD is prohibited for this work.
+- Web and mobile emulator runs use separate, application-scoped ports and `CODEX_DEMO` fixtures. Never create synthetic writes in CPB or any other real event.
+- Provider integration source foundations may be present while OAuth consent, external registrations, secrets, and production webhooks remain owner-controlled. Do not report an integration as live until an authenticated end-to-end receipt is evidenced.
+- Registration payments remain internal ledger/reconciliation records. No online payment gateway is in scope.
+
+## Current Release Evidence
+
+- Dedicated Android E2E: passed all 11 custom ADB/UIAutomator flows on the clean GSV AVD on 2026-08-26.
+- Root product QA: passed on 2026-08-26, including lint, emulator-backed tests, browser smoke, production build, audit, route/docs checks, and advisory React Doctor.
+- Production deployment, authenticated owner verification, live provider OAuth/webhook verification, and merge/push are not claimed by this handoff unless separately evidenced below.

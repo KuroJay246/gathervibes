@@ -2,6 +2,8 @@ import crypto from 'node:crypto'
 
 const REPLAY_WINDOW_MS = 5 * 60 * 1000
 const MAX_BODY_BYTES = 128 * 1024
+const RATE_LIMIT_WINDOW_MS = 60 * 1000
+const RATE_LIMIT_MAX = 10
 const ALLOWED_TARGET_TYPES = new Set([
   'guest-registration',
   'baker-application',
@@ -82,7 +84,33 @@ function timingSafeEqual(a = '', b = '') {
   return left.length === right.length && crypto.timingSafeEqual(left, right)
 }
 
-async function enqueueReviewedInboxResponse({ db, payload, idempotencyKey, receivedBy = 'google-forms-function' }) {
+export function createRateLimiter({ limit = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW_MS } = {}) {
+  const windows = new Map()
+  return {
+    consume(key, now = Date.now()) {
+      const current = (windows.get(key) || []).filter((timestamp) => timestamp > now - windowMs)
+      if (current.length >= limit) {
+        return { ok: false, retryAfterMs: current[0] + windowMs - now }
+      }
+      current.push(now)
+      windows.set(key, current)
+      return { ok: true, retryAfterMs: 0 }
+    },
+  }
+}
+
+export function sanitizePayloadForLogging(payload = {}) {
+  return {
+    connectionId: payload.connectionId || '',
+    eventId: payload.eventId || '',
+    formId: payload.formId || '',
+    responseId: payload.responseId || '',
+    receivedAt: payload.receivedAt || '',
+    answerCount: Array.isArray(payload.answers) ? payload.answers.length : 0,
+  }
+}
+
+export async function enqueueReviewedInboxResponse({ db, payload, idempotencyKey, receivedBy = 'google-forms-function' }) {
   const responseRef = db.collection('formResponses').doc(idempotencyKey.replaceAll('/', '_').slice(0, 160))
   await db.runTransaction(async (transaction) => {
     const existing = await transaction.get(responseRef)
@@ -97,4 +125,53 @@ async function enqueueReviewedInboxResponse({ db, payload, idempotencyKey, recei
       originalResponseSnapshot: payload,
     })
   })
+}
+
+export async function handleGoogleFormsReceiver({
+  request,
+  secret,
+  allowedConnections = new Map(),
+  rateLimiter = createRateLimiter(),
+  db,
+  log = () => {},
+}) {
+  const rateLimitKey = request?.ip || headerValue(request?.headers || {}, 'x-forwarded-for') || 'unknown'
+  const limitResult = rateLimiter.consume(rateLimitKey)
+  if (!limitResult.ok) {
+    return {
+      ok: false,
+      status: 429,
+      error: `rate limit exceeded; retry in ${limitResult.retryAfterMs}ms`,
+    }
+  }
+
+  const verified = verifySignedRequest({
+    method: request?.method,
+    headers: request?.headers,
+    rawBody: request?.rawBody,
+    secret,
+    allowedConnections,
+  })
+  if (!verified.ok) {
+    log({ level: 'warn', error: verified.error })
+    return verified
+  }
+
+  await enqueueReviewedInboxResponse({
+    db,
+    payload: verified.payload,
+    idempotencyKey: verified.idempotencyKey,
+  })
+
+  log({
+    level: 'info',
+    payload: sanitizePayloadForLogging(verified.payload),
+    idempotencyKey: verified.idempotencyKey,
+  })
+
+  return {
+    ok: true,
+    status: 202,
+    payload: sanitizePayloadForLogging(verified.payload),
+  }
 }

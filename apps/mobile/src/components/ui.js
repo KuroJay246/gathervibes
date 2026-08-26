@@ -44,7 +44,16 @@ export function Metric({ label, value, detail }) {
   )
 }
 
-export function Field({ label, value, onChangeText, placeholder, secureTextEntry = false, autoCapitalize = 'sentences' }) {
+export function Field({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  secureTextEntry = false,
+  autoCapitalize = 'sentences',
+  testID,
+  accessibilityLabel,
+}) {
   return (
     <View style={styles.field}>
       <Text style={styles.fieldLabel}>{label}</Text>
@@ -56,22 +65,36 @@ export function Field({ label, value, onChangeText, placeholder, secureTextEntry
         secureTextEntry={secureTextEntry}
         autoCapitalize={autoCapitalize}
         style={styles.input}
+        testID={testID}
+        accessibilityLabel={accessibilityLabel || testID || label}
       />
     </View>
   )
 }
 
-export function PrimaryButton({ label, onPress, disabled = false }) {
+export function PrimaryButton({ label, onPress, disabled = false, testID, accessibilityLabel }) {
   return (
-    <Pressable disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.primaryButton, disabled ? styles.buttonDisabled : null, pressed && !disabled ? styles.buttonPressed : null]}>
+    <Pressable
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [styles.primaryButton, disabled ? styles.buttonDisabled : null, pressed && !disabled ? styles.buttonPressed : null]}
+      testID={testID}
+      accessibilityLabel={accessibilityLabel || testID || label}
+    >
       <Text style={styles.primaryButtonText}>{label}</Text>
     </Pressable>
   )
 }
 
-export function SecondaryButton({ label, onPress, disabled = false }) {
+export function SecondaryButton({ label, onPress, disabled = false, testID, accessibilityLabel }) {
   return (
-    <Pressable disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.secondaryButton, disabled ? styles.buttonDisabled : null, pressed && !disabled ? styles.buttonPressed : null]}>
+    <Pressable
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [styles.secondaryButton, disabled ? styles.buttonDisabled : null, pressed && !disabled ? styles.buttonPressed : null]}
+      testID={testID}
+      accessibilityLabel={accessibilityLabel || testID || label}
+    >
       <Text style={styles.secondaryButtonText}>{label}</Text>
     </Pressable>
   )

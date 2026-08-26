@@ -17,6 +17,16 @@ Read this file first for every Gather & Savor task, then read `PROJECT_HANDOFF.m
 - QR payload must remain `GSV:TICKET:{ticketCode}`.
 - `xlsx` must remain absent. `read-excel-file` remains the XLSX parser.
 
+## Two-App And Mobile Isolation Rules
+
+- Gather & Savor and Couple Book are separate applications, Firebase projects, package identifiers, data stores, and QA targets. Never infer one app's runtime, credentials, emulator data, or deployment state from the other.
+- Gather & Savor mobile uses package `com.gathervibeshub.staff`, deep-link scheme `gsvstaff`, and Firebase project `gathervibeshub`. Couple Book uses its own package, project, and emulator data.
+- Mobile Android QA must use a dedicated clean GSV AVD and explicit `GSV_ANDROID_DEVICE_ID` plus `GSV_ANDROID_AVD_NAME`. The Couple Book AVD (`medium_phone`) is not a valid GSV QA target.
+- Keep web and mobile emulator ports, project IDs, fixtures, and credentials scoped to the application under test. Do not stop or mutate another app's emulator or package to make a test pass.
+- Expo Development Build/CNG changes require generated-native review, a reproducible build, and platform-specific validation. iOS signing and physical-device verification remain owner actions when unavailable locally.
+- Firebase browser API keys and native Firebase configuration identifiers are client configuration, not private credentials; still apply provider/API restrictions and never commit service-account keys, private keys, tokens, cookies, or passwords.
+- Registration payments are ledger/reconciliation workflows only. Do not add an online payment gateway or conflate registration payment records with Couple Book private or patron-payment data.
+
 ## Required Startup Checks
 
 1. Confirm branch, HEAD, `origin/main`, and working-tree status.

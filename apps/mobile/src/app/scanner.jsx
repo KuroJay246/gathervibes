@@ -121,7 +121,7 @@ export default function ScannerScreen() {
             <Text style={{ color: '#5c554f', lineHeight: 20 }}>
               The app still supports manual entry. Re-enable camera access in system settings when you want QR scanning back.
             </Text>
-            <SecondaryButton label="Retry Permission" onPress={() => void requestPermission()} />
+            <SecondaryButton label="Retry Permission" onPress={() => void requestPermission()} testID="scanner-retry-permission-button" accessibilityLabel="scanner-retry-permission-button" />
           </Card>
         ) : (
           <Card>
@@ -141,12 +141,12 @@ export default function ScannerScreen() {
             <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2023' }}>{selectedRegistration.fullName || selectedRegistration.buyerName || 'Guest'}</Text>
             <Text style={{ color: '#5c554f' }}>{selectedRegistration.ticketCode || 'No ticket code'}</Text>
             {selectedRegistration.checkedIn ? (
-              <SecondaryButton label="Record Duplicate Attempt" onPress={handleDuplicate} disabled={saving} />
+              <SecondaryButton label="Record Duplicate Attempt" onPress={handleDuplicate} disabled={saving} testID="scanner-duplicate-button" accessibilityLabel="scanner-duplicate-button" />
             ) : (
-              <PrimaryButton label="Authoritative Check-In" onPress={handleCheckIn} disabled={saving || !checkInState.allowed} />
+              <PrimaryButton label="Authoritative Check-In" onPress={handleCheckIn} disabled={saving || !checkInState.allowed} testID="scanner-checkin-button" accessibilityLabel="scanner-checkin-button" />
             )}
             {!selectedRegistration.checkedIn && !checkInState.allowed ? <Banner tone="warning">{checkInState.reason}</Banner> : null}
-            <SecondaryButton label="Scan Next Guest" onPress={() => resetSelection()} disabled={saving} />
+            <SecondaryButton label="Scan Next Guest" onPress={() => resetSelection()} disabled={saving} testID="scanner-next-button" accessibilityLabel="scanner-next-button" />
           </Card>
         ) : (
           <Card tone="muted">

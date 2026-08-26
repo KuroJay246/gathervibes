@@ -41,8 +41,8 @@ export default function SettingsScreen() {
         <PrimaryButton label="Choose Another Assigned Event" onPress={async () => {
           await clearActiveEvent()
           router.replace('/events')
-        }} />
-        <SecondaryButton label="Sign Out" onPress={() => void signOut()} />
+        }} testID="settings-change-event-button" accessibilityLabel="settings-change-event-button" />
+        <SecondaryButton label="Sign Out" onPress={() => void signOut()} testID="settings-sign-out-button" accessibilityLabel="settings-sign-out-button" />
         {access?.protectedOwner ? <SecondaryButton label="Return to Event-Day Home" onPress={() => router.replace('/home')} /> : null}
       </Section>
     </Screen>

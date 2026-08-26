@@ -5,21 +5,27 @@ import { isProtectedOwnerUser } from '../config/protectedOwner'
 export const DEFAULT_INTEGRATIONS = {
   googleFormsReceiver: {
     name: 'Google Forms Receiver',
-    status: 'Packaged but Not Deployed',
+    status: 'Backend Foundation Ready',
     setupRequirements: 'Deploy the signed receiver backend, configure the form source, and pass a live intake test before automatic intake can be marked connected.',
-    connectionError: 'Receiver backend is not deployed/configured in production.',
+    connectionError: 'Receiver deployment and live form authorization are still required.',
   },
   googleSheets: {
     name: 'Google Sheets',
-    status: 'Manual CSV/Excel Workflow',
-    setupRequirements: 'Use downloaded CSV or Excel files in Import Center. No OAuth or live sync is configured.',
-    connectionError: '',
+    status: 'Authorization Required',
+    setupRequirements: 'Manual CSV/Excel import remains available. The backend Sheets OAuth and preview foundation is ready, but Google Cloud authorization is still required.',
+    connectionError: 'No authorized Google Sheets connection is configured.',
   },
   gmail: {
     name: 'Gmail',
-    status: 'Disconnected',
-    setupRequirements: 'A secure backend/OAuth flow is required before the app can send mail. Message Builder remains copy-only.',
-    connectionError: 'No secure Gmail connection is configured.',
+    status: 'Authorization Required',
+    setupRequirements: 'A secure backend/OAuth flow now exists in source, but Google Cloud authorization and mailbox consent are still required. Message Builder remains copy-only until connected.',
+    connectionError: 'No authorized Gmail connection is configured.',
+  },
+  outlook: {
+    name: 'Microsoft Outlook',
+    status: 'Authorization Required',
+    setupRequirements: 'A secure Microsoft Graph backend foundation now exists in source, but Entra tenant authorization and mailbox consent are still required.',
+    connectionError: 'No authorized Microsoft Outlook connection is configured.',
   },
   messageBuilder: {
     name: 'Message Builder',

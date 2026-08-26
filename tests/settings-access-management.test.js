@@ -59,8 +59,9 @@ test('staff and integration management preserve product boundaries', async () =>
   assert.match(staffService, /staffProfiles/)
   assert.match(staffService, /staffAssignments/)
   assert.match(staffService, /staffAssignmentHistory/)
-  assert.match(integrationService, /Packaged but Not Deployed/)
-  assert.match(integrationService, /Disconnected/)
+  assert.match(integrationService, /Backend Foundation Ready/)
+  assert.match(integrationService, /Authorization Required/)
+  assert.match(integrationService, /Microsoft Outlook/)
   assert.doesNotMatch(integrationService, /secret|token|password/i)
 })
 

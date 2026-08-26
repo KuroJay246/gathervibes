@@ -52,6 +52,8 @@ export default function SignInScreen() {
             onChangeText={setEmail}
             placeholder="approved.account@example.com"
             autoCapitalize="none"
+            testID="sign-in-email-input"
+            accessibilityLabel="sign-in-email-input"
           />
           <Field
             label="Password"
@@ -60,9 +62,17 @@ export default function SignInScreen() {
             placeholder="Password"
             secureTextEntry
             autoCapitalize="none"
+            testID="sign-in-password-input"
+            accessibilityLabel="sign-in-password-input"
           />
           {errorMessage ? <Banner tone="danger">{errorMessage}</Banner> : null}
-          <PrimaryButton label={loading ? 'Signing In…' : 'Sign In'} onPress={handleSignIn} disabled={loading || !email.trim() || !password} />
+          <PrimaryButton
+            label={loading ? 'Signing In…' : 'Sign In'}
+            onPress={handleSignIn}
+            disabled={loading || !email.trim() || !password}
+            testID="sign-in-submit-button"
+            accessibilityLabel="sign-in-submit-button"
+          />
         </Card>
 
         <Banner tone="info">
@@ -74,7 +84,7 @@ export default function SignInScreen() {
           <Text style={{ fontSize: 14, lineHeight: 20, color: '#5c554f' }}>
             It does not queue false offline check-ins, does not broaden access from device state, and does not send Gmail or Outlook messages.
           </Text>
-          <SecondaryButton label="Back to Start" onPress={() => router.replace('/')} />
+          <SecondaryButton label="Back to Start" onPress={() => router.replace('/')} testID="sign-in-back-button" accessibilityLabel="sign-in-back-button" />
         </Card>
       </Section>
     </Screen>

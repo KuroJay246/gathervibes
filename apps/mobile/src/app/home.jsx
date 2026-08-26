@@ -70,9 +70,9 @@ export default function HomeScreen() {
         <Card>
           <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2023' }}>Core event-day actions</Text>
           <View style={{ gap: 10 }}>
-            <PrimaryButton label="Guest Search" onPress={() => router.push('/lookup')} />
-            <PrimaryButton label="QR Scanner" onPress={() => router.push('/scanner')} />
-            <SecondaryButton label="Manual Ticket Code" onPress={() => router.push('/manual-entry')} />
+            <PrimaryButton label="Guest Search" onPress={() => router.push('/lookup')} testID="home-guest-search-button" accessibilityLabel="home-guest-search-button" />
+            <PrimaryButton label="QR Scanner" onPress={() => router.push('/scanner')} testID="home-qr-scanner-button" accessibilityLabel="home-qr-scanner-button" />
+            <SecondaryButton label="Manual Ticket Code" onPress={() => router.push('/manual-entry')} testID="home-manual-ticket-button" accessibilityLabel="home-manual-ticket-button" />
           </View>
         </Card>
 
@@ -83,7 +83,7 @@ export default function HomeScreen() {
             <SecondaryButton label="Operational Notes" onPress={() => router.push('/notes')} />
             <SecondaryButton label="Event Contacts" onPress={() => router.push('/contacts')} />
             <SecondaryButton label="Limited Reports" onPress={() => router.push('/reports')} />
-            <SecondaryButton label="Settings and Sign Out" onPress={() => router.push('/settings')} />
+            <SecondaryButton label="Settings and Sign Out" onPress={() => router.push('/settings')} testID="home-settings-button" accessibilityLabel="home-settings-button" />
           </View>
         </Card>
 
@@ -93,6 +93,8 @@ export default function HomeScreen() {
             await clearActiveEvent()
             router.replace('/events')
           }}
+          testID="home-change-event-button"
+          accessibilityLabel="home-change-event-button"
         />
       </Section>
     </Screen>

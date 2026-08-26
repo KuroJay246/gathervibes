@@ -18,6 +18,8 @@ Private internal event-operations system for Gather & Savor organizers.
 - Message Builder is copy-only. It does not send email, WhatsApp, or AI-generated messages.
 - `xlsx` must remain absent. `read-excel-file` is the XLSX parser.
 
+Gather & Savor is isolated from the separate Couple Book application. Keep Firebase projects, package IDs, emulator ports, fixtures, credentials, private media, and deployment targets separate. Gather mobile is `com.gathervibeshub.staff` and its Android QA must use a dedicated clean AVD with explicit device/AVD guard variables. Provider integrations are not live merely because source foundations exist, and registration payments remain internal ledger/reconciliation workflows without an online payment gateway.
+
 ## Start Here
 
 Read these first:

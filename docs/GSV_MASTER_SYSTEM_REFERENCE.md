@@ -1,6 +1,6 @@
 # Gather & Savor Master System Reference
 
-Last updated: 2026-08-20.
+Last updated: 2026-08-26.
 
 This is the primary engineering, debugging, QA, and release reference for the Gather & Savor Event Hub. It describes the current product, source layout, route map, access model, Firestore shape, safety boundaries, and first files to inspect when a feature breaks. Historical phase reports under `docs/archive/` are evidence only and are not current operating instructions.
 
@@ -9,6 +9,8 @@ This is the primary engineering, debugging, QA, and release reference for the Ga
 Gather & Savor Event Hub is a private internal event-operations web application for approved organizers and event-scoped helpers. It supports event setup, guest and registration work, ticketing, check-in, event-level operations, reporting, imports, documents, contacts, run of show, resources, and copy-only messaging.
 
 It is not a public guest portal, public vendor portal, payment gateway, CRM, public marketing site, native app, or automatic communications sender.
+
+Gather & Savor has a separate staff mobile application. The mobile package is `com.gathervibeshub.staff`, the deep-link scheme is `gsvstaff`, and its Firebase/emulator configuration is independent from Couple Book. Registration payments are internal payment-ledger and reconciliation records; an online payment gateway is not part of this product boundary.
 
 Current production:
 

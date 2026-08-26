@@ -5,6 +5,21 @@ import { defaultRouteForAccess, roleLabel } from '@gsv/contracts/accessRoles'
 import { verifyWorkspaceAccess } from '@/services/access'
 import { AuthContext } from '@/providers/AuthContext'
 
+function normalizeAuthErrorCode(error, fallbackCode) {
+  const message = String(error?.message || '').toLowerCase()
+  const nativeCode = String(error?.nativeErrorCode || '').toLowerCase()
+  const code = String(error?.code || '').toLowerCase()
+  const signal = `${code} ${nativeCode} ${message}`
+
+  if (signal.includes('network')) return 'auth/network-request-failed'
+  if (signal.includes('invalid-credential') || signal.includes('wrong-password') || signal.includes('user-not-found')) {
+    return 'auth/invalid-credential'
+  }
+  if (signal.includes('invalid-email')) return 'auth/invalid-email'
+
+  return error?.code || fallbackCode
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [accessControl, setAccessControl] = useState(null)
@@ -68,7 +83,8 @@ export function AuthProvider({ children }) {
         setStaffAssignments([])
         setAssignedEvents([])
         setIsAuthorized(false)
-        setAuthError(error?.code || 'auth/access-check-failed')
+        console.error('GSV_MOBILE_ACCESS_CHECK_FAILED', error)
+        setAuthError(normalizeAuthErrorCode(error, 'auth/access-check-failed'))
         await firebaseSignOut(auth).catch(() => {})
       } finally {
         setLoading(false)
@@ -98,7 +114,10 @@ export function AuthProvider({ children }) {
         await signInWithEmailAndPassword(auth, String(email || '').trim(), password)
       } catch (error) {
         setLoading(false)
-        setAuthError(error?.code || 'auth/sign-in-failed')
+        console.error('GSV_MOBILE_SIGN_IN_FAILED', error)
+        const normalizedCode = normalizeAuthErrorCode(error, 'auth/sign-in-failed')
+        setAuthError(normalizedCode)
+        if (error && !error.code) error.code = normalizedCode
         throw error
       }
     },
