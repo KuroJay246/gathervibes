@@ -77,6 +77,8 @@ npm run doctor:json
 
 Deploy Hosting only for application-source changes that require a new web build:
 
+The 2026-08-26 web production completion pass deployed Hosting only and live-verified the security headers. See `output/web-production-completion/production-readiness-ledger.md` for the current release decision and owner-controlled actions. Do not infer that App Check enforcement, provider OAuth/webhooks, monitoring, backups, or authenticated owner acceptance are complete from the Hosting deployment.
+
 ```bash
 npx firebase-tools deploy --only hosting --project gathervibeshub
 ```

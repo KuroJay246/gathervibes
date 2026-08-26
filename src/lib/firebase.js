@@ -1,4 +1,5 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
+import { ReCaptchaV3Provider, initializeAppCheck } from 'firebase/app-check'
 import { connectAuthEmulator, getAuth } from 'firebase/auth'
 import { connectFirestoreEmulator, getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 
@@ -36,6 +37,41 @@ const app = isFirebaseConfigured ? (getApps().length ? getApp() : initializeApp(
 export const auth = app ? getAuth(app) : null
 
 const useFirebaseEmulators = import.meta.env.VITE_FIREBASE_USE_EMULATORS === 'true'
+const appCheckSiteKey = String(import.meta.env.VITE_FIREBASE_APP_CHECK_SITE_KEY || '').trim()
+const appCheckDebugToken = String(import.meta.env.VITE_FIREBASE_APP_CHECK_DEBUG_TOKEN || '').trim()
+
+const runtimeSecurityState = {
+  appCheck: {
+    mode: useFirebaseEmulators ? 'emulator-disabled' : import.meta.env.MODE === 'test' ? 'test-disabled' : 'not-configured',
+    provider: 'none',
+    siteKeyConfigured: Boolean(appCheckSiteKey),
+    initialized: false,
+    debugTokenConfigured: Boolean(appCheckDebugToken),
+    error: '',
+  },
+}
+
+function publishRuntimeSecurityState() {
+  if (typeof window !== 'undefined') {
+    window.__GSV_RUNTIME_SECURITY__ = {
+      ...runtimeSecurityState,
+      appCheck: { ...runtimeSecurityState.appCheck },
+    }
+  }
+  return runtimeSecurityState
+}
+
+function setAppCheckState(nextState) {
+  runtimeSecurityState.appCheck = {
+    ...runtimeSecurityState.appCheck,
+    ...nextState,
+  }
+  publishRuntimeSecurityState()
+}
+
+export function readRuntimeSecurityState() {
+  return publishRuntimeSecurityState()
+}
 
 export const db = app ? (
   useFirebaseEmulators
@@ -58,5 +94,59 @@ if (useFirebaseEmulators && typeof window !== 'undefined') {
   if (db && !window.__GSV_FIREBASE_EMULATORS__.firestore) {
     connectFirestoreEmulator(db, '127.0.0.1', 8080)
     window.__GSV_FIREBASE_EMULATORS__.firestore = true
+  }
+}
+
+if (typeof window !== 'undefined') {
+  publishRuntimeSecurityState()
+}
+
+if (app && typeof window !== 'undefined') {
+  if (useFirebaseEmulators) {
+    setAppCheckState({
+      mode: 'emulator-disabled',
+      provider: 'none',
+      initialized: false,
+      error: '',
+    })
+  } else if (import.meta.env.MODE === 'test') {
+    setAppCheckState({
+      mode: 'test-disabled',
+      provider: 'none',
+      initialized: false,
+      error: '',
+    })
+  } else if (!appCheckSiteKey) {
+    setAppCheckState({
+      mode: 'not-configured',
+      provider: 'none',
+      initialized: false,
+      error: '',
+    })
+  } else {
+    try {
+      if (appCheckDebugToken) {
+        window.FIREBASE_APPCHECK_DEBUG_TOKEN = appCheckDebugToken
+      }
+
+      initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(appCheckSiteKey),
+        isTokenAutoRefreshEnabled: true,
+      })
+
+      setAppCheckState({
+        mode: 'recaptcha-v3',
+        provider: 'recaptcha-v3',
+        initialized: true,
+        error: '',
+      })
+    } catch (error) {
+      setAppCheckState({
+        mode: 'initialization-failed',
+        provider: 'recaptcha-v3',
+        initialized: false,
+        error: error instanceof Error ? error.message : 'App Check initialization failed.',
+      })
+    }
   }
 }

@@ -432,6 +432,9 @@ git status --short
 Deployment rules:
 
 - Hosting-only command: `npx firebase-tools deploy --only hosting --project gathervibeshub`.
+- On 2026-08-26 the web build was deployed with Hosting-only scope and live-verified at `https://gathervibeshub.web.app`. The deployed CSP explicitly allows only the Firebase Auth/Firestore/Installations, Google/reCAPTCHA, and optional Sentry origins required by the client. No Firestore rules, indexes, functions, storage, or Auth configuration was deployed in that operation.
+- The post-deployment Mozilla HTTP Observatory result was A+ / 115 with 10 passed and 0 failed checks; retain the raw capture under `output/web-production-completion/security/observatory-after.json`.
+- Web App Check initialization is supported by `src/lib/firebase.js` through `VITE_FIREBASE_APP_CHECK_SITE_KEY`; production enforcement and the site-key registration remain owner actions and must be verified in Firebase Console before claiming App Check protection.
 - Deploy Firestore rules only when `firestore.rules` intentionally changes and rules tests pass.
 - Deploy Firestore indexes only when `firestore.indexes.json` intentionally changes.
 - Do not deploy Functions, Storage, or Auth configuration from this repository unless a future scope explicitly adds that target.

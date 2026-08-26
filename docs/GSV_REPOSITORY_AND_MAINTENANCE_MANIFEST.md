@@ -188,6 +188,8 @@ Active docs must not present historical facts as current instructions. Archive d
 
 Use Hosting-only deployment for app-source changes:
 
+The current web deployment evidence is recorded in `output/web-production-completion/`, including before/after response headers, production login evidence, local authenticated visual evidence, the Android preservation screenshot, and the readiness ledger. The ledger is authoritative for the distinction between implemented code, deployed behavior, local verification, and owner-controlled production actions.
+
 ```bash
 npx firebase-tools deploy --only hosting --project gathervibeshub
 ```

@@ -3,7 +3,7 @@ import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react'
 import { collection, doc, getDoc, getDocs, limit, query, where } from 'firebase/firestore'
 import { useAuth } from '../auth/useAuth'
 import { useActiveEvent } from '../events/useActiveEvent'
-import { db, firebaseProjectId, isFirebaseConfigured } from '../lib/firebase'
+import { db, firebaseProjectId, isFirebaseConfigured, readRuntimeSecurityState } from '../lib/firebase'
 import { buildRuntimeHealthItems, healthTone } from '../utils/runtimeHealth'
 import { isProtectedOwnerUser } from '../config/protectedOwner'
 
@@ -26,6 +26,7 @@ export function SystemHealthPanel({ compact = false }) {
   const [eventsStatus, setEventsStatus] = useState('warn')
   const [registrationsStatus, setRegistrationsStatus] = useState('warn')
   const [auditStatus, setAuditStatus] = useState('warn')
+  const appCheckStatus = readRuntimeSecurityState().appCheck
 
   useEffect(() => {
     let active = true
@@ -92,11 +93,12 @@ export function SystemHealthPanel({ compact = false }) {
       eventsStatus,
       registrationsStatus,
       auditStatus,
+      appCheckStatus,
       serviceWorkerSafe: true,
       activeEvent,
       buildCommit: import.meta.env.VITE_BUILD_COMMIT,
     }),
-    [activeEvent, allowlistApproved, auditStatus, currentRoleLabel, eventsStatus, registrationsStatus, user],
+    [activeEvent, allowlistApproved, appCheckStatus, auditStatus, currentRoleLabel, eventsStatus, registrationsStatus, user],
   )
 
   return (
