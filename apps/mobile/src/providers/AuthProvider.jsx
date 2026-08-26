@@ -44,6 +44,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     return onAuthStateChanged(auth, async (nextUser) => {
       if (!nextUser) {
+        setAuthError('')
         setUser(null)
         setAccessControl(null)
         setStaffProfile(null)
