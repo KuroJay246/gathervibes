@@ -108,7 +108,7 @@ test('Phase 23V guardrails preserve routes, QR payload, rules, indexes, access, 
   const shell = await readFile('src/layout/AppShell.jsx', 'utf8')
   const rules = await readFile('firestore.rules', 'utf8')
   const indexes = await readFile('firestore.indexes.json', 'utf8')
-  const access = await readFile('src/utils/accessRoles.js', 'utf8')
+  const access = await readFile('packages/contracts/src/accessRoles.js', 'utf8')
   const accessRequestContract = await readFile('src/services/accessRequestContract.js', 'utf8')
 
   for (const route of ['/dashboard', '/events', '/registrations', '/payments', '/tickets', '/check-in', '/operations', '/event-review', '/communications', '/imports', '/settings', '/qa']) {

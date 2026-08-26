@@ -252,10 +252,9 @@ test('Phase 17C-B3 AuthProvider checks staff path before not-approved error', as
   const loginPage = await readFile('src/pages/LoginPage.jsx', 'utf8')
   const rules = await readFile('firestore.rules', 'utf8')
 
-  assert.match(authProvider, /STAFF_ASSIGNMENT_EVENT_IDS = \[CODEX_DEMO_EVENT_ID\]/)
   assert.match(authProvider, /getDoc\(doc\(db, 'staffProfiles', nextUser\.uid\)\)/)
+  assert.match(authProvider, /staffProfile\?\.assignedEventIds/)
   assert.match(authProvider, /getDoc\(doc\(db, 'events', eventId, 'staffAssignments', nextUser\.uid\)\)/)
-  assert.doesNotMatch(authProvider, /collectionGroup\(db, 'staffAssignments'\)/)
   assert.match(authProvider, /access\.level !== 'staff' \|\| access\.assignedEventIds\.length === 0/)
   assert.match(authProvider, /workspaceDefaultRoute: sanitizeReturnPath\(requestedReturnPath/)
   assert.match(protectedRoute, /canViewRoute\(access, location\.pathname\)/)

@@ -138,6 +138,7 @@ async function seedScanner(env) {
       displayName: 'CODEX_TEST Scanner',
       status: 'active',
       defaultRole: 'scanner',
+      assignedEventIds: [eventId],
       createdAt: Timestamp.fromMillis(1710000000000),
       updatedAt: Timestamp.fromMillis(1710000000000),
       createdBy: adminEmail,
@@ -393,6 +394,62 @@ test('Firestore rules allow protected owner UID when email is absent from mutabl
 
     await assertSucceeds(getDoc(doc(db, 'settings', 'accessControl')))
     await assertSucceeds(batch.commit())
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules allow staff to read their own profile index and assignment for the indexed event', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    await seedScanner(env)
+    const db = env.authenticatedContext(scannerUid, { email: scannerEmail }).firestore()
+    const profile = await assertSucceeds(getDoc(doc(db, 'staffProfiles', scannerUid)))
+    const assignment = await assertSucceeds(getDoc(doc(db, 'events', eventId, 'staffAssignments', scannerUid)))
+
+    assert.deepEqual(profile.data().assignedEventIds, [eventId])
+    assert.equal(assignment.data().eventId, eventId)
+    assert.equal(assignment.data().uid, scannerUid)
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject staff self-edit of assignedEventIds on their own profile', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    await seedScanner(env)
+    const db = env.authenticatedContext(scannerUid, { email: scannerEmail }).firestore()
+
+    await assertFails(updateDoc(doc(db, 'staffProfiles', scannerUid), {
+      assignedEventIds: [eventId, 'another-event'],
+      updatedAt: serverTimestamp(),
+      updatedBy: scannerEmail,
+    }))
+  } finally {
+    await env.cleanup()
+  }
+})
+
+test('Firestore rules reject scanner self-creation of an event assignment', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    const db = env.authenticatedContext(scannerUid, { email: scannerEmail }).firestore()
+
+    await assertFails(setDoc(doc(db, 'events', eventId, 'staffAssignments', scannerUid), {
+      uid: scannerUid,
+      eventId,
+      email: scannerEmail,
+      role: 'scanner',
+      status: 'active',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      createdBy: scannerEmail,
+      updatedBy: scannerEmail,
+    }))
   } finally {
     await env.cleanup()
   }

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "9444350727",
+    "project_id": "gathervibeshub",
+    "storage_bucket": "gathervibeshub.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:9444350727:android:d6535bf2c78fdb741183a2",
+        "android_client_info": {
+          "package_name": "com.gathervibeshub.staff"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "9444350727-s49a9eb34pf4alh4nekqpu2ld30hgfeh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsVPnzPOZY3mIJFPfDpudXSCoXAqvE-ho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "9444350727-s49a9eb34pf4alh4nekqpu2ld30hgfeh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "9444350727-tecud7hbusnisksuen34s2qb33d7lhs0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gathervibeshub.staff"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

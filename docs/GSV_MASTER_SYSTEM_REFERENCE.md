@@ -1,6 +1,6 @@
 # Gather & Savor Master System Reference
 
-Last updated: 2026-08-20.
+Last updated: 2026-08-26.
 
 This is the primary engineering, debugging, QA, and release reference for the Gather & Savor Event Hub. It describes the current product, source layout, route map, access model, Firestore shape, safety boundaries, and first files to inspect when a feature breaks. Historical phase reports under `docs/archive/` are evidence only and are not current operating instructions.
 
@@ -9,6 +9,8 @@ This is the primary engineering, debugging, QA, and release reference for the Ga
 Gather & Savor Event Hub is a private internal event-operations web application for approved organizers and event-scoped helpers. It supports event setup, guest and registration work, ticketing, check-in, event-level operations, reporting, imports, documents, contacts, run of show, resources, and copy-only messaging.
 
 It is not a public guest portal, public vendor portal, payment gateway, CRM, public marketing site, native app, or automatic communications sender.
+
+Gather & Savor has a separate staff mobile application. The mobile package is `com.gathervibeshub.staff`, the deep-link scheme is `gsvstaff`, and its Firebase/emulator configuration is independent from Couple Book. Registration payments are internal payment-ledger and reconciliation records; an online payment gateway is not part of this product boundary.
 
 Current production:
 
@@ -152,6 +154,8 @@ Auth state is Firebase Auth based. Organizer approval is checked against `settin
 - Protected Owner diagnostic problem;
 - staff/scanner assignment problem;
 - Firestore rule denial after auth succeeded.
+
+Staff/scanner auth resolution reads the signed-in user's `staffProfiles/{uid}` document, uses its admin-maintained `assignedEventIds` index, then reads the user's matching active `events/{eventId}/staffAssignments/{uid}` documents before loading the corresponding event records.
 
 Do not fix permission-denied save errors by loosening broad rules. Verify the user UID, access document, target event, write shape, and audit-log batch first.
 
@@ -428,6 +432,9 @@ git status --short
 Deployment rules:
 
 - Hosting-only command: `npx firebase-tools deploy --only hosting --project gathervibeshub`.
+- On 2026-08-26 the web build was deployed with Hosting-only scope and live-verified at `https://gathervibeshub.web.app`. The deployed CSP explicitly allows only the Firebase Auth/Firestore/Installations, Google/reCAPTCHA, and optional Sentry origins required by the client. No Firestore rules, indexes, functions, storage, or Auth configuration was deployed in that operation.
+- The post-deployment Mozilla HTTP Observatory result was A+ / 115 with 10 passed and 0 failed checks; retain the raw capture under `output/web-production-completion/security/observatory-after.json`.
+- Web App Check initialization is supported by `src/lib/firebase.js` through `VITE_FIREBASE_APP_CHECK_SITE_KEY`; production enforcement and the site-key registration remain owner actions and must be verified in Firebase Console before claiming App Check protection.
 - Deploy Firestore rules only when `firestore.rules` intentionally changes and rules tests pass.
 - Deploy Firestore indexes only when `firestore.indexes.json` intentionally changes.
 - Do not deploy Functions, Storage, or Auth configuration from this repository unless a future scope explicitly adds that target.

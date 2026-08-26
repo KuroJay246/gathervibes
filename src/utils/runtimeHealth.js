@@ -13,10 +13,23 @@ export function buildRuntimeHealthItems({
   eventsStatus,
   registrationsStatus,
   auditStatus,
+  appCheckStatus,
   serviceWorkerSafe,
   activeEvent,
   buildCommit,
 }) {
+  const appCheckDetail = appCheckStatus?.mode === 'recaptcha-v3'
+    ? 'reCAPTCHA v3 App Check is initialized for web requests.'
+    : appCheckStatus?.mode === 'not-configured'
+      ? 'Web App Check site key is not configured in this build.'
+      : appCheckStatus?.mode === 'emulator-disabled'
+        ? 'App Check stays off in emulator mode.'
+        : appCheckStatus?.mode === 'test-disabled'
+          ? 'App Check stays off in test mode.'
+          : appCheckStatus?.mode === 'initialization-failed'
+            ? `Initialization failed: ${appCheckStatus?.error || 'unknown error'}.`
+            : 'App Check status is not available.'
+
   return [
     {
       label: 'Firebase config loaded',
@@ -27,6 +40,11 @@ export function buildRuntimeHealthItems({
       label: 'Firebase project',
       status: projectId === 'gathervibeshub' ? 'ok' : 'fail',
       detail: projectId || 'No project ID detected.',
+    },
+    {
+      label: 'Web App Check',
+      status: appCheckStatus?.mode === 'recaptcha-v3' ? 'ok' : appCheckStatus?.mode === 'initialization-failed' ? 'fail' : 'warn',
+      detail: appCheckDetail,
     },
     {
       label: 'Auth user signed in',

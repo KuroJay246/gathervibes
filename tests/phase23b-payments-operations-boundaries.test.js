@@ -17,7 +17,7 @@ import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
 test('Payments route is organizer-facing while scanner navigation remains isolated', async () => {
   const app = await readFile('src/App.jsx', 'utf8')
   const shell = await readFile('src/layout/AppShell.jsx', 'utf8')
-  const access = await readFile('src/utils/accessRoles.js', 'utf8')
+  const access = await readFile('packages/contracts/src/accessRoles.js', 'utf8')
   const paymentsPage = await readFile('src/pages/PaymentsPage.jsx', 'utf8')
 
   assert.match(app, /path="\/payments"/)

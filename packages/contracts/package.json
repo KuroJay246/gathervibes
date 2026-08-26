@@ -1,0 +1,14 @@
+{
+  "name": "@gsv/contracts",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.js",
+    "./accessRoles": "./src/accessRoles.js",
+    "./paymentStatus": "./src/paymentStatus.js",
+    "./protectedOwner": "./src/protectedOwner.js",
+    "./qrTicketUtils": "./src/qrTicketUtils.js",
+    "./ticketUtils": "./src/ticketUtils.js"
+  }
+}

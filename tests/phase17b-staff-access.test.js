@@ -71,6 +71,20 @@ test('Phase 17B scanner can view only scanner route and cannot access admin rout
   assert.equal(canCheckIn(access, 'event-2'), false)
 })
 
+test('Phase 17B multiple active assignments remain event-scoped and deduplicated', () => {
+  const access = staffAccess(scannerUser, 'scanner', [
+    { uid: scannerUser.uid, email: scannerUser.email, eventId: 'event-1', role: 'scanner', status: 'active' },
+    { uid: scannerUser.uid, email: scannerUser.email, eventId: 'event-2', role: 'scanner', status: 'active' },
+    { uid: scannerUser.uid, email: scannerUser.email, eventId: 'event-2', role: 'scanner', status: 'active' },
+  ])
+
+  assert.deepEqual(access.assignedEventIds, ['event-1', 'event-2'])
+  assert.equal(canCheckIn(access, 'event-1'), true)
+  assert.equal(canCheckIn(access, 'event-2'), true)
+  assert.equal(canCheckIn(access, 'event-3'), false)
+  assert.equal(canViewRoute(access, '/settings'), false)
+})
+
 test('Phase 17B viewer and operations helper remain limited', () => {
   const viewer = staffAccess(viewerUser, 'viewer', [
     { uid: viewerUser.uid, email: viewerUser.email, eventId: 'event-1', role: 'viewer', status: 'active' },
@@ -113,9 +127,10 @@ test('Phase 17B UI surfaces staff role gating and assigned-event fallback', asyn
   const operations = await readFile('src/pages/OperationsPage.jsx', 'utf8')
 
   assert.match(auth, /staffProfiles/)
-  assert.match(auth, /STAFF_ASSIGNMENT_EVENT_IDS/)
-  assert.match(auth, /doc\(db, 'events', eventId, 'staffAssignments', nextUser\.uid\)/)
-  assert.doesNotMatch(auth, /collectionGroup\(db, 'staffAssignments'\)/)
+  assert.match(auth, /staffProfile\?\.assignedEventIds/)
+  assert.match(auth, /getDoc\(doc\(db, 'events', eventId, 'staffAssignments', nextUser\.uid\)\)/)
+  assert.match(auth, /if \(!assignmentSnapshot\.exists\(\)\) continue/)
+  assert.match(auth, /assignment\?\.status !== 'active'/)
   assert.match(protectedRoute, /canViewRoute/)
   assert.match(shell, /canViewRoute\(access, to\)/)
   assert.match(app, /path="\/scanner"/)

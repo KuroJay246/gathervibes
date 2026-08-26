@@ -7,6 +7,7 @@ test('Phase 23P configures Sentry React SDK without hardcoding DSN or default PI
   const monitoring = await readFile('src/lib/monitoring.js', 'utf8')
   const main = await readFile('src/main.jsx', 'utf8')
   const boundary = await readFile('src/components/AppErrorBoundary.jsx', 'utf8')
+  const firebase = await readFile('src/lib/firebase.js', 'utf8')
   const envExample = await readFile('.env.example', 'utf8')
 
   assert.equal(packageJson.dependencies['@sentry/react'], '^10.67.0')
@@ -22,7 +23,14 @@ test('Phase 23P configures Sentry React SDK without hardcoding DSN or default PI
   assert.match(main, /initializeMonitoring\(\)/)
   assert.match(boundary, /captureAppError/)
   assert.match(envExample, /VITE_SENTRY_DSN=/)
+  assert.match(firebase, /initializeAppCheck/)
+  assert.match(firebase, /ReCaptchaV3Provider/)
+  assert.match(firebase, /VITE_FIREBASE_APP_CHECK_SITE_KEY/)
+  assert.match(firebase, /readRuntimeSecurityState/)
+  assert.match(envExample, /VITE_FIREBASE_APP_CHECK_SITE_KEY=/)
+  assert.match(envExample, /VITE_FIREBASE_APP_CHECK_DEBUG_TOKEN=/)
   assert.doesNotMatch(monitoring, /44e3ae7d455a969a3afdac0f246fc930/)
+  assert.doesNotMatch(firebase, /FIREBASE_APPCHECK_DEBUG_TOKEN=\w{10,}/)
 })
 
 test('Phase 23P adds permanent product QA and audit commands without production credentials', async () => {

@@ -63,7 +63,7 @@ test('simplification guardrails keep data model, QR, dependencies, and rules unt
   const packageJson = JSON.parse(await source('package.json'))
   const rules = await source('firestore.rules')
   const indexes = await source('firestore.indexes.json')
-  const access = await source('src/utils/accessRoles.js')
+  const access = await source('packages/contracts/src/accessRoles.js')
   const scanner = await source('src/pages/ScannerPage.jsx')
 
   assert.equal(qrPayloadForTicketCode('SIMPLIFY-001'), 'GSV:TICKET:SIMPLIFY-001')

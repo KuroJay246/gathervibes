@@ -31,14 +31,12 @@ import {
   resolveAccessRole,
   roleLabel,
 } from '../utils/accessRoles'
-import { CODEX_DEMO_EVENT_ID } from '../utils/demoEvent'
 
 const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({ prompt: 'select_account' })
 
 const FIREBASE_APP_HOST = 'gathervibeshub.firebaseapp.com'
 const WEB_APP_HOST = 'gathervibeshub.web.app'
-const STAFF_ASSIGNMENT_EVENT_IDS = [CODEX_DEMO_EVENT_ID]
 const AUTH_STORAGE_ERROR_CODE = 'auth/persistence-failed'
 
 let persistenceInitializationPromise = null
@@ -148,20 +146,30 @@ async function readStaffAccess(nextUser) {
   if (!profileSnapshot.exists()) return { staffProfile: null, staffAssignments: [], assignedEvents: [] }
 
   const staffProfile = profileSnapshot.data()
-  const staffAssignments = []
+  const assignmentsByEvent = new Map()
+  const assignedEventIds = Array.isArray(staffProfile?.assignedEventIds)
+    ? [...new Set(staffProfile.assignedEventIds.filter((eventId) => typeof eventId === 'string' && eventId))]
+    : []
   const assignedEvents = []
-
-  for (const eventId of STAFF_ASSIGNMENT_EVENT_IDS) {
+  for (const eventId of assignedEventIds) {
     try {
       const assignmentSnapshot = await getDoc(doc(db, 'events', eventId, 'staffAssignments', nextUser.uid))
       if (!assignmentSnapshot.exists()) continue
 
       const assignment = assignmentSnapshot.data()
-      if (assignment?.uid !== nextUser.uid || assignment?.status !== 'active' || assignment?.eventId !== eventId) continue
+      if (
+        assignment?.uid !== nextUser.uid
+        || assignment?.status !== 'active'
+        || assignment?.eventId !== eventId
+      ) {
+        continue
+      }
 
-      staffAssignments.push(assignment)
+      assignmentsByEvent.set(eventId, assignment)
       const eventSnapshot = await getDoc(doc(db, 'events', eventId))
-      if (eventSnapshot.exists()) assignedEvents.push(eventSnapshot.data())
+      if (!eventSnapshot.exists()) continue
+
+      assignedEvents.push(eventSnapshot.data())
     } catch (error) {
       if (import.meta.env.DEV) {
         console.warn('[Diagnostic] Staff assignment/event read failed:', {
@@ -173,7 +181,11 @@ async function readStaffAccess(nextUser) {
     }
   }
 
-  return { staffProfile, staffAssignments, assignedEvents }
+  return {
+    staffProfile,
+    staffAssignments: [...assignmentsByEvent.values()],
+    assignedEvents,
+  }
 }
 
 async function verifyWorkspaceAccess(nextUser) {

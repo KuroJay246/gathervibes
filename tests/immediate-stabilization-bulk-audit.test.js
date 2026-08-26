@@ -117,7 +117,7 @@ test('Immediate Stabilization services expose deterministic audit IDs and operat
 })
 
 test('Immediate Stabilization role wording no longer claims staff rules are unenforced', async () => {
-  const accessRoles = await readFile('src/utils/accessRoles.js', 'utf8')
+  const accessRoles = await readFile('packages/contracts/src/accessRoles.js', 'utf8')
 
   assert.doesNotMatch(accessRoles, /live staff access does not enforce scoped rules yet/)
   assert.match(accessRoles, /Route gates and Firestore rules keep writes narrow and event-scoped/)

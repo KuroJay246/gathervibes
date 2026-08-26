@@ -1,6 +1,6 @@
 # Gather & Savor Repository And Maintenance Manifest
 
-Last updated: 2026-08-20.
+Last updated: 2026-08-26.
 
 This manifest is the repository-maintenance source of truth for Gather & Savor Event Hub. Pair it with `docs/GSV_MASTER_SYSTEM_REFERENCE.md`: the Master Reference explains how the app works; this manifest explains where things live, what is generated, what is safe to clean, and how to keep repository knowledge current.
 
@@ -188,6 +188,8 @@ Active docs must not present historical facts as current instructions. Archive d
 
 Use Hosting-only deployment for app-source changes:
 
+The current web deployment evidence is recorded in `output/web-production-completion/`, including before/after response headers, production login evidence, local authenticated visual evidence, the Android preservation screenshot, and the readiness ledger. The ledger is authoritative for the distinction between implemented code, deployed behavior, local verification, and owner-controlled production actions.
+
 ```bash
 npx firebase-tools deploy --only hosting --project gathervibeshub
 ```
@@ -197,6 +199,10 @@ Do not deploy Firestore rules unless `firestore.rules` intentionally changed and
 Do not deploy Firestore indexes unless `firestore.indexes.json` intentionally changed.
 
 Do not deploy Functions, Storage, or Auth configuration from this repository unless a future approved scope adds that target.
+
+## Cross-App And Mobile Isolation
+
+Couple Book is a separate application and must not share Gather & Savor package identifiers, Firebase projects, emulator state, test fixtures, credentials, private media, or deployment conclusions. Gather mobile QA uses `com.gathervibeshub.staff` on a dedicated clean AVD and requires explicit device/AVD identity variables. Expo CNG/Development Build changes must be validated from the generated native project without assuming Couple Book's Android environment is compatible. Firebase client API keys are public configuration values, while service-account keys and other authentication material remain secret. Provider foundations are source-only until authenticated external delivery is verified.
 
 ## Validation Checklist
 

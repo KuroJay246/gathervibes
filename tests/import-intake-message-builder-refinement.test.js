@@ -122,7 +122,7 @@ test('Refinement guardrails preserve QR, dependencies, rules, indexes, and acces
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'))
   const rules = await readFile('firestore.rules', 'utf8')
   const indexes = await readFile('firestore.indexes.json', 'utf8')
-  const access = await readFile('src/utils/accessRoles.js', 'utf8')
+  const access = await readFile('packages/contracts/src/accessRoles.js', 'utf8')
 
   assert.equal(packageJson.dependencies.xlsx, undefined)
   assert.equal(packageJson.dependencies['read-excel-file'], '^9.2.0')

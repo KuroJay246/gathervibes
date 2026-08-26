@@ -260,7 +260,7 @@ service cloud.firestore {
         ])
         && data.keys().hasOnly([
           'uid', 'email', 'displayName', 'status', 'defaultRole',
-          'createdAt', 'updatedAt', 'createdBy', 'updatedBy'
+          'assignedEventIds', 'createdAt', 'updatedAt', 'createdBy', 'updatedBy'
         ])
         && data.uid == uid
         && data.uid is string
@@ -273,6 +273,7 @@ service cloud.firestore {
         && data.displayName.size() <= 120
         && data.status in ['active', 'inactive', 'revoked']
         && data.defaultRole in ['event-manager', 'scanner', 'viewer', 'operations-helper']
+        && (!('assignedEventIds' in data) || (data.assignedEventIds is list && data.assignedEventIds.size() <= 50))
         && data.createdAt is timestamp
         && data.updatedAt is timestamp
         && data.createdBy is string
@@ -1973,6 +1974,7 @@ service cloud.firestore {
           && request.auth.uid == uid
           && activeStaffProfile()
           && resource.data.uid == request.auth.uid
+          && resource.data.eventId == eventId
           && resource.data.status == 'active'
         );
       allow create: if isApprovedAdmin()
