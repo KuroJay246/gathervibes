@@ -258,6 +258,14 @@ async function waitForSelector(selector, timeoutMs = 15000) {
   return node
 }
 
+async function assertNoVisibleText(text, timeoutMs = 3000) {
+  const node = await findNode((candidate) => candidate.text === text || candidate['content-desc'] === text, timeoutMs)
+  if (node) {
+    await captureScreenshot(`unexpected-${text.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`)
+    throw new Error(`Unexpected visible text: ${text}`)
+  }
+}
+
 async function tapBySelector(selector, timeoutMs = 15000) {
   const node = await findNode((candidate) => selectorMatches(candidate, selector) && candidate.enabled !== 'false', timeoutMs)
   if (!node) {
@@ -612,6 +620,7 @@ async function main() {
   await waitForSelector({ accessibilityLabel: 'settings-sign-out-button' }, 15000)
   await tapBySelector({ accessibilityLabel: 'settings-sign-out-button' })
   await waitForSelector({ accessibilityLabel: 'sign-in-email-input' }, 15000)
+  await assertNoVisibleText('Sign-in failed.')
 
   await captureScreenshot('android-e2e-pass')
 

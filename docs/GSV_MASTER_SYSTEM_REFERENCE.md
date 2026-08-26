@@ -438,7 +438,7 @@ Deployment rules:
 - Owner-session closeout evidence on 2026-08-26 verified the live Protected Owner identity, CODEX_DEMO selection, Settings/Staff/Integrations surfaces, and a read-only System QA result of 84/84 checks without blocking failures. No production write was submitted.
 - Google Cloud API-key inspection found empty application restrictions for the Firebase Browser and Android auto-created keys. Treat both as an owner-controlled security action: restrict the browser key by approved HTTPS referrers, restrict the Android key by package and signing certificate, keep API targets minimal, and validate Auth/Firestore after the change.
 - The Firebase Console account was stopped at its mandatory MFA gate, so App Check registration/enforcement, billing settings, backup configuration, and custom monitoring policies remain unverified. Current billing status reports disabled; no custom Cloud Monitoring policies were listed.
-- The existing Android E2E pass exposed a stale sign-in error banner after sign-out. `apps/mobile/src/providers/AuthProvider.jsx` now clears `authError` when the auth listener receives no user; native rebuild/visual verification remains intentionally deferred.
+- The Android sign-out path now clears both provider and local sign-in errors. A release-like APK was rebuilt from current source on 2026-08-26, and the guarded `gsv_api36_staff` emulator regression passed 11/11 including explicit stale-error absence.
 - Deploy Firestore rules only when `firestore.rules` intentionally changes and rules tests pass.
 - Deploy Firestore indexes only when `firestore.indexes.json` intentionally changes.
 - Do not deploy Functions, Storage, or Auth configuration from this repository unless a future scope explicitly adds that target.

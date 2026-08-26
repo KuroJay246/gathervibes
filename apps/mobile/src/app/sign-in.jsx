@@ -25,7 +25,10 @@ export default function SignInScreen() {
   const [password, setPassword] = useState('')
   const [localError, setLocalError] = useState('')
 
-  const errorMessage = useMemo(() => localError || authMessage(authError), [authError, localError])
+  const errorMessage = useMemo(() => {
+    if (!authError && !isAuthorized) return ''
+    return localError || authMessage(authError)
+  }, [authError, isAuthorized, localError])
 
   if (authInitialized && isAuthorized) return <Redirect href={defaultRoute === '/scanner' ? '/scanner' : '/home'} />
 

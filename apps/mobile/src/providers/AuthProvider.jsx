@@ -124,6 +124,7 @@ export function AuthProvider({ children }) {
     },
     signOut: async () => {
       setLoading(true)
+      setAuthError('')
       try {
         await firebaseSignOut(auth)
       } finally {

@@ -16,7 +16,7 @@ Read this file first for every Gather & Savor task, then read `PROJECT_HANDOFF.m
 - CPB is a normal completed real event. It is not a synthetic QA target and must not receive synthetic writes.
 - QR payload must remain `GSV:TICKET:{ticketCode}`.
 - `xlsx` must remain absent. `read-excel-file` remains the XLSX parser.
-- Web App Check is source-configured behind `VITE_FIREBASE_APP_CHECK_SITE_KEY` but is not active in the deployed build until the owner registers the web app and enforces it in Firebase Console. Native mobile App Check is not configured in the current Expo package.
+- Web App Check is source-configured behind `VITE_FIREBASE_APP_CHECK_SITE_KEY` but is not active in the deployed build until the owner registers the web app and enforces it in Firebase Console. Native mobile App Check is not configured in the current Expo package. The rebuilt Android release-like APK and guarded 11-flow emulator regression are current evidence; console MFA, key restrictions, App Check registration/enforcement, and live monitoring remain owner-controlled.
 - Google Cloud read-only inspection on 2026-08-26 found the Firebase Browser and Android auto-created keys without application restrictions. Do not change them blindly: add the approved web referrers and Android package/signing restrictions only after the owner confirms the allowed API targets and validates Auth/Firestore.
 
 ## Two-App And Mobile Isolation Rules
