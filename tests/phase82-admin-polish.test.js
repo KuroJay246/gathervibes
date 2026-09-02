@@ -72,14 +72,16 @@ test('Import Center exposes editable preview, bulk actions, and ticket handling 
 
 test('Registrations page has count bars and current-event bulk actions', async () => {
   const page = await readFile('src/pages/RegistrationsPage.jsx', 'utf8')
+  const filters = await readFile('src/features/registrations/contracts/registrationFilters.js', 'utf8')
+  const registrationModel = await readFile('src/features/registrations/readModels/registrationListModel.js', 'utf8')
   const service = await readFile('src/services/registrationService.js', 'utf8')
 
   assert.match(page, /Select all visible registrations/)
   assert.match(page, /Select all filtered registrations/)
   assert.match(page, /Delete selected/)
-  assert.match(page, /Door/)
-  assert.match(page, /Missing Ticket Code/)
-  assert.match(page, /Selected Registrations/)
+  assert.match(filters, /Door/)
+  assert.match(registrationModel, /Missing Ticket Code/)
+  assert.match(registrationModel, /Selected Registrations/)
   assert.match(service, /registration\.eventId === eventId/)
   assert.match(service, /bulkDeleteRegistrations/)
   assert.match(service, /registration\.delete/)

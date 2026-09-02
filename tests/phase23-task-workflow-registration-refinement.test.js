@@ -105,6 +105,7 @@ test('Phase 23 Firestore rules define scoped task documents and task audit actio
 test('Phase 23 registration refinement exposes supported source ticket and attendance filters without formula changes', async () => {
   const filters = await readFile('src/components/registrations/RegistrationFilters.jsx', 'utf8')
   const page = await readFile('src/pages/RegistrationsPage.jsx', 'utf8')
+  const registrationModel = await readFile('src/features/registrations/readModels/registrationListModel.js', 'utf8')
   const card = await readFile('src/components/registrations/RegistrationCard.jsx', 'utf8')
   const form = await readFile('src/components/registrations/RegistrationFormModal.jsx', 'utf8')
 
@@ -112,7 +113,7 @@ test('Phase 23 registration refinement exposes supported source ticket and atten
   assert.match(filters, /Ticket state filter/)
   assert.match(filters, /Attendance state filter/)
   assert.match(page, /sourceLabel/)
-  assert.match(page, /deriveAttendanceRecordType/)
+  assert.match(registrationModel, /deriveAttendanceRecordType/)
   assert.match(card, /Record Source/)
   assert.match(form, /Registration and guest identity/)
   assert.match(form, /Registration payment fields/)

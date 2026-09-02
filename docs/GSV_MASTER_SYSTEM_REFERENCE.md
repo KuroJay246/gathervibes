@@ -4,6 +4,8 @@ Last updated: 2026-08-26.
 
 This is the primary engineering, debugging, QA, and release reference for the Gather & Savor Event Hub. It describes the current product, source layout, route map, access model, Firestore shape, safety boundaries, and first files to inspect when a feature breaks. Historical phase reports under `docs/archive/` are evidence only and are not current operating instructions.
 
+Roadmap 7-20 modernization status as of 2026-09-02: feature-owned contracts and pure read models now live under `src/features/` for Registrations, Dashboard, Check-In, Operations, and Imports. The largest page modules should keep subscriptions, actions, and rendering in the page while derived state, filters, queue models, summaries, and release limits move into these feature modules with focused tests.
+
 ## 1. Product Definition
 
 Gather & Savor Event Hub is a private internal event-operations web application for approved organizers and event-scoped helpers. It supports event setup, guest and registration work, ticketing, check-in, event-level operations, reporting, imports, documents, contacts, run of show, resources, and copy-only messaging.

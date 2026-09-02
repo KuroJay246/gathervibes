@@ -53,6 +53,7 @@ test('Phase 23M Overview, Payments, and Reports finance totals align', () => {
 
 test('Phase 23M source uses aligned finance concepts across Overview, Payments, and Reports', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
+  const dashboardModel = await readFile('src/features/dashboard/readModels/dashboardOverviewModel.js', 'utf8')
   const payments = await readFile('src/pages/PaymentsPage.jsx', 'utf8')
   const reports = await readFile('src/pages/EventReviewPage.jsx', 'utf8')
 
@@ -61,7 +62,8 @@ test('Phase 23M source uses aligned finance concepts across Overview, Payments, 
   assert.match(dashboard, /Outstanding registration balance/)
   assert.match(dashboard, /Operations commitments remain separate from registration payments/)
   assert.doesNotMatch(dashboard, /Planning view, not final profit|Projected cash position/)
-  assert.match(dashboard, /buildFinanceSummary\(registrations, selectedEvent\)/)
+  assert.match(dashboard, /buildDashboardOverviewModel/)
+  assert.match(dashboardModel, /buildFinanceSummary\(registrations, event\)/)
   assert.match(dashboard, /formatCurrency\(financeSummary\.totalCollected, financeSummary\.currency\)/)
   assert.doesNotMatch(dashboard, /defaultTicketPriceForEvent|ticketPrice \* metrics|metrics\.totalPersons \*/)
 

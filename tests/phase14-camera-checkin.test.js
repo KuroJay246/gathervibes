@@ -21,10 +21,12 @@ test('CSV injection prevention: sanitises formula-starting values', () => {
 })
 
 test('RegistrationsPage includes Door Paid and To Pay at Door tabs', async () => {
-  const src = await readFile('src/pages/RegistrationsPage.jsx', 'utf8')
-  assert.match(src, /Door Paid/)
-  assert.match(src, /To Pay at Door/)
-  assert.match(src, /'door-list'/)
+  const page = await readFile('src/pages/RegistrationsPage.jsx', 'utf8')
+  const filters = await readFile('src/features/registrations/contracts/registrationFilters.js', 'utf8')
+  assert.match(page, /REGISTRATION_TABS/)
+  assert.match(filters, /Door Paid/)
+  assert.match(filters, /To Pay at Door/)
+  assert.match(filters, /'door-list'/)
 })
 
 test('QA page includes empty allowlist check', async () => {
@@ -173,7 +175,7 @@ test('CheckInPage includes check-in timestamp on undo confirmation modal', async
 })
 
 test('CheckInPage search cap is raised to 20', async () => {
-  const src = await readFile('src/pages/CheckInPage.jsx', 'utf8')
+  const src = await readFile('src/features/checkin/readModels/checkInQueueModel.js', 'utf8')
   assert.match(src, /slice\(0, 20\)/)
   assert.doesNotMatch(src, /slice\(0, 8\)/)
 })

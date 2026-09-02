@@ -51,6 +51,7 @@ test('shared visual system tokens define calm event-neutral shell foundations', 
 
 test('Overview uses supported event metrics, attention, quick actions, and safe recent activity', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
+  const dashboardModel = await readFile('src/features/dashboard/readModels/dashboardOverviewModel.js', 'utf8')
 
   for (const label of [
     'Registration records',
@@ -69,7 +70,8 @@ test('Overview uses supported event metrics, attention, quick actions, and safe 
     assert.match(dashboard, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
 
-  assert.match(dashboard, /buildRecentActivity/)
+  assert.match(dashboard, /buildDashboardOverviewModel/)
+  assert.match(dashboardModel, /buildRecentActivity/)
   assert.match(dashboard, /Registration payments only/)
   assert.match(dashboard, /Event-level ledger only/)
   assert.match(dashboard, /canViewRoute\(access, action\.to\)/)

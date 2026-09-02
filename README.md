@@ -88,3 +88,5 @@ Do not deploy Firestore Rules, indexes, Functions, Storage, or Auth configuratio
 ## Permanent Engineering Standard
 
 When changing persistent data behavior, support existing legitimate records. Do not implement only for newly created demo records. Check old records, import paths, reports, rules, services, audit logs, and UI workflows for compatibility before calling a change complete.
+
+Roadmap 7-20 modernization is ongoing. Current feature-owned read models live under `src/features/` for Registrations, Dashboard, Check-In, Operations, and Imports. Import Center production guardrails currently limit files to 2 MB, previews to 1,000 rows, and confirmed save batches to 500 rows.

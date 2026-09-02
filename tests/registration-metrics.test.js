@@ -68,8 +68,10 @@ test('persons attending normalization defaults blanks and blocks invalid imports
 test('Dashboard and Check-In use shared count wording and helpers', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
   const checkIn = await readFile('src/pages/CheckInPage.jsx', 'utf8')
+  const dashboardModel = await readFile('src/features/dashboard/readModels/dashboardOverviewModel.js', 'utf8')
 
-  assert.match(dashboard, /buildRegistrationMetrics/)
+  assert.match(dashboard, /buildDashboardOverviewModel/)
+  assert.match(dashboardModel, /buildRegistrationMetrics/)
   assert.match(checkIn, /formatRegistrationGuestSummary/)
   assert.match(dashboard, /Registration records/)
   assert.match(dashboard, /Guests/)

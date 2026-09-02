@@ -1,6 +1,6 @@
 # Gather & Savor Current Project Handoff
 
-Last updated: 2026-08-26.
+Last updated: 2026-09-02.
 
 ## Current State
 
@@ -74,3 +74,4 @@ That archive is release evidence, not the current project instruction source.
 - The Android owner-closeout run exposed a stale sign-in error banner that survived sign-out. The fix now clears provider and local sign-in errors on signed-out state; the release-like APK was rebuilt from current source and the guarded emulator regression passed 11/11 with an explicit stale-error assertion.
 - Current Android native signing remains a release boundary: `apps/mobile/android/app/build.gradle` still maps the `release` build type to the debug keystore, so the active SHA-1/SHA-256 for both current debug and release-like local APKs are the Android debug certificate. Do not present this as final production signing.
 - Final closeout PDF: `output/web-production-completion/reports/GSV_Final_Production_Closeout_and_Owner_Acceptance_Report.pdf`.
+- Roadmap 7-20 modernization is in progress, not complete. The 2026-09-02 slice added feature-owned read models/contracts for Registrations, Dashboard, Check-In, Operations, and Imports, wired the largest pages to those read models where safe, and enforced Import Center production limits of 2 MB per file, 1,000 preview rows, and 500 confirmed save rows. Evidence: `output/web-production-completion/owner-closeout/roadmap-7-20-modernization-slice.md`.

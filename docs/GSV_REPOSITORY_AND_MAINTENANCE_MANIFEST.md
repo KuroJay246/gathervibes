@@ -1,6 +1,6 @@
 # Gather & Savor Repository And Maintenance Manifest
 
-Last updated: 2026-08-26.
+Last updated: 2026-09-02.
 
 This manifest is the repository-maintenance source of truth for Gather & Savor Event Hub. Pair it with `docs/GSV_MASTER_SYSTEM_REFERENCE.md`: the Master Reference explains how the app works; this manifest explains where things live, what is generated, what is safe to clean, and how to keep repository knowledge current.
 
@@ -17,6 +17,7 @@ Old worktrees, Desktop archives, Downloads files, and output evidence are not au
 ## Top-Level Shape
 
 - `src/`: React app source, auth, layout, pages, components, services, utilities, tutorial, Firebase client setup, and styles.
+- `src/features/`: feature-owned contracts and read models for large organizer workflows. Keep pure derived state here when refactoring page-sized modules.
 - `tests/`: Node test suite for product behavior, routes, Firestore rule contracts, import parsing, finance, tickets, check-in, protected owner, docs, and guardrails.
 - `e2e/`: Playwright browser tests.
 - `scripts/`: product QA, e2e setup, admin utilities, diagnostics, audit generators, and repository-maintenance automation.
@@ -58,6 +59,7 @@ Start debugging from these anchors:
 - `src/config/protectedOwner.js`: Protected Owner constants.
 - `src/events/ActiveEventProvider.jsx`: Working Event state.
 - `src/lib/firebase.js`: Firebase client initialization.
+- `src/features/architecture/contracts/featureModuleStandard.js`: active feature-boundary contract for Roadmap 7-20 modernization.
 - `firestore.rules`: active Firestore security policy.
 - `firebase.json`: Hosting, rules/index paths, emulator config.
 - `.firebaserc`: default Firebase project.

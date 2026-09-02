@@ -35,6 +35,7 @@ import {
   formConnectionStatusLabel,
   formResponseStatusLabel,
 } from '../utils/formResponseInbox'
+import { IMPORT_LIMITS } from '../features/imports/contracts/importLimits.js'
 
 function isPermissionDeniedImportError(err) {
   const text = `${err?.code || ''} ${err?.message || ''}`.toLowerCase()
@@ -56,6 +57,10 @@ function buildSafeImportErrorDetails(err, rowCount) {
     retryableRows: (operationResult?.failedCount ?? 0) + (operationResult?.unattemptedCount ?? 0),
     privacy: 'Guest row values are not included in this diagnostic.',
   }
+}
+
+function importFileSizeLimitLabel() {
+  return `${Math.round(IMPORT_LIMITS.maxFileBytes / (1024 * 1024))} MB`
 }
 
 export function ImportsPage() {
@@ -171,6 +176,12 @@ export function ImportsPage() {
     setImportResult(null)
     setUploadedFileName(file.name)
 
+    if (file.size > IMPORT_LIMITS.maxFileBytes) {
+      setError(`This file is ${file.size.toLocaleString()} bytes. Import files are limited to ${importFileSizeLimitLabel()} for production safety.`)
+      e.target.value = ''
+      return
+    }
+
     if (selectedSource.mode === 'xlsx') {
       setParsingFile(true)
       try {
@@ -217,6 +228,10 @@ export function ImportsPage() {
   }
 
   function loadParsedData(headers, rows, context = {}) {
+    if (rows.length > IMPORT_LIMITS.maxRowsPerPreview) {
+      setError(`This import has ${rows.length.toLocaleString()} rows. Split it into files of ${IMPORT_LIMITS.maxRowsPerPreview.toLocaleString()} rows or fewer before preview.`)
+      return
+    }
     setParsedData({ headers, rows })
     setError('')
     setImportErrorDetails(null)
@@ -418,6 +433,12 @@ export function ImportsPage() {
       setImportResult({ importedCount: 0, blockedCount: processedRows.length })
       setImportErrorDetails(null)
       setError('No rows were imported because every row is blocked or skipped. Go back to Duplicate Review or start over with a corrected file.')
+      return
+    }
+    if (validRows.length > IMPORT_LIMITS.maxRowsPerBatch) {
+      setImportResult(null)
+      setImportErrorDetails(null)
+      setError(`This confirmed batch has ${validRows.length.toLocaleString()} rows. Production imports are limited to ${IMPORT_LIMITS.maxRowsPerBatch.toLocaleString()} rows per save batch.`)
       return
     }
 

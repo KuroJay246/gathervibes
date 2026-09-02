@@ -7,7 +7,7 @@ import { useActiveEvent } from '../events/useActiveEvent'
 import { EmptyState } from '../components/ui/EmptyState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
-import { buildFinanceSummary, formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
+import { formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
 import { subscribeToRegistrations } from '../services/registrationService'
 import {
   LEDGER_ENTRY_TYPES,
@@ -20,17 +20,13 @@ import {
 import { deletePartnerRecord, savePartnerRecord, subscribeToEvents } from '../services/eventService'
 import {
   OPERATIONS_ENTRY_EFFECTS,
-  buildOperationsControlSummary,
-  buildOperationsEntryCounts,
   buildOperationsLedgerReport,
-  buildOperationsSettlementSummary,
-  buildOperationsTotals,
-  findPossibleRegistrationPaymentOverlap,
 } from '../utils/operationsReport'
 import { InfoHint } from '../components/ui/InfoHint'
 import { PageTabs } from '../components/ui/PageTabs'
 import { canWriteOperations, isApprovedAdmin } from '../utils/accessRoles'
 import { hydrateEventForPlanning, isCompletedEvent } from '../utils/eventPlanning'
+import { buildOperationsSummaryModel } from '../features/operations/readModels/operationsSummaryModel.js'
 
 const EMPTY_FORM = {
   entryType: 'income',
@@ -208,34 +204,25 @@ export function OperationsPage() {
     }
   }, [adminUser, currentEvent?.eventId])
 
-  const filteredEntries = entries.filter((entry) => {
-    if (filters.type !== 'all' && entry.entryType !== filters.type) return false
-    if (filters.status !== 'all' && entry.status !== filters.status) return false
-    if (filters.category && !String(entry.category || '').toLowerCase().includes(filters.category.toLowerCase())) return false
-    if (filters.search) {
-      const query = filters.search.toLowerCase()
-      const haystack = [
-        entry.label,
-        entry.category,
-        entry.paidByOrPaidTo,
-        entry.paymentReference,
-        entry.notes,
-        entry.date,
-        entry.entryType,
-        entry.status,
-      ].map((value) => String(value || '').toLowerCase())
-      if (!haystack.some((value) => value.includes(query))) return false
-    }
-    return true
-  })
-
-  const financeSummary = useMemo(() => buildFinanceSummary(registrations, currentEvent), [currentEvent, registrations])
-  const operationsTotals = useMemo(() => buildOperationsTotals(entries), [entries])
-  const operationsSettlement = useMemo(() => buildOperationsSettlementSummary(entries), [entries])
-  const filteredTotals = useMemo(() => buildOperationsTotals(filteredEntries), [filteredEntries])
-  const filteredCounts = useMemo(() => buildOperationsEntryCounts(filteredEntries), [filteredEntries])
-  const filteredControl = useMemo(() => buildOperationsControlSummary(filteredEntries), [filteredEntries])
-  const possibleRegistrationPaymentOverlap = useMemo(() => findPossibleRegistrationPaymentOverlap(entries), [entries])
+  const operationsModel = useMemo(
+    () => buildOperationsSummaryModel({
+      entries,
+      registrations,
+      event: currentEvent,
+      filters,
+    }),
+    [currentEvent, entries, filters, registrations],
+  )
+  const {
+    filteredEntries,
+    filteredTotals,
+    filteredCounts,
+    filteredControl,
+    operationsTotals,
+    operationsSettlement,
+    registrationFinanceSummary: financeSummary,
+    possibleRegistrationOverlaps: possibleRegistrationPaymentOverlap,
+  } = operationsModel
   const filterScopeLabel = useMemo(() => buildFilterScopeLabel(filters), [filters])
   const partnerRecords = useMemo(() => planningEvent.partnerRecords || [], [planningEvent])
   const commitmentRows = useMemo(() => partnerRecords

@@ -125,13 +125,15 @@ test('finance filters, communications segments, and QR privacy are safe', () => 
 test('Phase 9 UI and Firestore rules expose finance without broad access', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
   const registrations = await readFile('src/pages/RegistrationsPage.jsx', 'utf8')
+  const registrationModel = await readFile('src/features/registrations/readModels/registrationListModel.js', 'utf8')
   const tickets = await readFile('src/pages/TicketsPage.jsx', 'utf8')
   const checkIn = await readFile('src/pages/CheckInPage.jsx', 'utf8')
   const qa = await readFile('src/pages/QaPage.jsx', 'utf8')
   const rules = await readFile('firestore.rules', 'utf8')
 
   assert.match(dashboard, /Payments received/)
-  assert.match(registrations, /Outstanding Balance/)
+  assert.match(registrations, /buildRegistrationListModel/)
+  assert.match(registrationModel, /Outstanding Balance/)
   assert.match(registrations, /bulkUpdateFinanceFields/)
   assert.match(tickets, /Balance/)
   assert.match(checkIn, /Door payment/)
@@ -143,9 +145,11 @@ test('Phase 9 UI and Firestore rules expose finance without broad access', async
 
 test('Dashboard documents missing selected event, default currency, and missing pricing fallbacks', async () => {
   const dashboard = await readFile('src/pages/DashboardPage.jsx', 'utf8')
+  const dashboardModel = await readFile('src/features/dashboard/readModels/dashboardOverviewModel.js', 'utf8')
 
   assert.match(dashboard, /Choose or create an event|Select a Working Event/)
   assert.match(dashboard, /Payments received/)
-  assert.match(dashboard, /buildFinanceSummary\(registrations, selectedEvent\)/)
+  assert.match(dashboard, /buildDashboardOverviewModel/)
+  assert.match(dashboardModel, /buildFinanceSummary\(registrations, event\)/)
   assert.match(dashboard, /formatCurrency\(financeSummary\.totalCollected, financeSummary\.currency\)/)
 })

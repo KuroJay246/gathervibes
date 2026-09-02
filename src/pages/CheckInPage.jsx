@@ -9,26 +9,23 @@ import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { QrScannerPanel } from '../components/checkin/QrScannerPanel'
-import { canCompleteCheckIn, checkInWarnings, searchableRegistrationText } from '../utils/ticketUtils'
-import { CHECK_IN_VIEWS, filterCheckInRegistrations, formatCheckInTime } from '../utils/checkInUtils'
+import { canCompleteCheckIn } from '../utils/ticketUtils'
+import { CHECK_IN_VIEWS, formatCheckInTime } from '../utils/checkInUtils'
 import { isApprovedAdmin } from '../utils/accessRoles'
 import {
-  buildEventDaySummary,
   formatDoorStatus,
   formatEventDayCsv,
   formatPaymentLabel,
   formatTicketStatus,
-  getDoorListRegistrations,
-  getMissingTicketRegistrations,
-  getPendingPaymentRegistrations,
 } from '../utils/eventDayUtils'
 import { normalizePaymentStatus } from '../utils/paymentStatus'
 import { calculateRegistrationFinance, formatCurrency, formatPaymentMethod } from '../utils/financeUtils'
-import { buildRegistrationMetrics, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
+import { formatRegistrationGuestSummary } from '../utils/registrationMetrics'
 import { InfoHint } from '../components/ui/InfoHint'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 import { PageTabs } from '../components/ui/PageTabs'
+import { buildCheckInQueueModel } from '../features/checkin/readModels/checkInQueueModel.js'
 
 const CHECK_IN_FILTER_GROUPS = [
   { label: 'Guest Lookup', values: ['search'] },
@@ -135,39 +132,32 @@ export function CheckInPage() {
       return next
     }, { replace: true })
   }
-  const summary = useMemo(() => buildEventDaySummary(registrations), [registrations])
-  const visibleRegistrations = useMemo(
-    () => filterCheckInRegistrations(registrations, activeView, activeEvent),
-    [activeEvent, activeView, registrations],
+  const checkInQueue = useMemo(
+    () => buildCheckInQueueModel({
+      registrations,
+      event: activeEvent,
+      activeView,
+      helperView,
+      searchQuery,
+      selectedId,
+    }),
+    [activeEvent, activeView, helperView, registrations, searchQuery, selectedId],
   )
-  const visibleMetrics = useMemo(() => buildRegistrationMetrics(visibleRegistrations, activeEvent), [activeEvent, visibleRegistrations])
+  const {
+    summary,
+    visibleRegistrations,
+    visibleMetrics,
+    helperRows,
+    recentCheckIns,
+    matches,
+    selectedRegistration,
+    selectedWarnings,
+    selectedFinance,
+    checkInState,
+  } = checkInQueue
   const selectedListRows = visibleRegistrations.filter((registration) => selectedListIds.has(registration.registrationId))
   const allVisibleListRowsSelected = visibleRegistrations.length > 0 && visibleRegistrations.every((registration) => selectedListIds.has(registration.registrationId))
-  const helperRows = useMemo(() => {
-    if (helperView === 'missing-ticket') return getMissingTicketRegistrations(registrations)
-    if (helperView === 'pending-payment') return getPendingPaymentRegistrations(registrations)
-    return getDoorListRegistrations(registrations)
-  }, [helperView, registrations])
   const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(activeEvent?.eventId), [activeEvent?.eventId])
-  const recentCheckIns = useMemo(() => (
-    [...registrations]
-      .filter((registration) => registration.checkedIn)
-      .sort((left, right) => String(right.checkInTime || '').localeCompare(String(left.checkInTime || '')))
-      .slice(0, 6)
-  ), [registrations])
-
-  const matches = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase()
-    if (!query) return []
-    return registrations
-      .filter((registration) => searchableRegistrationText(registration).includes(query))
-      .slice(0, 20)
-  }, [registrations, searchQuery])
-
-  const selectedRegistration = registrations.find((registration) => registration.registrationId === selectedId) || matches[0]
-  const selectedWarnings = selectedRegistration ? checkInWarnings(selectedRegistration) : []
-  const selectedFinance = selectedRegistration ? calculateRegistrationFinance(selectedRegistration, activeEvent) : null
-  const checkInState = selectedRegistration ? canCompleteCheckIn(selectedRegistration) : { allowed: false, reason: '' }
   const canUndoCheckIn = isApprovedAdmin(access)
 
   if (!activeEvent?.eventId) {

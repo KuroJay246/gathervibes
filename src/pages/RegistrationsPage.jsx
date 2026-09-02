@@ -23,30 +23,28 @@ import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { InfoHint } from '../components/ui/InfoHint'
 import { PageTabs } from '../components/ui/PageTabs'
 import { Link, useSearchParams } from 'react-router'
-import { buildRegistrationMetrics, formatRegistrationGuestSummary } from '../utils/registrationMetrics'
-import { formatPaymentLabel, paymentStatusMatches } from '../utils/paymentStatus'
+import { formatPaymentLabel } from '../utils/paymentStatus'
 import {
-  buildFinanceSummary,
   calculateRegistrationFinance,
-  financeFilterMatches,
   formatCurrency,
   formatPaymentMethod,
 } from '../utils/financeUtils'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
-import { deriveAttendanceRecordType } from '../utils/attendanceUtils'
 import { organizerSaveErrorMessage } from '../utils/organizerErrors'
+import { REGISTRATION_TABS } from '../features/registrations/contracts/registrationFilters'
+import {
+  attendeeNamesText,
+  buildRegistrationListModel,
+  registrationNeedsReview,
+} from '../features/registrations/readModels/registrationListModel'
 
-const TABS = ['All', 'Paid', 'Pending', 'Door Paid', 'To Pay at Door', 'Complimentary', 'Outstanding Balance', 'Missing Ticket Code', 'Needs Review', 'Checked In']
+const TABS = REGISTRATION_TABS
 
 function titleCase(value = '') {
   return value
     .split('-')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
-}
-
-function attendeeNamesText(registration = {}) {
-  return Array.isArray(registration.attendeeNames) ? registration.attendeeNames.join(', ') : ''
 }
 
 function personsLabel(registration = {}) {
@@ -67,52 +65,10 @@ function dateLabel(value) {
   return date.toLocaleDateString('en-BB', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-function registrationNeedsReview(registration = {}, event = {}) {
-  const finance = calculateRegistrationFinance(registration, event)
-  return Boolean(finance.needsFinanceReview || registration.financeReviewRequired || !registration.ticketCode)
-}
-
 function bulkOperationMessage(result, fallback) {
   if (!result?.message) return fallback
   if (result.status === 'partial-failure') return `${result.message} Use the current selection to retry remaining unchanged records.`
   return result.message
-}
-
-function duplicateContactKeys(registrations = []) {
-  const emailCounts = new Map()
-  const phoneCounts = new Map()
-
-  registrations.forEach((registration) => {
-    const email = String(registration.email || '').trim().toLowerCase()
-    const phone = String(registration.phone || '').trim().toLowerCase()
-    if (email) emailCounts.set(email, (emailCounts.get(email) || 0) + 1)
-    if (phone) phoneCounts.set(phone, (phoneCounts.get(phone) || 0) + 1)
-  })
-
-  return { emailCounts, phoneCounts }
-}
-
-function hasDuplicateContact(registration = {}, contactKeys = duplicateContactKeys([])) {
-  const email = String(registration.email || '').trim().toLowerCase()
-  const phone = String(registration.phone || '').trim().toLowerCase()
-  return Boolean(
-    (email && (contactKeys.emailCounts.get(email) || 0) > 1)
-    || (phone && (contactKeys.phoneCounts.get(phone) || 0) > 1),
-  )
-}
-
-function matchesCardFilter(registration = {}, key, event = {}) {
-  const finance = calculateRegistrationFinance(registration, event)
-  if (!key) return true
-  if (key === 'finance-warning') return finance.needsFinanceReview || registration.financeReviewRequired
-  if (key === 'missing-ticket') return !registration.ticketCode
-  if (key === 'outstanding') return (finance.balanceDue || 0) > 0
-  if (key === 'door') return paymentStatusMatches(registration.paymentStatus, 'door')
-  if (key === 'door-list') return paymentStatusMatches(registration.paymentStatus, 'door-list')
-  if (key === 'checked-in') return Boolean(registration.checkedIn)
-  if (key === 'not-checked-in') return !registration.checkedIn
-  if (key === 'review-needed') return registrationNeedsReview(registration, event)
-  return true
 }
 
 function CountCard({ label, value, help, active, onClick }) {
@@ -234,93 +190,23 @@ export function RegistrationsPage() {
   const effectiveFilters = duplicateContactReview ? { ...filters, duplicateContacts: true } : filters
   const effectiveActiveTab = duplicateContactReview ? 'All' : activeTab
   const effectiveCardFilter = duplicateContactReview ? '' : cardFilter
-  const duplicateContactLookup = duplicateContactKeys(registrations)
-  const filteredRegistrations = registrations.filter((reg) => {
-    const finance = calculateRegistrationFinance(reg, activeEvent)
-    if (!matchesCardFilter(reg, effectiveCardFilter, activeEvent)) return false
-    // 1. Tab filtering
-    if (effectiveActiveTab === 'Checked In' && !reg.checkedIn) return false
-    if (effectiveActiveTab === 'Missing Ticket Code' && reg.ticketCode) return false
-    if (effectiveActiveTab === 'Door Paid' && !paymentStatusMatches(reg.paymentStatus, 'door')) return false
-    if (effectiveActiveTab === 'To Pay at Door' && !paymentStatusMatches(reg.paymentStatus, 'door-list')) return false
-    if (effectiveActiveTab === 'Needs Review' && !registrationNeedsReview(reg, activeEvent)) return false
-    if (['Paid', 'Pending', 'Complimentary', 'Outstanding Balance'].includes(effectiveActiveTab)) {
-      if (!financeFilterMatches(reg, effectiveActiveTab, activeEvent)) return false
-    }
-
-    // 2. Advanced Filters
-    if (effectiveFilters.keyword) {
-      const q = effectiveFilters.keyword.toLowerCase()
-      if (![reg.fullName, reg.buyerName, attendeeNamesText(reg), reg.email, reg.phone, reg.ticketCode].some(v => v?.toLowerCase().includes(q))) {
-        return false
-      }
-    }
-    if (effectiveFilters.guestName && !reg.fullName?.toLowerCase().includes(effectiveFilters.guestName.toLowerCase())) return false
-    if (effectiveFilters.buyerName && !reg.buyerName?.toLowerCase().includes(effectiveFilters.buyerName.toLowerCase())) return false
-    if (effectiveFilters.attendeeName && !attendeeNamesText(reg).toLowerCase().includes(effectiveFilters.attendeeName.toLowerCase())) return false
-    if (effectiveFilters.contact && !(reg.email?.toLowerCase().includes(effectiveFilters.contact.toLowerCase()) || reg.phone?.toLowerCase().includes(effectiveFilters.contact.toLowerCase()))) return false
-    if (effectiveFilters.group && !reg.groupName?.toLowerCase().includes(effectiveFilters.group.toLowerCase())) return false
-    if (effectiveFilters.ticketCode && !reg.ticketCode?.toLowerCase().includes(effectiveFilters.ticketCode.toLowerCase())) return false
-    if (effectiveFilters.priceTier && !reg.priceTier?.toLowerCase().includes(effectiveFilters.priceTier.toLowerCase())) return false
-    if (effectiveFilters.paymentStatus && !paymentStatusMatches(reg.paymentStatus, effectiveFilters.paymentStatus)) return false
-    if (effectiveFilters.paymentMethod && reg.paymentMethod !== effectiveFilters.paymentMethod) return false
-    if (effectiveFilters.source && reg.source !== effectiveFilters.source) return false
-    if (effectiveFilters.ticketState === 'assigned' && reg.ticketStatus !== 'assigned') return false
-    if (effectiveFilters.ticketState === 'missing' && reg.ticketCode) return false
-    if (effectiveFilters.ticketState === 'partial' && reg.ticketStatus !== 'partially-assigned') return false
-    if (effectiveFilters.attendanceState === 'checked-in' && !reg.checkedIn) return false
-    if (effectiveFilters.attendanceState === 'not-checked-in' && reg.checkedIn) return false
-    if (effectiveFilters.attendanceState === 'historical' && deriveAttendanceRecordType(reg) !== 'organizer-confirmed-historical') return false
-    if (effectiveFilters.balanceDue) {
-      if (!finance.balanceDue || finance.balanceDue <= 0) return false
-    }
-    if (effectiveFilters.missingTicket && reg.ticketCode) return false
-    if (effectiveFilters.missingAmount) {
-      if (finance.amountDue !== null && finance.amountPaid !== null) return false
-    }
-    if (effectiveFilters.reviewNeeded) {
-      if (!registrationNeedsReview(reg, activeEvent)) return false
-    }
-    if (effectiveFilters.duplicateContacts) {
-      if (!hasDuplicateContact(reg, duplicateContactLookup)) return false
-    }
-    
-    return true
+  const registrationListModel = buildRegistrationListModel({
+    registrations,
+    event: activeEvent,
+    activeTab: effectiveActiveTab,
+    cardFilter: effectiveCardFilter,
+    filters: effectiveFilters,
+    selectedIds,
   })
-  const allMetrics = buildRegistrationMetrics(registrations, activeEvent)
-  const filteredMetrics = buildRegistrationMetrics(filteredRegistrations, activeEvent)
-  const financeSummary = buildFinanceSummary(registrations, activeEvent)
+  const {
+    filteredRegistrations,
+    activeFilterCount,
+    showingText,
+    selectedRegistrations,
+    allVisibleSelected,
+  } = registrationListModel
   const evidenceAudit = getEventFinancialEvidenceAudit(activeEvent?.eventId)
-  const isFiltering = effectiveActiveTab !== 'All' || Boolean(effectiveCardFilter) || Object.values(effectiveFilters).some(Boolean)
-  const activeFilterCount = [
-    effectiveActiveTab !== 'All',
-    Boolean(effectiveCardFilter),
-    ...Object.values(effectiveFilters).map(Boolean),
-  ].filter(Boolean).length
-  const showingText = isFiltering
-    ? `Showing ${filteredMetrics.totalRegistrations} registration${filteredMetrics.totalRegistrations === 1 ? '' : 's'} covering ${filteredMetrics.totalPersons} guest${filteredMetrics.totalPersons === 1 ? '' : 's'}.`
-    : 'Showing all registrations.'
-  const selectedRegistrations = filteredRegistrations.filter((registration) => selectedIds.has(registration.registrationId))
-  const allVisibleSelected = filteredRegistrations.length > 0 && filteredRegistrations.every((registration) => selectedIds.has(registration.registrationId))
-  const registrationMetricCards = [
-    { label: 'Total Registrations', value: allMetrics.totalRegistrations, help: 'Registration records for this Working Event.', key: '' },
-    { label: 'Total Guests', value: allMetrics.totalPersons, help: 'Guests represented by those registrations, including groups.', key: '' },
-    { label: 'Expected Registration Income', value: formatCurrency(financeSummary.totalExpected), help: 'Registration totals from explicit ticket price or amount due only.' },
-    { label: 'Recorded Registration Payments', value: formatCurrency(financeSummary.totalCollected), help: 'Confirmed amountPaid across registrations.' },
-    { label: 'Outstanding Balance', value: formatCurrency(financeSummary.totalOutstanding), help: 'Click to see rows with balance due.', tab: 'Outstanding Balance', card: 'outstanding' },
-    { label: 'Needs Review', value: registrations.filter((reg) => registrationNeedsReview(reg, activeEvent)).length, help: 'Registrations with finance review, ticket review, or missing ticket information.', tab: 'Needs Review', card: 'review-needed' },
-    { label: 'Paid', value: formatRegistrationGuestSummary(allMetrics.paidRegistrations, allMetrics.paidPersons), help: 'Registrations marked paid.', tab: 'Paid' },
-    { label: 'Pending', value: formatRegistrationGuestSummary(allMetrics.pendingRegistrations, allMetrics.pendingPersons), help: 'Registrations still pending payment review or collection.', tab: 'Pending' },
-    { label: 'Complimentary', value: formatRegistrationGuestSummary(allMetrics.complimentaryRegistrations, allMetrics.complimentaryPersons), help: 'Registrations marked complimentary.', tab: 'Complimentary' },
-    { label: 'Door Paid', value: formatRegistrationGuestSummary(allMetrics.doorRegistrations, allMetrics.doorPersons), help: 'Paid at door or late payment confirmed.', tab: 'Door Paid', card: 'door' },
-    { label: 'To Pay at Door', value: formatCurrency(financeSummary.doorTotal), help: 'Expected door balances, not confirmed paid.', tab: 'To Pay at Door', card: 'door-list' },
-    { label: 'Complimentary Value', value: formatCurrency(financeSummary.complimentaryValue), help: 'Value of complimentary tickets when prices are explicit.' },
-    { label: 'Finance Review', value: financeSummary.financeWarningCount, help: 'Click to see registrations needing finance review.', card: 'finance-warning' },
-    { label: 'Checked In', value: formatRegistrationGuestSummary(allMetrics.checkedInRegistrations, allMetrics.checkedInPersons), help: 'Checked-in registrations and guests represented.', card: 'checked-in' },
-    { label: 'Not Checked In', value: formatRegistrationGuestSummary(allMetrics.remainingRegistrations, allMetrics.remainingPersons), help: 'Registrations and guests not checked in yet.', card: 'not-checked-in' },
-    { label: 'Missing Ticket Code', value: allMetrics.missingTicketRegistrations, help: 'Registrations with no ticket code assigned.', tab: 'Missing Ticket Code', card: 'missing-ticket' },
-    { label: 'Selected Registrations', value: selectedIds.size, help: 'Registrations currently selected for bulk actions.' },
-  ]
+  const registrationMetricCards = registrationListModel.metricCards
 
   function toggleSelected(registrationId) {
     setSelectedIds((current) => {

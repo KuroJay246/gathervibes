@@ -25,11 +25,9 @@ import { subscribeToEventResources } from '../services/eventResourceService.js'
 import { subscribeToRunOfShow } from '../services/runOfShowService.js'
 import { subscribeToTasks } from '../services/taskService.js'
 import { formatEventDate, toDateInput, upcomingEvents } from '../utils/dateUtils'
-import { buildRegistrationMetrics } from '../utils/registrationMetrics'
-import { buildFinanceSummary, formatCurrency } from '../utils/financeUtils'
+import { formatCurrency } from '../utils/financeUtils'
 import { getWorkingEventDisplayName, hasSelectedWorkingEvent } from '../utils/eventDefaults'
 import { canViewRoute, isApprovedAdmin } from '../utils/accessRoles'
-import { buildEventReadiness } from '../utils/eventReadiness'
 import {
   eventStatusLabel,
   formatDaysUntilEvent,
@@ -38,8 +36,8 @@ import {
   isEventDayStatus,
 } from '../utils/eventPlanning'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
-import { buildTaskWorkflowSummary } from '../utils/taskWorkflow.js'
 import { PageTabs } from '../components/ui/PageTabs'
+import { buildDashboardOverviewModel } from '../features/dashboard/readModels/dashboardOverviewModel.js'
 
 const HOME_TABS = [
   ['summary', 'Event Summary'],
@@ -341,62 +339,6 @@ function formatClock(value) {
   return CLOCK_FORMATTER.format(value)
 }
 
-function dateFromTimestamp(value) {
-  if (!value) return null
-  if (typeof value.toDate === 'function') return value.toDate()
-  const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? null : date
-}
-
-function buildRecentActivity({ event, registrations = [], operationsEntries = [] }) {
-  const activity = []
-
-  if (event?.updatedAt || event?.createdAt) {
-    activity.push({
-      key: 'event-updated',
-      label: event.eventName || 'Event',
-      action: 'Event details updated',
-      actor: 'Organizer workspace',
-      source: 'Events',
-      date: dateFromTimestamp(event.updatedAt || event.createdAt),
-      to: '/events',
-    })
-  }
-
-  registrations.slice(0, 6).forEach((registration) => {
-    const date = dateFromTimestamp(registration.updatedAt || registration.createdAt || registration.timestamp)
-    if (!date) return
-    activity.push({
-      key: `registration-${registration.registrationId || registration.id || date.getTime()}`,
-      label: registration.fullName || registration.buyerName || 'Registration',
-      action: registration.ticketCode ? 'Registration and ticket record updated' : 'Registration record updated',
-      actor: registration.updatedByName || registration.updatedBy || registration.createdByName || 'Organizer',
-      source: 'Guests & Registrations',
-      date,
-      to: '/registrations',
-    })
-  })
-
-  operationsEntries.slice(0, 6).forEach((entry) => {
-    const date = dateFromTimestamp(entry.updatedAt || entry.createdAt)
-    if (!date) return
-    activity.push({
-      key: `operations-${entry.entryId || entry.id || date.getTime()}`,
-      label: entry.label || 'Operations ledger entry',
-      action: 'Operations entry updated',
-      actor: entry.updatedByName || entry.updatedBy || entry.createdByName || 'Organizer',
-      source: 'Operations',
-      date,
-      to: '/operations',
-    })
-  })
-
-  return activity
-    .filter((item) => item.date)
-    .sort((a, b) => b.date.getTime() - a.date.getTime())
-    .slice(0, 5)
-}
-
 export function DashboardPage() {
   const { activeEvent, clearActiveEvent, setActiveEvent } = useActiveEvent()
   const { access, assignedEvents = [] } = useAuth()
@@ -443,13 +385,18 @@ export function DashboardPage() {
 
   const upcoming = useMemo(() => upcomingEvents(visibleEvents), [visibleEvents])
   const hydratedEvent = useMemo(() => hydrateEventForPlanning(selectedEvent || {}), [selectedEvent])
-  const metrics = useMemo(() => buildRegistrationMetrics(registrations, selectedEvent), [registrations, selectedEvent])
-  const financeSummary = useMemo(() => buildFinanceSummary(registrations, selectedEvent), [registrations, selectedEvent])
-  const readiness = useMemo(
-    () => buildEventReadiness(selectedEvent, registrations, operationsEntries, runOfShowItems, resources),
-    [operationsEntries, registrations, resources, runOfShowItems, selectedEvent],
+  const dashboardModel = useMemo(
+    () => buildDashboardOverviewModel({
+      event: selectedEvent,
+      registrations,
+      operationsEntries,
+      runOfShowItems,
+      resources,
+      tasks,
+    }),
+    [operationsEntries, registrations, resources, runOfShowItems, selectedEvent, tasks],
   )
-  const taskSummary = useMemo(() => buildTaskWorkflowSummary(tasks), [tasks])
+  const { metrics, financeSummary, readiness, taskSummary, recentActivity } = dashboardModel
   const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(selectedEvent?.eventId), [selectedEvent?.eventId])
   const completedEvent = isCompletedEvent(hydratedEvent)
   const eventDayMode = isEventDayStatus(hydratedEvent)
@@ -496,10 +443,6 @@ export function DashboardPage() {
       }))
     return [...uniqueIssueSteps, ...fallbacks]
   }, [quickActions, readiness.actionItems])
-  const recentActivity = useMemo(
-    () => buildRecentActivity({ event: selectedEvent, registrations, operationsEntries }),
-    [operationsEntries, registrations, selectedEvent],
-  )
   const requestedTab = searchParams.get('tab') || 'summary'
   const activeHomeTab = HOME_TABS.some(([id]) => id === requestedTab) ? requestedTab : 'summary'
   function setHomeTab(tab) {
