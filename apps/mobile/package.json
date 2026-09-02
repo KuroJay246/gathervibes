@@ -6,6 +6,7 @@
     "@expo/ui": "~57.0.13",
     "@gsv/contracts": "file:../../packages/contracts",
     "@react-native-firebase/app": "^26.3.2",
+    "@react-native-firebase/app-check": "^26.3.2",
     "@react-native-firebase/auth": "^26.3.2",
     "@react-native-firebase/crashlytics": "^26.3.2",
     "@react-native-firebase/firestore": "^26.3.2",

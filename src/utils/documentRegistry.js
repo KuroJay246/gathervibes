@@ -156,25 +156,25 @@ export function effectiveDocumentStatus(document = {}, today) {
   return document.status || 'Needed'
 }
 
-export function filterDocuments(documents = [], filter = 'All', contactId = '', organizationId = '') {
+export function filterDocuments(documents = [], filter = 'All', contactId = '', organizationId = '', today = new Date()) {
   return documents.filter((document) => {
     if (contactId && document.linkedContactId !== contactId) return false
     if (organizationId && document.linkedOrganizationId !== organizationId) return false
     if (filter === 'All') return true
     if (filter === 'Required') return document.required
     if (filter === 'Missing / Needed') return document.required && ['Needed', 'Requested'].includes(document.status)
-    if (filter === 'Expiring Soon') return documentTimingState(document) === 'expiring-soon'
-    if (filter === 'Expired') return documentTimingState(document) === 'expired' || document.status === 'Expired'
+    if (filter === 'Expiring Soon') return documentTimingState(document, today) === 'expiring-soon'
+    if (filter === 'Expired') return documentTimingState(document, today) === 'expired' || document.status === 'Expired'
     return document.status === filter
   })
 }
 
-export function buildDocumentSummary(documents = []) {
+export function buildDocumentSummary(documents = [], today = new Date()) {
   return documents.reduce((summary, document) => {
     summary.total += 1
     if (document.required) summary.required += 1
     if (document.required && ['Needed', 'Requested'].includes(document.status)) summary.missingRequired += 1
-    const timing = documentTimingState(document)
+    const timing = documentTimingState(document, today)
     if (timing === 'expiring-soon') summary.expiringSoon += 1
     if (timing === 'expired') summary.expired += 1
     return summary

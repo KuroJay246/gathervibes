@@ -77,7 +77,7 @@ npm run doctor:json
 
 Deploy Hosting only for application-source changes that require a new web build:
 
-The 2026-08-26 web production completion pass deployed Hosting only and live-verified the security headers. The current mobile closeout rebuilt the release-like Android APK from `4803512` and passed the guarded 11-flow emulator regression, including stale-error absence. See `output/web-production-completion/production-readiness-ledger.md` and `output/web-production-completion/owner-closeout/mobile-audit-release-classification.md` for the current release decision and owner-controlled actions. Do not infer that App Check enforcement, provider OAuth/webhooks, monitoring, backups, or authenticated owner acceptance are complete from the Hosting deployment.
+The 2026-08-26 web production completion pass deployed Hosting only and live-verified the security headers. The current mobile closeout added native Android App Check support, registered `com.gathervibeshub.staff` for Play Integrity in Firebase Console monitoring mode, registered the web app with reCAPTCHA Enterprise, deployed the approved public site-key configuration, rebuilt and reinstalled the current debug APK, and passed the guarded 11-flow emulator regression including stale-error absence. See `output/web-production-completion/production-readiness-ledger.md` and `output/web-production-completion/owner-closeout/mobile-audit-release-classification.md` for the current release decision and owner-controlled actions. App Check enforcement, API-key restrictions, provider OAuth/webhooks, monitoring receipt, backups, and billing controls remain separate gates.
 
 ```bash
 npx firebase-tools deploy --only hosting --project gathervibeshub

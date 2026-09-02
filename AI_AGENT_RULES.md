@@ -16,7 +16,7 @@ Read this file first for every Gather & Savor task, then read `PROJECT_HANDOFF.m
 - CPB is a normal completed real event. It is not a synthetic QA target and must not receive synthetic writes.
 - QR payload must remain `GSV:TICKET:{ticketCode}`.
 - `xlsx` must remain absent. `read-excel-file` remains the XLSX parser.
-- Web App Check is source-configured behind `VITE_FIREBASE_APP_CHECK_SITE_KEY` but is not active in the deployed build until the owner registers the web app and enforces it in Firebase Console. Native mobile App Check is not configured in the current Expo package. The rebuilt Android release-like APK and guarded 11-flow emulator regression are current evidence; console MFA, key restrictions, App Check registration/enforcement, and live monitoring remain owner-controlled.
+- Web App Check is source-configured behind `VITE_FIREBASE_APP_CHECK_SITE_KEY`; the production web app is registered with reCAPTCHA Enterprise, the public site-key configuration is deployed, and live authenticated monitoring-mode initialization is verified. Enforcement remains disabled pending separate owner approval. Native Android App Check is implemented with `@react-native-firebase/app-check`, uses `debug` for emulator/development, and uses `playIntegrity` for production builds. Firebase Console access was restored after owner MFA completion, and the Android app `com.gathervibeshub.staff` was registered for App Check with Play Integrity in monitoring mode. API-key restrictions, billing, backup/restore, and live monitoring receipt remain owner-controlled or unverified.
 - Google Cloud read-only inspection on 2026-08-26 found the Firebase Browser and Android auto-created keys without application restrictions. Do not change them blindly: add the approved web referrers and Android package/signing restrictions only after the owner confirms the allowed API targets and validates Auth/Firestore.
 
 ## Two-App And Mobile Isolation Rules
@@ -48,7 +48,7 @@ Read this file first for every Gather & Savor task, then read `PROJECT_HANDOFF.m
 - Do not deploy Firebase targets that were not intentionally changed and validated.
 - Do not force-push or rewrite Git history.
 - Do not delete unmerged branches or external evidence automatically.
-- Firebase Console currently requires MFA before App Check, billing, backup, or enforcement settings can be inspected. Treat this as an owner access boundary, not as proof that those controls are configured.
+- Firebase Console MFA was completed by the owner on 2026-08-26, restoring access to project `gathervibeshub`. Treat any unconfigured or unverified App Check, billing, backup, monitoring, or API-key state as a separate control gap, not as an MFA blocker.
 
 ## Access Rules
 

@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
-import { ReCaptchaV3Provider, initializeAppCheck } from 'firebase/app-check'
+import { ReCaptchaEnterpriseProvider, initializeAppCheck } from 'firebase/app-check'
 import { connectAuthEmulator, getAuth } from 'firebase/auth'
 import { connectFirestoreEmulator, getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 
@@ -130,20 +130,20 @@ if (app && typeof window !== 'undefined') {
       }
 
       initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider(appCheckSiteKey),
+        provider: new ReCaptchaEnterpriseProvider(appCheckSiteKey),
         isTokenAutoRefreshEnabled: true,
       })
 
       setAppCheckState({
-        mode: 'recaptcha-v3',
-        provider: 'recaptcha-v3',
+        mode: 'recaptcha-enterprise',
+        provider: 'recaptcha-enterprise',
         initialized: true,
         error: '',
       })
     } catch (error) {
       setAppCheckState({
         mode: 'initialization-failed',
-        provider: 'recaptcha-v3',
+        provider: 'recaptcha-enterprise',
         initialized: false,
         error: error instanceof Error ? error.message : 'App Check initialization failed.',
       })

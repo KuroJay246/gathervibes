@@ -18,8 +18,8 @@ export function buildRuntimeHealthItems({
   activeEvent,
   buildCommit,
 }) {
-  const appCheckDetail = appCheckStatus?.mode === 'recaptcha-v3'
-    ? 'reCAPTCHA v3 App Check is initialized for web requests.'
+  const appCheckDetail = appCheckStatus?.mode === 'recaptcha-enterprise'
+    ? 'reCAPTCHA Enterprise App Check is initialized for web requests.'
     : appCheckStatus?.mode === 'not-configured'
       ? 'Web App Check site key is not configured in this build.'
       : appCheckStatus?.mode === 'emulator-disabled'
@@ -43,7 +43,7 @@ export function buildRuntimeHealthItems({
     },
     {
       label: 'Web App Check',
-      status: appCheckStatus?.mode === 'recaptcha-v3' ? 'ok' : appCheckStatus?.mode === 'initialization-failed' ? 'fail' : 'warn',
+      status: appCheckStatus?.mode === 'recaptcha-enterprise' ? 'ok' : appCheckStatus?.mode === 'initialization-failed' ? 'fail' : 'warn',
       detail: appCheckDetail,
     },
     {

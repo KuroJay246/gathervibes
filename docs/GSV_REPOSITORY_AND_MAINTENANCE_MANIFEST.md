@@ -192,6 +192,16 @@ The current web deployment evidence is recorded in `output/web-production-comple
 
 The owner closeout extension is in `output/web-production-completion/owner-closeout/`. It contains redacted live Protected Owner screenshots, the Firebase Console MFA blocker capture, mobile audit JSON and release classification, fresh Android regression evidence, production route screenshots, and provider-status evidence. No credentials, tokens, private key values, or production test writes were captured.
 
+Current Android native App Check source changes live in:
+
+- `apps/mobile/src/lib/firebase.js`
+- `apps/mobile/src/lib/appCheckConfig.js`
+- `apps/mobile/app.json`
+- `apps/mobile/package.json`
+- `tests/mobile-app-check-config.test.js`
+
+The current local Android signing caveat also lives in source, not just release notes: `apps/mobile/android/app/build.gradle` still maps `buildTypes.release.signingConfig` to the debug keystore, so local release-like APK fingerprints are not final production signing identity.
+
 ```bash
 npx firebase-tools deploy --only hosting --project gathervibeshub
 ```

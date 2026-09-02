@@ -21,6 +21,7 @@ test('Firebase Hosting applies private admin security headers', async () => {
   assert.match(valuesByKey.get('Content-Security-Policy'), /securetoken\.googleapis\.com/)
   assert.match(valuesByKey.get('Content-Security-Policy'), /firestore\.googleapis\.com/)
   assert.match(valuesByKey.get('Content-Security-Policy'), /firebaseinstallations\.googleapis\.com/)
+  assert.match(valuesByKey.get('Content-Security-Policy'), /content-firebaseappcheck\.googleapis\.com/)
   assert.match(valuesByKey.get('Content-Security-Policy'), /accounts\.google\.com/)
   assert.match(valuesByKey.get('Content-Security-Policy'), /recaptcha/)
   assert.equal(valuesByKey.get('X-Content-Type-Options'), 'nosniff')

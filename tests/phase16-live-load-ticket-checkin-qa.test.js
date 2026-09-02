@@ -20,6 +20,7 @@ test('Phase 16 keeps Firebase Hosting SPA routes and non-overblocking security h
   assert.match(valuesByKey.get('Content-Security-Policy'), /connect-src 'self'/)
   assert.match(valuesByKey.get('Content-Security-Policy'), /identitytoolkit\.googleapis\.com/)
   assert.match(valuesByKey.get('Content-Security-Policy'), /firestore\.googleapis\.com/)
+  assert.match(valuesByKey.get('Content-Security-Policy'), /content-firebaseappcheck\.googleapis\.com/)
   assert.equal(valuesByKey.get('X-Content-Type-Options'), 'nosniff')
   assert.equal(valuesByKey.get('Referrer-Policy'), 'strict-origin-when-cross-origin')
   assert.match(valuesByKey.get('Permissions-Policy'), /camera=\(self\)/)

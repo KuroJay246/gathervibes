@@ -1,14 +1,30 @@
 /* global process */
 import { Platform } from 'react-native'
 import { getApp } from '@react-native-firebase/app'
+import { initializeAppCheck } from '@react-native-firebase/app-check'
 import { connectAuthEmulator, getAuth } from '@react-native-firebase/auth'
 import { connectFirestoreEmulator, getFirestore } from '@react-native-firebase/firestore'
 
+import { DEBUG_TOKEN_ENV, getNativeAppCheckProviderOptions } from './appCheckConfig'
+
 export const firebaseApp = getApp()
+const useFirebaseEmulators = process.env.EXPO_PUBLIC_FIREBASE_USE_EMULATORS === 'true'
+const appCheckProviderOptions = getNativeAppCheckProviderOptions({
+  platform: Platform.OS,
+  isDev: globalThis.__DEV__ === true,
+  useEmulators: useFirebaseEmulators,
+  debugToken: process.env[DEBUG_TOKEN_ENV],
+})
+
+export const appCheck = appCheckProviderOptions
+  ? initializeAppCheck(firebaseApp, {
+      provider: { providerOptions: appCheckProviderOptions },
+      isTokenAutoRefreshEnabled: true,
+    })
+  : null
+
 export const auth = getAuth(firebaseApp)
 export const firestore = getFirestore(firebaseApp)
-
-const useFirebaseEmulators = process.env.EXPO_PUBLIC_FIREBASE_USE_EMULATORS === 'true'
 
 function defaultEmulatorHost(port) {
   return `${Platform.OS === 'android' ? '10.0.2.2' : '127.0.0.1'}:${port}`

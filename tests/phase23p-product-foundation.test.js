@@ -24,7 +24,7 @@ test('Phase 23P configures Sentry React SDK without hardcoding DSN or default PI
   assert.match(boundary, /captureAppError/)
   assert.match(envExample, /VITE_SENTRY_DSN=/)
   assert.match(firebase, /initializeAppCheck/)
-  assert.match(firebase, /ReCaptchaV3Provider/)
+  assert.match(firebase, /ReCaptchaEnterpriseProvider/)
   assert.match(firebase, /VITE_FIREBASE_APP_CHECK_SITE_KEY/)
   assert.match(firebase, /readRuntimeSecurityState/)
   assert.match(envExample, /VITE_FIREBASE_APP_CHECK_SITE_KEY=/)
