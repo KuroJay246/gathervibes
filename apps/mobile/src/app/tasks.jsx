@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 
-import { AppIcon, Card, EmptyState, Metric, Pill, Screen, Section } from '@/components/ui'
+import { AppIcon, Banner, Card, EmptyState, Metric, Pill, Screen, Section } from '@/components/ui'
 import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
@@ -12,10 +12,12 @@ export default function TasksScreen() {
   const { authInitialized, isAuthorized } = useAuth()
   const { activeEvent, ready } = useActiveEvent()
   const [tasks, setTasks] = useState([])
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
-    return subscribeToTasks(activeEvent.eventId, setTasks, () => {})
+    return subscribeToTasks(activeEvent.eventId, (rows) => { setTasks(rows); setLoaded(true) }, (nextError) => { setError(nextError?.message || 'Tasks could not be loaded.'); setLoaded(true) })
   }, [activeEvent?.eventId])
 
   const openTasks = useMemo(() => tasks.filter((task) => task.status !== 'Completed' && task.status !== 'Cancelled'), [tasks])
@@ -33,7 +35,10 @@ export default function TasksScreen() {
           <Metric label="Blocked" value={tasks.filter((task) => task.status === 'Blocked').length} />
         </View>
 
-        {tasks.length === 0 ? (
+        {!loaded ? <Banner>Loading assigned tasks…</Banner> : null}
+        {error ? <Banner tone="danger">{error}</Banner> : null}
+
+        {loaded && tasks.length === 0 ? (
           <EmptyState title="No tasks recorded" description="This event does not have visible tasks yet." />
         ) : (
           tasks.map((task) => (
