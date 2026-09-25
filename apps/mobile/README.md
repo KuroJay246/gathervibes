@@ -28,7 +28,7 @@ npm run android:e2e
 - Native iOS project files must be generated from macOS or Linux.
 - Local emulator-driven mobile QA uses `.env` values that mirror `.env.example`.
 - EAS build profiles live in `eas.json` for `development`, `preview`, and `production`.
-- Gather Android QA uses only the dedicated clean `gsv_api36_staff` AVD. Set `GSV_ANDROID_DEVICE_ID` and `GSV_ANDROID_AVD_NAME` explicitly; the Couple Book `medium_phone` AVD is not valid for this harness.
+- Gather Android QA uses only the dedicated clean `gsv_api36_staff_clean` AVD. Set `GSV_ANDROID_DEVICE_ID` and `GSV_ANDROID_AVD_NAME` explicitly; the older `gsv_api36_staff` AVD is contaminated and the Couple Book `medium_phone` AVD is not valid for this harness.
 
 ## Android E2E
 

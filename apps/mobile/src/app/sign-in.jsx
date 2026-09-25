@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { Redirect, useRouter } from 'expo-router'
-import { Text, View } from 'react-native'
 
 import { Banner, Card, Field, PrimaryButton, Screen, SecondaryButton, Section } from '@/components/ui'
 import { useAuth } from '@/providers/useAuth'
@@ -79,16 +78,10 @@ export default function SignInScreen() {
         </Card>
 
         <Banner tone="info">
-          Mobile Google provider sign-in is not wired in this first native pass. Email/password uses the same Firebase Auth project and the same Firestore access gate.
+          Sign in with an approved Gather &amp; Savor account. Access is checked again after authentication.
         </Banner>
 
-        <Card tone="muted">
-          <Text style={{ fontSize: 16, fontWeight: '700', color: '#1f2023' }}>What this app does not do</Text>
-          <Text style={{ fontSize: 14, lineHeight: 20, color: '#5c554f' }}>
-            It does not queue false offline check-ins, does not broaden access from device state, and does not send Gmail or Outlook messages.
-          </Text>
-          <SecondaryButton label="Back to Start" onPress={() => router.replace('/')} testID="sign-in-back-button" accessibilityLabel="sign-in-back-button" />
-        </Card>
+        <SecondaryButton label="Back to Start" onPress={() => router.replace('/')} testID="sign-in-back-button" accessibilityLabel="sign-in-back-button" />
       </Section>
     </Screen>
   )

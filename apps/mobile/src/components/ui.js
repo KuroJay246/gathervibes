@@ -1,9 +1,10 @@
-import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export function Screen({ children, scroll = false, contentStyle }) {
   const Wrapper = scroll ? ScrollView : View
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView edges={['top', 'right', 'bottom', 'left']} style={styles.safeArea}>
       <Wrapper style={styles.surface} contentContainerStyle={scroll ? [styles.scrollContent, contentStyle] : undefined}>
         {!scroll ? <View style={[styles.content, contentStyle]}>{children}</View> : children}
       </Wrapper>

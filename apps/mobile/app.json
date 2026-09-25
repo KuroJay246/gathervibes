@@ -57,7 +57,10 @@
           "cameraPermission": "Allow Gather & Savor Staff to access the camera for QR ticket scanning.",
           "barcodeScannerEnabled": true
         }
-      ]
+      ],
+      "expo-font",
+      "expo-image",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
