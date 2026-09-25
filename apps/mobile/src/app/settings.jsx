@@ -1,8 +1,9 @@
 import { Redirect, useRouter } from 'expo-router'
-import { Text } from 'react-native'
+import { Text, View } from 'react-native'
 import { useNetworkState } from 'expo-network'
 
-import { Banner, Card, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
+import { AppIcon, Banner, Card, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
+import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 
@@ -23,11 +24,16 @@ export default function SettingsScreen() {
         title="Settings and Sign Out"
         description="This screen is deliberately narrow. It does not edit workspace access, does not connect Gmail or Outlook, and does not queue offline check-ins."
       >
-        <Card>
-          <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2023' }}>{user?.email || 'Signed-in account'}</Text>
-          <Text style={{ color: '#5c554f' }}>{currentRoleLabel}</Text>
-          <Text style={{ color: '#5c554f' }}>{activeEvent.eventName || activeEvent.eventId}</Text>
-          <Text style={{ color: '#5c554f' }}>{networkState.isInternetReachable ?? networkState.isConnected ? 'Online' : 'Offline'}</Text>
+        <Card tone="muted">
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
+            <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}><AppIcon name="person-circle-outline" size={25} color={colors.primary} accessibilityLabel="Signed-in account" /></View>
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={{ ...typography.section, color: colors.text }}>{user?.email || 'Signed-in account'}</Text>
+              <Text style={{ ...typography.body, color: colors.textMuted }}>{currentRoleLabel}</Text>
+              <Text style={{ ...typography.caption, color: colors.textSubtle }}>{activeEvent.eventName || activeEvent.eventId}</Text>
+            </View>
+            <Pill tone={networkState.isInternetReachable ?? networkState.isConnected ? 'success' : 'warning'}>{networkState.isInternetReachable ?? networkState.isConnected ? 'Online' : 'Offline'}</Pill>
+          </View>
         </Card>
 
         <Banner tone="info">
