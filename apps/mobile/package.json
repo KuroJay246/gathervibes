@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@expo/ui": "~57.0.20",
+    "@expo/vector-icons": "^15.0.2",
     "@gsv/contracts": "file:../../packages/contracts",
     "@react-native-firebase/app": "^26.3.2",
     "@react-native-firebase/app-check": "^26.3.2",

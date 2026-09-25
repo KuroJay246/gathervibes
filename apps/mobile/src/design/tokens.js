@@ -1,0 +1,5 @@
+export const colors = { background: '#f6f3ef', surface: '#ffffff', surfaceMuted: '#f1ede8', surfaceElevated: '#fffdfb', primary: '#7c3144', primaryPressed: '#64263a', primarySoft: '#f2e4e8', text: '#211f20', textMuted: '#69615c', textSubtle: '#8a817a', border: '#e2dad3', borderStrong: '#cfc4bb', success: '#1e754b', successSoft: '#e6f3eb', warning: '#8a5a12', warningSoft: '#fff2d9', danger: '#a33d3d', dangerSoft: '#fbeaea', infoSoft: '#eaf1fb' }
+export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 }
+export const radii = { sm: 10, md: 14, lg: 20, pill: 999 }
+export const typography = { display: { fontSize: 32, lineHeight: 38, fontWeight: '700' }, title: { fontSize: 26, lineHeight: 32, fontWeight: '700' }, section: { fontSize: 18, lineHeight: 24, fontWeight: '700' }, body: { fontSize: 15, lineHeight: 22, fontWeight: '400' }, label: { fontSize: 13, lineHeight: 18, fontWeight: '600' }, caption: { fontSize: 12, lineHeight: 16, fontWeight: '500' } }
+export const controls = { minTouch: 48, field: 54, button: 52 }

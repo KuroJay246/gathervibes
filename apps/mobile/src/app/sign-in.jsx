@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Redirect, useRouter } from 'expo-router'
 
-import { Banner, Card, Field, PrimaryButton, Screen, SecondaryButton, Section } from '@/components/ui'
+import { Banner, Card, Field, IconButton, PrimaryButton, Screen, SecondaryButton, Section } from '@/components/ui'
 import { useAuth } from '@/providers/useAuth'
 
 function authMessage(code) {
@@ -22,6 +22,7 @@ export default function SignInScreen() {
   const { authInitialized, defaultRoute, isAuthorized, loading, signIn, authError } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [localError, setLocalError] = useState('')
 
   const errorMessage = useMemo(() => {
@@ -62,8 +63,9 @@ export default function SignInScreen() {
             value={password}
             onChangeText={setPassword}
             placeholder="Password"
-            secureTextEntry
+            secureTextEntry={!showPassword}
             autoCapitalize="none"
+            rightIcon={<IconButton name={showPassword ? 'eye-off-outline' : 'eye-outline'} onPress={() => setShowPassword((visible) => !visible)} label={showPassword ? 'Hide password' : 'Show password'} />}
             testID="sign-in-password-input"
             accessibilityLabel="sign-in-password-input"
           />

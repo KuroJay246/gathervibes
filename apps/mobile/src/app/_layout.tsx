@@ -6,6 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { AuthProvider } from '@/providers/AuthProvider'
 import { SelectedEventProvider } from '@/providers/SelectedEventProvider'
+import { colors } from '@/design/tokens'
 
 export default function RootLayout() {
   return (
@@ -17,7 +18,7 @@ export default function RootLayout() {
             <Stack
               screenOptions={{
                 headerShown: false,
-                contentStyle: { backgroundColor: '#f5f1ec' },
+                contentStyle: { backgroundColor: colors.background },
               }}
             />
           </SelectedEventProvider>

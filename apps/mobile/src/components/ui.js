@@ -1,5 +1,7 @@
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useState } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Ionicons } from '@expo/vector-icons'
+import { colors, controls, radii, spacing, typography } from '@/design/tokens'
 
 export function Screen({ children, scroll = false, contentStyle }) {
   const Wrapper = scroll ? ScrollView : View
@@ -54,23 +56,26 @@ export function Field({
   autoCapitalize = 'sentences',
   testID,
   accessibilityLabel,
+  rightIcon,
 }) {
+  const [focused, setFocused] = useState(false)
   return (
     <View style={styles.field}>
       <Text style={styles.fieldLabel}>{label}</Text>
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#877f78"
-        secureTextEntry={secureTextEntry}
-        autoCapitalize={autoCapitalize}
-        style={styles.input}
-        testID={testID}
-        accessibilityLabel={accessibilityLabel || testID || label}
-      />
+      <View style={[styles.inputShell, focused ? styles.inputShellFocused : null]}>
+        <TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.textSubtle} secureTextEntry={secureTextEntry} autoCapitalize={autoCapitalize} autoCorrect={false} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={styles.input} testID={testID} accessibilityLabel={accessibilityLabel || testID || label} />
+        {rightIcon}
+      </View>
     </View>
   )
+}
+
+export function AppIcon({ name, size = 20, color = colors.textMuted, accessibilityLabel }) {
+  return <Ionicons name={name} size={size} color={color} accessibilityLabel={accessibilityLabel} />
+}
+
+export function IconButton({ name, onPress, label, color = colors.text }) {
+  return <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} hitSlop={8} style={({ pressed }) => [styles.iconButton, pressed ? styles.buttonPressed : null]}><AppIcon name={name} color={color} accessibilityLabel={label} /></Pressable>
 }
 
 export function PrimaryButton({ label, onPress, disabled = false, testID, accessibilityLabel }) {
@@ -105,7 +110,7 @@ export function LoadingView({ label = 'Loading…' }) {
   return (
     <Screen>
       <View style={styles.loadingView}>
-        <ActivityIndicator size="large" color="#7c3144" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>{label}</Text>
       </View>
     </Screen>
@@ -128,79 +133,74 @@ export function Divider() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f5f1ec',
+    backgroundColor: colors.background,
   },
   surface: {
     flex: 1,
   },
   content: {
     flex: 1,
-    padding: 16,
-    gap: 16,
+    padding: spacing.lg,
+    gap: spacing.lg,
   },
   scrollContent: {
-    padding: 16,
-    gap: 16,
+    padding: spacing.lg,
+    gap: spacing.lg,
   },
   section: {
     gap: 8,
   },
   eyebrow: {
-    fontSize: 10,
-    fontWeight: '700',
+    ...typography.caption,
     letterSpacing: 1,
-    color: '#7c3144',
+    color: colors.primary,
     textTransform: 'uppercase',
   },
   sectionTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1f2023',
+    ...typography.title,
+    color: colors.text,
   },
   sectionDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#5c554f',
+    ...typography.body,
+    color: colors.textMuted,
   },
   sectionBody: {
     gap: 12,
   },
   card: {
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd4cc',
-    backgroundColor: '#ffffff',
-    padding: 14,
-    gap: 10,
+    borderRadius: radii.md,
+    backgroundColor: colors.surface,
+    padding: spacing.lg,
+    gap: spacing.md,
   },
   cardMuted: {
-    backgroundColor: '#fbf8f4',
+    backgroundColor: colors.surfaceMuted,
   },
   banner: {
-    borderRadius: 8,
+    borderRadius: radii.sm,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
   bannerInfo: {
-    backgroundColor: '#eef3fb',
+    backgroundColor: colors.infoSoft,
   },
   bannerWarning: {
-    backgroundColor: '#fff3dd',
+    backgroundColor: colors.warningSoft,
   },
   bannerDanger: {
-    backgroundColor: '#fdeceb',
+    backgroundColor: colors.dangerSoft,
   },
   bannerSuccess: {
-    backgroundColor: '#e8f4ec',
+    backgroundColor: colors.successSoft,
   },
   bannerText: {
-    color: '#1f2023',
+    color: colors.text,
     fontSize: 13,
     lineHeight: 18,
   },
   pill: {
     alignSelf: 'flex-start',
-    borderRadius: 999,
+    borderRadius: radii.pill,
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
@@ -210,23 +210,21 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   pillNeutral: {
-    backgroundColor: '#ece7e1',
+    backgroundColor: colors.surfaceMuted,
   },
   pillSuccess: {
-    backgroundColor: '#dcefe2',
+    backgroundColor: colors.successSoft,
   },
   pillWarning: {
-    backgroundColor: '#f9ebc8',
+    backgroundColor: colors.warningSoft,
   },
   pillDanger: {
-    backgroundColor: '#f6dddd',
+    backgroundColor: colors.dangerSoft,
   },
   metric: {
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e2d9d1',
-    backgroundColor: '#ffffff',
-    padding: 12,
+    borderRadius: radii.sm,
+    backgroundColor: colors.surfaceElevated,
+    padding: spacing.md,
     flex: 1,
     minWidth: 140,
     gap: 4,
@@ -235,63 +233,68 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     textTransform: 'uppercase',
-    color: '#7a726b',
+    color: colors.textSubtle,
   },
   metricValue: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1f2023',
+    color: colors.text,
   },
   metricDetail: {
     fontSize: 12,
-    color: '#5c554f',
+    color: colors.textMuted,
   },
   field: {
     gap: 6,
   },
   fieldLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#4f4842',
-    textTransform: 'uppercase',
+    ...typography.label,
+    color: colors.textMuted,
+  },
+  inputShell: {
+    minHeight: controls.field,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  inputShellFocused: {
+    borderColor: colors.primary,
   },
   input: {
-    minHeight: 48,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#d7cec6',
-    backgroundColor: '#ffffff',
+    flex: 1,
+    minHeight: controls.field - 2,
     paddingHorizontal: 12,
-    color: '#1f2023',
+    color: colors.text,
     fontSize: 16,
   },
   primaryButton: {
-    minHeight: 48,
-    borderRadius: 8,
-    backgroundColor: '#7c3144',
+    minHeight: controls.button,
+    borderRadius: radii.sm,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
   primaryButtonText: {
-    color: '#ffffff',
-    fontSize: 15,
-    fontWeight: '700',
+    color: colors.surface,
+    ...typography.label,
   },
   secondaryButton: {
-    minHeight: 48,
-    borderRadius: 8,
+    minHeight: controls.button,
+    borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: '#d7cec6',
-    backgroundColor: '#ffffff',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
   secondaryButtonText: {
-    color: '#2f2a26',
-    fontSize: 15,
-    fontWeight: '700',
+    color: colors.text,
+    ...typography.label,
   },
   buttonDisabled: {
     opacity: 0.45,
@@ -306,18 +309,25 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   loadingText: {
-    color: '#4f4842',
-    fontSize: 15,
+    color: colors.textMuted,
+    ...typography.body,
   },
   emptyTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1f2023',
+    color: colors.text,
   },
   emptyDescription: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#5c554f',
+    color: colors.textMuted,
+  },
+  iconButton: {
+    minWidth: controls.minTouch,
+    minHeight: controls.minTouch,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radii.pill,
   },
   divider: {
     height: 1,
