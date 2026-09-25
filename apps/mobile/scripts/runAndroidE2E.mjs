@@ -114,6 +114,15 @@ async function assertDeviceGuard() {
   const bootCompleted = adb(['shell', 'getprop', 'sys.boot_completed'])
   if (bootCompleted !== '1') throw new Error(`Android device ${DEVICE_ID} is not boot-complete.`)
 
+  const simulatedStylus = adb(['shell', 'getprop', 'debug.input.simulate_stylus_with_touch'])
+  const defaultIme = adb(['shell', 'settings', 'get', 'secure', 'default_input_method'])
+  const availableImes = adb(['shell', 'ime', 'list', '-s']).split(/\r?\n/).filter(Boolean)
+  console.log(JSON.stringify({ inputPreflight: { simulatedStylus, defaultIme, availableImeCount: availableImes.length } }))
+  if (simulatedStylus === '1' || simulatedStylus.toLowerCase() === 'true') {
+    adb(['shell', 'setprop', 'debug.input.simulate_stylus_with_touch', 'false'])
+    await sleep(500)
+  }
+
   const installedPackages = adb(['shell', 'pm', 'list', 'packages'])
   const presentBlockedPackage = BLOCKED_PACKAGES.find((blockedPackage) => installedPackages.includes(`package:${blockedPackage}`))
   if (presentBlockedPackage) {
