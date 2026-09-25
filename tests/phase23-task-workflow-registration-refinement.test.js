@@ -18,6 +18,7 @@ import {
   getUserAccessLevel,
 } from '../src/utils/accessRoles.js'
 import { qrPayloadForTicketCode } from '../src/utils/qrTicketUtils.js'
+import { getEventHubRouteMetadata } from '../src/app/routeManifest.js'
 
 const EVENT_ID = 'xPfa0b3KZyLSDnAD2uGI'
 
@@ -66,7 +67,7 @@ test('Phase 23 route labels preserve paths and keep scanner isolated from tasks'
 
   assert.match(app, /path="\/tasks"/)
   assert.match(shell, /Tasks & Deadlines/)
-  assert.match(shell, /'\/tasks': \['Tasks & Deadlines'/)
+  assert.equal(getEventHubRouteMetadata('/tasks').pageTitle, 'Tasks & Deadlines')
   assert.doesNotMatch(navigation, /\/tasks/)
 
   const admin = getUserAccessLevel({ uid: 'admin', email: 'admin@example.com' }, { approvedEmails: ['admin@example.com'] })

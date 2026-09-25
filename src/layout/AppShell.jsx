@@ -36,12 +36,13 @@ import { mobilePrimaryNavigationForAccess } from '../utils/navigation'
 import { TutorialProvider } from '../tutorial/TutorialProvider'
 import { isTestEvent } from '../utils/eventPlanning'
 import { pageGuidance } from '../utils/pageGuidance'
+import { getEventHubPageTitles } from '../app/routeManifest'
 
 const navGroups = [
   {
     label: 'Home',
     items: [
-      { to: '/dashboard', label: 'Home', icon: LayoutDashboard },
+      { to: '/dashboard', label: 'Home', icon: LayoutDashboard, 'data-route-label': 'Overview' },
     ],
   },
   {
@@ -115,26 +116,7 @@ const mobileMoreGroups = [
   },
 ]
 
-const pageTitles = {
-  '/dashboard': ['Event Overview', 'Current event status, priorities, and next actions'],
-  '/events': ['Events', 'Plan and organize every gathering'],
-  '/tasks': ['Tasks & Deadlines', 'Event-scoped work, blockers, and follow-up dates'],
-  '/registrations': ['Guests & Registrations', 'Manage registration records and guest counts'],
-  '/payments': ['Registration Payments', 'Review registration charges, payments, balances, and follow-up'],
-  '/payments/reconciliation': ['Review & Reconcile Records', 'Read-only workbook comparison before any correction'],
-  '/tickets': ['Tickets', 'Assign ticket codes and prepare QR access'],
-  '/check-in': ['Check-In', 'Track event-day attendance'],
-  '/operations': ['Operations', 'Track event-level money and obligations'],
-  '/run-of-show': ['Run of Show', 'Event-day sequence, supplier arrivals, dependencies, and Now/Next'],
-  '/resources': ['Equipment & Supplies', 'Equipment, supplies, packing, pickup, and return tracking'],
-  '/documents': ['Documents', 'Event document references, links, and evidence'],
-  '/contacts': ['Contacts & Organizations', 'Reusable people, businesses, and event relationships'],
-  '/event-review': ['Reports', 'Read-only follow-up, payments, operations, and summary'],
-  '/imports': ['Import Center', 'Bring in CSV exports and pasted table rows safely'],
-  '/qa': ['System QA', 'System health, data checks, and safe test guidance'],
-  '/communications': ['Message Builder', 'Create, personalize, and copy event messages'],
-  '/settings': ['Settings', 'Practical workspace and event defaults'],
-}
+const pageTitles = getEventHubPageTitles()
 
 const mobileIconMap = {
   LayoutDashboard,
@@ -193,7 +175,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
           <div className="mb-5" key={group.label}>
             <p className={`${collapsed ? 'sr-only' : 'mb-2 px-3'} text-[9px] font-bold uppercase tracking-[0.22em] text-white/65`}>{group.label}</p>
             <div className="space-y-1">
-              {group.items.reduce((links, { to, label, icon: Icon }) => {
+              {group.items.reduce((links, { to, label, icon: Icon, 'data-route-label': dataRouteLabel }) => {
                 if (!canViewRoute(access, to)) return links
                 links.push(
                   <NavLink
@@ -203,6 +185,7 @@ function SidebarContent({ onNavigate, mobile = false, groups = navGroups, collap
                     title={collapsed ? label : undefined}
                     aria-label={collapsed ? label : undefined}
                     data-tooltip={collapsed ? label : undefined}
+                    data-route-label={dataRouteLabel}
                     className={({ isActive }) =>
                       `group relative flex min-h-10 items-center ${collapsed ? 'justify-center px-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F5E6C8]' : 'gap-3 px-3'} rounded-xl py-2.5 text-[13px] transition ${
                         isActive
