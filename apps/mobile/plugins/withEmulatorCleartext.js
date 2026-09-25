@@ -5,7 +5,16 @@ module.exports = function withEmulatorCleartext(config) {
 
   return withAndroidManifest(config, (mod) => {
     const application = mod.modResults.manifest.application?.[0]
-    if (application) application.$['android:usesCleartextTraffic'] = 'true'
+    if (application) {
+      application.$['android:usesCleartextTraffic'] = 'true'
+      application['meta-data'] ||= []
+      application['meta-data'].push({
+        $: {
+          'android:name': 'firebase_crashlytics_collection_enabled',
+          'android:value': 'false',
+        },
+      })
+    }
     return mod
   })
 }

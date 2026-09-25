@@ -11,6 +11,9 @@ const DEVICE_ID = String(process.env.GSV_ANDROID_DEVICE_ID || '').trim()
 const EXPECTED_AVD_NAME = String(process.env.GSV_ANDROID_AVD_NAME || '').trim()
 const DEV_URL = process.env.GSV_MOBILE_E2E_DEV_URL || ''
 const LAUNCH_MODE = process.env.GSV_MOBILE_E2E_LAUNCH_MODE || (DEV_URL ? 'dev-client' : 'native')
+const STARTUP_TIMEOUT_MS = Number(process.env.GSV_MOBILE_E2E_STARTUP_TIMEOUT_MS || (LAUNCH_MODE === 'dev-client' ? 120000 : 30000))
+const ADB_COMMAND_TIMEOUT_MS = Number(process.env.GSV_ANDROID_ADB_TIMEOUT_MS || 20000)
+const SKIP_PM_CLEAR = process.env.GSV_ANDROID_SKIP_PM_CLEAR === 'true'
 const BLOCKED_PACKAGES = ['com.jaylan.couplebook', ...String(process.env.GSV_ANDROID_BLOCKED_PACKAGES || '')
   .split(',')
   .map((value) => value.trim())
@@ -61,6 +64,7 @@ function execAdb(args, options = {}) {
   const output = execFileSync(ADB_PATH, args, {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
+    timeout: ADB_COMMAND_TIMEOUT_MS,
     ...options,
   })
   return typeof output === 'string' ? output.trim() : ''
@@ -287,6 +291,19 @@ async function tapBySelector(selector, timeoutMs = 15000) {
   await sleep(500)
 }
 
+async function scrollUntilVisibleText(text, maxSwipes = 4) {
+  for (let attempt = 0; attempt <= maxSwipes; attempt += 1) {
+    const visible = await findNode((candidate) => candidate.text === text || candidate['content-desc'] === text || String(candidate.text || '').includes(text), 1200)
+    if (visible) return visible
+    if (attempt < maxSwipes) {
+      adb(['shell', 'input', 'swipe', '540', '1900', '540', '700', '350'])
+      await sleep(500)
+    }
+  }
+  await captureScreenshot(`missing-${text.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`)
+  throw new Error(`Timed out waiting for text after bounded scrolls: ${text}`)
+}
+
 function encodeAdbText(value) {
   return String(value)
     .replaceAll('%', '%25')
@@ -370,7 +387,9 @@ async function relaunchApp() {
     if (!DEV_URL) throw new Error('GSV_MOBILE_E2E_DEV_URL is required when GSV_MOBILE_E2E_LAUNCH_MODE=dev-client')
     adb(['shell', 'am', 'start', '-a', 'android.intent.action.VIEW', '-d', DEV_URL])
   } else {
-    adb(['shell', 'am', 'start', '-W', '-n', MAIN_ACTIVITY])
+    // Do not make ADB wait for React Native startup; the bounded UI checks below
+    // provide the actual readiness signal and preserve useful failure evidence.
+    adb(['shell', 'am', 'start', '-n', MAIN_ACTIVITY])
   }
   await sleep(3000)
 }
@@ -378,10 +397,18 @@ async function relaunchApp() {
 async function ensureAppForeground(timeoutMs = 15000) {
   const startedAt = Date.now()
   let relaunchCount = 0
+  let anrObserved = false
 
   while (Date.now() - startedAt < timeoutMs) {
     const nodes = await dumpUi('foreground-check')
     if (appIsForeground(nodes)) return
+
+    if (isExternalAnrDialog(nodes)) {
+      anrObserved = true
+      await dismissExternalAnrDialog(nodes)
+      await sleep(2000)
+      continue
+    }
 
     relaunchCount += 1
     await relaunchApp()
@@ -389,13 +416,16 @@ async function ensureAppForeground(timeoutMs = 15000) {
   }
 
   await captureScreenshot('app-not-foreground')
-  throw new Error('Gather & Savor Staff did not remain in the foreground.')
+  const detail = anrObserved
+    ? 'Android reported a startup ANR before the app became responsive.'
+    : 'The app was not present in the foreground.'
+  throw new Error(`Gather & Savor Staff did not remain in the foreground. ${detail}`)
 }
 
 async function openRoute(route) {
   adb(['shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', `gsvstaff://${route.replace(/^\//, '')}`, APP_ID])
   await sleep(2000)
-  await ensureAppForeground()
+  await ensureAppForeground(STARTUP_TIMEOUT_MS)
 }
 
 async function dismissDevMenuIfPresent() {
@@ -463,7 +493,7 @@ async function resolvePostSignInDestination(timeoutMs = 30000) {
 }
 
 async function submitSignIn() {
-  await ensureAppForeground()
+  await ensureAppForeground(STARTUP_TIMEOUT_MS)
   await waitForSelector({ accessibilityLabel: 'sign-in-submit-button' }, 10000)
   await tapBySelector({ accessibilityLabel: 'sign-in-submit-button' })
   await sleep(1500)
@@ -567,12 +597,14 @@ async function main() {
   step('device-guard')
   await assertDeviceGuard()
   step('clear-app-state')
-  adb(['shell', 'pm', 'clear', APP_ID])
+  adb(['shell', 'am', 'force-stop', APP_ID])
+  if (!SKIP_PM_CLEAR) adb(['shell', 'pm', 'clear', APP_ID])
+  if (SKIP_PM_CLEAR) console.log(JSON.stringify({ e2eStep: 'clear-app-state-skipped', reason: 'GSV_ANDROID_SKIP_PM_CLEAR=true' }))
   await sleep(1500)
 
   step('launch-sign-in')
   await relaunchApp()
-  await ensureAppForeground()
+  await ensureAppForeground(STARTUP_TIMEOUT_MS)
   await dismissDevMenuIfPresent()
   await waitForSelector({ accessibilityLabel: 'sign-in-email-input' }, 45000)
   await waitForSelector({ accessibilityLabel: 'sign-in-submit-button' }, 10000)
@@ -589,10 +621,11 @@ async function main() {
   await openScreenFromHome({ accessibilityLabel: 'home-run-of-show-button' }, '/run-of-show', { text: 'Run of Show' }, 15000)
   await waitForVisibleText('Staff briefing', 10000)
   await waitForVisibleText('Registration opens', 10000)
-  await waitForVisibleText('Lunch service', 10000)
-  await waitForVisibleText('Supplier load-in', 10000)
-  await waitForVisibleText('Venue access confirmed', 10000)
   await captureScreenshot('run-of-show-current-next')
+  await scrollUntilVisibleText('Lunch service')
+  await scrollUntilVisibleText('Supplier load-in')
+  await scrollUntilVisibleText('Venue access confirmed')
+  await captureScreenshot('run-of-show-upcoming')
   adb(['shell', 'input', 'keyevent', '4'])
   await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 10000)
 
@@ -600,7 +633,7 @@ async function main() {
   adb(['shell', 'am', 'force-stop', APP_ID])
   await sleep(1500)
   await relaunchApp()
-  await ensureAppForeground()
+  await ensureAppForeground(STARTUP_TIMEOUT_MS)
   await dismissDevMenuIfPresent()
   await ensureHomeScreen()
 
