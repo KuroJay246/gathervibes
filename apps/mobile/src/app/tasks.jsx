@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 
-import { Card, EmptyState, Metric, Screen, Section } from '@/components/ui'
+import { AppIcon, Card, EmptyState, Metric, Pill, Screen, Section } from '@/components/ui'
+import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 import { subscribeToTasks } from '@/services/tasks'
@@ -25,7 +26,7 @@ export default function TasksScreen() {
 
   return (
     <Screen scroll>
-      <Section eyebrow="Assigned Tasks" title="Tasks" description="Read-only event-scoped task visibility for the selected working event.">
+      <Section eyebrow="Assigned Tasks" title="Keep the event moving" description="Event-scoped work, ordered for quick scanning during setup and event day.">
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <Metric label="Open" value={openTasks.length} />
           <Metric label="Completed" value={tasks.filter((task) => task.status === 'Completed').length} />
@@ -36,11 +37,19 @@ export default function TasksScreen() {
           <EmptyState title="No tasks recorded" description="This event does not have visible tasks yet." />
         ) : (
           tasks.map((task) => (
-            <Card key={task.taskId}>
-              <Text style={{ fontSize: 17, fontWeight: '700', color: '#1f2023' }}>{task.title || 'Untitled task'}</Text>
-              <Text style={{ color: '#5c554f' }}>{task.status || 'Not Started'}{task.dueDate ? ` • Due ${task.dueDate}` : ''}</Text>
-              {task.notes ? <Text style={{ color: '#4f4842', lineHeight: 20 }}>{task.notes}</Text> : null}
-              {task.blockerReason ? <Text style={{ color: '#8d3f28', lineHeight: 20 }}>Blocker: {task.blockerReason}</Text> : null}
+            <Card key={task.taskId} tone="muted">
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
+                <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
+                  <AppIcon name="checkmark-circle-outline" size={21} color={colors.primary} accessibilityLabel="Task" />
+                </View>
+                <View style={{ flex: 1, gap: 5 }}>
+                  <Text style={{ ...typography.section, color: colors.text }}>{task.title || 'Untitled task'}</Text>
+                  <Text style={{ ...typography.body, color: colors.textMuted }}>{task.dueDate ? `Due ${task.dueDate}` : 'No due date'}</Text>
+                </View>
+                <Pill tone={task.status === 'Completed' ? 'success' : task.status === 'Blocked' ? 'danger' : 'warning'}>{task.status || 'Not Started'}</Pill>
+              </View>
+              {task.notes ? <Text style={{ ...typography.body, color: colors.textMuted }}>{task.notes}</Text> : null}
+              {task.blockerReason ? <Text style={{ ...typography.body, color: colors.danger }}>Blocked: {task.blockerReason}</Text> : null}
             </Card>
           ))
         )}

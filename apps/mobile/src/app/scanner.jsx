@@ -5,7 +5,8 @@ import { Text, View } from 'react-native'
 import { CameraView, useCameraPermissions } from 'expo-camera'
 import { useNetworkState } from 'expo-network'
 
-import { Banner, Card, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
+import { AppIcon, Banner, Card, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
+import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 import { completeCheckIn, recordDuplicateCheckInAttempt } from '@/services/checkin'
@@ -116,14 +117,14 @@ export default function ScannerScreen() {
       <Section
         eyebrow="QR Scanner"
         title="Scanner Mode"
-        description="Camera permission is requested only on this screen. If access is denied, manual ticket code entry stays available."
+        description="Scan a ticket, confirm the guest, and move to the next check-in without leaving this flow."
       >
         {!online ? <Banner tone="warning">The camera can still scan offline, but final check-in stays blocked until the device has a live connection.</Banner> : null}
         {error ? <Banner tone="danger">{error}</Banner> : null}
         {message ? <Banner tone="success">{message}</Banner> : null}
 
         {permissionDenied ? (
-          <Card>
+          <Card tone="muted">
             <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2023' }}>Camera access denied</Text>
             <Text style={{ color: '#5c554f', lineHeight: 20 }}>
               The app still supports manual entry. Re-enable camera access in system settings when you want QR scanning back.
@@ -146,8 +147,16 @@ export default function ScannerScreen() {
 
         {selectedRegistration ? (
           <Card>
-            <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2023' }}>{selectedRegistration.fullName || selectedRegistration.buyerName || 'Guest'}</Text>
-            <Text style={{ color: '#5c554f' }}>{selectedRegistration.ticketCode || 'No ticket code'}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
+              <View style={{ width: 40, height: 40, borderRadius: 14, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
+                <AppIcon name="person-outline" size={22} color={colors.primary} accessibilityLabel="Scanned guest" />
+              </View>
+              <View style={{ flex: 1, gap: 5 }}>
+                <Text style={{ ...typography.section, color: colors.text }}>{selectedRegistration.fullName || selectedRegistration.buyerName || 'Guest'}</Text>
+                <Text style={{ ...typography.body, color: colors.textMuted }}>{selectedRegistration.ticketCode || 'No ticket code'}</Text>
+              </View>
+              <Pill tone={selectedRegistration.checkedIn ? 'warning' : 'success'}>{selectedRegistration.checkedIn ? 'Checked In' : 'Ready'}</Pill>
+            </View>
             {selectedRegistration.checkedIn ? (
               <SecondaryButton label="Record Duplicate Attempt" onPress={handleDuplicate} disabled={saving} testID="scanner-duplicate-button" accessibilityLabel="scanner-duplicate-button" />
             ) : (

@@ -3,7 +3,8 @@ import { useRouter, Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 import { useNetworkState } from 'expo-network'
 
-import { Banner, Card, Metric, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
+import { AppIcon, Banner, Card, Metric, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
+import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 import { subscribeToDocuments } from '@/services/documents'
@@ -49,13 +50,21 @@ export default function HomeScreen() {
 
   return (
     <Screen scroll>
-      <Section
-        eyebrow="Event-Day Home"
-        title={activeEvent.eventName || 'Assigned Event'}
-        description={`${activeEvent.eventDate || 'Date not recorded'}${activeEvent.location ? ` • ${activeEvent.location}` : ''}`}
-      >
+      <Section eyebrow="Event-Day Home" title="Operations at a glance" description="A focused view of the selected event and the work that needs attention now.">
+        <Card tone="muted">
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
+            <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
+              <AppIcon name="calendar-outline" size={24} color={colors.primary} accessibilityLabel="Working event" />
+            </View>
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={{ ...typography.section, color: colors.text }}>{activeEvent.eventName || 'Assigned Event'}</Text>
+              <Text style={{ ...typography.body, color: colors.textMuted }}>{activeEvent.eventDate || 'Date not recorded'}{activeEvent.location ? ` • ${activeEvent.location}` : ''}</Text>
+            </View>
+            <Pill tone={online ? 'success' : 'warning'}>{online ? 'Live' : 'Offline'}</Pill>
+          </View>
+        </Card>
         {online ? (
-          <Banner tone="success">Live connection confirmed. Final check-in success waits for server confirmation before this app reports success.</Banner>
+          <Banner tone="success">Live connection confirmed. Check-in waits for server confirmation before reporting success.</Banner>
         ) : (
           <Banner tone="warning">Offline mode is visible, but check-ins stay blocked until the connection returns.</Banner>
         )}
@@ -63,12 +72,15 @@ export default function HomeScreen() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <Metric label="Registrations" value={registrations.length} detail={`${checkedIn} checked in`} />
           <Metric label="Open Tasks" value={openTasks} detail={`${tasks.length - openTasks} completed or cancelled`} />
-          <Metric label="Documents" value={documents.length} detail="Read-only document register" />
-          <Metric label="Readiness" value={readinessItems === 0 ? 'Ready' : `${readinessItems} items`} detail="First mobile cut" />
+          <Metric label="Documents" value={documents.length} detail="Event register" />
+          <Metric label="Readiness" value={readinessItems === 0 ? 'Ready' : `${readinessItems} items`} detail="Needs attention" />
         </View>
 
         <Card>
-          <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2023' }}>Core event-day actions</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+            <AppIcon name="flash-outline" size={20} color={colors.primary} accessibilityLabel="Quick actions" />
+            <Text style={{ ...typography.section, color: colors.text }}>Quick actions</Text>
+          </View>
           <View style={{ gap: 10 }}>
             <PrimaryButton label="Guest Search" onPress={() => router.push('/lookup')} testID="home-guest-search-button" accessibilityLabel="home-guest-search-button" />
             <PrimaryButton label="QR Scanner" onPress={() => router.push('/scanner')} testID="home-qr-scanner-button" accessibilityLabel="home-qr-scanner-button" />
@@ -76,8 +88,11 @@ export default function HomeScreen() {
           </View>
         </Card>
 
-        <Card>
-          <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2023' }}>Operations</Text>
+        <Card tone="muted">
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+            <AppIcon name="list-outline" size={20} color={colors.primary} accessibilityLabel="Operations" />
+            <Text style={{ ...typography.section, color: colors.text }}>More operations</Text>
+          </View>
           <View style={{ gap: 10 }}>
             <SecondaryButton label="Assigned Tasks" onPress={() => router.push('/tasks')} />
             <SecondaryButton label="Operational Notes" onPress={() => router.push('/notes')} />

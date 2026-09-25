@@ -3,7 +3,8 @@ import { Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 import { useNetworkState } from 'expo-network'
 
-import { Banner, Card, EmptyState, Field, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
+import { AppIcon, Banner, Card, EmptyState, Field, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
+import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 import { completeCheckIn, recordDuplicateCheckInAttempt, undoCheckIn } from '@/services/checkin'
@@ -125,16 +126,19 @@ export default function LookupScreen() {
         ) : (
           <View style={{ gap: 12 }}>
             {visibleMatches.map((registration) => (
-              <Card key={registration.registrationId}>
+              <Card key={registration.registrationId} tone="muted">
                 {(() => {
                   const warnings = checkInWarnings(registration)
                   const checkInState = canCompleteCheckIn(registration)
                   return (
                     <>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: spacing.md }}>
+                  <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
+                    <AppIcon name="person-outline" size={20} color={colors.primary} accessibilityLabel="Guest" />
+                  </View>
                   <View style={{ flex: 1, gap: 4 }}>
-                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2023' }}>{registrationName(registration)}</Text>
-                    <Text style={{ color: '#5c554f' }}>{registration.ticketCode || 'No ticket code'} • {formatPaymentLabel(registration.paymentStatus)}</Text>
+                    <Text style={{ ...typography.section, color: colors.text }}>{registrationName(registration)}</Text>
+                    <Text style={{ ...typography.body, color: colors.textMuted }}>{registration.ticketCode || 'No ticket code'} • {formatPaymentLabel(registration.paymentStatus)}</Text>
                   </View>
                   <Pill tone={registration.checkedIn ? 'warning' : 'success'}>{registration.checkedIn ? 'Checked In' : 'Ready'}</Pill>
                 </View>
