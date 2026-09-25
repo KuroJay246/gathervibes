@@ -49,7 +49,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "android:e2e:seed": "node ./scripts/seedMobileE2EFixture.mjs",
-    "android:e2e": "node ./scripts/runAndroidE2E.mjs"
+    "android:e2e": "node ./scripts/runAndroidE2EWithSeed.mjs"
   },
   "private": true
 }
