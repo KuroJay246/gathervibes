@@ -9,12 +9,3 @@ export function createLifecycleSnapshot(state = 'idle', details = {}) {
 export function isLifecycleState(states, state) {
   return Array.isArray(states) && states.includes(state)
 }
-
-export function createRequestVersion() {
-  let version = 0
-  return Object.freeze({
-    next() { version += 1; return version },
-    current() { return version },
-    isCurrent(candidate) { return candidate === version },
-  })
-}

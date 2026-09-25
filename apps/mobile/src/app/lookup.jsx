@@ -11,6 +11,7 @@ import { searchRegistrations, subscribeToRegistrations } from '@/services/regist
 import { canCompleteCheckIn, checkInWarnings } from '@gsv/contracts/ticketUtils'
 import { formatPaymentLabel } from '@gsv/contracts/paymentStatus'
 import { isApprovedAdmin } from '@gsv/contracts/accessRoles'
+import { createRequestVersion } from '@gsv/contracts'
 
 function registrationName(registration) {
   return registration?.fullName || registration?.buyerName || 'Guest'
@@ -25,13 +26,22 @@ export default function LookupScreen() {
   const [message, setMessage] = useState('')
   const [actionError, setActionError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [visibleMatches, setVisibleMatches] = useState([])
+  const requestVersion = useMemo(() => createRequestVersion(), [])
 
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
     return subscribeToRegistrations(activeEvent.eventId, setRegistrations, (error) => setActionError(error?.message || 'Registrations could not be loaded.'))
   }, [activeEvent?.eventId])
 
-  const matches = useMemo(() => searchRegistrations(registrations, queryText, 20), [registrations, queryText])
+  useEffect(() => {
+    const requestId = requestVersion.next()
+    const nextMatches = searchRegistrations(registrations, queryText, 20)
+    Promise.resolve().then(() => {
+      if (requestVersion.isCurrent(requestId)) setVisibleMatches(nextMatches)
+    })
+    return undefined
+  }, [queryText, registrations, requestVersion])
   const canUndo = isApprovedAdmin(access)
   const online = networkState.isInternetReachable ?? networkState.isConnected
 
@@ -114,7 +124,7 @@ export default function LookupScreen() {
           <EmptyState title="Start typing" description="This screen shows up to 20 event-scoped matches from the local event-day registration list." />
         ) : (
           <View style={{ gap: 12 }}>
-            {matches.map((registration) => (
+            {visibleMatches.map((registration) => (
               <Card key={registration.registrationId}>
                 {(() => {
                   const warnings = checkInWarnings(registration)
@@ -149,7 +159,7 @@ export default function LookupScreen() {
                 })()}
               </Card>
             ))}
-            {matches.length === 0 ? <EmptyState title="No matches" description="Nothing in the selected event matched this search." /> : null}
+            {visibleMatches.length === 0 ? <EmptyState title="No matches" description="Nothing in the selected event matched this search." /> : null}
           </View>
         )}
       </Section>

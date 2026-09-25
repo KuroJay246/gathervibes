@@ -1,7 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { EVENT_HUB_ROUTE_MANIFEST, getEventHubPageTitles, getEventHubRouteMetadata } from '../src/app/routeManifest.js'
-import { CHECKIN_LIFECYCLE, IMPORT_LIFECYCLE, PROVIDER_LIFECYCLE, createLifecycleSnapshot, createRequestVersion, isLifecycleState } from '../src/features/workflows/lifecycle.js'
+import { CHECKIN_LIFECYCLE, IMPORT_LIFECYCLE, PROVIDER_LIFECYCLE, createLifecycleSnapshot, isLifecycleState } from '../src/features/workflows/lifecycle.js'
+import { createRequestVersion } from '../packages/contracts/src/requestVersion.js'
 
 test('Event Hub route manifest covers every current App route and key workflow metadata', () => {
   assert.equal(EVENT_HUB_ROUTE_MANIFEST.length, 18)

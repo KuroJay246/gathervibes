@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { AppState } from 'react-native'
 import { Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 import { CameraView, useCameraPermissions } from 'expo-camera'
@@ -23,7 +24,13 @@ export default function ScannerScreen() {
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [scanEnabled, setScanEnabled] = useState(true)
+  const [appState, setAppState] = useState(AppState.currentState)
   const online = networkState.isInternetReachable ?? networkState.isConnected
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', setAppState)
+    return () => subscription.remove()
+  }, [])
 
   useEffect(() => {
     if (permission?.granted) return
@@ -51,7 +58,7 @@ export default function ScannerScreen() {
   }
 
   function handleBarcodeScanned({ data }) {
-    if (!scanEnabled) return
+    if (appState !== 'active' || !scanEnabled) return
     const parsed = parseQrTicketCode(data)
     if (parsed.error) {
       setError(parsed.error)
@@ -129,6 +136,7 @@ export default function ScannerScreen() {
               <CameraView
                 style={{ minHeight: 320 }}
                 facing="back"
+                active={appState === 'active' && scanEnabled}
                 barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
                 onBarcodeScanned={handleBarcodeScanned}
               />
