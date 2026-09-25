@@ -2,6 +2,7 @@ import {
   collection,
   doc,
   onSnapshot,
+  runTransaction,
   serverTimestamp,
   writeBatch,
 } from 'firebase/firestore'
@@ -71,6 +72,7 @@ function sanitizeTaskPayload(values = {}, event, user, existingTask = null) {
     updatedBy: performedBy(user),
     completedAt: status === 'Completed' ? (existingTask?.completedAt || serverTimestamp()) : null,
     cancelledAt: status === 'Cancelled' ? (existingTask?.cancelledAt || serverTimestamp()) : null,
+    revision: Number.isInteger(existingTask?.revision) ? existingTask.revision + 1 : 1,
   }
 }
 
@@ -120,6 +122,7 @@ export async function updateTask(event, existingTask, values, user, action = 'ta
   const firestore = requireDatabase()
   const normalizedExisting = normalizeTask(existingTask)
   const ref = taskRef(event.eventId, normalizedExisting.taskId)
+  const expectedRevision = Number.isInteger(normalizedExisting.revision) ? normalizedExisting.revision : 0
   const payload = sanitizeTaskPayload({ ...normalizedExisting, ...values, taskId: normalizedExisting.taskId }, event, user, normalizedExisting)
   const after = { ...normalizedExisting, ...payload, taskId: normalizedExisting.taskId }
   const audit = createAuditLogWrite({
@@ -130,8 +133,25 @@ export async function updateTask(event, existingTask, values, user, action = 'ta
     performedBy: user,
     details: auditDetails(normalizedExisting, after, action.replace('task.', '')),
   })
+  try {
+    await runTransaction(firestore, async (transaction) => {
+      const snapshot = await transaction.get(ref)
+      if (!snapshot.exists()) throw new Error('This task no longer exists.')
+      const currentRevision = Number.isInteger(snapshot.data()?.revision) ? snapshot.data().revision : 0
+      if (currentRevision !== expectedRevision) {
+        const conflict = new Error('This task changed since you opened it. Reload the latest task before retrying.')
+        conflict.code = 'conflict/stale-revision'
+        conflict.expectedRevision = expectedRevision
+        conflict.currentRevision = currentRevision
+        throw conflict
+      }
+      transaction.update(ref, { ...payload, revision: currentRevision + 1 })
+    })
+  } catch (error) {
+    if (error?.code === 'conflict/stale-revision') throw error
+    throw error
+  }
   const batch = writeBatch(firestore)
-  batch.update(ref, payload)
   batch.set(audit.ref, audit.data)
   await batch.commit()
 }

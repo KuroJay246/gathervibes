@@ -1067,6 +1067,7 @@ service cloud.firestore {
           'responsibleType', 'responsibleUserId', 'responsibleLabel',
           'waitingOn', 'blockerReason', 'createdAt', 'createdBy',
           'updatedAt', 'updatedBy', 'completedAt', 'cancelledAt'
+          , 'revision'
         ])
         && data.taskId == taskId
         && validShortId(data.taskId)
@@ -1104,7 +1105,8 @@ service cloud.firestore {
         && (data.status == 'Waiting on Someone' || data.waitingOn == '')
         && (data.status == 'Blocked' || data.blockerReason == '')
         && (data.status == 'Completed' || data.completedAt == null)
-        && (data.status == 'Cancelled' || data.cancelledAt == null);
+        && (data.status == 'Cancelled' || data.cancelledAt == null)
+        && (!('revision' in data) || (data.revision is int && data.revision >= 1));
     }
 
     function taskIdentityUnchanged(taskId) {
@@ -1113,6 +1115,12 @@ service cloud.firestore {
         && request.resource.data.eventId == resource.data.eventId
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.createdBy == resource.data.createdBy;
+    }
+
+    function taskRevisionAdvances() {
+      return !('revision' in resource.data)
+        ? request.resource.data.revision == 1
+        : request.resource.data.revision == resource.data.revision + 1;
     }
 
     function validRunOfShowStatus(status) {
@@ -2008,6 +2016,7 @@ service cloud.firestore {
       allow update: if canManageTask(eventId)
         && validTask(request.resource.data, eventId, taskId)
         && taskIdentityUnchanged(taskId)
+        && taskRevisionAdvances()
         && request.resource.data.updatedAt == request.time;
       allow delete: if canManageTask(eventId);
     }
