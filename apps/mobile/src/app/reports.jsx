@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Redirect } from 'expo-router'
-import { View } from 'react-native'
+import { Text, View } from 'react-native'
 
-import { Metric, Screen, Section } from '@/components/ui'
+import { Banner, Card, EmptyState, Metric, Screen, Section } from '@/components/ui'
+import { colors, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 import { subscribeToRegistrations } from '@/services/registrations'
@@ -12,10 +13,12 @@ export default function ReportsScreen() {
   const { authInitialized, isAuthorized } = useAuth()
   const { activeEvent, ready } = useActiveEvent()
   const [registrations, setRegistrations] = useState([])
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
-    return subscribeToRegistrations(activeEvent.eventId, setRegistrations, () => {})
+    return subscribeToRegistrations(activeEvent.eventId, (rows) => { setRegistrations(rows); setLoaded(true) }, (nextError) => { setError(nextError?.message || 'Reports could not be loaded.'); setLoaded(true) })
   }, [activeEvent?.eventId])
 
   const paid = useMemo(() => registrations.filter((registration) => normalizePaymentStatus(registration.paymentStatus) === 'paid').length, [registrations])
@@ -34,6 +37,9 @@ export default function ReportsScreen() {
         title="Reports"
         description="This mobile report surface stays narrow: registration, payment-status, and check-in totals for the currently selected event only."
       >
+        {!loaded ? <Banner>Loading event summary…</Banner> : null}
+        {error ? <Banner tone="danger">{error}</Banner> : null}
+        {loaded && !error && registrations.length === 0 ? <EmptyState title="No registration activity" description="The selected event has no visible registration records yet." /> : null}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <Metric label="Registrations" value={registrations.length} />
           <Metric label="Checked In" value={checkedIn} />
@@ -42,6 +48,10 @@ export default function ReportsScreen() {
           <Metric label="Door" value={door} />
           <Metric label="Not Checked In" value={Math.max(registrations.length - checkedIn, 0)} />
         </View>
+        <Card tone="muted">
+          <Text style={{ ...typography.section, color: colors.text }}>Event-day readout</Text>
+          <Text style={{ ...typography.body, color: colors.textMuted }}>{checkedIn} of {registrations.length} registrations checked in. {pending > 0 ? `${pending} payment${pending === 1 ? '' : 's'} still need review.` : 'No pending payments are visible.'}</Text>
+        </Card>
       </Section>
     </Screen>
   )
