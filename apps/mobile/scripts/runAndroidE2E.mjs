@@ -574,6 +574,7 @@ async function main() {
   await typeInto('sign-in-password-input', FIXTURE_PASSWORD)
   await submitSignIn()
   await ensureHomeScreen()
+  await captureScreenshot('owner-home')
 
   adb(['shell', 'am', 'force-stop', APP_ID])
   await sleep(1500)
@@ -590,6 +591,7 @@ async function main() {
   )
   await typeInto('lookup-search-input', 'Lookup Guest')
   await waitForVisibleText('Lookup Guest', 10000)
+  await captureScreenshot('guests-search')
   adb(['shell', 'input', 'keyevent', '4'])
   await openScreenFromHome(
     { accessibilityLabel: 'home-manual-ticket-button' },
@@ -602,10 +604,12 @@ async function main() {
 
   await typeInto('manual-ticket-input', 'GSV-E2E-READY')
   await waitForVisibleText('Fixture Guest', 10000)
+  await captureScreenshot('scanner-success-ready-to-confirm')
   await tapForVisibleText({ accessibilityLabel: 'manual-checkin-button' }, 'Fixture Guest checked in successfully.', 20000)
 
   await typeInto('manual-ticket-input', 'GSV-E2E-READY')
   await waitForVisibleText('Fixture Guest', 10000)
+  await captureScreenshot('scanner-duplicate')
   await tapForVisibleText({ accessibilityLabel: 'manual-duplicate-button' }, 'Duplicate attempt recorded. No new check-in was saved.', 20000)
 
   await openRoute('/home')
@@ -613,6 +617,7 @@ async function main() {
   adb(['shell', 'pm', 'revoke', APP_ID, 'android.permission.CAMERA'])
   adb(['shell', 'cmd', 'appops', 'set', APP_ID, 'CAMERA', 'deny'])
   await openRoute('/scanner')
+  await captureScreenshot('scanner-ready')
   await maybeDenyCameraPrompt()
   await waitForVisibleText('Camera access denied', 15000)
   adb(['shell', 'input', 'keyevent', '4'])

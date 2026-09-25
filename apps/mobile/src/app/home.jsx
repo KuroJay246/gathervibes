@@ -73,7 +73,7 @@ export default function HomeScreen() {
           <Metric label="Registrations" value={registrations.length} detail={`${checkedIn} checked in`} />
           <Metric label="Open Tasks" value={openTasks} detail={`${tasks.length - openTasks} completed or cancelled`} />
           <Metric label="Documents" value={documents.length} detail="Event register" />
-          <Metric label="Readiness" value={readinessItems === 0 ? 'Ready' : `${readinessItems} items`} detail="Needs attention" />
+          <Metric label="Readiness" value={readinessItems === 0 ? 'Ready' : `${readinessItems} ${readinessItems === 1 ? 'item' : 'items'}`} detail="Needs attention" />
         </View>
 
         <Card>
