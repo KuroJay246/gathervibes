@@ -1,20 +1,26 @@
 import { useEffect, useState } from 'react'
 import { Redirect } from 'expo-router'
-import { Text } from 'react-native'
+import { Text, View } from 'react-native'
 
-import { Card, EmptyState, Screen, Section } from '@/components/ui'
+import { AppIcon, Banner, Card, EmptyState, Metric, Pill, Screen, Section } from '@/components/ui'
+import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 import { subscribeToDocuments } from '@/services/documents'
+import { subscribeToOperationsLedger } from '@/services/operations'
 
 export default function NotesScreen() {
   const { authInitialized, isAuthorized } = useAuth()
   const { activeEvent, ready } = useActiveEvent()
   const [documents, setDocuments] = useState([])
+  const [operations, setOperations] = useState([])
+  const [operationsError, setOperationsError] = useState('')
 
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
-    return subscribeToDocuments(activeEvent.eventId, setDocuments, () => {})
+    const unsubscribeDocuments = subscribeToDocuments(activeEvent.eventId, setDocuments, () => {})
+    const unsubscribeOperations = subscribeToOperationsLedger(activeEvent.eventId, setOperations, (nextError) => setOperationsError(nextError?.message || 'Operations could not be loaded.'))
+    return () => { unsubscribeDocuments(); unsubscribeOperations() }
   }, [activeEvent?.eventId])
 
   if (!authInitialized || !ready) return null
@@ -24,10 +30,23 @@ export default function NotesScreen() {
   return (
     <Screen scroll>
       <Section
-        eyebrow="Operational Notes"
-        title="Notes and References"
-        description="This first mobile cut exposes event-scoped document references, descriptions, notes, dates, and URLs without adding file upload or OCR behavior."
+        eyebrow="Operations"
+        title="Event operations"
+        description="A compact read-only view of the selected event's commitments, ledger context, and operational references."
       >
+        {operationsError ? <Banner tone="danger">{operationsError}</Banner> : null}
+        <Card tone="muted">
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}><AppIcon name="receipt-outline" size={20} color={colors.primary} accessibilityLabel="Operations" /><Text style={{ ...typography.section, color: colors.text }}>Ledger snapshot</Text></View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+            <Metric label="Entries" value={operations.length} />
+            <Metric label="Open" value={operations.filter((entry) => ['expected', 'pending'].includes(entry.status)).length} />
+            <Metric label="Paid / received" value={operations.filter((entry) => ['paid', 'received'].includes(entry.status)).length} />
+          </View>
+          {operations.slice(0, 4).map((entry) => <View key={entry.ledgerEntryId} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}><AppIcon name={entry.status === 'pending' || entry.status === 'expected' ? 'time-outline' : 'checkmark-circle-outline'} size={18} color={entry.status === 'pending' || entry.status === 'expected' ? colors.warning : colors.success} accessibilityLabel="Ledger status" /><Text style={{ ...typography.body, color: colors.text, flex: 1 }}>{entry.label || 'Ledger entry'}</Text><Pill tone={entry.status === 'pending' || entry.status === 'expected' ? 'warning' : 'success'}>{entry.status || 'unknown'}</Pill></View>)}
+          {operations.length === 0 ? <Text style={{ ...typography.body, color: colors.textMuted }}>No operations ledger entries are visible for this event.</Text> : null}
+        </Card>
+
+        <Section eyebrow="References" title="Notes and documents">
         {documents.length === 0 ? (
           <EmptyState title="No document references" description="The selected event does not have visible document references yet." />
         ) : (
@@ -41,6 +60,7 @@ export default function NotesScreen() {
             </Card>
           ))
         )}
+        </Section>
       </Section>
     </Screen>
   )
