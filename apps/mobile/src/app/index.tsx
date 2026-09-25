@@ -4,9 +4,10 @@ import { Redirect } from 'expo-router'
 import { LoadingView } from '@/components/ui'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
+import { mobileLandingRouteForAccess } from '@gsv/contracts/accessRoles'
 
 export default function IndexRoute() {
-  const { authInitialized, isAuthorized, loading } = useAuth()
+  const { authInitialized, isAuthorized, loading, access } = useAuth()
   const { activeEvent, ready } = useActiveEvent()
 
   if (!authInitialized || loading || !ready) {
@@ -14,6 +15,5 @@ export default function IndexRoute() {
   }
 
   if (!isAuthorized) return <Redirect href="/sign-in" />
-  if (!activeEvent?.eventId) return <Redirect href="/events" />
-  return <Redirect href="/home" />
+  return <Redirect href={mobileLandingRouteForAccess(access, Boolean(activeEvent?.eventId))} />
 }

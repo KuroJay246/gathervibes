@@ -410,3 +410,12 @@ export function defaultRouteForAccess(access = DEFAULT_ACCESS) {
   if (role === 'operations-helper') return '/operations'
   return '/dashboard'
 }
+
+export function mobileLandingRouteForAccess(access = DEFAULT_ACCESS, hasWorkingEvent = false) {
+  if (!hasWorkingEvent) return '/events'
+  if (isApprovedAdmin(access)) return '/home'
+  const role = normalizeAccessRole(access?.role)
+  if (role === 'scanner') return '/scanner'
+  if (role === 'operations-helper') return '/home'
+  return '/home'
+}
