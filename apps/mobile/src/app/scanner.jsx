@@ -119,6 +119,16 @@ export default function ScannerScreen() {
         title="Scanner Mode"
         description="Scan a ticket, confirm the guest, and move to the next check-in without leaving this flow."
       >
+        <Card tone="muted">
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+            <AppIcon name={online ? 'wifi-outline' : 'cloud-offline-outline'} size={20} color={online ? colors.success : colors.warning} accessibilityLabel={online ? 'Live connection' : 'Offline connection'} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={{ ...typography.label, color: colors.text }}>{online ? 'Ready for authoritative check-in' : 'Check-in is paused offline'}</Text>
+              <Text style={{ ...typography.caption, color: colors.textMuted }}>{scanEnabled ? 'Point the camera at one QR ticket.' : 'Review the result before scanning again.'}</Text>
+            </View>
+            <Pill tone={online ? 'success' : 'warning'}>{online ? 'Live' : 'Offline'}</Pill>
+          </View>
+        </Card>
         {!online ? <Banner tone="warning">The camera can still scan offline, but final check-in stays blocked until the device has a live connection.</Banner> : null}
         {error ? <Banner tone="danger">{error}</Banner> : null}
         {message ? <Banner tone="success">{message}</Banner> : null}
