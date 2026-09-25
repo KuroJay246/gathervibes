@@ -48,6 +48,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "test": "node ../../tests/mobile-run-of-show.test.js",
     "android:e2e:seed": "node ./scripts/seedMobileE2EFixture.mjs",
     "android:e2e": "node ./scripts/runAndroidE2EWithSeed.mjs"
   },
