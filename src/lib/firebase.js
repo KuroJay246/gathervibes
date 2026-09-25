@@ -37,6 +37,8 @@ const app = isFirebaseConfigured ? (getApps().length ? getApp() : initializeApp(
 export const auth = app ? getAuth(app) : null
 
 const useFirebaseEmulators = import.meta.env.VITE_FIREBASE_USE_EMULATORS === 'true'
+const emulatorAuthPort = Number(import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_PORT || 9099)
+const emulatorFirestorePort = Number(import.meta.env.VITE_FIREBASE_FIRESTORE_EMULATOR_PORT || 8080)
 const appCheckSiteKey = String(import.meta.env.VITE_FIREBASE_APP_CHECK_SITE_KEY || '').trim()
 const appCheckDebugToken = String(import.meta.env.VITE_FIREBASE_APP_CHECK_DEBUG_TOKEN || '').trim()
 
@@ -87,12 +89,12 @@ if (useFirebaseEmulators && typeof window !== 'undefined') {
   window.__GSV_FIREBASE_EMULATORS__ ||= {}
 
   if (auth && !window.__GSV_FIREBASE_EMULATORS__.auth) {
-    connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true })
+    connectAuthEmulator(auth, `http://127.0.0.1:${emulatorAuthPort}`, { disableWarnings: true })
     window.__GSV_FIREBASE_EMULATORS__.auth = true
   }
 
   if (db && !window.__GSV_FIREBASE_EMULATORS__.firestore) {
-    connectFirestoreEmulator(db, '127.0.0.1', 8080)
+    connectFirestoreEmulator(db, '127.0.0.1', emulatorFirestorePort)
     window.__GSV_FIREBASE_EMULATORS__.firestore = true
   }
 }

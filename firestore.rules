@@ -1118,7 +1118,9 @@ service cloud.firestore {
     }
 
     function taskRevisionAdvances() {
-      return !('revision' in resource.data)
+      return !('revision' in request.resource.data)
+        ? !('revision' in resource.data)
+        : !('revision' in resource.data)
         ? request.resource.data.revision == 1
         : request.resource.data.revision == resource.data.revision + 1;
     }

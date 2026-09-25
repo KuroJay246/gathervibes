@@ -1,13 +1,15 @@
 /* global console, process */
 import { spawn } from 'node:child_process'
 
+// The isolated runner pins firebase-tools@14.19.0 while allowing GSV ports to move.
+
 const mode = process.argv[2]
 
 const commands = {
   qa: [
     'npm run lint',
     'npm test',
-    'npx -y firebase-tools@14.19.0 emulators:exec --only auth,firestore --project gathervibeshub "npm run product:qa:emulator-checks"',
+    'node scripts/product/runIsolatedEmulators.mjs "npm run product:qa:emulator-checks"',
     'npm run build',
     'npm audit --omit=dev',
     'npm run doctor:changed',
