@@ -95,6 +95,7 @@ export default function HomeScreen() {
           </View>
           <View style={{ gap: 10 }}>
             <SecondaryButton label="Assigned Tasks" onPress={() => router.push('/tasks')} />
+            <SecondaryButton label="Run of Show" onPress={() => router.push('/run-of-show')} testID="home-run-of-show-button" accessibilityLabel="home-run-of-show-button" />
             <SecondaryButton label="Operational Notes" onPress={() => router.push('/notes')} />
             <SecondaryButton label="Event Contacts" onPress={() => router.push('/contacts')} />
             <SecondaryButton label="Limited Reports" onPress={() => router.push('/reports')} />

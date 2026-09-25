@@ -105,6 +105,23 @@ async function seedFirestore(userRecord) {
     category: 'operations',
   }, { merge: true })
 
+  const runOfShow = [
+    ['mobile-e2e-past', 'Venue access confirmed', 'Setup', 'Completed', '08:00', 'Venue', 'Site access is confirmed before the team arrives.'],
+    ['mobile-e2e-current', 'Staff briefing', 'Staff Arrival', 'In Progress', '09:00', 'Main entrance', 'Review assignments and safety notes.'],
+    ['mobile-e2e-next', 'Registration opens', 'Registration / Doors Open', 'Confirmed', '10:00', 'Welcome desk', 'Begin guest check-in and direct arrivals.'],
+    ['mobile-e2e-upcoming', 'Lunch service', 'Food / Beverage Service', 'Planned', '12:30', 'Dining area', 'Coordinate service timing with the venue lead.'],
+    ['mobile-e2e-delayed', 'Supplier load-in', 'Supplier Arrival', 'Delayed', '08:30', 'Service entrance', 'Waiting for supplier confirmation.', 'Delayed'],
+  ]
+  for (const [itemId, title, category, status, startTime, location, description, arrivalStatus = 'Expected'] of runOfShow) {
+    batch.set(eventRef.collection('runOfShow').doc(itemId), {
+      itemId, eventId: EVENT_ID, eventName: EVENT_NAME, title, category, date: '2026-08-24', startTime,
+      endTime: '', sequence: runOfShow.findIndex(([id]) => id === itemId), location, status, description,
+      notes: '', responsibleLabel: 'Event team', expectedArrivalTime: category === 'Supplier Arrival' ? startTime : '', actualArrivalTime: '', arrivalStatus,
+      arrivalNote: '', linkedTaskId: '', linkedDocumentIds: [], linkedResourceIds: [], dependencyItemIds: [], delayReason: status === 'Delayed' ? 'Supplier confirmation pending.' : '', criticalForEvent: status === 'Delayed',
+      createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(), updatedBy: 'mobile-e2e-fixture',
+    }, { merge: true })
+  }
+
   batch.set(db.collection('contacts').doc('mobile-e2e-contact'), {
     contactId: 'mobile-e2e-contact',
     displayName: 'E2E Venue Lead',
