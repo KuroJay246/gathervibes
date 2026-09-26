@@ -650,6 +650,20 @@ async function main() {
   await captureScreenshot('scanner-success-ready-to-confirm')
   await tapForVisibleText({ accessibilityLabel: 'manual-checkin-button' }, 'Fixture Guest checked in successfully.', 20000)
 
+  if (EXPECTED_REGISTRATION_COUNT > 0) {
+    await openRoute('/home')
+    await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 15000)
+    await waitForVisibleText(`${EXPECTED_REGISTRATION_COUNT}`, 15000)
+    await waitForVisibleText('2 checked in', 15000)
+    await captureScreenshot('home-refresh-after-checkin')
+
+    await openRoute('/reports')
+    await waitForVisibleText(`2 of ${EXPECTED_REGISTRATION_COUNT} registrations checked in.`, 15000)
+    await captureScreenshot('reports-refresh-after-checkin')
+    await openRoute('/manual-entry')
+    await waitForSelector({ accessibilityLabel: 'manual-ticket-input' }, 15000)
+  }
+
   await typeInto('manual-ticket-input', 'GSV-E2E-READY')
   await waitForVisibleText('Fixture Guest', 10000)
   await captureScreenshot('scanner-duplicate')
