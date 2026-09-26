@@ -28,6 +28,7 @@ export default function LookupScreen() {
   const [actionError, setActionError] = useState('')
   const [saving, setSaving] = useState(false)
   const [visibleMatches, setVisibleMatches] = useState([])
+  const [statusFilter, setStatusFilter] = useState('all')
   const requestVersion = useMemo(() => createRequestVersion(), [])
 
   useEffect(() => {
@@ -37,12 +38,17 @@ export default function LookupScreen() {
 
   useEffect(() => {
     const requestId = requestVersion.next()
-    const nextMatches = searchRegistrations(registrations, queryText, 20)
+    const searchedMatches = searchRegistrations(registrations, queryText, 100)
+    const nextMatches = searchedMatches.filter((registration) => {
+      if (statusFilter === 'checked-in') return registration.checkedIn
+      if (statusFilter === 'ready') return !registration.checkedIn
+      return true
+    }).slice(0, 20)
     Promise.resolve().then(() => {
       if (requestVersion.isCurrent(requestId)) setVisibleMatches(nextMatches)
     })
     return undefined
-  }, [queryText, registrations, requestVersion])
+  }, [queryText, registrations, requestVersion, statusFilter])
   const canUndo = isApprovedAdmin(access)
   const online = networkState.isInternetReachable ?? networkState.isConnected
 
@@ -116,6 +122,20 @@ export default function LookupScreen() {
             testID="lookup-search-input"
             accessibilityLabel="lookup-search-input"
           />
+          <View style={{ gap: 8 }}>
+            <Text style={{ ...typography.caption, color: colors.textMuted }}>Show</Text>
+            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+              {[
+                ['all', 'All guests'],
+                ['ready', 'Ready'],
+                ['checked-in', 'Checked in'],
+              ].map(([value, label]) => value === statusFilter ? (
+                <PrimaryButton key={value} label={label} onPress={() => setStatusFilter(value)} accessibilityLabel={`Show ${label}`} />
+              ) : (
+                <SecondaryButton key={value} label={label} onPress={() => setStatusFilter(value)} accessibilityLabel={`Show ${label}`} />
+              ))}
+            </View>
+          </View>
         </Card>
 
         {actionError ? <Banner tone="danger">{actionError}</Banner> : null}
