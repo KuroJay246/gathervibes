@@ -10,6 +10,7 @@ const FIXTURE_PASSWORD = process.env.GSV_MOBILE_E2E_PASSWORD || 'MobileE2E123'
 const EVENT_ID = 'codex_demo_full_system_walkthrough'
 const EVENT_NAME = 'CODEX_DEMO - Full System Walkthrough'
 const FIXTURE_UID = 'mobile-e2e-staff'
+const REGISTRATION_COUNT = Math.max(3, Number(process.env.GSV_MOBILE_E2E_REGISTRATION_COUNT || 3))
 
 process.env.FIRESTORE_EMULATOR_HOST = FIRESTORE_EMULATOR_HOST
 process.env.FIREBASE_AUTH_EMULATOR_HOST = FIREBASE_AUTH_EMULATOR_HOST
@@ -91,13 +92,11 @@ async function seedFirestore(userRecord) {
     updatedAt: FieldValue.serverTimestamp(),
   }, { merge: true })
 
-  for (const row of [
+  const baseRegistrations = [
     registration('mobile-e2e-ready', 'Fixture Guest', 'GSV-E2E-READY'),
     registration('mobile-e2e-duplicate', 'Duplicate Guest', 'GSV-E2E-DUPLICATE', true),
     registration('mobile-e2e-search', 'Lookup Guest', 'GSV-E2E-LOOKUP'),
-  ]) {
-    batch.set(db.collection('registrations').doc(row.registrationId), row, { merge: true })
-  }
+  ]
 
   batch.set(eventRef.collection('tasks').doc('mobile-e2e-task'), {
     taskId: 'mobile-e2e-task',
@@ -162,6 +161,18 @@ async function seedFirestore(userRecord) {
   }, { merge: true })
 
   await batch.commit()
+
+  const scaleRegistrations = Array.from({ length: REGISTRATION_COUNT - baseRegistrations.length }, (_, index) => (
+    registration(`mobile-e2e-scale-${index + 1}`, `Scale Guest ${index + 1}`, `GSV-E2E-SCALE-${String(index + 1).padStart(5, '0')}`)
+  ))
+  const registrations = [...baseRegistrations, ...scaleRegistrations]
+  for (let offset = 0; offset < registrations.length; offset += 450) {
+    const registrationBatch = db.batch()
+    for (const row of registrations.slice(offset, offset + 450)) {
+      registrationBatch.set(db.collection('registrations').doc(row.registrationId), row, { merge: true })
+    }
+    await registrationBatch.commit()
+  }
 }
 
 async function main() {
@@ -182,6 +193,7 @@ async function main() {
       duplicateTicket: 'GSV-E2E-DUPLICATE',
       invalidTicket: 'GSV-E2E-INVALID',
       searchText: 'Lookup Guest',
+      registrationCount: REGISTRATION_COUNT,
     },
   }, null, 2))
 }
