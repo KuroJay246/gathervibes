@@ -56,6 +56,13 @@ async function seedFirestore(userRecord) {
   const profileRef = db.collection('staffProfiles').doc(userRecord.uid)
   const assignmentRef = eventRef.collection('staffAssignments').doc(userRecord.uid)
 
+  batch.set(db.collection('settings').doc('accessControl'), {
+    approvedEmails: [FIXTURE_EMAIL],
+    rolesByEmail: { [FIXTURE_EMAIL]: 'admin' },
+    updatedAt: FieldValue.serverTimestamp(),
+    updatedBy: 'mobile-e2e-fixture',
+  }, { merge: true })
+
   batch.set(eventRef, {
     eventId: EVENT_ID,
     eventName: EVENT_NAME,

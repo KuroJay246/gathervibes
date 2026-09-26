@@ -1,15 +1,18 @@
 import { useMemo, useState } from 'react'
 import { Redirect, useRouter } from 'expo-router'
+import { Text, View } from 'react-native'
 
-import { Banner, Card, Field, IconButton, PrimaryButton, Screen, SecondaryButton, Section } from '@/components/ui'
+import { Banner, Card, PrimaryButton, Screen, SecondaryButton, Section } from '@/components/ui'
+import { colors, radii, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 
 function authMessage(code) {
   const messages = {
-    'auth/invalid-credential': 'The email or password is incorrect.',
-    'auth/invalid-email': 'Enter a valid email address.',
     'auth/network-request-failed': 'Could not reach Firebase Auth. Check the connection and try again.',
     'auth/too-many-requests': 'Too many attempts. Wait a moment and try again.',
+    'auth/cancelled-by-user': 'Google sign-in was cancelled. Nothing changed.',
+    'auth/google-configuration-missing': 'Google sign-in still needs the Android signing fingerprint registered for this app.',
+    'auth/google-token-missing': 'Google sign-in did not return a valid identity token. Try again.',
     'auth/access-check-failed': 'Sign-in succeeded, but mobile access could not confirm the Gather & Savor workspace boundary.',
     'auth/unapproved-account': 'This account is not approved for the private Gather & Savor workspace.',
   }
@@ -19,10 +22,7 @@ function authMessage(code) {
 
 export default function SignInScreen() {
   const router = useRouter()
-  const { authInitialized, defaultRoute, isAuthorized, loading, signIn, authError } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const { authInitialized, defaultRoute, isAuthorized, loading, signInWithGoogle, authError } = useAuth()
   const [localError, setLocalError] = useState('')
 
   const errorMessage = useMemo(() => {
@@ -35,7 +35,7 @@ export default function SignInScreen() {
   async function handleSignIn() {
     setLocalError('')
     try {
-      await signIn(email, password)
+      await signInWithGoogle()
     } catch (error) {
       setLocalError(authMessage(error?.code))
     }
@@ -44,43 +44,31 @@ export default function SignInScreen() {
   return (
     <Screen scroll contentStyle={{ gap: 16 }}>
       <Section
-        eyebrow="Private Staff Tool"
-        title="Secure Sign In"
-        description="Use the same approved Firebase account that can enter the private Gather & Savor workspace."
+        eyebrow="Gather & Savor"
+        title="Secure staff access"
+        description="Continue with your approved Google account. Workspace permissions are verified after Google confirms your identity."
       >
         <Card>
-          <Field
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="approved.account@example.com"
-            autoCapitalize="none"
-            testID="sign-in-email-input"
-            accessibilityLabel="sign-in-email-input"
-          />
-          <Field
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Password"
-            secureTextEntry={!showPassword}
-            autoCapitalize="none"
-            rightIcon={<IconButton name={showPassword ? 'eye-off-outline' : 'eye-outline'} onPress={() => setShowPassword((visible) => !visible)} label={showPassword ? 'Hide password' : 'Show password'} />}
-            testID="sign-in-password-input"
-            accessibilityLabel="sign-in-password-input"
-          />
+          <View style={{ alignItems: 'center', gap: spacing.md, paddingVertical: spacing.sm }}>
+            <View style={{ width: 56, height: 56, borderRadius: radii.md, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center' }}>
+              <Text accessibilityLabel="Google" style={{ ...typography.title, color: colors.primary }}>G</Text>
+            </View>
+            <Text style={{ ...typography.body, color: colors.textMuted, textAlign: 'center' }}>
+              Google confirms who you are. Gather &amp; Savor still checks your role, event assignments, and enabled status before opening the workspace.
+            </Text>
+          </View>
           {errorMessage ? <Banner tone="danger">{errorMessage}</Banner> : null}
           <PrimaryButton
-            label={loading ? 'Signing In…' : 'Sign In'}
+            label={loading ? 'Opening Google…' : 'Continue with Google'}
             onPress={handleSignIn}
-            disabled={loading || !email.trim() || !password}
-            testID="sign-in-submit-button"
-            accessibilityLabel="sign-in-submit-button"
+            disabled={loading}
+            testID="google-sign-in-button"
+            accessibilityLabel="Continue with Google"
           />
         </Card>
 
         <Banner tone="info">
-          Sign in with an approved Gather &amp; Savor account. Access is checked again after authentication.
+          Access is restricted to approved staff. Authentication alone never grants event access.
         </Banner>
 
         <SecondaryButton label="Back to Start" onPress={() => router.replace('/')} testID="sign-in-back-button" accessibilityLabel="sign-in-back-button" />

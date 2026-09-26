@@ -9,7 +9,8 @@ import { connectFirestoreEmulator, getFirestore } from '@react-native-firebase/f
 import { DEBUG_TOKEN_ENV, getNativeAppCheckProviderOptions } from './appCheckConfig'
 
 export const firebaseApp = getApp()
-const firebaseRuntimeConfig = Constants.expoConfig?.extra?.gsvFirebase || {}
+export const firebaseRuntimeConfig = Constants.expoConfig?.extra?.gsvFirebase || {}
+export const googleWebClientId = Constants.expoConfig?.extra?.googleWebClientId || ''
 const useFirebaseEmulators = firebaseRuntimeConfig.useEmulators === true || process.env.EXPO_PUBLIC_FIREBASE_USE_EMULATORS === 'true'
 const appCheckProviderOptions = getNativeAppCheckProviderOptions({
   platform: Platform.OS,

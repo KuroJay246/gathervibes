@@ -22,7 +22,7 @@ test('service worker does not cache or intercept private admin data', async () =
   assert.doesNotMatch(serviceWorker, /caches\./)
 })
 
-test('Google and email sign-in both retain admin allowlist verification', async () => {
+test('Google sign-in retains admin allowlist verification without password UI', async () => {
   const authProvider = await readFile('src/auth/AuthProvider.jsx', 'utf8')
   const authFlow = await readFile('src/auth/authFlow.js', 'utf8')
   const firebaseConfig = await readFile('src/lib/firebase.js', 'utf8')
@@ -32,7 +32,6 @@ test('Google and email sign-in both retain admin allowlist verification', async 
   assert.match(authProvider, /browserLocalPersistence/)
   assert.match(authProvider, /signInWithPopup/)
   assert.match(authProvider, /signInWithRedirect/)
-  assert.match(authProvider, /signInWithEmailAndPassword/)
   assert.match(authProvider, /verifyWorkspaceAccess/)
   assert.match(authProvider, /ensureAuthPersistence/)
   assert.match(authProvider, /getRedirectResultOnce/)
@@ -49,7 +48,7 @@ test('Google and email sign-in both retain admin allowlist verification', async 
   assert.match(loginPage, /Continue with Google/)
   assert.match(loginPage, /Retry access check/)
   assert.doesNotMatch(loginPage, /Sign up with Google/)
-  assert.match(loginPage, /Sign in with email/)
+  assert.doesNotMatch(loginPage, /Sign in with email|type="password"/)
 })
 
 test('registration audit logs preserve registration target type', async () => {

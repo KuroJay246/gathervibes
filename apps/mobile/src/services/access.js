@@ -1,4 +1,4 @@
-import { doc, getDoc } from '@react-native-firebase/firestore'
+import { collection, doc, getDoc, getDocs } from '@react-native-firebase/firestore'
 import { firestore } from '@/lib/firebase'
 import { getUserAccessLevel, isApprovedAdmin } from '@gsv/contracts/accessRoles'
 
@@ -21,6 +21,14 @@ function normalizeAssignedEventIds(staffProfile) {
 export async function readAdminAccessControl() {
   const snapshot = await getDoc(doc(firestore, 'settings', 'accessControl'))
   return snapshot.exists() ? snapshot.data() : null
+}
+
+async function readAdminEvents() {
+  const snapshot = await getDocs(collection(firestore, 'events'))
+  return snapshot.docs.map((eventDocument) => ({
+    eventId: eventDocument.data().eventId || eventDocument.id,
+    ...eventDocument.data(),
+  }))
 }
 
 export async function readStaffAccess(user) {
@@ -79,7 +87,7 @@ export async function verifyWorkspaceAccess(user) {
         accessControl,
         staffProfile: null,
         staffAssignments: [],
-        assignedEvents: [],
+        assignedEvents: await readAdminEvents(),
         access,
       }
     }

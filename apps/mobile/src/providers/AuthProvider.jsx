@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut as firebaseSignOut } from '@react-native-firebase/auth'
-import { auth } from '@/lib/firebase'
+import { auth, firebaseRuntimeConfig, googleWebClientId } from '@/lib/firebase'
+import { resolveNativeAuthMode } from '@/lib/authMode'
 import { defaultRouteForAccess, roleLabel } from '@gsv/contracts/accessRoles'
 import { verifyWorkspaceAccess } from '@/services/access'
+import { signInWithNativeGoogle, signOutFromNativeGoogle } from '@/services/nativeGoogleAuth'
 import { AuthContext } from '@/providers/AuthContext'
 
 function normalizeAuthErrorCode(error, fallbackCode) {
@@ -12,6 +14,8 @@ function normalizeAuthErrorCode(error, fallbackCode) {
   const signal = `${code} ${nativeCode} ${message}`
 
   if (signal.includes('network')) return 'auth/network-request-failed'
+  if (signal.includes('developer_error') || signal.includes('configuration')) return 'auth/google-configuration-missing'
+  if (signal.includes('cancel')) return 'auth/cancelled-by-user'
   if (signal.includes('invalid-credential') || signal.includes('wrong-password') || signal.includes('user-not-found')) {
     return 'auth/invalid-credential'
   }
@@ -108,17 +112,34 @@ export function AuthProvider({ children }) {
     authInitialized,
     isAuthorized,
     authError,
-    signIn: async (email, password) => {
+    signInWithGoogle: async () => {
       setAuthError('')
       setLoading(true)
       try {
-        await signInWithEmailAndPassword(auth, String(email || '').trim(), password)
+        await signInWithNativeGoogle(auth, googleWebClientId)
       } catch (error) {
         setLoading(false)
-        console.error('GSV_MOBILE_SIGN_IN_FAILED', error)
+        console.error('GSV_MOBILE_GOOGLE_SIGN_IN_FAILED', error)
         const normalizedCode = normalizeAuthErrorCode(error, 'auth/sign-in-failed')
         setAuthError(normalizedCode)
         if (error && !error.code) error.code = normalizedCode
+        throw error
+      }
+    },
+    signInForE2E: async () => {
+      const authMode = resolveNativeAuthMode(firebaseRuntimeConfig)
+      if (authMode !== 'emulator-e2e') {
+        const error = new Error('Emulator E2E authentication is disabled for this build.')
+        error.code = 'auth/e2e-disabled'
+        throw error
+      }
+      setAuthError('')
+      setLoading(true)
+      try {
+        await signInWithEmailAndPassword(auth, firebaseRuntimeConfig.e2eEmail, firebaseRuntimeConfig.e2ePassword)
+      } catch (error) {
+        setLoading(false)
+        setAuthError(normalizeAuthErrorCode(error, 'auth/sign-in-failed'))
         throw error
       }
     },
@@ -126,6 +147,7 @@ export function AuthProvider({ children }) {
       setLoading(true)
       setAuthError('')
       try {
+        await signOutFromNativeGoogle().catch(() => {})
         await firebaseSignOut(auth)
       } finally {
         setLoading(false)

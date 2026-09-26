@@ -40,8 +40,8 @@ export default function SettingsScreen() {
           Firebase Auth persistence is native on iOS and Android in this stack. The selected event snapshot is stored with expo-secure-store, not plain AsyncStorage.
         </Banner>
 
-        <Banner tone="warning">
-          Google mobile sign-in, provider mailbox connections, Apple signing, and physical iPhone validation remain separate follow-up work.
+        <Banner tone="info">
+          Google is the production sign-in method. Workspace access still comes from the immutable Firebase UID, staff profile, enabled status, role capabilities, and Working Event assignment.
         </Banner>
 
         <PrimaryButton label="Choose Another Assigned Event" onPress={async () => {

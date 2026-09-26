@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, Sparkles } from 'lucide-react'
+import { ShieldCheck, Sparkles } from 'lucide-react'
 import { Navigate, useLocation, useNavigate } from 'react-router'
 import { BrandMark } from '../components/BrandMark'
 import { ProductFooter } from '../components/ProductFooter'
@@ -45,9 +45,6 @@ function getAuthErrorMessage(code) {
 }
 
 export function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
   const [submitting, setSubmitting] = useState('')
   const [error, setError] = useState('')
   const {
@@ -56,7 +53,6 @@ export function LoginPage() {
     authError,
     defaultRoute,
     isAuthorized,
-    signIn,
     signInWithGoogle,
     signOut,
     isConfigured,
@@ -121,23 +117,6 @@ export function LoginPage() {
       defaultRoute,
       allowScanner: Boolean((storedRedirectPath || defaultRoute || '/dashboard').startsWith('/scanner')),
     })} replace />
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault()
-    if (!isConfigured) return
-
-    setError('')
-    setSubmitting('email')
-
-    try {
-      const result = await signIn(email.trim(), password, from)
-      navigate(result?.workspaceDefaultRoute || from, { replace: true })
-    } catch (authError) {
-      setError(getAuthErrorMessage(authError.code))
-    } finally {
-      setSubmitting('')
-    }
   }
 
   if (user && !isAuthorized) {
@@ -215,7 +194,7 @@ export function LoginPage() {
             <div className="mb-9">
               <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.24em] text-[#9A5260]">Welcome back</p>
               <h2 className="font-serif text-4xl tracking-[-0.02em] text-[#2B1723]">Sign in to your hub</h2>
-              <p className="mt-3 text-sm leading-6 text-[#806C61]">Use your approved admin account to continue.</p>
+              <p className="mt-3 text-sm leading-6 text-[#806C61]">Use your approved Google account to continue.</p>
             </div>
 
             {!isConfigured && (
@@ -247,82 +226,11 @@ export function LoginPage() {
               )}
             </button>
 
-            <div className="my-6 flex items-center gap-3" aria-hidden="true">
-              <span className="h-px flex-1 bg-[#E9DDD6]" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#80685B]">Sign in with email</span>
-              <span className="h-px flex-1 bg-[#E9DDD6]" />
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label htmlFor="email" className="mb-2 block text-xs font-semibold text-[#4F3B43]">
-                  Email address
-                </label>
-                <div className="relative">
-                  <Mail className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-[#B49B8D]" aria-hidden="true" />
-                  <input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    placeholder="admin@gatherandsavor.com"
-                    className="field-input"
-                    disabled={!isConfigured || Boolean(submitting)}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <label htmlFor="password" className="text-xs font-semibold text-[#4F3B43]">
-                    Password
-                  </label>
-                  <span className="text-[11px] text-[#80685B]">Admin access only</span>
-                </div>
-                <div className="relative">
-                  <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-[#B49B8D]" aria-hidden="true" />
-                  <input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    placeholder="Enter your password"
-                    className="field-input pr-12"
-                    disabled={!isConfigured || Boolean(submitting)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((visible) => !visible)}
-                    disabled={!isConfigured}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-2 text-[#80685B] transition hover:bg-[#FFF8F2] hover:text-[#2B1723] disabled:opacity-40"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <EyeOff className="size-[18px]" /> : <Eye className="size-[18px]" />}
-                  </button>
-                </div>
-              </div>
-
-              {displayedError && (
-                <p className="rounded-xl border border-[#F2C6C6] bg-[#FFF1F1] px-4 py-3 text-xs text-[#A32626]" role="alert">
-                  {displayedError}
-                </p>
-              )}
-
-              <button type="submit" className="primary-button" disabled={!isConfigured || Boolean(submitting)}>
-                {submitting === 'email' ? (
-                  <>
-                    <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                    Signing in…
-                  </>
-                ) : (
-                  'Sign in securely'
-                )}
-              </button>
-            </form>
+            {displayedError && (
+              <p className="mt-5 rounded-xl border border-[#F2C6C6] bg-[#FFF1F1] px-4 py-3 text-xs text-[#A32626]" role="alert">
+                {displayedError}
+              </p>
+            )}
 
             <div className="mt-8 flex items-start gap-3 border-t border-[#EFE2DA] pt-6 text-[11px] leading-5 text-[#8C786C]">
               <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[#2F855A]" aria-hidden="true" />

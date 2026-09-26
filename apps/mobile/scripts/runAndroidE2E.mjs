@@ -18,8 +18,6 @@ const BLOCKED_PACKAGES = ['com.jaylan.couplebook', ...String(process.env.GSV_AND
   .split(',')
   .map((value) => value.trim())
   .filter(Boolean)]
-const FIXTURE_EMAIL = process.env.GSV_MOBILE_E2E_EMAIL || 'mobilee2e@gsv.test'
-const FIXTURE_PASSWORD = process.env.GSV_MOBILE_E2E_PASSWORD || 'MobileE2E123'
 const OUTPUT_DIR = path.resolve(__dirname, '..', '..', '..', 'output', 'mobile-e2e')
 const UI_DUMP_PATH = path.join(OUTPUT_DIR, 'window_dump.xml')
 const REQUIRED_FLOWS = [
@@ -376,7 +374,7 @@ function detectPostSignInDestination(nodes) {
   if (nodes.some((candidate) => candidate.text === 'Scanner Mode' || candidate.text === 'QR SCANNER')) {
     return 'scanner'
   }
-  if (nodes.some((candidate) => selectorMatches(candidate, { accessibilityLabel: 'sign-in-email-input' }))) {
+  if (nodes.some((candidate) => selectorMatches(candidate, { accessibilityLabel: 'Continue with Google' }))) {
     return 'sign-in'
   }
   return null
@@ -428,34 +426,41 @@ async function openRoute(route) {
   await ensureAppForeground(STARTUP_TIMEOUT_MS)
 }
 
+function isDevMenuOverlay(nodes) {
+  return nodes.some((candidate) => {
+    const text = `${candidate.text || ''} ${candidate['content-desc'] || ''}`
+    return text.includes('This is the developer menu')
+      || text.includes('Reload')
+      || text.includes('Go home')
+      || text.includes('Fast Refresh')
+      || text.includes('Open React Native dev menu')
+  })
+}
+
+async function dismissVisibleDevMenu(nodes) {
+  const continueNode = nodes.find((candidate) => candidate.text === 'Continue')
+  if (continueNode) {
+    const point = parseBounds(continueNode.bounds)
+    if (point) adb(['shell', 'input', 'tap', String(point.x), String(point.y)])
+    await sleep(1000)
+    return
+  }
+
+  const closeNode = nodes.find((candidate) => candidate.text === '×' || candidate['content-desc'] === 'Close')
+  if (closeNode) {
+    const point = parseBounds(closeNode.bounds)
+    if (point) adb(['shell', 'input', 'tap', String(point.x), String(point.y)])
+    await sleep(1000)
+  }
+}
+
 async function dismissDevMenuIfPresent() {
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const nodes = await dumpUi(`dev-menu-${attempt}`)
-    const overlayVisible = nodes.some((candidate) => {
-      const text = `${candidate.text || ''} ${candidate['content-desc'] || ''}`
-      return text.includes('Reload')
-        || text.includes('Go home')
-        || text.includes('Fast Refresh')
-        || text.includes('Open React Native dev menu')
-    })
+    const overlayVisible = isDevMenuOverlay(nodes)
     if (!overlayVisible) return
 
-    const continueNode = nodes.find((candidate) => candidate.text === 'Continue')
-    if (continueNode) {
-      const point = parseBounds(continueNode.bounds)
-      adb(['shell', 'input', 'tap', String(point.x), String(point.y)])
-      await sleep(1000)
-      continue
-    }
-
-    const closeNode = nodes.find((candidate) => candidate.text === '×' || candidate['content-desc'] === 'Close')
-    if (closeNode) {
-      const point = parseBounds(closeNode.bounds)
-      if (point) {
-        adb(['shell', 'input', 'tap', String(point.x), String(point.y)])
-        await sleep(1000)
-      }
-    }
+    await dismissVisibleDevMenu(nodes)
 
     adb(['shell', 'input', 'tap', '540', '700'])
     await sleep(500)
@@ -466,13 +471,7 @@ async function dismissDevMenuIfPresent() {
   }
 
   const nodes = await dumpUi('dev-menu-final')
-  const overlayVisible = nodes.some((candidate) => {
-    const text = `${candidate.text || ''} ${candidate['content-desc'] || ''}`
-    return text.includes('Reload')
-      || text.includes('Go home')
-      || text.includes('Fast Refresh')
-      || text.includes('Open React Native dev menu')
-  })
+  const overlayVisible = isDevMenuOverlay(nodes)
   if (overlayVisible) {
     await captureScreenshot('dev-menu-still-open')
     throw new Error('Expo developer menu remained open after repeated dismissal attempts.')
@@ -483,6 +482,10 @@ async function resolvePostSignInDestination(timeoutMs = 30000) {
   const startedAt = Date.now()
   while (Date.now() - startedAt < timeoutMs) {
     const nodes = await dumpUi('live')
+    if (isDevMenuOverlay(nodes)) {
+      await dismissVisibleDevMenu(nodes)
+      continue
+    }
     const destination = detectPostSignInDestination(nodes)
     if (destination && destination !== 'sign-in') return destination
     await sleep(750)
@@ -490,37 +493,6 @@ async function resolvePostSignInDestination(timeoutMs = 30000) {
 
   await captureScreenshot('missing-post-sign-in-destination')
   throw new Error('Timed out waiting for a post-sign-in destination.')
-}
-
-async function submitSignIn() {
-  await ensureAppForeground(STARTUP_TIMEOUT_MS)
-  await waitForSelector({ accessibilityLabel: 'sign-in-submit-button' }, 10000)
-  await tapBySelector({ accessibilityLabel: 'sign-in-submit-button' })
-  await sleep(1500)
-
-  let retried = false
-  const startedAt = Date.now()
-  while (Date.now() - startedAt < 15000) {
-    const nodes = await dumpUi('post-submit')
-    const initialState = detectPostSignInDestination(nodes)
-    if (initialState && initialState !== 'sign-in') return
-
-    const submitNode = nodes.find((candidate) => selectorMatches(candidate, { accessibilityLabel: 'sign-in-submit-button' }))
-    const signingIn = nodes.some((candidate) => String(candidate.text || '').startsWith('Signing In'))
-    if (!submitNode || submitNode.enabled === 'false' || signingIn) {
-      await sleep(750)
-      continue
-    }
-
-    if (!retried) {
-      retried = true
-      await tapBySelector({ accessibilityLabel: 'sign-in-submit-button' })
-      await sleep(2000)
-      continue
-    }
-
-    break
-  }
 }
 
 async function ensureHomeScreen() {
@@ -602,18 +574,14 @@ async function main() {
   if (SKIP_PM_CLEAR) console.log(JSON.stringify({ e2eStep: 'clear-app-state-skipped', reason: 'GSV_ANDROID_SKIP_PM_CLEAR=true' }))
   await sleep(1500)
 
-  step('launch-sign-in')
+  step('launch-test-auth')
   await relaunchApp()
   await ensureAppForeground(STARTUP_TIMEOUT_MS)
   await dismissDevMenuIfPresent()
-  await waitForSelector({ accessibilityLabel: 'sign-in-email-input' }, 45000)
-  await waitForSelector({ accessibilityLabel: 'sign-in-submit-button' }, 10000)
+  await openRoute('/e2e-auth')
 
-  step('submit-auth')
-  await typeInto('sign-in-email-input', FIXTURE_EMAIL)
-  await typeInto('sign-in-password-input', FIXTURE_PASSWORD)
+  step('establish-emulator-identity')
   step('authenticated-home')
-  await submitSignIn()
   await ensureHomeScreen()
   await captureScreenshot('owner-home')
 
@@ -670,10 +638,11 @@ async function main() {
   await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 15000)
   adb(['shell', 'pm', 'revoke', APP_ID, 'android.permission.CAMERA'])
   adb(['shell', 'cmd', 'appops', 'set', APP_ID, 'CAMERA', 'deny'])
-  await openRoute('/scanner')
-  await captureScreenshot('scanner-ready')
+  await tapBySelector({ accessibilityLabel: 'home-qr-scanner-button' })
+  await sleep(1500)
   await maybeDenyCameraPrompt()
   await waitForVisibleText('Camera access denied', 15000)
+  await captureScreenshot('scanner-ready')
   adb(['shell', 'input', 'keyevent', '4'])
   await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 15000)
 
@@ -687,7 +656,7 @@ async function main() {
   await openRoute('/settings')
   await waitForSelector({ accessibilityLabel: 'settings-sign-out-button' }, 15000)
   await tapBySelector({ accessibilityLabel: 'settings-sign-out-button' })
-  await waitForSelector({ accessibilityLabel: 'sign-in-email-input' }, 15000)
+  await waitForSelector({ accessibilityLabel: 'Continue with Google' }, 15000)
   await assertNoVisibleText('Sign-in failed.')
 
   await captureScreenshot('android-e2e-pass')
