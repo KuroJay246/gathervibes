@@ -2,7 +2,7 @@ import { Redirect, useRouter } from 'expo-router'
 import { Text, View } from 'react-native'
 import { useNetworkState } from 'expo-network'
 
-import { AppIcon, Banner, Card, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
+import { AppIcon, Card, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
 import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
@@ -19,11 +19,7 @@ export default function SettingsScreen() {
 
   return (
     <Screen scroll>
-      <Section
-        eyebrow="Settings"
-        title="Your workspace"
-        description="Manage your account, selected event, and app access from one place."
-      >
+      <Section eyebrow="Settings" title="Your workspace" description="Manage your account, selected event, and app access from one place.">
         <Text style={{ ...typography.caption, color: colors.textSubtle }}>ACCOUNT</Text>
         <Card tone="muted">
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
