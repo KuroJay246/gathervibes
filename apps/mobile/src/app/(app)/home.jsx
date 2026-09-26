@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useRouter, Redirect } from 'expo-router'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useFocusEffect, useRouter, Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 import { useNetworkState } from 'expo-network'
 
@@ -8,7 +8,7 @@ import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 import { subscribeToDocuments } from '@/services/documents'
-import { subscribeToRegistrations } from '@/services/registrations'
+import { loadRegistrationSummary } from '@/services/registrations'
 import { subscribeToTasks } from '@/services/tasks'
 import { subscribeToOperationsLedger } from '@/services/operations'
 import { subscribeToRunOfShow } from '@/services/runOfShow'
@@ -19,7 +19,7 @@ export default function HomeScreen() {
   const networkState = useNetworkState()
   const { isAuthorized, authInitialized } = useAuth()
   const { activeEvent, ready, clearActiveEvent } = useActiveEvent()
-  const [registrations, setRegistrations] = useState([])
+  const [registrationSummary, setRegistrationSummary] = useState({ totalRegistrations: 0, checkedIn: 0, attendancePercentage: 0 })
   const [tasks, setTasks] = useState([])
   const [documents, setDocuments] = useState([])
   const [operations, setOperations] = useState([])
@@ -27,9 +27,17 @@ export default function HomeScreen() {
   const [runOfShowLoaded, setRunOfShowLoaded] = useState(false)
   const [runOfShowError, setRunOfShowError] = useState('')
 
+  useFocusEffect(useCallback(() => {
+    let cancelled = false
+    if (!activeEvent?.eventId) return undefined
+    loadRegistrationSummary(activeEvent.eventId)
+      .then((summary) => { if (!cancelled) setRegistrationSummary(summary) })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [activeEvent]))
+
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
-    const unsubscribeRegistrations = subscribeToRegistrations(activeEvent.eventId, setRegistrations, () => {})
     const unsubscribeTasks = subscribeToTasks(activeEvent.eventId, setTasks, () => {})
     const unsubscribeDocuments = subscribeToDocuments(activeEvent.eventId, setDocuments, () => {})
     const unsubscribeOperations = subscribeToOperationsLedger(activeEvent.eventId, setOperations, () => {})
@@ -41,7 +49,6 @@ export default function HomeScreen() {
       setRunOfShowLoaded(true)
     })
     return () => {
-      unsubscribeRegistrations()
       unsubscribeTasks()
       unsubscribeDocuments()
       unsubscribeOperations()
@@ -49,18 +56,18 @@ export default function HomeScreen() {
     }
   }, [activeEvent?.eventId])
 
-  const checkedIn = useMemo(() => registrations.filter((registration) => registration.checkedIn).length, [registrations])
+  const checkedIn = registrationSummary.checkedIn
   const openTasks = useMemo(() => tasks.filter((task) => task.status !== 'Completed' && task.status !== 'Cancelled').length, [tasks])
   const openOperations = useMemo(() => operations.filter((entry) => !['paid', 'received', 'cancelled'].includes(entry.status)).length, [operations])
   const attentionCount = openTasks + openOperations
-  const attendancePercent = registrations.length ? Math.round((checkedIn / registrations.length) * 100) : 0
+  const attendancePercent = registrationSummary.attendancePercentage
   const readinessItems = useMemo(() => {
     let count = 0
     if (openTasks > 0) count += 1
     if (documents.length === 0) count += 1
-    if (registrations.length === 0) count += 1
+    if (registrationSummary.totalRegistrations === 0) count += 1
     return count
-  }, [documents.length, openTasks, registrations.length])
+  }, [documents.length, openTasks, registrationSummary.totalRegistrations])
   const runOfShowGroups = useMemo(() => groupRunOfShowItems(runOfShow), [runOfShow])
 
   if (!authInitialized || !ready) return null
@@ -91,10 +98,10 @@ export default function HomeScreen() {
         )}
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-          <Metric label="Registrations" value={registrations.length} detail={`${checkedIn} checked in`} />
+          <Metric label="Registrations" value={registrationSummary.totalRegistrations} detail={`${checkedIn} checked in`} />
           <Metric label="Open Tasks" value={openTasks} detail={`${tasks.length - openTasks} completed or cancelled`} />
           <Metric label="Documents" value={documents.length} detail="Event register" />
-          <Metric label="Attendance" value={`${attendancePercent}%`} detail={`${checkedIn} of ${registrations.length} checked in`} />
+          <Metric label="Attendance" value={`${attendancePercent}%`} detail={`${checkedIn} of ${registrationSummary.totalRegistrations} checked in`} />
         </View>
 
         <Card tone="muted">

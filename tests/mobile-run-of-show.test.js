@@ -65,6 +65,21 @@ test('native Home and Reports use bounded operational summaries', async () => {
   assert.match(reports, /label="Pending"/)
 })
 
+test('native Home and Reports use server-side registration aggregation', async () => {
+  const fs = await import('node:fs/promises')
+  const [home, reports, registrations] = await Promise.all([
+    fs.readFile(new URL('../apps/mobile/src/app/(app)/home.jsx', import.meta.url), 'utf8'),
+    fs.readFile(new URL('../apps/mobile/src/app/(app)/reports.jsx', import.meta.url), 'utf8'),
+    fs.readFile(new URL('../apps/mobile/src/services/registrations.js', import.meta.url), 'utf8'),
+  ])
+  assert.match(registrations, /getCountFromServer/)
+  assert.match(registrations, /loadRegistrationSummary/)
+  assert.doesNotMatch(home, /subscribeToRegistrations/)
+  assert.doesNotMatch(reports, /subscribeToRegistrations/)
+  assert.match(home, /useFocusEffect/)
+  assert.match(reports, /useFocusEffect/)
+})
+
 test('mobile planning listeners use bounded service reads', async () => {
   const fs = await import('node:fs/promises')
   const paths = [

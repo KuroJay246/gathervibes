@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, limit, onSnapshot, orderBy, query, startAfter, where } from '@react-native-firebase/firestore'
+import { collection, doc, getCountFromServer, getDoc, getDocs, limit, onSnapshot, orderBy, query, startAfter, where } from '@react-native-firebase/firestore'
 import { firestore } from '@/lib/firebase'
 import { normalizeTicketCode, searchableRegistrationText } from '@gsv/contracts/ticketUtils'
 
@@ -20,6 +20,51 @@ export function subscribeToRegistrations(eventId, onRegistrations, onError) {
     }))),
     onError,
   )
+}
+
+const PAYMENT_STATUS_ALIASES = {
+  paid: ['paid', 'Paid', 'paid confirmed', 'Paid Confirmed', 'payment confirmed', 'Payment Confirmed'],
+  pending: ['pending', 'Pending', 'unpaid', 'Unpaid', 'partial', 'Partial', 'partial payment', 'Partial Payment', 'part paid', 'Part Paid', 'partially paid', 'Partially Paid'],
+  complimentary: ['complimentary', 'Complimentary', 'comp', 'Comp'],
+  door: ['door', 'Door', 'door payment', 'Door Payment', 'door paid', 'Door Paid', 'door sale', 'Door Sale', 'walk in', 'Walk In', 'walk-in', 'Walk-In'],
+  'door-list': ['pay at door', 'Pay at Door', 'to pay at door', 'To Pay at Door', 'door list', 'Door List'],
+}
+
+async function countRegistrations(eventId, ...constraints) {
+  const snapshot = await getCountFromServer(query(
+    collection(firestore, 'registrations'),
+    where('eventId', '==', eventId),
+    ...constraints,
+  ))
+  return Number(snapshot.data()?.count || 0)
+}
+
+export async function loadRegistrationSummary(eventId) {
+  if (!eventId) {
+    return { totalRegistrations: 0, checkedIn: 0, notCheckedIn: 0, attendancePercentage: 0, paid: 0, pending: 0, door: 0, complete: true }
+  }
+
+  const [totalRegistrations, checkedIn, paid, pending, complimentary, door, doorList] = await Promise.all([
+    countRegistrations(eventId),
+    countRegistrations(eventId, where('checkedIn', '==', true)),
+    countRegistrations(eventId, where('paymentStatus', 'in', PAYMENT_STATUS_ALIASES.paid)),
+    countRegistrations(eventId, where('paymentStatus', 'in', PAYMENT_STATUS_ALIASES.pending)),
+    countRegistrations(eventId, where('paymentStatus', 'in', PAYMENT_STATUS_ALIASES.complimentary)),
+    countRegistrations(eventId, where('paymentStatus', 'in', PAYMENT_STATUS_ALIASES.door)),
+    countRegistrations(eventId, where('paymentStatus', 'in', PAYMENT_STATUS_ALIASES['door-list'])),
+  ])
+
+  return {
+    totalRegistrations,
+    checkedIn,
+    notCheckedIn: Math.max(totalRegistrations - checkedIn, 0),
+    attendancePercentage: totalRegistrations ? Math.round((checkedIn / totalRegistrations) * 100) : 0,
+    paid,
+    pending,
+    door: door + doorList,
+    complimentary,
+    complete: true,
+  }
 }
 
 export async function loadRegistrationPage(eventId, { cursor = null, pageSize = 50 } = {}) {
