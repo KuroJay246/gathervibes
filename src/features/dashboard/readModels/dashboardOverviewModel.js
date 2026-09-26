@@ -62,6 +62,7 @@ export function buildRecentActivity({ event, registrations = [], operationsEntri
 export function buildDashboardOverviewModel({
   event,
   registrations = [],
+  recentRegistrations = registrations,
   registrationSummary = null,
   operationsEntries = [],
   runOfShowItems = [],
@@ -85,6 +86,6 @@ export function buildDashboardOverviewModel({
     financeSummary: buildFinanceSummary(registrations, event),
     readiness: buildEventReadiness(event, registrations, operationsEntries, runOfShowItems, resources),
     taskSummary: buildTaskWorkflowSummary(tasks),
-    recentActivity: buildRecentActivity({ event, registrations, operationsEntries }),
+    recentActivity: buildRecentActivity({ event, registrations: recentRegistrations, operationsEntries }),
   }
 }

@@ -36,7 +36,7 @@ import {
   isEventDayStatus,
 } from '../utils/eventPlanning'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
-import { loadRegistrationSummary } from '../services/registrationSummaryService'
+import { loadRegistrationSummary, subscribeToRecentRegistrationRows } from '../services/registrationSummaryService'
 import { PageTabs } from '../components/ui/PageTabs'
 import { buildDashboardOverviewModel } from '../features/dashboard/readModels/dashboardOverviewModel.js'
 
@@ -55,6 +55,20 @@ function useEventRegistrations(eventId) {
     setRows([])
     if (!eventId) return undefined
     return subscribeToRegistrations(eventId, setRows, () => {})
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [eventId])
+
+  return rows
+}
+
+function useRecentEventRegistrations(eventId) {
+  const [rows, setRows] = useState([])
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setRows([])
+    if (!eventId) return undefined
+    return subscribeToRecentRegistrationRows(eventId, setRows, () => {})
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [eventId])
 
@@ -354,6 +368,7 @@ export function DashboardPage() {
   const visibleEventsLoaded = adminUser ? eventsLoaded : true
   const selectedEvent = activeEvent ? visibleEvents.find((event) => event.eventId === activeEvent.eventId) || activeEvent : null
   const registrations = useEventRegistrations(activeEvent?.eventId)
+  const recentRegistrations = useRecentEventRegistrations(activeEvent?.eventId)
   const operationsEntries = useEventOperations(activeEvent?.eventId)
   const tasks = useEventTasks(activeEvent?.eventId)
   const runOfShowItems = useRunOfShowItems(activeEvent?.eventId)
@@ -402,13 +417,14 @@ export function DashboardPage() {
     () => buildDashboardOverviewModel({
       event: selectedEvent,
       registrations,
+      recentRegistrations,
       registrationSummary: registrationSummary?.eventId === selectedEvent?.eventId ? registrationSummary : null,
       operationsEntries,
       runOfShowItems,
       resources,
       tasks,
     }),
-    [operationsEntries, registrationSummary, registrations, resources, runOfShowItems, selectedEvent, tasks],
+    [operationsEntries, recentRegistrations, registrationSummary, registrations, resources, runOfShowItems, selectedEvent, tasks],
   )
   const { metrics, financeSummary, readiness, taskSummary, recentActivity } = dashboardModel
   const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(selectedEvent?.eventId), [selectedEvent?.eventId])

@@ -1,4 +1,4 @@
-import { collection, getCountFromServer, query, where } from 'firebase/firestore'
+import { collection, getCountFromServer, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore'
 import { db } from '../lib/firebase.js'
 
 function requireDatabase() {
@@ -42,4 +42,23 @@ export async function loadRegistrationSummary(eventId) {
       ? Math.round((checkedIn / totalRegistrations) * 100)
       : 0,
   }
+}
+
+export function subscribeToRecentRegistrationRows(eventId, onRows, onError, rowLimit = 6) {
+  if (!eventId) return () => {}
+  const registrationsQuery = query(
+    collection(requireDatabase(), 'registrations'),
+    where('eventId', '==', eventId),
+    orderBy('createdAt', 'desc'),
+    limit(rowLimit),
+  )
+
+  return onSnapshot(
+    registrationsQuery,
+    (snapshot) => onRows(snapshot.docs.map((registrationDocument) => ({
+      ...registrationDocument.data(),
+      registrationId: registrationDocument.data().registrationId || registrationDocument.id,
+    }))),
+    onError,
+  )
 }

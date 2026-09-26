@@ -8,6 +8,9 @@ test('web registration summary service uses event-scoped checkedIn aggregation',
   assert.match(source, /where\('eventId', '==', eventId\)/)
   assert.match(source, /where\('checkedIn', '==', true\)/)
   assert.match(source, /notCheckedIn/)
+  assert.match(source, /subscribeToRecentRegistrationRows/)
+  assert.match(source, /orderBy\('createdAt', 'desc'\)/)
+  assert.match(source, /limit\(rowLimit\)/)
 })
 
 test('web summary read models accept aggregate counts without replacing row-derived data', async () => {
@@ -16,4 +19,6 @@ test('web summary read models accept aggregate counts without replacing row-deri
   assert.match(dashboard, /registrationSummary/)
   assert.match(review, /registrationSummary/)
   assert.match(review, /buildFinanceClassificationContext\(rows, event\)/)
+  assert.match(dashboard, /recentRegistrations/)
+  assert.match(dashboard, /recentActivity: buildRecentActivity/)
 })
