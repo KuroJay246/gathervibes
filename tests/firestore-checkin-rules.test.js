@@ -860,6 +860,30 @@ test('Firestore rules reject duplicate check-in registration update', { skip: !e
   }
 })
 
+test('Firestore rules allow exactly one simultaneous check-in transition', { skip: !emulatorHost }, async () => {
+  const env = await createTestEnv()
+  try {
+    await seed(env)
+    const dbA = env.authenticatedContext('admin-user-a', { email: adminEmail }).firestore()
+    const dbB = env.authenticatedContext('admin-user-b', { email: adminEmail }).firestore()
+    const batchA = writeBatch(dbA)
+    const batchB = writeBatch(dbB)
+
+    batchA.update(doc(dbA, 'registrations', registrationId), checkInAfterState())
+    batchA.set(doc(dbA, 'auditLogs', 'audit-checkin-concurrent-a'), { ...checkInAuditData(), logId: 'audit-checkin-concurrent-a' })
+    batchB.update(doc(dbB, 'registrations', registrationId), checkInAfterState())
+    batchB.set(doc(dbB, 'auditLogs', 'audit-checkin-concurrent-b'), { ...checkInAuditData(), logId: 'audit-checkin-concurrent-b' })
+
+    const results = await Promise.allSettled([batchA.commit(), batchB.commit()])
+    assert.equal(results.filter((result) => result.status === 'fulfilled').length, 1)
+    assert.equal(results.filter((result) => result.status === 'rejected').length, 1)
+    const finalRegistration = await getDoc(doc(dbA, 'registrations', registrationId))
+    assert.equal(finalRegistration.data()?.checkedIn, true)
+  } finally {
+    await env.cleanup()
+  }
+})
+
 test('Firestore rules allow approved admin undo check-in batch', { skip: !emulatorHost }, async () => {
   const env = await createTestEnv()
   try {
