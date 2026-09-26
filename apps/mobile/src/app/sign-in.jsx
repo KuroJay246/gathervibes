@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
-import { Redirect, useRouter } from 'expo-router'
+import { Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 
-import { Banner, Card, PrimaryButton, Screen, SecondaryButton, Section } from '@/components/ui'
+import { Banner, Card, PrimaryButton, Screen, Section } from '@/components/ui'
 import { colors, radii, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 
@@ -21,7 +21,6 @@ function authMessage(code) {
 }
 
 export default function SignInScreen() {
-  const router = useRouter()
   const { authInitialized, defaultRoute, isAuthorized, loading, signInWithGoogle, authError } = useAuth()
   const [localError, setLocalError] = useState('')
 
@@ -70,8 +69,6 @@ export default function SignInScreen() {
         <Banner tone="info">
           Private access for approved team members.
         </Banner>
-
-        <SecondaryButton label="Back to Start" onPress={() => router.replace('/')} testID="sign-in-back-button" accessibilityLabel="sign-in-back-button" />
       </Section>
     </Screen>
   )
