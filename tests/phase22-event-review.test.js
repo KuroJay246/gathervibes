@@ -259,3 +259,18 @@ test('Phase 22 event review preview rows use stable unique keys for duplicate na
   assert.match(page, /key=\{`\$\{item\.key\}-\$\{name\}-\$\{index\}`\}/)
   assert.doesNotMatch(page, /item\.preview\.map\(\(name\) => <li key=\{name\}>/)
 })
+
+test('Phase 22 Event Review keeps authoritative counts separate from preview rows', () => {
+  const rows = [
+    { registrationId: 'full-1', fullName: 'Full record', personsAttending: 1, paymentStatus: 'pending', ticketCode: null, checkedIn: false },
+    { registrationId: 'full-2', fullName: 'Second full record', personsAttending: 1, paymentStatus: 'paid', ticketCode: 'GSV-002', checkedIn: true },
+  ]
+  const review = buildEventReview(baseEvent, rows, [], {
+    registrationPreviewRows: [rows[0]],
+  })
+
+  assert.equal(review.summary.registrationCount, 2)
+  assert.equal(review.summary.checkedInRegistrations, 1)
+  assert.equal(review.paymentReview.registrationRecords.registrationCount, 2)
+  assert.equal(review.followUp.items.find((item) => item.key === 'payment-review')?.preview[0], 'Full record')
+})

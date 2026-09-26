@@ -198,6 +198,8 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
   const asOf = options?.asOf || new Date()
   const rows = Array.isArray(registrations) ? registrations : []
   const ledgerRows = Array.isArray(operationsEntries) ? operationsEntries : []
+  const registrationPreviewRows = Array.isArray(options?.registrationPreviewRows) ? options.registrationPreviewRows : rows
+  const operationsPreviewRows = Array.isArray(options?.operationsPreviewRows) ? options.operationsPreviewRows : ledgerRows
 
   if (!event?.eventId) {
     return {
@@ -250,7 +252,7 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
       count: missingContactRows.length,
       explanation: 'These registrations have neither a usable email address nor a phone number for follow-up.',
       to: '/registrations',
-      preview: sampleNames(missingContactRows),
+      preview: sampleNames(registrationPreviewRows.filter((registration) => !String(registration?.email || '').trim() && !String(registration?.phone || '').trim())),
     }))
   }
 
@@ -261,7 +263,7 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
       count: paymentReviewRows.length,
       explanation: 'These registrations still look unresolved for payment collection or balance follow-up.',
       to: '/registrations',
-      preview: sampleNames(paymentReviewRows),
+      preview: sampleNames(registrationPreviewRows.filter((registration) => classifyRegistrationFinance(registration, event, financeContext).paymentFollowUpRequired)),
     }))
   }
 
@@ -272,7 +274,10 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
       count: paidMissingTicketRows.length,
       explanation: 'These registrations appear paid but still do not have ticket codes assigned.',
       to: '/tickets',
-      preview: sampleNames(paidMissingTicketRows),
+      preview: sampleNames(registrationPreviewRows.filter((registration) => {
+        const paymentStatus = normalizePaymentStatus(registration?.paymentStatus)
+        return !normalizeTicketCode(registration?.ticketCode) && (paymentStatus === 'paid' || paymentStatus === 'door')
+      })),
     }))
   }
 
@@ -283,7 +288,10 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
       count: otherMissingTicketRows.length,
       explanation: 'These registrations still need ticket assignment before event-day use.',
       to: '/tickets',
-      preview: sampleNames(otherMissingTicketRows),
+      preview: sampleNames(registrationPreviewRows.filter((registration) => {
+        const paymentStatus = normalizePaymentStatus(registration?.paymentStatus)
+        return !normalizeTicketCode(registration?.ticketCode) && paymentStatus !== 'paid' && paymentStatus !== 'door'
+      })),
     }))
   }
 
@@ -294,7 +302,7 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
       count: incompleteFinanceRows.length,
       explanation: 'These registrations do not show money outstanding, but they still need active organizer review or internal cleanup.',
       to: '/registrations',
-      preview: sampleNames(incompleteFinanceRows),
+      preview: sampleNames(registrationPreviewRows.filter((registration) => classifyRegistrationFinance(registration, event, financeContext).dataReviewProminent)),
     }))
   }
 
@@ -305,7 +313,7 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
       count: duplicateContactRows.length,
       explanation: 'These registrations reuse the same email or phone details. Review them in Registrations to decide whether they are group bookings or true duplicates.',
       to: '/registrations?review=duplicate-contacts',
-      preview: sampleNames(duplicateContactRows),
+      preview: sampleNames(registrationPreviewRows.filter((registration) => duplicateContactRows.some((row) => row?.registrationId === registration?.registrationId))),
     }))
   }
 
@@ -330,7 +338,7 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
       count: openLedgerRows.length,
       explanation: 'These ledger entries are still expected or pending and should be reviewed before the event is considered settled.',
       to: '/operations',
-      preview: sampleLedgerLabels(openLedgerRows),
+      preview: sampleLedgerLabels(operationsPreviewRows.filter((entry) => entry?.status === 'pending' || entry?.status === 'expected')),
     }))
   }
 
