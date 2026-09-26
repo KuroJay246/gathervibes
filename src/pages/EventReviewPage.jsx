@@ -19,7 +19,7 @@ import { buildEventReview, formatEventReviewMoney } from '../utils/eventReview'
 import { formatEventDate } from '../utils/dateUtils'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
 import { PageTabs } from '../components/ui/PageTabs'
-import { loadRegistrationSummary } from '../services/registrationSummaryService'
+import { loadRegistrationSummary, subscribeToRecentRegistrationRows } from '../services/registrationSummaryService'
 
 const EVENT_REVIEW_TABS = [
   ['attention', 'Needs Attention'],
@@ -96,6 +96,7 @@ export function EventReviewPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [registrationSummary, setRegistrationSummary] = useState(null)
+  const [registrationPreviewRows, setRegistrationPreviewRows] = useState([])
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -103,6 +104,7 @@ export function EventReviewPage() {
     setOperationsEntries([])
     setResolvedActiveEvent(activeEvent)
     setRegistrationSummary(null)
+    setRegistrationPreviewRows([])
     setError('')
     setLoading(Boolean(activeEvent?.eventId))
     /* eslint-enable react-hooks/set-state-in-effect */
@@ -115,6 +117,11 @@ export function EventReviewPage() {
       .then((summary) => { if (!cancelled) setRegistrationSummary(summary) })
       .catch(() => { if (!cancelled) setRegistrationSummary(null) })
     return () => { cancelled = true }
+  }, [resolvedActiveEvent?.eventId])
+
+  useEffect(() => {
+    if (!resolvedActiveEvent?.eventId) return undefined
+    return subscribeToRecentRegistrationRows(resolvedActiveEvent.eventId, setRegistrationPreviewRows, () => {})
   }, [resolvedActiveEvent?.eventId])
 
   useEffect(() => {
@@ -177,9 +184,9 @@ export function EventReviewPage() {
 
   const review = useMemo(
     () => registrationSummary
-      ? buildEventReview(resolvedActiveEvent, registrations, operationsEntries, { registrationSummary })
+      ? buildEventReview(resolvedActiveEvent, registrations, operationsEntries, { registrationSummary, registrationPreviewRows })
       : buildEventReview(resolvedActiveEvent, registrations, operationsEntries),
-    [registrationSummary, resolvedActiveEvent, operationsEntries, registrations],
+    [registrationPreviewRows, registrationSummary, resolvedActiveEvent, operationsEntries, registrations],
   )
   const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(resolvedActiveEvent?.eventId), [resolvedActiveEvent?.eventId])
 
