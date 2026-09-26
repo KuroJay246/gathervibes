@@ -54,7 +54,7 @@ test('native Home and Reports use bounded operational summaries', async () => {
   const fs = await import('node:fs/promises')
   const [home, reports] = await Promise.all([
     fs.readFile(new URL('../apps/mobile/src/app/(app)/home.jsx', import.meta.url), 'utf8'),
-    fs.readFile(new URL('../apps/mobile/src/app/reports.jsx', import.meta.url), 'utf8'),
+    fs.readFile(new URL('../apps/mobile/src/app/(app)/reports.jsx', import.meta.url), 'utf8'),
   ])
   assert.match(home, /subscribeToOperationsLedger/)
   assert.match(home, /Needs attention/)
