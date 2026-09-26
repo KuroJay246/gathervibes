@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter, Redirect } from 'expo-router'
-import { Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import { useNetworkState } from 'expo-network'
 
 import { AppIcon, Banner, Card, Metric, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
@@ -68,6 +68,37 @@ export default function HomeScreen() {
         ) : (
           <Banner tone="warning">Offline mode is visible, but check-ins stay blocked until the connection returns.</Banner>
         )}
+
+        <View accessibilityRole="tablist" style={{ flexDirection: 'row', gap: 8 }}>
+          {[
+            ['home', 'Home', 'home-outline', () => router.replace('/home')],
+            ['guests', 'Guests', 'people-outline', () => router.push('/lookup')],
+            ['scanner', 'Scanner', 'scan-outline', () => router.push('/scanner')],
+            ['settings', 'Settings', 'settings-outline', () => router.push('/settings')],
+          ].map(([key, label, icon, onPress]) => (
+            <Pressable
+              key={key}
+              onPress={onPress}
+              accessibilityRole="tab"
+              accessibilityLabel={`Open ${label}`}
+              style={({ pressed }) => ({
+                flex: 1,
+                minHeight: 72,
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 5,
+                borderRadius: 12,
+                backgroundColor: key === 'home' ? colors.primarySoft : colors.surface,
+                borderWidth: 1,
+                borderColor: key === 'home' ? colors.primary : colors.border,
+                opacity: pressed ? 0.75 : 1,
+              })}
+            >
+              <AppIcon name={icon} size={21} color={key === 'home' ? colors.primary : colors.textMuted} accessibilityLabel={label} />
+              <Text style={{ ...typography.caption, color: key === 'home' ? colors.primary : colors.textMuted, fontWeight: '700' }}>{label}</Text>
+            </Pressable>
+          ))}
+        </View>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <Metric label="Registrations" value={registrations.length} detail={`${checkedIn} checked in`} />
