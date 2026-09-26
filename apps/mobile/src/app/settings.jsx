@@ -21,9 +21,10 @@ export default function SettingsScreen() {
     <Screen scroll>
       <Section
         eyebrow="Settings"
-        title="Settings and Sign Out"
-        description="This screen is deliberately narrow. It does not edit workspace access, does not connect Gmail or Outlook, and does not queue offline check-ins."
+        title="Your workspace"
+        description="Manage your account, selected event, and app access from one place."
       >
+        <Text style={{ ...typography.caption, color: colors.textSubtle }}>ACCOUNT</Text>
         <Card tone="muted">
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
             <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}><AppIcon name="person-circle-outline" size={25} color={colors.primary} accessibilityLabel="Signed-in account" /></View>
@@ -36,13 +37,32 @@ export default function SettingsScreen() {
           </View>
         </Card>
 
-        <Banner tone="info">
-          Firebase Auth persistence is native on iOS and Android in this stack. The selected event snapshot is stored with expo-secure-store, not plain AsyncStorage.
-        </Banner>
+        <Text style={{ ...typography.caption, color: colors.textSubtle }}>EVENT</Text>
+        <Card tone="muted">
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+            <AppIcon name="calendar-outline" size={22} color={colors.primary} accessibilityLabel="Selected event" />
+            <View style={{ flex: 1, gap: 3 }}>
+              <Text style={{ ...typography.label, color: colors.text }}>Selected event</Text>
+              <Text style={{ ...typography.body, color: colors.textMuted }}>{activeEvent.eventName || 'Assigned event'}</Text>
+            </View>
+          </View>
+        </Card>
 
-        <Banner tone="info">
-          Google is the production sign-in method. Workspace access still comes from the immutable Firebase UID, staff profile, enabled status, role capabilities, and Working Event assignment.
-        </Banner>
+        <Text style={{ ...typography.caption, color: colors.textSubtle }}>APPLICATION</Text>
+        <Card tone="muted">
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+            <AppIcon name="shield-checkmark-outline" size={22} color={colors.primary} accessibilityLabel="Private workspace" />
+            <View style={{ flex: 1, gap: 3 }}>
+              <Text style={{ ...typography.label, color: colors.text }}>Private staff workspace</Text>
+              <Text style={{ ...typography.body, color: colors.textMuted }}>Access is limited to approved team members and assigned event capabilities.</Text>
+            </View>
+          </View>
+        </Card>
+
+        <Text style={{ ...typography.caption, color: colors.textSubtle }}>SECURITY & ABOUT</Text>
+        <Card tone="muted">
+          <Text style={{ ...typography.body, color: colors.textMuted }}>Gather & Savor keeps check-in actions online-confirmed and protects event data with your assigned access.</Text>
+        </Card>
 
         <PrimaryButton label="Choose Another Assigned Event" onPress={async () => {
           await clearActiveEvent()
