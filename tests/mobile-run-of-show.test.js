@@ -38,3 +38,15 @@ test('native Operations remains event-scoped, bounded, searchable, and read-only
   assert.match(screen, /No operations recorded/)
   assert.doesNotMatch(screen, /createLedgerEntry|updateLedgerEntry|deleteLedgerEntry/)
 })
+
+test('mobile planning listeners use bounded service reads', async () => {
+  const fs = await import('node:fs/promises')
+  const paths = [
+    '../apps/mobile/src/services/contacts.js',
+    '../apps/mobile/src/services/tasks.js',
+    '../apps/mobile/src/services/runOfShow.js',
+    '../apps/mobile/src/services/documents.js',
+  ]
+  const sources = await Promise.all(paths.map((path) => fs.readFile(new URL(path, import.meta.url), 'utf8')))
+  for (const source of sources) assert.match(source, /limit\(/)
+})

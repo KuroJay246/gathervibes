@@ -1,9 +1,9 @@
-import { collection, onSnapshot } from '@react-native-firebase/firestore'
+import { collection, limit, onSnapshot, query } from '@react-native-firebase/firestore'
 import { firestore } from '@/lib/firebase'
 
 export function subscribeToContacts(onContacts, onError) {
   return onSnapshot(
-    collection(firestore, 'contacts'),
+    query(collection(firestore, 'contacts'), limit(200)),
     (snapshot) => {
       const rows = snapshot.docs.map((contactDocument) => ({
         ...contactDocument.data(),
@@ -18,7 +18,7 @@ export function subscribeToContacts(onContacts, onError) {
 
 export function subscribeToOrganizations(onOrganizations, onError) {
   return onSnapshot(
-    collection(firestore, 'organizations'),
+    query(collection(firestore, 'organizations'), limit(200)),
     (snapshot) => {
       const rows = snapshot.docs.map((organizationDocument) => ({
         ...organizationDocument.data(),
@@ -35,7 +35,7 @@ export function subscribeToEventContactLinks(eventId, onLinks, onError) {
   if (!eventId) return () => {}
 
   return onSnapshot(
-    collection(firestore, 'events', eventId, 'contactLinks'),
+    query(collection(firestore, 'events', eventId, 'contactLinks'), limit(200)),
     (snapshot) => onLinks(snapshot.docs.map((linkDocument) => ({
       ...linkDocument.data(),
       linkId: linkDocument.data().linkId || linkDocument.id,

@@ -1,11 +1,11 @@
-import { collection, onSnapshot } from '@react-native-firebase/firestore'
+import { collection, limit, onSnapshot, query } from '@react-native-firebase/firestore'
 import { firestore } from '@/lib/firebase'
 
 export function subscribeToRunOfShow(eventId, onItems, onError) {
   if (!eventId) return () => {}
 
   return onSnapshot(
-    collection(firestore, 'events', eventId, 'runOfShow'),
+    query(collection(firestore, 'events', eventId, 'runOfShow'), limit(100)),
     (snapshot) => {
       const rows = snapshot.docs.map((itemDocument) => ({
         ...itemDocument.data(),

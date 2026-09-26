@@ -1,11 +1,11 @@
-import { collection, onSnapshot } from '@react-native-firebase/firestore'
+import { collection, limit, onSnapshot, query } from '@react-native-firebase/firestore'
 import { firestore } from '@/lib/firebase'
 
 export function subscribeToTasks(eventId, onTasks, onError) {
   if (!eventId) return () => {}
 
   return onSnapshot(
-    collection(firestore, 'events', eventId, 'tasks'),
+    query(collection(firestore, 'events', eventId, 'tasks'), limit(100)),
     (snapshot) => {
       const rows = snapshot.docs.map((taskDocument) => ({
         ...taskDocument.data(),
