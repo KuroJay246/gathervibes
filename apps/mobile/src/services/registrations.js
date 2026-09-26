@@ -1,4 +1,4 @@
-import { collection, getDocs, limit, onSnapshot, orderBy, query, startAfter, where } from '@react-native-firebase/firestore'
+import { collection, doc, getDoc, getDocs, limit, onSnapshot, orderBy, query, startAfter, where } from '@react-native-firebase/firestore'
 import { firestore } from '@/lib/firebase'
 import { normalizeTicketCode, searchableRegistrationText } from '@gsv/contracts/ticketUtils'
 
@@ -36,6 +36,14 @@ export async function loadRegistrationPage(eventId, { cursor = null, pageSize = 
     cursor: snapshot.docs[snapshot.docs.length - 1] || null,
     hasMore: snapshot.docs.length === pageSize,
   }
+}
+
+export async function loadRegistrationDetail(eventId, registrationId) {
+  if (!eventId || !registrationId) return null
+  const snapshot = await getDoc(doc(firestore, 'registrations', registrationId))
+  if (!snapshot.exists) return null
+  const registration = { ...snapshot.data(), registrationId: snapshot.data().registrationId || snapshot.id }
+  return registration.eventId === eventId ? registration : null
 }
 
 export function searchRegistrations(registrations = [], value = '', limit = 20) {

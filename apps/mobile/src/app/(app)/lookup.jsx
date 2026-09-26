@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Redirect } from 'expo-router'
+import { Redirect, useRouter } from 'expo-router'
 import { Text, View } from 'react-native'
 import { useNetworkState } from 'expo-network'
 
@@ -19,6 +19,7 @@ function registrationName(registration) {
 }
 
 export default function LookupScreen() {
+  const router = useRouter()
   const networkState = useNetworkState()
   const { authInitialized, isAuthorized, user, access } = useAuth()
   const { activeEvent, ready } = useActiveEvent()
@@ -204,6 +205,7 @@ export default function LookupScreen() {
                   </View>
                 ) : null}
                 <View style={{ gap: 10 }}>
+                  <SecondaryButton label="View guest details" onPress={() => router.push(`/guest/${registration.registrationId}`)} accessibilityLabel={`View details for ${registrationName(registration)}`} />
                   {registration.checkedIn ? (
                     <SecondaryButton label="Record Duplicate Attempt" onPress={() => handleDuplicate(registration)} disabled={saving} />
                   ) : (
