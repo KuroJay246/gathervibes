@@ -8,7 +8,7 @@ import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 import { completeCheckIn, recordDuplicateCheckInAttempt, undoCheckIn } from '@/services/checkin'
-import { searchRegistrations, subscribeToRegistrations } from '@/services/registrations'
+import { loadRegistrationPage, searchRegistrations } from '@/services/registrations'
 import { canCompleteCheckIn, checkInWarnings } from '@gsv/contracts/ticketUtils'
 import { formatPaymentLabel } from '@gsv/contracts/paymentStatus'
 import { isApprovedAdmin } from '@gsv/contracts/accessRoles'
@@ -29,11 +29,31 @@ export default function LookupScreen() {
   const [saving, setSaving] = useState(false)
   const [visibleMatches, setVisibleMatches] = useState([])
   const [statusFilter, setStatusFilter] = useState('all')
+  const [cursor, setCursor] = useState(null)
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingPage, setLoadingPage] = useState(false)
   const requestVersion = useMemo(() => createRequestVersion(), [])
 
   useEffect(() => {
+    let cancelled = false
     if (!activeEvent?.eventId) return undefined
-    return subscribeToRegistrations(activeEvent.eventId, setRegistrations, (error) => setActionError(error?.message || 'Registrations could not be loaded.'))
+    Promise.resolve().then(() => {
+      if (cancelled) return
+      setRegistrations([])
+      setCursor(null)
+      setHasMore(false)
+      setLoadingPage(true)
+    })
+    loadRegistrationPage(activeEvent.eventId)
+      .then((page) => {
+        if (cancelled) return
+        setRegistrations(page.registrations)
+        setCursor(page.cursor)
+        setHasMore(page.hasMore)
+      })
+      .catch((error) => { if (!cancelled) setActionError(error?.message || 'Registrations could not be loaded.') })
+      .finally(() => { if (!cancelled) setLoadingPage(false) })
+    return () => { cancelled = true }
   }, [activeEvent?.eventId])
 
   useEffect(() => {
@@ -103,6 +123,22 @@ export default function LookupScreen() {
     }
   }
 
+  async function loadMore() {
+    if (!activeEvent?.eventId || !cursor || !hasMore || loadingPage) return
+    setLoadingPage(true)
+    setActionError('')
+    try {
+      const page = await loadRegistrationPage(activeEvent.eventId, { cursor })
+      setRegistrations((current) => [...current, ...page.registrations])
+      setCursor(page.cursor)
+      setHasMore(page.hasMore)
+    } catch (error) {
+      setActionError(error?.message || 'More registrations could not be loaded.')
+    } finally {
+      setLoadingPage(false)
+    }
+  }
+
   return (
     <Screen scroll>
       <Section
@@ -142,7 +178,7 @@ export default function LookupScreen() {
         {message ? <Banner tone="success">{message}</Banner> : null}
 
         {!queryText.trim() ? (
-          <EmptyState title="Start typing" description="This screen shows up to 20 event-scoped matches from the local event-day registration list." />
+          <EmptyState title={loadingPage ? 'Loading guests' : 'Start typing'} description="Search the selected event. Results stay bounded and can be loaded in pages." />
         ) : (
           <View style={{ gap: 12 }}>
             {visibleMatches.map((registration) => (
@@ -184,6 +220,7 @@ export default function LookupScreen() {
               </Card>
             ))}
             {visibleMatches.length === 0 ? <EmptyState title="No matches" description="Nothing in the selected event matched this search." /> : null}
+            {hasMore ? <SecondaryButton label={loadingPage ? 'Loading guests…' : 'Load more guests'} onPress={loadMore} disabled={loadingPage} accessibilityLabel="Load more guests" /> : null}
           </View>
         )}
       </Section>
