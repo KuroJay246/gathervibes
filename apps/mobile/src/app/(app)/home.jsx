@@ -10,6 +10,7 @@ import { useActiveEvent } from '@/providers/useActiveEvent'
 import { subscribeToDocuments } from '@/services/documents'
 import { subscribeToRegistrations } from '@/services/registrations'
 import { subscribeToTasks } from '@/services/tasks'
+import { subscribeToOperationsLedger } from '@/services/operations'
 import { subscribeToRunOfShow } from '@/services/runOfShow'
 import { groupRunOfShowItems } from '@/lib/runOfShowModel'
 
@@ -21,6 +22,7 @@ export default function HomeScreen() {
   const [registrations, setRegistrations] = useState([])
   const [tasks, setTasks] = useState([])
   const [documents, setDocuments] = useState([])
+  const [operations, setOperations] = useState([])
   const [runOfShow, setRunOfShow] = useState([])
   const [runOfShowLoaded, setRunOfShowLoaded] = useState(false)
   const [runOfShowError, setRunOfShowError] = useState('')
@@ -30,6 +32,7 @@ export default function HomeScreen() {
     const unsubscribeRegistrations = subscribeToRegistrations(activeEvent.eventId, setRegistrations, () => {})
     const unsubscribeTasks = subscribeToTasks(activeEvent.eventId, setTasks, () => {})
     const unsubscribeDocuments = subscribeToDocuments(activeEvent.eventId, setDocuments, () => {})
+    const unsubscribeOperations = subscribeToOperationsLedger(activeEvent.eventId, setOperations, () => {})
     const unsubscribeRunOfShow = subscribeToRunOfShow(activeEvent.eventId, (rows) => {
       setRunOfShow(rows)
       setRunOfShowLoaded(true)
@@ -41,12 +44,16 @@ export default function HomeScreen() {
       unsubscribeRegistrations()
       unsubscribeTasks()
       unsubscribeDocuments()
+      unsubscribeOperations()
       unsubscribeRunOfShow()
     }
   }, [activeEvent?.eventId])
 
   const checkedIn = useMemo(() => registrations.filter((registration) => registration.checkedIn).length, [registrations])
   const openTasks = useMemo(() => tasks.filter((task) => task.status !== 'Completed' && task.status !== 'Cancelled').length, [tasks])
+  const openOperations = useMemo(() => operations.filter((entry) => !['paid', 'received', 'cancelled'].includes(entry.status)).length, [operations])
+  const attentionCount = openTasks + openOperations
+  const attendancePercent = registrations.length ? Math.round((checkedIn / registrations.length) * 100) : 0
   const readinessItems = useMemo(() => {
     let count = 0
     if (openTasks > 0) count += 1
@@ -87,8 +94,18 @@ export default function HomeScreen() {
           <Metric label="Registrations" value={registrations.length} detail={`${checkedIn} checked in`} />
           <Metric label="Open Tasks" value={openTasks} detail={`${tasks.length - openTasks} completed or cancelled`} />
           <Metric label="Documents" value={documents.length} detail="Event register" />
-          <Metric label="Readiness" value={readinessItems === 0 ? 'Ready' : `${readinessItems} ${readinessItems === 1 ? 'item' : 'items'}`} detail="Needs attention" />
+          <Metric label="Attendance" value={`${attendancePercent}%`} detail={`${checkedIn} of ${registrations.length} checked in`} />
         </View>
+
+        <Card tone="muted">
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+            <AppIcon name="alert-circle-outline" size={20} color={attentionCount ? colors.warning : colors.success} accessibilityLabel="Needs attention" />
+            <Text style={{ ...typography.section, color: colors.text }}>Needs attention</Text>
+            <Pill tone={attentionCount ? 'warning' : 'success'}>{attentionCount ? `${attentionCount} open` : 'Clear'}</Pill>
+          </View>
+          <Text style={{ ...typography.body, color: colors.textMuted }}>{openTasks} task{openTasks === 1 ? '' : 's'} and {openOperations} operation{openOperations === 1 ? '' : 's'} require attention.</Text>
+          <Text style={{ ...typography.caption, color: colors.textSubtle }}>{readinessItems === 0 ? 'Event register is ready.' : `${readinessItems} readiness ${readinessItems === 1 ? 'item' : 'items'} still need review.`}</Text>
+        </Card>
 
         <Card>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>

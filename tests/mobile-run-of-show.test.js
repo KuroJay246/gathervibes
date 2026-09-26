@@ -50,6 +50,21 @@ test('native ticket details preserve current and legacy check-in fields', async 
   assert.match(ticketDetail, /ticketType \|\| registration\?\.ticketCategory \|\| registration\?\.category/)
 })
 
+test('native Home and Reports use bounded operational summaries', async () => {
+  const fs = await import('node:fs/promises')
+  const [home, reports] = await Promise.all([
+    fs.readFile(new URL('../apps/mobile/src/app/(app)/home.jsx', import.meta.url), 'utf8'),
+    fs.readFile(new URL('../apps/mobile/src/app/reports.jsx', import.meta.url), 'utf8'),
+  ])
+  assert.match(home, /subscribeToOperationsLedger/)
+  assert.match(home, /Needs attention/)
+  assert.match(reports, /attendancePercent/)
+  assert.match(reports, /subscribeToTasks/)
+  assert.match(reports, /subscribeToOperationsLedger/)
+  assert.match(reports, /label="Paid"/)
+  assert.match(reports, /label="Pending"/)
+})
+
 test('mobile planning listeners use bounded service reads', async () => {
   const fs = await import('node:fs/promises')
   const paths = [
