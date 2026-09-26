@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AppState } from 'react-native'
-import { Redirect } from 'expo-router'
+import { Redirect, useRouter } from 'expo-router'
 import { Text, View } from 'react-native'
 import { CameraView, useCameraPermissions } from 'expo-camera'
 import { useNetworkState } from 'expo-network'
@@ -15,6 +15,7 @@ import { canCompleteCheckIn } from '@gsv/contracts/ticketUtils'
 import { parseQrTicketCode } from '@gsv/contracts/qrTicketUtils'
 
 export default function ScannerScreen() {
+  const router = useRouter()
   const networkState = useNetworkState()
   const { authInitialized, isAuthorized, user } = useAuth()
   const { activeEvent, ready } = useActiveEvent()
@@ -27,6 +28,7 @@ export default function ScannerScreen() {
   const [scanEnabled, setScanEnabled] = useState(true)
   const [appState, setAppState] = useState(AppState.currentState)
   const online = networkState.isInternetReachable ?? networkState.isConnected
+  const recentCheckIns = useMemo(() => registrations.filter((registration) => registration.checkedIn).slice(0, 5), [registrations])
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', setAppState)
@@ -155,6 +157,8 @@ export default function ScannerScreen() {
           </Card>
         )}
 
+        <SecondaryButton label="Enter ticket code manually" onPress={() => router.push('/manual-entry')} testID="scanner-manual-entry-button" accessibilityLabel="scanner-manual-entry-button" />
+
         {selectedRegistration ? (
           <Card>
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
@@ -182,6 +186,23 @@ export default function ScannerScreen() {
             </Text>
           </Card>
         )}
+
+        {recentCheckIns.length ? (
+          <Card tone="muted">
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+              <AppIcon name="time-outline" size={20} color={colors.primary} accessibilityLabel="Recent check-ins" />
+              <Text style={{ ...typography.section, color: colors.text }}>Recent check-ins</Text>
+            </View>
+            <View style={{ gap: 8 }}>
+              {recentCheckIns.map((registration) => (
+                <View key={registration.registrationId} style={{ flexDirection: 'row', justifyContent: 'space-between', gap: spacing.md }}>
+                  <Text style={{ ...typography.body, color: colors.text }}>{registration.fullName || registration.buyerName || 'Guest'}</Text>
+                  <Pill tone="success">Checked in</Pill>
+                </View>
+              ))}
+            </View>
+          </Card>
+        ) : null}
       </Section>
     </Screen>
   )
