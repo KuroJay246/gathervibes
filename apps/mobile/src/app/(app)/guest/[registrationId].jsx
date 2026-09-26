@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Redirect, useLocalSearchParams } from 'expo-router'
+import { Redirect, useLocalSearchParams, useRouter } from 'expo-router'
 import { Text, View } from 'react-native'
 
-import { AppIcon, Banner, Card, EmptyState, Pill, Screen, Section } from '@/components/ui'
+import { AppIcon, Banner, Card, EmptyState, Pill, Screen, Section, SecondaryButton } from '@/components/ui'
 import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
@@ -18,6 +18,7 @@ function valueOrFallback(value, fallback = 'Not provided') {
 }
 
 export default function GuestDetailScreen() {
+  const router = useRouter()
   const { registrationId } = useLocalSearchParams()
   const { authInitialized, isAuthorized } = useAuth()
   const { activeEvent, ready } = useActiveEvent()
@@ -75,6 +76,7 @@ export default function GuestDetailScreen() {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}><AppIcon name="qr-code-outline" size={21} color={colors.primary} accessibilityLabel="Ticket" /><Text style={{ ...typography.label, color: colors.text }}>Ticket status</Text></View>
             <Text style={{ ...typography.body, color: colors.text }}>{valueOrFallback(registration.ticketCode, 'No ticket assigned')}</Text>
             <Text style={{ ...typography.caption, color: colors.textMuted }}>{valueOrFallback(registration.ticketStatus, 'Status unavailable')}</Text>
+            <SecondaryButton label="View ticket details" onPress={() => router.push(`/guest/${registration.registrationId}/ticket`)} accessibilityLabel="View ticket details" />
           </View>
         </Card>
 
