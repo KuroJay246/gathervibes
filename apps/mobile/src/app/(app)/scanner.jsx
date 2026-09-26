@@ -22,6 +22,7 @@ export default function ScannerScreen() {
   const [permission, requestPermission] = useCameraPermissions()
   const [registrations, setRegistrations] = useState([])
   const [selectedRegistration, setSelectedRegistration] = useState(null)
+  const [result, setResult] = useState(null)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -58,20 +59,27 @@ export default function ScannerScreen() {
     setScanEnabled(true)
     setMessage(nextMessage)
     setError('')
+    setResult(null)
+  }
+
+  function showResult(kind, title, detail) {
+    setResult({ kind, title, detail })
+    setMessage('')
+    setError('')
   }
 
   function handleBarcodeScanned({ data }) {
     if (appState !== 'active' || !scanEnabled) return
     const parsed = parseQrTicketCode(data)
     if (parsed.error) {
-      setError(parsed.error)
+      showResult('invalid', 'Ticket not recognized', 'Use a valid event ticket or enter the code manually.')
       setScanEnabled(false)
       return
     }
 
     const registration = findRegistrationByTicketCode(registrations, parsed.ticketCode)
     if (!registration) {
-      setError('This QR code does not match a registration for the selected event.')
+      showResult('invalid', 'Ticket not valid for this event', 'No registration matched this ticket in the selected event.')
       setScanEnabled(false)
       return
     }
@@ -89,9 +97,16 @@ export default function ScannerScreen() {
     setMessage('')
     try {
       await completeCheckIn(selectedRegistration, user, { networkConnected: online !== false })
-      resetSelection(`${selectedRegistration.fullName || 'Guest'} checked in successfully.`)
+      const completedGuest = selectedRegistration.fullName || selectedRegistration.buyerName || 'Guest'
+      setSelectedRegistration(null)
+      setScanEnabled(false)
+      showResult('success', 'Check-in complete', `${completedGuest} is confirmed for this event.`)
     } catch (nextError) {
-      setError(nextError?.message || 'Check-in failed. No local success state was applied.')
+      if (nextError?.code === 'mobile/offline-write-blocked') {
+        showResult('offline', 'Connection required', 'Check-in was not saved. Retry when the device is back online.')
+      } else {
+        showResult('failed', 'Check-in could not be confirmed', 'No local success state was applied. Retry the check-in.')
+      }
     } finally {
       setSaving(false)
     }
@@ -104,9 +119,16 @@ export default function ScannerScreen() {
     setMessage('')
     try {
       await recordDuplicateCheckInAttempt(selectedRegistration, user, { networkConnected: online !== false })
-      setMessage('Duplicate attempt recorded. Check-in remains blocked.')
+      const duplicateGuest = selectedRegistration.fullName || selectedRegistration.buyerName || 'This guest'
+      setSelectedRegistration(null)
+      setScanEnabled(false)
+      showResult('duplicate', 'Already checked in', `${duplicateGuest} already has a confirmed check-in.`)
     } catch (nextError) {
-      setError(nextError?.message || 'Duplicate attempt could not be recorded.')
+      if (nextError?.code === 'mobile/offline-write-blocked') {
+        showResult('offline', 'Connection required', 'The duplicate attempt was not recorded while offline.')
+      } else {
+        showResult('failed', 'Duplicate check-in could not be recorded', 'Retry when the connection is stable.')
+      }
     } finally {
       setSaving(false)
     }
@@ -134,6 +156,24 @@ export default function ScannerScreen() {
         {!online ? <Banner tone="warning">The camera can still scan offline, but final check-in stays blocked until the device has a live connection.</Banner> : null}
         {error ? <Banner tone="danger">{error}</Banner> : null}
         {message ? <Banner tone="success">{message}</Banner> : null}
+
+        {result ? (
+          <Card tone="muted" accessibilityLabel={`${result.title}: ${result.detail}`}>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
+              <AppIcon
+                name={result.kind === 'success' ? 'checkmark-circle-outline' : result.kind === 'duplicate' ? 'time-outline' : result.kind === 'offline' ? 'cloud-offline-outline' : 'alert-circle-outline'}
+                size={28}
+                color={result.kind === 'success' ? colors.success : result.kind === 'duplicate' ? colors.warning : colors.danger}
+                accessibilityLabel={result.kind === 'success' ? 'Check-in complete' : result.title}
+              />
+              <View style={{ flex: 1, gap: 5 }}>
+                <Text style={{ ...typography.section, color: colors.text }}>{result.title}</Text>
+                <Text style={{ ...typography.body, color: colors.textMuted }}>{result.detail}</Text>
+              </View>
+            </View>
+            <PrimaryButton label="Scan Next Guest" onPress={() => resetSelection()} disabled={saving} testID="scanner-result-next-button" accessibilityLabel="scanner-result-next-button" />
+          </Card>
+        ) : null}
 
         {permissionDenied ? (
           <Card tone="muted">
