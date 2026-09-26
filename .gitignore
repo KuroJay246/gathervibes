@@ -16,6 +16,7 @@ secrets/
 *.key
 *.local
 test_output.txt
+apps/mobile/.metro-e2e.log
 test-results/
 playwright-report/
 output/

@@ -25,7 +25,7 @@ export default function AppLayout() {
     >
       <Tabs.Screen name="home" options={{ title: 'Home', tabBarIcon: ({ color }) => <TabIcon name="home-outline" color={color} /> }} />
       <Tabs.Screen name="lookup" options={{ title: 'Guests', tabBarIcon: ({ color }) => <TabIcon name="people-outline" color={color} />, href: scannerOnly ? null : '/lookup' }} />
-      <Tabs.Screen name="scanner" options={{ title: 'Scan', tabBarIcon: ({ color }) => <TabIcon name="scan-outline" color={color} /> }} />
+      <Tabs.Screen name="scanner" options={{ title: 'Scan', tabBarAccessibilityLabel: 'Scan', tabBarButtonTestID: 'tab-scan', tabBarIcon: ({ color }) => <TabIcon name="scan-outline" color={color} /> }} />
       <Tabs.Screen name="tasks" options={{ title: 'Tasks', tabBarIcon: ({ color }) => <TabIcon name="checkbox-outline" color={color} />, href: scannerOnly ? null : '/tasks' }} />
       <Tabs.Screen name="more" options={{ title: 'More', tabBarIcon: ({ color }) => <TabIcon name="ellipsis-horizontal-circle-outline" color={color} />, href: scannerOnly ? null : '/more' }} />
       <Tabs.Screen name="settings" options={{ href: null }} />

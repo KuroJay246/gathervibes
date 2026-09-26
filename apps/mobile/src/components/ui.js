@@ -146,6 +146,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: spacing.lg,
+    paddingBottom: spacing.lg + 112,
     gap: spacing.lg,
   },
   section: {

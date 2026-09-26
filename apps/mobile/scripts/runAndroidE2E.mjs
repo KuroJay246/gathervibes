@@ -284,9 +284,27 @@ async function tapBySelector(selector, timeoutMs = 15000) {
     throw new Error(`Node not found for selector ${JSON.stringify(selector)}`)
   }
   const point = parseBounds(node.bounds)
-  if (!point) throw new Error(`Node bounds missing for selector ${JSON.stringify(selector)}`)
+  const bounds = String(node.bounds || '').match(/\[(\d+),(\d+)\]\[(\d+),(\d+)\]/)
+  const validBounds = bounds && Number(bounds[3]) > Number(bounds[1]) && Number(bounds[4]) > Number(bounds[2])
+  if (!point || !validBounds || point.y <= 150 || point.y >= 2400) {
+    throw new Error(`Node is not visibly tappable for selector ${JSON.stringify(selector)}`)
+  }
   adb(['shell', 'input', 'tap', String(point.x), String(point.y)])
   await sleep(500)
+}
+
+async function scrollUntilVisibleSelector(selector, maxSwipes = 4) {
+  for (let attempt = 0; attempt <= maxSwipes; attempt += 1) {
+    const visible = await findNode((candidate) => selectorMatches(candidate, selector) && candidate.enabled !== 'false', 1200)
+    const point = visible ? parseBounds(visible.bounds) : null
+    if (point && point.y > 150 && point.y < 2150) return visible
+    if (attempt < maxSwipes) {
+      adb(['shell', 'input', 'swipe', '540', '1900', '540', '700', '350'])
+      await sleep(500)
+    }
+  }
+  await captureScreenshot(`missing-visible-${(selector.accessibilityLabel || selector.text || 'node').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`)
+  throw new Error(`Selector was not visible after bounded scrolls: ${JSON.stringify(selector)}`)
 }
 
 async function scrollUntilVisibleText(text, maxSwipes = 4) {
@@ -522,6 +540,7 @@ async function ensureHomeScreen() {
 
 async function openScreenFromHome(buttonSelector, route, targetSelector, timeoutMs = 15000) {
   try {
+    await scrollUntilVisibleSelector(buttonSelector)
     await tapBySelector(buttonSelector, Math.min(timeoutMs, 5000))
     const directTarget = await findNode((candidate) => selectorMatches(candidate, targetSelector), Math.min(timeoutMs, 8000))
     if (directTarget) return
@@ -634,13 +653,27 @@ async function main() {
   await captureScreenshot('scanner-duplicate')
   await tapForVisibleText({ accessibilityLabel: 'manual-duplicate-button' }, 'Duplicate attempt recorded. No new check-in was saved.', 20000)
 
-  await openRoute('/home')
-  await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 15000)
+  adb(['shell', 'input', 'keyevent', '4'])
+  try {
+    await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 5000)
+  } catch {
+    await openRoute('/home')
+    await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 10000)
+  }
   adb(['shell', 'pm', 'revoke', APP_ID, 'android.permission.CAMERA'])
   adb(['shell', 'cmd', 'appops', 'set', APP_ID, 'CAMERA', 'deny'])
-  await tapBySelector({ accessibilityLabel: 'home-qr-scanner-button' })
+  try {
+    // Target the native tab parent; the visible "Scan" TextView is a
+    // non-clickable child.
+    await tapBySelector({ accessibilityLabel: 'Scan' }, 5000)
+    await maybeDenyCameraPrompt()
+    await waitForSelector({ text: 'Scanner Mode' }, 10000)
+  } catch {
+    await openRoute('/scanner')
+    await maybeDenyCameraPrompt()
+    await waitForSelector({ text: 'Scanner Mode' }, 10000)
+  }
   await sleep(1500)
-  await maybeDenyCameraPrompt()
   await waitForVisibleText('Camera access denied', 15000)
   await captureScreenshot('scanner-ready')
   adb(['shell', 'input', 'keyevent', '4'])
