@@ -3,13 +3,15 @@ import { useRouter, Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 import { useNetworkState } from 'expo-network'
 
-import { AppIcon, Banner, Card, Metric, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
+import { AppIcon, Banner, Card, EmptyState, Metric, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
 import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 import { subscribeToDocuments } from '@/services/documents'
 import { subscribeToRegistrations } from '@/services/registrations'
 import { subscribeToTasks } from '@/services/tasks'
+import { subscribeToRunOfShow } from '@/services/runOfShow'
+import { groupRunOfShowItems } from '@/lib/runOfShowModel'
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -19,16 +21,27 @@ export default function HomeScreen() {
   const [registrations, setRegistrations] = useState([])
   const [tasks, setTasks] = useState([])
   const [documents, setDocuments] = useState([])
+  const [runOfShow, setRunOfShow] = useState([])
+  const [runOfShowLoaded, setRunOfShowLoaded] = useState(false)
+  const [runOfShowError, setRunOfShowError] = useState('')
 
   useEffect(() => {
     if (!activeEvent?.eventId) return undefined
     const unsubscribeRegistrations = subscribeToRegistrations(activeEvent.eventId, setRegistrations, () => {})
     const unsubscribeTasks = subscribeToTasks(activeEvent.eventId, setTasks, () => {})
     const unsubscribeDocuments = subscribeToDocuments(activeEvent.eventId, setDocuments, () => {})
+    const unsubscribeRunOfShow = subscribeToRunOfShow(activeEvent.eventId, (rows) => {
+      setRunOfShow(rows)
+      setRunOfShowLoaded(true)
+    }, (error) => {
+      setRunOfShowError(error?.message || 'Run of Show could not be loaded.')
+      setRunOfShowLoaded(true)
+    })
     return () => {
       unsubscribeRegistrations()
       unsubscribeTasks()
       unsubscribeDocuments()
+      unsubscribeRunOfShow()
     }
   }, [activeEvent?.eventId])
 
@@ -41,6 +54,7 @@ export default function HomeScreen() {
     if (registrations.length === 0) count += 1
     return count
   }, [documents.length, openTasks, registrations.length])
+  const runOfShowGroups = useMemo(() => groupRunOfShowItems(runOfShow), [runOfShow])
 
   if (!authInitialized || !ready) return null
   if (!isAuthorized) return <Redirect href="/sign-in" />
@@ -86,6 +100,40 @@ export default function HomeScreen() {
             <PrimaryButton label="QR Scanner" onPress={() => router.push('/scanner')} testID="home-qr-scanner-button" accessibilityLabel="home-qr-scanner-button" />
             <SecondaryButton label="Manual Ticket Code" onPress={() => router.push('/manual-entry')} testID="home-manual-ticket-button" accessibilityLabel="home-manual-ticket-button" />
           </View>
+        </Card>
+
+        <Card tone="muted">
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+            <AppIcon name="time-outline" size={20} color={colors.primary} accessibilityLabel="Run of Show" />
+            <Text style={{ ...typography.section, color: colors.text }}>Event timeline</Text>
+          </View>
+          {!runOfShowLoaded ? <Banner>Loading event timeline…</Banner> : null}
+          {runOfShowError ? <Banner tone="danger">{runOfShowError}</Banner> : null}
+          {runOfShowLoaded && !runOfShowError && runOfShow.length === 0 ? (
+            <EmptyState title="No timeline items" description="Add event-day timing in Run of Show when the schedule is ready." />
+          ) : null}
+          {runOfShowGroups.current[0] ? (
+            <View style={{ gap: 3 }}>
+              <Text style={{ ...typography.caption, color: colors.primary }}>CURRENT</Text>
+              <Text style={{ ...typography.section, color: colors.text }}>{runOfShowGroups.current[0].title || 'Current item'}</Text>
+              <Text style={{ ...typography.body, color: colors.textMuted }}>{runOfShowGroups.current[0].startTime || 'Time not set'}{runOfShowGroups.current[0].location ? ` • ${runOfShowGroups.current[0].location}` : ''}</Text>
+            </View>
+          ) : null}
+          {!runOfShowGroups.current[0] && runOfShowGroups.next[0] ? (
+            <View style={{ gap: 3 }}>
+              <Text style={{ ...typography.caption, color: colors.textMuted }}>NEXT</Text>
+              <Text style={{ ...typography.section, color: colors.text }}>{runOfShowGroups.next[0].title || 'Next item'}</Text>
+              <Text style={{ ...typography.body, color: colors.textMuted }}>{runOfShowGroups.next[0].startTime || 'Time not set'}{runOfShowGroups.next[0].location ? ` • ${runOfShowGroups.next[0].location}` : ''}</Text>
+            </View>
+          ) : null}
+          {runOfShowGroups.current[0] && runOfShowGroups.next[0] ? (
+            <View style={{ gap: 3 }}>
+              <Text style={{ ...typography.caption, color: colors.textMuted }}>NEXT</Text>
+              <Text style={{ ...typography.section, color: colors.text }}>{runOfShowGroups.next[0].title || 'Next item'}</Text>
+              <Text style={{ ...typography.body, color: colors.textMuted }}>{runOfShowGroups.next[0].startTime || 'Time not set'}{runOfShowGroups.next[0].location ? ` • ${runOfShowGroups.next[0].location}` : ''}</Text>
+            </View>
+          ) : null}
+          <SecondaryButton label="Open Run of Show" onPress={() => router.push('/run-of-show')} accessibilityLabel="Open Run of Show" />
         </Card>
 
         <SecondaryButton
