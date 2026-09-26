@@ -47,6 +47,7 @@ test('auth reliability derives intended route from protected-route state safely'
 test('auth reliability popup fallback and cancellation logic stay deterministic', () => {
   assert.equal(shouldFallbackToRedirectSignIn('auth/popup-blocked'), true)
   assert.equal(shouldFallbackToRedirectSignIn('auth/web-storage-unsupported'), true)
+  assert.equal(shouldFallbackToRedirectSignIn('auth/internal-error'), true)
   assert.equal(shouldFallbackToRedirectSignIn('auth/popup-closed-by-user'), false)
   assert.equal(isPopupCancelledError('auth/popup-closed-by-user'), true)
   assert.equal(isPopupCancelledError('auth/cancelled-popup-request'), true)

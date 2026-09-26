@@ -7,6 +7,7 @@ export const GOOGLE_SIGN_IN_REDIRECT_STATE_KEY = 'gsv.googleSignInState'
 const REDIRECT_FALLBACK_ERROR_CODES = new Set([
   'auth/popup-blocked',
   'auth/web-storage-unsupported',
+  'auth/internal-error',
 ])
 
 const POPUP_CANCELLED_ERROR_CODES = new Set([
