@@ -17,6 +17,10 @@ function valueOrFallback(value, fallback = 'Not provided') {
   return value === undefined || value === null || value === '' ? fallback : String(value)
 }
 
+function checkInTimestamp(registration) {
+  return registration?.checkedInAt || registration?.checkInTime || null
+}
+
 export default function GuestDetailScreen() {
   const router = useRouter()
   const { registrationId } = useLocalSearchParams()
@@ -90,7 +94,7 @@ export default function GuestDetailScreen() {
         </Card>
 
         {registration.checkedIn ? (
-          <Banner tone="success">Checked in{registration.checkedInAt ? ` at ${valueOrFallback(registration.checkedInAt)}` : ''}. This record is read-only here.</Banner>
+          <Banner tone="success">Checked in{checkInTimestamp(registration) ? ` at ${valueOrFallback(checkInTimestamp(registration))}` : ''}. This record is read-only here.</Banner>
         ) : <Banner tone="info">Check-in is completed from Scanner or Registration Lookup.</Banner>}
       </Section>
     </Screen>

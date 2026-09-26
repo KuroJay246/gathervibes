@@ -16,6 +16,14 @@ function display(value, fallback = 'Not available') {
   return value === undefined || value === null || value === '' ? fallback : String(value)
 }
 
+function checkInTimestamp(registration) {
+  return registration?.checkedInAt || registration?.checkInTime || null
+}
+
+function ticketCategory(registration) {
+  return registration?.ticketType || registration?.ticketCategory || registration?.category || null
+}
+
 export default function TicketDetailScreen() {
   const { registrationId } = useLocalSearchParams()
   const { authInitialized, isAuthorized } = useAuth()
@@ -66,8 +74,9 @@ export default function TicketDetailScreen() {
         <Card tone="muted">
           <View style={{ gap: 8 }}>
             <Text style={{ ...typography.body, color: colors.text }}>Ticket: {display(registration.ticketStatus, 'Status unavailable')}</Text>
+            {ticketCategory(registration) ? <Text style={{ ...typography.body, color: colors.textMuted }}>Category: {display(ticketCategory(registration))}</Text> : null}
             <Text style={{ ...typography.body, color: colors.textMuted }}>Check-in: {registration.checkedIn ? 'Complete' : 'Not checked in'}</Text>
-            {registration.checkInTime ? <Text style={{ ...typography.body, color: colors.textMuted }}>Checked in at: {display(registration.checkInTime)}</Text> : null}
+            {checkInTimestamp(registration) ? <Text style={{ ...typography.body, color: colors.textMuted }}>Checked in at: {display(checkInTimestamp(registration))}</Text> : null}
             <Text style={{ ...typography.body, color: colors.textMuted }}>Registration: {display(registration.registrationStatus, 'Active')}</Text>
           </View>
         </Card>
