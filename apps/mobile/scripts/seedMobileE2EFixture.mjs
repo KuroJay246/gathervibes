@@ -33,7 +33,7 @@ async function ensureUser() {
   })
 }
 
-function registration(id, fullName, ticketCode, checkedIn = false) {
+function registration(id, fullName, ticketCode, checkedIn = false, createdAt = '2026-08-24T07:00:00.000Z') {
   return {
     registrationId: id,
     eventId: EVENT_ID,
@@ -46,12 +46,23 @@ function registration(id, fullName, ticketCode, checkedIn = false) {
     checkedIn,
     checkInTime: checkedIn ? Timestamp.fromDate(new Date('2026-08-24T08:00:00.000Z')) : null,
     checkedInBy: checkedIn ? 'prior-scanner@example.com' : null,
-    createdAt: Timestamp.fromDate(new Date('2026-08-24T07:00:00.000Z')),
+    createdAt: Timestamp.fromDate(new Date(createdAt)),
     updatedAt: Timestamp.fromDate(new Date('2026-08-24T08:05:00.000Z')),
   }
 }
 
+async function clearScaleRegistrations() {
+  const snapshot = await db.collection('registrations').where('eventId', '==', EVENT_ID).get()
+  const scaleRows = snapshot.docs.filter((registrationDocument) => registrationDocument.id.startsWith('mobile-e2e-scale-'))
+  for (let offset = 0; offset < scaleRows.length; offset += 450) {
+    const deleteBatch = db.batch()
+    for (const registrationDocument of scaleRows.slice(offset, offset + 450)) deleteBatch.delete(registrationDocument.ref)
+    await deleteBatch.commit()
+  }
+}
+
 async function seedFirestore(userRecord) {
+  await clearScaleRegistrations()
   const batch = db.batch()
   const eventRef = db.collection('events').doc(EVENT_ID)
   const profileRef = db.collection('staffProfiles').doc(userRecord.uid)
@@ -163,7 +174,7 @@ async function seedFirestore(userRecord) {
   await batch.commit()
 
   const scaleRegistrations = Array.from({ length: REGISTRATION_COUNT - baseRegistrations.length }, (_, index) => (
-    registration(`mobile-e2e-scale-${index + 1}`, `Scale Guest ${index + 1}`, `GSV-E2E-SCALE-${String(index + 1).padStart(5, '0')}`)
+    registration(`mobile-e2e-scale-${index + 1}`, `Scale Guest ${index + 1}`, `GSV-E2E-SCALE-${String(index + 1).padStart(5, '0')}`, false, '2026-08-23T07:00:00.000Z')
   ))
   const registrations = [...baseRegistrations, ...scaleRegistrations]
   for (let offset = 0; offset < registrations.length; offset += 450) {

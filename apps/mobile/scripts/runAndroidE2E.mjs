@@ -10,6 +10,7 @@ const MAIN_ACTIVITY = process.env.GSV_MOBILE_MAIN_ACTIVITY || `${APP_ID}/.MainAc
 const DEVICE_ID = String(process.env.GSV_ANDROID_DEVICE_ID || '').trim()
 const EXPECTED_AVD_NAME = String(process.env.GSV_ANDROID_AVD_NAME || '').trim()
 const DEV_URL = process.env.GSV_MOBILE_E2E_DEV_URL || ''
+const EXPECTED_REGISTRATION_COUNT = Number(process.env.GSV_MOBILE_E2E_EXPECTED_REGISTRATION_COUNT || 0)
 const LAUNCH_MODE = process.env.GSV_MOBILE_E2E_LAUNCH_MODE || (DEV_URL ? 'dev-client' : 'native')
 const STARTUP_TIMEOUT_MS = Number(process.env.GSV_MOBILE_E2E_STARTUP_TIMEOUT_MS || (LAUNCH_MODE === 'dev-client' ? 120000 : 30000))
 const ADB_COMMAND_TIMEOUT_MS = Number(process.env.GSV_ANDROID_ADB_TIMEOUT_MS || 20000)
@@ -602,6 +603,7 @@ async function main() {
   step('establish-emulator-identity')
   step('authenticated-home')
   await ensureHomeScreen()
+  if (EXPECTED_REGISTRATION_COUNT > 0) await waitForVisibleText(String(EXPECTED_REGISTRATION_COUNT), 20000)
   await captureScreenshot('owner-home')
 
   step('run-of-show')
