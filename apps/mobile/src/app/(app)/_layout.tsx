@@ -30,8 +30,6 @@ export default function AppLayout() {
       <Tabs.Screen name="more" options={{ title: 'More', tabBarIcon: ({ color }) => <TabIcon name="ellipsis-horizontal-circle-outline" color={color} />, href: scannerOnly ? null : '/more' }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
       <Tabs.Screen name="reports" options={{ href: null }} />
-      <Tabs.Screen name="guest/[registrationId]" options={{ href: null }} />
-      <Tabs.Screen name="guest/[registrationId]/ticket" options={{ href: null }} />
     </Tabs>
   )
 }

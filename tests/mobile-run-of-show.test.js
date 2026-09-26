@@ -42,8 +42,8 @@ test('native Operations remains event-scoped, bounded, searchable, and read-only
 test('native ticket details preserve current and legacy check-in fields', async () => {
   const fs = await import('node:fs/promises')
   const [guestDetail, ticketDetail] = await Promise.all([
-    fs.readFile(new URL('../apps/mobile/src/app/(app)/guest/[registrationId].jsx', import.meta.url), 'utf8'),
-    fs.readFile(new URL('../apps/mobile/src/app/(app)/guest/[registrationId]/ticket.jsx', import.meta.url), 'utf8'),
+    fs.readFile(new URL('../apps/mobile/src/app/guest/[registrationId].jsx', import.meta.url), 'utf8'),
+    fs.readFile(new URL('../apps/mobile/src/app/guest/[registrationId]/ticket.jsx', import.meta.url), 'utf8'),
   ])
   assert.match(guestDetail, /checkedInAt \|\| registration\?\.checkInTime/)
   assert.match(ticketDetail, /checkedInAt \|\| registration\?\.checkInTime/)
