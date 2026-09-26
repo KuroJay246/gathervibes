@@ -660,6 +660,7 @@ async function main() {
     await openRoute('/reports')
     await waitForVisibleText(`2 of ${EXPECTED_REGISTRATION_COUNT} registrations checked in.`, 15000)
     await captureScreenshot('reports-refresh-after-checkin')
+
     await openRoute('/manual-entry')
     await waitForSelector({ accessibilityLabel: 'manual-ticket-input' }, 15000)
   }
@@ -694,6 +695,19 @@ async function main() {
   await captureScreenshot('scanner-ready')
   adb(['shell', 'input', 'keyevent', '4'])
   await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 15000)
+
+  if (EXPECTED_REGISTRATION_COUNT > 0) {
+    await openRoute('/guest/mobile-e2e-ready')
+    await waitForVisibleText('Fixture Guest', 15000)
+    await waitForVisibleText('CHECKED IN', 15000)
+    await captureScreenshot('guest-refresh-after-checkin')
+    await openRoute('/guest/mobile-e2e-ready/ticket')
+    await waitForVisibleText('TICKET DETAIL', 15000)
+    await waitForVisibleText('Check-in: Complete', 15000)
+    await captureScreenshot('ticket-refresh-after-checkin')
+    await openRoute('/home')
+    await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 15000)
+  }
 
   adb(['shell', 'svc', 'wifi', 'disable'])
   adb(['shell', 'svc', 'data', 'disable'])
