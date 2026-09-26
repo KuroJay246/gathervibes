@@ -46,7 +46,7 @@ export default function SignInScreen() {
       <Section
         eyebrow="Gather & Savor"
         title="Secure staff access"
-        description="Continue with your approved Google account. Workspace permissions are verified after Google confirms your identity."
+        description="Private event operations for approved team members."
       >
         <Card>
           <View style={{ alignItems: 'center', gap: spacing.md, paddingVertical: spacing.sm }}>
@@ -54,7 +54,7 @@ export default function SignInScreen() {
               <Text accessibilityLabel="Google" style={{ ...typography.title, color: colors.primary }}>G</Text>
             </View>
             <Text style={{ ...typography.body, color: colors.textMuted, textAlign: 'center' }}>
-              Google confirms who you are. Gather &amp; Savor still checks your role, event assignments, and enabled status before opening the workspace.
+              Sign in with your approved Google account to continue.
             </Text>
           </View>
           {errorMessage ? <Banner tone="danger">{errorMessage}</Banner> : null}
@@ -68,7 +68,7 @@ export default function SignInScreen() {
         </Card>
 
         <Banner tone="info">
-          Access is restricted to approved staff. Authentication alone never grants event access.
+          Private access for approved team members.
         </Banner>
 
         <SecondaryButton label="Back to Start" onPress={() => router.replace('/')} testID="sign-in-back-button" accessibilityLabel="sign-in-back-button" />

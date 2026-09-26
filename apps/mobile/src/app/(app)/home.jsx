@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter, Redirect } from 'expo-router'
-import { Pressable, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { useNetworkState } from 'expo-network'
 
 import { AppIcon, Banner, Card, Metric, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
@@ -69,37 +69,6 @@ export default function HomeScreen() {
           <Banner tone="warning">Offline mode is visible, but check-ins stay blocked until the connection returns.</Banner>
         )}
 
-        <View accessibilityRole="tablist" style={{ flexDirection: 'row', gap: 8 }}>
-          {[
-            ['home', 'Home', 'home-outline', () => router.replace('/home')],
-            ['guests', 'Guests', 'people-outline', () => router.push('/lookup')],
-            ['scanner', 'Scanner', 'scan-outline', () => router.push('/scanner')],
-            ['settings', 'Settings', 'settings-outline', () => router.push('/settings')],
-          ].map(([key, label, icon, onPress]) => (
-            <Pressable
-              key={key}
-              onPress={onPress}
-              accessibilityRole="tab"
-              accessibilityLabel={`Open ${label}`}
-              style={({ pressed }) => ({
-                flex: 1,
-                minHeight: 72,
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 5,
-                borderRadius: 12,
-                backgroundColor: key === 'home' ? colors.primarySoft : colors.surface,
-                borderWidth: 1,
-                borderColor: key === 'home' ? colors.primary : colors.border,
-                opacity: pressed ? 0.75 : 1,
-              })}
-            >
-              <AppIcon name={icon} size={21} color={key === 'home' ? colors.primary : colors.textMuted} accessibilityLabel={label} />
-              <Text style={{ ...typography.caption, color: key === 'home' ? colors.primary : colors.textMuted, fontWeight: '700' }}>{label}</Text>
-            </Pressable>
-          ))}
-        </View>
-
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <Metric label="Registrations" value={registrations.length} detail={`${checkedIn} checked in`} />
           <Metric label="Open Tasks" value={openTasks} detail={`${tasks.length - openTasks} completed or cancelled`} />
@@ -116,22 +85,6 @@ export default function HomeScreen() {
             <PrimaryButton label="Guest Search" onPress={() => router.push('/lookup')} testID="home-guest-search-button" accessibilityLabel="home-guest-search-button" />
             <PrimaryButton label="QR Scanner" onPress={() => router.push('/scanner')} testID="home-qr-scanner-button" accessibilityLabel="home-qr-scanner-button" />
             <SecondaryButton label="Manual Ticket Code" onPress={() => router.push('/manual-entry')} testID="home-manual-ticket-button" accessibilityLabel="home-manual-ticket-button" />
-          </View>
-        </Card>
-
-        <Card tone="muted">
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-            <AppIcon name="list-outline" size={20} color={colors.primary} accessibilityLabel="Operations" />
-            <Text style={{ ...typography.section, color: colors.text }}>More operations</Text>
-          </View>
-          <View style={{ gap: 10 }}>
-            <SecondaryButton label="Assigned Tasks" onPress={() => router.push('/tasks')} />
-            <SecondaryButton label="Operations" onPress={() => router.push('/operations')} accessibilityLabel="home-operations-button" />
-            <SecondaryButton label="Run of Show" onPress={() => router.push('/run-of-show')} testID="home-run-of-show-button" accessibilityLabel="home-run-of-show-button" />
-            <SecondaryButton label="Operational Notes" onPress={() => router.push('/notes')} />
-            <SecondaryButton label="Event Contacts" onPress={() => router.push('/contacts')} />
-            <SecondaryButton label="Limited Reports" onPress={() => router.push('/reports')} />
-            <SecondaryButton label="Settings and Sign Out" onPress={() => router.push('/settings')} testID="home-settings-button" accessibilityLabel="home-settings-button" />
           </View>
         </Card>
 
