@@ -36,6 +36,7 @@ import {
   isEventDayStatus,
 } from '../utils/eventPlanning'
 import { getEventFinancialEvidenceAudit } from '../utils/financialEvidenceAudit'
+import { loadRegistrationSummary } from '../services/registrationSummaryService'
 import { PageTabs } from '../components/ui/PageTabs'
 import { buildDashboardOverviewModel } from '../features/dashboard/readModels/dashboardOverviewModel.js'
 
@@ -345,6 +346,7 @@ export function DashboardPage() {
   const [allEvents, setAllEvents] = useState([])
   const [eventsLoaded, setEventsLoaded] = useState(false)
   const [currentTime, setCurrentTime] = useState(() => new Date())
+  const [registrationSummary, setRegistrationSummary] = useState(null)
   const [searchParams, setSearchParams] = useSearchParams()
 
   const adminUser = isApprovedAdmin(access)
@@ -356,6 +358,17 @@ export function DashboardPage() {
   const tasks = useEventTasks(activeEvent?.eventId)
   const runOfShowItems = useRunOfShowItems(activeEvent?.eventId)
   const resources = useEventResources(activeEvent?.eventId)
+
+  useEffect(() => {
+    let cancelled = false
+    if (!activeEvent?.eventId) {
+      return undefined
+    }
+    loadRegistrationSummary(activeEvent.eventId)
+      .then((summary) => { if (!cancelled) setRegistrationSummary({ eventId: activeEvent.eventId, ...summary }) })
+      .catch(() => { if (!cancelled) setRegistrationSummary(null) })
+    return () => { cancelled = true }
+  }, [activeEvent?.eventId])
 
   useEffect(() => {
     if (!adminUser) return undefined
@@ -389,12 +402,13 @@ export function DashboardPage() {
     () => buildDashboardOverviewModel({
       event: selectedEvent,
       registrations,
+      registrationSummary: registrationSummary?.eventId === selectedEvent?.eventId ? registrationSummary : null,
       operationsEntries,
       runOfShowItems,
       resources,
       tasks,
     }),
-    [operationsEntries, registrations, resources, runOfShowItems, selectedEvent, tasks],
+    [operationsEntries, registrationSummary, registrations, resources, runOfShowItems, selectedEvent, tasks],
   )
   const { metrics, financeSummary, readiness, taskSummary, recentActivity } = dashboardModel
   const evidenceAudit = useMemo(() => getEventFinancialEvidenceAudit(selectedEvent?.eventId), [selectedEvent?.eventId])

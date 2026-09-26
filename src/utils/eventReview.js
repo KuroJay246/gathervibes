@@ -213,7 +213,15 @@ export function buildEventReview(event = null, registrations = [], operationsEnt
   const timing = getEventTiming(event, asOf)
   const readiness = buildEventReadiness(event, rows, ledgerRows)
   const planningOverview = buildOrganizerOverview(event, rows, ledgerRows)
-  const metrics = buildRegistrationMetrics(rows, event)
+  const rowMetrics = buildRegistrationMetrics(rows, event)
+  const metrics = options?.registrationSummary
+    ? {
+        ...rowMetrics,
+        totalRegistrations: options.registrationSummary.totalRegistrations,
+        checkedInRegistrations: options.registrationSummary.checkedIn,
+        remainingRegistrations: options.registrationSummary.notCheckedIn,
+      }
+    : rowMetrics
   const finance = buildRegistrationPaymentBreakdown(rows, event)
   const financeContext = buildFinanceClassificationContext(rows, event)
   const ledger = buildLedgerBreakdown(ledgerRows, finance.currency)

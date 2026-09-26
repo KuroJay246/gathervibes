@@ -62,13 +62,26 @@ export function buildRecentActivity({ event, registrations = [], operationsEntri
 export function buildDashboardOverviewModel({
   event,
   registrations = [],
+  registrationSummary = null,
   operationsEntries = [],
   runOfShowItems = [],
   resources = [],
   tasks = [],
 } = {}) {
+  const rowMetrics = buildRegistrationMetrics(registrations, event)
+  const metrics = registrationSummary
+    ? {
+        ...rowMetrics,
+        totalRegistrations: registrationSummary.totalRegistrations,
+        checkedInRegistrations: registrationSummary.checkedIn,
+        remainingRegistrations: registrationSummary.notCheckedIn,
+        capacityPercent: rowMetrics.capacity > 0
+          ? Math.min(100, Math.round((rowMetrics.capacityUsed / rowMetrics.capacity) * 100))
+          : 0,
+      }
+    : rowMetrics
   return {
-    metrics: buildRegistrationMetrics(registrations, event),
+    metrics,
     financeSummary: buildFinanceSummary(registrations, event),
     readiness: buildEventReadiness(event, registrations, operationsEntries, runOfShowItems, resources),
     taskSummary: buildTaskWorkflowSummary(tasks),
