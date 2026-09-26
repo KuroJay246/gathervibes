@@ -1,4 +1,4 @@
-import { collection, onSnapshot, orderBy, query, where } from '@react-native-firebase/firestore'
+import { collection, limit, onSnapshot, orderBy, query, where } from '@react-native-firebase/firestore'
 import { firestore } from '@/lib/firebase'
 import { normalizeTicketCode, searchableRegistrationText } from '@gsv/contracts/ticketUtils'
 
@@ -9,6 +9,7 @@ export function subscribeToRegistrations(eventId, onRegistrations, onError) {
     collection(firestore, 'registrations'),
     where('eventId', '==', eventId),
     orderBy('createdAt', 'desc'),
+    limit(500),
   )
 
   return onSnapshot(

@@ -129,6 +129,32 @@ async function seedFirestore(userRecord) {
     }, { merge: true })
   }
 
+  for (const entry of [
+    {
+      ledgerEntryId: 'mobile-e2e-ops-pending', entryType: 'expense', category: 'Supplier',
+      label: 'Confirm catering load-in', amount: 450, status: 'pending', date: '2026-08-24',
+      paidByOrPaidTo: 'Island Catering', notes: 'Awaiting the final delivery window.',
+    },
+    {
+      ledgerEntryId: 'mobile-e2e-ops-expected', entryType: 'expense', category: 'Venue',
+      label: 'Venue deposit', amount: 1200, status: 'expected', date: '2026-08-23',
+      paidByOrPaidTo: 'Main Street Venue', notes: 'Confirm receipt with the venue lead.',
+    },
+    {
+      ledgerEntryId: 'mobile-e2e-ops-paid', entryType: 'expense', category: 'Transport',
+      label: 'Shuttle service', amount: 300, status: 'paid', date: '2026-08-22',
+      paidByOrPaidTo: 'Island Shuttle Co.', notes: 'Receipt recorded by the event team.',
+    },
+  ]) {
+    batch.set(db.collection('operationsLedger').doc(entry.ledgerEntryId), {
+      ...entry,
+      eventId: EVENT_ID,
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+      updatedBy: 'mobile-e2e-fixture',
+    }, { merge: true })
+  }
+
   batch.set(db.collection('contacts').doc('mobile-e2e-contact'), {
     contactId: 'mobile-e2e-contact',
     displayName: 'E2E Venue Lead',

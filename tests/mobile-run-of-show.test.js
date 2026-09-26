@@ -24,3 +24,17 @@ test('Run of Show groups current, next, upcoming, delayed, and completed states'
   assert.equal(groups.completed[0].itemId, 'done')
   assert.deepEqual(groupRunOfShowItems([]).ordered, [])
 })
+
+test('native Operations remains event-scoped, bounded, searchable, and read-only', async () => {
+  const fs = await import('node:fs/promises')
+  const [service, screen] = await Promise.all([
+    fs.readFile(new URL('../apps/mobile/src/services/operations.js', import.meta.url), 'utf8'),
+    fs.readFile(new URL('../apps/mobile/src/app/operations.jsx', import.meta.url), 'utf8'),
+  ])
+
+  assert.match(service, /where\('eventId', '==', eventId\)/)
+  assert.match(service, /limit\(200\)/)
+  assert.match(screen, /operations-search-input/)
+  assert.match(screen, /No operations recorded/)
+  assert.doesNotMatch(screen, /createLedgerEntry|updateLedgerEntry|deleteLedgerEntry/)
+})
