@@ -8,6 +8,18 @@ import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 import { subscribeToTasks } from '@/services/tasks'
 
+function dueState(task) {
+  if (!task?.dueDate || task.status === 'Completed' || task.status === 'Cancelled') return { label: task?.dueDate ? `Due ${task.dueDate}` : 'No due date', tone: 'neutral' }
+  const due = new Date(task.dueDate)
+  if (Number.isNaN(due.getTime())) return { label: `Due ${task.dueDate}`, tone: 'neutral' }
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  due.setHours(0, 0, 0, 0)
+  if (due < today) return { label: `Overdue • ${task.dueDate}`, tone: 'danger' }
+  if (due.getTime() === today.getTime()) return { label: 'Due today', tone: 'warning' }
+  return { label: `Due ${task.dueDate}`, tone: 'neutral' }
+}
+
 export default function TasksScreen() {
   const { authInitialized, isAuthorized } = useAuth()
   const { activeEvent, ready } = useActiveEvent()
@@ -21,6 +33,7 @@ export default function TasksScreen() {
   }, [activeEvent?.eventId])
 
   const openTasks = useMemo(() => tasks.filter((task) => task.status !== 'Completed' && task.status !== 'Cancelled'), [tasks])
+  const overdueTasks = useMemo(() => openTasks.filter((task) => dueState(task).tone === 'danger'), [openTasks])
 
   if (!authInitialized || !ready) return null
   if (!isAuthorized) return <Redirect href="/sign-in" />
@@ -33,6 +46,7 @@ export default function TasksScreen() {
           <Metric label="Open" value={openTasks.length} />
           <Metric label="Completed" value={tasks.filter((task) => task.status === 'Completed').length} />
           <Metric label="Blocked" value={tasks.filter((task) => task.status === 'Blocked').length} />
+          <Metric label="Overdue" value={overdueTasks.length} />
         </View>
 
         {!loaded ? <Banner>Loading assigned tasks…</Banner> : null}
@@ -43,18 +57,26 @@ export default function TasksScreen() {
         ) : (
           tasks.map((task) => (
             <Card key={task.taskId} tone="muted">
+              {(() => {
+                const due = dueState(task)
+                return (
+                  <>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
                 <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
                   <AppIcon name="checkmark-circle-outline" size={21} color={colors.primary} accessibilityLabel="Task" />
                 </View>
                 <View style={{ flex: 1, gap: 5 }}>
                   <Text style={{ ...typography.section, color: colors.text }}>{task.title || 'Untitled task'}</Text>
-                  <Text style={{ ...typography.body, color: colors.textMuted }}>{task.dueDate ? `Due ${task.dueDate}` : 'No due date'}</Text>
+                  <Text style={{ ...typography.body, color: due.tone === 'danger' ? colors.danger : colors.textMuted }}>{due.label}</Text>
+                  {task.assignedTo || task.assignee ? <Text style={{ ...typography.caption, color: colors.textSubtle }}>Assigned to {task.assignedTo || task.assignee}</Text> : null}
                 </View>
                 <Pill tone={task.status === 'Completed' ? 'success' : task.status === 'Blocked' ? 'danger' : 'warning'}>{task.status || 'Not Started'}</Pill>
               </View>
               {task.notes ? <Text style={{ ...typography.body, color: colors.textMuted }}>{task.notes}</Text> : null}
               {task.blockerReason ? <Text style={{ ...typography.body, color: colors.danger }}>Blocked: {task.blockerReason}</Text> : null}
+                  </>
+                )
+              })()}
             </Card>
           ))
         )}
