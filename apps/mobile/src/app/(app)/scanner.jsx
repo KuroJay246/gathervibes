@@ -117,7 +117,7 @@ export default function ScannerScreen() {
       <Section
         eyebrow="QR Scanner"
         title="Scanner Mode"
-        description="Scan a ticket, confirm the guest, and move to the next check-in without leaving this flow."
+        description={`Working Event: ${activeEvent.eventName || 'Assigned Event'}. Scan a ticket, confirm the guest, and move to the next check-in without leaving this flow.`}
       >
         <Card tone="muted">
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
