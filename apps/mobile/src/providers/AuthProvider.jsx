@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut as firebaseSignOut } from '@react-native-firebase/auth'
 import { auth, firebaseRuntimeConfig, googleWebClientId } from '@/lib/firebase'
 import { resolveNativeAuthMode } from '@/lib/authMode'
@@ -44,6 +44,34 @@ export function AuthProvider({ children }) {
   const [authInitialized, setAuthInitialized] = useState(false)
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [authError, setAuthError] = useState('')
+  const [authState, setAuthState] = useState('resolving')
+
+  const resolveAccess = useCallback(async (nextUser = user) => {
+    if (!nextUser) return false
+    setLoading(true)
+    setAuthState('checking-access')
+    try {
+      const accessData = await verifyWorkspaceAccess(nextUser)
+      setUser(nextUser)
+      setAccessControl(accessData.accessControl)
+      setStaffProfile(accessData.staffProfile)
+      setStaffAssignments(accessData.staffAssignments)
+      setAssignedEvents(accessData.assignedEvents)
+      setAccess(accessData.access)
+      setIsAuthorized(true)
+      setAuthError('')
+      setAuthState('authorized')
+      return true
+    } catch (error) {
+      setIsAuthorized(false)
+      setAuthError(normalizeAuthErrorCode(error, 'auth/access-check-failed'))
+      setAuthState(error?.code === 'auth/unapproved-account' ? 'access-denied' : 'access-required')
+      return false
+    } finally {
+      setLoading(false)
+      setAuthInitialized(true)
+    }
+  }, [user])
 
   useEffect(() => {
     return onAuthStateChanged(auth, async (nextUser) => {
@@ -65,38 +93,21 @@ export function AuthProvider({ children }) {
           capabilities: {},
         })
         setIsAuthorized(false)
+        setAuthState('signed-out')
         setLoading(false)
         setAuthInitialized(true)
         return
       }
 
-      setLoading(true)
-      try {
-        const accessData = await verifyWorkspaceAccess(nextUser)
-        setUser(nextUser)
-        setAccessControl(accessData.accessControl)
-        setStaffProfile(accessData.staffProfile)
-        setStaffAssignments(accessData.staffAssignments)
-        setAssignedEvents(accessData.assignedEvents)
-        setAccess(accessData.access)
-        setIsAuthorized(true)
-        setAuthError('')
-      } catch (error) {
-        setUser(null)
-        setAccessControl(null)
-        setStaffProfile(null)
-        setStaffAssignments([])
-        setAssignedEvents([])
-        setIsAuthorized(false)
-        console.error('GSV_MOBILE_ACCESS_CHECK_FAILED', error)
-        setAuthError(normalizeAuthErrorCode(error, 'auth/access-check-failed'))
-        await firebaseSignOut(auth).catch(() => {})
-      } finally {
-        setLoading(false)
-        setAuthInitialized(true)
-      }
+      setUser(nextUser)
+      setAccessControl(null)
+      setStaffProfile(null)
+      setStaffAssignments([])
+      setAssignedEvents([])
+      console.error('GSV_MOBILE_ACCESS_CHECK_STARTED')
+      await resolveAccess(nextUser)
     })
-  }, [])
+  }, [resolveAccess])
 
   const value = useMemo(() => ({
     user,
@@ -112,6 +123,8 @@ export function AuthProvider({ children }) {
     authInitialized,
     isAuthorized,
     authError,
+    authState,
+    retryAccess: () => resolveAccess(),
     signInWithGoogle: async () => {
       setAuthError('')
       setLoading(true)
@@ -153,7 +166,7 @@ export function AuthProvider({ children }) {
         setLoading(false)
       }
     },
-  }), [access, accessControl, assignedEvents, authError, authInitialized, isAuthorized, loading, staffAssignments, staffProfile, user])
+  }), [access, accessControl, assignedEvents, authError, authInitialized, authState, isAuthorized, loading, resolveAccess, staffAssignments, staffProfile, user])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

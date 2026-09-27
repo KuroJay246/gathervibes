@@ -21,7 +21,7 @@ function authMessage(code) {
 }
 
 export default function SignInScreen() {
-  const { authInitialized, defaultRoute, isAuthorized, loading, signInWithGoogle, authError } = useAuth()
+  const { authInitialized, authState, defaultRoute, isAuthorized, loading, signInWithGoogle, authError } = useAuth()
   const [localError, setLocalError] = useState('')
 
   const errorMessage = useMemo(() => {
@@ -30,6 +30,7 @@ export default function SignInScreen() {
   }, [authError, isAuthorized, localError])
 
   if (authInitialized && isAuthorized) return <Redirect href={defaultRoute === '/scanner' ? '/scanner' : '/home'} />
+  if (authInitialized && (authState === 'access-denied' || authState === 'access-required')) return <Redirect href="/access-required" />
 
   async function handleSignIn() {
     setLocalError('')
@@ -42,19 +43,19 @@ export default function SignInScreen() {
 
   return (
     <Screen scroll contentStyle={{ gap: 16 }}>
-      <Section
-        eyebrow="Gather & Savor"
-        title="Secure staff access"
-        description="Private event operations for approved team members."
-      >
+      <Section eyebrow="Gather & Savor" title="Event Hub" description="Your private workspace for running events.">
+        <View style={{ paddingTop: spacing.sm, gap: spacing.sm }}>
+          <Text style={{ ...typography.body, color: colors.textMuted }}>Keep guests, check-in and event-day operations moving from one calm workspace.</Text>
+        </View>
         <Card>
-          <View style={{ alignItems: 'center', gap: spacing.md, paddingVertical: spacing.sm }}>
-            <View style={{ width: 56, height: 56, borderRadius: radii.md, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center' }}>
-              <Text accessibilityLabel="Google" style={{ ...typography.title, color: colors.primary }}>G</Text>
+          <View style={{ gap: spacing.md }}>
+            <View style={{ width: 56, height: 56, borderRadius: radii.md, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
+              <Text accessibilityLabel="Gather and Savor" style={{ ...typography.title, color: colors.primary }}>G</Text>
             </View>
-            <Text style={{ ...typography.body, color: colors.textMuted, textAlign: 'center' }}>
-              Sign in with your approved Google account to continue.
-            </Text>
+            <View style={{ gap: spacing.xs }}>
+              <Text style={{ ...typography.section, color: colors.text }}>Secure staff access</Text>
+              <Text style={{ ...typography.body, color: colors.textMuted }}>Sign in with your approved Google account.</Text>
+            </View>
           </View>
           {errorMessage ? <Banner tone="danger">{errorMessage}</Banner> : null}
           <PrimaryButton
@@ -62,13 +63,11 @@ export default function SignInScreen() {
             onPress={handleSignIn}
             disabled={loading}
             testID="google-sign-in-button"
+            accessibilityRole="button"
             accessibilityLabel="Continue with Google"
           />
+          <Text style={{ ...typography.caption, color: colors.textSubtle, textAlign: 'center' }}>Authorized Gather & Savor staff only.</Text>
         </Card>
-
-        <Banner tone="info">
-          Private access for approved team members.
-        </Banner>
       </Section>
     </Screen>
   )

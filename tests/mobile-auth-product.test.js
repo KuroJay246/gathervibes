@@ -14,7 +14,19 @@ test('native auth defaults to Google and requires both emulator gates for E2E au
 test('mobile sign-in presents Google only and hides password product controls', async () => {
   const source = await readFile(new URL('../apps/mobile/src/app/sign-in.jsx', import.meta.url), 'utf8')
   assert.match(source, /Continue with Google/)
+  assert.match(source, /Your private workspace for running events\./)
+  assert.match(source, /Authorized Gather & Savor staff only\./)
   assert.doesNotMatch(source, /sign-in-email-input|sign-in-password-input|showPassword/)
+})
+
+test('mobile entry preserves authenticated identities for explicit access states', async () => {
+  const provider = await readFile(new URL('../apps/mobile/src/providers/AuthProvider.jsx', import.meta.url), 'utf8')
+  const accessRoute = await readFile(new URL('../apps/mobile/src/app/access-required.jsx', import.meta.url), 'utf8')
+  assert.match(provider, /'access-denied'/)
+  assert.match(provider, /setUser\(nextUser\)/)
+  assert.match(provider, /retryAccess/)
+  assert.match(accessRoute, /Access denied|Access required/)
+  assert.match(accessRoute, /Retry access check/)
 })
 
 test('web login presents Google without an email-password form', async () => {
