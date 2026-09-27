@@ -55,6 +55,7 @@ test('native event surfaces normalize Firestore Timestamp dates before rendering
   ])
   for (const source of [events, home]) {
     assert.match(source, /typeof value\?\.toDate === 'function'/)
+    assert.match(source, /Number\.isFinite\(value\._seconds\)/)
     assert.match(source, /formatMobileEventDate\(activeEvent\.eventDate\)|formatMobileEventDate\(event\.eventDate\)/)
   }
 })
