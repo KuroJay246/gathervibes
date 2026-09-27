@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react'
 import { Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 
-import { Banner, Card, PrimaryButton, Screen, Section } from '@/components/ui'
-import { colors, radii, spacing, typography } from '@/design/tokens'
+import { AppIcon, Banner, GoogleSignInButton, Screen } from '@/components/ui'
+import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 
 function authMessage(code) {
@@ -42,33 +42,26 @@ export default function SignInScreen() {
   }
 
   return (
-    <Screen scroll contentStyle={{ gap: 16 }}>
-      <Section eyebrow="Gather & Savor" title="Event Hub" description="Your private workspace for running events.">
-        <View style={{ paddingTop: spacing.sm, gap: spacing.sm }}>
-          <Text style={{ ...typography.body, color: colors.textMuted }}>Keep guests, check-in and event-day operations moving from one calm workspace.</Text>
+    <Screen scroll contentStyle={{ gap: spacing.xxl }}>
+      <View style={{ gap: spacing.lg, paddingTop: spacing.xxl }}>
+        <View style={{ width: 56, height: 56, borderRadius: 18, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
+          <Text accessibilityLabel="Gather and Savor" style={{ fontSize: 32, lineHeight: 36, fontWeight: '700', color: colors.surface }}>&amp;</Text>
         </View>
-        <Card>
-          <View style={{ gap: spacing.md }}>
-            <View style={{ width: 56, height: 56, borderRadius: radii.md, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
-              <Text accessibilityLabel="Gather and Savor" style={{ ...typography.title, color: colors.primary }}>G</Text>
-            </View>
-            <View style={{ gap: spacing.xs }}>
-              <Text style={{ ...typography.section, color: colors.text }}>Secure staff access</Text>
-              <Text style={{ ...typography.body, color: colors.textMuted }}>Sign in with your approved Google account.</Text>
-            </View>
-          </View>
-          {errorMessage ? <Banner tone="danger">{errorMessage}</Banner> : null}
-          <PrimaryButton
-            label={loading ? 'Opening Google…' : 'Continue with Google'}
-            onPress={handleSignIn}
-            disabled={loading}
-            testID="google-sign-in-button"
-            accessibilityRole="button"
-            accessibilityLabel="Continue with Google"
-          />
-          <Text style={{ ...typography.caption, color: colors.textSubtle, textAlign: 'center' }}>Authorized Gather & Savor staff only.</Text>
-        </Card>
-      </Section>
+        <View style={{ gap: spacing.sm }}>
+          <Text style={{ ...typography.caption, letterSpacing: 1.2, textTransform: 'uppercase', color: colors.primary }}>Gather &amp; Savor</Text>
+          <Text style={{ ...typography.display, color: colors.text }}>Welcome to Event Hub</Text>
+          <Text style={{ ...typography.body, color: colors.textMuted, maxWidth: 420 }}>Run guests, check-in and event-day operations from one place.</Text>
+        </View>
+      </View>
+      <View style={{ gap: spacing.lg, paddingTop: spacing.lg }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+          <AppIcon name="lock-closed-outline" size={18} color={colors.primary} accessibilityLabel="Secure staff access" />
+          <Text style={{ ...typography.label, color: colors.text }}>Approved staff access</Text>
+        </View>
+        {errorMessage ? <Banner tone="danger">{errorMessage}</Banner> : null}
+        <GoogleSignInButton loading={loading} onPress={handleSignIn} testID="google-sign-in-button" accessibilityLabel="Continue with Google" />
+        <Text style={{ ...typography.caption, color: colors.textSubtle }}>Use your approved Google account. You can choose another account or add one from the Google sign-in screen.</Text>
+      </View>
     </Screen>
   )
 }

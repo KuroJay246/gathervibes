@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { colors, controls, radii, spacing, typography } from '@/design/tokens'
+import googleSignInButton from '../../assets/images/google-sign-in-button.png'
 
 export function Screen({ children, scroll = false, contentStyle }) {
   const Wrapper = scroll ? ScrollView : View
@@ -89,6 +90,21 @@ export function PrimaryButton({ label, onPress, disabled = false, testID, access
       accessibilityLabel={accessibilityLabel || testID || label}
     >
       <Text style={styles.primaryButtonText}>{label}</Text>
+    </Pressable>
+  )
+}
+
+export function GoogleSignInButton({ loading = false, onPress, testID, accessibilityLabel = 'Continue with Google' }) {
+  return (
+    <Pressable
+      disabled={loading}
+      onPress={onPress}
+      style={({ pressed }) => [styles.googleButton, loading ? styles.buttonDisabled : null, pressed && !loading ? styles.buttonPressed : null]}
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+    >
+      {loading ? <ActivityIndicator color="#1f1f1f" /> : <Image source={googleSignInButton} style={styles.googleButtonImage} resizeMode="contain" accessibilityIgnoresInvertColors />}
     </Pressable>
   )
 }
@@ -283,6 +299,17 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: colors.surface,
     ...typography.label,
+  },
+  googleButton: {
+    minHeight: controls.button,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radii.pill,
+  },
+  googleButtonImage: {
+    width: '100%',
+    height: 52,
   },
   secondaryButton: {
     minHeight: controls.button,
