@@ -19,6 +19,8 @@ function formatMobileEventDate(value) {
     ? value.toDate()
     : value && typeof value === 'object' && Number.isFinite(value._seconds)
       ? new Date(value._seconds * 1000 + Math.floor((value._nanoseconds || 0) / 1e6))
+      : value && typeof value === 'object' && Number.isFinite(value.seconds)
+        ? new Date(value.seconds * 1000 + Math.floor((value.nanoseconds || 0) / 1e6))
       : value
   if (!raw) return ''
   if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw
