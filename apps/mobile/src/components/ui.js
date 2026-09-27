@@ -304,8 +304,6 @@ const styles = StyleSheet.create({
     minHeight: controls.button,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radii.pill,
   },
   googleButtonImage: {
     width: '100%',

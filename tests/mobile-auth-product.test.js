@@ -14,8 +14,8 @@ test('native auth defaults to Google and requires both emulator gates for E2E au
 test('mobile sign-in presents Google only and hides password product controls', async () => {
   const source = await readFile(new URL('../apps/mobile/src/app/sign-in.jsx', import.meta.url), 'utf8')
   assert.match(source, /Continue with Google/)
-  assert.match(source, /Run guests, check-in and event-day operations from one place\./)
-  assert.match(source, /Approved staff access/)
+  assert.match(source, /Event operations, in one place\./)
+  assert.match(source, /Sign in with your approved Gather &amp; Savor account\./)
   assert.doesNotMatch(source, /sign-in-email-input|sign-in-password-input|showPassword/)
 })
 

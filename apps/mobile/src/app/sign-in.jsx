@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 
-import { AppIcon, Banner, GoogleSignInButton, Screen } from '@/components/ui'
+import { Banner, GoogleSignInButton, Screen } from '@/components/ui'
 import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 
@@ -42,25 +42,24 @@ export default function SignInScreen() {
   }
 
   return (
-    <Screen scroll contentStyle={{ gap: spacing.xxl }}>
-      <View style={{ gap: spacing.lg, paddingTop: spacing.xxl }}>
-        <View style={{ width: 56, height: 56, borderRadius: 18, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
-          <Text accessibilityLabel="Gather and Savor" style={{ fontSize: 32, lineHeight: 36, fontWeight: '700', color: colors.surface }}>&amp;</Text>
+    <Screen contentStyle={{ paddingHorizontal: 0, paddingVertical: 0, gap: 0 }}>
+      <View style={{ flex: 0.88, minHeight: 300, backgroundColor: colors.primary, paddingHorizontal: spacing.xl, paddingVertical: spacing.xxl, justifyContent: 'space-between' }}>
+        <View style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
+          <Text accessibilityLabel="Gather and Savor" style={{ fontSize: 36, lineHeight: 40, fontWeight: '700', color: colors.primary }}>&amp;</Text>
         </View>
         <View style={{ gap: spacing.sm }}>
-          <Text style={{ ...typography.caption, letterSpacing: 1.2, textTransform: 'uppercase', color: colors.primary }}>Gather &amp; Savor</Text>
-          <Text style={{ ...typography.display, color: colors.text }}>Welcome to Event Hub</Text>
-          <Text style={{ ...typography.body, color: colors.textMuted, maxWidth: 420 }}>Run guests, check-in and event-day operations from one place.</Text>
+          <Text style={{ ...typography.caption, letterSpacing: 1.2, textTransform: 'uppercase', color: colors.surface }}>Gather &amp; Savor</Text>
+          <Text style={{ ...typography.title, color: colors.surface }}>Event operations, in one place.</Text>
         </View>
       </View>
-      <View style={{ gap: spacing.lg, paddingTop: spacing.lg }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-          <AppIcon name="lock-closed-outline" size={18} color={colors.primary} accessibilityLabel="Secure staff access" />
-          <Text style={{ ...typography.label, color: colors.text }}>Approved staff access</Text>
+      <View style={{ flex: 1.12, minHeight: 420, backgroundColor: colors.background, paddingHorizontal: spacing.xl, paddingVertical: spacing.xxl, gap: spacing.lg, justifyContent: 'center' }}>
+        <View style={{ gap: spacing.sm }}>
+          <Text style={{ ...typography.display, color: colors.text }}>Welcome to Event Hub</Text>
+          <Text style={{ ...typography.body, color: colors.textMuted }}>Sign in with your approved Gather &amp; Savor account.</Text>
         </View>
         {errorMessage ? <Banner tone="danger">{errorMessage}</Banner> : null}
         <GoogleSignInButton loading={loading} onPress={handleSignIn} testID="google-sign-in-button" accessibilityLabel="Continue with Google" />
-        <Text style={{ ...typography.caption, color: colors.textSubtle }}>Use your approved Google account. You can choose another account or add one from the Google sign-in screen.</Text>
+        <Text style={{ ...typography.caption, color: colors.textSubtle }}>Private workspace for authorized staff.</Text>
       </View>
     </Screen>
   )
