@@ -190,6 +190,23 @@ function appIsForeground(nodes) {
   return nodes.some((candidate) => candidate.package === APP_ID)
 }
 
+function getForegroundPackage() {
+  const activityState = adb(['shell', 'dumpsys', 'activity', 'activities'])
+  const match = activityState.match(/mResumedActivity:.*?\s([A-Za-z0-9._]+)\/[^\s}]*/)
+    || activityState.match(/ResumedActivity:.*?\s([A-Za-z0-9._]+)\/[^\s}]*/)
+  return match?.[1] || ''
+}
+
+async function assertGsvForeground(step) {
+  const foregroundPackage = getForegroundPackage()
+  if (foregroundPackage === APP_ID) return
+
+  await captureScreenshot(`environment-contamination-${step}`)
+  throw new Error(
+    `ENVIRONMENT CONTAMINATION at ${step}: foreground package is "${foregroundPackage || 'unknown'}"; expected "${APP_ID}".`,
+  )
+}
+
 function getSystemDialogTitle(nodes) {
   return nodes.find((candidate) => candidate['resource-id'] === 'android:id/alertTitle')?.text || ''
 }
@@ -418,7 +435,10 @@ async function ensureAppForeground(timeoutMs = 15000) {
 
   while (Date.now() - startedAt < timeoutMs) {
     const nodes = await dumpUi('foreground-check')
-    if (appIsForeground(nodes)) return
+    if (appIsForeground(nodes)) {
+      await assertGsvForeground('foreground-check')
+      return
+    }
 
     if (isExternalAnrDialog(nodes)) {
       anrObserved = true
@@ -443,6 +463,7 @@ async function openRoute(route) {
   adb(['shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', `gsvstaff://${route.replace(/^\//, '')}`, APP_ID])
   await sleep(2000)
   await ensureAppForeground(STARTUP_TIMEOUT_MS)
+  await assertGsvForeground(`route-${route.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`)
 }
 
 function isDevMenuOverlay(nodes) {
@@ -500,6 +521,7 @@ async function dismissDevMenuIfPresent() {
 async function resolvePostSignInDestination(timeoutMs = 30000) {
   const startedAt = Date.now()
   while (Date.now() - startedAt < timeoutMs) {
+    await assertGsvForeground('post-sign-in-destination')
     const nodes = await dumpUi('live')
     if (isDevMenuOverlay(nodes)) {
       await dismissVisibleDevMenu(nodes)
@@ -541,6 +563,7 @@ async function ensureHomeScreen() {
 
 async function openScreenFromHome(buttonSelector, route, targetSelector, timeoutMs = 15000) {
   try {
+    await assertGsvForeground(`before-${route}`)
     await scrollUntilVisibleSelector(buttonSelector)
     await tapBySelector(buttonSelector, Math.min(timeoutMs, 5000))
     const directTarget = await findNode((candidate) => selectorMatches(candidate, targetSelector), Math.min(timeoutMs, 8000))
@@ -680,8 +703,8 @@ async function main() {
   adb(['shell', 'pm', 'revoke', APP_ID, 'android.permission.CAMERA'])
   adb(['shell', 'cmd', 'appops', 'set', APP_ID, 'CAMERA', 'deny'])
   try {
-    // Target the native tab parent; the visible "Scan" TextView is a
-    // non-clickable child.
+    // Target the visible native tab parent; the visible "Scan" TextView is a
+    // non-clickable child and the Home quick action can be below the viewport.
     await tapBySelector({ accessibilityLabel: 'Scan' }, 5000)
     await maybeDenyCameraPrompt()
     await waitForSelector({ text: 'Scanner Mode' }, 10000)

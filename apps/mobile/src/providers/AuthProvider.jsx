@@ -104,7 +104,7 @@ export function AuthProvider({ children }) {
       setStaffProfile(null)
       setStaffAssignments([])
       setAssignedEvents([])
-      console.error('GSV_MOBILE_ACCESS_CHECK_STARTED')
+      console.info('GSV_MOBILE_ACCESS_CHECK_STARTED')
       await resolveAccess(nextUser)
     })
   }, [resolveAccess])
