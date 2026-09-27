@@ -47,3 +47,14 @@ test('approved mobile admins load readable events after authorization', async ()
   assert.match(source, /getDocs\(collection\(firestore, 'events'\)\)/)
   assert.match(source, /assignedEvents: await readAdminEvents\(\)/)
 })
+
+test('native event surfaces normalize Firestore Timestamp dates before rendering', async () => {
+  const [events, home] = await Promise.all([
+    readFile(new URL('../apps/mobile/src/app/events.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../apps/mobile/src/app/(app)/home.jsx', import.meta.url), 'utf8'),
+  ])
+  for (const source of [events, home]) {
+    assert.match(source, /typeof value\?\.toDate === 'function'/)
+    assert.match(source, /formatMobileEventDate\(activeEvent\.eventDate\)|formatMobileEventDate\(event\.eventDate\)/)
+  }
+})

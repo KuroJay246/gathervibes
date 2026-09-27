@@ -5,6 +5,14 @@ import { Card, EmptyState, Pill, PrimaryButton, Screen, Section, SecondaryButton
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 
+function formatMobileEventDate(value) {
+  const raw = typeof value?.toDate === 'function' ? value.toDate() : value
+  if (!raw) return ''
+  if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw
+  const date = raw instanceof Date ? raw : new Date(raw)
+  return Number.isNaN(date.getTime()) ? String(raw) : date.toLocaleDateString()
+}
+
 export default function EventSelectionScreen() {
   const router = useRouter()
   const { assignedEvents, authInitialized, isAuthorized, signOut, currentRoleLabel } = useAuth()
@@ -37,7 +45,7 @@ export default function EventSelectionScreen() {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
                   <View style={{ flex: 1, gap: 6 }}>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2023' }}>{event.eventName || event.eventId}</Text>
-                    <Text style={{ fontSize: 14, color: '#5c554f' }}>{event.eventDate || 'Date not recorded'}{event.location ? ` • ${event.location}` : ''}</Text>
+                    <Text style={{ fontSize: 14, color: '#5c554f' }}>{event.eventDate ? formatMobileEventDate(event.eventDate) : 'Date not recorded'}{event.location ? ` • ${event.location}` : ''}</Text>
                   </View>
                   <Pill tone="neutral">{event.status || 'scheduled'}</Pill>
                 </View>

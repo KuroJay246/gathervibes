@@ -14,6 +14,14 @@ import { subscribeToOperationsLedger } from '@/services/operations'
 import { subscribeToRunOfShow } from '@/services/runOfShow'
 import { groupRunOfShowItems } from '@/lib/runOfShowModel'
 
+function formatMobileEventDate(value) {
+  const raw = typeof value?.toDate === 'function' ? value.toDate() : value
+  if (!raw) return ''
+  if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw
+  const date = raw instanceof Date ? raw : new Date(raw)
+  return Number.isNaN(date.getTime()) ? String(raw) : date.toLocaleDateString()
+}
+
 export default function HomeScreen() {
   const router = useRouter()
   const networkState = useNetworkState()
@@ -86,7 +94,7 @@ export default function HomeScreen() {
             </View>
             <View style={{ flex: 1, gap: 4 }}>
               <Text style={{ ...typography.section, color: colors.text }}>{activeEvent.eventName || 'Assigned Event'}</Text>
-              <Text style={{ ...typography.body, color: colors.textMuted }}>{activeEvent.eventDate || 'Date not recorded'}{activeEvent.location ? ` • ${activeEvent.location}` : ''}</Text>
+              <Text style={{ ...typography.body, color: colors.textMuted }}>{activeEvent.eventDate ? formatMobileEventDate(activeEvent.eventDate) : 'Date not recorded'}{activeEvent.location ? ` • ${activeEvent.location}` : ''}</Text>
             </View>
             <Pill tone={online ? 'success' : 'warning'}>{online ? 'Live' : 'Offline'}</Pill>
           </View>
