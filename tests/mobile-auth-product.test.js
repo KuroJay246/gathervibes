@@ -59,3 +59,15 @@ test('native event surfaces normalize Firestore Timestamp dates before rendering
     assert.match(source, /formatMobileEventDate\(activeEvent\.eventDate\)|formatMobileEventDate\(event\.eventDate\)/)
   }
 })
+
+test('native guest and ticket detail surfaces format Firestore check-in timestamps', async () => {
+  const [guestDetail, ticketDetail] = await Promise.all([
+    readFile(new URL('../apps/mobile/src/app/guest/[registrationId].jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../apps/mobile/src/app/guest/[registrationId]/ticket.jsx', import.meta.url), 'utf8'),
+  ])
+  for (const source of [guestDetail, ticketDetail]) {
+    assert.match(source, /typeof value\?\.toDate === 'function'/)
+    assert.match(source, /Number\.isFinite\(value\._seconds\)/)
+    assert.doesNotMatch(source, /checkInTimestamp\(registration\)\}\}/)
+  }
+})

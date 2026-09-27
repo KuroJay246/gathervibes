@@ -17,6 +17,16 @@ function valueOrFallback(value, fallback = 'Not provided') {
   return value === undefined || value === null || value === '' ? fallback : String(value)
 }
 
+function formatTimestamp(value) {
+  const date = typeof value?.toDate === 'function'
+    ? value.toDate()
+    : value && typeof value === 'object' && Number.isFinite(value._seconds)
+      ? new Date(value._seconds * 1000 + Math.floor((value._nanoseconds || 0) / 1e6))
+      : value
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return valueOrFallback(value)
+  return date.toLocaleString()
+}
+
 function checkInTimestamp(registration) {
   return registration?.checkedInAt || registration?.checkInTime || null
 }
@@ -94,7 +104,7 @@ export default function GuestDetailScreen() {
         </Card>
 
         {registration.checkedIn ? (
-          <Banner tone="success"><Text>Checked in{checkInTimestamp(registration) ? ` at ${valueOrFallback(checkInTimestamp(registration))}` : ''}. This record is read-only here.</Text></Banner>
+          <Banner tone="success"><Text>Checked in{checkInTimestamp(registration) ? ` at ${formatTimestamp(checkInTimestamp(registration))}` : ''}. This record is read-only here.</Text></Banner>
         ) : <Banner tone="info">Check-in is completed from Scanner or Registration Lookup.</Banner>}
       </Section>
     </Screen>

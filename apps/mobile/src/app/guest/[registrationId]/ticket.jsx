@@ -16,6 +16,16 @@ function display(value, fallback = 'Not available') {
   return value === undefined || value === null || value === '' ? fallback : String(value)
 }
 
+function formatTimestamp(value) {
+  const date = typeof value?.toDate === 'function'
+    ? value.toDate()
+    : value && typeof value === 'object' && Number.isFinite(value._seconds)
+      ? new Date(value._seconds * 1000 + Math.floor((value._nanoseconds || 0) / 1e6))
+      : value
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return display(value)
+  return date.toLocaleString()
+}
+
 function checkInTimestamp(registration) {
   return registration?.checkedInAt || registration?.checkInTime || null
 }
@@ -76,7 +86,7 @@ export default function TicketDetailScreen() {
             <Text style={{ ...typography.body, color: colors.text }}>Ticket: {display(registration.ticketStatus, 'Status unavailable')}</Text>
             {ticketCategory(registration) ? <Text style={{ ...typography.body, color: colors.textMuted }}>Category: {display(ticketCategory(registration))}</Text> : null}
             <Text style={{ ...typography.body, color: colors.textMuted }}>Check-in: {registration.checkedIn ? 'Complete' : 'Not checked in'}</Text>
-            {checkInTimestamp(registration) ? <Text style={{ ...typography.body, color: colors.textMuted }}>Checked in at: {display(checkInTimestamp(registration))}</Text> : null}
+            {checkInTimestamp(registration) ? <Text style={{ ...typography.body, color: colors.textMuted }}>Checked in at: {formatTimestamp(checkInTimestamp(registration))}</Text> : null}
             <Text style={{ ...typography.body, color: colors.textMuted }}>Registration: {display(registration.registrationStatus, 'Active')}</Text>
           </View>
         </Card>
