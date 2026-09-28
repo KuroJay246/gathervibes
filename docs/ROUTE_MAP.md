@@ -26,3 +26,35 @@
 - CODEX_DEMO is the safe synthetic QA and demo event.
 - Real events share the same standard safeguards and must not be used for synthetic QA.
 - Clearing the Working Event should show clean empty states rather than stale data.
+
+## Mobile parity audit (2026-09-28)
+
+The native app keeps five compact primary destinations on phones: Home, Guests,
+Scan, Tasks, and More. Event selection is a modal searchable picker rather than
+an inline list, so a large assignment set does not consume the page. The
+current event can be changed from Home or Settings without signing out.
+
+| Web capability | Mobile surface | Current state | Next decision |
+| --- | --- | --- | --- |
+| Dashboard / Working Event | Home | Compact native summary with live event-scoped listeners | Continue hierarchy and live-state QA |
+| Events | Event picker sheet | Native picker with chronological rows and search | Add runtime switch-from-context proof |
+| Registrations / Guests | Guests | Native bounded lookup and guest detail | Expand registration filters and editing parity |
+| Tickets | Guests / ticket detail | Read-only ticket lookup and detail | Add ticket-management decision for owner role |
+| Check-In / Scanner | Scan | Native scanner, manual fallback, result states | Complete physical/device acceptance |
+| Tasks | Tasks | Native event-scoped list | Recheck write/conflict parity against web |
+| Operations | More > Operations | Native read-only operational summary | Decide approved native write scope |
+| Run of Show | More > Run of Show | Native read-only timeline | Continue runtime evidence and accessibility QA |
+| Contacts | More > Event Contacts | Native compact list | Add search/action parity where authorized |
+| Reports / Event Review | More > Reports | Native compact summary | Expand payment/reconciliation coverage |
+| Documents | More > Operational Notes | Native read-only notes/documents subset | Decide document-management scope |
+| Resources | None | Web deep-link only | Keep web-first until a mobile workflow is approved |
+| Payments | Reports subset | Read-only summary only | Do not imply payment editing or gateway support |
+| Payment reconciliation | None | Web deep-link only | Keep reconciliation web-first |
+| Imports | None | Web-only by design | Preserve preview-first web workflow |
+| Communications / Message Builder | None | Web-only by design | Preserve copy-only web workflow |
+| Settings | More > Settings | Native account, event, security, and connectivity view | Add approved operational settings deliberately |
+| System QA | None | Web deep-link only | Keep technical QA out of primary mobile navigation |
+
+The audit is a product-scope record, not a claim that every web capability is
+already native. Native screens must retain event scoping, capability checks,
+read/write boundaries, listener cleanup, and explicit offline behavior.

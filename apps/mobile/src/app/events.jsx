@@ -1,8 +1,9 @@
 import { Redirect, useRouter } from 'expo-router'
 import { useMemo, useState } from 'react'
-import { Text, View } from 'react-native'
+import { FlatList, Modal, Pressable, Text, View } from 'react-native'
 
 import { AppIcon, Card, EmptyState, Field, Pill, PrimaryButton, Screen, Section, SecondaryButton } from '@/components/ui'
+import { colors, radii, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
 
@@ -33,10 +34,10 @@ function eventSearchText(event) {
 
 export default function EventSelectionScreen() {
   const router = useRouter()
-  const { assignedEvents, authInitialized, isAuthorized, signOut, currentRoleLabel } = useAuth()
+  const { assignedEvents, authInitialized, isAuthorized, signOut, currentRoleLabel, access } = useAuth()
   const { activeEvent, ready, setActiveEvent } = useActiveEvent()
   const [query, setQuery] = useState('')
-  const [expanded, setExpanded] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
 
   const visibleEvents = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -61,7 +62,7 @@ export default function EventSelectionScreen() {
             <AppIcon name="shield-checkmark-outline" size={19} color="#7c3144" accessibilityLabel="Authorized staff" />
             <Text style={{ fontSize: 13, fontWeight: '600', color: '#69615c' }}>{currentRoleLabel}</Text>
           </View>
-          <Text style={{ fontSize: 13, color: '#8a817a' }}>{assignedEvents.length} assigned</Text>
+          <Text style={{ fontSize: 13, color: '#8a817a' }}>{assignedEvents.length} {access?.protectedOwner ? 'available' : 'assigned'}</Text>
         </View>
 
         {assignedEvents.length === 0 ? (
@@ -71,44 +72,37 @@ export default function EventSelectionScreen() {
           />
         ) : (
           <View style={{ gap: 12 }}>
-            <View style={{ borderRadius: 14, backgroundColor: '#f2e4e8', overflow: 'hidden' }}>
+            <Pressable onPress={() => setPickerOpen(true)} accessibilityRole="button" accessibilityLabel="Open event picker" style={({ pressed }) => [{ borderRadius: 14, backgroundColor: '#f2e4e8', overflow: 'hidden' }, pressed ? { opacity: 0.82 } : null]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', padding: 14, gap: 10 }}>
                 <AppIcon name="albums-outline" size={21} color="#7c3144" accessibilityLabel="Assigned events" />
                 <View style={{ flex: 1, gap: 2 }}>
-                  <Text style={{ fontSize: 15, fontWeight: '700', color: '#211f20' }}>Assigned events</Text>
-                  <Text style={{ fontSize: 12, color: '#69615c' }}>{assignedEvents.length} available · choose one to continue</Text>
+                  <Text style={{ fontSize: 15, fontWeight: '700', color: '#211f20' }}>Choose an event</Text>
+                  <Text style={{ fontSize: 12, color: '#69615c' }}>{assignedEvents.length} {access?.protectedOwner ? 'available' : 'assigned'} · opens a searchable picker</Text>
                 </View>
-                <SecondaryButton label={expanded ? 'Hide' : 'Browse'} onPress={() => setExpanded((value) => !value)} accessibilityLabel={expanded ? 'Hide assigned events' : 'Browse assigned events'} />
+                <AppIcon name="chevron-forward-outline" size={21} color="#7c3144" accessibilityLabel="Open event picker" />
               </View>
-            </View>
-            {expanded ? <>
-              <Field label="Find an assigned event" value={query} onChangeText={setQuery} placeholder="Search name, date, location" autoCapitalize="none" accessibilityLabel="event-selection-search" rightIcon={<AppIcon name="search-outline" color="#8a817a" accessibilityLabel="Search events" />} />
-              <Text style={{ fontSize: 12, color: '#8a817a' }}>{visibleEvents.length} {visibleEvents.length === 1 ? 'event' : 'events'} shown · earliest first</Text>
-              {visibleEvents.length === 0 ? <EmptyState title="No matching events" description="Try a different name, location, or status." /> : visibleEvents.map((event) => (
-              <Card key={event.eventId}>
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
-                  <View style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: '#f2e4e8', alignItems: 'center', justifyContent: 'center' }}>
-                    <AppIcon name="calendar-outline" size={22} color="#7c3144" accessibilityLabel="Event" />
+            </Pressable>
+            <Modal visible={pickerOpen} animationType="slide" transparent onRequestClose={() => setPickerOpen(false)}>
+              <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(33,31,32,0.42)' }}>
+                <View style={{ maxHeight: '88%', backgroundColor: colors.background, borderTopLeftRadius: radii.lg, borderTopRightRadius: radii.lg, padding: spacing.lg, gap: spacing.md }} accessibilityViewIsModal>
+                  <View style={{ alignItems: 'center' }}><View style={{ width: 42, height: 4, borderRadius: 2, backgroundColor: colors.borderStrong }} /></View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View style={{ gap: 2 }}><Text style={{ ...typography.title, color: colors.text }}>Select an event</Text><Text style={{ ...typography.caption, color: colors.textMuted }}>{visibleEvents.length} shown · earliest first</Text></View>
+                    <Pressable onPress={() => setPickerOpen(false)} accessibilityRole="button" accessibilityLabel="Close event picker" hitSlop={8}><AppIcon name="close-outline" size={28} color={colors.text} accessibilityLabel="Close event picker" /></Pressable>
                   </View>
-                  <View style={{ flex: 1, gap: 5 }}>
-                    <Text style={{ fontSize: 17, lineHeight: 22, fontWeight: '700', color: '#211f20' }}>{event.eventName || event.eventId}</Text>
-                    <Text style={{ fontSize: 14, lineHeight: 19, color: '#69615c' }}>{event.eventDate ? formatMobileEventDate(event.eventDate) : 'Date not recorded'}</Text>
-                    {event.location ? <Text numberOfLines={2} style={{ fontSize: 13, lineHeight: 18, color: '#8a817a' }}>{event.location}</Text> : null}
-                  </View>
-                  <Pill tone={event.status === 'completed' ? 'neutral' : 'success'}>{event.status || 'scheduled'}</Pill>
+                  <Field label="Search events" value={query} onChangeText={setQuery} placeholder="Name, date, location" autoCapitalize="none" accessibilityLabel="event-selection-search" rightIcon={<AppIcon name="search-outline" color={colors.textSubtle} accessibilityLabel="Search events" />} />
+                  {visibleEvents.length === 0 ? <EmptyState title="No matching events" description="Try a different name, location, or status." /> : <FlatList data={visibleEvents} keyExtractor={(event) => event.eventId} ItemSeparatorComponent={() => <View style={{ height: spacing.sm }} />} renderItem={({ item: event }) => (
+                    <Pressable onPress={async () => { setPickerOpen(false); await setActiveEvent(event); router.replace('/home') }} testID={`event-select-open-${event.eventId}`} accessibilityRole="button" accessibilityLabel={`Open ${event.eventName || event.eventId}`} style={({ pressed }) => [{ backgroundColor: colors.surface, borderRadius: radii.md, padding: spacing.md, gap: spacing.xs }, pressed ? { opacity: 0.82 } : null]}>
+                      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
+                        <View style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}><AppIcon name="calendar-outline" size={22} color={colors.primary} accessibilityLabel="Event" /></View>
+                        <View style={{ flex: 1, gap: 3 }}><Text style={{ ...typography.section, color: colors.text }}>{event.eventName || event.eventId}</Text><Text style={{ ...typography.body, color: colors.textMuted }}>{event.eventDate ? formatMobileEventDate(event.eventDate) : 'Date not recorded'}</Text>{event.location ? <Text numberOfLines={1} style={{ ...typography.caption, color: colors.textSubtle }}>{event.location}</Text> : null}</View>
+                        <Pill tone={event.status === 'completed' ? 'neutral' : 'success'}>{event.status || 'scheduled'}</Pill>
+                      </View>
+                    </Pressable>
+                  )} />}
                 </View>
-                <PrimaryButton
-                  label="Open event workspace"
-                  onPress={async () => {
-                    await setActiveEvent(event)
-                    router.replace('/home')
-                  }}
-                  testID={`event-select-open-${event.eventId}`}
-                  accessibilityLabel={`Open ${event.eventName || event.eventId}`}
-                />
-              </Card>
-              ))}
-            </> : null}
+              </View>
+            </Modal>
           </View>
         )}
 
