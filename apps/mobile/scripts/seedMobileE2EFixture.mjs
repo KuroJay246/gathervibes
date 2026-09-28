@@ -5,11 +5,13 @@ import { FieldValue, Timestamp, getFirestore } from 'firebase-admin/firestore'
 const PROJECT_ID = process.env.GSV_FIREBASE_PROJECT_ID || 'gathervibeshub'
 const FIRESTORE_EMULATOR_HOST = process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080'
 const FIREBASE_AUTH_EMULATOR_HOST = process.env.FIREBASE_AUTH_EMULATOR_HOST || '127.0.0.1:9099'
-const FIXTURE_EMAIL = process.env.GSV_MOBILE_E2E_EMAIL || 'mobilee2e@gsv.test'
+const ACCESS_STATE = process.env.GSV_MOBILE_E2E_ACCESS_STATE || 'authorized'
+if (!['authorized', 'denied'].includes(ACCESS_STATE)) throw new Error(`Unsupported GSV_MOBILE_E2E_ACCESS_STATE: ${ACCESS_STATE}`)
+const FIXTURE_EMAIL = process.env.GSV_MOBILE_E2E_EMAIL || (ACCESS_STATE === 'denied' ? 'mobilee2e-denied@gsv.test' : 'mobilee2e@gsv.test')
 const FIXTURE_PASSWORD = process.env.GSV_MOBILE_E2E_PASSWORD || 'MobileE2E123'
 const EVENT_ID = 'codex_demo_full_system_walkthrough'
 const EVENT_NAME = 'CODEX_DEMO - Full System Walkthrough'
-const FIXTURE_UID = 'mobile-e2e-staff'
+const FIXTURE_UID = ACCESS_STATE === 'denied' ? 'mobile-e2e-denied' : 'mobile-e2e-staff'
 const REGISTRATION_COUNT = Math.max(3, Number(process.env.GSV_MOBILE_E2E_REGISTRATION_COUNT || 3))
 
 process.env.FIRESTORE_EMULATOR_HOST = FIRESTORE_EMULATOR_HOST
@@ -69,8 +71,8 @@ async function seedFirestore(userRecord) {
   const assignmentRef = eventRef.collection('staffAssignments').doc(userRecord.uid)
 
   batch.set(db.collection('settings').doc('accessControl'), {
-    approvedEmails: [FIXTURE_EMAIL],
-    rolesByEmail: { [FIXTURE_EMAIL]: 'admin' },
+    approvedEmails: ACCESS_STATE === 'denied' ? ['mobilee2e@gsv.test'] : [FIXTURE_EMAIL],
+    rolesByEmail: ACCESS_STATE === 'denied' ? { 'mobilee2e@gsv.test': 'admin' } : { [FIXTURE_EMAIL]: 'admin' },
     updatedAt: FieldValue.serverTimestamp(),
     updatedBy: 'mobile-e2e-fixture',
   }, { merge: true })
@@ -84,24 +86,34 @@ async function seedFirestore(userRecord) {
     updatedAt: FieldValue.serverTimestamp(),
   }, { merge: true })
 
-  batch.set(profileRef, {
-    uid: userRecord.uid,
-    email: FIXTURE_EMAIL,
-    displayName: 'Mobile E2E Staff',
-    status: 'active',
-    defaultRole: 'scanner',
-    assignedEventIds: [EVENT_ID],
-    updatedAt: FieldValue.serverTimestamp(),
-  }, { merge: true })
+  if (ACCESS_STATE === 'denied') {
+    batch.delete(profileRef)
+    batch.delete(assignmentRef)
+  } else {
+    batch.set(profileRef, {
+      uid: userRecord.uid,
+      email: FIXTURE_EMAIL,
+      displayName: 'Mobile E2E Staff',
+      status: 'active',
+      defaultRole: 'scanner',
+      assignedEventIds: [EVENT_ID],
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true })
 
-  batch.set(assignmentRef, {
-    uid: userRecord.uid,
-    email: FIXTURE_EMAIL,
-    eventId: EVENT_ID,
-    role: 'scanner',
-    status: 'active',
-    updatedAt: FieldValue.serverTimestamp(),
-  }, { merge: true })
+    batch.set(assignmentRef, {
+      uid: userRecord.uid,
+      email: FIXTURE_EMAIL,
+      eventId: EVENT_ID,
+      role: 'scanner',
+      status: 'active',
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true })
+  }
+
+  if (ACCESS_STATE === 'denied') {
+    await batch.commit()
+    return
+  }
 
   const baseRegistrations = [
     registration('mobile-e2e-ready', 'Fixture Guest', 'GSV-E2E-READY'),
@@ -195,6 +207,7 @@ async function main() {
     authEmulator: FIREBASE_AUTH_EMULATOR_HOST,
     firestoreEmulator: FIRESTORE_EMULATOR_HOST,
     fixture: {
+      accessState: ACCESS_STATE,
       uid: userRecord.uid,
       email: FIXTURE_EMAIL,
       password: FIXTURE_PASSWORD,
