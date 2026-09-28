@@ -228,7 +228,7 @@ export default function ScannerScreen() {
         ) : (
           <Card tone="muted">
             <Text style={{ color: '#5c554f', lineHeight: 20 }}>
-              Keep the QR code inside the frame. The guest is confirmed after the event record responds.
+              Keep the QR code inside the frame. Confirm the guest and keep the line moving.
             </Text>
           </Card>
         )}

@@ -96,7 +96,7 @@ export default function ManualEntryScreen() {
             {registration.checkedIn ? (
               <SecondaryButton label="Record Duplicate Attempt" onPress={handleDuplicate} disabled={saving} testID="manual-duplicate-button" accessibilityLabel="manual-duplicate-button" />
             ) : (
-              <PrimaryButton label="Authoritative Check-In" onPress={handleCheckIn} disabled={saving || !canCheckInState.allowed} testID="manual-checkin-button" accessibilityLabel="manual-checkin-button" />
+              <PrimaryButton label="Check in guest" onPress={handleCheckIn} disabled={saving || !canCheckInState.allowed} testID="manual-checkin-button" accessibilityLabel="manual-checkin-button" />
             )}
             {!registration.checkedIn && !canCheckInState.allowed ? <Banner tone="warning">{canCheckInState.reason}</Banner> : null}
           </Card>

@@ -214,7 +214,7 @@ export default function LookupScreen() {
                   {registration.checkedIn ? (
                     <SecondaryButton label="Record Duplicate Attempt" onPress={() => handleDuplicate(registration)} disabled={saving} />
                   ) : (
-                    <PrimaryButton label="Authoritative Check-In" onPress={() => handleCheckIn(registration)} disabled={saving || !checkInState.allowed} />
+                    <PrimaryButton label="Check in guest" onPress={() => handleCheckIn(registration)} disabled={saving || !checkInState.allowed} />
                   )}
                   {canUndo && registration.checkedIn ? (
                     <SecondaryButton label="Admin Undo Check-In" onPress={() => handleUndo(registration)} disabled={saving} />

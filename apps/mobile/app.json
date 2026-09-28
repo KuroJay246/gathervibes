@@ -31,6 +31,16 @@
     "plugins": [
       "expo-router",
       [
+        "expo-dev-launcher",
+        {
+          "android": {
+            "toolsButton": false,
+            "showMenuAtLaunch": false,
+            "skipOnboarding": true
+          }
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#2B1723",

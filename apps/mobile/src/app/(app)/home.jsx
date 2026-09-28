@@ -106,7 +106,7 @@ export default function HomeScreen() {
           </View>
         </Card>
         {online ? (
-          <Banner tone="success">Live connection. Check-ins confirm with the event record.</Banner>
+          <Banner tone="success">Connected</Banner>
         ) : (
           <Banner tone="warning">Offline mode is visible, but check-ins stay blocked until the connection returns.</Banner>
         )}

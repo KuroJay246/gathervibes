@@ -90,7 +90,7 @@ export default function TicketDetailScreen() {
             <Text style={{ ...typography.body, color: colors.textMuted }}>Registration: {display(registration.registrationStatus, 'Active')}</Text>
           </View>
         </Card>
-        <Banner tone="info">Check-in remains authoritative in Scanner and Registration Lookup.</Banner>
+        <Banner tone="info">Check-in is managed from Scanner or Registration Lookup.</Banner>
       </Section>
     </Screen>
   )
