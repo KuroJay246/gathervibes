@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc } from '@react-native-firebase/firestore'
+import { Timestamp, collection, doc, getDocs, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc } from '@react-native-firebase/firestore'
 
 import { firestore } from '@/lib/firebase'
 
@@ -41,7 +41,7 @@ function buildEventPayload(values) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(eventDate)) throw new Error('Use a date in YYYY-MM-DD format.')
   return {
     eventName,
-    eventDate,
+    eventDate: Timestamp.fromDate(new Date(`${eventDate}T12:00:00`)),
     location: String(values.location || '').trim(),
     venueName: String(values.venueName || '').trim(),
     eventType: String(values.eventType || 'event').trim(),
