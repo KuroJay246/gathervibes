@@ -175,6 +175,29 @@ function parseBounds(bounds = '') {
   }
 }
 
+function selectDevServerIfPicker(nodes) {
+  if (LAUNCH_MODE !== 'dev-client' || !nodes.some((candidate) => candidate.text === 'DEVELOPMENT SERVERS')) return false
+
+  const configuredServer = decodeURIComponent(DEV_URL).match(/https?:\/\/([^/?]+)/)?.[1] || ''
+  const serverText = nodes.find((candidate) => configuredServer && String(candidate.text || '').includes(configuredServer))
+  const point = parseBounds(serverText?.bounds)
+  if (!point) return false
+
+  const clickableParents = nodes
+    .filter((candidate) => candidate.clickable === 'true')
+    .map((candidate) => ({ candidate, bounds: String(candidate.bounds || '').match(/\[(\d+),(\d+)\]\[(\d+),(\d+)\]/) }))
+    .filter(({ bounds }) => bounds)
+    .filter(({ bounds }) => point.x >= Number(bounds[1]) && point.x <= Number(bounds[3]) && point.y >= Number(bounds[2]) && point.y <= Number(bounds[4]))
+    .sort((left, right) => (Number(left.bounds[3]) - Number(left.bounds[1])) * (Number(left.bounds[4]) - Number(left.bounds[2])) - (Number(right.bounds[3]) - Number(right.bounds[1])) * (Number(right.bounds[4]) - Number(right.bounds[2])))
+
+  const target = clickableParents[0]?.candidate
+  const targetPoint = parseBounds(target?.bounds)
+  if (!targetPoint) return false
+  adb(['shell', 'input', 'tap', String(targetPoint.x), String(targetPoint.y)])
+  blockingSleep(1500)
+  return true
+}
+
 function parseNodes(xml) {
   const matches = [...xml.matchAll(/<node\b([^>]*)>/g)]
   return matches.map(([, rawAttributes]) => {
@@ -278,6 +301,15 @@ async function waitForVisibleText(text, timeoutMs = 15000) {
   return node
 }
 
+async function waitForHomeReady(timeoutMs = 15000) {
+  const node = await findNode((candidate) => candidate.text === 'EVENT DAY' || candidate.text === 'Guest search', timeoutMs)
+  if (!node) {
+    await captureScreenshot('missing-home-ready')
+    throw new Error('Timed out waiting for the authenticated Home route.')
+  }
+  return node
+}
+
 async function waitForSelector(selector, timeoutMs = 15000) {
   const node = await findNode((candidate) => selectorMatches(candidate, selector), timeoutMs)
   if (!node) {
@@ -350,9 +382,8 @@ function encodeAdbText(value) {
 async function typeInto(accessibilityLabel, value) {
   await tapBySelector({ accessibilityLabel })
   adb(['shell', 'input', 'keyevent', 'KEYCODE_MOVE_END'])
-  for (let index = 0; index < Math.max(String(value).length + 4, 20); index += 1) {
-    adb(['shell', 'input', 'keyevent', 'KEYCODE_DEL'])
-  }
+  const deleteCount = Math.max(String(value).length + 4, 20)
+  adb(['shell', 'input', 'keyevent', ...Array.from({ length: deleteCount }, () => 'KEYCODE_DEL')])
   adb(['shell', 'input', 'text', encodeAdbText(value)])
   await sleep(500)
 }
@@ -407,6 +438,9 @@ function detectPostSignInDestination(nodes) {
   if (nodes.some((candidate) => selectorMatches(candidate, { accessibilityLabel: 'home-guest-search-button' }))) {
     return 'home'
   }
+  if (nodes.some((candidate) => candidate.text === 'EVENT DAY' || candidate.text === 'At a glance')) {
+    return 'home'
+  }
   if (nodes.some((candidate) => candidate.text === 'Scanner Mode' || candidate.text === 'QR SCANNER')) {
     return 'scanner'
   }
@@ -419,13 +453,17 @@ function detectPostSignInDestination(nodes) {
 async function relaunchApp() {
   if (LAUNCH_MODE === 'dev-client') {
     if (!DEV_URL) throw new Error('GSV_MOBILE_E2E_DEV_URL is required when GSV_MOBILE_E2E_LAUNCH_MODE=dev-client')
-    adb(['shell', 'am', 'start', '-a', 'android.intent.action.VIEW', '-d', DEV_URL])
+    adb(['shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', DEV_URL, APP_ID])
   } else {
     // Do not make ADB wait for React Native startup; the bounded UI checks below
     // provide the actual readiness signal and preserve useful failure evidence.
     adb(['shell', 'am', 'start', '-n', MAIN_ACTIVITY])
   }
   await sleep(3000)
+  if (LAUNCH_MODE === 'dev-client') {
+    const nodes = await dumpUi('dev-server-picker')
+    selectDevServerIfPicker(nodes)
+  }
 }
 
 async function ensureAppForeground(timeoutMs = 15000) {
@@ -540,7 +578,7 @@ async function ensureHomeScreen() {
   const destination = await resolvePostSignInDestination()
   if (destination === 'events') {
     await tapBySelector({ accessibilityLabel: 'event-select-open-codex_demo_full_system_walkthrough' })
-    await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 20000)
+    await waitForHomeReady(20000)
     return
   }
   if (destination === 'scanner-permission-prompt') {
@@ -550,15 +588,15 @@ async function ensureHomeScreen() {
       throw new Error('Camera permission prompt remained open after denial attempt.')
     }
     await openRoute('/home')
-    await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 20000)
+    await waitForHomeReady(20000)
     return
   }
   if (destination === 'scanner') {
     await openRoute('/home')
-    await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 20000)
+    await waitForHomeReady(20000)
     return
   }
-  await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 20000)
+  await waitForHomeReady(20000)
 }
 
 async function openScreenFromHome(buttonSelector, route, targetSelector, timeoutMs = 15000) {
@@ -630,7 +668,7 @@ async function main() {
   await captureScreenshot('owner-home')
 
   step('run-of-show')
-  await openScreenFromHome({ accessibilityLabel: 'home-run-of-show-button' }, '/run-of-show', { text: 'Run of Show' }, 15000)
+  await openScreenFromHome({ accessibilityLabel: 'Open Run of Show' }, '/run-of-show', { text: 'Run of Show' }, 15000)
   await waitForVisibleText('Staff briefing', 10000)
   await waitForVisibleText('Registration opens', 10000)
   await captureScreenshot('run-of-show-current-next')
@@ -639,7 +677,7 @@ async function main() {
   await scrollUntilVisibleText('Venue access confirmed')
   await captureScreenshot('run-of-show-upcoming')
   adb(['shell', 'input', 'keyevent', '4'])
-  await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 10000)
+  await waitForHomeReady(10000)
 
   step('session-recovery')
   adb(['shell', 'am', 'force-stop', APP_ID])
@@ -675,7 +713,7 @@ async function main() {
 
   if (EXPECTED_REGISTRATION_COUNT > 0) {
     await openRoute('/home')
-    await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 15000)
+    await waitForHomeReady(15000)
     await waitForVisibleText(`${EXPECTED_REGISTRATION_COUNT}`, 15000)
     await waitForVisibleText('2 checked in', 15000)
     await captureScreenshot('home-refresh-after-checkin')
@@ -694,12 +732,8 @@ async function main() {
   await tapForVisibleText({ accessibilityLabel: 'manual-duplicate-button' }, 'Duplicate attempt recorded. No new check-in was saved.', 20000)
 
   adb(['shell', 'input', 'keyevent', '4'])
-  try {
-    await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 5000)
-  } catch {
-    await openRoute('/home')
-    await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 10000)
-  }
+  await openRoute('/home')
+  await waitForHomeReady(10000)
   adb(['shell', 'pm', 'revoke', APP_ID, 'android.permission.CAMERA'])
   adb(['shell', 'cmd', 'appops', 'set', APP_ID, 'CAMERA', 'deny'])
   try {
@@ -717,7 +751,7 @@ async function main() {
   await waitForVisibleText('Camera access denied', 15000)
   await captureScreenshot('scanner-ready')
   adb(['shell', 'input', 'keyevent', '4'])
-  await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 15000)
+  await waitForHomeReady(15000)
 
   if (EXPECTED_REGISTRATION_COUNT > 0) {
     await openRoute('/guest/mobile-e2e-ready')
@@ -729,12 +763,17 @@ async function main() {
     await waitForVisibleText('Check-in: Complete', 15000)
     await captureScreenshot('ticket-refresh-after-checkin')
     await openRoute('/home')
-    await waitForSelector({ accessibilityLabel: 'home-guest-search-button' }, 15000)
+    await waitForHomeReady(15000)
   }
 
+  adb(['shell', 'input', 'swipe', '540', '600', '540', '2100', '500'])
+  await sleep(750)
+  adb(['shell', 'cmd', 'connectivity', 'airplane-mode', 'enable'])
   adb(['shell', 'svc', 'wifi', 'disable'])
   adb(['shell', 'svc', 'data', 'disable'])
+  await sleep(2000)
   await waitForVisibleText('Offline mode is visible, but check-ins stay blocked until the connection returns.', 15000)
+  adb(['shell', 'cmd', 'connectivity', 'airplane-mode', 'disable'])
   adb(['shell', 'svc', 'wifi', 'enable'])
   adb(['shell', 'svc', 'data', 'enable'])
   await sleep(5000)
