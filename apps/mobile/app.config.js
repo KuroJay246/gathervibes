@@ -19,7 +19,9 @@ module.exports = ({ config }) => ({
       authEmulatorHost: firebaseAuthEmulatorHost,
       firestoreEmulatorHost: firestoreEmulatorHost,
       e2eAuthEnabled,
-      e2eEmail: e2eAuthEnabled ? process.env.GSV_MOBILE_E2E_EMAIL || 'mobilee2e@gsv.test' : '',
+      e2eEmail: e2eAuthEnabled
+        ? process.env.GSV_MOBILE_E2E_EMAIL || (process.env.GSV_MOBILE_E2E_ACCESS_STATE === 'denied' ? 'mobilee2e-denied@gsv.test' : 'mobilee2e@gsv.test')
+        : '',
       e2ePassword: e2eAuthEnabled ? process.env.GSV_MOBILE_E2E_PASSWORD || 'MobileE2E123' : '',
     },
     googleWebClientId,

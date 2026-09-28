@@ -6,14 +6,16 @@ import { firebaseRuntimeConfig } from '@/lib/firebase'
 import { useAuth } from '@/providers/useAuth'
 
 export default function EmulatorE2EAuthScreen() {
-  const { authInitialized, defaultRoute, isAuthorized, signInForE2E } = useAuth()
+  const { authInitialized, defaultRoute, isAuthorized, signInForE2E, signOut } = useAuth()
   const started = useRef(false)
 
   useEffect(() => {
     if (started.current || !firebaseRuntimeConfig.useEmulators || !firebaseRuntimeConfig.e2eAuthEnabled) return
     started.current = true
-    void signInForE2E()
-  }, [signInForE2E])
+    void signOut()
+      .catch(() => {})
+      .finally(() => signInForE2E())
+  }, [signInForE2E, signOut])
 
   if (!firebaseRuntimeConfig.useEmulators || !firebaseRuntimeConfig.e2eAuthEnabled) {
     return (
