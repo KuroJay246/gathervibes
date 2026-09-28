@@ -101,6 +101,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     return onAuthStateChanged(auth, async (nextUser) => {
       if (!nextUser) {
+        setAuthError('')
         clearSignedOutState()
         setLoading(false)
         return
