@@ -17,23 +17,34 @@ export default function MoreScreen() {
   if (access?.role === 'scanner' && !access?.protectedOwner && !access?.isAdmin) return <Redirect href="/scanner" />
 
   const destinations = [
-    ['time-outline', 'Run of Show', 'Event-day timeline', '/run-of-show'],
-    ['briefcase-outline', 'Operations', 'Commitments and readiness', '/operations'],
-    ['people-outline', 'Event Contacts', 'People and organizations', '/contacts'],
-    ['bar-chart-outline', 'Reports', 'Compact event summaries', '/reports'],
-    ['settings-outline', 'Settings', 'Account and app preferences', '/settings'],
-    ['document-text-outline', 'Operational Notes', 'Read-only event notes', '/notes'],
+    ['EVENT DAY', [
+      ['time-outline', 'Run of Show', 'Event-day timeline', '/run-of-show'],
+      ['briefcase-outline', 'Operations', 'Commitments and readiness', '/operations'],
+    ]],
+    ['PEOPLE', [
+      ['people-outline', 'Event Contacts', 'People and organizations', '/contacts'],
+    ]],
+    ['INSIGHTS', [
+      ['bar-chart-outline', 'Reports', 'Attendance and readiness', '/reports'],
+    ]],
+    ['APP', [
+      ['settings-outline', 'Settings', 'Account and app preferences', '/settings'],
+      ['document-text-outline', 'Operational Notes', 'Read-only event notes', '/notes'],
+    ]],
   ]
 
   return (
     <Screen scroll>
-      <Section eyebrow="Workspace" title="More" description="Planning and administration for the selected event.">
+      <Section eyebrow="Workspace" title="More">
         <Card tone="muted">
           <Text style={{ ...typography.caption, color: colors.textSubtle }}>WORKING EVENT</Text>
           <Text accessibilityRole="header" style={{ ...typography.section, color: colors.text }}>{activeEvent.eventName || 'Working event'}</Text>
         </Card>
-        <View style={{ gap: 1 }}>
-          {destinations.map(([icon, label, description, route]) => (
+        <View style={{ gap: spacing.lg }}>
+          {destinations.map(([group, items]) => (
+            <View key={group} style={{ gap: spacing.xs }}>
+              <Text style={{ ...typography.caption, color: colors.textSubtle }}>{group}</Text>
+              {items.map(([icon, label, description, route]) => (
             <Pressable
               key={route}
               onPress={() => router.push(route)}
@@ -50,6 +61,8 @@ export default function MoreScreen() {
               </View>
               <AppIcon name="chevron-forward-outline" size={19} color={colors.textSubtle} accessibilityLabel={`Open ${label}`} />
             </Pressable>
+              ))}
+            </View>
           ))}
         </View>
       </Section>

@@ -141,13 +141,13 @@ export default function ScannerScreen() {
       <Section
         eyebrow="QR Scanner"
         title="Scanner Mode"
-        description={`Working Event: ${activeEvent.eventName || 'Assigned Event'}. Scan a ticket, confirm the guest, and move to the next check-in without leaving this flow.`}
+        description={`Working Event: ${activeEvent.eventName || 'Assigned Event'}. Scan a ticket and keep the line moving.`}
       >
         <Card tone="muted">
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
             <AppIcon name={online ? 'wifi-outline' : 'cloud-offline-outline'} size={20} color={online ? colors.success : colors.warning} accessibilityLabel={online ? 'Live connection' : 'Offline connection'} />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={{ ...typography.label, color: colors.text }}>{online ? 'Ready for authoritative check-in' : 'Check-in is paused offline'}</Text>
+              <Text style={{ ...typography.label, color: colors.text }}>{online ? 'Ready to scan' : 'Connection required'}</Text>
               <Text style={{ ...typography.caption, color: colors.textMuted }}>{scanEnabled ? 'Point the camera at one QR ticket.' : 'Review the result before scanning again.'}</Text>
             </View>
             <Pill tone={online ? 'success' : 'warning'}>{online ? 'Live' : 'Offline'}</Pill>
@@ -185,7 +185,7 @@ export default function ScannerScreen() {
           </Card>
         ) : (
           <Card>
-            <View style={{ overflow: 'hidden', borderRadius: 8, minHeight: 320 }}>
+            <View style={{ overflow: 'hidden', borderRadius: 8, minHeight: 320, position: 'relative', backgroundColor: '#1b1718' }}>
               <CameraView
                 style={{ minHeight: 320 }}
                 facing="back"
@@ -193,6 +193,12 @@ export default function ScannerScreen() {
                 barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
                 onBarcodeScanned={handleBarcodeScanned}
               />
+              <View pointerEvents="none" style={{ position: 'absolute', left: '22%', right: '22%', top: '20%', bottom: '20%' }}>
+                <View style={{ position: 'absolute', left: 0, top: 0, width: 32, height: 32, borderLeftWidth: 3, borderTopWidth: 3, borderColor: colors.surface }} />
+                <View style={{ position: 'absolute', right: 0, top: 0, width: 32, height: 32, borderRightWidth: 3, borderTopWidth: 3, borderColor: colors.surface }} />
+                <View style={{ position: 'absolute', left: 0, bottom: 0, width: 32, height: 32, borderLeftWidth: 3, borderBottomWidth: 3, borderColor: colors.surface }} />
+                <View style={{ position: 'absolute', right: 0, bottom: 0, width: 32, height: 32, borderRightWidth: 3, borderBottomWidth: 3, borderColor: colors.surface }} />
+              </View>
             </View>
           </Card>
         )}
@@ -214,7 +220,7 @@ export default function ScannerScreen() {
             {selectedRegistration.checkedIn ? (
               <SecondaryButton label="Record Duplicate Attempt" onPress={handleDuplicate} disabled={saving} testID="scanner-duplicate-button" accessibilityLabel="scanner-duplicate-button" />
             ) : (
-              <PrimaryButton label="Authoritative Check-In" onPress={handleCheckIn} disabled={saving || !checkInState.allowed} testID="scanner-checkin-button" accessibilityLabel="scanner-checkin-button" />
+              <PrimaryButton label="Check in guest" onPress={handleCheckIn} disabled={saving || !checkInState.allowed} testID="scanner-checkin-button" accessibilityLabel="scanner-checkin-button" />
             )}
             {!selectedRegistration.checkedIn && !checkInState.allowed ? <Banner tone="warning">{checkInState.reason}</Banner> : null}
             <SecondaryButton label="Scan Next Guest" onPress={() => resetSelection()} disabled={saving} testID="scanner-next-button" accessibilityLabel="scanner-next-button" />
@@ -222,7 +228,7 @@ export default function ScannerScreen() {
         ) : (
           <Card tone="muted">
             <Text style={{ color: '#5c554f', lineHeight: 20 }}>
-              Keep the QR code inside the camera frame. This app only trusts the shared ticket format and still confirms the final state from Firestore before reporting success.
+              Keep the QR code inside the frame. The guest is confirmed after the event record responds.
             </Text>
           </Card>
         )}

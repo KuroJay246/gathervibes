@@ -19,7 +19,7 @@ export default function SettingsScreen() {
 
   return (
     <Screen scroll>
-      <Section eyebrow="Settings" title="Your workspace" description="Manage your account, selected event, and app access from one place.">
+      <Section eyebrow="Settings" title="Your workspace">
         <Text style={{ ...typography.caption, color: colors.textSubtle }}>ACCOUNT</Text>
         <Card tone="muted">
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
@@ -55,9 +55,9 @@ export default function SettingsScreen() {
           </View>
         </Card>
 
-        <Text style={{ ...typography.caption, color: colors.textSubtle }}>SECURITY & ABOUT</Text>
+        <Text style={{ ...typography.caption, color: colors.textSubtle }}>SECURITY</Text>
         <Card tone="muted">
-          <Text style={{ ...typography.body, color: colors.textMuted }}>Gather & Savor keeps check-in actions online-confirmed and protects event data with your assigned access.</Text>
+          <Text style={{ ...typography.body, color: colors.textMuted }}>Check-ins require a live connection and your assigned access.</Text>
         </Card>
 
         <PrimaryButton label="Choose Another Assigned Event" onPress={async () => {

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Redirect } from 'expo-router'
 import { Linking, Text, View } from 'react-native'
 
-import { AppIcon, Card, EmptyState, Field, Screen, Section, SecondaryButton } from '@/components/ui'
+import { AppIcon, EmptyState, Field, IconButton, Screen, Section } from '@/components/ui'
 import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
@@ -48,7 +48,7 @@ export default function ContactsScreen() {
       <Section
         eyebrow="Event Contacts"
         title="Contacts"
-        description="Business contacts and organizations stay separate from login access. This screen shows only the selected event’s linked relationships."
+        description="People and organizations linked to this event."
       >
         <Field label="Search event contacts" value={query} onChangeText={setQuery} placeholder="Name, organization, role" autoCapitalize="none" rightIcon={<AppIcon name="search-outline" color={colors.textSubtle} accessibilityLabel="Search" />} />
         {links.length === 0 ? (
@@ -60,21 +60,20 @@ export default function ContactsScreen() {
             const contact = contactsById.get(link.contactId)
             const organization = organizationsById.get(link.organizationId)
             return (
-              <Card key={link.linkId}>
-                <View style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' }}>
+              <View key={link.linkId} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                <View style={{ flex: 1, flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start', minWidth: 0 }}>
                   <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}><AppIcon name="person-outline" size={21} color={colors.primary} accessibilityLabel="Contact" /></View>
-                  <View style={{ flex: 1, gap: 4 }}>
+                  <View style={{ flex: 1, gap: 4, minWidth: 0 }}>
                     <Text style={{ ...typography.section, color: colors.text }}>{contact?.displayName || organization?.name || 'Relationship'}</Text>
                     <Text style={{ ...typography.body, color: colors.textMuted }}>{link.roleForEvent || link.relationshipType || 'Event relationship'}</Text>
                     {organization?.name && contact?.displayName ? <Text style={{ ...typography.caption, color: colors.textSubtle }}>{organization.name}</Text> : null}
                   </View>
                 </View>
-                {link.notes ? <Text style={{ ...typography.body, color: colors.textMuted }}>{link.notes}</Text> : null}
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                  {contact?.phone ? <SecondaryButton label="Call" onPress={() => Linking.openURL(`tel:${contact.phone}`)} /> : null}
-                  {contact?.email ? <SecondaryButton label="Email" onPress={() => Linking.openURL(`mailto:${contact.email}`)} /> : null}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                  {contact?.phone ? <IconButton name="call-outline" label={`Call ${contact.displayName || 'contact'}`} onPress={() => Linking.openURL(`tel:${contact.phone}`)} /> : null}
+                  {contact?.email ? <IconButton name="mail-outline" label={`Email ${contact.displayName || 'contact'}`} onPress={() => Linking.openURL(`mailto:${contact.email}`)} /> : null}
                 </View>
-              </Card>
+              </View>
             )
           })
         )}

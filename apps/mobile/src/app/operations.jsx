@@ -52,7 +52,7 @@ export default function OperationsScreen() {
 
   return (
     <Screen scroll>
-      <Section eyebrow="Event Operations" title="What needs attention" description="A compact view of commitments and ledger activity for the selected event. Registration Payments stay separate.">
+      <Section eyebrow="Event operations" title="What needs attention">
         <Card tone="muted">
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
             <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
@@ -79,7 +79,7 @@ export default function OperationsScreen() {
 
         <View style={{ gap: 10 }}>
           {visibleEntries.map((entry) => (
-            <Card key={entry.ledgerEntryId} tone={CLOSED_STATUSES.has(entry.status) ? 'muted' : 'default'}>
+            <View key={entry.ledgerEntryId} style={{ gap: spacing.sm, paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border, opacity: CLOSED_STATUSES.has(entry.status) ? 0.72 : 1 }}>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
                 <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center' }}>
                   <AppIcon name={entry.status === 'pending' ? 'alert-circle-outline' : 'receipt-outline'} size={20} color={entry.status === 'pending' ? colors.warning : colors.primary} accessibilityLabel="Operation status" />
@@ -95,7 +95,7 @@ export default function OperationsScreen() {
                 <Text selectable style={{ ...typography.section, color: colors.text }}>{money(entry.amount)}</Text>
               </View>
               {entry.notes ? <Text selectable style={{ ...typography.caption, color: colors.textSubtle }}>{entry.notes}</Text> : null}
-            </Card>
+            </View>
           ))}
         </View>
       </Section>

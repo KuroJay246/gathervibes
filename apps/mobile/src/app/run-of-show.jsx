@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 
-import { AppIcon, Banner, Card, EmptyState, Metric, Pill, Screen, Section } from '@/components/ui'
+import { Banner, EmptyState, Metric, Pill, Screen, Section } from '@/components/ui'
 import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
@@ -18,22 +18,28 @@ function statusTone(status) {
 
 function TimelineCard({ item }) {
   return (
-    <Card tone="muted">
-      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
-        <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
-          <AppIcon name="time-outline" size={21} color={colors.primary} accessibilityLabel="Timeline item" />
-        </View>
-        <View style={{ flex: 1, gap: 4 }}>
-          <Text style={{ ...typography.section, color: colors.text }}>{item.title}</Text>
-          <Text style={{ ...typography.body, color: colors.textMuted }}>{item.startTime}{item.endTime ? `–${item.endTime}` : ''} · {item.category}</Text>
-          {item.location ? <Text style={{ ...typography.caption, color: colors.textSubtle }}>{item.location}</Text> : null}
-        </View>
-        <Pill tone={statusTone(item.status)}>{item.status}</Pill>
+    <View style={{ flexDirection: 'row', alignItems: 'stretch', gap: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+      <View style={{ width: 54, alignItems: 'flex-end', paddingTop: 3 }}>
+        <Text style={{ ...typography.label, color: colors.primary, textAlign: 'right' }}>{item.startTime || '—'}</Text>
+        {item.endTime ? <Text style={{ ...typography.caption, color: colors.textSubtle, textAlign: 'right' }}>{item.endTime}</Text> : null}
       </View>
-      {item.description ? <Text style={{ ...typography.body, color: colors.textMuted }}>{item.description}</Text> : null}
-      {item.responsibleLabel ? <Text style={{ ...typography.caption, color: colors.textSubtle }}>Owner: {item.responsibleLabel}</Text> : null}
-      {item.arrivalStatus && item.arrivalStatus !== 'Expected' ? <Text style={{ ...typography.caption, color: item.arrivalStatus === 'Delayed' ? colors.danger : colors.success }}>Arrival: {item.arrivalStatus}</Text> : null}
-    </Card>
+      <View style={{ width: 18, alignItems: 'center' }}>
+        <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: item.status === 'Completed' ? colors.success : item.status === 'Delayed' ? colors.warning : colors.primary, marginTop: 4 }} />
+        <View style={{ width: 1, flex: 1, backgroundColor: colors.border, marginTop: 4 }} />
+      </View>
+      <View style={{ flex: 1, gap: 4, minWidth: 0 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm }}>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={{ ...typography.section, color: colors.text }}>{item.title}</Text>
+            <Text style={{ ...typography.caption, color: colors.textMuted }}>{item.category}{item.location ? ` · ${item.location}` : ''}</Text>
+          </View>
+          <Pill tone={statusTone(item.status)}>{item.status}</Pill>
+        </View>
+        {item.description ? <Text style={{ ...typography.body, color: colors.textMuted }}>{item.description}</Text> : null}
+        {item.responsibleLabel ? <Text style={{ ...typography.caption, color: colors.textSubtle }}>Owner: {item.responsibleLabel}</Text> : null}
+        {item.arrivalStatus && item.arrivalStatus !== 'Expected' ? <Text style={{ ...typography.caption, color: item.arrivalStatus === 'Delayed' ? colors.danger : colors.success }}>Arrival: {item.arrivalStatus}</Text> : null}
+      </View>
+    </View>
   )
 }
 
@@ -57,7 +63,7 @@ export default function RunOfShowScreen() {
 
   return (
     <Screen scroll>
-      <Section eyebrow="Event-day timeline" title="Run of Show" description="See what is happening now, what comes next, and which event-day dependencies need attention.">
+      <Section eyebrow="Event-day timeline" title="Run of Show">
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <Metric label="Total" value={items.length} />
           <Metric label="Current" value={groups.current.length} />

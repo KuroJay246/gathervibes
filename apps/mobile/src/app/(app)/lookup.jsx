@@ -72,6 +72,11 @@ export default function LookupScreen() {
   }, [queryText, registrations, requestVersion, statusFilter])
   const canUndo = isApprovedAdmin(access)
   const online = networkState.isInternetReachable ?? networkState.isConnected
+  const displayedMatches = queryText.trim() ? visibleMatches : registrations.filter((registration) => {
+    if (statusFilter === 'checked-in') return registration.checkedIn
+    if (statusFilter === 'ready') return !registration.checkedIn
+    return true
+  }).slice(0, 20)
 
   if (!authInitialized || !ready) return null
   if (!isAuthorized) return <Redirect href="/sign-in" />
@@ -178,11 +183,11 @@ export default function LookupScreen() {
         {actionError ? <Banner tone="danger">{actionError}</Banner> : null}
         {message ? <Banner tone="success">{message}</Banner> : null}
 
-        {!queryText.trim() ? (
-          <EmptyState title={loadingPage ? 'Loading guests' : 'Start typing'} description="Search the selected event. Results stay bounded and can be loaded in pages." />
+        {!queryText.trim() && loadingPage ? (
+          <EmptyState title="Loading guests" description="Preparing the selected event's guest list." />
         ) : (
           <View style={{ gap: 12 }}>
-            {visibleMatches.map((registration) => (
+            {displayedMatches.map((registration) => (
               <Card key={registration.registrationId} tone="muted">
                 {(() => {
                   const warnings = checkInWarnings(registration)
@@ -221,7 +226,7 @@ export default function LookupScreen() {
                 })()}
               </Card>
             ))}
-            {visibleMatches.length === 0 ? <EmptyState title="No matches" description="Nothing in the selected event matched this search." /> : null}
+            {displayedMatches.length === 0 ? <EmptyState title={queryText.trim() ? 'No matches' : 'No guests yet'} description={queryText.trim() ? 'Nothing in the selected event matched this search.' : 'No guest records are visible for this event.'} /> : null}
             {hasMore ? <SecondaryButton label={loadingPage ? 'Loading guests…' : 'Load more guests'} onPress={loadMore} disabled={loadingPage} accessibilityLabel="Load more guests" /> : null}
           </View>
         )}

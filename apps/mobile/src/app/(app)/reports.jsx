@@ -56,21 +56,21 @@ export default function ReportsScreen() {
   return (
     <Screen scroll>
       <Section
-        eyebrow="Limited Reports"
+        eyebrow="Event readout"
         title="Reports"
-        description="This mobile report surface stays narrow: registration, payment-status, and check-in totals for the currently selected event only."
+        description="Attendance, readiness, and event-day signals for the selected event."
       >
         {!loaded ? <Banner>Loading event summary…</Banner> : null}
         {error ? <Banner tone="danger">{error}</Banner> : null}
         {loaded && !error && registrationSummary.totalRegistrations === 0 ? <EmptyState title="No registration activity" description="The selected event has no visible registration records yet." /> : null}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          <Metric label="Attendance" value={`${attendancePercent}%`} detail={`${checkedIn} of ${registrationSummary.totalRegistrations} checked in`} emphasis />
           <Metric label="Registrations" value={registrationSummary.totalRegistrations} />
-          <Metric label="Checked In" value={checkedIn} />
-          <Metric label="Attendance" value={`${attendancePercent}%`} detail={`${registrationSummary.notCheckedIn} remaining`} />
+          <Metric label="Checked in" value={checkedIn} />
           <Metric label="Paid" value={paid} />
           <Metric label="Pending" value={pending} />
           <Metric label="Door" value={door} />
-          <Metric label="Not Checked In" value={registrationSummary.notCheckedIn} />
+          <Metric label="Remaining" value={registrationSummary.notCheckedIn} />
         </View>
         <Card tone="muted">
           <Text style={{ ...typography.section, color: colors.text }}>Attendance</Text>
@@ -80,7 +80,7 @@ export default function ReportsScreen() {
           <Text style={{ ...typography.body, color: colors.textMuted }}>{checkedIn} of {registrationSummary.totalRegistrations} registrations checked in.</Text>
         </Card>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-          <Metric label="Open Tasks" value={openTasks.length} detail={`${overdueTasks.length} overdue`} />
+          <Metric label="Open tasks" value={openTasks.length} detail={`${overdueTasks.length} overdue`} />
           <Metric label="Operations" value={attentionOperations.length} detail={openOperations.length ? `${outstandingOperations.toFixed(2)} outstanding` : 'Clear'} />
         </View>
         <Card tone="muted">

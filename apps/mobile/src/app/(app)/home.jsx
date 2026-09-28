@@ -92,7 +92,7 @@ export default function HomeScreen() {
 
   return (
     <Screen scroll>
-      <Section eyebrow="Event-Day Home" title="Operations at a glance" description="A focused view of the selected event and the work that needs attention now.">
+      <Section eyebrow="Event day" title="At a glance">
         <Card tone="muted">
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
             <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
@@ -106,16 +106,16 @@ export default function HomeScreen() {
           </View>
         </Card>
         {online ? (
-          <Banner tone="success">Live connection confirmed. Check-in waits for server confirmation before reporting success.</Banner>
+          <Banner tone="success">Live connection. Check-ins confirm with the event record.</Banner>
         ) : (
           <Banner tone="warning">Offline mode is visible, but check-ins stay blocked until the connection returns.</Banner>
         )}
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <Metric label="Registrations" value={registrationSummary.totalRegistrations} detail={`${checkedIn} checked in`} />
-          <Metric label="Open Tasks" value={openTasks} detail={`${tasks.length - openTasks} completed or cancelled`} />
+          <Metric label="Open tasks" value={openTasks} detail={`${tasks.length - openTasks} completed`} />
           <Metric label="Documents" value={documents.length} detail="Event register" />
-          <Metric label="Attendance" value={`${attendancePercent}%`} detail={`${checkedIn} of ${registrationSummary.totalRegistrations} checked in`} />
+          <Metric label="Attendance" value={`${attendancePercent}%`} detail={`${checkedIn} of ${registrationSummary.totalRegistrations} checked in`} emphasis />
         </View>
 
         <Card tone="muted">
@@ -126,6 +126,12 @@ export default function HomeScreen() {
           </View>
           <Text style={{ ...typography.body, color: colors.textMuted }}>{openTasks} task{openTasks === 1 ? '' : 's'} and {openOperations} operation{openOperations === 1 ? '' : 's'} require attention.</Text>
           <Text style={{ ...typography.caption, color: colors.textSubtle }}>{readinessItems === 0 ? 'Event register is ready.' : `${readinessItems} readiness ${readinessItems === 1 ? 'item' : 'items'} still need review.`}</Text>
+          {attentionCount > 0 ? (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
+              {openTasks > 0 ? <SecondaryButton label="Review tasks" onPress={() => router.push('/tasks')} accessibilityLabel="Review open tasks" /> : null}
+              {openOperations > 0 ? <SecondaryButton label="Review operations" onPress={() => router.push('/operations')} accessibilityLabel="Review open operations" /> : null}
+            </View>
+          ) : null}
         </Card>
 
         <Card>
@@ -134,8 +140,8 @@ export default function HomeScreen() {
             <Text style={{ ...typography.section, color: colors.text }}>Quick actions</Text>
           </View>
           <View style={{ gap: 10 }}>
-            <PrimaryButton label="Guest Search" onPress={() => router.push('/lookup')} testID="home-guest-search-button" accessibilityLabel="home-guest-search-button" />
-            <PrimaryButton label="QR Scanner" onPress={() => router.push('/scanner')} testID="home-qr-scanner-button" accessibilityLabel="home-qr-scanner-button" />
+            <PrimaryButton label="Guest search" onPress={() => router.push('/lookup')} testID="home-guest-search-button" accessibilityLabel="home-guest-search-button" />
+            <PrimaryButton label="Scan a ticket" onPress={() => router.push('/scanner')} testID="home-qr-scanner-button" accessibilityLabel="home-qr-scanner-button" />
             <SecondaryButton label="Manual Ticket Code" onPress={() => router.push('/manual-entry')} testID="home-manual-ticket-button" accessibilityLabel="home-manual-ticket-button" />
           </View>
         </Card>

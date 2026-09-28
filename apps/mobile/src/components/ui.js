@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { colors, controls, radii, spacing, typography } from '@/design/tokens'
 import googleSignInButton from '../../assets/images/google-sign-in-button.png'
 
 export function Screen({ children, scroll = false, contentStyle }) {
   const Wrapper = scroll ? ScrollView : View
+  const insets = useSafeAreaInsets()
   return (
     <SafeAreaView edges={['top', 'right', 'bottom', 'left']} style={styles.safeArea}>
-      <Wrapper style={styles.surface} contentContainerStyle={scroll ? [styles.scrollContent, contentStyle] : undefined}>
+      <Wrapper style={styles.surface} contentContainerStyle={scroll ? [styles.scrollContent, { paddingBottom: spacing.lg + insets.bottom + 72 }, contentStyle] : undefined}>
         {!scroll ? <View style={[styles.content, contentStyle]}>{children}</View> : children}
       </Wrapper>
     </SafeAreaView>
@@ -39,11 +40,11 @@ export function Pill({ tone = 'neutral', children }) {
   return <View style={[styles.pill, tone === 'success' ? styles.pillSuccess : tone === 'warning' ? styles.pillWarning : tone === 'danger' ? styles.pillDanger : styles.pillNeutral]}><Text style={styles.pillText}>{children}</Text></View>
 }
 
-export function Metric({ label, value, detail }) {
+export function Metric({ label, value, detail, emphasis = false }) {
   return (
-    <View style={styles.metric}>
+    <View style={[styles.metric, emphasis ? styles.metricEmphasis : null]}>
       <Text style={styles.metricLabel}>{label}</Text>
-      <Text style={styles.metricValue}>{value}</Text>
+      <Text style={[styles.metricValue, emphasis ? styles.metricValueEmphasis : null]}>{value}</Text>
       {detail ? <Text style={styles.metricDetail}>{detail}</Text> : null}
     </View>
   )
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: spacing.lg,
-    paddingBottom: spacing.lg + 112,
+    paddingBottom: spacing.lg + 72,
     gap: spacing.lg,
   },
   section: {
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: radii.md,
     backgroundColor: colors.surface,
-    padding: spacing.lg,
+    padding: spacing.md,
     gap: spacing.md,
   },
   cardMuted: {
@@ -247,6 +248,12 @@ const styles = StyleSheet.create({
     minWidth: 140,
     gap: 4,
   },
+  metricEmphasis: {
+    backgroundColor: colors.primarySoft,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    flexBasis: '100%',
+  },
   metricLabel: {
     fontSize: 11,
     fontWeight: '700',
@@ -257,6 +264,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: colors.text,
+  },
+  metricValueEmphasis: {
+    fontSize: 30,
+    color: colors.primary,
   },
   metricDetail: {
     fontSize: 12,

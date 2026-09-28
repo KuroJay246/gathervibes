@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Redirect } from 'expo-router'
 import { Text, View } from 'react-native'
 
-import { AppIcon, Banner, Card, EmptyState, Metric, Pill, Screen, Section } from '@/components/ui'
+import { AppIcon, Banner, EmptyState, Metric, Pill, Screen, Section } from '@/components/ui'
 import { colors, spacing, typography } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { useActiveEvent } from '@/providers/useActiveEvent'
@@ -41,7 +41,7 @@ export default function TasksScreen() {
 
   return (
     <Screen scroll>
-      <Section eyebrow="Assigned Tasks" title="Keep the event moving" description="Event-scoped work, ordered for quick scanning during setup and event day.">
+      <Section eyebrow="Event tasks" title="Keep the event moving">
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <Metric label="Open" value={openTasks.length} />
           <Metric label="Completed" value={tasks.filter((task) => task.status === 'Completed').length} />
@@ -56,7 +56,7 @@ export default function TasksScreen() {
           <EmptyState title="No tasks recorded" description="This event does not have visible tasks yet." />
         ) : (
           tasks.map((task) => (
-            <Card key={task.taskId} tone="muted">
+            <View key={task.taskId} style={{ gap: spacing.sm, paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border }}>
               {(() => {
                 const due = dueState(task)
                 return (
@@ -77,7 +77,7 @@ export default function TasksScreen() {
                   </>
                 )
               })()}
-            </Card>
+            </View>
           ))
         )}
       </Section>

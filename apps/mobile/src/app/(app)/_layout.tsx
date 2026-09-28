@@ -1,17 +1,21 @@
 import { Tabs } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import type { ComponentProps } from 'react'
 
 import { colors } from '@/design/tokens'
 import { useAuth } from '@/providers/useAuth'
 import { isApprovedAdmin } from '@gsv/contracts/accessRoles'
 
-function TabIcon({ name, color }) {
+function TabIcon({ name, color }: { name: ComponentProps<typeof Ionicons>['name']; color: ComponentProps<typeof Ionicons>['color'] }) {
   return <Ionicons name={name} size={22} color={color} />
 }
 
 export default function AppLayout() {
-  const { access } = useAuth()
-  const scannerOnly = access?.role === 'scanner' && !isApprovedAdmin(access)
+  const insets = useSafeAreaInsets()
+  const { access } = useAuth() as { access?: Parameters<typeof isApprovedAdmin>[0] | null }
+  const role = (access as unknown as { role?: string } | null)?.role
+  const scannerOnly = role === 'scanner' && (!access || !isApprovedAdmin(access))
 
   return (
     <Tabs
@@ -19,7 +23,7 @@ export default function AppLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSubtle,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border, height: 58 + insets.bottom, paddingBottom: Math.max(insets.bottom, 8), paddingTop: 6 },
         tabBarLabelStyle: { fontSize: 11, fontWeight: '700' },
       }}
     >
