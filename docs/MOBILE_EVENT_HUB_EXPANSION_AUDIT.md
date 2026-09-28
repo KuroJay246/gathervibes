@@ -27,12 +27,12 @@ not implement a native version in Batch A.
 | Web route | Canonical capability | Read model / data source | Mutation service | Native surface | Current status |
 | --- | --- | --- | --- | --- | --- |
 | `/dashboard` | Event overview | `buildDashboardOverviewModel`, registration summary, operations/tasks/documents listeners | none on page | Home | Native compact |
-| `/events` | Event management and selection | `eventService.subscribeToEvents` | `eventService` | Event picker only | Selection native; management missing |
+| `/events` | Event management and selection | `eventService.subscribeToEvents` | `eventService` | Event picker + Events management | Native view/create/edit; runtime proof pending |
 | `/tasks` | Tasks and deadlines | task listener / task read model | `taskService` with revision transaction | Tasks | Read-only native |
-| `/registrations` | Registration management | `buildRegistrationListModel`, registration listener | `registrationService` | Guests / lookup | Lookup subset |
+| `/registrations` | Registration management | `buildRegistrationListModel`, registration listener | `registrationService` | Guests + Registrations management | Native bounded list/detail/create/edit; runtime proof pending |
 | `/payments` | Registration payments | `buildPaymentReconciliationModel` | `registrationService` payment mutations | Reports subset | Native summary only |
 | `/payments/reconciliation` | Reconciliation review | `reconciliationReadService`, payment reconciliation model | none for apply | none | Web review |
-| `/tickets` | Ticket assignment and QR access | ticket lookup / registrations | `ticketService` | Guest/ticket detail subset | Detail/check-in subset |
+| `/tickets` | Ticket assignment and QR access | ticket lookup / registrations | `ticketService` | Guests/ticket detail + Tickets management | Assignment/correction adapter added; runtime proof pending |
 | `/check-in` | Check-in operations | check-in queue / registrations | `checkInService` | Scan, manual entry | Native core |
 | `/operations` | Operations ledger | `buildOperationsSummaryModel`, operations listener | `operationsLedgerService` | Operations | Read-only native |
 | `/run-of-show` | Event-day timeline | run-of-show listener/read model | `runOfShowService` | Run of Show | Read-only native |
