@@ -67,7 +67,7 @@ export default function ManualEntryScreen() {
   }
 
   return (
-    <Screen scroll>
+    <Screen scroll back>
       <Section
         eyebrow="Manual Entry"
         title="Manual Ticket Code"

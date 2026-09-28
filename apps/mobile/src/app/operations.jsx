@@ -51,7 +51,7 @@ export default function OperationsScreen() {
   if (!activeEvent?.eventId) return <Redirect href="/events" />
 
   return (
-    <Screen scroll>
+    <Screen scroll back>
       <Section eyebrow="Event operations" title="What needs attention">
         <Card tone="muted">
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>

@@ -68,7 +68,7 @@ export default function TicketDetailScreen() {
   if (!registration) return <Screen><Section eyebrow="Ticket" title="Ticket details"><EmptyState title="Ticket not found" description="This ticket is not available in the selected event." /></Section></Screen>
 
   return (
-    <Screen scroll>
+    <Screen scroll back>
       <Section eyebrow="Ticket Detail" title={display(registration.ticketCode, 'Unassigned ticket')} description={activeEvent.eventName || 'Selected event'}>
         <Card tone="muted">
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>

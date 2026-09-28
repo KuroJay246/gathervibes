@@ -36,6 +36,7 @@ export default function EventSelectionScreen() {
   const { assignedEvents, authInitialized, isAuthorized, signOut, currentRoleLabel } = useAuth()
   const { activeEvent, ready, setActiveEvent } = useActiveEvent()
   const [query, setQuery] = useState('')
+  const [expanded, setExpanded] = useState(false)
 
   const visibleEvents = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -70,11 +71,20 @@ export default function EventSelectionScreen() {
           />
         ) : (
           <View style={{ gap: 12 }}>
-            <Field label="Find an assigned event" value={query} onChangeText={setQuery} placeholder="Search name, date, location" autoCapitalize="none" accessibilityLabel="event-selection-search" rightIcon={<AppIcon name="search-outline" color="#8a817a" accessibilityLabel="Search events" />} />
-            <Text style={{ fontSize: 12, color: '#8a817a' }}>{visibleEvents.length} {visibleEvents.length === 1 ? 'event' : 'events'} shown · earliest first</Text>
-            {visibleEvents.length === 0 ? (
-              <EmptyState title="No matching events" description="Try a different name, location, or status." />
-            ) : visibleEvents.map((event) => (
+            <View style={{ borderRadius: 14, backgroundColor: '#f2e4e8', overflow: 'hidden' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', padding: 14, gap: 10 }}>
+                <AppIcon name="albums-outline" size={21} color="#7c3144" accessibilityLabel="Assigned events" />
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text style={{ fontSize: 15, fontWeight: '700', color: '#211f20' }}>Assigned events</Text>
+                  <Text style={{ fontSize: 12, color: '#69615c' }}>{assignedEvents.length} available · choose one to continue</Text>
+                </View>
+                <SecondaryButton label={expanded ? 'Hide' : 'Browse'} onPress={() => setExpanded((value) => !value)} accessibilityLabel={expanded ? 'Hide assigned events' : 'Browse assigned events'} />
+              </View>
+            </View>
+            {expanded ? <>
+              <Field label="Find an assigned event" value={query} onChangeText={setQuery} placeholder="Search name, date, location" autoCapitalize="none" accessibilityLabel="event-selection-search" rightIcon={<AppIcon name="search-outline" color="#8a817a" accessibilityLabel="Search events" />} />
+              <Text style={{ fontSize: 12, color: '#8a817a' }}>{visibleEvents.length} {visibleEvents.length === 1 ? 'event' : 'events'} shown · earliest first</Text>
+              {visibleEvents.length === 0 ? <EmptyState title="No matching events" description="Try a different name, location, or status." /> : visibleEvents.map((event) => (
               <Card key={event.eventId}>
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
                   <View style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: '#f2e4e8', alignItems: 'center', justifyContent: 'center' }}>
@@ -97,7 +107,8 @@ export default function EventSelectionScreen() {
                   accessibilityLabel={`Open ${event.eventName || event.eventId}`}
                 />
               </Card>
-            ))}
+              ))}
+            </> : null}
           </View>
         )}
 

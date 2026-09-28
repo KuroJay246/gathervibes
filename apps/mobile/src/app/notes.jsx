@@ -28,7 +28,7 @@ export default function NotesScreen() {
   if (!activeEvent?.eventId) return <Redirect href="/events" />
 
   return (
-    <Screen scroll>
+    <Screen scroll back>
       <Section
         eyebrow="Operations"
         title="Event operations"

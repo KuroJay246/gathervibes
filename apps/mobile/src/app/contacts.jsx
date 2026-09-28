@@ -44,7 +44,7 @@ export default function ContactsScreen() {
   if (!activeEvent?.eventId) return <Redirect href="/events" />
 
   return (
-    <Screen scroll>
+    <Screen scroll back>
       <Section
         eyebrow="Event Contacts"
         title="Contacts"

@@ -2,15 +2,18 @@ import { useState } from 'react'
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
+import { useRouter } from 'expo-router'
 import { colors, controls, radii, spacing, typography } from '@/design/tokens'
 import googleSignInButton from '../../assets/images/google-sign-in-button.png'
 
-export function Screen({ children, scroll = false, contentStyle }) {
+export function Screen({ children, scroll = false, contentStyle, back = false, backLabel = 'Back' }) {
   const Wrapper = scroll ? ScrollView : View
   const insets = useSafeAreaInsets()
+  const router = useRouter()
   return (
     <SafeAreaView edges={['top', 'right', 'bottom', 'left']} style={styles.safeArea}>
       <Wrapper style={styles.surface} contentContainerStyle={scroll ? [styles.scrollContent, { paddingBottom: spacing.lg + insets.bottom + 72 }, contentStyle] : undefined}>
+        {back ? <View style={styles.backRow}><IconButton name="arrow-back-outline" onPress={() => router.back()} label={backLabel} /></View> : null}
         {!scroll ? <View style={[styles.content, contentStyle]}>{children}</View> : children}
       </Wrapper>
     </SafeAreaView>
@@ -185,6 +188,10 @@ const styles = StyleSheet.create({
   },
   sectionBody: {
     gap: 12,
+  },
+  backRow: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
   },
   card: {
     borderRadius: radii.md,

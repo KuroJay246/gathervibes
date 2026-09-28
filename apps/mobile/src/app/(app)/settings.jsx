@@ -18,7 +18,7 @@ export default function SettingsScreen() {
   if (!activeEvent?.eventId) return <Redirect href="/events" />
 
   return (
-    <Screen scroll>
+    <Screen scroll back>
       <Section eyebrow="Settings" title="Your workspace">
         <Text style={{ ...typography.caption, color: colors.textSubtle }}>ACCOUNT</Text>
         <Card tone="muted">

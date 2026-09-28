@@ -62,7 +62,7 @@ export default function RunOfShowScreen() {
   if (!activeEvent?.eventId) return <Redirect href="/events" />
 
   return (
-    <Screen scroll>
+    <Screen scroll back>
       <Section eyebrow="Event-day timeline" title="Run of Show">
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <Metric label="Total" value={items.length} />

@@ -54,7 +54,7 @@ export default function ReportsScreen() {
   if (!activeEvent?.eventId) return <Redirect href="/events" />
 
   return (
-    <Screen scroll>
+    <Screen scroll back>
       <Section
         eyebrow="Event readout"
         title="Reports"

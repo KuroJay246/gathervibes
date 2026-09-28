@@ -69,7 +69,7 @@ export default function GuestDetailScreen() {
   if (!registration) return <Screen><Section eyebrow="Guest" title="Guest details"><EmptyState title="Guest not found" description="This guest is not available in the selected event." /></Section></Screen>
 
   return (
-    <Screen scroll>
+    <Screen scroll back>
       <Section eyebrow="Guest Detail" title={guestName(registration)} description={activeEvent.eventName || 'Selected event'}>
         <Card tone="muted">
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
