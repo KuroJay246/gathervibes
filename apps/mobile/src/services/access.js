@@ -8,7 +8,11 @@ function permissionDenied(error) {
 
 function workspaceAccessError(cause) {
   const error = new Error('This account is not approved for the private Gather & Savor workspace.', { cause })
-  error.code = cause?.code === 'permission-denied' ? 'auth/unapproved-account' : 'auth/access-check-failed'
+  const signal = `${cause?.code || ''} ${cause?.message || ''}`.toLowerCase()
+  if (signal.includes('app check') || signal.includes('attestation') || signal.includes('token exchange')) error.code = 'auth/access-check-app-check'
+  else if (signal.includes('network') || signal.includes('unavailable') || signal.includes('timeout')) error.code = 'auth/access-check-network'
+  else if (signal.includes('firestore/permission-denied')) error.code = 'auth/access-check-failed'
+  else error.code = cause?.code === 'permission-denied' ? 'auth/unapproved-account' : 'auth/access-check-failed'
   return error
 }
 

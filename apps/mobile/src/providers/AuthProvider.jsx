@@ -46,12 +46,36 @@ export function AuthProvider({ children }) {
   const [authError, setAuthError] = useState('')
   const [authState, setAuthState] = useState('resolving')
 
+  const clearSignedOutState = useCallback(() => {
+    setAuthError('')
+    setUser(null)
+    setAccessControl(null)
+    setStaffProfile(null)
+    setStaffAssignments([])
+    setAssignedEvents([])
+    setAccess({
+      level: 'none',
+      role: null,
+      roleLabel: 'No access',
+      assignedEventIds: [],
+      assignmentsByEvent: {},
+      assignedEvents: [],
+      protectedOwner: false,
+      capabilities: {},
+    })
+    setIsAuthorized(false)
+    setAuthState('signed-out')
+    setAuthInitialized(true)
+  }, [])
+
   const resolveAccess = useCallback(async (nextUser = user) => {
     if (!nextUser) return false
     setLoading(true)
     setAuthState('checking-access')
+    console.info('GSV_MOBILE_AUTH_STAGE', 'access-lookup-start')
     try {
       const accessData = await verifyWorkspaceAccess(nextUser)
+      console.info('GSV_MOBILE_AUTH_STAGE', 'access-lookup-pass')
       setUser(nextUser)
       setAccessControl(accessData.accessControl)
       setStaffProfile(accessData.staffProfile)
@@ -63,6 +87,7 @@ export function AuthProvider({ children }) {
       setAuthState('authorized')
       return true
     } catch (error) {
+      console.warn('GSV_MOBILE_AUTH_STAGE', 'access-lookup-fail', normalizeAuthErrorCode(error, 'auth/access-check-failed'))
       setIsAuthorized(false)
       setAuthError(normalizeAuthErrorCode(error, 'auth/access-check-failed'))
       setAuthState(error?.code === 'auth/unapproved-account' ? 'access-denied' : 'access-required')
@@ -76,26 +101,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     return onAuthStateChanged(auth, async (nextUser) => {
       if (!nextUser) {
-        setAuthError('')
-        setUser(null)
-        setAccessControl(null)
-        setStaffProfile(null)
-        setStaffAssignments([])
-        setAssignedEvents([])
-        setAccess({
-          level: 'none',
-          role: null,
-          roleLabel: 'No access',
-          assignedEventIds: [],
-          assignmentsByEvent: {},
-          assignedEvents: [],
-          protectedOwner: false,
-          capabilities: {},
-        })
-        setIsAuthorized(false)
-        setAuthState('signed-out')
+        clearSignedOutState()
         setLoading(false)
-        setAuthInitialized(true)
         return
       }
 
@@ -104,10 +111,11 @@ export function AuthProvider({ children }) {
       setStaffProfile(null)
       setStaffAssignments([])
       setAssignedEvents([])
+      console.info('GSV_MOBILE_AUTH_STAGE', 'current-user-present')
       console.info('GSV_MOBILE_ACCESS_CHECK_STARTED')
       await resolveAccess(nextUser)
     })
-  }, [resolveAccess])
+  }, [clearSignedOutState, resolveAccess])
 
   const value = useMemo(() => ({
     user,
@@ -129,7 +137,9 @@ export function AuthProvider({ children }) {
       setAuthError('')
       setLoading(true)
       try {
+        console.info('GSV_MOBILE_AUTH_STAGE', 'google-sign-in-start')
         await signInWithNativeGoogle(auth, googleWebClientId)
+        console.info('GSV_MOBILE_AUTH_STAGE', 'firebase-credential-pass')
       } catch (error) {
         setLoading(false)
         console.error('GSV_MOBILE_GOOGLE_SIGN_IN_FAILED', error)
@@ -161,12 +171,15 @@ export function AuthProvider({ children }) {
       setAuthError('')
       try {
         await signOutFromNativeGoogle().catch(() => {})
-        await firebaseSignOut(auth)
+        await firebaseSignOut(auth).catch((error) => {
+          if (error?.code !== 'auth/no-current-user') throw error
+          clearSignedOutState()
+        })
       } finally {
         setLoading(false)
       }
     },
-  }), [access, accessControl, assignedEvents, authError, authInitialized, authState, isAuthorized, loading, resolveAccess, staffAssignments, staffProfile, user])
+  }), [access, accessControl, assignedEvents, authError, authInitialized, authState, clearSignedOutState, isAuthorized, loading, resolveAccess, staffAssignments, staffProfile, user])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
