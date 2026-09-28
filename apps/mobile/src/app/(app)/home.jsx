@@ -105,17 +105,16 @@ export default function HomeScreen() {
             <Pill tone={online ? 'success' : 'warning'}>{online ? 'Live' : 'Offline'}</Pill>
           </View>
         </Card>
-        {online ? (
-          <Banner tone="success">Connected</Banner>
-        ) : (
-          <Banner tone="warning">Offline mode is visible, but check-ins stay blocked until the connection returns.</Banner>
-        )}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: 28 }} accessibilityLabel={online ? 'Connected' : 'Offline'}>
+          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: online ? colors.success : colors.warning }} />
+          <Text style={{ ...typography.caption, color: colors.textMuted }}>{online ? 'Connected' : 'Offline — check-ins are paused'}</Text>
+        </View>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-          <Metric label="Registrations" value={registrationSummary.totalRegistrations} detail={`${checkedIn} checked in`} />
-          <Metric label="Open tasks" value={openTasks} detail={`${tasks.length - openTasks} completed`} />
-          <Metric label="Documents" value={documents.length} detail="Event register" />
           <Metric label="Attendance" value={`${attendancePercent}%`} detail={`${checkedIn} of ${registrationSummary.totalRegistrations} checked in`} emphasis />
+          <Metric label="Open tasks" value={openTasks} detail={`${tasks.length - openTasks} completed`} />
+          <Metric label="Registrations" value={registrationSummary.totalRegistrations} detail={`${checkedIn} checked in`} />
+          <Metric label="Documents" value={documents.length} detail="Event register" />
         </View>
 
         <Card tone="muted">
