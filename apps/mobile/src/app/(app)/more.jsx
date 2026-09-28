@@ -24,6 +24,10 @@ export default function MoreScreen() {
       ['time-outline', 'Run of Show', 'Event-day timeline', '/run-of-show'],
       ['briefcase-outline', 'Operations', 'Commitments and readiness', '/operations'],
     ]],
+    ['REGISTRATION', [
+      ['people-outline', 'Registrations', 'Review records for the working event', '/registrations-management'],
+      ['pricetag-outline', 'Tickets', 'Review ticket assignments and status', '/tickets-management'],
+    ]],
     ['PEOPLE', [
       ['people-outline', 'Event Contacts', 'People and organizations', '/contacts'],
     ]],

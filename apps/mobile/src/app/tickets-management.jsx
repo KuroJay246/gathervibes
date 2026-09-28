@@ -1,0 +1,21 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Redirect, useRouter } from 'expo-router'
+import { Text, View } from 'react-native'
+import { Banner, EmptyState, Field, LoadingView, Pill, Screen, Section, SecondaryButton } from '@/components/ui'
+import { colors, spacing, typography } from '@/design/tokens'
+import { useAuth } from '@/providers/useAuth'
+import { useActiveEvent } from '@/providers/useActiveEvent'
+import { loadRegistrationPage } from '@/services/registrations'
+
+export default function TicketsManagementScreen() {
+  const router = useRouter(); const { authInitialized, isAuthorized } = useAuth(); const { activeEvent, ready } = useActiveEvent(); const [records, setRecords] = useState([]); const [query, setQuery] = useState(''); const [error, setError] = useState(''); const [loading, setLoading] = useState(true)
+  useEffect(() => { let cancelled = false; if (!activeEvent?.eventId) return undefined; Promise.resolve().then(() => { if (!cancelled) setLoading(true); return loadRegistrationPage(activeEvent.eventId, { pageSize: 50 }) }).then((page) => { if (!cancelled) setRecords(page.registrations) }).catch((nextError) => { if (!cancelled) setError(nextError?.message || 'Tickets could not be loaded.') }).finally(() => { if (!cancelled) setLoading(false) }); return () => { cancelled = true } }, [activeEvent?.eventId])
+  const filtered = useMemo(() => records.filter((record) => { const text = `${record.fullName || ''} ${record.ticketCode || ''} ${record.ticketStatus || ''}`.toLowerCase(); return !query.trim() || text.includes(query.trim().toLowerCase()) }), [records, query])
+  if (!authInitialized || !ready) return <LoadingView label="Loading tickets" />
+  if (!isAuthorized) return <Redirect href="/sign-in" />
+  if (!activeEvent?.eventId) return <Redirect href="/events" />
+  return <Screen scroll back><Section eyebrow="Ticket management" title="Tickets" description="Review ticket assignments for the working event. QR payload remains GSV:TICKET:{ticketCode}.">
+    {error ? <Banner tone="danger">{error}</Banner> : null}<Field label="Search tickets" value={query} onChangeText={setQuery} placeholder="Guest, ticket code, or status" autoCapitalize="none" />
+    {loading ? <EmptyState title="Loading tickets" description="Preparing ticket records." /> : filtered.length === 0 ? <EmptyState title={query ? 'No matching tickets' : 'No tickets found'} description="Ticket records will appear here when available." /> : <View style={{ gap: spacing.sm }}>{filtered.map((record) => <View key={record.registrationId} style={{ padding: spacing.md, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border, gap: spacing.sm }}><View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}><View style={{ flex: 1 }}><Text style={{ ...typography.section, color: colors.text }}>{record.fullName || 'Unnamed guest'}</Text><Text style={{ ...typography.body, color: colors.textMuted }}>{record.ticketCode || 'No ticket assigned'}</Text></View><Pill tone={record.ticketCode ? 'success' : 'neutral'}>{record.ticketStatus || 'Unassigned'}</Pill></View><SecondaryButton label="View ticket details" onPress={() => router.push(`/guest/${record.registrationId}/ticket`)} /></View>)}</View>}
+  </Section></Screen>
+}
