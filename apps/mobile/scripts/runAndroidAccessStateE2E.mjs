@@ -6,6 +6,7 @@ import path from 'node:path'
 const device = process.env.GSV_ANDROID_DEVICE_ID
 const avd = process.env.GSV_ANDROID_AVD_NAME
 const appId = 'com.gathervibeshub.staff'
+const devUrl = process.env.GSV_MOBILE_E2E_DEV_URL || ''
 const adbPath = process.env.ADB_PATH || 'adb'
 const outputDir = path.resolve('output/mobile-e2e')
 if (!device || !avd) throw new Error('GSV_ANDROID_DEVICE_ID and GSV_ANDROID_AVD_NAME are required.')
@@ -46,6 +47,14 @@ const installed = adb(['shell', 'pm', 'path', appId])
 if (!installed) throw new Error(`${appId} is not installed on ${avd}`)
 adb(['shell', 'am', 'force-stop', appId])
 adb(['shell', 'pm', 'clear', appId])
+if (devUrl) adb(['shell', 'am', 'start', '-a', 'android.intent.action.VIEW', '-d', devUrl])
+else adb(['shell', 'am', 'start', '-n', `${appId}/.MainActivity`])
+Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10000)
+if (devUrl) {
+  adb(['shell', 'input', 'tap', '540', '2165'])
+  adb(['shell', 'input', 'keyevent', '4'])
+}
+Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1500)
 adb(['shell', 'am', 'start', '-a', 'android.intent.action.VIEW', '-d', 'gsvstaff://e2e-auth', appId])
 const xml = waitFor('Access denied')
 await writeFile(path.join(outputDir, 'access-denied-window.xml'), xml)
