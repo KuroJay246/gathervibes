@@ -51,7 +51,7 @@ current event can be changed from Home or Settings without signing out.
 | Payments | Reports subset | Read-only summary only | Design mobile payment review without implying a gateway |
 | Payment reconciliation | None | Native capability not yet implemented | Assess mobile review/status before any apply action |
 | Imports | None | Native capability not yet implemented | Assess a preview-first mobile subset |
-| Communications / Message Builder | None | Native capability not yet implemented | Assess compose/preview/copy workflow |
+| Communications / Message Builder | None | Deprioritized native work; web utility retained pending retirement review | Trace references before hiding or retiring |
 | Settings | More > Settings | Native account, event, security, and connectivity view | Add approved operational settings deliberately |
 | System QA | None | Web deep-link only | Keep technical QA out of primary mobile navigation |
 
