@@ -47,14 +47,15 @@ current event can be changed from Home or Settings without signing out.
 | Contacts | More > Event Contacts | Native compact list | Add search/action parity where authorized |
 | Reports / Event Review | More > Reports | Native compact summary | Expand payment/reconciliation coverage |
 | Documents | More > Operational Notes | Native read-only notes/documents subset | Decide document-management scope |
-| Resources | None | Web deep-link only | Keep web-first until a mobile workflow is approved |
-| Payments | Reports subset | Read-only summary only | Do not imply payment editing or gateway support |
-| Payment reconciliation | None | Web deep-link only | Keep reconciliation web-first |
-| Imports | None | Web-only by design | Preserve preview-first web workflow |
-| Communications / Message Builder | None | Web-only by design | Preserve copy-only web workflow |
+| Resources | None | Native capability not yet implemented | Decide mobile read/review workflow |
+| Payments | Reports subset | Read-only summary only | Design mobile payment review without implying a gateway |
+| Payment reconciliation | None | Native capability not yet implemented | Assess mobile review/status before any apply action |
+| Imports | None | Native capability not yet implemented | Assess a preview-first mobile subset |
+| Communications / Message Builder | None | Native capability not yet implemented | Assess compose/preview/copy workflow |
 | Settings | More > Settings | Native account, event, security, and connectivity view | Add approved operational settings deliberately |
 | System QA | None | Web deep-link only | Keep technical QA out of primary mobile navigation |
 
 The audit is a product-scope record, not a claim that every web capability is
-already native. Native screens must retain event scoping, capability checks,
+already native. “Not yet implemented” is a current implementation status, not
+a permanent product decision. Native screens must retain event scoping, capability checks,
 read/write boundaries, listener cleanup, and explicit offline behavior.

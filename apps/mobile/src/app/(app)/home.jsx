@@ -32,7 +32,7 @@ export default function HomeScreen() {
   const router = useRouter()
   const networkState = useNetworkState()
   const { isAuthorized, authInitialized } = useAuth()
-  const { activeEvent, ready, clearActiveEvent } = useActiveEvent()
+  const { activeEvent, ready } = useActiveEvent()
   const [registrationSummary, setRegistrationSummary] = useState({ totalRegistrations: 0, checkedIn: 0, attendancePercentage: 0 })
   const [tasks, setTasks] = useState([])
   const [documents, setDocuments] = useState([])
@@ -182,8 +182,7 @@ export default function HomeScreen() {
         <SecondaryButton
           label="Choose Another Assigned Event"
           onPress={async () => {
-            await clearActiveEvent()
-            router.replace('/events')
+            router.push('/events')
           }}
           testID="home-change-event-button"
           accessibilityLabel="home-change-event-button"

@@ -11,7 +11,7 @@ export default function SettingsScreen() {
   const router = useRouter()
   const networkState = useNetworkState()
   const { access, authInitialized, currentRoleLabel, isAuthorized, signOut, user } = useAuth()
-  const { activeEvent, clearActiveEvent, ready } = useActiveEvent()
+  const { activeEvent, ready } = useActiveEvent()
 
   if (!authInitialized || !ready) return null
   if (!isAuthorized) return <Redirect href="/sign-in" />
@@ -60,10 +60,7 @@ export default function SettingsScreen() {
           <Text style={{ ...typography.body, color: colors.textMuted }}>Check-ins require a live connection and your assigned access.</Text>
         </Card>
 
-        <PrimaryButton label="Choose Another Assigned Event" onPress={async () => {
-          await clearActiveEvent()
-          router.replace('/events')
-        }} testID="settings-change-event-button" accessibilityLabel="settings-change-event-button" />
+        <PrimaryButton label="Choose Another Assigned Event" onPress={() => router.push('/events')} testID="settings-change-event-button" accessibilityLabel="settings-change-event-button" />
         <SecondaryButton label="Sign Out" onPress={() => void signOut()} testID="settings-sign-out-button" accessibilityLabel="settings-sign-out-button" />
         {access?.protectedOwner ? <SecondaryButton label="Return to Event-Day Home" onPress={() => router.replace('/home')} /> : null}
       </Section>
