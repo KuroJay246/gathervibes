@@ -17,6 +17,9 @@ export default function MoreScreen() {
   if (access?.role === 'scanner' && !access?.protectedOwner && !access?.isAdmin) return <Redirect href="/scanner" />
 
   const destinations = [
+    ['EVENT MANAGEMENT', [
+      ['calendar-outline', 'Events', 'Create, review, and update event records', '/events-management'],
+    ]],
     ['EVENT DAY', [
       ['time-outline', 'Run of Show', 'Event-day timeline', '/run-of-show'],
       ['briefcase-outline', 'Operations', 'Commitments and readiness', '/operations'],
