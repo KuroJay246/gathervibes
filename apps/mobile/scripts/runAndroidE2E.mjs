@@ -302,7 +302,10 @@ async function waitForVisibleText(text, timeoutMs = 15000) {
 }
 
 async function waitForHomeReady(timeoutMs = 15000) {
-  const node = await findNode((candidate) => candidate.text === 'EVENT DAY' || candidate.text === 'Guest search', timeoutMs)
+  const node = await findNode((candidate) => {
+    const text = String(candidate.text || '').toLowerCase()
+    return text === 'event day' || text === 'guest search' || text === 'registration lookup'
+  }, timeoutMs)
   if (!node) {
     await captureScreenshot('missing-home-ready')
     throw new Error('Timed out waiting for the authenticated Home route.')
@@ -432,7 +435,8 @@ function detectPostSignInDestination(nodes) {
   if (nodes.some((candidate) => candidate.package === 'com.google.android.permissioncontroller')) {
     return 'scanner-permission-prompt'
   }
-  if (nodes.some((candidate) => selectorMatches(candidate, { accessibilityLabel: 'event-select-open-codex_demo_full_system_walkthrough' }))) {
+  if (nodes.some((candidate) => selectorMatches(candidate, { accessibilityLabel: 'event-select-open-codex_demo_full_system_walkthrough' })
+    || selectorMatches(candidate, { accessibilityLabel: 'Open event picker' }))) {
     return 'events'
   }
   if (nodes.some((candidate) => selectorMatches(candidate, { accessibilityLabel: 'home-guest-search-button' }))) {
@@ -577,7 +581,15 @@ async function resolvePostSignInDestination(timeoutMs = 30000) {
 async function ensureHomeScreen() {
   const destination = await resolvePostSignInDestination()
   if (destination === 'events') {
-    await tapBySelector({ accessibilityLabel: 'event-select-open-codex_demo_full_system_walkthrough' })
+    const picker = await findNode((candidate) => selectorMatches(candidate, { accessibilityLabel: 'event-select-open-codex_demo_full_system_walkthrough' })
+      || selectorMatches(candidate, { accessibilityLabel: 'Open event picker' }), 5000)
+    if (picker?.['content-desc'] === 'Open event picker') {
+      await tapBySelector({ accessibilityLabel: 'Open event picker' })
+      await tapBySelector({ accessibilityLabel: 'Open CODEX_DEMO - Full System Walkthrough' })
+    } else {
+      await tapBySelector({ accessibilityLabel: 'event-select-open-codex_demo_full_system_walkthrough' })
+    }
+    await openRoute('/home')
     await waitForHomeReady(20000)
     return
   }

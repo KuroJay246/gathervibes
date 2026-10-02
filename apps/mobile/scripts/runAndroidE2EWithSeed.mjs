@@ -6,8 +6,8 @@ const scriptsDir = path.dirname(fileURLToPath(import.meta.url))
 
 const env = {
   ...process.env,
-  FIREBASE_AUTH_EMULATOR_HOST: process.env.FIREBASE_AUTH_EMULATOR_HOST || '127.0.0.1:9199',
-  FIRESTORE_EMULATOR_HOST: process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8180',
+  FIREBASE_AUTH_EMULATOR_HOST: process.env.FIREBASE_AUTH_EMULATOR_HOST || '127.0.0.1:9099',
+  FIRESTORE_EMULATOR_HOST: process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080',
 }
 
 for (const script of ['./seedMobileE2EFixture.mjs', './runAndroidE2E.mjs']) {
