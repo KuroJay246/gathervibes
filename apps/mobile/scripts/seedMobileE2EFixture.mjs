@@ -82,7 +82,12 @@ async function seedFirestore(userRecord) {
     eventName: EVENT_NAME,
     eventDate: '2026-08-24',
     location: 'Training Event',
+    eventType: 'event',
     status: 'active',
+    capacity: 100,
+    ticketPrice: 0,
+    notes: '',
+    createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
   }, { merge: true })
 
