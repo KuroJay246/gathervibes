@@ -733,6 +733,10 @@ async function main() {
   if (EXPECTED_REGISTRATION_COUNT > 0) {
     await openRoute('/home')
     await waitForHomeReady(15000)
+    // Home preserves the prior scroll offset after returning from Scanner;
+    // restore the summary header before asserting refreshed totals.
+    adb(['shell', 'input', 'swipe', '540', '500', '540', '1900', '300'])
+    await sleep(500)
     await waitForVisibleText(`${EXPECTED_REGISTRATION_COUNT}`, 15000)
     await waitForVisibleText('2 checked in', 15000)
     await captureScreenshot('home-refresh-after-checkin')
