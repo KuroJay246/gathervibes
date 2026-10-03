@@ -68,6 +68,7 @@ async function seedFirestore(userRecord) {
   const batch = db.batch()
   const eventRef = db.collection('events').doc(EVENT_ID)
   const profileRef = db.collection('staffProfiles').doc(userRecord.uid)
+  const capabilityRef = db.collection('accessCapabilities').doc(userRecord.uid)
   const assignmentRef = eventRef.collection('staffAssignments').doc(userRecord.uid)
 
   batch.set(db.collection('settings').doc('accessControl'), {
@@ -92,9 +93,25 @@ async function seedFirestore(userRecord) {
   }, { merge: true })
 
   if (ACCESS_STATE === 'denied') {
+    batch.set(capabilityRef, {
+      uid: userRecord.uid,
+      email: FIXTURE_EMAIL,
+      accessState: 'revoked',
+      approvedOrganizer: false,
+      schemaVersion: 1,
+      updatedAt: FieldValue.serverTimestamp(),
+    })
     batch.delete(profileRef)
     batch.delete(assignmentRef)
   } else {
+    batch.set(capabilityRef, {
+      uid: userRecord.uid,
+      email: FIXTURE_EMAIL,
+      accessState: 'authorized',
+      approvedOrganizer: true,
+      schemaVersion: 1,
+      updatedAt: FieldValue.serverTimestamp(),
+    })
     batch.set(profileRef, {
       uid: userRecord.uid,
       email: FIXTURE_EMAIL,

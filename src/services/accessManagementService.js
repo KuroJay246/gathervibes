@@ -42,6 +42,24 @@ function currentAccessData(snapshot) {
   return snapshot.exists() ? snapshot.data() : { approvedEmails: [], rolesByEmail: {}, approvedOrganizerRecords: {} }
 }
 
+function normalizeKnownUid(rawUid = '') {
+  const uid = String(rawUid || '').trim()
+  if (!uid) return ''
+  if (uid.length > 128) throw new Error('The organizer UID is invalid.')
+  return uid
+}
+
+function capabilityPayload(uid, email, authorized) {
+  return {
+    uid,
+    email,
+    accessState: authorized ? 'authorized' : 'revoked',
+    approvedOrganizer: authorized,
+    schemaVersion: 1,
+    updatedAt: serverTimestamp(),
+  }
+}
+
 export async function getAccessControlSnapshot() {
   const snapshot = await getDoc(doc(requireDb(), 'settings', 'accessControl'))
   return currentAccessData(snapshot)
@@ -63,11 +81,13 @@ export function subscribeAccessHistory(onData, onError) {
   )
 }
 
-export async function addApprovedOrganizer(rawEmail, user, accessType = 'admin') {
+export async function addApprovedOrganizer(rawEmail, user, accessType = 'admin', knownUid = '') {
   requireProtectedOwner(user)
   const email = validateOrganizerEmail(rawEmail)
+  const uid = normalizeKnownUid(knownUid)
   const accessRef = doc(requireDb(), 'settings', 'accessControl')
   const historyRef = doc(collection(accessRef, 'history'))
+  const capabilityRef = uid ? doc(requireDb(), 'accessCapabilities', uid) : null
   await runTransaction(db, async (transaction) => {
     const snapshot = await transaction.get(accessRef)
     const data = currentAccessData(snapshot)
@@ -86,6 +106,7 @@ export async function addApprovedOrganizer(rawEmail, user, accessType = 'admin')
         [email]: {
           accessType,
           status: 'active',
+          ...(uid ? { uid } : {}),
           addedAt: records[email]?.addedAt || serverTimestamp(),
           addedBy: records[email]?.addedBy || actor(user),
           lastChangedAt: serverTimestamp(),
@@ -95,7 +116,42 @@ export async function addApprovedOrganizer(rawEmail, user, accessType = 'admin')
       updatedAt: serverTimestamp(),
       updatedBy: actor(user),
     }, { merge: true })
+    if (capabilityRef) transaction.set(capabilityRef, capabilityPayload(uid, email, true))
     transaction.set(historyRef, historyPayload({ email, action: 'organizer.add', status: 'active', accessType, user }))
+  })
+}
+
+export async function materializeApprovedOrganizerCapability(rawEmail, knownUid, user) {
+  requireProtectedOwner(user)
+  const email = validateOrganizerEmail(rawEmail)
+  const uid = normalizeKnownUid(knownUid)
+  if (!uid) throw new Error('A verified organizer UID is required.')
+  const accessRef = doc(requireDb(), 'settings', 'accessControl')
+  const capabilityRef = doc(requireDb(), 'accessCapabilities', uid)
+  await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(accessRef)
+    const data = currentAccessData(snapshot)
+    const approvedEmails = Array.isArray(data.approvedEmails) ? data.approvedEmails.map(normalizeAccessEmail).filter(Boolean) : []
+    const records = data.approvedOrganizerRecords && typeof data.approvedOrganizerRecords === 'object' ? data.approvedOrganizerRecords : {}
+    const existing = records[email] || {}
+    if (!approvedEmails.includes(email) || existing.status !== 'active') {
+      throw new Error('The organizer must have an active approval before capability materialization.')
+    }
+    transaction.set(accessRef, {
+      ...data,
+      approvedOrganizerRecords: {
+        ...records,
+        [email]: {
+          ...existing,
+          uid,
+          lastChangedAt: serverTimestamp(),
+          lastChangedBy: actor(user),
+        },
+      },
+      updatedAt: serverTimestamp(),
+      updatedBy: actor(user),
+    }, { merge: true })
+    transaction.set(capabilityRef, capabilityPayload(uid, email, true))
   })
 }
 
@@ -113,6 +169,8 @@ export async function changeApprovedOrganizerStatus(rawEmail, user, nextStatus) 
     const existing = records[email] || {}
     if (!approvedEmails.includes(email) && nextStatus !== 'removed') throw new Error('This organizer is not approved yet.')
     const accessType = existing.accessType || data.rolesByEmail?.[email] || 'admin'
+    const uid = normalizeKnownUid(existing.uid)
+    const capabilityRef = uid ? doc(requireDb(), 'accessCapabilities', uid) : null
     const nextEmails = nextStatus === 'removed'
       ? approvedEmails.filter((item) => item !== email)
       : [...new Set([...approvedEmails, email])].sort()
@@ -138,6 +196,7 @@ export async function changeApprovedOrganizerStatus(rawEmail, user, nextStatus) 
       updatedAt: serverTimestamp(),
       updatedBy: actor(user),
     }, { merge: true })
+    if (capabilityRef) transaction.set(capabilityRef, capabilityPayload(uid, email, nextStatus === 'active'))
     transaction.set(historyRef, historyPayload({
       email,
       action: nextStatus === 'active' ? 'organizer.restore' : nextStatus === 'disabled' ? 'organizer.disable' : 'organizer.remove',

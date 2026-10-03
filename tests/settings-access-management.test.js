@@ -48,6 +48,12 @@ test('Settings exposes owner-only organizer management from settings/accessContr
   assert.match(accessService, /settings', 'accessControl', 'history'/)
   assert.match(accessService, /isProtectedOwnerUser/)
   assert.match(accessService, /PROTECTED_OWNER_EMAIL/)
+  assert.match(accessService, /accessCapabilities/)
+  assert.match(accessService, /knownUid/)
+  assert.match(accessService, /accessState: authorized \? 'authorized' : 'revoked'/)
+  assert.match(accessService, /if \(capabilityRef\) transaction\.set\(capabilityRef, capabilityPayload/)
+  assert.match(accessService, /export async function materializeApprovedOrganizerCapability/)
+  assert.match(accessService, /must have an active approval before capability materialization/)
 })
 
 test('staff and integration management preserve product boundaries', async () => {
@@ -92,4 +98,6 @@ test('rules allow only protected owner organizer and integration mutations', asy
   assert.match(rules, /match \/events\/\{eventId\}\/staffAssignmentHistory\/\{historyId\}/)
   assert.match(rules, /match \/staffProfiles\/\{uid\} \{[\s\S]*allow delete: if false;/)
   assert.match(rules, /match \/events\/\{eventId\}\/staffAssignments\/\{uid\} \{[\s\S]*allow delete: if false;/)
+  assert.match(rules, /match \/accessCapabilities\/\{uid\} \{[\s\S]*allow create: if isProtectedOwner\(\)[\s\S]*allow delete: if false;/)
+  assert.match(rules, /function canManageEvents\(\) \{\s*return isProtectedOwner\(\) \|\| isApprovedEventOrganizer\(\);/)
 })

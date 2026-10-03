@@ -222,3 +222,24 @@ per-feature; Home listeners do not make the whole product globally realtime.
 | Message Builder | web copy utility | `messageBuilder`; no send contract | compose/copy / no provider write | none / none | admin | manual | web required | no provider audit | RETIREMENT CANDIDATE |
 | Reports | event review aggregates | event review read model | full / none | compact / none | admin | aggregate/focus | read-only | report audit | WEB AHEAD |
 | Settings | access/settings documents | settings/access services | full / protected writes | partial / none | owner, organizer | focus refresh | local/shared split | security audit | WEB AHEAD |
+
+## Batch A Event Authorization Repair
+
+Event mutation authorization now uses a small UID-keyed capability document at
+`accessCapabilities/{uid}`. The immutable Protected Owner UID remains a direct
+Rules path and does not depend on a capability document. Approved organizer
+email configuration remains in `settings/accessControl` for management and
+compatibility, but it is no longer consulted by the Event create/update/delete
+hot path.
+
+The organizer-management transaction can materialize a capability only when a
+trusted UID is supplied. Approvals without a known UID remain pending
+configuration and do not authorize Event writes. Disable/remove actions revoke
+the associated capability when the organizer record contains a verified UID.
+Ordinary users and approved organizers cannot write capability documents;
+Protected Owner writes are schema-validated and deletion is denied so
+revocation remains explicit and auditable.
+
+Acceptance status: implementation complete; isolated Rules, regression, and
+unchanged-APK Android runtime proof must pass before Events are classified as
+fully aligned.
