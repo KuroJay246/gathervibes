@@ -180,6 +180,7 @@ function selectDevServerIfPicker(nodes) {
 
   const configuredServer = decodeURIComponent(DEV_URL).match(/https?:\/\/([^/?]+)/)?.[1] || ''
   const serverText = nodes.find((candidate) => configuredServer && String(candidate.text || '').includes(configuredServer))
+    || nodes.find((candidate) => /^https?:\/\//.test(String(candidate.text || '')))
   const point = parseBounds(serverText?.bounds)
   if (!point) return false
 
@@ -502,7 +503,7 @@ async function ensureAppForeground(timeoutMs = 15000) {
 }
 
 async function openRoute(route) {
-  adb(['shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', `gsvstaff://${route.replace(/^\//, '')}`, APP_ID])
+  adb(['shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', `gsvstaff:///${route.replace(/^\//, '')}`, APP_ID])
   await sleep(2000)
   await ensureAppForeground(STARTUP_TIMEOUT_MS)
   await assertGsvForeground(`route-${route.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`)
@@ -565,6 +566,10 @@ async function resolvePostSignInDestination(timeoutMs = 30000) {
   while (Date.now() - startedAt < timeoutMs) {
     await assertGsvForeground('post-sign-in-destination')
     const nodes = await dumpUi('live')
+    if (selectDevServerIfPicker(nodes)) {
+      await sleep(1500)
+      continue
+    }
     if (isDevMenuOverlay(nodes)) {
       await dismissVisibleDevMenu(nodes)
       continue
@@ -709,7 +714,11 @@ async function main() {
   await waitForVisibleText('Lookup Guest', 10000)
   await captureScreenshot('guests-search')
   adb(['shell', 'input', 'keyevent', '4'])
-  await openRoute('/scanner')
+  // Use the mounted primary navigation control here. Deep-link intents are
+  // not a reliable substitute for exercising the real tab transition in a
+  // development client.
+  await tapBySelector({ text: 'Scan' })
+  await maybeDenyCameraPrompt()
   await waitForSelector({ text: 'Scanner Mode' }, 10000)
   await tapBySelector({ accessibilityLabel: 'scanner-manual-entry-button' })
   await waitForSelector({ accessibilityLabel: 'manual-ticket-input' }, 15000)
