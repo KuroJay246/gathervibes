@@ -617,6 +617,66 @@ service cloud.firestore {
         );
     }
 
+    // Updates must preserve the complete event shape, but validating every
+    // optional planner field on every update exceeds Firestore's expression
+    // budget. Validate only fields that changed while retaining the same
+    // canonical constraints for those fields.
+    function isValidEventUpdate(data, eventId) {
+      let changedKeys = request.resource.data.diff(resource.data).affectedKeys();
+      return data.keys().hasAll([
+          'eventId', 'eventName', 'eventDate', 'location', 'eventType',
+          'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'eventId', 'eventName', 'eventDate', 'location', 'eventType',
+          'status', 'capacity', 'ticketPrice', 'notes', 'createdAt', 'updatedAt',
+          'priceTiers', 'venueName', 'eventStartTime', 'eventEndTime',
+          'eventDescription', 'registrationRequired', 'ticketTypeCount',
+          'complimentaryAllowed', 'doorPaymentAllowed',
+          'registrationOpenDate', 'registrationCloseDate', 'eventCapabilities',
+          'financialPlan', 'operationsPlan', 'readinessChecklist',
+          'planningTasks', 'partnerRecords'
+        ])
+        && changedKeys.hasOnly([
+          'eventName', 'eventDate', 'location', 'eventType', 'status',
+          'capacity', 'ticketPrice', 'notes', 'priceTiers', 'venueName',
+          'eventStartTime', 'eventEndTime', 'eventDescription',
+          'registrationRequired', 'ticketTypeCount', 'complimentaryAllowed',
+          'doorPaymentAllowed', 'registrationOpenDate', 'registrationCloseDate',
+          'eventCapabilities', 'financialPlan', 'operationsPlan',
+          'readinessChecklist', 'planningTasks', 'partnerRecords', 'updatedAt'
+        ])
+        && data.eventId == eventId
+        && data.eventId == resource.data.eventId
+        && data.createdAt == resource.data.createdAt
+        && data.updatedAt == request.time
+        && (!changedKeys.hasAny(['eventName']) || (data.eventName is string && data.eventName.size() > 0 && data.eventName.size() <= 150))
+        && (!changedKeys.hasAny(['eventDate']) || data.eventDate is timestamp)
+        && (!changedKeys.hasAny(['location']) || (data.location is string && data.location.size() > 0 && data.location.size() <= 250))
+        && (!changedKeys.hasAny(['eventType']) || validEventType(data.eventType))
+        && (!changedKeys.hasAny(['status']) || validEventStatus(data.status))
+        && (!changedKeys.hasAny(['capacity']) || (data.capacity is int && data.capacity > 0 && data.capacity <= 100000))
+        && (!changedKeys.hasAny(['ticketPrice']) || (data.ticketPrice is number && data.ticketPrice >= 0 && data.ticketPrice <= 1000000))
+        && (!changedKeys.hasAny(['notes']) || (data.notes is string && data.notes.size() <= 10000))
+        && (!changedKeys.hasAny(['venueName']) || validOptionalString(data.venueName, 250))
+        && (!changedKeys.hasAny(['eventStartTime']) || validOptionalString(data.eventStartTime, 32))
+        && (!changedKeys.hasAny(['eventEndTime']) || validOptionalString(data.eventEndTime, 32))
+        && (!changedKeys.hasAny(['eventDescription']) || validOptionalString(data.eventDescription, 5000))
+        && (!changedKeys.hasAny(['registrationRequired']) || data.registrationRequired is bool)
+        && (!changedKeys.hasAny(['ticketTypeCount']) || (data.ticketTypeCount is int && data.ticketTypeCount >= 1 && data.ticketTypeCount <= 12))
+        && (!changedKeys.hasAny(['complimentaryAllowed']) || data.complimentaryAllowed is bool)
+        && (!changedKeys.hasAny(['doorPaymentAllowed']) || data.doorPaymentAllowed is bool)
+        && (!changedKeys.hasAny(['registrationOpenDate']) || data.registrationOpenDate == null || data.registrationOpenDate is timestamp)
+        && (!changedKeys.hasAny(['registrationCloseDate']) || data.registrationCloseDate == null || data.registrationCloseDate is timestamp)
+        && (!changedKeys.hasAny(['priceTiers']) || validPriceTiers(data.priceTiers))
+        && (!changedKeys.hasAny(['eventCapabilities']) || validEventCapabilities(data.eventCapabilities))
+        && (!changedKeys.hasAny(['financialPlan']) || validFinancialPlan(data.financialPlan))
+        && (!changedKeys.hasAny(['operationsPlan']) || validOperationsPlan(data.operationsPlan))
+        && (!changedKeys.hasAny(['readinessChecklist']) || validReadinessChecklist(data.readinessChecklist))
+        && (!changedKeys.hasAny(['planningTasks']) || validPlanningTasks(data.planningTasks))
+        && (!changedKeys.hasAny(['partnerRecords']) || validPartnerRecords(data.partnerRecords));
+    }
+
     function isValidRegistration(data, registrationId) {
       return data.keys().hasAll([
           'registrationId', 'eventId', 'fullName', 'email', 'phone',
@@ -1961,10 +2021,7 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       allow update: if isApprovedAdmin()
-        && isValidEvent(request.resource.data, eventId)
-        && request.resource.data.eventId == resource.data.eventId
-        && request.resource.data.createdAt == resource.data.createdAt
-        && request.resource.data.updatedAt == request.time;
+        && isValidEventUpdate(request.resource.data, eventId);
       allow delete: if isApprovedAdmin();
     }
 

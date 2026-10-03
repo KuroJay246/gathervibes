@@ -44,7 +44,7 @@ function buildEventPayload(values) {
     eventDate: Timestamp.fromDate(new Date(`${eventDate}T12:00:00`)),
     location: String(values.location || '').trim(),
     venueName: String(values.venueName || '').trim(),
-    eventType: String(values.eventType || 'event').trim(),
+    eventType: String(values.eventType || 'workshop').trim(),
     status: String(values.status || 'planning').trim(),
     eventStartTime: String(values.eventStartTime || '').trim(),
     eventEndTime: String(values.eventEndTime || '').trim(),
