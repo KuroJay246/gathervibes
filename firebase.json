@@ -1,4 +1,7 @@
 {
+  "react-native": {
+    "android_bypass_emulator_url_remap": true
+  },
   "auth": {
     "authorizedDomains": [
       "gathervibeshub.web.app",
