@@ -709,12 +709,10 @@ async function main() {
   await waitForVisibleText('Lookup Guest', 10000)
   await captureScreenshot('guests-search')
   adb(['shell', 'input', 'keyevent', '4'])
-  await openScreenFromHome(
-    { accessibilityLabel: 'home-manual-ticket-button' },
-    '/manual-entry',
-    { accessibilityLabel: 'manual-ticket-input' },
-    15000,
-  )
+  await openRoute('/scanner')
+  await waitForSelector({ text: 'Scanner Mode' }, 10000)
+  await tapBySelector({ accessibilityLabel: 'scanner-manual-entry-button' })
+  await waitForSelector({ accessibilityLabel: 'manual-ticket-input' }, 15000)
   await typeInto('manual-ticket-input', 'GSV-E2E-INVALID')
   await waitForVisibleText('No event-scoped registration matched that ticket code.', 10000)
 
