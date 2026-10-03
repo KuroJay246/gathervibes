@@ -193,7 +193,38 @@ function selectDevServerIfPicker(nodes) {
 
   const target = clickableParents[0]?.candidate
   const targetPoint = parseBounds(target?.bounds)
-  if (!targetPoint) return false
+  if (!targetPoint) {
+    const fetchNode = nodes.find((candidate) => candidate.text === 'Fetch development servers')
+    const fetchPoint = parseBounds(fetchNode?.bounds)
+    if (fetchPoint) {
+      adb(['shell', 'input', 'tap', String(fetchPoint.x), String(fetchPoint.y)])
+      blockingSleep(2000)
+      return true
+    }
+    // A cold dev client can open before Expo has discovered Metro. Connect to
+    // the explicitly supplied URL instead of leaving the harness on the
+    // native server-picker screen indefinitely.
+    const field = nodes.find((candidate) => candidate.text === 'http://')
+    const fieldPoint = parseBounds(field?.bounds)
+    const configuredUrl = (() => {
+      try {
+        return new URL(DEV_URL).searchParams.get('url') || ''
+      } catch {
+        return ''
+      }
+    })()
+    if (!fieldPoint || !configuredUrl) return false
+    adb(['shell', 'input', 'tap', String(fieldPoint.x), String(fieldPoint.y)])
+    adb(['shell', 'input', 'keyevent', 'KEYCODE_MOVE_END'])
+    adb(['shell', 'input', 'keyevent', ...Array.from({ length: 32 }, () => 'KEYCODE_DEL')])
+    adb(['shell', 'input', 'text', encodeAdbText(configuredUrl)])
+    const connect = nodes.find((candidate) => candidate.text === 'Connect')
+    const connectPoint = parseBounds(connect?.bounds)
+    if (!connectPoint) return false
+    adb(['shell', 'input', 'tap', String(connectPoint.x), String(connectPoint.y)])
+    blockingSleep(1500)
+    return true
+  }
   adb(['shell', 'input', 'tap', String(targetPoint.x), String(targetPoint.y)])
   blockingSleep(1500)
   return true
