@@ -24,3 +24,4 @@ export const MOBILE_PARITY_MANIFEST = Object.freeze([
 export function getMobileParity(featureId) {
   return MOBILE_PARITY_MANIFEST.find((entry) => entry.featureId === featureId) || null
 }
+

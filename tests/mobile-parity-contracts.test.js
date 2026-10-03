@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { mobileLandingRouteForAccess } from '../packages/contracts/src/accessRoles.js'
 import { EVENT_HUB_ROUTE_MANIFEST } from '../src/app/routeManifest.js'
-import { MOBILE_PARITY_MANIFEST } from '../apps/mobile/src/app/mobileParityManifest.js'
+import { MOBILE_PARITY_MANIFEST } from '../apps/mobile/src/lib/mobileParityManifest.js'
 
 test('mobile landing keeps scanner-only staff in scanner and organizers in home', () => {
   assert.equal(mobileLandingRouteForAccess({ level: 'staff', role: 'scanner' }, true), '/scanner')
